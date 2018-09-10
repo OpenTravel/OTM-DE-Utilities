@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.web.WebView?>
+
+<BorderPane prefHeight="394.0" prefWidth="563.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.diffutil.DiffUtilityController">
+   <top>
+      <TabPane prefHeight="178.0" prefWidth="563.0" tabClosingPolicy="UNAVAILABLE">
+         <tabs>
+            <Tab text="Compare Projects">
+               <content>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <GridPane AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                              <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" prefWidth="100.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="Old Project / Release" GridPane.halignment="RIGHT" GridPane.valignment="TOP">
+                                <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
+                                 <children>
+                                    <TextField fx:id="oldProjectFilename" editable="false" HBox.hgrow="ALWAYS">
+                                       <HBox.margin>
+                                          <Insets right="2.0" />
+                                       </HBox.margin></TextField>
+                                    <Button fx:id="oldProjectFileButton" mnemonicParsing="false" onAction="#selectOldProject" text="...">
+                                       <tooltip>
+                                          <Tooltip text="Select Old Project File" />
+                                       </tooltip>
+                                       <HBox.margin>
+                                          <Insets left="2.0" right="2.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                    <Button fx:id="oldReleaseFileButton" maxHeight="15.0" mnemonicParsing="false" onAction="#selectOldRelease" prefHeight="25.0">
+                                       <tooltip>
+                                          <Tooltip text="Select Old Project File" />
+                                       </tooltip>
+                                       <graphic>
+                                          <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true" translateX="3.0">
+                                             <image>
+                                                <Image url="@images/repository.gif" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                              <Button fx:id="runProjectButton" alignment="CENTER" mnemonicParsing="false" onAction="#runProjectComparison" text="Run Comparison" textAlignment="CENTER" wrapText="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowSpan="2147483647" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                                 <GridPane.margin>
+                                    <Insets bottom="5.0" left="5.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <Label text="New Project / Release" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="TOP">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <children>
+                                    <TextField fx:id="newProjectFilename" editable="false" HBox.hgrow="ALWAYS">
+                                       <HBox.margin>
+                                          <Insets right="2.0" />
+                                       </HBox.margin></TextField>
+                                    <Button fx:id="newProjectFileButton" mnemonicParsing="false" onAction="#selectNewProject" text="...">
+                                       <tooltip>
+                                          <Tooltip text="Select New Project File" />
+                                       </tooltip>
+                                       <HBox.margin>
+                                          <Insets left="2.0" right="2.0" />
+                                       </HBox.margin></Button>
+                                    <Button fx:id="newReleaseFileButton" maxWidth="15.0" mnemonicParsing="false" onAction="#selectNewRelease" prefHeight="25.0">
+                                       <tooltip>
+                                          <Tooltip text="Select New Project File" />
+                                       </tooltip>
+                                       <graphic>
+                                          <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true" translateX="3.0">
+                                             <image>
+                                                <Image url="@images/repository.gif" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="10.0" />
+                           </padding>
+                        </GridPane>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+            <Tab text="Compare Libraries">
+               <content>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <GridPane AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <columnConstraints>
+                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="90.0" minWidth="50.0" prefWidth="90.0" />
+                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="60.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="60.0" prefWidth="100.0" />
+                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="60.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                             <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                             <children>
+                                <Label text="Old Library" GridPane.halignment="RIGHT" GridPane.valignment="TOP">
+                                   <padding>
+                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                   </padding>
+                                </Label>
+                                <Label text="Old Entity" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="TOP">
+                                   <padding>
+                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                   </padding>
+                                </Label>
+                                <Label text="New Library" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP">
+                                   <GridPane.margin>
+                                      <Insets />
+                                   </GridPane.margin>
+                                   <padding>
+                                      <Insets bottom="5.0" left="5.0" right="5.0" top="15.0" />
+                                   </padding>
+                                </Label>
+                                <Label text="New Entity" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="TOP">
+                                   <padding>
+                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                   </padding>
+                                </Label>
+                                <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="3">
+                                   <children>
+                                      <TextField fx:id="oldLibraryFilename" editable="false" HBox.hgrow="ALWAYS">
+                                       <HBox.margin>
+                                          <Insets right="2.0" />
+                                       </HBox.margin></TextField>
+                                      <Button fx:id="oldLibraryFileButton" mnemonicParsing="false" onAction="#selectOldLibraryFromFile" text="...">
+                                         <tooltip>
+                                            <Tooltip text="Select Old Library from File" />
+                                         </tooltip>
+                                       <HBox.margin>
+                                          <Insets left="2.0" right="2.0" />
+                                       </HBox.margin>
+                                      </Button>
+                                      <Button fx:id="oldLibraryRepoButton" maxWidth="15.0" mnemonicParsing="false" onAction="#selectOldLibraryFromRepo" prefHeight="25.0" prefWidth="3.0">
+                                         <graphic>
+                                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true" translateX="3.0">
+                                               <image>
+                                                  <Image url="@images/repository.gif" />
+                                               </image>
+                                            </ImageView>
+                                         </graphic>
+                                         <HBox.margin>
+                                            <Insets left="2.0" />
+                                         </HBox.margin>
+                                         <tooltip>
+                                            <Tooltip text="Select Old Library from Repository" />
+                                         </tooltip>
+                                      </Button>
+                                   </children>
+                                </HBox>
+                                <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="2">
+                                   <children>
+                                      <TextField fx:id="newLibraryFilename" editable="false" HBox.hgrow="ALWAYS">
+                                         <HBox.margin>
+                                            <Insets right="2.0" top="15.0" />
+                                         </HBox.margin>
+                                      </TextField>
+                                      <Button fx:id="newLibraryFileButton" mnemonicParsing="false" onAction="#selectNewLibraryFromFile" text="...">
+                                         <HBox.margin>
+                                            <Insets left="2.0" right="2.0" top="15.0" />
+                                         </HBox.margin>
+                                         <tooltip>
+                                            <Tooltip text="Select New Library from File" />
+                                         </tooltip>
+                                      </Button>
+                                      <Button fx:id="newLibraryRepoButton" mnemonicParsing="false" onAction="#selectNewLibraryFromRepo" prefHeight="25.0" prefWidth="32.0">
+                                         <graphic>
+                                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true" translateX="3.0">
+                                               <image>
+                                                  <Image url="@images/repository.gif" />
+                                               </image>
+                                            </ImageView>
+                                         </graphic>
+                                         <HBox.margin>
+                                            <Insets left="2.0" top="15.0" />
+                                         </HBox.margin>
+                                         <tooltip>
+                                            <Tooltip text="Select New Library from Repository" />
+                                         </tooltip>
+                                      </Button>
+                                   </children>
+                                </HBox>
+                                <ChoiceBox fx:id="oldEntityChoice" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+                                <ChoiceBox fx:id="newEntityChoice" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
+                                <Button fx:id="runLibraryButton" mnemonicParsing="false" onAction="#runLibraryComparison" text="Run Comparison" textAlignment="CENTER" wrapText="true" GridPane.columnIndex="4" GridPane.rowSpan="2147483647">
+                                   <GridPane.margin>
+                                      <Insets left="5.0" />
+                                   </GridPane.margin>
+                                </Button>
+                              <Label fx:id="oldCommitLabel" text="Commit Date" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="TOP">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <ChoiceBox fx:id="oldCommitChoice" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+                              <Label fx:id="newCommitLabel" text="Commit Date" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="TOP">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <ChoiceBox fx:id="newCommitChoice" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
+                             </children>
+                             <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="10.0" />
+                             </padding>
+                          </GridPane>
+                       </children>
+                    </AnchorPane>
+                 </content>
+              </Tab>
+          </tabs>
+       </TabPane>
+   </top>
+   <center>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-border-width: 1; -fx-border-color: black;" BorderPane.alignment="CENTER">
+         <children>
+            <WebView fx:id="reportViewer" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+         </children>
+      </AnchorPane>
+   </center>
+   <bottom>
+      <HBox prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button mnemonicParsing="false" onAction="#editSettings">
+               <HBox.margin>
+                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+               </HBox.margin>
+               <graphic>
+                  <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@images/settings.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Label fx:id="statusBarLabel" maxWidth="1.7976931348623157E308" prefWidth="445.0" HBox.hgrow="ALWAYS">
+               <padding>
+                  <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+               </padding>
+            </Label>
+            <Button fx:id="backButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#browserBack" prefWidth="30.0" text="&lt;">
+               <HBox.margin>
+                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="forwardButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#browserForward" prefWidth="30.0" text="&gt;">
+               <HBox.margin>
+                  <Insets bottom="2.0" left="2.0" right="10.0" top="2.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="saveReportButton" alignment="CENTER" mnemonicParsing="false" onAction="#saveReport" prefHeight="25.0" prefWidth="167.0" text="Save Report...">
+               <HBox.margin>
+                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>

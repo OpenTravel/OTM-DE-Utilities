@@ -1,0 +1,105 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>ota2-app-launcher</artifactId>
+	<packaging>jar</packaging>
+	<name>OTA2.0 Utility Application Launcher</name>
+	
+	<parent>
+		<groupId>org.opentravel.otm</groupId>
+		<artifactId>ota-utilities-parent-pom</artifactId>
+		<version>4.0-SNAPSHOT</version>
+	</parent>
+
+	<properties>
+		<appVersion>${project.version}-${maven.build.timestamp}</appVersion>
+		<build.timestamp>${maven.build.timestamp}</build.timestamp>
+		<maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.opentravel.otm</groupId>
+			<artifactId>ota2-application-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opentravel.otm</groupId>
+			<artifactId>ota2-example-helper</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opentravel.otm</groupId>
+			<artifactId>ota2-diff-utility</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opentravel.otm</groupId>
+			<artifactId>ota2-release-editor</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opentravel.otm</groupId>
+			<artifactId>ota2-example-upgrade-utility</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opentravel.otm</groupId>
+			<artifactId>ota2-message-validator</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opentravel.otm</groupId>
+			<artifactId>ota2-model-check</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>com.zenjava</groupId>
+				<artifactId>javafx-maven-plugin</artifactId>
+				<version>8.5.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<mainClass>org.opentravel.launcher.LauncherApplication</mainClass>
+							<jfxMainAppJarName>${project.artifactId}.jar</jfxMainAppJarName>
+							<nativeInstallers />
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<descriptors>
+						<descriptor>${project.basedir}/src/main/assembly/bin.xml</descriptor>
+					</descriptors>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

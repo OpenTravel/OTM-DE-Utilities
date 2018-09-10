@@ -1,0 +1,18 @@
+.json_braceBracket {
+    -fx-fill: black;
+}
+.json_delimeter {
+    -fx-fill: black;
+}
+.json_termName {
+    -fx-fill: darkgreen;
+}
+.json_stringValue {
+    -fx-fill: blue;
+}
+.json_numberValue {
+    -fx-fill: black;
+}
+.json_otherValue {
+    -fx-fill: black;
+}

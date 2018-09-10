@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="550.0" minWidth="400.0" prefHeight="700.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.release.OTMReleaseController">
+   <center>
+      <SplitPane dividerPositions="0.65" minHeight="-Infinity" prefHeight="20.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <VBox layoutX="117.0" layoutY="53.0" prefHeight="20.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                          <columnConstraints>
+                            <ColumnConstraints minWidth="-Infinity" />
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" />
+                          </columnConstraints>
+                          <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="Filename" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="Release Name" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="Base Namespace" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="Status" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="Version" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <TextField fx:id="releaseFilename" editable="false" style="-fx-background-color: #EEE; -fx-border-color: #888; -fx-border-radius: 3;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+                              <Button fx:id="releaseFileButton" mnemonicParsing="false" onAction="#openReleaseFile" text="..." GridPane.columnIndex="2">
+                                 <GridPane.margin>
+                                    <Insets left="5.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <TextField fx:id="releaseName" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <TextField fx:id="releaseBaseNamespace" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <TextField fx:id="releaseVersion" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <TextArea fx:id="releaseDescription" prefRowCount="2" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" GridPane.vgrow="ALWAYS">
+                                 <GridPane.margin>
+                                    <Insets bottom="5.0" top="3.0" />
+                                 </GridPane.margin>
+                              </TextArea>
+                              <Label text="Description" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="TOP">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="7.0" />
+                                 </padding>
+                              </Label>
+                              <Label fx:id="releaseStatus" maxWidth="1.7976931348623157E308" text="Draft" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3">
+                                 <padding>
+                                    <Insets left="4.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="Default Effective Date" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <HBox fx:id="effectiveDateHBox" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                           </children>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </GridPane>
+                        <Accordion fx:id="releaseAccordion" minHeight="20.0" prefHeight="20.0" VBox.vgrow="ALWAYS">
+                          <panes>
+                            <TitledPane fx:id="releaseMembersPane" minHeight="20.0" prefHeight="20.0" text="Release Members">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <VBox prefHeight="199.0" prefWidth="508.0" AnchorPane.bottomAnchor="-10.0" AnchorPane.leftAnchor="-10.0" AnchorPane.rightAnchor="-10.0" AnchorPane.topAnchor="-10.0">
+                                             <children>
+                                                <HBox>
+                                                   <children>
+                                                      <Label maxWidth="1.7976931348623157E308" text="Principal Libraries" HBox.hgrow="ALWAYS">
+                                                         <padding>
+                                                            <Insets bottom="3.0" left="5.0" right="5.0" top="7.0" />
+                                                         </padding>
+                                                      </Label>
+                                                      <Button fx:id="reloadModelButton" mnemonicParsing="false" onAction="#reloadModel" text="Reload Model">
+                                                         <HBox.margin>
+                                                            <Insets left="3.0" right="3.0" top="3.0" />
+                                                         </HBox.margin>
+                                                      </Button>
+                                                      <Button fx:id="addLibraryButton" mnemonicParsing="false" onAction="#addPrincipalLibrary" text="Add...">
+                                                         <HBox.margin>
+                                                            <Insets left="3.0" right="3.0" top="3.0" />
+                                                         </HBox.margin>
+                                                      </Button>
+                                                      <Button fx:id="removeLibraryButton" mnemonicParsing="false" onAction="#removePrincipalLibrary" text="Remove...">
+                                                         <HBox.margin>
+                                                            <Insets left="3.0" right="5.0" top="3.0" />
+                                                         </HBox.margin>
+                                                      </Button>
+                                                   </children>
+                                                </HBox>
+                                                <TableView fx:id="principalTableView" minHeight="50.0" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                                  <columns>
+                                                    <TableColumn fx:id="principalNameColumn" editable="false" prefWidth="150.0" sortable="false" text="Library" />
+                                                    <TableColumn fx:id="principalStatusColumn" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" sortable="false" text="Status" />
+                                                      <TableColumn fx:id="principalDateColumn" prefWidth="250.0" sortable="false" text="Effective Date" />
+                                                  </columns>
+                                                   <VBox.margin>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="3.0" />
+                                                   </VBox.margin>
+                                                   <columnResizePolicy>
+                                                      <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                   </columnResizePolicy>
+                                                </TableView>
+                                                <Label text="Referenced Libraries">
+                                                   <padding>
+                                                      <Insets bottom="4.0" left="5.0" right="5.0" top="10.0" />
+                                                   </padding>
+                                                </Label>
+                                                <TableView fx:id="referencedTableView" minHeight="50.0" prefHeight="200.0" prefWidth="200.0">
+                                                  <columns>
+                                                    <TableColumn fx:id="referencedNameColumn" editable="false" prefWidth="150.0" sortable="false" text="Library" />
+                                                    <TableColumn fx:id="referencedStatusColumn" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" sortable="false" text="Status" />
+                                                      <TableColumn fx:id="referencedDateColumn" prefWidth="250.0" sortable="false" text="Effective Date" />
+                                                  </columns>
+                                                   <VBox.margin>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="4.0" />
+                                                   </VBox.margin>
+                                                   <columnResizePolicy>
+                                                      <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                   </columnResizePolicy>
+                                                </TableView>
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </TitledPane>
+                            <TitledPane expanded="false" minHeight="20.0" prefHeight="20.0" text="Compiler Options">
+                              <content>
+                                    <ScrollPane fx:id="optionsScrollPane" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                      <content>
+                                        <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
+                                             <children>
+                                                <VBox maxWidth="1.7976931348623157E308" minHeight="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <children>
+                                                      <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" VBox.vgrow="ALWAYS">
+                                                        <columnConstraints>
+                                                          <ColumnConstraints minWidth="10.0" />
+                                                          <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                                                        </columnConstraints>
+                                                        <rowConstraints>
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                        </rowConstraints>
+                                                         <children>
+                                                            <Label text="Binding Style" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <Label text="Compile XML Schemas" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <Label text="Compile Services" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <Label text="Compile JSON Schemas" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <Label text="Compile Swagger" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <Label text="Compile Documentation" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <Label text="Service Endpoint URL" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <Label text="Base Resource URL" GridPane.halignment="RIGHT" GridPane.rowIndex="7" GridPane.valignment="CENTER">
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <Label text="Suppress OTM Extensions" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.valignment="CENTER">
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <ChoiceBox fx:id="bindingStyleChoice" prefHeight="25.0" prefWidth="75.0" GridPane.columnIndex="1" />
+                                                            <CheckBox fx:id="compileXmlSchemasCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                            <CheckBox fx:id="compileServicesCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                            <CheckBox fx:id="compileJsonSchemasCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                            <CheckBox fx:id="compileSwaggerCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                            <CheckBox fx:id="compileDocumentationCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                            <CheckBox fx:id="suppressExtensionsCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                                                            <TextField fx:id="serviceEndpointUrl" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                                               <GridPane.margin>
+                                                                  <Insets right="5.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <TextField fx:id="baseResourceUrl" GridPane.columnIndex="1" GridPane.rowIndex="7">
+                                                               <GridPane.margin>
+                                                                  <Insets right="5.0" />
+                                                               </GridPane.margin>
+                                                            </TextField>
+                                                            <HBox GridPane.rowIndex="9">
+                                                               <children>
+                                                                  <CheckBox fx:id="generateExamplesCheckbox" mnemonicParsing="false">
+                                                                     <HBox.margin>
+                                                                        <Insets left="10.0" right="5.0" top="15.0" />
+                                                                     </HBox.margin>
+                                                                  </CheckBox>
+                                                                  <Label text="Generate XML &amp; JSON Examples">
+                                                                     <HBox.margin>
+                                                                        <Insets top="15.0" />
+                                                                     </HBox.margin>
+                                                                  </Label>
+                                                               </children>
+                                                            </HBox>
+                                                         </children>
+                                                      </GridPane>
+                                                      <GridPane prefWidth="483.0" style="-fx-border-color: black; -fx-border-width: 0.5; -fx-border-radius: 5;">
+                                                        <columnConstraints>
+                                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                                          <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                                                        </columnConstraints>
+                                                        <rowConstraints>
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints maxHeight="5.0" minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
+                                                        </rowConstraints>
+                                                         <VBox.margin>
+                                                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                         </VBox.margin>
+                                                         <children>
+                                                            <Label text="Max Details" GridPane.halignment="RIGHT">
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <Label text="Max Repeat Count" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <Label text="Max Recursion Depth" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <Label text="Suppress Optional Fields" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
+                                                               <padding>
+                                                                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <CheckBox fx:id="exampleMaxDetailCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" />
+                                                            <Spinner fx:id="maxRepeatSpinner" prefWidth="50.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                            <Spinner fx:id="maxRecursionDepthSpinner" prefWidth="50.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                            <CheckBox fx:id="suppressOptionalFieldsCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                         </children>
+                                                      </GridPane>
+                                                   </children>
+                                                   <padding>
+                                                      <Insets top="5.0" />
+                                                   </padding>
+                                                </VBox>
+                                             </children>
+                                          </AnchorPane>
+                                      </content>
+                                    </ScrollPane>
+                              </content>
+                            </TitledPane>
+                            <TitledPane expanded="false" minHeight="20.0" prefHeight="20.0" text="Substitution Groups (Example Facet Selections)">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <TableView fx:id="facetSelectionTableView" layoutX="105.0" layoutY="70.0" minHeight="100.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="-5.0" AnchorPane.leftAnchor="-5.0" AnchorPane.rightAnchor="-5.0" AnchorPane.topAnchor="-5.0">
+                                            <columns>
+                                              <TableColumn fx:id="facetOwnerColumn" prefWidth="251.0" text="Facet Owner" />
+                                              <TableColumn fx:id="facetSelectionColumn" prefWidth="251.0" text="Preferred Facet" />
+                                            </columns>
+                                             <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                             </columnResizePolicy>
+                                          </TableView>
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </TitledPane>
+                              <TitledPane expanded="false" minHeight="20.0" prefHeight="20.0" text="Validation Results">
+                                <content>
+                                  <AnchorPane minHeight="100.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <TableView fx:id="validationTableView" minHeight="100.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="-5.0" AnchorPane.leftAnchor="-5.0" AnchorPane.rightAnchor="-5.0" AnchorPane.topAnchor="-5.0">
+                                            <columns>
+                                              <TableColumn fx:id="validationLevelColumn" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" style="-fx-alignment: CENTER;" />
+                                              <TableColumn fx:id="validationComponentColumn" prefWidth="185.0" text="Component" />
+                                                <TableColumn fx:id="validationDescriptionColumn" prefWidth="276.0" text="Description" />
+                                            </columns>
+                                             <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                             </columnResizePolicy>
+                                          </TableView>
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </TitledPane>
+                          </panes>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </Accordion>
+                     </children>
+                  </VBox>
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <SplitPane dividerPositions="0.7" layoutX="40.0" layoutY="129.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <items>
+                      <AnchorPane minHeight="0.0" minWidth="0.0">
+                           <children>
+                              <VBox layoutX="14.0" layoutY="34.0" minHeight="-Infinity" prefHeight="20.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <Label text="Library Browser">
+                                       <padding>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </padding>
+                                    </Label>
+                                    <TreeView fx:id="libraryTreeView" minHeight="20.0" VBox.vgrow="ALWAYS">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </TreeView>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                      <AnchorPane minHeight="0.0" minWidth="0.0">
+                           <children>
+                              <VBox layoutX="87.0" layoutY="-15.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <Label text="Selection Properties">
+                                       <padding>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </padding>
+                                    </Label>
+                                    <TableView fx:id="propertyTableView" VBox.vgrow="ALWAYS">
+                                      <columns>
+                                        <TableColumn fx:id="propertyNameColumn" editable="false" maxWidth="500.0" minWidth="50.0" prefWidth="131.0" text="Name" />
+                                        <TableColumn fx:id="propertyValueColumn" editable="false" maxWidth="500.0" minWidth="50.0" prefWidth="131.0" text="Value" />
+                                      </columns>
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" />
+                                       </VBox.margin>
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TableView>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                    </items>
+                  </SplitPane>
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </center>
+   <bottom>
+      <HBox BorderPane.alignment="CENTER">
+         <children>
+            <ImageView fx:id="statusBarIcon" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+               <HBox.margin>
+                  <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+               </HBox.margin>
+            </ImageView>
+            <Label fx:id="statusBarLabel" HBox.hgrow="ALWAYS">
+               <padding>
+                  <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+               </padding>
+            </Label>
+         </children>
+      </HBox>
+   </bottom>
+   <top>
+      <MenuBar prefWidth="800.0" BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+                  <MenuItem fx:id="newMenu" mnemonicParsing="false" onAction="#newReleaseFile" text="New...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem fx:id="openMenu" mnemonicParsing="false" onAction="#openReleaseFile" text="Open...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem fx:id="importMenu" mnemonicParsing="false" onAction="#importFromProject" text="Import from OTP..." />
+                  <MenuItem fx:id="saveMenu" mnemonicParsing="false" onAction="#saveReleaseFile" text="Save">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem fx:id="saveAsMenu" mnemonicParsing="false" onAction="#saveReleaseFileAs" text="Save As...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem fx:id="compileMenu" mnemonicParsing="false" onAction="#compileRelease" text="Compile" />
+	              <MenuItem fx:id="closeMenu" mnemonicParsing="false" onAction="#closeReleaseFile" text="Close">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="W" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem fx:id="exitMenu" mnemonicParsing="false" onAction="#exitApplication" text="Exit" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+                  <MenuItem fx:id="undoMenu" mnemonicParsing="false" onAction="#undoAction" text="Undo">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="Z" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem fx:id="redoMenu" mnemonicParsing="false" onAction="#redoAction" text="Redo">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="Y" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <SeparatorMenuItem mnemonicParsing="false" />
+              <MenuItem fx:id="addLibraryMenu" mnemonicParsing="false" onAction="#addPrincipalLibrary" text="Add Principal Library...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="A" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+              </MenuItem>
+              <MenuItem fx:id="reloadModelMenu" mnemonicParsing="false" onAction="#reloadModel" text="Reload Model">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="F5" control="UP" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+              </MenuItem>
+            </items>
+          </Menu>
+            <Menu mnemonicParsing="false" text="Repository">
+              <items>
+                  <MenuItem fx:id="openManagedMenu" mnemonicParsing="false" onAction="#openManagedRelease" text="Open Managed Release">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="M" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <Menu fx:id="publishReleaseMenu" mnemonicParsing="false" text="Publish Release To" />
+                  <MenuItem fx:id="newReleaseVersionMenu" mnemonicParsing="false" onAction="#newReleaseVersion" text="New Release Version..." />
+                  <MenuItem fx:id="unpublishReleaseMenu" mnemonicParsing="false" onAction="#unpublishRelease" text="Unpublish Release..." />
+              </items>
+            </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem fx:id="aboutMenu" mnemonicParsing="false" onAction="#aboutApplication" text="About Release Editor" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+</BorderPane>

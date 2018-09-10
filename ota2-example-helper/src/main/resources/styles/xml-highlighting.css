@@ -1,0 +1,19 @@
+.xml_tagmark {
+    -fx-fill: grey;
+}
+.xml_anytag {
+    -fx-fill: #3f7f7f;
+}
+.xml_paren {
+    -fx-fill: firebrick;
+    -fx-font-weight: bold;
+}
+.xml_attribute {
+    -fx-fill: #7f007f;
+}
+.xml_avalue {
+    -fx-fill: blue;
+}
+.xml_comment {
+	-fx-fill: teal;
+}

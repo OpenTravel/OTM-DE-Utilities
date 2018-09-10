@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.opentravel.otm</groupId>
+	<artifactId>ota2-utilities-parent-pom</artifactId>
+	<version>4.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<inceptionYear>2014</inceptionYear>
+
+	<modules>
+		<module>ota2-application-common</module>
+		<module>ota2-release-editor</module>
+		<module>ota2-example-helper</module>
+		<module>ota2-diff-utility</module>
+		<module>ota2-model-check</module>
+		<module>ota2-message-validator</module>
+		<module>ota2-example-upgrade-utility</module>
+		<module>ota2-app-launcher</module>
+	</modules>
+
+	<properties>
+		<!-- General Build Properties -->
+		<appVersion>${project.version}-${maven.build.timestamp}</appVersion>
+		<maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		
+		<!-- Dependency Versions -->
+		<fge.version>2.2.6</fge.version>
+		<richtextfx.version>0.7-M2</richtextfx.version>
+		<jfxtras.version>8.0-r5</jfxtras.version>
+		<junit.version>4.12</junit.version>
+		
+		<!-- Plugin Versions -->
+		<license.plugin.version>2.10</license.plugin.version>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>${license.plugin.version}</version>
+				<configuration>
+					<header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+					<properties>
+						<owner>OpenTravel Alliance</owner>
+						<year>${project.inceptionYear}</year>
+						<email>info@opentravel.org</email>
+					</properties>
+					<includes>
+						<include>src/**</include>
+					</includes>
+					<excludes>
+						<exclude>**/pom.xml</exclude>
+						<exclude>**/*.launch</exclude>
+						<exclude>**/*.txt</exclude>
+						<exclude>**/*.sh</exclude>
+						<exclude>**/*.properties</exclude>
+						<exclude>**/*.sql</exclude>
+						<exclude>**/*.jrxml</exclude>
+						<exclude>src/test/resources/**</exclude>
+						<exclude>src/main/resources/**</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.github.fge</groupId>
+				<artifactId>json-schema-validator</artifactId>
+				<version>${fge.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.fxmisc.richtext</groupId>
+				<artifactId>richtextfx</artifactId>
+				<version>${richtextfx.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jfxtras</groupId>
+				<artifactId>jfxtras-controls</artifactId>
+				<version>${jfxtras.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+</project>

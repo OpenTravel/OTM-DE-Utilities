@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.web.WebView?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="550.0" minWidth="400.0" prefHeight="700.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.modelcheck.ModelCheckController">
+   <bottom>
+      <HBox BorderPane.alignment="CENTER_LEFT">
+         <children>
+            <Button fx:id="optionsButton" mnemonicParsing="false" onAction="#editOptions">
+               <HBox.margin>
+                  <Insets bottom="3.0" left="5.0" right="3.0" top="5.0" />
+               </HBox.margin>
+               <graphic>
+                  <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true" translateY="1.0">
+                     <image>
+                        <Image url="@images/settings.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <ImageView fx:id="statusBarIcon" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+               <HBox.margin>
+                  <Insets bottom="3.0" left="3.0" top="8.0" />
+               </HBox.margin>
+            </ImageView>
+            <Label fx:id="statusBarLabel" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+               <padding>
+                  <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+               </padding>
+               <HBox.margin>
+                  <Insets bottom="3.0" left="3.0" right="3.0" top="5.0" />
+               </HBox.margin>
+            </Label>
+            <Button fx:id="navBackButton" mnemonicParsing="false" onAction="#navigateBack" text="&lt;">
+               <HBox.margin>
+                  <Insets bottom="3.0" left="3.0" right="3.0" top="5.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="navForwardButton" mnemonicParsing="false" onAction="#navigateForward" text="&gt;">
+               <HBox.margin>
+                  <Insets bottom="3.0" left="3.0" right="3.0" top="5.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="saveReportButton" mnemonicParsing="false" onAction="#saveReport" text="Save Report...">
+               <HBox.margin>
+                  <Insets bottom="3.0" left="3.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+   </bottom>
+   <top>
+      <HBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Project / Release">
+               <padding>
+                  <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+               </padding>
+            </Label>
+            <TextField fx:id="filenameText" editable="false" maxWidth="300.0" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+               </HBox.margin>
+            </TextField>
+            <Button fx:id="localFileButton" mnemonicParsing="false" onAction="#selectLocalFile" text="...">
+               <HBox.margin>
+                  <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="managedReleaseButton" mnemonicParsing="false" onAction="#selectManagedRelease">
+               <HBox.margin>
+                  <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+               </HBox.margin>
+               <graphic>
+                  <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true" translateX="3.0">
+                     <image>
+                        <Image url="@images/repository.gif" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+         <BorderPane.margin>
+            <Insets top="5.0" />
+         </BorderPane.margin>
+      </HBox>
+   </top>
+   <center>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-border-width: 1; -fx-border-color: black;" BorderPane.alignment="CENTER">
+         <children>
+            <WebView fx:id="reportViewer" layoutX="415.0" layoutY="59.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+         </children>
+         <BorderPane.margin>
+            <Insets left="5.0" right="5.0" top="5.0" />
+         </BorderPane.margin>
+      </AnchorPane>
+   </center>
+</BorderPane>

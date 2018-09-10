@@ -1,0 +1,22 @@
+.exact-match {
+}
+.partial-match {
+	-fx-text-fill: blue;
+	-fx-font-weight: bold;
+}
+.no-match {
+	-fx-text-fill: red;
+	-fx-font-weight: bold;
+}
+.missing-match {
+	-fx-text-fill: darkgrey;
+}
+.manual-match {
+	-fx-text-fill: brown;
+}
+.is-referenced {
+}
+.not-referenced {
+	-fx-text-fill: red;
+	-fx-font-weight: bold;
+}
