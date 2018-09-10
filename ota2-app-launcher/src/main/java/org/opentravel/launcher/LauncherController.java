@@ -132,7 +132,7 @@ public class LauncherController extends AbstractMainWindowController {
 					Process newProcess;
 					
 					// Configure proxy settings (if necessary)
-					if (!StringUtils.isEmpty( settings.getProxyHost() )) {
+					if (!settings.isUseProxy()) {
 						cmds.add( "-Dhttp.proxyHost=" + settings.getProxyHost() );
 						
 						if (settings.getProxyPort() != null) {
