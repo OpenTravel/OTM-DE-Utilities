@@ -15,8 +15,9 @@
  */
 package org.opentravel.launcher;
 
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.routines.DomainValidator;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -40,7 +41,9 @@ public class ProxySettingsDialogController {
 	private static final String MSG_PROXY_PORT_REQUIRED     = "validation.proxyPort.required";
 	private static final String MSG_PROXY_PORT_INVALID      = "validation.proxyPort.invalid";
 	private static final String MSG_NON_PROXY_HOSTS_INVALID = "validation.nonProxyHosts.invalid";
-	private static final DomainValidator hostValidator = DomainValidator.getInstance( true );
+	
+	private static final Pattern hostnamePattern = Pattern.compile( "^[a-zA-Z0-9]+(?:\\.[a-zA-Z0-9]+)*$" );
+	private static final Pattern nphostPattern = Pattern.compile( "^(?:[a-zA-Z0-9]+|\\*)(?:\\.[a-zA-Z0-9]+)*(?:\\.\\*)?$" );
 	
 	@FXML private CheckBox useProxyCB;
 	@FXML private TextField proxyHostText;
@@ -175,7 +178,7 @@ public class ProxySettingsDialogController {
 		if (StringUtils.isEmpty( hostname )) {
 			errorMessage = MessageBuilder.formatMessage( MSG_PROXY_HOST_REQUIRED );
 			
-		} else if (!hostValidator.isValid( hostname )) {
+		} else if (!hostnamePattern.matcher( hostname ).matches()) {
 			errorMessage = MessageBuilder.formatMessage( MSG_PROXY_HOST_INVALID );
 		}
 		return errorMessage;
@@ -229,7 +232,7 @@ public class ProxySettingsDialogController {
 					npHost = npHost.replace( ".*", ".com" );
 				}
 				
-				if (!hostValidator.isValid( npHost )) {
+				if (!nphostPattern.matcher( npHost ).matches()) {
 					errorMessage = MessageBuilder.formatMessage( MSG_NON_PROXY_HOSTS_INVALID );
 					break;
 				}
