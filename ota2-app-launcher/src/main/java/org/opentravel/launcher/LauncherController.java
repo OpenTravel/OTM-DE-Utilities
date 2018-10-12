@@ -21,31 +21,37 @@ import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.AbstractOTMApplication;
+import org.opentravel.application.common.OTA2ApplicationProvider;
+import org.opentravel.application.common.OTA2ApplicationSpec;
+import org.opentravel.application.common.OTA2LauncherTabSpec;
 import org.opentravel.application.common.StatusType;
-import org.opentravel.diffutil.OTMDiffApplication;
-import org.opentravel.examplehelper.ExampleHelperApplication;
-import org.opentravel.exampleupgrade.ExampleUpgradeApplication;
-import org.opentravel.messagevalidate.OTMMessageValidatorApplication;
-import org.opentravel.modelcheck.ModelCheckApplication;
-import org.opentravel.release.OTMReleaseApplication;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -64,8 +70,7 @@ public class LauncherController extends AbstractMainWindowController {
 	private static final String MSG_LAUNCH_TITLE            = "task.launch.title";
 	private static final String MSG_LAUNCH_ERROR            = "task.launch.error";
 	
-	@FXML private TilePane releasedAppsPane;
-	@FXML private TilePane experimentalAppsPane;
+	@FXML private TabPane tabPane;
 	@FXML private ImageView statusBarIcon;
 	@FXML private Label statusBarLabel;
 	
@@ -214,14 +219,65 @@ public class LauncherController extends AbstractMainWindowController {
 	 */
 	@Override
 	protected void initialize(Stage primaryStage) {
+		Map<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>> appsByTab = getApplicationsByTab();
+		
 		super.initialize( primaryStage );
 		
-		releasedAppsPane.getChildren().add( newAppIcon( ExampleHelperApplication.class, Images.exampleHelperIcon ) );
-		releasedAppsPane.getChildren().add( newAppIcon( OTMDiffApplication.class, Images.diffUtilityIcon ) );
-		releasedAppsPane.getChildren().add( newAppIcon( OTMReleaseApplication.class, Images.releaseEditorIcon ) );
-		experimentalAppsPane.getChildren().add( newAppIcon( OTMMessageValidatorApplication.class, Images.messageValidatorIcon ) );
-		experimentalAppsPane.getChildren().add( newAppIcon( ModelCheckApplication.class, Images.messageValidatorIcon ) );
-		experimentalAppsPane.getChildren().add( newAppIcon( ExampleUpgradeApplication.class, Images.exampleUpgradeIcon ) );
+		for (OTA2LauncherTabSpec tabSpec : appsByTab.keySet()) {
+			TilePane buttonPane = newTab( tabSpec.getName() );
+			
+			for (OTA2ApplicationSpec appSpec : appsByTab.get( tabSpec )) {
+				buttonPane.getChildren().add( newAppIcon(
+						appSpec.getApplicationClass(), appSpec.getLaunchIcon() ) );
+			}
+		}
+	}
+	
+	/**
+	 * Returns the list of <code>OTA2ApplicationSpec</code>s organized by tab.
+	 * 
+	 * @return Map<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>>
+	 */
+	private Map<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>> getApplicationsByTab() {
+		ServiceLoader<OTA2ApplicationProvider> loader = ServiceLoader.load( OTA2ApplicationProvider.class );
+		Map<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>> appsByTab = new TreeMap<>();
+		
+		for (OTA2ApplicationProvider provider : loader) {
+			OTA2ApplicationSpec spec = provider.getApplicationSpec();
+			SortedSet<OTA2ApplicationSpec> appSpecs = appsByTab.get( spec.getLauncherTab() );
+			
+			if (appSpecs == null) {
+				appSpecs = new TreeSet<>();
+				appsByTab.put( spec.getLauncherTab(), appSpecs );
+			}
+			appSpecs.add( spec );
+		}
+		return appsByTab;
+	}
+	
+	/**
+	 * Creates a new launcher tab with the specified name and returns the content
+	 * pane for the tab.
+	 * 
+	 * @param name  the name of the tab to create
+	 * @return TilePane
+	 */
+	private TilePane newTab(String name) {
+		Tab tab = new Tab( name );
+		StackPane tabContent = new StackPane();
+		TilePane buttonPane = new TilePane();
+		
+		buttonPane.setHgap( 25.0 );
+		buttonPane.setVgap( 25.0 );
+		buttonPane.setPrefRows( 1 );
+		buttonPane.setPrefColumns( 1 );
+		buttonPane.setPadding( new Insets( 25.0, 25.0, 25.0, 25.0 ) );
+		
+		tabContent.getChildren().add( buttonPane );
+		tab.setContent( tabContent );
+		tabPane.getTabs().add( tab );
+		
+		return buttonPane;
 	}
 	
 	/**
