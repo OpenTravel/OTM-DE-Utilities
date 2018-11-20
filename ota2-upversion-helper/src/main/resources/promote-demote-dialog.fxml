@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="425.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.upversion.PromoteDemoteDialogController">
+   <children>
+      <VBox layoutX="278.0" layoutY="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <padding>
+            <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+         <children>
+            <HBox fx:id="filterPanel" alignment="CENTER_LEFT">
+               <children>
+                  <VBox>
+                     <children>
+                        <RadioButton fx:id="promoteRadio" mnemonicParsing="false" onAction="#promoteSelected" selected="true" text="Promote">
+                           <VBox.margin>
+                              <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                           </VBox.margin>
+                        </RadioButton>
+                        <RadioButton fx:id="demoteRadio" mnemonicParsing="false" onAction="#demoteSelected" text="Demote">
+                           <VBox.margin>
+                              <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                           </VBox.margin>
+                        </RadioButton>
+                     </children>
+                  </VBox>
+                  <Label text=" libraries from " />
+                  <ChoiceBox fx:id="fromStatusChoice" />
+                  <Label text=" to " />
+                  <Label fx:id="toStatusLabel" text="UNKNOWN" />
+                  <Label text=" status." />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT">
+               <children>
+                  <Label text="This action will affect ">
+                     <HBox.margin>
+                        <Insets bottom="3.0" />
+                     </HBox.margin>
+                  </Label>
+                  <Label fx:id="affectedCountLabel" text="#" />
+                  <Label text=" of the " />
+                  <Label fx:id="totalCountLabel" text="#" />
+                  <Label text=" selected libraries." />
+                  <ProgressIndicator fx:id="progressInd" disable="true" progress="0.0">
+                     <HBox.margin>
+                        <Insets left="93.0" />
+                     </HBox.margin>
+                  </ProgressIndicator>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="10.0" top="10.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT">
+               <children>
+                  <Button fx:id="goCloseButton" mnemonicParsing="false" onAction="#goCloseSelected" text="Go">
+                     <HBox.margin>
+                        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#cancelSelected" text="Cancel">
+                     <HBox.margin>
+                        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

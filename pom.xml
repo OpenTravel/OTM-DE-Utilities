@@ -15,6 +15,7 @@
 		<module>ota2-release-editor</module>
 		<module>ota2-example-helper</module>
 		<module>ota2-diff-utility</module>
+		<module>ota2-upversion-helper</module>
 		<module>ota2-model-check</module>
 		<module>ota2-message-validator</module>
 		<module>ota2-example-upgrade-utility</module>

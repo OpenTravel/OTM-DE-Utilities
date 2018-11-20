@@ -41,6 +41,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.opentravel.otm</groupId>
+			<artifactId>ota2-upversion-helper</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opentravel.otm</groupId>
 			<artifactId>ota2-example-upgrade-utility</artifactId>
 			<version>${project.version}</version>
 		</dependency>
