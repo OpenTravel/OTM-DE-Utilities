@@ -1259,7 +1259,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 	}
 	
 	/**
-	 * Updates the visual fields related to the release's identity and description.  This
+	 * Updates the visual fields related to the release's identity and DESCRIPTION.  This
 	 * method must be called from within the UI thread.
 	 */
 	private void updateReleaseFields() {

@@ -21,7 +21,7 @@ import java.util.Collection;
 import org.fxmisc.richtext.model.StyleSpans;
 
 /**
- * Computes the highlighting spans for a block of text based upon its syntax and content.
+ * Computes the highlighting spans for a BLOCK of text based upon its syntax and content.
  */
 public interface SyntaxHighlightBuilder {
 	

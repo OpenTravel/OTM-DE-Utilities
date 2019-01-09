@@ -67,7 +67,7 @@ import javafx.scene.image.ImageView;
 /**
  * Utility class that handles the construction of the upgraded DOM tree structure
  * by comparing items from the OTM model and attempting to match them with the
- * original DOM example tree.
+ * original DOM EXAMPLE tree.
  */
 public class UpgradeTreeBuilder {
 	
@@ -82,7 +82,7 @@ public class UpgradeTreeBuilder {
 	
 	/**
 	 * Constructor that specifies the options to use when generating unmatched sections
-	 * of the upgraded example tree.
+	 * of the upgraded EXAMPLE tree.
 	 */
 	public UpgradeTreeBuilder(ExampleGeneratorOptions exampleOptions) {
 		this( newDocument(), exampleOptions );
@@ -90,7 +90,7 @@ public class UpgradeTreeBuilder {
 	
 	/**
 	 * Constructor that specifies the options to use when generating unmatched sections
-	 * of the upgraded example tree.
+	 * of the upgraded EXAMPLE tree.
 	 */
 	public UpgradeTreeBuilder(Document upgradeDocument, ExampleGeneratorOptions exampleOptions) {
 		this.upgradeDocument = upgradeDocument;
@@ -140,7 +140,7 @@ public class UpgradeTreeBuilder {
 	 * @param origTreeItem  the upgrade tree item to be replaced
 	 * @param originalNode  the original DOM tree node from which to build new upgrade content
 	 * @return TreeItem<DOMTreeUpgradeNode>
-	 * @throws ExampleUpgradeException  thrown if an error occurs during the example generation process
+	 * @throws ExampleUpgradeException  thrown if an error occurs during the EXAMPLE generation process
 	 */
 	public TreeItem<DOMTreeUpgradeNode> replaceUpgradeDOMBranch(
 			TreeItem<DOMTreeUpgradeNode> origTreeItem, Node originalNode)
@@ -302,7 +302,7 @@ public class UpgradeTreeBuilder {
 	 * 
 	 * @param treeItem  the upgrade tree item to be replaced
 	 * @return TreeItem<DOMTreeUpgradeNode>
-	 * @throws ExampleUpgradeException  thrown if an error occurs during the example generation process
+	 * @throws ExampleUpgradeException  thrown if an error occurs during the EXAMPLE generation process
 	 */
 	public TreeItem<DOMTreeUpgradeNode> clearUpgradeDOMBranch(TreeItem<DOMTreeUpgradeNode> treeItem) {
 		TreeItem<DOMTreeUpgradeNode> newTreeItem, parentTreeItem = treeItem.getParent();
@@ -1222,7 +1222,7 @@ public class UpgradeTreeBuilder {
 		 * @param upgradeItem  the tree item for the upgrade tree
 		 * @param originalElement  the original DOM element from which the upgrade item was created (may be null)
 		 * @param otmElementType  the actual type of the OTM element
-		 * @param autoGenNode flag value indicating whethe the node's context was created from an auto-generated example
+		 * @param autoGenNode flag value indicating whethe the node's context was created from an auto-generated EXAMPLE
 		 */
 		public UpgradeNodeContext(TreeItem<DOMTreeUpgradeNode> upgradeItem,
 				Element originalElement, NamedEntity otmElementType, boolean autoGenNode) {
@@ -1269,7 +1269,7 @@ public class UpgradeTreeBuilder {
 
 		/**
 		 * Returns true if the node's context was created from an auto-generated
-		 * example.
+		 * EXAMPLE.
 		 *
 		 * @return boolean
 		 */

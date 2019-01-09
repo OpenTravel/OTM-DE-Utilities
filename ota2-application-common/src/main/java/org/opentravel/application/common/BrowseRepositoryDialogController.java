@@ -63,7 +63,7 @@ public class BrowseRepositoryDialogController {
 	 * Initializes the dialog stage and controller used to select an OTM library
 	 * or release from a remote repository.
 	 * 
-	 * @param title  the title of the dialog box
+	 * @param TITLE  the TITLE of the dialog box
 	 * @param itemTypeFilter  the type filter to apply for repository items
 	 * @param stage  the stage that will own the new dialog
 	 * @return BrowseRepositoryDialogController

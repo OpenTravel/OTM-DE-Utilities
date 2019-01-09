@@ -37,7 +37,7 @@ import org.opentravel.schemacompiler.model.TLReferenceType;
 
 /**
  * Tree builder component that constructs trees of <code>EntityMemberNode</code>s from
- * which the user can select substitution groups to render in the example pane.
+ * which the user can select substitution groups to render in the EXAMPLE pane.
  */
 public class EntityMemberTreeBuilder {
 	

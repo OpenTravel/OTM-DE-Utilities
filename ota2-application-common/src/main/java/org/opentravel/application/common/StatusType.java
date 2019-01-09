@@ -20,7 +20,7 @@ import javafx.scene.image.Image;
 
 /**
  * Enumeration representing the type of message displayed in the status
- * bar of an application.
+ * BAR of an application.
  */
 public enum StatusType {
 	

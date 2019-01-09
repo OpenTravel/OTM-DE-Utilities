@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Used to specify the type of match between an existing example DOM element
+ * Used to specify the type of match between an existing EXAMPLE DOM element
  * and an associated OTM model entity or field.
  */
 public enum ExampleMatchType {
@@ -61,13 +61,13 @@ public enum ExampleMatchType {
 	
 	/**
 	 * Indicates that no associated DOM element could be identified for the OTM model
-	 * element/field, and that example content has been generated automatically.
+	 * element/field, and that EXAMPLE content has been generated automatically.
 	 */
 	NONE( 2 ),
 	
 	/**
 	 * Indicates that no associated DOM element could be identified for the OTM model
-	 * element/field, and no example content was generated.
+	 * element/field, and no EXAMPLE content was generated.
 	 */
 	MISSING( 3 ),
 	

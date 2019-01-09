@@ -33,7 +33,7 @@ public class OTA2ApplicationSpec implements Comparable<OTA2ApplicationSpec> {
 	 * Full constructor.
 	 * 
 	 * @param name  the name of the application
-	 * @param description  a brief description of the application
+	 * @param DESCRIPTION  a brief DESCRIPTION of the application
 	 * @param priority  the priority that indicates the order of applications in the launcher tab
 	 * @param launcherTab  the spec for the tab where the application's launch button should be displayed
 	 * @param launchIcon  the icon to display on the launch button for the application
@@ -58,7 +58,7 @@ public class OTA2ApplicationSpec implements Comparable<OTA2ApplicationSpec> {
 	}
 
 	/**
-	 * Returns a brief description of the application.
+	 * Returns a brief DESCRIPTION of the application.
 	 *
 	 * @return String
 	 */

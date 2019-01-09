@@ -113,7 +113,7 @@ import javafx.stage.WindowEvent;
  */
 public class ExampleUpgradeController extends AbstractMainWindowController {
 	
-	public static final String FXML_FILE = "/ota2-example-upgrade.fxml";
+	public static final String FXML_FILE = "/ota2-EXAMPLE-upgrade.fxml";
 	
 	private static final DataFormat DRAG_FORMAT = new DataFormat("application/ota2-original-dom-node");
 	
@@ -199,7 +199,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 							releaseManager.loadRelease( selectedFile, findings );
 							
 							if (findings.hasFinding( FindingType.ERROR )) {
-								throw new LibraryLoaderException("Validation errors detected in model (see log for details)");
+								throw new LibraryLoaderException("Validation errors detected in model (see log for DETAILS)");
 							}
 							newModel = releaseManager.getModel();
 							
@@ -219,7 +219,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 							userSettings.setLastModelFile( modelFile );
 							
 							// Scan the model to pre-populate tables with lists of potential entity
-							// selections for the example root element.
+							// selections for the EXAMPLE root element.
 							new ModelNavigator( visitor ).navigate( model );
 							familyMatches = visitor.getFamilyMatches();
 							allElementsByBaseNS = visitor.getAllElementsByBaseNS();
@@ -233,7 +233,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 							for (String message : findings.getAllValidationMessages(FindingMessageFormat.IDENTIFIED_FORMAT)) {
 								System.out.println("  " + message);
 							}
-							throw new LibraryLoaderException("Validation errors detected in model (see log for details)");
+							throw new LibraryLoaderException("Validation errors detected in model (see log for DETAILS)");
 						}
 						
 					} finally {
@@ -339,7 +339,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 	}
 	
 	/**
-	 * Called when the user clicks the button to load a new example file to be upgraded.
+	 * Called when the user clicks the button to load a new EXAMPLE file to be upgraded.
 	 * 
 	 * @param event  the action event that triggered this method call
 	 */
@@ -367,7 +367,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 							throw new Exception("JSON documents not yet supported.");
 							
 						} else {
-							throw new Exception("Unknown example file format: " + selectedFile.getName());
+							throw new Exception("Unknown EXAMPLE file format: " + selectedFile.getName());
 						}
 						exampleFile = selectedFile;
 						exampleFolder = exampleFile.getParentFile();
@@ -385,7 +385,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 	}
 	
 	/**
-	 * Populates the contents of the visual controls associated with example content.
+	 * Populates the contents of the visual controls associated with EXAMPLE content.
 	 * 
 	 * @param newObjectSelected  flag indicating whether the OTM object is a new selection by the user
 	 */
@@ -490,7 +490,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 	}
 	
 	/**
-	 * Resets all manual updates and restores the upgraded example to its original default
+	 * Resets all manual updates and restores the upgraded EXAMPLE to its original default
 	 * state.
 	 * 
 	 * @param event  the action event that triggered this method call
@@ -509,7 +509,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 	}
 	
 	/**
-	 * Called when the user clicks the button to save the current example output to file.
+	 * Called when the user clicks the button to save the current EXAMPLE output to file.
 	 * 
 	 * @param event  the action event that triggered this method call
 	 */
@@ -567,7 +567,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 	/**
 	 * Displays the specified legend documentation.
 	 * 
-	 * @param title  the title of the dialog box
+	 * @param TITLE  the TITLE of the dialog box
 	 * @param legendUrl  the URL of the legend documentation to display
 	 */
 	private void showLegend(String title, String legendUrl) {
@@ -1019,7 +1019,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 					confirmDialog.setTitle( "Unsaved Changes" );
 					confirmDialog.setHeaderText( null );
 					confirmDialog.setContentText(
-							"Your upgraded example document has unsaved changes.  "
+							"Your upgraded EXAMPLE document has unsaved changes.  "
 							+ "Click 'Ok' to save now or 'Cancel' to exit without saving.");
 					confirmDialog.showAndWait();
 					
@@ -1037,7 +1037,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 	
 	/**
 	 * Returns the set of options that should be used when generating unmatched sections
-	 * of the upgraded example tree.
+	 * of the upgraded EXAMPLE tree.
 	 * 
 	 * @return ExampleGeneratorOptions
 	 */

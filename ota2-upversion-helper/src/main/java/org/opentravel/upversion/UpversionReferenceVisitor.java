@@ -29,6 +29,7 @@ import org.opentravel.schemacompiler.model.TLExtension;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLFacetOwner;
 import org.opentravel.schemacompiler.model.TLMemberField;
+import org.opentravel.schemacompiler.model.TLMemberFieldOwner;
 import org.opentravel.schemacompiler.model.TLParamGroup;
 import org.opentravel.schemacompiler.model.TLParameter;
 import org.opentravel.schemacompiler.model.TLProperty;
@@ -191,7 +192,8 @@ public class UpversionReferenceVisitor extends ModelElementVisitorAdapter {
 		// new-version fields.  This does not seem to cause problems in the resulting
 		// OTM files except for some unnecessary import statements.
 		if (facetRef != null) {
-			List<TLMemberField<?>> newFacetFields = ResourceCodegenUtils.getEligibleParameterFields( facetRef );
+			List<TLMemberField<TLMemberFieldOwner>> newFacetFields =
+					ResourceCodegenUtils.getEligibleParameterFields( facetRef );
 			
 			for (TLParameter parameter : paramGroup.getParameters()) {
 				String fieldName = parameter.getFieldRefName();

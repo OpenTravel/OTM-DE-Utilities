@@ -74,7 +74,7 @@ public class UpgradeModelNavigator extends AbstractNavigator<NamedEntity>{
      * 
      * @param visitor  the visitor to be notified when model elements are encountered
      * @param model  the model containing all of the entities to be visited
-	 * @param exampleOptions  the example generation options
+	 * @param exampleOptions  the EXAMPLE generation options
      */
 	public UpgradeModelNavigator(UpgradeModelVisitor visitor, TLModel model,
 			ExampleGeneratorOptions exampleOptions) {
@@ -296,7 +296,7 @@ public class UpgradeModelNavigator extends AbstractNavigator<NamedEntity>{
                     previousFacetIdentity = currentFacetIdentity;
                 }
 
-                // Navigate the example content for the current element
+                // Navigate the EXAMPLE content for the current element
                 navigateElement(element);
                 
         	} else if (elementItem instanceof TLIndicator) {

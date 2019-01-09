@@ -16,7 +16,7 @@
 package org.opentravel.exampleupgrade;
 
 /**
- * Thrown when an unrecoverable error occurs while upgrading an example to a
+ * Thrown when an unrecoverable error occurs while upgrading an EXAMPLE to a
  * new model version.
  */
 public class ExampleUpgradeException extends Exception {

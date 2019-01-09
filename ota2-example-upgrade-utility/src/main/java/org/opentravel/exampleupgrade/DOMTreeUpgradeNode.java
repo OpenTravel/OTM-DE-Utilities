@@ -38,7 +38,7 @@ public class DOMTreeUpgradeNode extends AbstractDOMTreeNode {
 	 * @param otmEntity  the OTM complex entity type associated with this node
 	 * @param declaredEntity  the entity type originally declared in the owning OTM element
 	 * @param domNode  the DOM node instance
-	 * @param matchType  indicates the match type of the OTM entity with the original example
+	 * @param matchType  indicates the match type of the OTM entity with the original EXAMPLE
 	 */
 	public DOMTreeUpgradeNode(NamedEntity otmEntity, NamedEntity declaredEntity, Node domNode, ExampleMatchType matchType) {
 		super(domNode, (matchType == ExampleMatchType.MISSING) ? (domNode.getNodeName() + " [MISSING]") : null);
@@ -49,11 +49,11 @@ public class DOMTreeUpgradeNode extends AbstractDOMTreeNode {
 	
 	/**
 	 * Constructor used to create a node representing an OTM field (attribute, element,
-	 * or indicator) with a simple example value.
+	 * or indicator) with a simple EXAMPLE value.
 	 * 
 	 * @param otmField  the OTM field associated with this node
 	 * @param domNode  the DOM node instance
-	 * @param matchType  indicates the match type of the OTM field with the original example
+	 * @param matchType  indicates the match type of the OTM field with the original EXAMPLE
 	 */
 	public DOMTreeUpgradeNode(TLMemberField<?> otmField, Node domNode, ExampleMatchType matchType) {
 		super(domNode, (matchType == ExampleMatchType.MISSING) ? (domNode.getNodeName() + " [MISSING]") : null);
@@ -90,7 +90,7 @@ public class DOMTreeUpgradeNode extends AbstractDOMTreeNode {
 
 	/**
 	 * Returns the flag indicating the match type of the OTM entity or field
-	 * with the original example.
+	 * with the original EXAMPLE.
 	 *
 	 * @return ExampleMatchType
 	 */
@@ -100,7 +100,7 @@ public class DOMTreeUpgradeNode extends AbstractDOMTreeNode {
 	
 	/**
 	 * Assigns the flag indicating the match type of the OTM entity or field
-	 * with the original example.
+	 * with the original EXAMPLE.
 	 *
 	 * @param matchType  the match type value to assign
 	 */

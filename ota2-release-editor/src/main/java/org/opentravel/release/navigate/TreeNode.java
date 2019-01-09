@@ -118,10 +118,10 @@ public abstract class TreeNode<E> {
 	}
 	
 	/**
-	 * Returns the description of given model element or an empty string if no
-	 * description has been defined.
+	 * Returns the DESCRIPTION of given model element or an empty string if no
+	 * DESCRIPTION has been defined.
 	 * 
-	 * @param docOwner  the model element for which to return a description
+	 * @param docOwner  the model element for which to return a DESCRIPTION
 	 * @return String
 	 */
 	protected String getDescription(TLDocumentationOwner docOwner) {

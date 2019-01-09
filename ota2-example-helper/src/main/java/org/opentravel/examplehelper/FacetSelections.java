@@ -43,7 +43,7 @@ public class FacetSelections {
 	 * Configures the given <code>ExampleGeneratorOptions</code> with the user's
 	 * current facet selections.
 	 * 
-	 * @param options  the example generator options to configure
+	 * @param options  the EXAMPLE generator options to configure
 	 */
 	public void configureExampleOptions(ExampleGeneratorOptions options) {
 		for (EntityFacetSelection facetSelection : facetSelections) {

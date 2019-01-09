@@ -68,7 +68,7 @@ public class ActionTreeNode extends TreeNode<TLAction> {
 		TLAction action = getEntity();
 		
 		props.add( new NodeProperty( "actionId", () -> { return action.getActionId(); } ) );
-		props.add( new NodeProperty( "description", () -> { return getDescription( action ); } ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( action ); } ) );
 		props.add( new NodeProperty( "commonAction", () -> { return action.isCommonAction() + ""; } ) );
 		return props;
 	}

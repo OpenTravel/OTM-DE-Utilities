@@ -137,7 +137,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
 			Runnable r = new BackgroundTask( "Importing libraries...", StatusType.INFO ) {
 				public void execute() throws Throwable {
 					try {
-						ProjectType otpContent = ProjectFileUtils.loadJaxbProjectFile( selectedFile, null );
+						ProjectType otpContent = new ProjectFileUtils().loadJaxbProjectFile( selectedFile, null );
 						List<RepositoryItemWrapper> selectedItems = selectedLibrariesTable.getItems();
 						ObservableList<RepositoryItemWrapper> candidateItems = FXCollections.observableArrayList();
 						
@@ -228,7 +228,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
 							repoRefs.getRepositoryRef().add( repoRef );
 						}
 						otp.setRepositoryReferences( repoRefs );
-						ProjectFileUtils.saveProjectFile( otp, selectedFile );
+						new ProjectFileUtils().saveProjectFile( otp, selectedFile );
 						
 					} finally {
 						userSettings.setProjectFolder( selectedFile.getParentFile() );

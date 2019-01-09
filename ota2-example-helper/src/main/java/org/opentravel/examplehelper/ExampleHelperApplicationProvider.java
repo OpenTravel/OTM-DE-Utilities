@@ -25,7 +25,7 @@ import org.opentravel.application.common.OTA2LauncherTabSpec;
 public class ExampleHelperApplicationProvider implements OTA2ApplicationProvider {
 	
 	private static final OTA2ApplicationSpec spec = new OTA2ApplicationSpec(
-			"Example Helper", "Assists with the generation of example XML and JSON messages",
+			"Example Helper", "Assists with the generation of EXAMPLE XML and JSON messages",
 			10, OTA2LauncherTabSpec.RELEASED_TAB, Images.launcherIcon, ExampleHelperApplication.class );
 	
 	/**

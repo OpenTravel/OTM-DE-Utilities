@@ -172,7 +172,7 @@ public class UserSettings extends AbstractUserSettings {
 	}
 
 	/**
-	 * Returns the folder location where the last example file was saved.
+	 * Returns the folder location where the last EXAMPLE file was saved.
 	 *
 	 * @return File
 	 */
@@ -181,7 +181,7 @@ public class UserSettings extends AbstractUserSettings {
 	}
 
 	/**
-	 * Assigns the folder location where the last example file was saved.
+	 * Assigns the folder location where the last EXAMPLE file was saved.
 	 *
 	 * @param lastExampleFolder  the folder location to assign
 	 */

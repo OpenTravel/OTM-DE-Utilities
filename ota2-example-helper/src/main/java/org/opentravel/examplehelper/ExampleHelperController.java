@@ -112,7 +112,7 @@ import javafx.util.Callback;
  */
 public class ExampleHelperController extends AbstractMainWindowController {
 	
-	public static final String FXML_FILE = "/ota2-example-helper.fxml";
+	public static final String FXML_FILE = "/ota2-EXAMPLE-helper.fxml";
 	
 	private static final FacetCodegenDelegateFactory facetDelegateFactory = new FacetCodegenDelegateFactory( null );
 	
@@ -212,7 +212,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
 							for (String message : findings.getAllValidationMessages(FindingMessageFormat.IDENTIFIED_FORMAT)) {
 								System.out.println("  " + message);
 							}
-							throw new LibraryLoaderException("Validation errors detected in model (see log for details)");
+							throw new LibraryLoaderException("Validation errors detected in model (see log for DETAILS)");
 						}
 						
 					} finally {
@@ -251,7 +251,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
 								if (RepositoryItemType.LIBRARY.isItemType( selectedItem.getFilename() )) {
 									ProjectManager projectManager = new ProjectManager( new TLModel(), false, repositoryManager );
 									Project tempProject = projectManager.newProject( File.createTempFile( "tempProject", ".otp" ),
-											"http://example-helper.com/project/temp", "Temp Project", null );
+											"http://EXAMPLE-helper.com/project/temp", "Temp Project", null );
 									ProjectItem item = projectManager.addManagedProjectItem( selectedItem, tempProject );
 									
 									model = projectManager.getModel();
@@ -264,7 +264,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
 									releaseManager.loadRelease( selectedItem, findings );
 									
 									if (findings.hasFinding( FindingType.ERROR )) {
-										throw new LibraryLoaderException("Validation errors detected in model (see log for details)");
+										throw new LibraryLoaderException("Validation errors detected in model (see log for DETAILS)");
 									}
 									model = releaseManager.getModel();
 									modelFile = URLUtils.toFile( releaseManager.getRelease().getReleaseUrl() );
@@ -394,7 +394,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
 	}
 	
 	/**
-	 * Refreshes the contents of the example text viewer.
+	 * Refreshes the contents of the EXAMPLE text viewer.
 	 */
 	private void refreshExample() {
 		Platform.runLater( new Runnable() {
@@ -449,7 +449,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
 	}
 	
 	/**
-	 * Called when the user clicks the button to save the current example output to file.
+	 * Called when the user clicks the button to save the current EXAMPLE output to file.
 	 * 
 	 * @param event  the action event that triggered this method call
 	 */

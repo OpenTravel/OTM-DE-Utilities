@@ -71,7 +71,7 @@ public class ParentRefTreeNode extends TreeNode<TLResourceParentRef> {
 		
 		props.add( new NodeProperty( "parentName", () -> { return getEntityDisplayName( parentRef.getParentResource() ); } ) );
 		props.add( new NodeProperty( "parentParamGroup", () -> { return (parentParamGroup == null) ? "" : parentParamGroup.getName(); } ) );
-		props.add( new NodeProperty( "description", () -> { return getDescription( parentRef ); } ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( parentRef ); } ) );
 		props.add( new NodeProperty( "pathTemplate", () -> { return parentRef.getPathTemplate(); } ) );
 		return props;
 	}

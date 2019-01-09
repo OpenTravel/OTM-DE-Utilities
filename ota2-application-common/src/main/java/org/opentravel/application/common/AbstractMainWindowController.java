@@ -48,10 +48,10 @@ public abstract class AbstractMainWindowController {
 	}
 	
 	/**
-	 * Displays a message to the user in the status bar and optionally disables the
+	 * Displays a message to the user in the status BAR and optionally disables the
 	 * interactive controls on the display.
 	 * 
-	 * @param message  the status bar message to display
+	 * @param message  the status BAR message to display
 	 * @param disableControls  flag indicating whether interactive controls should be disabled
 	 */
 	protected abstract void setStatusMessage(String message, StatusType statusType, boolean disableControls);
@@ -66,10 +66,10 @@ public abstract class AbstractMainWindowController {
 	 * Returns a new file chooser that is configured for the selection of specific
 	 * types of files.
 	 * 
-	 * @param title  the title of the new file chooser
+	 * @param TITLE  the TITLE of the new file chooser
 	 * @param initialDirectory  the initial directory location for the chooser
 	 * @param extensionFilters  two-element arrays that specify the file extension
-	 *							and extension description (in that order)
+	 *							and extension DESCRIPTION (in that order)
 	 * @return FileChooser
 	 */
 	protected FileChooser newFileChooser(String title, File initialDirectory,
@@ -98,7 +98,7 @@ public abstract class AbstractMainWindowController {
 	/**
 	 * Returns a new directory chooser instance.
 	 * 
-	 * @param title  the title of the new directory chooser
+	 * @param TITLE  the TITLE of the new directory chooser
 	 * @param initialDirectory  the initial directory location for the chooser
 	 * @return DirectoryChooser
 	 */
@@ -155,7 +155,7 @@ public abstract class AbstractMainWindowController {
 				execute();
 				
 			} catch (Throwable t) {
-				String errorMessage = (t.getMessage() != null) ? t.getMessage() : "See log output for details.";
+				String errorMessage = (t.getMessage() != null) ? t.getMessage() : "See log output for DETAILS.";
 				
 				try {
 					setStatusMessage( "ERROR: " + errorMessage, StatusType.ERROR, false );

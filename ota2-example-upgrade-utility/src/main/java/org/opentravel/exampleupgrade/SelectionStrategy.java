@@ -37,7 +37,7 @@ public class SelectionStrategy {
 		
 		/**
 		 * Strategy that considers only those objects in the same base namespace
-		 * as the original XML example document.
+		 * as the original XML EXAMPLE document.
 		 */
 		EXAMPLE_NAMESPACE,
 		

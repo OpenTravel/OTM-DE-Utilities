@@ -68,7 +68,7 @@ public class AttributeTreeNode extends TreeNode<TLAttribute> {
 		TLAttribute attribute = getEntity();
 		
 		props.add( new NodeProperty( "name", () -> { return attribute.getName(); } ) );
-		props.add( new NodeProperty( "description", () -> { return getDescription( attribute ); } ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( attribute ); } ) );
 		props.add( new NodeProperty( "type", () -> { return getEntityDisplayName( attribute.getType() ); } ) );
 		props.add( new NodeProperty( "isReference", () -> { return attribute.isReference() + ""; } ) );
 		if (attribute.isReference()) {

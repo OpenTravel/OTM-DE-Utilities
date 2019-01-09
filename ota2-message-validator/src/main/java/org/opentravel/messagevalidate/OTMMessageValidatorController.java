@@ -164,7 +164,7 @@ public class OTMMessageValidatorController extends AbstractMainWindowController 
         	for (String message : findings.getValidationMessages( FindingType.ERROR, FindingMessageFormat.IDENTIFIED_FORMAT )) {
         		System.out.println("  " + message);
         	}
-        	throw new SchemaCompilerException("Errors in OTM model (see console for details).");
+        	throw new SchemaCompilerException("Errors in OTM model (see console for DETAILS).");
         }
 	}
 	

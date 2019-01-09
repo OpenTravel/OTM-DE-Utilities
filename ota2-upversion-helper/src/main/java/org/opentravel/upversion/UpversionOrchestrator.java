@@ -382,7 +382,7 @@ public class UpversionOrchestrator {
 			jaxbProject.getProjectItemBase().add(
 					objectFactory.createUnmanagedProjectItem( projectItem ) );
 		}
-		ProjectFileUtils.saveProjectFile( jaxbProject, projectFile );
+		new ProjectFileUtils().saveProjectFile( jaxbProject, projectFile );
 		reportWorkUnitCompleted();
 	}
 	

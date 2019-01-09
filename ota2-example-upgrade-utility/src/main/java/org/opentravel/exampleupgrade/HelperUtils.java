@@ -101,7 +101,7 @@ public class HelperUtils {
 		
 		if (errorMessage == null) {
 			errorMessage = "An unknown error occurred: " + errorType.getSimpleName()
-						 + " (see log for details).";
+						 + " (see log for DETAILS).";
 		}
 		return errorMessage;
 	}

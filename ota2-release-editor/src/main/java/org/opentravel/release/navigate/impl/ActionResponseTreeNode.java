@@ -68,7 +68,7 @@ public class ActionResponseTreeNode extends TreeNode<TLActionResponse> {
 		TLActionResponse response = getEntity();
 		
 		props.add( new NodeProperty( "statusCodes", () -> { return getDisplayStatusCodes(); } ) );
-		props.add( new NodeProperty( "description", () -> { return getDescription( response ); } ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( response ); } ) );
 		props.add( new NodeProperty( "payloadType", () -> { return getEntityDisplayName( response.getPayloadType() ); } ) );
 		return props;
 	}

@@ -68,7 +68,7 @@ public class ServiceTreeNode extends TreeNode<TLService> {
 		TLService service = getEntity();
 		
 		props.add( new NodeProperty( "name", () -> { return service.getName(); } ) );
-		props.add( new NodeProperty( "description", () -> { return getDescription( service ); } ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( service ); } ) );
 		return props;
 	}
 

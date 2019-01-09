@@ -67,7 +67,7 @@ public class OperationTreeNode extends TreeNode<TLOperation> {
 		TLOperation operation = getEntity();
 		
 		props.add( new NodeProperty( "name", () -> { return operation.getName(); } ) );
-		props.add( new NodeProperty( "description", () -> { return getDescription( operation ); } ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( operation ); } ) );
 		props.add( new NodeProperty( "extends", () -> { return getExtensionName( operation ); } ) );
 		return props;
 	}
