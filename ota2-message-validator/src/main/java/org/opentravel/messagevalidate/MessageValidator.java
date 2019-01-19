@@ -40,6 +40,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.opentravel.schemacompiler.codegen.json.JsonSchemaCodegenUtils;
+import org.opentravel.schemacompiler.util.FileUtils;
 import org.w3._2001.xmlschema.OpenAttrs;
 import org.w3._2001.xmlschema.TopLevelElement;
 import org.w3c.dom.Document;
@@ -215,7 +216,7 @@ public class MessageValidator {
     	try {
 			Unmarshaller u = jaxbContext.createUnmarshaller();
 			org.w3._2001.xmlschema.Schema schema =
-					(org.w3._2001.xmlschema.Schema) u.unmarshal( xsdFile );
+					(org.w3._2001.xmlschema.Schema) FileUtils.unmarshalFileContent( xsdFile, u );
 			
 			for (OpenAttrs schemaItem : schema.getSimpleTypeOrComplexTypeOrGroup()) {
 				if (schemaItem instanceof TopLevelElement) {
@@ -229,7 +230,7 @@ public class MessageValidator {
 				}
 			}
 			
-		} catch (JAXBException e) {
+		} catch (JAXBException | IOException e) {
 			// No action - return an empty collection
 		}
     	return globalElements;

@@ -31,6 +31,8 @@ public class OptionsDialogController {
 	public static final String FXML_FILE = "/options.fxml";
 	
 	@FXML private CheckBox suppressFieldVersionChangesCB;
+	@FXML private CheckBox suppressLibraryPropertyChangesCB;
+	@FXML private CheckBox suppressDocumentationChangesCB;
 	
 	private Stage dialogStage;
 	private ModelCompareOptions compareOptions;
@@ -43,6 +45,8 @@ public class OptionsDialogController {
 	 */
 	@FXML public void selectOk(ActionEvent event) {
 		compareOptions.setSuppressFieldVersionChanges( suppressFieldVersionChangesCB.isSelected() );
+		compareOptions.setSuppressLibraryPropertyChanges( suppressLibraryPropertyChangesCB.isSelected() );
+		compareOptions.setSuppressDocumentationChanges( suppressDocumentationChangesCB.isSelected() );
 		dialogStage.close();
 		okSelected = true;
 	}
@@ -74,6 +78,8 @@ public class OptionsDialogController {
 	public void setCompareOptions(ModelCompareOptions compareOptions) {
 		this.compareOptions = compareOptions;
 		suppressFieldVersionChangesCB.setSelected( compareOptions.isSuppressFieldVersionChanges() );
+		suppressLibraryPropertyChangesCB.setSelected( compareOptions.isSuppressLibraryPropertyChanges() );
+		suppressDocumentationChangesCB.setSelected( compareOptions.isSuppressDocumentationChanges() );
 	}
 	
 	/**
