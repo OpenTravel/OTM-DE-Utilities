@@ -112,7 +112,7 @@ import javafx.util.Callback;
  */
 public class ExampleHelperController extends AbstractMainWindowController {
 	
-	public static final String FXML_FILE = "/ota2-EXAMPLE-helper.fxml";
+	public static final String FXML_FILE = "/ota2-example-helper.fxml";
 	
 	private static final FacetCodegenDelegateFactory facetDelegateFactory = new FacetCodegenDelegateFactory( null );
 	

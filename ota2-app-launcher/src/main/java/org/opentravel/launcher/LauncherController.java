@@ -157,8 +157,11 @@ public class LauncherController extends AbstractMainWindowController {
 					
 					// Wait a second before checking the status
 					try {
-						Thread.sleep( 1000 );
-					} catch (InterruptedException e) {}
+						Thread.sleep( 5000 );
+						
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+					}
 					
 					// Finish up by saving the running process or reporting an error
 					if (newProcess.isAlive()) {
