@@ -18,6 +18,7 @@ package org.opentravel.exampleupgrade;
 
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLMemberField;
+import org.opentravel.schemacompiler.model.TLMemberFieldOwner;
 import org.w3c.dom.Node;
 
 /**
@@ -82,10 +83,11 @@ public class DOMTreeUpgradeNode extends AbstractDOMTreeNode {
 	/**
 	 * Returns the OTM field associated with this node.
 	 *
-	 * @return TLMemberField<?>
+	 * @return TLMemberField<TLMemberFieldOwner>
 	 */
-	public TLMemberField<?> getOtmField() {
-		return otmField;
+	@SuppressWarnings("unchecked")
+    public TLMemberField<TLMemberFieldOwner> getOtmField() {
+		return (TLMemberField<TLMemberFieldOwner>) otmField;
 	}
 
 	/**

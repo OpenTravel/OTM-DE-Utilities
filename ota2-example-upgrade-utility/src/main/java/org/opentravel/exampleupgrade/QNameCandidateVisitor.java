@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -63,8 +64,8 @@ public class QNameCandidateVisitor extends ModelElementVisitorAdapter {
 	public Map<QName, List<OTMObjectChoice>> getFamilyMatches() {
 		Map<QName, List<OTMObjectChoice>> familyMatches = new HashMap<>();
 		
-		for (QName baseFamilyName : baseFamilyMatches.keySet()) {
-			List<OTMObjectChoice> familyChoices = baseFamilyMatches.get( baseFamilyName );
+		for (Entry<QName,List<OTMObjectChoice>> entry : baseFamilyMatches.entrySet()) {
+			List<OTMObjectChoice> familyChoices = entry.getValue();
 			
 			Collections.sort( familyChoices,
 					(w1, w2) -> qnComparator.compare( w1.getOtmObjectName(), w2.getOtmObjectName() ) );
@@ -86,7 +87,7 @@ public class QNameCandidateVisitor extends ModelElementVisitorAdapter {
 	 * @return Map<String,List<OTMObjectChoice>>
 	 */
 	public Map<String, List<OTMObjectChoice>> getAllElementsByBaseNS() {
-		allElementsByBaseNS.values().forEach( (list) ->
+		allElementsByBaseNS.values().forEach( list ->
 			Collections.sort( list,
 					(w1, w2) -> qnComparator.compare( w1.getOtmObjectName(), w2.getOtmObjectName() ) ) );
 		return allElementsByBaseNS;
@@ -104,18 +105,14 @@ public class QNameCandidateVisitor extends ModelElementVisitorAdapter {
 		if ((entityName != null) && !visitedNames.contains( entityName )) {
 			String baseNS = ((TLLibrary) entity.getOwningLibrary()).getBaseNamespace();
 			QName baseNSName = new QName( baseNS, baseObjectLocalName );
-			List<OTMObjectChoice> baseNSMatchList = baseFamilyMatches.get( baseNSName );
-			List<OTMObjectChoice> allElementsBaseNSList = allElementsByBaseNS.get( baseNS );
-			OTMObjectChoice objectChoice = new OTMObjectChoice( entity, entityName );
+            OTMObjectChoice objectChoice = new OTMObjectChoice( entity, entityName );
 			
-			if (baseNSMatchList == null) {
-				baseNSMatchList = new ArrayList<>();
-				baseFamilyMatches.put( baseNSName, baseNSMatchList );
-			}
-			if (allElementsBaseNSList == null) {
-				allElementsBaseNSList = new ArrayList<>();
-				allElementsByBaseNS.put( baseNS, allElementsBaseNSList );
-			}
+			baseFamilyMatches.computeIfAbsent( baseNSName, nsName -> baseFamilyMatches.put( nsName, new ArrayList<>() ) );
+			List<OTMObjectChoice> baseNSMatchList = baseFamilyMatches.get( baseNSName );
+			
+			allElementsByBaseNS.computeIfAbsent( baseNS, ns -> allElementsByBaseNS.put( ns, new ArrayList<>() ) );
+			List<OTMObjectChoice> allElementsBaseNSList = allElementsByBaseNS.get( baseNS );
+			
 			baseNSMatchList.add( objectChoice );
 			allElementsBaseNSList.add( objectChoice );
 			visitedNames.add( entityName );
@@ -174,32 +171,44 @@ public class QNameCandidateVisitor extends ModelElementVisitorAdapter {
 		if (alias.getOwningEntity() instanceof TLFacet) {
 			QName nonsubElementName = XsdCodegenUtils.getGlobalElementName( alias );
 			QName subElementName = XsdCodegenUtils.getSubstitutableElementName( alias );
-			TLAlias ownerAlias = AliasCodegenUtils.getOwnerAlias( alias );
-			TLFacetType facetType = ((TLFacet) alias.getOwningEntity()).getFacetType();
-			
-			if ((facetType == TLFacetType.QUERY) || (facetType == TLFacetType.UPDATE)) {
-				if (ownerAlias.getOwningEntity() instanceof TLContextualFacet) {
-					TLAlias nextOwner = AliasCodegenUtils.getOwnerAlias( alias );
-					
-					while ((nextOwner != null) && (nextOwner.getOwningEntity() instanceof TLContextualFacet)) {
-						ownerAlias = nextOwner;
-						nextOwner = AliasCodegenUtils.getOwnerAlias( ownerAlias );
-					}
-				} else {
-					ownerAlias = alias;
-				}
-				
-			} else {
-				while (ownerAlias.getOwningEntity() instanceof TLFacet) {
-					ownerAlias = AliasCodegenUtils.getOwnerAlias( alias );
-				}
-			}
+			TLAlias ownerAlias = findOwnerAlias( alias );
 			
 			processEntity( alias, nonsubElementName, ownerAlias.getLocalName() );
 			processEntity( alias, subElementName, ownerAlias.getLocalName() );
 		}
 		return true;
 	}
+
+    /**
+     * Returns the owning alias of the given alias.
+     * 
+     * @param alias  the alias for which to return the owner
+     * @return TLAlias
+     */
+    private TLAlias findOwnerAlias(TLAlias alias) {
+        TLAlias ownerAlias = AliasCodegenUtils.getOwnerAlias( alias );
+        TLFacetType facetType = ((TLFacet) alias.getOwningEntity()).getFacetType();
+        
+        if ((facetType == TLFacetType.QUERY) || (facetType == TLFacetType.UPDATE)
+                || (facetType == TLFacetType.CHOICE)) {
+            if (ownerAlias.getOwningEntity() instanceof TLContextualFacet) {
+                TLAlias nextOwner = AliasCodegenUtils.getOwnerAlias( alias );
+                
+                while ((nextOwner != null) && (nextOwner.getOwningEntity() instanceof TLContextualFacet)) {
+                    ownerAlias = nextOwner;
+                    nextOwner = AliasCodegenUtils.getOwnerAlias( ownerAlias );
+                }
+            } else {
+                ownerAlias = alias;
+            }
+            
+        } else {
+            while (ownerAlias.getOwningEntity() instanceof TLFacet) {
+                ownerAlias = AliasCodegenUtils.getOwnerAlias( alias );
+            }
+        }
+        return ownerAlias;
+    }
 	
 	/**
 	 * @see org.opentravel.schemacompiler.visitor.ModelElementVisitorAdapter#visitActionFacet(org.opentravel.schemacompiler.model.TLActionFacet)

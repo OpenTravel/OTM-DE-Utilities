@@ -31,12 +31,12 @@ public class QNameComparator implements Comparator<QName> {
 	@Override
 	public int compare(QName qn1, QName qn2) {
 		String ns1 = nullToBlank( (qn1 == null) ? null : qn1.getNamespaceURI() );
-		String ns2 = nullToBlank( (qn2 == null) ? null : qn1.getNamespaceURI() );
+		String ns2 = nullToBlank( (qn2 == null) ? null : qn2.getNamespaceURI() );
 		int result = ns1.compareTo( ns2 );
 		
 		if (result == 0) {
 			String local1 = nullToBlank( (qn1 == null) ? null : qn1.getLocalPart() );
-			String local2 = nullToBlank( (qn2 == null) ? null : qn1.getLocalPart() );
+			String local2 = nullToBlank( (qn2 == null) ? null : qn2.getLocalPart() );
 			
 			result = local1.compareTo( local2 );
 		}

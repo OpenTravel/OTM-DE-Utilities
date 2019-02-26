@@ -69,8 +69,8 @@ public class ExtensionPointFacetTreeNode extends TreeNode<TLExtensionPointFacet>
 		List<NodeProperty> props = new ArrayList<>();
 		TLExtensionPointFacet epf = getEntity();
 		
-		props.add( new NodeProperty( "extends", () -> { return getExtensionName( epf ); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( epf ); } ) );
+		props.add( new NodeProperty( "extends", () -> getExtensionName( epf ) ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( epf ) ) );
 		return props;
 	}
 
@@ -78,8 +78,8 @@ public class ExtensionPointFacetTreeNode extends TreeNode<TLExtensionPointFacet>
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
-		List<TreeNode<?>> children = new ArrayList<>();
+    protected List<TreeNode<Object>> initializeChildren() {
+		List<TreeNode<Object>> children = new ArrayList<>();
 		TLExtensionPointFacet epf = getEntity();
 		
 		for (TLAttribute attribute : epf.getAttributes()) {

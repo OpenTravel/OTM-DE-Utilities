@@ -57,4 +57,9 @@ public class Images {
 	public static final Image warningIcon = new Image( Images.class.getResourceAsStream( "/images/warning.gif" ) );
 	public static final Image errorIcon = new Image( Images.class.getResourceAsStream( "/images/error.gif" ) );
 	
+	/**
+	 * Private constructor to prevent instantiation of this class.
+	 */
+	private Images() {}
+	
 }

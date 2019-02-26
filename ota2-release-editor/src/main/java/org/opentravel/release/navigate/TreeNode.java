@@ -34,7 +34,7 @@ import javafx.scene.image.Image;
 public abstract class TreeNode<E> {
 	
 	protected TreeNodeFactory treeNodeFactory;
-	private List<TreeNode<?>> children;
+	private List<TreeNode<Object>> children;
 	private E entity;
 	
 	/**
@@ -84,7 +84,7 @@ public abstract class TreeNode<E> {
 	 * 
 	 * @return List<TreeNode<?>>
 	 */
-	protected abstract List<TreeNode<?>> initializeChildren();
+	protected abstract List<TreeNode<Object>> initializeChildren();
 	
 	/**
 	 * Returns true if the children of this node are to be sorted in
@@ -102,7 +102,7 @@ public abstract class TreeNode<E> {
 	 * 
 	 * @return List<TreeNode<?>>
 	 */
-	public List<TreeNode<?>> getChildren() {
+	public List<TreeNode<Object>> getChildren() {
 		if (children == null) {
 			children = initializeChildren();
 		}

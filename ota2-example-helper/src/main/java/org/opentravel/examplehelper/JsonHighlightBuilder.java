@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.opentravel.application.common.SyntaxHighlightBuilder;
 
 /**
  * Syntax highlighting builder for XML documents.
@@ -39,7 +40,7 @@ public class JsonHighlightBuilder implements SyntaxHighlightBuilder {
     private static final int GROUP_OTHER_VALUE      = 6;
     
 	/**
-	 * @see org.opentravel.examplehelper.SyntaxHighlightBuilder#computeHighlighting(java.lang.String)
+	 * @see org.opentravel.application.common.SyntaxHighlightBuilder#computeHighlighting(java.lang.String)
 	 */
 	@Override
 	public StyleSpans<Collection<String>> computeHighlighting(String text) {

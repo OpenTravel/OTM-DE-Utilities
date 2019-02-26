@@ -24,6 +24,8 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import org.opentravel.application.common.AbstractUserSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Persists settings for the <code>ExampleUpgradeUtility</code> application between sessions.
@@ -33,6 +35,7 @@ public class UserSettings extends AbstractUserSettings {
 	private static final String USER_SETTINGS_FILE = "/.ota2/.eu-settings.properties";
 	
 	private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
+    private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
 	
 	private int repeatCount;
 	private File lastModelFile;
@@ -59,7 +62,7 @@ public class UserSettings extends AbstractUserSettings {
 				settings.load( usProps );
 				
 			} catch(Exception e) {
-				System.out.println("Error loading settings from prior session (using defaults).");
+				log.error( "Error loading settings from prior session (using defaults).", e );
 				settings = getDefaultSettings();
 			}
 		}
@@ -81,8 +84,7 @@ public class UserSettings extends AbstractUserSettings {
 			usProps.store( out, null );
 			
 		} catch(IOException e) {
-			System.out.println("Error saving user settings...");
-			e.printStackTrace( System.out );
+			log.error( "Error saving user settings.", e );
 		}
 	}
 	
@@ -92,14 +94,14 @@ public class UserSettings extends AbstractUserSettings {
 	 * @return UserSettings
 	 */
 	public static UserSettings getDefaultSettings() {
-		File userHomeDirectory = new File( System.getProperty( "user.home" ) );
+		String userHomeDirectory = System.getProperty( "user.home" );
 		UserSettings settings = new UserSettings();
 		
 		settings.setWindowPosition( settings.getDefaultWindowPosition() );
 		settings.setWindowSize( settings.getDefaultWindowSize() );
 		settings.setRepeatCount( 2 );
-		settings.setLastModelFile( new File( userHomeDirectory, "/dummy-file.otm" ) );
-		settings.setLastExampleFolder( userHomeDirectory );
+		settings.setLastModelFile( new File( userHomeDirectory + "/dummy-file.otm" ) );
+		settings.setLastExampleFolder( new File( userHomeDirectory ) );
 		return settings;
 	}
 
@@ -108,13 +110,13 @@ public class UserSettings extends AbstractUserSettings {
 	 */
 	@Override
 	protected void load(Properties settingsProps) {
-		int repeatCount = Integer.parseInt( settingsProps.getProperty( "repeatCount" ) );
-		String lastModelFile = settingsProps.getProperty( "lastModelFile" );
-		String lastExampleFolder = settingsProps.getProperty( "lastExampleFolder" );
+		int rptCount = Integer.parseInt( settingsProps.getProperty( "repeatCount" ) );
+		String modelFile = settingsProps.getProperty( "lastModelFile" );
+		String exampleFolder = settingsProps.getProperty( "lastExampleFolder" );
 		
-		setRepeatCount( repeatCount );
-		setLastModelFile( (lastModelFile == null) ? null : new File( lastModelFile ) );
-		setLastExampleFolder( (lastExampleFolder == null) ? null : new File( lastExampleFolder ) );
+		setRepeatCount( rptCount );
+		setLastModelFile( (modelFile == null) ? null : new File( modelFile ) );
+		setLastExampleFolder( (exampleFolder == null) ? null : new File( exampleFolder ) );
 		super.load( settingsProps );
 	}
 
@@ -124,14 +126,14 @@ public class UserSettings extends AbstractUserSettings {
 	@Override
 	protected void save(Properties settingsProps) {
 		UserSettings defaultValues = getDefaultSettings();
-		String lastModelFile = (this.lastModelFile == null) ?
+		String modelFile = (this.lastModelFile == null) ?
 				defaultValues.getLastModelFile().getAbsolutePath() : this.lastModelFile.getAbsolutePath();
-		String lastExampleFolder = (this.lastExampleFolder == null) ?
+		String exampleFolder = (this.lastExampleFolder == null) ?
 				defaultValues.getLastExampleFolder().getAbsolutePath() : this.lastExampleFolder.getAbsolutePath();
 		
 		settingsProps.put( "repeatCount", repeatCount + "" );
-		settingsProps.put( "lastModelFile", lastModelFile );
-		settingsProps.put( "lastExampleFolder", lastExampleFolder );
+		settingsProps.put( "lastModelFile", modelFile );
+		settingsProps.put( "lastExampleFolder", exampleFolder );
 		super.save( settingsProps );
 	}
 

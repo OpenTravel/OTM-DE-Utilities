@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ServiceLoader;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -33,7 +34,11 @@ import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.OTA2ApplicationProvider;
 import org.opentravel.application.common.OTA2ApplicationSpec;
 import org.opentravel.application.common.OTA2LauncherTabSpec;
+import org.opentravel.application.common.OtmApplicationException;
+import org.opentravel.application.common.OtmApplicationRuntimeException;
 import org.opentravel.application.common.StatusType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -63,6 +68,8 @@ public class LauncherController extends AbstractMainWindowController {
 
 	public static final String FXML_FILE = "/ota2-launcher.fxml";
 	
+    private static final Logger log = LoggerFactory.getLogger( LauncherController.class );
+    
 	private static final String APP_CLASS_KEY   = "appClass";
 	private static final String APP_PROCESS_KEY = "appProcess";
 	private static final String MSG_ALREADY_RUNNING_TITLE   = "alert.alreadyRunning.title";
@@ -98,7 +105,7 @@ public class LauncherController extends AbstractMainWindowController {
 			controller.showAndWait();
 			
 		} catch (IOException e) {
-			e.printStackTrace( System.out );
+		    log.error( "Error launching the proxy settings dialog.", e );
 		}
 	}
 	
@@ -127,50 +134,8 @@ public class LauncherController extends AbstractMainWindowController {
 		} else {
 			String statusMessage = MessageBuilder.formatMessage( MSG_LAUNCH_TITLE, MessageBuilder.getDisplayName( appClass ) );
 			Runnable r = new BackgroundTask( statusMessage, StatusType.INFO ) {
-				public void execute() throws Throwable {
-					String javaHome = System.getProperty( "java.home" );
-					String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
-					String classpath = System.getProperty( "java.class.path" );
-					UserSettings settings = UserSettings.load();
-					List<String> cmds = new ArrayList<>( Arrays.asList( javaBin, "-cp", classpath ) );
-					ProcessBuilder builder;
-					Process newProcess;
-					
-					// Configure proxy settings (if necessary)
-					if (!settings.isUseProxy()) {
-						cmds.add( "-Dhttp.proxyHost=" + settings.getProxyHost() );
-						
-						if (settings.getProxyPort() != null) {
-							cmds.add( "-Dhttp.proxyPort=" + settings.getProxyPort() );
-						}
-						if (!StringUtils.isEmpty( settings.getNonProxyHosts() )) {
-							cmds.add( "-Dhttp.nonProxyHosts=" + settings.getNonProxyHosts() );
-						}
-					}
-					
-					// Build and execute the command to start the new sub-process
-					cmds.add( appClass.getCanonicalName() );
-					builder = new ProcessBuilder( cmds );
-					builder.redirectErrorStream( true );
-					builder.redirectOutput( Redirect.to( getLogFile( appClass ) ) );
-					newProcess = builder.start();
-					
-					// Wait a second before checking the status
-					try {
-						Thread.sleep( 5000 );
-						
-					} catch (InterruptedException e) {
-						Thread.currentThread().interrupt();
-					}
-					
-					// Finish up by saving the running process or reporting an error
-					if (newProcess.isAlive()) {
-						sourceButton.getProperties().put( APP_PROCESS_KEY, newProcess );
-						
-					} else {
-						throw new RuntimeException( MessageBuilder.formatMessage(
-								MSG_LAUNCH_ERROR, MessageBuilder.getDisplayName( appClass ) ) );
-					}
+				public void execute() throws OtmApplicationException {
+				    launchApplicationProcess( sourceButton, appClass );
 				}
 			};
 			
@@ -179,6 +144,74 @@ public class LauncherController extends AbstractMainWindowController {
 		}
 	}
 	
+    /**
+     * Spawns an external Java process for the selected application.
+     * 
+     * @param sourceButton  the button that was clicked by the user to launch an application
+     * @param appClass  the JavaFX application class for the utility being launched
+     * @throws OtmApplicationException  thrown if an error occurs while launching the application
+     */
+    private void launchApplicationProcess(Button sourceButton,
+            Class<? extends AbstractOTMApplication> appClass) throws OtmApplicationException {
+        try {
+            String javaHome = System.getProperty( "java.home" );
+            String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
+            String classpath = System.getProperty( "java.class.path" );
+            UserSettings settings = UserSettings.load();
+            List<String> cmds = new ArrayList<>( Arrays.asList( javaBin, "-cp", classpath ) );
+            ProcessBuilder builder;
+            Process newProcess;
+            
+            // Configure proxy settings (if necessary)
+            if (!settings.isUseProxy()) {
+                cmds.add( "-Dhttp.proxyHost=" + settings.getProxyHost() );
+                
+                if (settings.getProxyPort() != null) {
+                    cmds.add( "-Dhttp.proxyPort=" + settings.getProxyPort() );
+                }
+                if (!StringUtils.isEmpty( settings.getNonProxyHosts() )) {
+                    cmds.add( "-Dhttp.nonProxyHosts=" + settings.getNonProxyHosts() );
+                }
+            }
+            
+            // Build and execute the command to start the new sub-process
+            cmds.add( appClass.getCanonicalName() );
+            builder = new ProcessBuilder( cmds );
+            builder.redirectErrorStream( true );
+            builder.redirectOutput( Redirect.to( getLogFile( appClass ) ) );
+            newProcess = builder.start();
+            
+            // Wait five seconds before checking the status
+            sleep( 5000 );
+            
+            // Finish up by saving the running process or reporting an error
+            if (newProcess.isAlive()) {
+                sourceButton.getProperties().put( APP_PROCESS_KEY, newProcess );
+                
+            } else {
+                throw new OtmApplicationRuntimeException( MessageBuilder.formatMessage(
+                        MSG_LAUNCH_ERROR, MessageBuilder.getDisplayName( appClass ) ) );
+            }
+            
+        } catch (Exception e) {
+            throw new OtmApplicationException( e.getMessage(), e );
+        }
+    }
+    
+    /**
+     * Causes the current thread to sleep for the specified number of milliseconds.
+     * 
+     * @param durationMillis  the duration (in millis) to sleep
+     */
+    private void sleep(long durationMillis) {
+        try {
+            Thread.sleep( durationMillis );
+            
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+    
 	/**
 	 * Called when the user clicks the menu to display the about-application
 	 * dialog.
@@ -226,10 +259,11 @@ public class LauncherController extends AbstractMainWindowController {
 		
 		super.initialize( primaryStage );
 		
-		for (OTA2LauncherTabSpec tabSpec : appsByTab.keySet()) {
+		for (Entry<OTA2LauncherTabSpec, SortedSet<OTA2ApplicationSpec>> entry : appsByTab.entrySet()) {
+		    OTA2LauncherTabSpec tabSpec = entry.getKey();
 			TilePane buttonPane = newTab( tabSpec.getName() );
 			
-			for (OTA2ApplicationSpec appSpec : appsByTab.get( tabSpec )) {
+			for (OTA2ApplicationSpec appSpec : entry.getValue()) {
 				buttonPane.getChildren().add( newAppIcon(
 						appSpec.getApplicationClass(), appSpec.getLaunchIcon() ) );
 			}
@@ -321,10 +355,10 @@ public class LauncherController extends AbstractMainWindowController {
 	 * @return File
 	 */
 	private File getLogFolder() {
-		File currentFolder = new File( System.getProperty( "user.dir" ) );
-		File targetFolder = new File( currentFolder, "/target" );
-		File rootFolder = targetFolder.exists() ? targetFolder : currentFolder;
-		File logFolder = new File( rootFolder, "/logs" );
+		String currentFolder = System.getProperty( "user.dir" );
+		File targetFolder = new File( currentFolder + "/target" );
+		File rootFolder = targetFolder.exists() ? targetFolder : new File( currentFolder );
+		File logFolder = new File( rootFolder + "/logs" );
 		
 		logFolder.mkdirs();
 		return logFolder;

@@ -17,7 +17,6 @@ package org.opentravel.launcher;
 
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.AbstractUserSettings;
-import org.opentravel.schemacompiler.util.OTM16Upgrade;
 
 /**
  * JavaFX application for the Utility Launcher.
@@ -57,12 +56,4 @@ public class LauncherApplication extends AbstractOTMApplication {
 		return "OTM-DE Utility Applications";
 	}
 
-	/**
-	 * Since this is a read-only application, enable the OTM 1.6 file format for
-	 * all operations.
-	 */
-	static {
-		OTM16Upgrade.otm16Enabled = true;
-	}
-	
 }

@@ -26,15 +26,22 @@ import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.opentravel.application.common.AbstractUserSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Persists settings for the <code>App-Launcher</code> application between sessions.
  */
 public class UserSettings extends AbstractUserSettings {
 	
-	private static final String USER_SETTINGS_FILE = "/.ota2/.al-settings.properties";
+    private static final String USE_PROXY = "useProxy";
+    private static final String PROXY_HOST = "proxyHost";
+    private static final String PROXY_PORT = "proxyPort";
+    private static final String NON_PROXY_HOSTS = "nonProxyHosts";
+    private static final String USER_SETTINGS_FILE = "/.ota2/.al-settings.properties";
 	
 	private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
+    private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
 	
 	private boolean useProxy;
 	private String proxyHost;
@@ -61,9 +68,8 @@ public class UserSettings extends AbstractUserSettings {
 				settings = new UserSettings();
 				settings.load( usProps );
 				
-			} catch(Throwable t) {
-				t.printStackTrace( System.out );
-				System.out.println("Error loading settings from prior session (using defaults).");
+			} catch (Exception e) {
+				log.error("Error loading settings from prior session (using defaults).", e);
 				settings = getDefaultSettings();
 			}
 			
@@ -86,9 +92,8 @@ public class UserSettings extends AbstractUserSettings {
 			save( usProps );
 			usProps.store( out, null );
 			
-		} catch(IOException e) {
-			System.out.println("Error saving user settings...");
-			e.printStackTrace( System.out );
+		} catch (IOException e) {
+			log.error("Error saving user settings.", e);
 		}
 	}
 	
@@ -99,14 +104,14 @@ public class UserSettings extends AbstractUserSettings {
 	 */
 	public static UserSettings getDefaultSettings() {
 		UserSettings settings = new UserSettings();
-		String portStr = MessageBuilder.getDefaultValue( "proxyPort" );
+		String portStr = MessageBuilder.getDefaultValue( PROXY_PORT );
 		
 		settings.setWindowPosition( settings.getDefaultWindowPosition() );
 		settings.setWindowSize( settings.getDefaultWindowSize() );
-		settings.setUseProxy( Boolean.parseBoolean( MessageBuilder.getDefaultValue( "useProxy" ) ) );
-		settings.setProxyHost( MessageBuilder.getDefaultValue( "proxyHost" ) );
+		settings.setUseProxy( Boolean.parseBoolean( MessageBuilder.getDefaultValue( USE_PROXY ) ) );
+		settings.setProxyHost( MessageBuilder.getDefaultValue( PROXY_HOST ) );
 		settings.setProxyPort( StringUtils.isEmpty( portStr ) ? null : Integer.parseInt( portStr ) );
-		settings.setNonProxyHosts( MessageBuilder.getDefaultValue( "nonProxyHosts" ) );
+		settings.setNonProxyHosts( MessageBuilder.getDefaultValue( NON_PROXY_HOSTS ) );
 		return settings;
 	}
 
@@ -115,23 +120,25 @@ public class UserSettings extends AbstractUserSettings {
 	 */
 	@Override
 	protected void load(Properties settingsProps) {
-		String useProxyStr = settingsProps.getProperty( "useProxy", "false" );
-		String proxyHost = settingsProps.getProperty( "proxyHost" );
-		String proxyPortStr = settingsProps.getProperty( "proxyPort" );
-		String nonProxyHosts = settingsProps.getProperty( "nonProxyHosts" );
-		boolean useProxy = false;
-		Integer proxyPort = null;
+		String useProxyStr = settingsProps.getProperty( USE_PROXY, "false" );
+		String prxHost = settingsProps.getProperty( PROXY_HOST );
+		String proxyPortStr = settingsProps.getProperty( PROXY_PORT );
+		String nonPrxHosts = settingsProps.getProperty( NON_PROXY_HOSTS );
+		boolean usePrx = false;
+		Integer prxPort = null;
 		
 		try {
-			useProxy = Boolean.parseBoolean( useProxyStr );
-			proxyPort = StringUtils.isEmpty( proxyPortStr) ? null : Integer.parseInt( proxyPortStr );
+			usePrx = Boolean.parseBoolean( useProxyStr );
+			prxPort = StringUtils.isEmpty( proxyPortStr) ? null : Integer.parseInt( proxyPortStr );
 			
-		} catch (NumberFormatException e) {}
+		} catch (NumberFormatException e) {
+		    // Ignore error and use default value(s)
+		}
 		
-		setUseProxy( useProxy );
-		setProxyHost( proxyHost );
-		setProxyPort( proxyPort );
-		setNonProxyHosts( nonProxyHosts );
+		setUseProxy( usePrx );
+		setProxyHost( prxHost );
+		setProxyPort( prxPort );
+		setNonProxyHosts( nonPrxHosts );
 		super.load( settingsProps );
 	}
 
@@ -141,15 +148,15 @@ public class UserSettings extends AbstractUserSettings {
 	@Override
 	protected void save(Properties settingsProps) {
 		if (!StringUtils.isEmpty( proxyHost )) {
-			settingsProps.put( "proxyHost", proxyHost );
+			settingsProps.put( PROXY_HOST, proxyHost );
 		}
 		if (proxyPort != null) {
-			settingsProps.put( "proxyPort", proxyPort.toString() );
+			settingsProps.put( PROXY_PORT, proxyPort.toString() );
 		}
 		if (!StringUtils.isEmpty( nonProxyHosts )) {
-			settingsProps.put( "nonProxyHosts", nonProxyHosts );
+			settingsProps.put( NON_PROXY_HOSTS, nonProxyHosts );
 		}
-		settingsProps.put( "useProxy", useProxy + "" );
+		settingsProps.put( USE_PROXY, useProxy + "" );
 		super.save( settingsProps );
 	}
 

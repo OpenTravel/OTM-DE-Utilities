@@ -67,10 +67,10 @@ public class CoreObjectTreeNode extends TreeNode<TLCoreObject> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLCoreObject core = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return core.getName(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( core ); } ) );
-		props.add( new NodeProperty( "extends", () -> { return getExtensionName( core ); } ) );
-		props.add( new NodeProperty( "notExtendable", () -> { return core.isNotExtendable() + ""; } ) );
+		props.add( new NodeProperty( "name", core::getName ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( core ) ) );
+		props.add( new NodeProperty( "extends", () -> getExtensionName( core ) ) );
+		props.add( new NodeProperty( "notExtendable", () -> core.isNotExtendable() + "" ) );
 		return props;
 	}
 
@@ -78,8 +78,8 @@ public class CoreObjectTreeNode extends TreeNode<TLCoreObject> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
-		List<TreeNode<?>> children = new ArrayList<>();
+    protected List<TreeNode<Object>> initializeChildren() {
+		List<TreeNode<Object>> children = new ArrayList<>();
 		TLCoreObject core = getEntity();
 		
 		for (TLAlias alias : core.getAliases()) {

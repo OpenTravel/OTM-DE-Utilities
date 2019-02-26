@@ -70,10 +70,10 @@ public class ActionRequestTreeNode extends TreeNode<TLActionRequest> {
 		TLActionRequest request = getEntity();
 		TLParamGroup paramGroup = request.getParamGroup();
 		
-		props.add( new NodeProperty( "method", () -> { return MessageBuilder.formatMessage( request.getHttpMethod().toString() ); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( request ); } ) );
-		props.add( new NodeProperty( "paramGroup", () -> { return (paramGroup == null) ? "" : paramGroup.getName(); } ) );
-		props.add( new NodeProperty( "payloadType", () -> { return getEntityDisplayName( request.getPayloadType() ); } ) );
+		props.add( new NodeProperty( "method", () -> MessageBuilder.formatMessage( request.getHttpMethod().toString() ) ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( request ) ) );
+		props.add( new NodeProperty( "paramGroup", () -> (paramGroup == null) ? "" : paramGroup.getName() ) );
+		props.add( new NodeProperty( "payloadType", () -> getEntityDisplayName( request.getPayloadType() ) ) );
 		return props;
 	}
 
@@ -81,7 +81,7 @@ public class ActionRequestTreeNode extends TreeNode<TLActionRequest> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
+    protected List<TreeNode<Object>> initializeChildren() {
 		return Collections.emptyList();
 	}
 

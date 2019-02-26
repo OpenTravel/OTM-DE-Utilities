@@ -68,10 +68,10 @@ public class ChoiceObjectTreeNode extends TreeNode<TLChoiceObject> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLChoiceObject choice = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return choice.getName(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( choice ); } ) );
-		props.add( new NodeProperty( "extends", () -> { return getExtensionName( choice ); } ) );
-		props.add( new NodeProperty( "notExtendable", () -> { return choice.isNotExtendable() + ""; } ) );
+		props.add( new NodeProperty( "name", choice::getName ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( choice ) ) );
+		props.add( new NodeProperty( "extends", () -> getExtensionName( choice ) ) );
+		props.add( new NodeProperty( "notExtendable", () -> choice.isNotExtendable() + "" ) );
 		return props;
 	}
 
@@ -79,8 +79,8 @@ public class ChoiceObjectTreeNode extends TreeNode<TLChoiceObject> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
-		List<TreeNode<?>> children = new ArrayList<>();
+    protected List<TreeNode<Object>> initializeChildren() {
+		List<TreeNode<Object>> children = new ArrayList<>();
 		TLChoiceObject choice = getEntity();
 		
 		for (TLAlias alias : choice.getAliases()) {

@@ -67,12 +67,12 @@ public class ElementTreeNode extends TreeNode<TLProperty> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLProperty element = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return element.getName(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( element ); } ) );
-		props.add( new NodeProperty( "type", () -> { return getEntityDisplayName( element.getType() ); } ) );
-		props.add( new NodeProperty( "isReference", () -> { return element.isReference() + ""; } ) );
-		props.add( new NodeProperty( "repeat", () -> { return element.getRepeat() + ""; } ) );
-		props.add( new NodeProperty( "mandatory", () -> { return element.isMandatory() + ""; } ) );
+		props.add( new NodeProperty( "name", element::getName ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( element ) ) );
+		props.add( new NodeProperty( "type", () -> getEntityDisplayName( element.getType() ) ) );
+		props.add( new NodeProperty( "isReference", () -> element.isReference() + "" ) );
+		props.add( new NodeProperty( "repeat", () -> element.getRepeat() + "" ) );
+		props.add( new NodeProperty( "mandatory", () -> element.isMandatory() + "" ) );
 		return props;
 	}
 
@@ -80,7 +80,7 @@ public class ElementTreeNode extends TreeNode<TLProperty> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
+    protected List<TreeNode<Object>> initializeChildren() {
 		return Collections.emptyList();
 	}
 

@@ -24,6 +24,8 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import org.opentravel.application.common.AbstractUserSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Persists settings for the <code>ExampleHelper</code> application between sessions.
@@ -34,6 +36,8 @@ public class UserSettings extends AbstractUserSettings {
 	
 	private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
 	
+    private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
+    
 	private File projectFolder;
 	private File messageFolder;
 	
@@ -57,9 +61,8 @@ public class UserSettings extends AbstractUserSettings {
 				settings = new UserSettings();
 				settings.load( usProps );
 				
-			} catch(Throwable t) {
-				t.printStackTrace( System.out );
-				System.out.println("Error loading settings from prior session (using defaults).");
+			} catch(Exception e) {
+				log.warn( "Error loading settings from prior session (using defaults).", e );
 				settings = getDefaultSettings();
 			}
 			
@@ -83,8 +86,7 @@ public class UserSettings extends AbstractUserSettings {
 			usProps.store( out, null );
 			
 		} catch(IOException e) {
-			System.out.println("Error saving user settings...");
-			e.printStackTrace( System.out );
+		    log.error( "Error saving user settings.", e );
 		}
 	}
 	
@@ -110,11 +112,11 @@ public class UserSettings extends AbstractUserSettings {
 	@Override
 	protected void load(Properties settingsProps) {
 		String currentFolder = System.getProperty( "user.dir" );
-		String projectFolder = settingsProps.getProperty( "projectFolder", currentFolder );
-		String messageFolder = settingsProps.getProperty( "messageFolder", currentFolder );
+		String prjFolder = settingsProps.getProperty( "projectFolder", currentFolder );
+		String msgFolder = settingsProps.getProperty( "messageFolder", currentFolder );
 		
-		setProjectFolder( new File( projectFolder ) );
-		setMessageFolder( new File( messageFolder ) );
+		setProjectFolder( new File( prjFolder ) );
+		setMessageFolder( new File( msgFolder ) );
 		super.load( settingsProps );
 	}
 

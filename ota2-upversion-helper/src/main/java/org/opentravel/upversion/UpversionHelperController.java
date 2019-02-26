@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import javax.xml.bind.JAXBElement;
 
 import org.opentravel.application.common.AbstractMainWindowController;
+import org.opentravel.application.common.OtmApplicationException;
 import org.opentravel.application.common.ProgressMonitor;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.ns.ota2.project_v01_00.ManagedProjectItemType;
@@ -44,6 +45,8 @@ import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.schemacompiler.repository.impl.ProjectFileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -80,6 +83,8 @@ public class UpversionHelperController extends AbstractMainWindowController {
 	
 	public static final String FXML_FILE = "/ota2-upversion-helper.fxml";
 	
+    private static final Logger log = LoggerFactory.getLogger( UpversionHelperController.class );
+    
 	@FXML private MenuItem importMenu;
 	@FXML private MenuItem exportMenu;
 	@FXML private MenuItem upversionMenu;
@@ -115,7 +120,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
 			availabilityChecker.pingAllRepositories( true );
 			
 		} catch (RepositoryException e) {
-			e.printStackTrace( System.out );
+		    log.error( "Error creating default repository item instance.", e );
 		}
 	}
 
@@ -129,38 +134,16 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		UserSettings userSettings = UserSettings.load();
 		FileChooser chooser = newFileChooser( "Import from OTM Project",
 				userSettings.getProjectFolder(),
-				new String[] { "*.otp", "OTM Project Files" },
-				new String[] { "*.*", "All Files (*.*)" } );
+				OTP_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
 		File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 		
 		if (selectedFile != null) {
 			Runnable r = new BackgroundTask( "Importing libraries...", StatusType.INFO ) {
-				public void execute() throws Throwable {
+				public void execute() throws OtmApplicationException {
 					try {
 						ProjectType otpContent = new ProjectFileUtils().loadJaxbProjectFile( selectedFile, null );
-						List<RepositoryItemWrapper> selectedItems = selectedLibrariesTable.getItems();
-						ObservableList<RepositoryItemWrapper> candidateItems = FXCollections.observableArrayList();
-						
-						for (JAXBElement<? extends ProjectItemType> piElement : otpContent.getProjectItemBase()) {
-							ProjectItemType piValue = piElement.getValue();
-							
-							if (piValue instanceof ManagedProjectItemType) {
-								try {
-									ManagedProjectItemType pi = (ManagedProjectItemType) piValue;
-									Repository repository = repositoryManager.getRepository( pi.getRepository() );
-									RepositoryItem item = repository.getRepositoryItem(
-											pi.getBaseNamespace(), pi.getFilename(), pi.getVersion() );
-									
-									if ((item != null) && !selectedItems.contains( item )) {
-										candidateItems.add( new RepositoryItemWrapper( item ) );
-									}
-									
-								} catch (RepositoryException e) {
-									// Ignore and proceed to next managed item
-								}
-							}
-						}
-						Collections.sort( candidateItems );
+						ObservableList<RepositoryItemWrapper> candidateItems =
+						        getCandidateRepositoryItems( otpContent );
 						
 						Platform.runLater( () -> {
 							namespaceChoice.getSelectionModel().clearSelection();
@@ -168,17 +151,54 @@ public class UpversionHelperController extends AbstractMainWindowController {
 							updateControlStates();
 						});
 						
+					} catch (Exception e) {
+					    throw new OtmApplicationException( e );
+					    
 					} finally {
 						userSettings.setProjectFolder( selectedFile.getParentFile() );
 						userSettings.save();
 					}
 				}
+
 			};
 			
 			new Thread( r ).start();
 		}
 	}
 	
+    /**
+     * Returns a list of candidate repository items from the OTM project.
+     * 
+     * @param otpContent  the OTM project from which to return managed repository items
+     * @return ObservableList<RepositoryItemWrapper>
+     */
+    private ObservableList<RepositoryItemWrapper> getCandidateRepositoryItems(ProjectType otpContent) {
+        List<RepositoryItemWrapper> selectedItems = selectedLibrariesTable.getItems();
+        ObservableList<RepositoryItemWrapper> candidateItems = FXCollections.observableArrayList();
+        
+        for (JAXBElement<? extends ProjectItemType> piElement : otpContent.getProjectItemBase()) {
+            ProjectItemType piValue = piElement.getValue();
+            
+            if (piValue instanceof ManagedProjectItemType) {
+                try {
+                    ManagedProjectItemType pi = (ManagedProjectItemType) piValue;
+                    Repository repository = repositoryManager.getRepository( pi.getRepository() );
+                    RepositoryItem item = repository.getRepositoryItem(
+                            pi.getBaseNamespace(), pi.getFilename(), pi.getVersion() );
+                    
+                    if ((item != null) && !selectedItems.contains( item )) {
+                        candidateItems.add( new RepositoryItemWrapper( item ) );
+                    }
+                    
+                } catch (RepositoryException e) {
+                    // Ignore and proceed to next managed item
+                }
+            }
+        }
+        Collections.sort( candidateItems );
+        return candidateItems;
+    }
+    
 	/**
 	 * Called when the user clicks the menu export selected libraries to
 	 * a new OTM project (OTP) file.
@@ -189,51 +209,13 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		UserSettings userSettings = UserSettings.load();
 		FileChooser chooser = newFileChooser( "Export to OTM Project",
 				userSettings.getProjectFolder(),
-				new String[] { "*.otp", "OTM Project Files" },
-				new String[] { "*.*", "All Files (*.*)" } );
+				OTP_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
 		File selectedFile = chooser.showSaveDialog( getPrimaryStage() );
 		
 		if (selectedFile != null) {
 			Runnable r = new BackgroundTask( "Exporting libraries...", StatusType.INFO ) {
-				public void execute() throws Throwable {
-					try {
-						String projectId = namespaceChoice.getSelectionModel().getSelectedItem();
-						Map<String,Repository> repositoryMap = new HashMap<>();
-						RepositoryReferencesType repoRefs = new RepositoryReferencesType();
-						ProjectType otp = new ProjectType();
-						
-						otp.setName( selectedFile.getName().replace( ".otp", "" ) );
-						otp.setProjectId( (projectId != null) ? projectId : "http://www.opentravel.org" );
-						
-						for (RepositoryItem item : selectedLibrariesTable.getItems()) {
-							ManagedProjectItemType pi = new ManagedProjectItemType();
-							Repository itemRepo = item.getRepository();
-							ObjectFactory objFactory = new ObjectFactory();
-							
-							if (!repositoryMap.containsKey( itemRepo.getId() )) {
-								repositoryMap.put( itemRepo.getId(), itemRepo );
-							}
-							pi.setRepository( itemRepo.getId() );
-							pi.setBaseNamespace( item.getBaseNamespace() );
-							pi.setFilename( item.getFilename() );
-							pi.setVersion( item.getVersion() );
-							otp.getProjectItemBase().add( objFactory.createManagedProjectItem( pi ) );
-						}
-						
-						for (Entry<String,Repository> entry : repositoryMap.entrySet()) {
-							RepositoryRefType repoRef = new RepositoryRefType();
-							
-							repoRef.setRepositoryId( entry.getKey() );
-							repoRef.setValue( ((RemoteRepository) entry.getValue()).getEndpointUrl() );
-							repoRefs.getRepositoryRef().add( repoRef );
-						}
-						otp.setRepositoryReferences( repoRefs );
-						new ProjectFileUtils().saveProjectFile( otp, selectedFile );
-						
-					} finally {
-						userSettings.setProjectFolder( selectedFile.getParentFile() );
-						userSettings.save();
-					}
+				public void execute() throws OtmApplicationException {
+					exportLibraries( selectedFile, userSettings );
 				}
 			};
 			
@@ -241,6 +223,58 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		}
 	}
 	
+    /**
+     * Exports the current list of selected libraries to the specified OTP file.
+     * 
+     * @param otpFile  the project file to which the libraries will be exported
+     * @param userSettings  the user's preference settings
+     * @throws OtmApplicationException  thrown if an error occurs while saving the project file
+     */
+    private void exportLibraries(File otpFile, UserSettings userSettings)
+            throws OtmApplicationException {
+        try {
+            String projectId = namespaceChoice.getSelectionModel().getSelectedItem();
+            Map<String,Repository> repositoryMap = new HashMap<>();
+            RepositoryReferencesType repoRefs = new RepositoryReferencesType();
+            ProjectType otp = new ProjectType();
+            
+            otp.setName( otpFile.getName().replace( ".otp", "" ) );
+            otp.setProjectId( (projectId != null) ? projectId : "http://www.opentravel.org" );
+            
+            for (RepositoryItem item : selectedLibrariesTable.getItems()) {
+                ManagedProjectItemType pi = new ManagedProjectItemType();
+                Repository itemRepo = item.getRepository();
+                ObjectFactory objFactory = new ObjectFactory();
+                
+                if (!repositoryMap.containsKey( itemRepo.getId() )) {
+                    repositoryMap.put( itemRepo.getId(), itemRepo );
+                }
+                pi.setRepository( itemRepo.getId() );
+                pi.setBaseNamespace( item.getBaseNamespace() );
+                pi.setFilename( item.getFilename() );
+                pi.setVersion( item.getVersion() );
+                otp.getProjectItemBase().add( objFactory.createManagedProjectItem( pi ) );
+            }
+            
+            for (Entry<String,Repository> entry : repositoryMap.entrySet()) {
+                RepositoryRefType repoRef = new RepositoryRefType();
+                
+                repoRef.setRepositoryId( entry.getKey() );
+                repoRef.setValue( ((RemoteRepository) entry.getValue()).getEndpointUrl() );
+                repoRefs.getRepositoryRef().add( repoRef );
+            }
+            otp.setRepositoryReferences( repoRefs );
+            new ProjectFileUtils().saveProjectFile( otp, otpFile );
+            
+        } catch (Exception e) {
+            throw new OtmApplicationException( e );
+            
+        } finally {
+            userSettings.setProjectFolder( otpFile.getParentFile() );
+            userSettings.save();
+        }
+    }
+    
 	/**
 	 * Called when the user clicks the menu to add items to the list of
 	 * selected libraries.
@@ -304,27 +338,18 @@ public class UpversionHelperController extends AbstractMainWindowController {
 
 			alert.getButtonTypes().setAll( ButtonType.YES, ButtonType.NO );
 			dialogResult = alert.showAndWait();
-			confirmPurgeExistingFiles = (dialogResult.get() == ButtonType.YES);
+			confirmPurgeExistingFiles = dialogResult.isPresent() && (dialogResult.get() == ButtonType.YES);
 		}
 		
 		if (confirmPurgeExistingFiles) {
 			Runnable r = new BackgroundTask( "Upversioning selected files...", StatusType.INFO ) {
-				public void execute() throws Throwable {
+				public void execute() throws OtmApplicationException {
 					try {
 						List<RepositoryItem> selectedItems = new ArrayList<>( selectedLibrariesTable.getItems() );
 						ProgressMonitor monitor = new ProgressMonitor( upversionProgressBar );
 						UpversionOrchestrator orchestrator = new UpversionOrchestrator();
-						String selectedNS = namespaceChoice.getSelectionModel().getSelectedItem();
 						
-						if (selectedNS == null) {
-							selectedNS = "http://www.opentravel.org";
-						}
-						
-						Platform.runLater( new Runnable() {
-							public void run() {
-								upversionProgressBar.setDisable( false );
-							}
-						});
+						Platform.runLater( () -> upversionProgressBar.setDisable( false ) );
 						
 						orchestrator
 							.setRepositoryManager( repositoryManager )
@@ -334,13 +359,14 @@ public class UpversionHelperController extends AbstractMainWindowController {
 							.setProgressMonitor( monitor )
 							.createNewVersions();
 							
-						Platform.runLater( new Runnable() {
-							public void run() {
-								upversionProgressBar.setDisable( true );
-								upversionProgressBar.setProgress( 0.0 );
-							}
+						Platform.runLater( () -> {
+                            upversionProgressBar.setDisable( true );
+                            upversionProgressBar.setProgress( 0.0 );
 						});
 						
+					} catch (Exception e) {
+					    throw new OtmApplicationException( e );
+					    
 					} finally {
 						userSettings.setOutputFolder( selectedFolder );
 						userSettings.save();
@@ -382,11 +408,9 @@ public class UpversionHelperController extends AbstractMainWindowController {
 			}
 		}
 		
-		Platform.runLater( new Runnable() {
-			public void run() {
-				selectedLibrariesTable.setItems( refreshedItems );
-				selectedLibrariesTable.refresh();
-			}
+		Platform.runLater( () -> {
+            selectedLibrariesTable.setItems( refreshedItems );
+            selectedLibrariesTable.refresh();
 		});
 	}
 	
@@ -415,16 +439,21 @@ public class UpversionHelperController extends AbstractMainWindowController {
 	 */
 	private void repositorySelectionChanged() {
 		Runnable r = new BackgroundTask( "Updating namespaces from remote repository...", StatusType.INFO ) {
-			public void execute() throws Throwable {
-				String rid = repositoryChoice.getSelectionModel().getSelectedItem();
-				Repository repository = repositoryManager.getRepository( rid );
-				List<String> baseNamespaces = repository.listBaseNamespaces();
-				
-				baseNamespaces.add( 0, null );
-				Platform.runLater( () -> {
-					namespaceChoice.setItems( FXCollections.observableList( baseNamespaces ) );
-					namespaceChoice.getSelectionModel().select( 0 );
-				});
+			public void execute() throws OtmApplicationException {
+			    try {
+	                String rid = repositoryChoice.getSelectionModel().getSelectedItem();
+	                Repository repository = repositoryManager.getRepository( rid );
+	                List<String> baseNamespaces = repository.listBaseNamespaces();
+	                
+	                baseNamespaces.add( 0, null );
+	                Platform.runLater( () -> {
+	                    namespaceChoice.setItems( FXCollections.observableList( baseNamespaces ) );
+	                    namespaceChoice.getSelectionModel().select( 0 );
+	                });
+			        
+			    } catch (Exception e) {
+			        throw new OtmApplicationException( e );
+			    }
 			}
 		};
 		
@@ -440,28 +469,22 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		
 		if (selectedNS != null) {
 			Runnable r = new BackgroundTask( "Updating candidate libraries from remote repository...", StatusType.INFO ) {
-				public void execute() throws Throwable {
-					String rid = repositoryChoice.getSelectionModel().getSelectedItem();
-					Repository repository = repositoryManager.getRepository( rid );
-					List<RepositoryItemWrapper> selectedItems = selectedLibrariesTable.getItems();
-					List<String> candidateNamespaces = getCandidateNamespaces();
-					List<RepositoryItemWrapper> candidateItems = new ArrayList<>();
-					
-					for (String candidateNS : candidateNamespaces) {
-						List<RepositoryItem> items = repository.listItems( candidateNS, null, true );
-						
-						for (RepositoryItem item : items) {
-							if (!selectedItems.contains( item )) {
-								candidateItems.add( new RepositoryItemWrapper( item ) );
-							}
-						}
-					}
-					Collections.sort( candidateItems );
-					
-					Platform.runLater( () -> {
-						candidateLibrariesTable.setItems( FXCollections.observableList( candidateItems ) );
-					});
+				public void execute() throws OtmApplicationException {
+				    try {
+	                    String rid = repositoryChoice.getSelectionModel().getSelectedItem();
+	                    Repository repository = repositoryManager.getRepository( rid );
+                        List<String> candidateNamespaces = getCandidateNamespaces();
+	                    List<RepositoryItemWrapper> candidateItems = getCandidateRepositoryItems(
+	                            repository, candidateNamespaces );
+	                    
+	                    Platform.runLater( () ->
+	                        candidateLibrariesTable.setItems( FXCollections.observableList( candidateItems ) ) );
+				        
+	                } catch (Exception e) {
+	                    throw new OtmApplicationException( e );
+				    }
 				}
+
 			};
 			
 			new Thread( r ).start();
@@ -474,6 +497,32 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		}
 	}
 	
+    /**
+     * Retrieves all candidate repository items from the selected namespaces of the given repository.
+     * 
+     * @param repository  the repository from which to retrieve candidate repository items
+     * @param candidateNamespaces  the list of candidate namespaces from the user's current selection
+     * @return List<RepositoryItemWrapper>
+     * @throws RepositoryException  thrown if an error occurs while accessing the remote repository
+     */
+    private List<RepositoryItemWrapper> getCandidateRepositoryItems(Repository repository,
+            List<String> candidateNamespaces) throws RepositoryException {
+        List<RepositoryItemWrapper> selectedItems = selectedLibrariesTable.getItems();
+        List<RepositoryItemWrapper> candidateItems = new ArrayList<>();
+        
+        for (String candidateNS : candidateNamespaces) {
+            List<RepositoryItem> items = repository.listItems( candidateNS, null, true );
+            
+            for (RepositoryItem item : items) {
+                if (!selectedItems.contains( item )) {
+                    candidateItems.add( new RepositoryItemWrapper( item ) );
+                }
+            }
+        }
+        Collections.sort( candidateItems );
+        return candidateItems;
+    }
+    
 	/**
 	 * Returns the list of candidate namespaces that are either equal to
 	 * or sub-namespaces of the currently selected namespace.
@@ -548,57 +597,45 @@ public class UpversionHelperController extends AbstractMainWindowController {
 	/**
 	 * @see org.opentravel.application.common.AbstractMainWindowController#initialize(javafx.stage.Stage)
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
+    @SuppressWarnings("squid:MaximumInheritanceDepth") // Unavoidable since the base class is from core JavaFXx
 	protected void initialize(Stage primaryStage) {
 		super.initialize(primaryStage);
 		
 		// Configure listeners for choice boxes
-		repositoryChoice.valueProperty().addListener( (observable, oldValue, newValue) -> {
-			repositorySelectionChanged();
-		} );
-		namespaceChoice.valueProperty().addListener( (observable, oldValue, newValue) -> {
-			namespaceSelectionChanged();
-		} );
+		repositoryChoice.valueProperty().addListener(
+		        (observable, oldValue, newValue) -> repositorySelectionChanged() );
+		namespaceChoice.valueProperty().addListener(
+		        (observable, oldValue, newValue) -> namespaceSelectionChanged() );
 		
 		// Configure cell values and tooltips for table views
 		Callback<CellDataFeatures<RepositoryItemWrapper,String>, ObservableValue<String>> nameColumnValueFactory =
-				new Callback<TableColumn.CellDataFeatures<RepositoryItemWrapper,String>, ObservableValue<String>>() {
-					public ObservableValue<String> call(CellDataFeatures<RepositoryItemWrapper, String> nodeFeatures) {
-						RepositoryItem item = nodeFeatures.getValue();
-						return new ReadOnlyStringWrapper( (item == null) ? "" : item.getLibraryName() );
-					}
+				nodeFeatures -> {
+                    RepositoryItem item = nodeFeatures.getValue();
+                    return new ReadOnlyStringWrapper( (item == null) ? "" : item.getLibraryName() );
 				};
 		Callback<CellDataFeatures<RepositoryItemWrapper,String>, ObservableValue<String>> versionColumnValueFactory =
-				new Callback<TableColumn.CellDataFeatures<RepositoryItemWrapper,String>, ObservableValue<String>>() {
-					public ObservableValue<String> call(CellDataFeatures<RepositoryItemWrapper, String> nodeFeatures) {
-						RepositoryItem item = nodeFeatures.getValue();
-						return new ReadOnlyStringWrapper( (item == null) ? "" : item.getVersion() );
-					}
+				nodeFeatures -> {
+                    RepositoryItem item = nodeFeatures.getValue();
+                    return new ReadOnlyStringWrapper( (item == null) ? "" : item.getVersion() );
 				};
 		Callback<CellDataFeatures<RepositoryItemWrapper,String>, ObservableValue<String>> statusColumnValueFactory =
-				new Callback<TableColumn.CellDataFeatures<RepositoryItemWrapper,String>, ObservableValue<String>>() {
-					public ObservableValue<String> call(CellDataFeatures<RepositoryItemWrapper, String> nodeFeatures) {
-						RepositoryItem item = nodeFeatures.getValue();
-						return new ReadOnlyStringWrapper( (item == null) ? "" : MessageBuilder.formatMessage( item.getStatus().toString() ) );
-					}
+				nodeFeatures -> {
+					RepositoryItem item = nodeFeatures.getValue();
+					return new ReadOnlyStringWrapper( (item == null) ? "" : MessageBuilder.formatMessage( item.getStatus().toString() ) );
 				};
 		Callback<TableView<RepositoryItemWrapper>,TableRow<RepositoryItemWrapper>> rowFactory =
-				new Callback<TableView<RepositoryItemWrapper>,TableRow<RepositoryItemWrapper>>() {
-					public TableRow<RepositoryItemWrapper> call(final TableView<RepositoryItemWrapper> tv) {
-						return new TableRow<RepositoryItemWrapper>() {
-							public void updateItem(RepositoryItemWrapper item, boolean empty) {
-								super.updateItem( item, empty );
-								if (item == null) {
-									setTooltip( null );
-								} else {
-									Tooltip tooltip = new Tooltip();
-									tooltip.setText( getItem().getNamespace() );
-									setTooltip( tooltip );
-								}
-							}
-						};
-					}
+				tv -> new TableRow<RepositoryItemWrapper>() {
+                    public void updateItem(RepositoryItemWrapper item, boolean empty) {
+                        super.updateItem( item, empty );
+                        if (item == null) {
+                            setTooltip( null );
+                        } else {
+                            Tooltip tooltip = new Tooltip();
+                            tooltip.setText( getItem().getNamespace() );
+                            setTooltip( tooltip );
+                        }
+                    }
 				};
 				
 		candidateNameColumn.setCellValueFactory( nameColumnValueFactory );
@@ -606,13 +643,13 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		candidateStatusColumn.setCellValueFactory( statusColumnValueFactory );
 		candidateLibrariesTable.setRowFactory( rowFactory );
 		candidateLibrariesTable.getSelectionModel().selectedItemProperty().addListener(
-				(observable, oldValue, newValue) -> { updateControlStates(); } );
+				(observable, oldValue, newValue) -> updateControlStates() );
 		selectedNameColumn.setCellValueFactory( nameColumnValueFactory );
 		selectedVersionColumn.setCellValueFactory( versionColumnValueFactory );
 		selectedStatusColumn.setCellValueFactory( statusColumnValueFactory );
 		selectedLibrariesTable.setRowFactory( rowFactory );
 		selectedLibrariesTable.getSelectionModel().selectedItemProperty().addListener(
-				(observable, oldValue, newValue) -> { updateControlStates(); } );
+				(observable, oldValue, newValue) -> updateControlStates() );
 		
 		// Configure multiselect and placeholder labels for empty tables
 		candidateLibrariesTable.setPlaceholder( new Label("") );
@@ -626,7 +663,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		
 		for (TableColumn<?,?> column : columns) {
 			column.setResizable( false );
-			column.impl_setReorderable( false );
+			column.setSortable( false );
 		}
 		candidateNameColumn.prefWidthProperty().bind( candidateLibrariesTable.widthProperty().multiply(0.6) );
 		candidateVersionColumn.prefWidthProperty().bind( candidateLibrariesTable.widthProperty().multiply(0.2) );

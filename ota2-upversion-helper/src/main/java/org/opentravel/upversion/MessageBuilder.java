@@ -28,6 +28,11 @@ public class MessageBuilder {
 	
 	private static final ResourceBundle messageBundle = ResourceBundle.getBundle( "upversion-helper-messages", Locale.getDefault() );
 	
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private MessageBuilder() {}
+    
 	/**
 	 * Returns the text for the given error or warning message.
 	 * 

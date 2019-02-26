@@ -79,7 +79,7 @@ public class EntityMemberNode {
 	 */
 	public List<EntityMemberNode> getChildren(String facetName) {
 		List<EntityMemberNode> children = childrenByFacet.get( facetName );
-		return (children == null) ? new ArrayList<EntityMemberNode>() : children;
+		return (children == null) ? new ArrayList<>() : children;
 	}
 	
 	/**
@@ -92,12 +92,9 @@ public class EntityMemberNode {
 		if (!facetSelection.getFacetNames().contains( facetName )) {
 			throw new IllegalArgumentException("Invalid facet name for child node: " + facetName);
 		}
+		childrenByFacet.computeIfAbsent( facetName, fn -> childrenByFacet.put( fn, new ArrayList<>() ) );
 		List<EntityMemberNode> children = childrenByFacet.get( facetName );
 		
-		if (children == null) {
-			children = new ArrayList<>();
-			childrenByFacet.put( facetName, children );
-		}
 		childNode.parentNode = this;
 		children.add( childNode );
 	}

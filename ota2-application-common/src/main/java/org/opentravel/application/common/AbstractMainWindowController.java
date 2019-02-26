@@ -20,6 +20,7 @@ import java.io.File;
 
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 /**
@@ -27,6 +28,14 @@ import javafx.stage.Stage;
  */
 public abstract class AbstractMainWindowController {
 	
+    protected static final ExtensionFilter OTM_EXTENSION_FILTER  = new ExtensionFilter( "OTM Library Files (*.otm)", "*.otm" );
+    protected static final ExtensionFilter OTP_EXTENSION_FILTER  = new ExtensionFilter( "OTM Project Files (*.otp)", "*.otp" );
+    protected static final ExtensionFilter OTR_EXTENSION_FILTER  = new ExtensionFilter( "OTM Release Files (*.otr)", "*.otr" );
+    protected static final ExtensionFilter XML_EXTENSION_FILTER  = new ExtensionFilter( "XML Files (*.xml)", "*.xml" );
+    protected static final ExtensionFilter JSON_EXTENSION_FILTER = new ExtensionFilter( "JSON Files (*.json)", "*.json" );
+    protected static final ExtensionFilter HTML_EXTENSION_FILTER = new ExtensionFilter( "HTML Files (*.html)", "*.html" );
+    protected static final ExtensionFilter ALL_EXTENSION_FILTER  = new ExtensionFilter( "All Files (*.*)", "*.*" );
+    
 	private Stage primaryStage;
 	
 	/**
@@ -73,7 +82,7 @@ public abstract class AbstractMainWindowController {
 	 * @return FileChooser
 	 */
 	protected FileChooser newFileChooser(String title, File initialDirectory,
-			String[]... extensionFilters) {
+	        ExtensionFilter... extensionFilters) {
 		FileChooser chooser = new FileChooser();
 		File directory = initialDirectory;
 		
@@ -88,9 +97,8 @@ public abstract class AbstractMainWindowController {
 		chooser.setTitle( title );
 		chooser.setInitialDirectory( directory );
 		
-		for (String[] filterInfo : extensionFilters) {
-			chooser.getExtensionFilters().add(
-					new FileChooser.ExtensionFilter( filterInfo[1], filterInfo[0] ) );
+		for (ExtensionFilter filter : extensionFilters) {
+	        chooser.getExtensionFilters().add( filter );
 		}
 		return chooser;
 	}
@@ -141,9 +149,9 @@ public abstract class AbstractMainWindowController {
 		/**
 		 * Executes the sub-class specific task functions.
 		 * 
-		 * @throws Throwable  thrown if an error occurs during task execution
+		 * @throws OtmApplicationException  thrown if an error occurs during task execution
 		 */
-		protected abstract void execute() throws Throwable;
+		protected abstract void execute() throws OtmApplicationException;
 
 		/**
 		 * @see java.lang.Runnable#run()
@@ -154,16 +162,17 @@ public abstract class AbstractMainWindowController {
 				setStatusMessage( statusMessage, statusType, true );
 				execute();
 				
-			} catch (Throwable t) {
-				String errorMessage = (t.getMessage() != null) ? t.getMessage() : "See log output for DETAILS.";
+			} catch (Exception e) {
+				String errorMessage = (e.getMessage() != null) ? e.getMessage() : "See log output for DETAILS.";
 				
 				try {
 					setStatusMessage( "ERROR: " + errorMessage, StatusType.ERROR, false );
 					updateControlStates();
-					t.printStackTrace( System.out );
 					Thread.sleep( 1000 );
 					
-				} catch (InterruptedException e) {}
+				} catch (InterruptedException e2) {
+				    Thread.currentThread().interrupt();
+				}
 				
 			} finally {
 				setStatusMessage( null, null, false );

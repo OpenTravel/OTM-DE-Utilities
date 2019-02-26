@@ -67,9 +67,9 @@ public class ActionTreeNode extends TreeNode<TLAction> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLAction action = getEntity();
 		
-		props.add( new NodeProperty( "actionId", () -> { return action.getActionId(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( action ); } ) );
-		props.add( new NodeProperty( "commonAction", () -> { return action.isCommonAction() + ""; } ) );
+		props.add( new NodeProperty( "actionId", action::getActionId ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( action ) ) );
+		props.add( new NodeProperty( "commonAction", () -> action.isCommonAction() + "" ) );
 		return props;
 	}
 
@@ -77,8 +77,8 @@ public class ActionTreeNode extends TreeNode<TLAction> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
-		List<TreeNode<?>> children = new ArrayList<>();
+    protected List<TreeNode<Object>> initializeChildren() {
+		List<TreeNode<Object>> children = new ArrayList<>();
 		TLAction action = getEntity();
 		
 		if (action.getRequest() != null) {

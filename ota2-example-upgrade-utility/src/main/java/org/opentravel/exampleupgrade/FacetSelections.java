@@ -36,7 +36,7 @@ import org.opentravel.schemacompiler.model.TLFacetOwner;
  */
 public class FacetSelections {
 	
-	private List<EntityFacetSelection> facetSelections = new ArrayList<>();
+	private List<EntityFacetSelection> facetSelectionList = new ArrayList<>();
 	private Map<QName,EntityFacetSelection> facetSelectionsByEntity = new HashMap<>();
 	
 	/**
@@ -46,7 +46,7 @@ public class FacetSelections {
 	 * @param options  the EXAMPLE generator options to configure
 	 */
 	public void configureExampleOptions(ExampleGeneratorOptions options) {
-		for (EntityFacetSelection facetSelection : facetSelections) {
+		for (EntityFacetSelection facetSelection : facetSelectionList) {
 			TLFacetOwner facetOwner = facetSelection.getFacetOwner();
 			
 			if (facetOwner != null) {
@@ -66,7 +66,7 @@ public class FacetSelections {
 	 * @return List<EntityFacetSelection>
 	 */
 	public List<EntityFacetSelection> getAllFacetSelections() {
-		return Collections.unmodifiableList( facetSelections );
+		return Collections.unmodifiableList( facetSelectionList );
 	}
 	
 	/**
@@ -87,14 +87,14 @@ public class FacetSelections {
 	 * @param facetSelection  the facet selection instance to add
 	 */
 	public void addFacetSelection(EntityFacetSelection facetSelection) {
-		if ((facetSelection != null) && !facetSelections.contains( facetSelection )) {
+		if ((facetSelection != null) && !facetSelectionList.contains( facetSelection )) {
 			NamedEntity otmEntity = nonAliasedEntity( facetSelection.getEntityType() );
 			QName entityName = new QName( otmEntity.getNamespace(), otmEntity.getLocalName() );
 			
 			if (facetSelectionsByEntity.containsKey( entityName )) {
 				throw new IllegalArgumentException("Facet selections are already defined for entity: " + entityName);
 			}
-			this.facetSelections.add( facetSelection );
+			this.facetSelectionList.add( facetSelection );
 			this.facetSelectionsByEntity.put( entityName, facetSelection );
 		}
 	}

@@ -34,10 +34,10 @@ public class TreeNodeFactory {
 	 * Constructs a new <code>TreeNode</code> for the given entity.
 	 * 
 	 * @param entity  the entity from which to construct the tree node
-	 * @return TreeItem<? extends TreeNode<E>>
+	 * @return TreeItem<TreeNode<Object>>
 	 * @throws IllegalArgumentException  thrown if a node cannot be constructed for the given entity
 	 */
-	public TreeItem<TreeNode<?>> newTree(Object entity) {
+	public TreeItem<TreeNode<Object>> newTree(Object entity) {
 		return newTree( newTreeNode( entity ) );
 	}
 	
@@ -45,17 +45,17 @@ public class TreeNodeFactory {
 	 * Recursively constructs a new tree of items for the given node.
 	 * 
 	 * @param node  the node for which to construct a tree
-	 * @return TreeItem<TreeNode<?>>
+	 * @return TreeItem<TreeNode<Object>>
 	 */
-	private TreeItem<TreeNode<?>> newTree(TreeNode<?> node) {
-		TreeItem<TreeNode<?>> treeItem = new TreeItem<>( node );
+	private TreeItem<TreeNode<Object>> newTree(TreeNode<Object> node) {
+		TreeItem<TreeNode<Object>> treeItem = new TreeItem<>( node );
 		Image nodeIcon = node.getIcon();
 		
 		if (nodeIcon != null) {
 			treeItem.setGraphic( new ImageView( nodeIcon ) );
 		}
 		
-		for (TreeNode<?> child : node.getChildren()) {
+		for (TreeNode<Object> child : node.getChildren()) {
 			treeItem.getChildren().add( newTree( child ) );
 		}
 		
@@ -95,22 +95,22 @@ public class TreeNodeFactory {
 	/**
 	 * Returns a comparator that can be used for sorting sibling tree items.
 	 * 
-	 * @return Comparator<TreeItem<TreeNode<?>>>
+	 * @return Comparator<TreeItem<TreeNode<Object>>>
 	 */
-	public Comparator<TreeItem<TreeNode<?>>> getComparator() {
+	public Comparator<TreeItem<TreeNode<Object>>> getComparator() {
 		return new TreeItemComparator();
 	}
 	
 	/**
 	 * Comparator used for sorting tree items creating by this factory.
 	 */
-	private static class TreeItemComparator implements Comparator<TreeItem<TreeNode<?>>> {
+	private static class TreeItemComparator implements Comparator<TreeItem<TreeNode<Object>>> {
 
 		/**
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
 		@Override
-		public int compare(TreeItem<TreeNode<?>> item1, TreeItem<TreeNode<?>> item2) {
+		public int compare(TreeItem<TreeNode<Object>> item1, TreeItem<TreeNode<Object>> item2) {
 			String label1 = item1.getValue().getLabel();
 			String label2 = item2.getValue().getLabel();
 			

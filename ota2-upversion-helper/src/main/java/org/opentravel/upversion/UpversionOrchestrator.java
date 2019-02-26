@@ -42,6 +42,7 @@ import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.schemacompiler.repository.impl.ProjectFileUtils;
 import org.opentravel.schemacompiler.saver.LibraryModelSaver;
 import org.opentravel.schemacompiler.transform.util.ModelReferenceResolver;
+import org.opentravel.schemacompiler.util.FileUtils;
 import org.opentravel.schemacompiler.util.SchemaCompilerException;
 import org.opentravel.schemacompiler.util.URLUtils;
 import org.opentravel.schemacompiler.version.MajorVersionHelper;
@@ -177,7 +178,7 @@ public class UpversionOrchestrator {
 		
 		// Run the up-version orchestration process and save the new-version libraries
 		if (monitor != null) {
-			monitor.taskStarted( (oldVersions.size() * 3) + 2 );
+			monitor.taskStarted( (oldVersions.size() * 3) + 2L );
 		}
 		List<TLLibrary> oldVersionLibraries = loadOldVersions();
 		validateOldVersionLibraries( oldVersionLibraries );
@@ -190,7 +191,6 @@ public class UpversionOrchestrator {
 		if (monitor != null) {
 			monitor.taskCompleted();
 		}
-		System.out.println("New versions created successfully.");
 		return new ArrayList<>( registry.getAllNewVersions() );
 	}
 	
@@ -260,7 +260,7 @@ public class UpversionOrchestrator {
 			String filename = f.getName().toLowerCase();
 			
 			if (f.isFile() && (filename.endsWith(".otp") || filename.endsWith(".otm"))) {
-				f.delete();
+			    FileUtils.delete( f );
 			}
 		}
 	}
@@ -280,8 +280,10 @@ public class UpversionOrchestrator {
 		
 		for (TLLibrary oldVersion : oldVersionLibraries) {
 			File libraryFile = getNewVersionFile( oldVersion );
-			System.out.println("Creating New Version: " + libraryFile.getAbsolutePath());
-			if (libraryFile.exists()) libraryFile.delete();
+			
+			if (libraryFile.exists()) {
+                FileUtils.delete( libraryFile );
+			}
 			TLLibrary newVersion = helper.createNewMajorVersion( oldVersion, libraryFile );
 			
 			registry.addLibraryVersionMapping( oldVersion, newVersion );
@@ -331,10 +333,10 @@ public class UpversionOrchestrator {
 			
 			ModelReferenceResolver.resolveReferences( model );
 			model.addListener( ic );
-			registry.getAllNewVersions().forEach( l -> navigator.navigateLibrary( l ) );
+			registry.getAllNewVersions().forEach( navigator::navigateLibrary );
 			model.removeListener( ic );
-			registry.getAllNewVersions().forEach( l ->
-					ImportManagementIntegrityChecker.verifyReferencedLibraries( l ) );
+			registry.getAllNewVersions().forEach(
+					ImportManagementIntegrityChecker::verifyReferencedLibraries );
 			reportWorkUnitCompleted();
 		}
 	}
@@ -353,7 +355,9 @@ public class UpversionOrchestrator {
 			String backupFilename = libraryFile.getName().replace( ".otm", ".bak" );
 			File backupFile = new File( libraryFile.getParentFile(), backupFilename );
 			
-			if (backupFile.exists()) backupFile.delete();
+			if (backupFile.exists()) {
+			    FileUtils.delete( backupFile );
+			}
 			reportWorkUnitCompleted();
 		}
 	}

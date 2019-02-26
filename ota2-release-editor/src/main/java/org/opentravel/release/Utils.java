@@ -31,6 +31,10 @@ import org.opentravel.schemacompiler.repository.RepositoryItemCommit;
  */
 public class Utils {
 	
+    /**
+     * Private constructor to prevent instantiation of this class.
+     */
+    private Utils() {}
 	
 	/**
 	 * Returns a display name label for the given OTM entity.

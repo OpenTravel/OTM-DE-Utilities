@@ -36,7 +36,7 @@ public class NodeProperty {
 		try {
 			this.value = valueProvider.getValue();
 			
-		} catch (Throwable t) {
+		} catch (Exception e) {
 			this.value = "";
 		}
 	}

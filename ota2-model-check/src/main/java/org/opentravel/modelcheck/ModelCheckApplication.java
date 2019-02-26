@@ -18,7 +18,6 @@ package org.opentravel.modelcheck;
 
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.AbstractUserSettings;
-import org.opentravel.schemacompiler.util.OTM16Upgrade;
 
 /**
  * JavaFX application for the Model Check Utility.
@@ -58,12 +57,4 @@ public class ModelCheckApplication extends AbstractOTMApplication {
 		return "OTM Model Check Utility";
 	}
 
-	/**
-	 * Since this is a read-only application, enable the OTM 1.6 file format for
-	 * all operations.
-	 */
-	static {
-		OTM16Upgrade.otm16Enabled = true;
-	}
-	
 }

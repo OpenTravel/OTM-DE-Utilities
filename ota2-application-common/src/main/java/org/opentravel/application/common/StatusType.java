@@ -22,6 +22,7 @@ import javafx.scene.image.Image;
  * Enumeration representing the type of message displayed in the status
  * BAR of an application.
  */
+@SuppressWarnings("squid:UnusedPrivateMethod") // Invalid finding
 public enum StatusType {
 	
 	INFO( Images.infoIcon ),

@@ -21,6 +21,8 @@ import java.util.List;
 
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.StatusType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -39,6 +41,8 @@ import javafx.stage.Stage;
 public class ModelCheckController extends AbstractMainWindowController {
 	
 	public static final String FXML_FILE = "/ota2-model-check.fxml";
+	
+    private static final Logger log = LoggerFactory.getLogger( ModelCheckController.class );
 
 	@FXML private TextField filenameText;
 	@FXML private Button localFileButton;
@@ -51,8 +55,6 @@ public class ModelCheckController extends AbstractMainWindowController {
 	@FXML private ImageView statusBarIcon;
 	@FXML private Label statusBarLabel;
 	
-	private UserSettings userSettings;
-	
 	/**
 	 * Called when the user clicks the button to select a release or project file from
 	 * the local file system.
@@ -60,7 +62,7 @@ public class ModelCheckController extends AbstractMainWindowController {
 	 * @param event  the action event that triggered this method call
 	 */
 	@FXML public void selectLocalFile(ActionEvent event) {
-		System.out.println("selectLocalFile()");
+		log.info( "selectLocalFile()");
 	}
 	
 	/**
@@ -70,7 +72,7 @@ public class ModelCheckController extends AbstractMainWindowController {
 	 * @param event  the action event that triggered this method call
 	 */
 	@FXML public void selectManagedRelease(ActionEvent event) {
-		System.out.println("selectManagedRelease()");
+	    log.info("selectManagedRelease()");
 	}
 	
 	/**
@@ -79,7 +81,7 @@ public class ModelCheckController extends AbstractMainWindowController {
 	 * @param event  the action event that triggered this method call
 	 */
 	@FXML public void editOptions(ActionEvent event) {
-		System.out.println("editOptions()");
+	    log.info("editOptions()");
 	}
 	
 	/**
@@ -89,7 +91,7 @@ public class ModelCheckController extends AbstractMainWindowController {
 	 * @param event  the action event that triggered this method call
 	 */
 	@FXML public void navigateBack(ActionEvent event) {
-		System.out.println("navigateBack()");
+	    log.info("navigateBack()");
 	}
 	
 	/**
@@ -99,7 +101,7 @@ public class ModelCheckController extends AbstractMainWindowController {
 	 * @param event  the action event that triggered this method call
 	 */
 	@FXML public void navigateForward(ActionEvent event) {
-		System.out.println("navigateForward()");
+	    log.info("navigateForward()");
 	}
 	
 	/**
@@ -109,7 +111,7 @@ public class ModelCheckController extends AbstractMainWindowController {
 	 * @param event  the action event that triggered this method call
 	 */
 	@FXML public void saveReport(ActionEvent event) {
-		System.out.println("saveReport()");
+	    log.info("saveReport()");
 	}
 	
 	/**
@@ -159,7 +161,6 @@ public class ModelCheckController extends AbstractMainWindowController {
 	@Override
 	protected void initialize(Stage primaryStage) {
 		super.initialize( primaryStage );
-		this.userSettings = UserSettings.load();
 		updateControlStates();
 	}
 	

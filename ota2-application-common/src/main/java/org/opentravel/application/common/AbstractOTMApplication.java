@@ -83,7 +83,7 @@ public abstract class AbstractOTMApplication extends Application {
 			primaryStage.show();
 			
 		} catch (IOException e) {
-			throw new RuntimeException("Unable to initialize JavaFX application.", e);
+			throw new OtmApplicationRuntimeException("Unable to initialize JavaFX application.", e);
 		}
 	}
 	

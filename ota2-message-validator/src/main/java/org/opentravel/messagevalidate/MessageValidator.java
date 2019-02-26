@@ -41,6 +41,8 @@ import javax.xml.validation.Validator;
 
 import org.opentravel.schemacompiler.codegen.json.JsonSchemaCodegenUtils;
 import org.opentravel.schemacompiler.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3._2001.xmlschema.OpenAttrs;
 import org.w3._2001.xmlschema.TopLevelElement;
 import org.w3c.dom.Document;
@@ -69,8 +71,10 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
  */
 public class MessageValidator {
 	
+    private static final Logger log = LoggerFactory.getLogger( MessageValidator.class );
     private static DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
     private static JAXBContext jaxbContext;
+    
     private File codegenFolder;
     private PrintStream out;
     
@@ -105,9 +109,8 @@ public class MessageValidator {
 				out.print("ERROR: Unrecognized file format (.json or .xml expected)");
 			}
 			
-		} catch (Throwable t) {
-			out.println("ERROR: Unexpected exception during message validation.\n");
-			t.printStackTrace( out );
+		} catch (Exception e) {
+		    log.error( "Unexpected exception during message validation.", e );
 		}
     }
     
@@ -185,18 +188,19 @@ public class MessageValidator {
      * @return File
      */
     private File getSchemaLocation(Document xmlDoc) {
-		File schemaFolder = new File( codegenFolder, "/schemas" );
+		File schemaFolder = new File( codegenFolder.getAbsolutePath() + "/schemas" );
 		Element rootElement = xmlDoc.getDocumentElement();
 		QName rootElementName = new QName( rootElement.getNamespaceURI(), rootElement.getLocalName() );
 		File schemaFile = null;
 		
 		for (File xsdFile : schemaFolder.listFiles()) {
-			if (!xsdFile.getName().endsWith(".xsd")) continue;
-			Collection<QName> schemaElements = getGlobalElements( xsdFile );
-			
-			if (schemaElements.contains( rootElementName )) {
-				schemaFile = xsdFile;
-				break;
+			if (xsdFile.getName().endsWith(".xsd")) {
+	            Collection<QName> schemaElements = getGlobalElements( xsdFile );
+	            
+	            if (schemaElements.contains( rootElementName )) {
+	                schemaFile = xsdFile;
+	                break;
+	            }
 			}
 		}
 		return schemaFile;
@@ -247,7 +251,6 @@ public class MessageValidator {
     		File jsonSchemaFile = findJsonSchema( jsonNode );
     		
     		if (jsonSchemaFile != null) {
-//        		JsonNode schemaNode = prohibitAdditionalProperties( JsonLoader.fromFile( jsonSchemaFile ) );
         		JsonNode schemaNode = JsonLoader.fromFile( jsonSchemaFile );
         		JsonSchema schema = newJsonSchemaFactory( jsonSchemaFile.getParentFile() ).getJsonSchema( schemaNode );
         		ProcessingReport report = schema.validate( jsonNode );
@@ -255,7 +258,7 @@ public class MessageValidator {
         		
 				out.println("Validation Results: " + jsonFile.getName() + "\n");
 				
-    			if (errors.size() == 0) {
+    			if (errors.isEmpty()) {
     				out.println("No validation errors or warnings found.");
     				
     			} else {
@@ -301,7 +304,7 @@ public class MessageValidator {
 	 * @param jsonSchema  the JSON schema to be configured
 	 * @return JsonNode
 	 */
-	private JsonNode prohibitAdditionalProperties(JsonNode jsonSchema) {
+	protected JsonNode prohibitAdditionalProperties(JsonNode jsonSchema) {
 		// TODO: Look for ways to make additional properties get flagged in the validation report
 		// (JSON schema has trouble with substitution since discriminators are not supported)
 		if (jsonSchema instanceof ObjectNode) {
@@ -338,7 +341,7 @@ public class MessageValidator {
 	private File findJsonSchema(JsonNode jsonDocument) {
 		Iterator<String> fieldNames = jsonDocument.fieldNames();
 		String rootElement = fieldNames.hasNext() ? fieldNames.next() : null;
-		File schemaFolder = new File( codegenFolder, "/json" );
+		File schemaFolder = new File( codegenFolder.getAbsolutePath() + "/json" );
 		File schemaFile = null;
 		
 		for (File candidateFile : schemaFolder.listFiles()) {
@@ -416,10 +419,7 @@ public class MessageValidator {
 				
 				while (rnIterator.hasNext()) {
 					ArrayNode reportJson = (ArrayNode) reportsNode.get( rnIterator.next() );
-					
-//					if (!isSuperfluousReportNode( reportJson )) {
-						errors.addAll( getValidationErrors( buildReport( reportJson ) ) );
-//					}
+                    errors.addAll( getValidationErrors( buildReport( reportJson ) ) );
 				}
 			}
 		}
@@ -501,8 +501,8 @@ public class MessageValidator {
 			jaxbContext = JAXBContext.newInstance( "org.w3._2001.xmlschema" );
 			domFactory.setNamespaceAware( true );
 			
-		} catch (Throwable t) {
-			throw new ExceptionInInitializerError( t );
+		} catch (Exception e) {
+			throw new ExceptionInInitializerError( e );
 		}
 	}
 }

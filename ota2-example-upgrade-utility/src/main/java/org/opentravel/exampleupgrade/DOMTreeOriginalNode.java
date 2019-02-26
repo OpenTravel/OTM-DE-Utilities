@@ -49,7 +49,7 @@ public class DOMTreeOriginalNode extends AbstractDOMTreeNode {
 	 */
 	public static TreeItem<DOMTreeOriginalNode> createTree(Node domNode) {
 		DOMTreeOriginalNode odn = new DOMTreeOriginalNode( domNode );
-		TreeItem<DOMTreeOriginalNode> treeItem = new TreeItem<DOMTreeOriginalNode>( odn );
+		TreeItem<DOMTreeOriginalNode> treeItem = new TreeItem<>( odn );
 		Node domChild = domNode.getFirstChild();
 		Image nodeImage;
 		

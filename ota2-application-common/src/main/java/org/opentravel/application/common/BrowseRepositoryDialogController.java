@@ -26,10 +26,10 @@ import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryItemType;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -50,6 +50,7 @@ import javafx.stage.Stage;
 public class BrowseRepositoryDialogController {
 	
 	private static final String FXML_FILE = "/browse-repository.fxml";
+    private static final Logger log = LoggerFactory.getLogger( BrowseRepositoryDialogController.class );
 	
 	private Stage dialogStage;
 	private boolean okSelected = false;
@@ -88,7 +89,7 @@ public class BrowseRepositoryDialogController {
 			controller.initializeTreeView();
 			
 		} catch (IOException e) {
-			e.printStackTrace( System.out );
+		    log.error( "Error constructing Browse Repository dialog.", e );
 		}
 		return controller;
 	}
@@ -125,10 +126,10 @@ public class BrowseRepositoryDialogController {
 			TreeItem<RepositoryTreeNode> childItem = treeItem.getChildren().get( 0 );
 			RepositoryTreeNode treeNode = childItem.getValue();
 			
-			if (treeNode.tempNode) {
+			if (treeNode.isTempNode()) {
 				try {
-					List<RepositoryItem> repoItemList = treeNode.repository.listItems(
-							treeNode.baseNS, TLLibraryStatus.DRAFT, false, itemTypeFilter );
+					List<RepositoryItem> repoItemList = treeNode.getRepository().listItems(
+							treeNode.getBaseNS(), TLLibraryStatus.DRAFT, false, itemTypeFilter );
 					
 					// Remove the temporary item and replace it with OTM library items
 					treeItem.getChildren().clear();
@@ -144,7 +145,7 @@ public class BrowseRepositoryDialogController {
 					}
 					
 				} catch (RepositoryException e) {
-					e.printStackTrace( System.out );
+				    log.error( "Error accessing remote repository.", e );
 				}
 				
 			}
@@ -158,7 +159,7 @@ public class BrowseRepositoryDialogController {
 	 * @param treeItem  the tree item that was selected
 	 */
 	private void handleTreeItemSelection(TreeItem<RepositoryTreeNode> treeItem) {
-		selectedRepositoryItem = treeItem.getValue().item;
+		selectedRepositoryItem = treeItem.getValue().getItem();
 		okButton.setDisable( selectedRepositoryItem == null );
 	}
 	
@@ -174,69 +175,88 @@ public class BrowseRepositoryDialogController {
 					new ImageView( Images.rootIcon ) );
 			
 			for (RemoteRepository repository : remoteRepositories) {
-				boolean repoAvailable = true;
-				List<String> baseNamespaces;
-				
-				try {
-					baseNamespaces = repository.listBaseNamespaces();
-					
-				} catch (RepositoryException e) {
-					baseNamespaces = new ArrayList<>();
-					repoAvailable = false;
-				}
-				String repoDisplayName = repository.getDisplayName() + (repoAvailable ? "" : " (Unavailable)");
-				TreeItem<RepositoryTreeNode> repoItem = new TreeItem<>(
-						new RepositoryTreeNode( repoDisplayName, null ),
-						new ImageView( repoAvailable ? Images.repositoryIcon : Images.errorIcon ) );
-				
-				if (repoAvailable) {
-					for (String rootNS : repository.listRootNamespaces()) {
-						TreeItem<RepositoryTreeNode> rootNSItem = new TreeItem<>(
-								new RepositoryTreeNode( rootNS, null ),
-								new ImageView( Images.rootNSIcon ) );
-						
-						for (String baseNS : baseNamespaces) {
-							if (!baseNS.startsWith( rootNS )) continue;
-							String baseNSLabel = baseNS.equals( rootNS ) ? "/" : baseNS.substring( rootNS.length() );
-							TreeItem<RepositoryTreeNode> baseNSItem = new TreeItem<>(
-									new RepositoryTreeNode( baseNSLabel, null ),
-									new ImageView( Images.baseNSIcon ) );
-							
-							rootNSItem.getChildren().add( baseNSItem );
-							baseNSItem.getChildren().add( new TreeItem<>( new RepositoryTreeNode( repository, baseNS ) ) );
-							baseNSItem.expandedProperty().addListener( new ChangeListener<Boolean>() {
-								@SuppressWarnings("unchecked")
-								public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-									if ((newValue != null) && newValue) {
-										BooleanProperty property = (BooleanProperty) observable;
-										handleTreeItemExpand( (TreeItem<RepositoryTreeNode>) property.getBean() );
-									}
-								}
-							});
-						}
-						repoItem.getChildren().add( rootNSItem );
-					}
-				}
-				rootItem.getChildren().add( repoItem );
+				buildRepositoryTree( repository, rootItem );
 			}
 			repositoryTreeView.setRoot( rootItem );
 			repositoryTreeView.getSelectionModel().selectedItemProperty()
-				.addListener( new ChangeListener<TreeItem<RepositoryTreeNode>>() {
-					public void changed(ObservableValue<? extends TreeItem<RepositoryTreeNode>> observable,
-							TreeItem<RepositoryTreeNode> oldValue, TreeItem<RepositoryTreeNode> newValue) {
-						handleTreeItemSelection( newValue );
-					}
-				});
+			    .addListener( ( observable, oldValue, newValue ) -> handleTreeItemSelection( newValue ) );
 			repositoryTreeView.setOnMouseClicked( e -> {
 				if (e.getClickCount() >  1) selectOk( null );
 			});
 			okButton.setDisable( true );
 			
 		} catch (RepositoryException e) {
-			e.printStackTrace( System.out );
+		    log.error( "Error initializing contents of repository tree view.", e );
 		}
 	}
 
+    /**
+     * Constructs a <code>TreeItem</code> structure from the contents of the given remote repository.
+     * 
+     * @param repository  the remote repository for which to construct the item tree
+     * @param rootItem  the root item to which the repository's tree strucutre will be added
+     * @throws RepositoryException  thrown if an error occurs while accessing the remote repository
+     */
+    private void buildRepositoryTree(RemoteRepository repository, TreeItem<RepositoryTreeNode> rootItem)
+            throws RepositoryException {
+        TreeItem<RepositoryTreeNode> repoItem;
+        List<String> baseNamespaces;
+        String repoDisplayName;
+        boolean repoAvailable = true;
+        
+        try {
+            baseNamespaces = repository.listBaseNamespaces();
+            
+        } catch (RepositoryException e) {
+            baseNamespaces = new ArrayList<>();
+            repoAvailable = false;
+        }
+        repoDisplayName = repository.getDisplayName() + (repoAvailable ? "" : " (Unavailable)");
+        repoItem = new TreeItem<>( new RepositoryTreeNode( repoDisplayName, null ),
+                new ImageView( repoAvailable ? Images.repositoryIcon : Images.errorIcon ) );
+        
+        if (repoAvailable) {
+            for (String rootNS : repository.listRootNamespaces()) {
+                addNamespaceItems( repository, rootNS, baseNamespaces, repoItem );
+            }
+        }
+        rootItem.getChildren().add( repoItem );
+    }
+
+    /**
+     * Adds new items to the parent tree node for the base namespaces that fall under the given
+     * root namespace.
+     * 
+     * @param repository  the remote repository for which items are being added
+     * @param rootNS  the root namespace for which to add base namespaces
+     * @param baseNamespaces  the list of all base namespaces in the repository
+     * @param parentItem  the tree node under which the new nodes will be added
+     */
+    @SuppressWarnings("unchecked")
+    private void addNamespaceItems(RemoteRepository repository, String rootNS, List<String> baseNamespaces,
+            TreeItem<RepositoryTreeNode> parentItem) {
+        TreeItem<RepositoryTreeNode> rootNSItem = new TreeItem<>( new RepositoryTreeNode( rootNS, null ),
+                new ImageView( Images.rootNSIcon ) );
+        
+        for (String baseNS : baseNamespaces) {
+            if (!baseNS.startsWith( rootNS ))
+                continue;
+            String baseNSLabel = baseNS.equals( rootNS ) ? "/" : baseNS.substring( rootNS.length() );
+            TreeItem<RepositoryTreeNode> baseNSItem = new TreeItem<>(
+                    new RepositoryTreeNode( baseNSLabel, null ), new ImageView( Images.baseNSIcon ) );
+            
+            rootNSItem.getChildren().add( baseNSItem );
+            baseNSItem.getChildren().add( new TreeItem<>( new RepositoryTreeNode( repository, baseNS ) ) );
+            baseNSItem.expandedProperty().addListener( (observable, oldValue, newValue) -> {
+                if ((newValue != null) && newValue) {
+                    BooleanProperty property = (BooleanProperty) observable;
+                    handleTreeItemExpand( (TreeItem<RepositoryTreeNode>) property.getBean() );
+                }
+            } );
+        }
+        parentItem.getChildren().add( rootNSItem );
+    }
+    
 	/**
 	 * Returns true if the user clicked the 'Ok' button to close
 	 * the dialog.
@@ -292,12 +312,12 @@ public class BrowseRepositoryDialogController {
 	 */
 	private static class RepositoryTreeNode {
 		
-		public String label;
-		public RepositoryItem item;
+		private String label;
+		private RepositoryItem item;
 		
-		public boolean tempNode;
-		public String baseNS;
-		public RemoteRepository repository;
+		private boolean tempNode;
+		private String baseNS;
+		private RemoteRepository repository;
 		
 		/**
 		 * Constructor that creates a temporary node with the given repository
@@ -307,9 +327,9 @@ public class BrowseRepositoryDialogController {
 		 * @param baseNS  the base namespace to use during lazy initialization
 		 */
 		public RepositoryTreeNode(RemoteRepository repository, String baseNS) {
-			this.tempNode = true;
-			this.repository = repository;
-			this.baseNS = baseNS;
+		    this.tempNode = true;
+		    this.repository = repository;
+		    this.baseNS = baseNS;
 		}
 		
 		/**
@@ -319,16 +339,61 @@ public class BrowseRepositoryDialogController {
 		 * @param item  the repository item associated with this node (null for non-libraries)
 		 */
 		public RepositoryTreeNode(String label, RepositoryItem item) {
-			this.tempNode = false;
-			this.label = label;
-			this.item = item;
+		    this.tempNode = false;
+		    this.label = label;
+		    this.item = item;
 		}
 		
 		/**
+         * Returns the display label of the tree item.
+         *
+         * @return String
+         */
+        public String getLabel() {
+            return label;
+        }
+
+        /**
+         * Returns the repository item associated with the tree item.
+         *
+         * @return RepositoryItem
+         */
+        public RepositoryItem getItem() {
+            return item;
+        }
+
+        /**
+         * Returns the flag indicating whether this is a temporary placeholder tree item.
+         *
+         * @return boolean
+         */
+        public boolean isTempNode() {
+            return tempNode;
+        }
+
+        /**
+         * Returns the base namespace associated with the tree item.
+         *
+         * @return String
+         */
+        public String getBaseNS() {
+            return baseNS;
+        }
+
+        /**
+         * Returns the remote repository associated with the tree item.
+         *
+         * @return RemoteRepository
+         */
+        public RemoteRepository getRepository() {
+            return repository;
+        }
+
+        /**
 		 * @see java.lang.Object#toString()
 		 */
 		public String toString() {
-			return tempNode ? "Retrieving Data..." : label;
+			return isTempNode() ? "Retrieving Data..." : getLabel();
 		}
 		
 	}

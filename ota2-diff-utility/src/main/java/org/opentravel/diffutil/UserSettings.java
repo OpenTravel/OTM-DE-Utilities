@@ -25,6 +25,8 @@ import java.util.Properties;
 
 import org.opentravel.application.common.AbstractUserSettings;
 import org.opentravel.schemacompiler.diff.ModelCompareOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Persists settings for the <code>Diff-Utility</code> application between sessions.
@@ -32,6 +34,7 @@ import org.opentravel.schemacompiler.diff.ModelCompareOptions;
 public class UserSettings extends AbstractUserSettings {
 	
 	private static final String USER_SETTINGS_FILE = "/.ota2/.du-settings.properties";
+    private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
 	
 	private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
 	
@@ -62,9 +65,8 @@ public class UserSettings extends AbstractUserSettings {
 				settings = new UserSettings();
 				settings.load( usProps );
 				
-			} catch(Throwable t) {
-				t.printStackTrace( System.out );
-				System.out.println("Error loading settings from prior session (using defaults).");
+			} catch(Exception e) {
+			    log.warn( "Error loading settings from prior session (using defaults).", e );
 				settings = getDefaultSettings();
 			}
 			
@@ -88,8 +90,7 @@ public class UserSettings extends AbstractUserSettings {
 			usProps.store( out, null );
 			
 		} catch(IOException e) {
-			System.out.println("Error saving user settings...");
-			e.printStackTrace( System.out );
+		    log.error( "Error saving user settings.", e );
 		}
 	}
 	
@@ -122,13 +123,13 @@ public class UserSettings extends AbstractUserSettings {
 		String npFolder = settingsProps.getProperty( "newProjectFolder", currentFolder );
 		String olFolder = settingsProps.getProperty( "oldLibraryFolder", currentFolder );
 		String nlFolder = settingsProps.getProperty( "newLibraryFolder", currentFolder );
-		String reportFolder = settingsProps.getProperty( "reportFolder", currentFolder );
+		String rptFolder = settingsProps.getProperty( "reportFolder", currentFolder );
 		
 		setOldProjectFolder( new File( opFolder ) );
 		setNewProjectFolder( new File( npFolder ) );
 		setOldLibraryFolder( new File( olFolder ) );
 		setNewLibraryFolder( new File( nlFolder ) );
-		setReportFolder( new File( reportFolder ) );
+		setReportFolder( new File( rptFolder ) );
 		compareOptions.loadOptions( settingsProps );
 		super.load( settingsProps );
 	}

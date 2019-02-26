@@ -22,6 +22,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import org.opentravel.application.common.OtmApplicationRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
@@ -30,6 +33,8 @@ import org.w3c.dom.ls.LSResourceResolver;
  */
 public class FileSystemResourceResolver implements LSResourceResolver {
 	
+    private static final Logger log = LoggerFactory.getLogger( FileSystemResourceResolver.class );
+    
 	private File sourceFolder;
 	private File builtInsFolder;
 	private File legacyFolder;
@@ -41,8 +46,8 @@ public class FileSystemResourceResolver implements LSResourceResolver {
 	 */
 	public FileSystemResourceResolver(File sourceSchema) {
 		this.sourceFolder = sourceSchema.getParentFile();
-		this.builtInsFolder = new File( this.sourceFolder, "/built-ins" );
-		this.legacyFolder = new File( this.sourceFolder, "/legacy" );
+		this.builtInsFolder = new File( this.sourceFolder.getAbsolutePath() + "/built-ins" );
+		this.legacyFolder = new File( this.sourceFolder.getAbsolutePath() + "/legacy" );
 	}
 	
     /**
@@ -50,99 +55,110 @@ public class FileSystemResourceResolver implements LSResourceResolver {
      *      java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public LSInput resolveResource(final String type, final String namespaceURI,
-            final String publicID, final String systemID, final String baseURI) {
+    public LSInput resolveResource(final String type, final String namespaceURI, final String publicID,
+            final String systemID, final String baseURI) {
         LSInput input = null;
-
+        
         if (systemID != null) {
-            final InputStream resourceStream = getResourceStream(systemID);
-            final Reader resourceReader = (resourceStream == null) ? null : new InputStreamReader(resourceStream);
-
-            if (resourceStream != null) {
-                input = new LSInput() {
-                	
-                	private String _systemID = systemID;
-                	private String _publicID = publicID;
-                	
-                    @Override
-                    public void setSystemId(String systemID) {
-                    	this._systemID = systemID;
-                    }
-
-                    @Override
-                    public void setStringData(String stringData) {
-                    }
-
-                    @Override
-                    public void setPublicId(String publicID) {
-                    	this._publicID = publicID;
-                    }
-
-                    @Override
-                    public void setEncoding(String encoding) {
-                    }
-
-                    @Override
-                    public void setCharacterStream(Reader characterStream) {
-                    }
-
-                    @Override
-                    public void setCertifiedText(boolean certifiedText) {
-                    }
-
-                    @Override
-                    public void setByteStream(InputStream byteStream) {
-                    }
-
-                    @Override
-                    public void setBaseURI(String baseURI) {
-                    }
-
-                    @Override
-                    public String getSystemId() {
-                        return _systemID;
-                    }
-
-                    @Override
-                    public String getStringData() {
-                        return null;
-                    }
-
-                    @Override
-                    public String getPublicId() {
-                        return _publicID;
-                    }
-
-                    @Override
-                    public String getEncoding() {
-                        return "UTF-8";
-                    }
-
-                    @Override
-                    public Reader getCharacterStream() {
-                        return resourceReader;
-                    }
-
-                    @Override
-                    public boolean getCertifiedText() {
-                        return false;
-                    }
-
-                    @Override
-                    public InputStream getByteStream() {
-                        return resourceStream;
-                    }
-
-                    @Override
-                    public String getBaseURI() {
-                        return baseURI;
-                    }
-                };
+            final InputStream resourceStream = getResourceStream( systemID );
+            
+            try (Reader resourceReader = (resourceStream == null) ? null : new InputStreamReader( resourceStream )) {
+                if (resourceStream != null) {
+                    input = new LSInput() {
+                        
+                        private String sid = systemID;
+                        private String pid = publicID;
+                        
+                        @Override
+                        public void setSystemId(String systemID) {
+                            this.sid = systemID;
+                        }
+                        
+                        @Override
+                        public void setStringData(String stringData) {
+                            // No action required
+                        }
+                        
+                        @Override
+                        public void setPublicId(String publicID) {
+                            this.pid = publicID;
+                        }
+                        
+                        @Override
+                        public void setEncoding(String encoding) {
+                            // No action required
+                        }
+                        
+                        @Override
+                        public void setCharacterStream(Reader characterStream) {
+                            // No action required
+                        }
+                        
+                        @Override
+                        public void setCertifiedText(boolean certifiedText) {
+                            // No action required
+                        }
+                        
+                        @Override
+                        public void setByteStream(InputStream byteStream) {
+                            // No action required
+                        }
+                        
+                        @Override
+                        public void setBaseURI(String baseURI) {
+                            // No action required
+                        }
+                        
+                        @Override
+                        public String getSystemId() {
+                            return sid;
+                        }
+                        
+                        @Override
+                        public String getStringData() {
+                            return null;
+                        }
+                        
+                        @Override
+                        public String getPublicId() {
+                            return pid;
+                        }
+                        
+                        @Override
+                        public String getEncoding() {
+                            return "UTF-8";
+                        }
+                        
+                        @Override
+                        public Reader getCharacterStream() {
+                            return resourceReader;
+                        }
+                        
+                        @Override
+                        public boolean getCertifiedText() {
+                            return false;
+                        }
+                        
+                        @Override
+                        public InputStream getByteStream() {
+                            return resourceStream;
+                        }
+                        
+                        @Override
+                        public String getBaseURI() {
+                            return baseURI;
+                        }
+                    };
+                }
+                
+            } catch (IOException e) {
+                throw new OtmApplicationRuntimeException( e );
             }
+            
         }
         return input;
     }
-
+    
     /**
      * Returns an input stream to the resource associated with the given systemID, or null if no
      * such resource was defined in the application context.
@@ -154,21 +170,23 @@ public class FileSystemResourceResolver implements LSResourceResolver {
     private InputStream getResourceStream(String systemID) {
         InputStream resourceStream = null;
         try {
-        	File schemaFile = new File( sourceFolder, "/" + systemID );
-        	
-        	if (!schemaFile.exists()) {
-        		schemaFile = new File( builtInsFolder, "/" + systemID );
-        	}
-        	if (!schemaFile.exists()) {
-        		schemaFile = new File( legacyFolder, "/" + systemID );
-        	}
-    		resourceStream = new FileInputStream( schemaFile );
-    		
+            String sidPath = File.separator + systemID;
+            
+            File schemaFile = new File( sourceFolder, sidPath );
+            
+            if (!schemaFile.exists()) {
+                schemaFile = new File( builtInsFolder, sidPath );
+            }
+            if (!schemaFile.exists()) {
+                schemaFile = new File( legacyFolder, sidPath );
+            }
+            resourceStream = new FileInputStream( schemaFile );
+            
         } catch (IOException e) {
             // no error - return a null input stream
         }
-        if (resourceStream == null) {
-            System.out.println("WARNING: No associated schema resource defined for System-ID: " + systemID);
+        if ((resourceStream == null) && log.isWarnEnabled()) {
+            log.warn( String.format( "No associated schema resource defined for System-ID: %s", systemID ) );
         }
         return resourceStream;
     }

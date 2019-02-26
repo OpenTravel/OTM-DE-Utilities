@@ -27,6 +27,8 @@ import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.upversion.LibraryStatusOrchestrator.StatusAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -54,6 +56,8 @@ public class PromoteDemoteDialogController {
 	
 	public static final String FXML_FILE = "/promote-demote-dialog.fxml";
 	
+    private static final Logger log = LoggerFactory.getLogger( PromoteDemoteDialogController.class );
+    
 	@FXML HBox filterPanel;
 	@FXML RadioButton promoteRadio;
 	@FXML RadioButton demoteRadio;
@@ -97,7 +101,7 @@ public class PromoteDemoteDialogController {
 			controller.setDialogStage( dialogStage );
 			
 		} catch (IOException | RepositoryException e) {
-			e.printStackTrace( System.out );
+		    log.error( "Error creating promote/demote dialog.", e );
 		}
 		return controller;
 	}
@@ -138,36 +142,30 @@ public class PromoteDemoteDialogController {
 	 */
 	@FXML public void goCloseSelected(ActionEvent event) {
 		if (!processingComplete) {
-			Runnable r = new Runnable() {
-				public void run() {
-					try {
-						ProgressMonitor monitor = new ProgressMonitor( progressInd );
-						
-						Platform.runLater( new Runnable() {
-							public void run() {
-								filterPanel.setDisable( true );
-								goCloseButton.setDisable( true );
-								cancelButton.setDisable( true );
-								progressInd.setDisable( false );
-							}
-						});
-						
-						orchestrator
-							.setProgressMonitor( monitor )
-							.updateStatus();
-						
-						Platform.runLater( new Runnable() {
-							public void run() {
-								goCloseButton.setDisable( false );
-								goCloseButton.setText( "Close" );
-								processingComplete = true;
-							}
-						});
-						
-					} catch (Throwable t) {
-						t.printStackTrace( System.out );
-					}
-				}
+			Runnable r = ()-> {
+                try {
+                    ProgressMonitor monitor = new ProgressMonitor( progressInd );
+                    
+                    Platform.runLater( () -> {
+                        filterPanel.setDisable( true );
+                        goCloseButton.setDisable( true );
+                        cancelButton.setDisable( true );
+                        progressInd.setDisable( false );
+                    });
+                    
+                    orchestrator
+                        .setProgressMonitor( monitor )
+                        .updateStatus();
+                    
+                    Platform.runLater( () -> {
+                        goCloseButton.setDisable( false );
+                        goCloseButton.setText( "Close" );
+                        processingComplete = true;
+                    });
+                    
+                } catch (Exception e) {
+                    log.error( "Error updating library statuses", e );
+                }
 			};
 			
 			new Thread( r ).start();
@@ -216,33 +214,31 @@ public class PromoteDemoteDialogController {
 	 * of the promote/demote radio buttons.
 	 */
 	private void updateStatusChoices() {
-		Platform.runLater( new Runnable() {
-			public void run() {
-				ObservableList<EnumWrapper<TLLibraryStatus>> statusChoices = FXCollections.observableArrayList();
-				EnumWrapper<TLLibraryStatus> selectedStatus = fromStatusChoice.getValue();
-				List<TLLibraryStatus> statusList = new ArrayList<>();
-				
-				if (promoteRadio.isSelected()) {
-					orchestrator.setStatusAction( StatusAction.PROMOTE );
-					statusList.addAll( Arrays.asList( TLLibraryStatus.DRAFT,
-							TLLibraryStatus.UNDER_REVIEW, TLLibraryStatus.FINAL ) );
-					
-				} else {
-					orchestrator.setStatusAction( StatusAction.DEMOTE );
-					statusList.addAll( Arrays.asList( TLLibraryStatus.UNDER_REVIEW,
-							TLLibraryStatus.FINAL, TLLibraryStatus.OBSOLETE ) );
-				}
-				statusList.forEach( status -> statusChoices.add( new EnumWrapper<TLLibraryStatus>( status ) ) );
-				
-				if ((selectedStatus == null) || !statusChoices.contains( selectedStatus )) {
-					selectedStatus = statusChoices.get( 0 );
-				}
-				fromStatusChoice.setItems( statusChoices );
-				
-				if (selectedStatus != null) {
-					fromStatusChoice.getSelectionModel().select( selectedStatus );
-				}
-			}
+		Platform.runLater( () -> {
+            ObservableList<EnumWrapper<TLLibraryStatus>> statusChoices = FXCollections.observableArrayList();
+            EnumWrapper<TLLibraryStatus> selectedStatus = fromStatusChoice.getValue();
+            List<TLLibraryStatus> statusList = new ArrayList<>();
+            
+            if (promoteRadio.isSelected()) {
+                orchestrator.setStatusAction( StatusAction.PROMOTE );
+                statusList.addAll( Arrays.asList( TLLibraryStatus.DRAFT,
+                        TLLibraryStatus.UNDER_REVIEW, TLLibraryStatus.FINAL ) );
+                
+            } else {
+                orchestrator.setStatusAction( StatusAction.DEMOTE );
+                statusList.addAll( Arrays.asList( TLLibraryStatus.UNDER_REVIEW,
+                        TLLibraryStatus.FINAL, TLLibraryStatus.OBSOLETE ) );
+            }
+            statusList.forEach( status -> statusChoices.add( new EnumWrapper<TLLibraryStatus>( status ) ) );
+            
+            if ((selectedStatus == null) || !statusChoices.contains( selectedStatus )) {
+                selectedStatus = statusChoices.get( 0 );
+            }
+            fromStatusChoice.setItems( statusChoices );
+            
+            if (selectedStatus != null) {
+                fromStatusChoice.getSelectionModel().select( selectedStatus );
+            }
 		});
 	}
 	
@@ -250,19 +246,17 @@ public class PromoteDemoteDialogController {
 	 * Called when the user changes the selection of the 'fromStatus' choice box.
 	 */
 	private void fromStatusChanged() {
-		Platform.runLater( new Runnable() {
-			public void run() {
-				EnumWrapper<TLLibraryStatus> selectedStatus = fromStatusChoice.getValue();
-				TLLibraryStatus toStatus = orchestrator.setFromStatus( selectedStatus.getValue() ).getToStatus();
-				
-				if (toStatus != null) {
-					toStatusLabel.setText( MessageBuilder.formatMessage( toStatus.toString() ) );
-				} else {
-					toStatusLabel.setText( "UNKNOWN" );
-				}
-				affectedCountLabel.setText( orchestrator.getAffectedLibraryCount() + "" );
-				totalCountLabel.setText( orchestrator.getTotalLibraryCount() + "" );
-			}
+		Platform.runLater( () -> {
+            EnumWrapper<TLLibraryStatus> selectedStatus = fromStatusChoice.getValue();
+            TLLibraryStatus toStatus = orchestrator.setFromStatus( selectedStatus.getValue() ).getToStatus();
+            
+            if (toStatus != null) {
+                toStatusLabel.setText( MessageBuilder.formatMessage( toStatus.toString() ) );
+            } else {
+                toStatusLabel.setText( "UNKNOWN" );
+            }
+            affectedCountLabel.setText( orchestrator.getAffectedLibraryCount() + "" );
+            totalCountLabel.setText( orchestrator.getTotalLibraryCount() + "" );
 		});
 	}
 	

@@ -24,4 +24,9 @@ public class Images {
 	
 	public static final Image launcherIcon = new Image( Images.class.getResourceAsStream( "/images/otm_release_editor.png" ) );
 	
+    /**
+     * Private constructor to prevent instantiation of this class.
+     */
+    private Images() {}
+    
 }

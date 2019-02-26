@@ -102,8 +102,9 @@ public class UpversionRegistry {
 				getNewVersion( (TLLibrary) oldLibraryVersion) : null;
 		SymbolTable newVersionST = newVersionSymbolTables.get( newLibraryVersion );
 		
-		return (newVersionST == null) ? null : (NamedEntity) newVersionST.getEntity(
-				newLibraryVersion.getNamespace(), oldVersion.getLocalName() );
+		return ((newVersionST == null) || (newLibraryVersion == null)) ?
+		        null : (NamedEntity) newVersionST.getEntity(
+		                newLibraryVersion.getNamespace(), oldVersion.getLocalName() );
 	}
 	
 }

@@ -41,6 +41,7 @@ public abstract class AbstractDOMTreeNode {
 	 */
 	public AbstractDOMTreeNode(Node domNode, String label) {
 		String nodeValue;
+		String nvDisplay;
 		
 		if (domNode instanceof Attr) {
 			nodeValue = ((Attr) domNode).getValue();
@@ -48,9 +49,9 @@ public abstract class AbstractDOMTreeNode {
 		} else { // must be an Element
 			nodeValue = HelperUtils.getElementTextValue( (Element) domNode );
 		}
+		nvDisplay = (nodeValue == null) ? "" : (" = " + nodeValue);
 		this.domNode = domNode;
-		this.label = (label != null) ? label :
-			(domNode.getNodeName() + ((nodeValue == null) ? "" : (" = " + nodeValue)));
+		this.label = (label != null) ? label : (domNode.getNodeName() + nvDisplay);
 	}
 	
 	/**

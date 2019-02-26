@@ -66,9 +66,9 @@ public class OperationTreeNode extends TreeNode<TLOperation> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLOperation operation = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return operation.getName(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( operation ); } ) );
-		props.add( new NodeProperty( "extends", () -> { return getExtensionName( operation ); } ) );
+		props.add( new NodeProperty( "name", operation::getName ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( operation ) ) );
+		props.add( new NodeProperty( "extends", () -> getExtensionName( operation ) ) );
 		return props;
 	}
 
@@ -76,8 +76,8 @@ public class OperationTreeNode extends TreeNode<TLOperation> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
-		List<TreeNode<?>> children = new ArrayList<>();
+    protected List<TreeNode<Object>> initializeChildren() {
+		List<TreeNode<Object>> children = new ArrayList<>();
 		TLOperation operation = getEntity();
 		
 		children.add( treeNodeFactory.newTreeNode( operation.getRequest() ) );

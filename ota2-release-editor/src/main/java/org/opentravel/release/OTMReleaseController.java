@@ -32,12 +32,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.BrowseRepositoryDialogController;
+import org.opentravel.application.common.OtmApplicationException;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.release.NewReleaseDialogController.NewReleaseInfo;
 import org.opentravel.release.navigate.TreeNode;
@@ -71,6 +73,8 @@ import org.opentravel.schemacompiler.validate.FindingMessageFormat;
 import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.validate.ValidationFinding;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -78,7 +82,6 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
@@ -108,7 +111,6 @@ import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.ChoiceBoxTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -122,11 +124,12 @@ public class OTMReleaseController extends AbstractMainWindowController {
 	
 	public static final String FXML_FILE = "/ota2-release-editor.fxml";
 	
-	private static final DateFormat dateTimeFormat = new SimpleDateFormat( "d MMM yyyy h:mm:ssa" );
 	private static final String SUBSTITUTION_GROUP_CHOICE = "Substitution Group";
 	private static final String BLANK_DATE_VALUE = "Latest Commit";
 	private static final String DEFAULT_SUFFIX = " (Release Default)";
 	
+    private static final Logger log = LoggerFactory.getLogger( OTMReleaseController.class );
+    
 	@FXML private MenuItem newMenu;
 	@FXML private MenuItem openMenu;
 	@FXML private MenuItem importMenu;
@@ -187,13 +190,14 @@ public class OTMReleaseController extends AbstractMainWindowController {
 	@FXML private TableColumn<ValidationFinding,ImageView> validationLevelColumn;
 	@FXML private TableColumn<ValidationFinding,String> validationComponentColumn;
 	@FXML private TableColumn<ValidationFinding,String> validationDescriptionColumn;
-	@FXML private TreeView<TreeNode<?>> libraryTreeView;
+	@FXML private TreeView<TreeNode<Object>> libraryTreeView;
 	@FXML private TableView<NodeProperty> propertyTableView;
 	@FXML private TableColumn<NodeProperty,String> propertyNameColumn;
 	@FXML private TableColumn<NodeProperty,String> propertyValueColumn;
 	@FXML private ImageView statusBarIcon;
 	@FXML private Label statusBarLabel;
 	
+    private DateFormat dateTimeFormat = new SimpleDateFormat( "d MMM yyyy h:mm:ssa" );
 	private LocalDateTimeTextField defaultEffectiveDate;
 	private Label timeZoneLabel;
 	private Button applyToAllButton;
@@ -222,7 +226,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 			availabilityChecker.pingAllRepositories( true );
 			
 		} catch (RepositoryException e) {
-			e.printStackTrace( System.out );
+		    log.error( "Error creating default release manager.", e );
 		}
 	}
 	
@@ -262,7 +266,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 				
 				if (!newReleaseFile.exists() || confirmOverwriteFile( newReleaseFile )) {
 					Runnable r = new BackgroundTask( "Creating New Release...", StatusType.INFO ) {
-						public void execute() throws Throwable {
+						public void execute() throws OtmApplicationException {
 							try {
 								newReleaseManager.createNewRelease( releaseInfo.getReleaseBaseNamespace(),
 										releaseInfo.getReleaseName(), releaseInfo.getReleaseDirectory() );
@@ -272,6 +276,9 @@ public class OTMReleaseController extends AbstractMainWindowController {
 								OTMReleaseController.this.managedRelease = false;
 								updateControlsForNewRelease();
 								
+			                } catch (Exception e) {
+			                    throw new OtmApplicationException( e.getMessage(), e );
+			                    
 							} finally {
 								userSettings.setReleaseFolder( releaseInfo.getReleaseDirectory() );
 								userSettings.save();
@@ -285,12 +292,17 @@ public class OTMReleaseController extends AbstractMainWindowController {
 			
 		} catch (RepositoryException | LibrarySaveException e) {
 			Runnable r = new BackgroundTask( "Error creating the new release", StatusType.ERROR ) {
-				public void execute() throws Throwable {
-					Thread.sleep( 5000 );
+				public void execute() throws OtmApplicationException {
+					try {
+                        Thread.sleep( 5000 );
+                        
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
 				}
 			};
-			e.printStackTrace( System.out );
 			
+			log.error( "Error creating the new release", e );
 			new Thread( r ).start();
 		}
 	}
@@ -306,13 +318,12 @@ public class OTMReleaseController extends AbstractMainWindowController {
 		}
 		FileChooser chooser = newFileChooser( "Open",
 				userSettings.getReleaseFolder(),
-				new String[] { "*.otr", "OTM Release Files" },
-				new String[] { "*.*", "All Files (*.*)" } );
+				OTR_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
 		File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 		
 		if ((selectedFile != null) && (selectedFile != releaseFile)) {
 			Runnable r = new BackgroundTask( "Loading Release: " + selectedFile.getName(), StatusType.INFO ) {
-				public void execute() throws Throwable {
+				public void execute() throws OtmApplicationException {
 					try {
 						ReleaseManager manager = new ReleaseManager( repositoryManager );
 						
@@ -323,6 +334,9 @@ public class OTMReleaseController extends AbstractMainWindowController {
 						OTMReleaseController.this.managedRelease = false;
 						updateControlsForNewRelease();
 						
+                    } catch (Exception e) {
+                        throw new OtmApplicationException( e.getMessage(), e );
+                        
 					} finally {
 						userSettings.setReleaseFolder( selectedFile.getParentFile() );
 						userSettings.save();
@@ -356,16 +370,21 @@ public class OTMReleaseController extends AbstractMainWindowController {
 				
 				if (selectedItem != null) {
 					Runnable r = new BackgroundTask( "Loading Managed Release...", StatusType.INFO ) {
-						public void execute() throws Throwable {
-							ReleaseManager manager = new ReleaseManager( repositoryManager );
-							
-							validationFindings = new ValidationFindings();
-							manager.loadRelease( selectedItem, validationFindings );
-							OTMReleaseController.this.releaseManager = manager;
-							OTMReleaseController.this.releaseFile = URLUtils.toFile(
-									releaseManager.getRelease().getReleaseUrl() );
-							OTMReleaseController.this.managedRelease = true;
-							updateControlsForNewRelease();
+						public void execute() throws OtmApplicationException {
+						    try {
+	                            ReleaseManager manager = new ReleaseManager( repositoryManager );
+	                            
+	                            validationFindings = new ValidationFindings();
+	                            manager.loadRelease( selectedItem, validationFindings );
+	                            OTMReleaseController.this.releaseManager = manager;
+	                            OTMReleaseController.this.releaseFile = URLUtils.toFile(
+	                                    releaseManager.getRelease().getReleaseUrl() );
+	                            OTMReleaseController.this.managedRelease = true;
+	                            updateControlsForNewRelease();
+						        
+						    } catch (Exception e) {
+                                throw new OtmApplicationException( e.getMessage(), e );
+						    }
 						}
 					};
 					
@@ -387,13 +406,12 @@ public class OTMReleaseController extends AbstractMainWindowController {
 		}
 		FileChooser chooser = newFileChooser( "Import from OTP",
 				userSettings.getReleaseFolder(),
-				new String[] { "*.otp", "OTM Project Files (*.otp)" },
-				new String[] { "*.*", "All Files (*.*)" } );
+				OTP_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
 		File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 		
 		if ((selectedFile != null) && (selectedFile != releaseFile)) {
 			Runnable r = new BackgroundTask( "Importing Release: " + selectedFile.getName(), StatusType.INFO ) {
-				public void execute() throws Throwable {
+				public void execute() throws OtmApplicationException {
 					try {
 						ValidationFindings findings = new ValidationFindings();
 						ReleaseManager newReleaseManager = new ReleaseManager( repositoryManager );
@@ -405,6 +423,9 @@ public class OTMReleaseController extends AbstractMainWindowController {
 						OTMReleaseController.this.managedRelease = false;
 						updateControlsForNewRelease();
 						
+					} catch (Exception e) {
+					    throw new OtmApplicationException( e.getMessage(), e );
+					    
 					} finally {
 						userSettings.setReleaseFolder( selectedFile.getParentFile() );
 						userSettings.save();
@@ -424,10 +445,15 @@ public class OTMReleaseController extends AbstractMainWindowController {
 	@FXML public void saveReleaseFile(ActionEvent event) {
 		if (releaseManager != null) {
 			Runnable r = new BackgroundTask( "Saving Release: " + releaseFile.getName(), StatusType.INFO ) {
-				public void execute() throws Throwable {
-					releaseManager.saveRelease();
-					releaseDirty = false;
-					updateControlStates();
+				public void execute() throws OtmApplicationException {
+				    try {
+	                    releaseManager.saveRelease();
+	                    releaseDirty = false;
+	                    updateControlStates();
+				        
+				    } catch (Exception e) {
+                        throw new OtmApplicationException( e.getMessage(), e );
+				    }
 				}
 			};
 			
@@ -450,13 +476,16 @@ public class OTMReleaseController extends AbstractMainWindowController {
 				
 				if (!saveAsFile.exists() || confirmOverwriteFile( saveAsFile )) {
 					Runnable r = new BackgroundTask( "Saving Release As...", StatusType.INFO ) {
-						public void execute() throws Throwable {
+						public void execute() throws OtmApplicationException {
 							try {
 								releaseManager.saveReleaseAs( selectedFolder );
 								releaseFile = URLUtils.toFile( releaseManager.getRelease().getReleaseUrl() );
 								releaseDirty = false;
 								updateControlStates();
 								
+		                    } catch (Exception e) {
+		                        throw new OtmApplicationException( e.getMessage(), e );
+		                        
 							} finally {
 								userSettings.setReleaseFolder( selectedFolder );
 								userSettings.save();
@@ -478,13 +507,18 @@ public class OTMReleaseController extends AbstractMainWindowController {
 	@FXML public void compileRelease(ActionEvent event) {
 		if ((releaseManager != null) && !validationFindings.hasFinding( FindingType.ERROR )) {
 			Runnable r = new BackgroundTask( "Compiling Release...", StatusType.INFO ) {
-				public void execute() throws Throwable {
-					CompileAllCompilerTask task = new CompileAllCompilerTask();
-					String releaseFolderName = releaseFile.getName().replaceAll("\\.otr", "");
-					File outputFolder = new File( releaseFile.getParentFile(), releaseFolderName );
-					
-					task.setOutputFolder( outputFolder.getAbsolutePath() );
-					task.compileOutput( releaseManager );
+				public void execute() throws OtmApplicationException {
+				    try {
+	                    CompileAllCompilerTask task = new CompileAllCompilerTask();
+	                    String releaseFolderName = releaseFile.getName().replaceAll("\\.otr", "");
+	                    File outputFolder = new File( releaseFile.getParentFile(), releaseFolderName );
+	                    
+	                    task.setOutputFolder( outputFolder.getAbsolutePath() );
+	                    task.compileOutput( releaseManager );
+				        
+				    } catch (Exception e) {
+                        throw new OtmApplicationException( e.getMessage(), e );
+				    }
 				}
 			};
 			
@@ -519,7 +553,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 				/** Capture the old/new effective dates before updating. */
 				public boolean doExecute() {
 					Release release = releaseManager.getRelease();
-					Date defaultEffectiveDate = release.getDefaultEffectiveDate();
+					Date effectiveDate = release.getDefaultEffectiveDate();
 					
 					for (ReleaseMember member : release.getAllMembers()) {
 						List<RepositoryItemCommit> commitHistory = commitHistoryMap.get( member );
@@ -528,14 +562,14 @@ public class OTMReleaseController extends AbstractMainWindowController {
 						
 						oldEffectiveDates.put( item, member.getEffectiveDate() );
 						
-						if (defaultEffectiveDate == null) {
+						if (effectiveDate == null) {
 							newEffectiveDates.put( item, null );
 							
-						} else if (defaultEffectiveDate.after( latestCommit )) {
+						} else if (effectiveDate.after( latestCommit )) {
 							newEffectiveDates.put( item, latestCommit );
 							
 						} else {
-							newEffectiveDates.put( item, defaultEffectiveDate );
+							newEffectiveDates.put( item, effectiveDate );
 						}
 					}
 					return updateEffectiveDates( newEffectiveDates );
@@ -549,29 +583,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
 				/** Reassigns the new effective dates. */
 				public boolean doExecuteRedo() {
 					return updateEffectiveDates( newEffectiveDates );
-				}
-				
-				/** Assign the effective dates specified in the map provided. */
-				private boolean updateEffectiveDates(Map<RepositoryItem,Date> effectiveDates) {
-					boolean result = true;
-					
-					for (RepositoryItem item : effectiveDates.keySet()) {
-						ReleaseMember member = releaseManager.getPrincipalMember( item );
-						
-						if (member == null) {
-							member = releaseManager.getReferencedMember( item );
-						}
-						if (member == null) {
-							result = false; break;
-						}
-						member.setEffectiveDate( effectiveDates.get( item ) );
-					}
-					modelDirty = true;
-					releaseDirty = true;
-					principalTableView.refresh();
-					referencedTableView.refresh();
-					updateControlStates();
-					return result;
 				}
 				
 			}.submit();
@@ -643,7 +654,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 				alert.getButtonTypes().setAll( ButtonType.YES, ButtonType.NO );
 				dialogResult = alert.showAndWait();
 				
-				if (dialogResult.get() == ButtonType.YES) {
+				if (dialogResult.isPresent() && (dialogResult.get() == ButtonType.YES)) {
 					new UndoableAction( undoManager ) {
 						
 						private RepositoryItem libraryItem = selectedMember.getRepositoryItem();
@@ -695,23 +706,29 @@ public class OTMReleaseController extends AbstractMainWindowController {
 		 * @see org.opentravel.release.OTMReleaseController.BackgroundTask#execute()
 		 */
 		@Override
-		protected void execute() throws Throwable {
-			if (addLibrary) {
-				releaseManager.addPrincipalMember( libraryItem );
-				
-			} else {
-				releaseManager.removePrincipalMember( libraryItem );
-			}
-			releaseManager.loadReleaseModel( validationFindings = new ValidationFindings() );
-			updateCommitHistories();
-			principalTableView.setItems(
-					FXCollections.observableList( releaseManager.getRelease().getPrincipalMembers() ) );
-			referencedTableView.setItems(
-					FXCollections.observableList( releaseManager.getRelease().getReferencedMembers() ) );
-			releaseDirty = true;
-			modelDirty = false;
-			updateControlStates();
-			updateModelTreeView();
+		protected void execute() throws OtmApplicationException {
+		    try {
+	            if (addLibrary) {
+	                releaseManager.addPrincipalMember( libraryItem );
+	                
+	            } else {
+	                releaseManager.removePrincipalMember( libraryItem );
+	            }
+	            validationFindings = new ValidationFindings();
+	            releaseManager.loadReleaseModel( validationFindings );
+	            updateCommitHistories();
+	            principalTableView.setItems(
+	                    FXCollections.observableList( releaseManager.getRelease().getPrincipalMembers() ) );
+	            referencedTableView.setItems(
+	                    FXCollections.observableList( releaseManager.getRelease().getReferencedMembers() ) );
+	            releaseDirty = true;
+	            modelDirty = false;
+	            updateControlStates();
+	            updateModelTreeView();
+		        
+            } catch (Exception e) {
+                throw new OtmApplicationException( e.getMessage(), e );
+		    }
 		}
 		
 	}
@@ -724,18 +741,23 @@ public class OTMReleaseController extends AbstractMainWindowController {
 	@FXML public void reloadModel(ActionEvent event) {
 		if (releaseManager != null) {
 			Runnable r = new BackgroundTask( "Reloading Model...", StatusType.INFO ) {
-				public void execute() throws Throwable {
-					validationFindings = new ValidationFindings();
-					releaseManager.loadReleaseModel( validationFindings );
-					validationTableView.setItems(
-							FXCollections.observableList( validationFindings.getAllFindingsAsList() ) );
-					referencedTableView.setItems(
-							FXCollections.observableList( releaseManager.getRelease().getReferencedMembers() ) );
-					modelDirty = false;
-					principalTableView.refresh();
-					referencedTableView.refresh();
-					updateControlStates();
-					updateModelTreeView();
+				public void execute() throws OtmApplicationException {
+				    try {
+	                    validationFindings = new ValidationFindings();
+	                    releaseManager.loadReleaseModel( validationFindings );
+	                    validationTableView.setItems(
+	                            FXCollections.observableList( validationFindings.getAllFindingsAsList() ) );
+	                    referencedTableView.setItems(
+	                            FXCollections.observableList( releaseManager.getRelease().getReferencedMembers() ) );
+	                    modelDirty = false;
+	                    principalTableView.refresh();
+	                    referencedTableView.refresh();
+	                    updateControlStates();
+	                    updateModelTreeView();
+				        
+		            } catch (Exception e) {
+		                throw new OtmApplicationException( e.getMessage(), e );
+				    }
 				}
 			};
 			
@@ -752,17 +774,22 @@ public class OTMReleaseController extends AbstractMainWindowController {
 		if ((repoMenu != null) && (releaseManager != null) && !managedRelease) {
 			RemoteRepository repository = (RemoteRepository) repoMenu.getProperties().get( "repository" );
 			Runnable r = new BackgroundTask( "Publishing Release...", StatusType.INFO ) {
-				public void execute() throws Throwable {
-					ReleaseItem releaseItem = releaseManager.publishRelease( repository );
-					ReleaseManager manager = new ReleaseManager( repositoryManager );
-					
-					validationFindings = new ValidationFindings();
-					manager.loadRelease( releaseItem, validationFindings );
-					OTMReleaseController.this.releaseManager = manager;
-					OTMReleaseController.this.releaseFile = URLUtils.toFile(
-							releaseManager.getRelease().getReleaseUrl() );
-					OTMReleaseController.this.managedRelease = true;
-					updateControlsForNewRelease();
+				public void execute() throws OtmApplicationException {
+				    try {
+	                    ReleaseItem releaseItem = releaseManager.publishRelease( repository );
+	                    ReleaseManager manager = new ReleaseManager( repositoryManager );
+	                    
+	                    validationFindings = new ValidationFindings();
+	                    manager.loadRelease( releaseItem, validationFindings );
+	                    OTMReleaseController.this.releaseManager = manager;
+	                    OTMReleaseController.this.releaseFile = URLUtils.toFile(
+	                            releaseManager.getRelease().getReleaseUrl() );
+	                    OTMReleaseController.this.managedRelease = true;
+	                    updateControlsForNewRelease();
+				        
+		            } catch (Exception e) {
+		                throw new OtmApplicationException( e.getMessage(), e );
+				    }
 				}
 			};
 			
@@ -786,7 +813,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 				
 				if (!newVersionFile.exists() || confirmOverwriteFile( newVersionFile )) {
 					Runnable r = new BackgroundTask( "Creating New Version...", StatusType.INFO ) {
-						public void execute() throws Throwable {
+						public void execute() throws OtmApplicationException {
 							try {
 								validationFindings = new ValidationFindings();
 								ReleaseManager manager = releaseManager.newVersion( selectedFolder, validationFindings );
@@ -797,6 +824,9 @@ public class OTMReleaseController extends AbstractMainWindowController {
 								OTMReleaseController.this.managedRelease = false;
 								updateControlsForNewRelease();
 								
+				            } catch (Exception e) {
+				                throw new OtmApplicationException( e.getMessage(), e );
+				                
 							} finally {
 								userSettings.setReleaseFolder( selectedFolder );
 								userSettings.save();
@@ -825,7 +855,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 				
 				if (!saveAsFile.exists() || confirmOverwriteFile( saveAsFile )) {
 					Runnable r = new BackgroundTask( "Unpublishing Release...", StatusType.INFO ) {
-						public void execute() throws Throwable {
+						public void execute() throws OtmApplicationException {
 							try {
 								validationFindings = new ValidationFindings();
 								ReleaseManager manager = releaseManager.unpublishRelease( selectedFolder );
@@ -837,6 +867,9 @@ public class OTMReleaseController extends AbstractMainWindowController {
 								OTMReleaseController.this.managedRelease = false;
 								updateControlsForNewRelease();
 								
+				            } catch (Exception e) {
+				                throw new OtmApplicationException( e.getMessage(), e );
+				                
 							} finally {
 								userSettings.setReleaseFolder( selectedFolder );
 								userSettings.save();
@@ -876,7 +909,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 
 		alert.getButtonTypes().setAll( ButtonType.YES, ButtonType.NO );
 		dialogResult = alert.showAndWait();
-		return (dialogResult.get() == ButtonType.YES);
+		return dialogResult.isPresent() && (dialogResult.get() == ButtonType.YES);
 	}
 	
 	/**
@@ -899,11 +932,13 @@ public class OTMReleaseController extends AbstractMainWindowController {
 			alert.getButtonTypes().setAll( ButtonType.YES, ButtonType.NO, ButtonType.CANCEL );
 			dialogResult = alert.showAndWait();
 			
-			if (dialogResult.get() == ButtonType.YES) {
-				saveReleaseFile( null );
-				
-			} else if (dialogResult.get() == ButtonType.CANCEL) {
-				confirmClose = false;
+			if (dialogResult.isPresent()) {
+	            if (dialogResult.get() == ButtonType.YES) {
+	                saveReleaseFile( null );
+	                
+	            } else if (dialogResult.get() == ButtonType.CANCEL) {
+	                confirmClose = false;
+	            }
 			}
 		}
 		return confirmClose;
@@ -1085,7 +1120,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 	/**
 	 * Called when a compiler option has been modified.
 	 */
-	private <T> void handleCompileOptionModified() {
+	private void handleCompileOptionModified() {
 		ReleaseCompileOptions options = getCompileOptions();
 		
 		if (options != null) {
@@ -1115,39 +1150,24 @@ public class OTMReleaseController extends AbstractMainWindowController {
 	}
 	
 	/**
-	 * Called when a facet selection has been modified.
-	 */
-	private void handleFacetSelectionsModified() {
-		Release release = getRelease();
-		
-		if (release != null) {
-			List<FacetSelection> facetSelections = facetSelectionTableView.getItems();
-			Map<QName,QName> selectionMap = FacetSelection.buildFacetSelectionMap( facetSelections );
-			
-			releaseDirty = true;
-			release.setPreferredFacets( selectionMap );
-			updateControlStates();
-		}
-	}
-	
-	/**
 	 * @see org.opentravel.application.common.AbstractMainWindowController#updateControlStates()
 	 */
 	@Override
 	protected void updateControlStates() {
 		Platform.runLater( () -> {
 			boolean isReleaseLoaded = (releaseManager != null);
+			boolean isEditableReleaseLoaded = isReleaseLoaded && !managedRelease;
 			boolean isGenerateExamples = (isReleaseLoaded && generateExamplesCheckbox.isSelected());
-			boolean isSaveEnabled = (isReleaseLoaded && !managedRelease && releaseDirty && !hasError);
-			boolean isSaveAsEnabled = (isReleaseLoaded && !managedRelease && !hasError);
-			boolean isReloadModelEnabled = (isReleaseLoaded && !managedRelease && modelDirty && !hasError);
+			boolean isSaveEnabled = (isEditableReleaseLoaded && releaseDirty && !hasError);
+			boolean isSaveAsEnabled = (isEditableReleaseLoaded && !hasError);
+			boolean isReloadModelEnabled = (isEditableReleaseLoaded && modelDirty && !hasError);
 			boolean isCompileEnabled = (isReleaseLoaded && !hasError
 					&& !validationFindings.hasFinding( FindingType.ERROR ));
-			boolean isPublishEnabled = (isReleaseLoaded && !releaseDirty && !managedRelease && !hasError
+			boolean isPublishEnabled = (isEditableReleaseLoaded && !releaseDirty && !hasError
 					&& !validationFindings.hasFinding( FindingType.ERROR ));
-			boolean isUnpublishEnabled = (isReleaseLoaded && !releaseDirty && managedRelease && !hasError
+			boolean isUnpublishEnabled = (isReleaseLoaded && managedRelease && !releaseDirty && !hasError
 					&& !validationFindings.hasFinding( FindingType.ERROR ));
-			boolean isRemoveEnabled = (isReleaseLoaded && !managedRelease &&
+			boolean isRemoveEnabled = (isEditableReleaseLoaded &&
 						!principalTableView.getSelectionModel().getSelectedItems().isEmpty());
 			
 			// Set the enable/disable status of all controls
@@ -1174,25 +1194,25 @@ public class OTMReleaseController extends AbstractMainWindowController {
 			releaseBaseNamespace.setDisable( !isReleaseLoaded );
 			releaseStatus.setDisable( !isReleaseLoaded );
 			releaseVersion.setDisable( !isReleaseLoaded );
-			defaultEffectiveDate.setDisable( !(isReleaseLoaded && !managedRelease) );
+			defaultEffectiveDate.setDisable( !isEditableReleaseLoaded );
 			timeZoneLabel.setDisable( !isReleaseLoaded );
-			applyToAllButton.setDisable( !(isReleaseLoaded && !managedRelease) );
+			applyToAllButton.setDisable( !isEditableReleaseLoaded );
 			releaseDescription.setDisable( !isReleaseLoaded );
-			addLibraryButton.setDisable( !(isReleaseLoaded && !managedRelease) );
+			addLibraryButton.setDisable( !isEditableReleaseLoaded );
 			removeLibraryButton.setDisable( !isRemoveEnabled );
 			reloadModelButton.setDisable( !isReloadModelEnabled );
 			principalTableView.setDisable( !isReleaseLoaded );
 			referencedTableView.setDisable( !isReleaseLoaded );
-			bindingStyleChoice.setDisable( !(isReleaseLoaded && !managedRelease) );
-			compileXmlSchemasCheckbox.setDisable( !(isReleaseLoaded && !managedRelease) );
-			compileServicesCheckbox.setDisable( !(isReleaseLoaded && !managedRelease) );
-			compileJsonSchemasCheckbox.setDisable( !(isReleaseLoaded && !managedRelease) );
-			compileSwaggerCheckbox.setDisable( !(isReleaseLoaded && !managedRelease) );
-			compileDocumentationCheckbox.setDisable( !(isReleaseLoaded && !managedRelease) );
+			bindingStyleChoice.setDisable( !isEditableReleaseLoaded );
+			compileXmlSchemasCheckbox.setDisable( !isEditableReleaseLoaded );
+			compileServicesCheckbox.setDisable( !isEditableReleaseLoaded );
+			compileJsonSchemasCheckbox.setDisable( !isEditableReleaseLoaded );
+			compileSwaggerCheckbox.setDisable( !isEditableReleaseLoaded );
+			compileDocumentationCheckbox.setDisable( !isEditableReleaseLoaded );
 			serviceEndpointUrl.setDisable( !isReleaseLoaded );
 			baseResourceUrl.setDisable( !isReleaseLoaded );
-			suppressExtensionsCheckbox.setDisable( !(isReleaseLoaded && !managedRelease) );
-			generateExamplesCheckbox.setDisable( !(isReleaseLoaded && !managedRelease) );
+			suppressExtensionsCheckbox.setDisable( !isEditableReleaseLoaded );
+			generateExamplesCheckbox.setDisable( !isEditableReleaseLoaded );
 			exampleMaxDetailCheckbox.setDisable( !(isGenerateExamples && !managedRelease) );
 			maxRepeatSpinner.setDisable( !isGenerateExamples );
 			maxRecursionDepthSpinner.setDisable( !isGenerateExamples );
@@ -1211,9 +1231,9 @@ public class OTMReleaseController extends AbstractMainWindowController {
 			baseResourceUrl.setEditable( !managedRelease );
 			maxRepeatSpinner.setEditable( !managedRelease );
 			maxRecursionDepthSpinner.setEditable( !managedRelease );
-			principalTableView.setEditable( isReleaseLoaded && !managedRelease );
-			referencedTableView.setEditable( isReleaseLoaded && !managedRelease );
-			facetSelectionTableView.setEditable( isReleaseLoaded && !managedRelease );
+			principalTableView.setEditable( isEditableReleaseLoaded );
+			referencedTableView.setEditable( isEditableReleaseLoaded );
+			facetSelectionTableView.setEditable( isEditableReleaseLoaded );
 			
 			if (!isReleaseLoaded) {
 				principalTableView.setItems( null );
@@ -1346,7 +1366,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 	 */
 	private void updateModelTreeView() {
 		Platform.runLater( () -> {
-			TreeItem<TreeNode<?>> rootItem = null;
+			TreeItem<TreeNode<Object>> rootItem = null;
 			
 			if (releaseManager != null) {
 				TreeNodeFactory nodeFactory = new TreeNodeFactory();
@@ -1408,6 +1428,33 @@ public class OTMReleaseController extends AbstractMainWindowController {
 		}
 	}
 	
+    /**
+     * Assign the effective dates specified in the map provided.
+     * 
+     * @param effectiveDates  the map that specifies effective dates for each repository item in the release
+     */
+    private boolean updateEffectiveDates(Map<RepositoryItem,Date> effectiveDates) {
+        boolean result = true;
+        for (Entry<RepositoryItem,Date> entry : effectiveDates.entrySet()) {
+            RepositoryItem item = entry.getKey();
+            ReleaseMember member = releaseManager.getPrincipalMember( item );
+            
+            if (member == null) {
+                member = releaseManager.getReferencedMember( item );
+            }
+            if (member == null) {
+                result = false; break;
+            }
+            member.setEffectiveDate( effectiveDates.get( item ) );
+        }
+        modelDirty = true;
+        releaseDirty = true;
+        principalTableView.refresh();
+        referencedTableView.refresh();
+        updateControlStates();
+        return result;
+    }
+    
 	/**
 	 * Validates the field values of all visual fields.  This method must be called
 	 * from within the UI thread.
@@ -1468,50 +1515,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
 	}
 	
 	/**
-	 * Converts the given repository item commit to a parseable date string.
-	 * 
-	 * @param commit  the repository item commit to be formatted as a date
-	 * @return String
-	 */
-	private String toDateString(RepositoryItemCommit commit) {
-		StringBuilder dateStr = new StringBuilder();
-		String remarks = commit.getRemarks();
-		
-		dateStr.append( dateTimeFormat.format( commit.getEffectiveOn() ) );
-		
-		if ((remarks != null) && (remarks.trim().length() > 0)) {
-			dateStr.append(" (").append( remarks.trim() ).append(")");
-		}
-		return dateStr.toString();
-	}
-	
-	/**
-	 * Parses an effective date from the string provided.
-	 * 
-	 * @param dateStr  the date string to parse
-	 * @return Date
-	 */
-	private Date parseEffectiveDate(String dateStr) {
-		Date date = null;
-		
-		try {
-			if (dateStr != null) {
-				int suffixIdx = dateStr.indexOf(" (");
-				
-				if (suffixIdx >= 0) {
-					dateStr = dateStr.substring( 0, suffixIdx );
-				}
-			}
-			date = ((dateStr == null) || dateStr.equals( BLANK_DATE_VALUE ))
-					? null : dateTimeFormat.parse( dateStr );
-			
-		} catch (ParseException e) {
-			// Ignore error and return null
-		}
-		return date;
-	}
-	
-	/**
 	 * Returns the release or null if one is not currently open in the editor.
 	 * 
 	 * @return Release
@@ -1537,10 +1540,11 @@ public class OTMReleaseController extends AbstractMainWindowController {
 	 * @param primaryStage  the primary stage for this controller
 	 */
 	@Override
+    @SuppressWarnings("squid:MaximumInheritanceDepth") // Unavoidable since the base class is from core JavaFXx
 	public void initialize(Stage primaryStage) {
 		List<String> bindingStyles = CompilerExtensionRegistry.getAvailableExtensionIds();
 		String defaultStyle = CompilerExtensionRegistry.getActiveExtension();
-		UserSettings userSettings = UserSettings.load();
+		UserSettings settings = UserSettings.load();
 		
 		super.initialize( primaryStage );
 		
@@ -1560,9 +1564,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 				repoMenu.setText( repository.getDisplayName() );
 				repoMenu.getProperties().put( "repository", repository );
 				repoMenu.getProperties().put( "rootNamespaces", repository.listRootNamespaces() );
-				repoMenu.setOnAction( event -> {
-					publishRelease( repoMenu );
-				});
+				repoMenu.setOnAction( event -> publishRelease( repoMenu ) );
 				publishReleaseMenu.getItems().add( repoMenu );
 				
 			} catch (RepositoryException e) {
@@ -1586,123 +1588,111 @@ public class OTMReleaseController extends AbstractMainWindowController {
 		HBox.setMargin( applyToAllButton, new Insets( 7, 5, 7, 5 ) );
 		
 		// Initialize value change listeners for all controls
-		undoManager.addListener( manager -> {
+		undoManager.addListener( manager ->
 			Platform.runLater( () -> {
 				undoMenu.setDisable( !manager.canUndo() );
 				redoMenu.setDisable( !manager.canRedo() );
-			});
-		});
-		
-		releaseName.textProperty().addListener( (observable, oldValue, newValue) -> {
-			new TextInputUndoableAction( releaseName, oldValue, undoManager, () -> {
-				handleReleaseFieldModified( false );
-			} ).submit();
-		} );
-		releaseBaseNamespace.textProperty().addListener( (observable, oldValue, newValue) -> {
-			new TextInputUndoableAction( releaseBaseNamespace, oldValue, undoManager, () -> {
-				handleReleaseFieldModified( true );
-			} ).submit();
-		} );
-		releaseVersion.textProperty().addListener( (observable, oldValue, newValue) -> {
-			new TextInputUndoableAction( releaseVersion, oldValue, undoManager, () -> {
-				handleReleaseFieldModified( false );
-			} ).submit();
-		} );
-		defaultEffectiveDate.localDateTimeProperty().addListener( (observable, oldValue, newValue) -> {
-			new WritableValueUndoableAction<>( defaultEffectiveDate.localDateTimeProperty(), oldValue, undoManager, () -> {
-				handleReleaseFieldModified( false );
-			} ).submit();
-		} );
-		applyToAllButton.setOnAction( event -> {
-			applyEffectiveDateToAllMembers( event );
-		});
-		releaseDescription.textProperty().addListener( (observable, oldValue, newValue) -> {
-			new TextInputUndoableAction( releaseDescription, oldValue, undoManager, () -> {
-				handleReleaseFieldModified( false );
-			} ).submit();
-		} );
-		principalTableView.getSelectionModel().selectedItemProperty().addListener(
-			(obs, oldSelection, newSelection) -> { updateControlStates(); }
+			})
 		);
-		bindingStyleChoice.valueProperty().addListener( (observable, oldValue, newValue) -> {
-			new WritableValueUndoableAction<>( bindingStyleChoice.valueProperty(), oldValue, undoManager, () -> {
-				handleCompileOptionModified();
-			} ).submit();
-		} );
-		compileXmlSchemasCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) -> {
-			new WritableValueUndoableAction<>( compileXmlSchemasCheckbox.selectedProperty(), oldValue, undoManager, () -> {
-				handleCompileOptionModified();
-			} ).submit();
-		} );
-		compileServicesCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) -> {
-			new WritableValueUndoableAction<>( compileServicesCheckbox.selectedProperty(), oldValue, undoManager, () -> {
-				handleCompileOptionModified();
-			} ).submit();
-		} );
-		compileJsonSchemasCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) -> {
-			new WritableValueUndoableAction<>( compileJsonSchemasCheckbox.selectedProperty(), oldValue, undoManager, () -> {
-				handleCompileOptionModified();
-			} ).submit();
-		} );
-		compileSwaggerCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) -> {
-			new WritableValueUndoableAction<>( compileSwaggerCheckbox.selectedProperty(), oldValue, undoManager, () -> {
-				handleCompileOptionModified();
-			} ).submit();
-		} );
-		compileDocumentationCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) -> {
-			new WritableValueUndoableAction<>( compileDocumentationCheckbox.selectedProperty(), oldValue, undoManager, () -> {
-				handleCompileOptionModified();
-			} ).submit();
-		} );
-		serviceEndpointUrl.textProperty().addListener( (observable, oldValue, newValue) -> {
-			new WritableValueUndoableAction<>( serviceEndpointUrl.textProperty(), oldValue, undoManager, () -> {
-				handleCompileOptionModified();
-			} ).submit();
-		} );
-		baseResourceUrl.textProperty().addListener( (observable, oldValue, newValue) -> {
-			new WritableValueUndoableAction<>( baseResourceUrl.textProperty(), oldValue, undoManager, () -> {
-				handleCompileOptionModified();
-			} ).submit();
-		} );
-		suppressExtensionsCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) -> {
-			new WritableValueUndoableAction<>( suppressExtensionsCheckbox.selectedProperty(), oldValue, undoManager, () -> {
-				handleCompileOptionModified();
-			} ).submit();
-		} );
-		generateExamplesCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) -> {
-			new WritableValueUndoableAction<>( generateExamplesCheckbox.selectedProperty(), oldValue, undoManager, () -> {
-				handleCompileOptionModified();
-			} ).submit();
-		} );
-		exampleMaxDetailCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) -> {
-			new WritableValueUndoableAction<>( exampleMaxDetailCheckbox.selectedProperty(), oldValue, undoManager, () -> {
-				handleCompileOptionModified();
-			} ).submit();
-		} );
-		maxRepeatSpinner.valueProperty().addListener( (observable, oldValue, newValue) -> {
-			new SpinnerUndoableAction<>( maxRepeatSpinner, oldValue, undoManager, () -> {
-				handleCompileOptionModified();
-			} ).submit();
-		} );
-		maxRecursionDepthSpinner.valueProperty().addListener( (observable, oldValue, newValue) -> {
-			new SpinnerUndoableAction<>( maxRecursionDepthSpinner, oldValue, undoManager, () -> {
-				handleCompileOptionModified();
-			} ).submit();
-		} );
-		suppressOptionalFieldsCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) -> {
-			new WritableValueUndoableAction<>( suppressOptionalFieldsCheckbox.selectedProperty(), oldValue, undoManager, () -> {
-				handleCompileOptionModified();
-			} ).submit();
-		} );
+		
+		releaseName.textProperty().addListener( (observable, oldValue, newValue) ->
+			new TextInputUndoableAction( releaseName, oldValue, undoManager,
+			        () -> handleReleaseFieldModified( false ) ).submit()
+		);
+		releaseBaseNamespace.textProperty().addListener( (observable, oldValue, newValue) ->
+			new TextInputUndoableAction( releaseBaseNamespace, oldValue, undoManager,
+			        () -> handleReleaseFieldModified( true ) ).submit()
+		);
+		releaseVersion.textProperty().addListener( (observable, oldValue, newValue) ->
+			new TextInputUndoableAction( releaseVersion, oldValue, undoManager,
+			        () -> handleReleaseFieldModified( false ) ).submit()
+		);
+		defaultEffectiveDate.localDateTimeProperty().addListener( (observable, oldValue, newValue) ->
+			new WritableValueUndoableAction<>( defaultEffectiveDate.localDateTimeProperty(), oldValue, undoManager,
+			        () -> handleReleaseFieldModified( false ) ).submit()
+		);
+		applyToAllButton.setOnAction( this::applyEffectiveDateToAllMembers );
+		releaseDescription.textProperty().addListener( (observable, oldValue, newValue) ->
+			new TextInputUndoableAction( releaseDescription, oldValue, undoManager,
+			        () -> handleReleaseFieldModified( false ) ).submit()
+		);
+		principalTableView.getSelectionModel().selectedItemProperty().addListener(
+			(obs, oldSelection, newSelection) -> updateControlStates() );
+		bindingStyleChoice.valueProperty().addListener( (observable, oldValue, newValue) ->
+			new WritableValueUndoableAction<>( bindingStyleChoice.valueProperty(), oldValue, undoManager,
+			        OTMReleaseController.this::handleCompileOptionModified ).submit() );
+		compileXmlSchemasCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) ->
+			new WritableValueUndoableAction<>( compileXmlSchemasCheckbox.selectedProperty(), oldValue, undoManager,
+			        OTMReleaseController.this::handleCompileOptionModified ).submit() );
+		compileServicesCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) ->
+			new WritableValueUndoableAction<>( compileServicesCheckbox.selectedProperty(), oldValue, undoManager,
+			        OTMReleaseController.this::handleCompileOptionModified ).submit() );
+		compileJsonSchemasCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) ->
+			new WritableValueUndoableAction<>( compileJsonSchemasCheckbox.selectedProperty(), oldValue, undoManager,
+                    OTMReleaseController.this::handleCompileOptionModified ).submit() );
+		compileSwaggerCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) ->
+			new WritableValueUndoableAction<>( compileSwaggerCheckbox.selectedProperty(), oldValue, undoManager,
+                    OTMReleaseController.this::handleCompileOptionModified ).submit() );
+		compileDocumentationCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) ->
+			new WritableValueUndoableAction<>( compileDocumentationCheckbox.selectedProperty(), oldValue, undoManager,
+                    OTMReleaseController.this::handleCompileOptionModified ).submit() );
+		serviceEndpointUrl.textProperty().addListener( (observable, oldValue, newValue) ->
+			new WritableValueUndoableAction<>( serviceEndpointUrl.textProperty(), oldValue, undoManager,
+                    OTMReleaseController.this::handleCompileOptionModified ).submit() );
+		baseResourceUrl.textProperty().addListener( (observable, oldValue, newValue) ->
+			new WritableValueUndoableAction<>( baseResourceUrl.textProperty(), oldValue, undoManager,
+                    OTMReleaseController.this::handleCompileOptionModified ).submit() );
+		suppressExtensionsCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) ->
+			new WritableValueUndoableAction<>( suppressExtensionsCheckbox.selectedProperty(), oldValue, undoManager,
+                    OTMReleaseController.this::handleCompileOptionModified ).submit() );
+		generateExamplesCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) ->
+			new WritableValueUndoableAction<>( generateExamplesCheckbox.selectedProperty(), oldValue, undoManager,
+                    OTMReleaseController.this::handleCompileOptionModified ).submit() );
+		exampleMaxDetailCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) ->
+			new WritableValueUndoableAction<>( exampleMaxDetailCheckbox.selectedProperty(), oldValue, undoManager,
+                    OTMReleaseController.this::handleCompileOptionModified ).submit() );
+		maxRepeatSpinner.valueProperty().addListener( (observable, oldValue, newValue) ->
+			new SpinnerUndoableAction<>( maxRepeatSpinner, oldValue, undoManager,
+                    OTMReleaseController.this::handleCompileOptionModified ).submit() );
+		maxRecursionDepthSpinner.valueProperty().addListener( (observable, oldValue, newValue) ->
+			new SpinnerUndoableAction<>( maxRecursionDepthSpinner, oldValue, undoManager,
+			        OTMReleaseController.this::handleCompileOptionModified ).submit()
+		);
+		suppressOptionalFieldsCheckbox.selectedProperty().addListener( (observable, oldValue, newValue) ->
+			new WritableValueUndoableAction<>( suppressOptionalFieldsCheckbox.selectedProperty(), oldValue, undoManager,
+                    OTMReleaseController.this::handleCompileOptionModified ).submit() );
 		libraryTreeView.getSelectionModel().selectedItemProperty().addListener( event -> {
-			TreeItem<TreeNode<?>> treeItem = libraryTreeView.getSelectionModel().getSelectedItem();
+			TreeItem<TreeNode<Object>> treeItem = libraryTreeView.getSelectionModel().getSelectedItem();
 			List<NodeProperty> nodeProps = (treeItem == null) ? Collections.emptyList() : treeItem.getValue().getProperties();
 			
 			propertyTableView.setItems( FXCollections.observableList( nodeProps ) );
 		});
 		
-		// Configure the display options for all tables
-		principalTableView.setEditable( true );
+		initPrincipleMembersTable();
+		initReferencedMembersTable();
+		initFacetSelectionsTable();
+		
+		// Configure placeholder labels for empty tables
+		principalTableView.setPlaceholder( new Label("") );
+		referencedTableView.setPlaceholder( new Label("") );
+		facetSelectionTableView.setPlaceholder( new Label("") );
+		validationTableView.setPlaceholder( new Label("") );
+		propertyTableView.setPlaceholder( new Label("") );
+		
+		// Complete initialization and update the control states
+		this.releaseAccordion.setExpandedPane( this.releaseMembersPane );
+		this.libraryTreeView.setShowRoot( false );
+		this.userSettings = settings;
+		
+		updateControlStates();
+	}
+
+    /**
+     * Configure the display options for the Principle Members table.
+     */
+    @SuppressWarnings("squid:MaximumInheritanceDepth") // Unavoidable since the base class is from core JavaFXx
+    private void initPrincipleMembersTable() {
+        principalTableView.setEditable( true );
 		principalDateColumn.setEditable( true );
 		principalTableView.setRowFactory(tv -> new TableRow<ReleaseMember>() {
             private Tooltip tooltip = new Tooltip();
@@ -1729,16 +1719,21 @@ public class OTMReleaseController extends AbstractMainWindowController {
 			
 			return new ReadOnlyStringWrapper( MessageBuilder.formatMessage( status.toString() ) );
 		});
-		principalDateColumn.setCellValueFactory( nodeFeatures -> {
-			return new ReadOnlyObjectWrapper<String>( toDateString( nodeFeatures.getValue().getEffectiveDate() ) );
-		});
-		principalDateColumn.setCellFactory( nodeFeatures -> {
-			return new EffectiveDateCell();
-		});
-		
-		referencedTableView.setEditable( true );
-		referencedDateColumn.setEditable( true );
-		referencedTableView.setRowFactory(tv -> new TableRow<ReleaseMember>() {
+		principalDateColumn.setCellValueFactory( nodeFeatures ->
+			new ReadOnlyObjectWrapper<String>( toDateString( nodeFeatures.getValue().getEffectiveDate() ) )
+		);
+		principalDateColumn.setCellFactory( nodeFeatures -> new EffectiveDateCell() );
+    }
+
+    /**
+     * Configure the display options for the Referenced Members table.
+     */
+    @SuppressWarnings("squid:MaximumInheritanceDepth") // Unavoidable since the base class is from core JavaFXx
+    private void initReferencedMembersTable() {
+        referencedTableView.setEditable( true );
+        referencedDateColumn.setEditable( true );
+        
+        referencedTableView.setRowFactory(tv -> new TableRow<ReleaseMember>() {
             private Tooltip tooltip = new Tooltip();
             public void updateItem(ReleaseMember member, boolean empty) {
                 super.updateItem( member, empty );
@@ -1763,14 +1758,17 @@ public class OTMReleaseController extends AbstractMainWindowController {
 			
 			return new ReadOnlyStringWrapper( MessageBuilder.formatMessage( status.toString() ) );
 		});
-		referencedDateColumn.setCellValueFactory( nodeFeatures -> {
-			return new ReadOnlyObjectWrapper<String>( toDateString( nodeFeatures.getValue().getEffectiveDate() ) );
-		});
-		referencedDateColumn.setCellFactory( nodeFeatures -> {
-			return new EffectiveDateCell();
-		});
-		
-		facetSelectionTableView.setEditable( true );
+		referencedDateColumn.setCellValueFactory( nodeFeatures ->
+			new ReadOnlyObjectWrapper<String>( toDateString( nodeFeatures.getValue().getEffectiveDate() ) )
+		);
+		referencedDateColumn.setCellFactory( nodeFeatures -> new EffectiveDateCell() );
+    }
+
+    /**
+     * Configure the display options for the Facet Selections table.
+     */
+    private void initFacetSelectionsTable() {
+        facetSelectionTableView.setEditable( true );
 		facetSelectionColumn.setEditable( true );
 		facetOwnerColumn.setCellValueFactory( nodeFeatures -> {
 			TLFacetOwner facetOwner = nodeFeatures.getValue().getFacetOwner();
@@ -1782,9 +1780,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 			String selectedFacet = nodeFeatures.getValue().getSelectedFacetName();
 			return new ReadOnlyStringWrapper( (selectedFacet == null) ? SUBSTITUTION_GROUP_CHOICE : selectedFacet );
 		});
-		facetSelectionColumn.setCellFactory( nodeFeatures -> {
-			return new FacetSelectCell();
-		});
+		facetSelectionColumn.setCellFactory( nodeFeatures -> new FacetSelectCell() );
 		
 		validationLevelColumn.setCellValueFactory( nodeFeatures -> {
 			FindingType findingType = nodeFeatures.getValue().getType();
@@ -1793,39 +1789,26 @@ public class OTMReleaseController extends AbstractMainWindowController {
 			
 			return new SimpleObjectProperty<ImageView>(new ImageView(image));
 		});
-		validationComponentColumn.setCellValueFactory( nodeFeatures -> {
-			return new ReadOnlyStringWrapper( nodeFeatures.getValue().getSource().getValidationIdentity() );
-		});
-		validationDescriptionColumn.setCellValueFactory( nodeFeatures -> {
-				return new ReadOnlyStringWrapper( nodeFeatures.getValue().getFormattedMessage( FindingMessageFormat.BARE_FORMAT ) );
-		});
+		validationComponentColumn.setCellValueFactory( nodeFeatures ->
+			new ReadOnlyStringWrapper( nodeFeatures.getValue().getSource().getValidationIdentity() )
+		);
+		validationDescriptionColumn.setCellValueFactory( nodeFeatures ->
+			new ReadOnlyStringWrapper( nodeFeatures.getValue().getFormattedMessage( FindingMessageFormat.BARE_FORMAT ) )
+		);
 		
-		propertyNameColumn.setCellValueFactory( nodeFeatures -> {
-			return new ReadOnlyStringWrapper( nodeFeatures.getValue().getName() );
-		});
-		propertyValueColumn.setCellValueFactory( nodeFeatures -> {
-			return new ReadOnlyStringWrapper( nodeFeatures.getValue().getValue() );
-		});
-		
-		// Configure placeholder labels for empty tables
-		principalTableView.setPlaceholder( new Label("") );
-		referencedTableView.setPlaceholder( new Label("") );
-		facetSelectionTableView.setPlaceholder( new Label("") );
-		validationTableView.setPlaceholder( new Label("") );
-		propertyTableView.setPlaceholder( new Label("") );
-		
-		// Complete initialization and update the control states
-		this.releaseAccordion.setExpandedPane( this.releaseMembersPane );
-		this.libraryTreeView.setShowRoot( false );
-		this.userSettings = userSettings;
-		
-		updateControlStates();
-	}
+		propertyNameColumn.setCellValueFactory( nodeFeatures ->
+			new ReadOnlyStringWrapper( nodeFeatures.getValue().getName() )
+		);
+		propertyValueColumn.setCellValueFactory( nodeFeatures ->
+			new ReadOnlyStringWrapper( nodeFeatures.getValue().getValue() )
+		);
+    }
 	
 	/**
 	 * Table cell that allows users to choose an effective date for an OTM release
 	 * member.
 	 */
+    @SuppressWarnings("squid:MaximumInheritanceDepth") // Unavoidable since the base class is from core JavaFXx
 	private class EffectiveDateCell extends ChoiceBoxTableCell<ReleaseMember,String> {
 		
 		/**
@@ -1833,19 +1816,57 @@ public class OTMReleaseController extends AbstractMainWindowController {
 		 */
 		public EffectiveDateCell() {
 			super( FXCollections.observableList( new ArrayList<>() ) );
-			setOnMouseEntered( new EventHandler<MouseEvent>() {
-			    public void handle(MouseEvent me) {
-			    	boolean isEditable = EffectiveDateCell.this.isEditable();
-			    	EffectiveDateCell.this.getScene().setCursor( isEditable ? Cursor.HAND : Cursor.DEFAULT );
-			    }
+			setOnMouseEntered( me -> {
+                boolean isEditable = EffectiveDateCell.this.isEditable();
+                EffectiveDateCell.this.getScene().setCursor( isEditable ? Cursor.HAND : Cursor.DEFAULT );
 			} );
-			setOnMouseExited( new EventHandler<MouseEvent>() {
-			    public void handle(MouseEvent me) {
-			    	EffectiveDateCell.this.getScene().setCursor( Cursor.DEFAULT );
-			    }
-			} );
+			setOnMouseExited( me -> EffectiveDateCell.this.getScene().setCursor( Cursor.DEFAULT ) );
 		}
 		
+	    /**
+	     * Converts the given repository item commit to a parseable date string.
+	     * 
+	     * @param commit  the repository item commit to be formatted as a date
+	     * @return String
+	     */
+	    private String toCommitDateString(RepositoryItemCommit commit) {
+	        StringBuilder dateStr = new StringBuilder();
+	        String remarks = commit.getRemarks();
+	        
+	        dateStr.append( dateTimeFormat.format( commit.getEffectiveOn() ) );
+	        
+	        if ((remarks != null) && (remarks.trim().length() > 0)) {
+	            dateStr.append(" (").append( remarks.trim() ).append(")");
+	        }
+	        return dateStr.toString();
+	    }
+	    
+	    /**
+	     * Parses an effective date from the string provided.
+	     * 
+	     * @param dateStr  the date string to parse
+	     * @return Date
+	     */
+	    private Date parseEffectiveDate(String dateStr) {
+	        Date date = null;
+	        
+	        try {
+	            if (dateStr != null) {
+	                int suffixIdx = dateStr.indexOf(" (");
+	                
+	                if (suffixIdx >= 0) {
+	                    dateStr = dateStr.substring( 0, suffixIdx );
+	                }
+	            }
+	            date = ((dateStr == null) || dateStr.equals( BLANK_DATE_VALUE ))
+	                    ? null : dateTimeFormat.parse( dateStr );
+	            
+	        } catch (ParseException e) {
+	            // Ignore error and return null
+	        }
+	        return date;
+	    }
+	    
 		/**
 		 * @see javafx.scene.control.cell.ChoiceBoxTableCell#updateItem(java.lang.Object, boolean)
 		 */
@@ -1870,7 +1891,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 				}
 				if (commitHistory != null) {
 					for (RepositoryItemCommit commit : commitHistory) {
-						itemList.add( toDateString( commit ) );
+						itemList.add( toCommitDateString( commit ) );
 					}
 				}
 				getItems().addAll( FXCollections.observableArrayList( itemList ) );
@@ -1886,12 +1907,12 @@ public class OTMReleaseController extends AbstractMainWindowController {
 		public void commitEdit(String newValue) {
 			List<ReleaseMember> memberList = getTableView().getItems();
 			int tableRow = getTableRow().getIndex();
-			ReleaseMember _member = (tableRow < 0) ? null : memberList.get( tableRow );
+			ReleaseMember releaseMember = (tableRow < 0) ? null : memberList.get( tableRow );
 			
-			if (_member != null) {
+			if (releaseMember != null) {
 				new UndoableAction( undoManager ) {
 					
-					private ReleaseMember member = _member;
+					private ReleaseMember member = releaseMember;
 					private Date oldEffectiveDate = (member == null) ? null : member.getEffectiveDate();
 					private Date newEffectiveDate = parseEffectiveDate( newValue );
 					
@@ -1930,6 +1951,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 	 * Table cell that allows the user to select a facet from the available list
 	 * for substitutable OTM entities.
 	 */
+    @SuppressWarnings("squid:MaximumInheritanceDepth") // Unavoidable since the base class is from core JavaFXx
 	private class FacetSelectCell extends ChoiceBoxTableCell<FacetSelection,String> {
 		
 		/**
@@ -1937,17 +1959,11 @@ public class OTMReleaseController extends AbstractMainWindowController {
 		 */
 		public FacetSelectCell() {
 			super( FXCollections.observableList( new ArrayList<>() ) );
-			setOnMouseEntered( new EventHandler<MouseEvent>() {
-			    public void handle(MouseEvent me) {
-			    	boolean isEditable = FacetSelectCell.this.isEditable();
-			    	FacetSelectCell.this.getScene().setCursor( isEditable ? Cursor.HAND : Cursor.DEFAULT );
-			    }
+			setOnMouseEntered( me -> {
+                boolean isEditable = FacetSelectCell.this.isEditable();
+                FacetSelectCell.this.getScene().setCursor( isEditable ? Cursor.HAND : Cursor.DEFAULT );
 			} );
-			setOnMouseExited( new EventHandler<MouseEvent>() {
-			    public void handle(MouseEvent me) {
-			    	FacetSelectCell.this.getScene().setCursor( Cursor.DEFAULT );
-			    }
-			} );
+			setOnMouseExited( me -> FacetSelectCell.this.getScene().setCursor( Cursor.DEFAULT ) );
 		}
 		
 		/**
@@ -1965,7 +1981,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
 				
 				itemList.add( SUBSTITUTION_GROUP_CHOICE );
 				itemList.addAll( facetSelection.getFacetNames() );
-				editable = (itemList != null) && (itemList.size() > 1);
+				editable = (itemList.size() > 1);
 				if (!editable) itemList = null;
 			}
 			setEditable( editable );
@@ -1984,20 +2000,21 @@ public class OTMReleaseController extends AbstractMainWindowController {
 		public void commitEdit(String newValue) {
 			List<FacetSelection> facetSelections = getTableView().getItems();
 			int tableRow = getTableRow().getIndex();
-			FacetSelection _facetSelection = (tableRow < 0) ? null : facetSelections.get( tableRow );
-			String _adjustedValue, adjustedValue = newValue;
+			FacetSelection tempFacetSelection = (tableRow < 0) ? null : facetSelections.get( tableRow );
+            String adjustedValue = newValue;
+			String tempAdjustedValue;
 			
 			if ((adjustedValue != null) && adjustedValue.equals( SUBSTITUTION_GROUP_CHOICE )) {
 				adjustedValue = null;
 			}
-			_adjustedValue = adjustedValue;
+			tempAdjustedValue = adjustedValue;
 			
-			if (_facetSelection != null) {
+			if (tempFacetSelection != null) {
 				new UndoableAction( undoManager ) {
 					
-					private FacetSelection facetSelection = _facetSelection;
+					private FacetSelection facetSelection = tempFacetSelection;
 					private String oldValue = facetSelection.getSelectedFacetName();
-					private String newValue = _adjustedValue;
+					private String newValue = tempAdjustedValue;
 					
 					public boolean doExecute() {
 						updateCellValue( newValue );
@@ -2024,6 +2041,22 @@ public class OTMReleaseController extends AbstractMainWindowController {
 			}
 		}
 
+	    /**
+	     * Called when a facet selection has been modified.
+	     */
+	    private void handleFacetSelectionsModified() {
+	        Release release = getRelease();
+	        
+	        if (release != null) {
+	            List<FacetSelection> facetSelections = facetSelectionTableView.getItems();
+	            Map<QName,QName> selectionMap = FacetSelection.buildFacetSelectionMap( facetSelections );
+	            
+	            releaseDirty = true;
+	            release.setPreferredFacets( selectionMap );
+	            updateControlStates();
+	        }
+	    }
+	    
 	}
 	
 }

@@ -18,6 +18,9 @@ package org.opentravel.upversion;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -34,6 +37,8 @@ public class AboutDialogController {
 	
 	public static final String FXML_FILE = "/uh-about-dialog.fxml";
 	
+    private static final Logger log = LoggerFactory.getLogger( AboutDialogController.class );
+    
 	private Stage dialogStage;
 	
 	@FXML private Label buildNumberLabel;
@@ -62,7 +67,7 @@ public class AboutDialogController {
 			controller.setDialogStage( dialogStage );
 			
 		} catch (IOException e) {
-			e.printStackTrace( System.out );
+		    log.error( "Error constructing about dialog.", e );
 		}
 		return controller;
 	}

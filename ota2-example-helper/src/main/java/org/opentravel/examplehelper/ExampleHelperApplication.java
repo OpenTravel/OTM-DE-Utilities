@@ -18,7 +18,6 @@ package org.opentravel.examplehelper;
 
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.AbstractUserSettings;
-import org.opentravel.schemacompiler.util.OTM16Upgrade;
 
 /**
  * JavaFX application for the OTA2 Example Helpere Utility.
@@ -58,12 +57,4 @@ public class ExampleHelperApplication extends AbstractOTMApplication {
 		return "OTM-DE Example Helper";
 	}
 
-	/**
-	 * Since this is a read-only application, enable the OTM 1.6 file format for
-	 * all operations.
-	 */
-	static {
-		OTM16Upgrade.otm16Enabled = true;
-	}
-	
 }

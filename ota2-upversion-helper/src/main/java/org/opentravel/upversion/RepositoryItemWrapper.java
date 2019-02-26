@@ -50,10 +50,9 @@ public class RepositoryItemWrapper implements RepositoryItem, Comparable<Reposit
 		if (other == null) {
 			result = 1;
 		} else {
-			if ((result = strCompare( this.getBaseNamespace(), other.getBaseNamespace() )) == 0) {
-				if ((result = strCompare( this.getLibraryName(), other.getLibraryName() )) == 0) {
-					result = strCompare( this.getVersion(), other.getVersion() );
-				}
+			if (((result = strCompare( this.getBaseNamespace(), other.getBaseNamespace() )) == 0)
+			        && ((result = strCompare( this.getLibraryName(), other.getLibraryName() )) == 0)) {
+                result = strCompare( this.getVersion(), other.getVersion() );
 			}
 		}
 		return result;

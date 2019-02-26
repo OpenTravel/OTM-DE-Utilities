@@ -69,9 +69,9 @@ public class ParameterTreeNode extends TreeNode<TLParameter> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLParameter param = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return getLabel(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( param ); } ) );
-		props.add( new NodeProperty( "location", () -> { return MessageBuilder.formatMessage( param.getLocation().toString() ); } ) );
+		props.add( new NodeProperty( "name", this::getLabel ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( param ) ) );
+		props.add( new NodeProperty( "location", () -> MessageBuilder.formatMessage( param.getLocation().toString() ) ) );
 		return props;
 	}
 
@@ -79,7 +79,7 @@ public class ParameterTreeNode extends TreeNode<TLParameter> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
+    protected List<TreeNode<Object>> initializeChildren() {
 		return Collections.emptyList();
 	}
 

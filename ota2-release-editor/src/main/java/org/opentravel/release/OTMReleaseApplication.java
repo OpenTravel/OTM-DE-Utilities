@@ -18,7 +18,6 @@ package org.opentravel.release;
 
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.AbstractUserSettings;
-import org.opentravel.schemacompiler.util.OTM16Upgrade;
 
 /**
  * JavaFX application for the OTM Release Editor.
@@ -58,12 +57,4 @@ public class OTMReleaseApplication extends AbstractOTMApplication {
 		return "OTM Release Editor";
 	}
 
-	/**
-	 * Since this is a read-only application, enable the OTM 1.6 file format for
-	 * all operations.
-	 */
-	static {
-		OTM16Upgrade.otm16Enabled = true;
-	}
-	
 }

@@ -87,10 +87,10 @@ public abstract class EnumerationTreeNode<E extends TLAbstractEnumeration> exten
 		List<NodeProperty> props = new ArrayList<>();
 		TLAbstractEnumeration enumeration = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return enumeration.getName(); } ) );
-		props.add( new NodeProperty( "enumType",() -> { return (enumeration instanceof TLOpenEnumeration) ? "Open" : "Closed"; } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( enumeration ); } ) );
-		props.add( new NodeProperty( "extends", () -> { return getExtensionName( enumeration ); } ) );
+		props.add( new NodeProperty( "name", enumeration::getName ) );
+		props.add( new NodeProperty( "enumType",() -> (enumeration instanceof TLOpenEnumeration) ? "Open" : "Closed" ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( enumeration ) ) );
+		props.add( new NodeProperty( "extends", () -> getExtensionName( enumeration ) ) );
 		return props;
 	}
 
@@ -98,7 +98,7 @@ public abstract class EnumerationTreeNode<E extends TLAbstractEnumeration> exten
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
+    protected List<TreeNode<Object>> initializeChildren() {
 		// TODO: Add enumeration value children
 		return Collections.emptyList();
 	}

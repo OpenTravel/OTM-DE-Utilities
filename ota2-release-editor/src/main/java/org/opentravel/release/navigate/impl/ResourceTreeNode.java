@@ -70,13 +70,13 @@ public class ResourceTreeNode extends TreeNode<TLResource> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLResource resource = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return resource.getName(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( resource ); } ) );
-		props.add( new NodeProperty( "extends", () -> { return getExtensionName( resource ); } ) );
-		props.add( new NodeProperty( "abstract", () -> { return resource.isAbstract() + ""; } ) );
-		props.add( new NodeProperty( "basePath", () -> { return resource.getBasePath(); } ) );
-		props.add( new NodeProperty( "firstClass", () -> { return resource.isFirstClass() + ""; } ) );
-		props.add( new NodeProperty( "businessObject", () -> { return getEntityDisplayName( resource.getBusinessObjectRef() ); } ) );
+		props.add( new NodeProperty( "name", resource::getName ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( resource ) ) );
+		props.add( new NodeProperty( "extends", () -> getExtensionName( resource ) ) );
+		props.add( new NodeProperty( "abstract", () -> resource.isAbstract() + "" ) );
+		props.add( new NodeProperty( "basePath", resource::getBasePath ) );
+		props.add( new NodeProperty( "firstClass", () -> resource.isFirstClass() + "" ) );
+		props.add( new NodeProperty( "businessObject", () -> getEntityDisplayName( resource.getBusinessObjectRef() ) ) );
 		return props;
 	}
 
@@ -84,8 +84,8 @@ public class ResourceTreeNode extends TreeNode<TLResource> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
-		List<TreeNode<?>> children = new ArrayList<>();
+    protected List<TreeNode<Object>> initializeChildren() {
+		List<TreeNode<Object>> children = new ArrayList<>();
 		TLResource resource = getEntity();
 		
 		for (TLResourceParentRef entity : resource.getParentRefs()) {

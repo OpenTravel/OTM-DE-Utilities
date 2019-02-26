@@ -29,7 +29,7 @@ import javafx.scene.input.KeyEvent;
 public class TextInputUndoableAction extends UndoableAction {
 	
 	/** The number of milliseconds after which new actions for the same control will not be merged. */
-	public static long pauseTimeLimit = 3000L;
+	public static final long PAUSE_TIME_LIMIT = 3000L;
 	
 	private static final String INSTRUMENTATION_KEY = "undo-redo-instrumented-keypress";
 	
@@ -114,7 +114,7 @@ public class TextInputUndoableAction extends UndoableAction {
 			TextInputUndoableAction action = (TextInputUndoableAction) nextAction;
 			
 			result = (action.control == this.control) &&
-					((this.lastExecutionTimestamp() + pauseTimeLimit) > System.currentTimeMillis());
+					((this.lastExecutionTimestamp() + PAUSE_TIME_LIMIT) > System.currentTimeMillis());
 		}
 		return result;
 	}

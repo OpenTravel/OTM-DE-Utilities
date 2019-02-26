@@ -67,14 +67,14 @@ public class AttributeTreeNode extends TreeNode<TLAttribute> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLAttribute attribute = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return attribute.getName(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( attribute ); } ) );
-		props.add( new NodeProperty( "type", () -> { return getEntityDisplayName( attribute.getType() ); } ) );
-		props.add( new NodeProperty( "isReference", () -> { return attribute.isReference() + ""; } ) );
+		props.add( new NodeProperty( "name", attribute::getName ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( attribute ) ) );
+		props.add( new NodeProperty( "type", () -> getEntityDisplayName( attribute.getType() ) ) );
+		props.add( new NodeProperty( "isReference", () -> attribute.isReference() + "" ) );
 		if (attribute.isReference()) {
-			props.add( new NodeProperty( "referenceRepeat", () -> { return attribute.getReferenceRepeat() + ""; } ) );
+			props.add( new NodeProperty( "referenceRepeat", () -> attribute.getReferenceRepeat() + "" ) );
 		}
-		props.add( new NodeProperty( "mandatory", () -> { return attribute.isMandatory() + ""; } ) );
+		props.add( new NodeProperty( "mandatory", () -> attribute.isMandatory() + "" ) );
 		return props;
 	}
 
@@ -82,7 +82,7 @@ public class AttributeTreeNode extends TreeNode<TLAttribute> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
+    protected List<TreeNode<Object>> initializeChildren() {
 		return Collections.emptyList();
 	}
 	

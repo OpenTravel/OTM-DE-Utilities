@@ -33,9 +33,14 @@ import java.util.ResourceBundle;
 public class MessageBuilder {
 	
 	private static final ResourceBundle messageBundle = ResourceBundle.getBundle( "ota2-app-launcher", Locale.getDefault() );
-	private static final String messageDefaultsFile = "/message-defaults.properties";
+	private static final String MESSAGE_DEFAULTS_FILE = "/message-defaults.properties";
 	private static final Map<String,String> messageDefaults;
 	
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private MessageBuilder() {}
+    
 	/**
 	 * Returns the text for the given error or warning message.
 	 * 
@@ -89,7 +94,7 @@ public class MessageBuilder {
 	 * used in a development environment when the property substitution has not yet occurred.
 	 */
 	static {
-		try (InputStream is = MessageBuilder.class.getResourceAsStream( messageDefaultsFile )) {
+		try (InputStream is = MessageBuilder.class.getResourceAsStream( MESSAGE_DEFAULTS_FILE )) {
 			Map<String,String> msgDefaults = new HashMap<>();
 			Properties defaultProps = new Properties();
 			
@@ -100,8 +105,8 @@ public class MessageBuilder {
 			}
 			messageDefaults = Collections.unmodifiableMap( msgDefaults );
 			
-		} catch (Throwable t) {
-			throw new ExceptionInInitializerError( t );
+		} catch (Exception e) {
+			throw new ExceptionInInitializerError( e );
 		}
 	}
 	

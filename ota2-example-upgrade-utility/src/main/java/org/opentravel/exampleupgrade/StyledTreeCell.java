@@ -19,7 +19,6 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -31,40 +30,33 @@ import javafx.scene.layout.HBox;
  * Extension of the <code>TreeCell</code> class that allows sub-classes to
  * configure the visual style of the cell.
  */
+@SuppressWarnings("squid:MaximumInheritanceDepth") // Unavoidable since the base class is from core JavaFXx
 public abstract class StyledTreeCell<T> extends TreeCell<T> {
 	
 	private HBox hbox;
 	
 	private WeakReference<TreeItem<T>> treeItemRef;
 	
-	private InvalidationListener treeItemGraphicListener = observable -> {
-		updateDisplay( getItem(), isEmpty() );
+	private InvalidationListener treeItemGraphicListener = observable -> updateDisplay( getItem(), isEmpty() );
+	
+    private WeakInvalidationListener weakTreeItemGraphicListener = new WeakInvalidationListener( treeItemGraphicListener );
+    
+	private InvalidationListener treeItemListener = o -> {
+        TreeItem<T> oldTreeItem = treeItemRef == null ? null : treeItemRef.get();
+        TreeItem<T> newTreeItem = getTreeItem();
+        
+        if (oldTreeItem != null) {
+            oldTreeItem.graphicProperty().removeListener( weakTreeItemGraphicListener );
+        }
+        
+        if (newTreeItem != null) {
+            newTreeItem.graphicProperty().addListener( weakTreeItemGraphicListener );
+            treeItemRef = new WeakReference<>( newTreeItem );
+        }
 	};
 	
-	private InvalidationListener treeItemListener = new InvalidationListener() {
-		
-		public void invalidated(Observable observable) {
-			TreeItem<T> oldTreeItem = treeItemRef == null ? null : treeItemRef.get();
-			TreeItem<T> newTreeItem = getTreeItem();
-			
-			if (oldTreeItem != null) {
-				oldTreeItem.graphicProperty().removeListener( weakTreeItemGraphicListener );
-			}
-			
-			if (newTreeItem != null) {
-				newTreeItem.graphicProperty().addListener( weakTreeItemGraphicListener );
-				treeItemRef = new WeakReference<TreeItem<T>>( newTreeItem );
-			}
-		}
-		
-	};
-	
-	private WeakInvalidationListener weakTreeItemGraphicListener =
-			new WeakInvalidationListener( treeItemGraphicListener );
-	
-	private WeakInvalidationListener weakTreeItemListener =
-			new WeakInvalidationListener( treeItemListener );
-	
+    private WeakInvalidationListener weakTreeItemListener = new WeakInvalidationListener( treeItemListener );
+    
 	/**
 	 * Default constructor.
 	 */
@@ -104,45 +96,54 @@ public abstract class StyledTreeCell<T> extends TreeCell<T> {
 			
 		} else {
 			// Update the graphic if one is set in the TreeItem
-			TreeItem<T> treeItem = getTreeItem();
-			Node graphic = treeItem == null ? null : treeItem.getGraphic();
-			ObservableList<String> styles = getStyleClass();
-			
-			if (graphic != null) {
-				if (item instanceof Node) {
-					setText( null );
-					
-					// The item is a Node, and the graphic exists, so
-					// we must insert both into an HBox and present that
-					// to the user (see RT-15910)
-					if (hbox == null) {
-						hbox = new HBox( 3 );
-					}
-					hbox.getChildren().setAll( graphic, (Node) item );
-					setGraphic( hbox );
-					
-				} else {
-					hbox = null;
-					setText( item.toString() );
-					setGraphic( graphic );
-				}
-				
-			} else {
-				hbox = null;
-				
-				if (item instanceof Node) {
-					setText( null );
-					setGraphic( (Node) item );
-					
-				} else {
-					setText( item.toString() );
-					setGraphic( null );
-				}
-			}
-			styles.removeAll( getConditionalStyleClasses() );
-			styles.add( getConditionalStyleClass() );
+			updateTreeItemGraphic( item );
 		}
 	}
+
+    /**
+     * Update the graphic if one is set in the associated TreeItem.
+     * 
+     * @param item  item for which to update the graphic
+     */
+    private void updateTreeItemGraphic(T item) {
+        TreeItem<T> treeItem = getTreeItem();
+        Node graphic = treeItem == null ? null : treeItem.getGraphic();
+        ObservableList<String> styles = getStyleClass();
+        
+        if (graphic != null) {
+        	if (item instanceof Node) {
+        		setText( null );
+        		
+        		// The item is a Node, and the graphic exists, so
+        		// we must insert both into an HBox and present that
+        		// to the user (see RT-15910)
+        		if (hbox == null) {
+        			hbox = new HBox( 3 );
+        		}
+        		hbox.getChildren().setAll( graphic, (Node) item );
+        		setGraphic( hbox );
+        		
+        	} else {
+        		hbox = null;
+        		setText( item.toString() );
+        		setGraphic( graphic );
+        	}
+        	
+        } else {
+        	hbox = null;
+        	
+        	if (item instanceof Node) {
+        		setText( null );
+        		setGraphic( (Node) item );
+        		
+        	} else {
+        		setText( item.toString() );
+        		setGraphic( null );
+        	}
+        }
+        styles.removeAll( getConditionalStyleClasses() );
+        styles.add( getConditionalStyleClass() );
+    }
 	
 	/**
 	 * @see javafx.scene.control.Cell#updateItem(java.lang.Object, boolean)

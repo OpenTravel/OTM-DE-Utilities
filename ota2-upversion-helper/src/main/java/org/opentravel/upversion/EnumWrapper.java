@@ -65,8 +65,8 @@ public class EnumWrapper<T extends Enum<T>> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(Object other) {
-		return (other instanceof EnumWrapper) ?
-				(this.enumValue == ((EnumWrapper<T>) other).enumValue ) : false;
+		return (other instanceof EnumWrapper) &&
+				(this.enumValue == ((EnumWrapper<T>) other).enumValue );
 	}
 	
 }

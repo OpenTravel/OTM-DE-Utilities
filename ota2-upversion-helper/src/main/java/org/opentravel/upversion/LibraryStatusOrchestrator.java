@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LibraryStatusOrchestrator {
 	
-	public static enum StatusAction { PROMOTE, DEMOTE };
+	public enum StatusAction { PROMOTE, DEMOTE }
 	
     private static final Logger log = LoggerFactory.getLogger( LibraryStatusOrchestrator.class );
     
@@ -154,8 +154,50 @@ public class LibraryStatusOrchestrator {
 		List<RepositoryItem> affectedItems = getAffectedLibraries();
 		boolean successInd = true;
 		
-		// Verify that all settings are valid
-		if (fromStatus == null) {
+		validateStatusUpdates( affectedItems );
+		
+		if (monitor != null) {
+			monitor.taskStarted( affectedItems.size() );
+		}
+		
+		// Process the status updates for all affected libraries
+        for (RepositoryItem item : affectedItems) {
+            try {
+                if (statusAction == StatusAction.PROMOTE) {
+                    logMessage( "Promoting Library: %s", item.getFilename() );
+                    repositoryManager.promote( item );
+                    
+                } else {
+                    logMessage( "Demoting Library: %s", item.getFilename() );
+                    repositoryManager.demote( item );
+                }
+                
+            } catch (RepositoryException e) {
+                log.warn( "Error updating status for library: " + item.getFilename(), e );
+                successInd = false;
+                
+            } finally {
+                if (monitor != null) {
+                    monitor.progress( 1 );
+                }
+            }
+        }
+        
+        if (monitor != null) {
+            monitor.taskCompleted();
+        }
+        
+        return successInd;
+	}
+	
+    /**
+     * Verify that all settings are valid before processing the requested status updates.
+     * 
+     * @param affectedItems  the list of affected repository items whose statuses are to be changed
+     * @throws RepositoryException  thrown if an error occurs while accessing the remote repository
+     */
+    private void validateStatusUpdates(List<RepositoryItem> affectedItems) throws RepositoryException {
+        if (fromStatus == null) {
 			throw new RepositoryException("The fromStatus value cannot be null.");
 		}
 		if (statusAction == null) {
@@ -169,43 +211,10 @@ public class LibraryStatusOrchestrator {
 						"' is not valid for libraries with a status of '" + fromStatus + "'.");
 			}
 		}
-		if (affectedItems.size() == 0) {
+		if (affectedItems.isEmpty()) {
 			throw new RepositoryException("No libraries found that match the selection criteria.");
 		}
-		
-		if (monitor != null) {
-			monitor.taskStarted( affectedItems.size() );
-		}
-		
-		// Process the status updates for all affected libraries
-		for (RepositoryItem item : affectedItems) {
-			try {
-				if (statusAction == StatusAction.PROMOTE) {
-					log.info("Promoting Library: " + item.getFilename());
-					repositoryManager.promote( item );
-					
-				} else {
-					log.info("Demoting Library: " + item.getFilename());
-					repositoryManager.demote( item );
-				}
-				
-			} catch (RepositoryException e) {
-				log.warn("Error updating status for library: " + item.getFilename(), e);
-				successInd = false;
-				
-			} finally {
-				if (monitor != null) {
-					monitor.progress( 1 );
-				}
-			}
-		}
-		
-		if (monitor != null) {
-			monitor.taskCompleted();
-		}
-		
-		return successInd;
-	}
+    }
 	
 	/**
 	 * Returns the list of libraries that should be processed by the 'updateStatus()'
@@ -226,4 +235,16 @@ public class LibraryStatusOrchestrator {
 		return affectedItems;
 	}
 	
+    /**
+     * Logs a message using the format and parameters provided.
+     * 
+     * @param messageFormat  the message format string
+     * @param messageParams  the message parameters
+     */
+    private void logMessage(String messageFormat, Object... messageParams) {
+        if (log.isInfoEnabled()) {
+            log.info( String.format( messageFormat, messageParams ) );
+        }
+    }
+
 }

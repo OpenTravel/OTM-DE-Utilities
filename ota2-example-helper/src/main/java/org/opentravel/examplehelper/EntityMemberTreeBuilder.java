@@ -105,42 +105,71 @@ public class EntityMemberTreeBuilder {
 			if (entity instanceof TLActionFacet) {
 				TLActionFacet actionFacet = (TLActionFacet) entity;
 				
-				if ((actionFacet.getReferenceType() != TLReferenceType.NONE)
-						&& !facetSelection.getFacetNames().isEmpty()) {
-					TLBusinessObject boRef = actionFacet.getOwningResource().getBusinessObjectRef();
-					EntityMemberNode boNode = buildTree( boRef, priorEntityNames );
-					
-					if (boNode != null) {
-						rootNode.addChild( facetSelection.getFacetNames().get( 0 ), boNode );
-					}
-				}
+				addBusinessObjectChild( rootNode, facetSelection, actionFacet, priorEntityNames );
 			}
 			
 			// Build a child node for each element of each facet
-			for (TLFacet facet : facetList) {
-				List<TLProperty> facetElements = PropertyCodegenUtils.getInheritedProperties( facet );
-				
-				for (TLProperty element : facetElements) {
-					TLPropertyType elementType = element.getType();
-					EntityMemberNode childNode;
-					
-					if (elementType instanceof TLAlias) {
-						elementType = (TLPropertyType) ((TLAlias) elementType).getOwningEntity();
-					}
-					if ((elementType instanceof TLPropertyOwner) || (elementType instanceof TLFacetOwner)) {
-						childNode = buildTree( element.getType(), priorEntityNames );
-						
-						if (childNode != null) {
-							rootNode.addChild( facetSelection.getFacetName( facet ), childNode );
-						}
-					}
-				}
-			}
+			addEntityElementChildren( rootNode, facetSelection, facetList, priorEntityNames );
 			
 			priorEntityNames.remove( entityName );
 		}
 		return rootNode;
 	}
+
+    /**
+     * If necessary, adds a child tree item for the business object referenced by the
+     * action facet provided.
+     * 
+     * @param rootNode  the root item of the tree being constructed
+     * @param facetSelection  the facet selection for the current tree item
+     * @param actionFacet  the action facet for which to construct a business object element
+     * @param priorEntityNames  the set of qualified entity names that have occurred
+     *                          in higher-level parent nodes of the tree
+     */
+    private void addBusinessObjectChild(EntityMemberNode rootNode, EntityFacetSelection facetSelection,
+            TLActionFacet actionFacet, Set<QName> priorEntityNames) {
+        if ((actionFacet.getReferenceType() != TLReferenceType.NONE)
+                && !facetSelection.getFacetNames().isEmpty()) {
+            TLBusinessObject boRef = actionFacet.getOwningResource().getBusinessObjectRef();
+            EntityMemberNode boNode = buildTree( boRef, priorEntityNames );
+            
+            if (boNode != null) {
+                rootNode.addChild( facetSelection.getFacetNames().get( 0 ), boNode );
+            }
+        }
+    }
+
+    /**
+     * Adds child tree items for each element of each selectable facet in the current tree item.
+     * 
+     * @param rootNode  the root item of the tree being constructed
+     * @param facetSelection  the facet selection for the current tree item
+     * @param facetList  the list of facets from which to obtain the list of all child elements
+     * @param priorEntityNames  the set of qualified entity names that have occurred
+     *                          in higher-level parent nodes of the tree
+     */
+    private void addEntityElementChildren(EntityMemberNode rootNode, EntityFacetSelection facetSelection,
+            List<TLFacet> facetList, Set<QName> priorEntityNames) {
+        for (TLFacet facet : facetList) {
+            List<TLProperty> facetElements = PropertyCodegenUtils.getInheritedProperties( facet );
+            
+            for (TLProperty element : facetElements) {
+                TLPropertyType elementType = element.getType();
+                EntityMemberNode childNode;
+                
+                if (elementType instanceof TLAlias) {
+                    elementType = (TLPropertyType) ((TLAlias) elementType).getOwningEntity();
+                }
+                if ((elementType instanceof TLPropertyOwner) || (elementType instanceof TLFacetOwner)) {
+                    childNode = buildTree( element.getType(), priorEntityNames );
+                    
+                    if (childNode != null) {
+                        rootNode.addChild( facetSelection.getFacetName( facet ), childNode );
+                    }
+                }
+            }
+        }
+    }
 	
 	/**
 	 * Returns the <code>FacetSelections</code> that contains the selection options

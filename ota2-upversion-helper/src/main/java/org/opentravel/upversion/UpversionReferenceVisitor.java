@@ -188,30 +188,39 @@ public class UpversionReferenceVisitor extends ModelElementVisitorAdapter {
 			paramGroup.setFacetRef( (TLFacet) newFacetRef );
 		}
 		
-		// Also make sure that all of the parameter references are pointing to the
-		// new-version fields.  This does not seem to cause problems in the resulting
-		// OTM files except for some unnecessary import statements.
+		// Also 
 		if (facetRef != null) {
-			List<TLMemberField<TLMemberFieldOwner>> newFacetFields =
-					ResourceCodegenUtils.getEligibleParameterFields( facetRef );
-			
-			for (TLParameter parameter : paramGroup.getParameters()) {
-				String fieldName = parameter.getFieldRefName();
-				
-				if (fieldName != null) {
-					TLMemberField<?> newField = null;
-					
-					for (TLMemberField<?> aField : newFacetFields) {
-						if (aField.getName().equals( fieldName )) {
-							newField = aField;
-						}
-					}
-					parameter.setFieldRef( newField );
-				}
-			}
+			assignParameterFieldRefs( paramGroup, facetRef );
 		}
 		return true;
 	}
+
+    /**
+     * Ensure that all of the parameter references are pointing to the new-version fields.  This does
+     * not seem to cause problems in the resulting OTM files except for some unnecessary import statements.
+     * 
+     * @param paramGroup  the group for which to assign paraameter field references
+     * @param facetRef  the facet reference of the parameter group
+     */
+    private void assignParameterFieldRefs(TLParamGroup paramGroup, TLFacet facetRef) {
+        List<TLMemberField<TLMemberFieldOwner>> newFacetFields =
+        		ResourceCodegenUtils.getEligibleParameterFields( facetRef );
+        
+        for (TLParameter parameter : paramGroup.getParameters()) {
+        	String fieldName = parameter.getFieldRefName();
+        	
+        	if (fieldName != null) {
+        		TLMemberField<?> newField = null;
+        		
+        		for (TLMemberField<?> aField : newFacetFields) {
+        			if (aField.getName().equals( fieldName )) {
+        				newField = aField;
+        			}
+        		}
+        		parameter.setFieldRef( newField );
+        	}
+        }
+    }
 
 	/**
 	 * @see org.opentravel.schemacompiler.visitor.ModelElementVisitorAdapter#visitActionFacet(org.opentravel.schemacompiler.model.TLActionFacet)

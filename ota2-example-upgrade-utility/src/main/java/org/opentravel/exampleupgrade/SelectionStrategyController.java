@@ -106,7 +106,7 @@ public class SelectionStrategyController {
 		Platform.runLater( () -> {
 			String selectedNS = initialStrategy.getUserNamespace();
 			
-			if ((selectedNS == null) && (userNamespaces.size() > 0)) {
+			if ((selectedNS == null) && !userNamespaces.isEmpty()) {
 				selectedNS = userNamespaces.get( 0 );
 			}
 			

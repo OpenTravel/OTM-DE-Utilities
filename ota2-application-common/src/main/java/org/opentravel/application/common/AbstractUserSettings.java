@@ -51,13 +51,13 @@ public abstract class AbstractUserSettings {
 	 * @param settingsProps  the properties to which the common settings will be saved
 	 */
 	protected void save(Properties settingsProps) {
-		Point windowPosition = (this.windowPosition == null) ? getDefaultWindowPosition() : this.windowPosition;
-		Dimension windowSize = (this.windowSize == null) ? getDefaultWindowSize() : this.windowSize;
+		Point winPosition = (this.windowPosition == null) ? getDefaultWindowPosition() : this.windowPosition;
+		Dimension winSize = (this.windowSize == null) ? getDefaultWindowSize() : this.windowSize;
 		
-		settingsProps.put( "windowPositionX", windowPosition.x + "" );
-		settingsProps.put( "windowPositionY", windowPosition.y + "" );
-		settingsProps.put( "windowWidth", windowSize.width + "" );
-		settingsProps.put( "windowHeight", windowSize.height + "" );
+		settingsProps.put( "windowPositionX", winPosition.x + "" );
+		settingsProps.put( "windowPositionY", winPosition.y + "" );
+		settingsProps.put( "windowWidth", winSize.width + "" );
+		settingsProps.put( "windowHeight", winSize.height + "" );
 	}
 	
 	/**

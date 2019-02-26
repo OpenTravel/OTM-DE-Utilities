@@ -28,6 +28,11 @@ public class MessageBuilder {
 	
 	private static final ResourceBundle messageBundle = ResourceBundle.getBundle( "ota2-release-messages", Locale.getDefault() );
 	
+    /**
+     * Private constructor to prevent instantiation of this class.
+     */
+    private MessageBuilder() {}
+    
 	/**
 	 * Returns the text for the given error or warning message.
 	 * 

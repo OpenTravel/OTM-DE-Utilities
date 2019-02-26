@@ -91,15 +91,15 @@ public class AbstractFacetTreeNode<E extends TLAbstractFacet> extends TreeNode<E
 		List<NodeProperty> props = new ArrayList<>();
 		TLAbstractFacet facet = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return MessageBuilder.formatMessage( facet.getFacetType().toString() ); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( facet ); } ) );
+		props.add( new NodeProperty( "name", () -> MessageBuilder.formatMessage( facet.getFacetType().toString() ) ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( facet ) ) );
 		
 		if (facet instanceof TLContextualFacet) {
 			TLContextualFacet ctxFacet = (TLContextualFacet) facet;
 			
-			props.add( new NodeProperty( "localFacet", () -> { return ctxFacet.isLocalFacet() + ""; } ) );
-			props.add( new NodeProperty( "facetOwner", () -> { return getEntityDisplayName( ctxFacet.getOwningEntity() ); } ) );
-			props.add( new NodeProperty( "owningLibrary", () -> { return getLibraryDisplayName( ctxFacet.getOwningLibrary() ); } ) );
+			props.add( new NodeProperty( "localFacet", () -> ctxFacet.isLocalFacet() + "" ) );
+			props.add( new NodeProperty( "facetOwner", () -> getEntityDisplayName( ctxFacet.getOwningEntity() ) ) );
+			props.add( new NodeProperty( "owningLibrary", () -> getLibraryDisplayName( ctxFacet.getOwningLibrary() ) ) );
 		}
 		return props;
 	}
@@ -108,8 +108,8 @@ public class AbstractFacetTreeNode<E extends TLAbstractFacet> extends TreeNode<E
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
-		List<TreeNode<?>> children = new ArrayList<>();
+	protected List<TreeNode<Object>> initializeChildren() {
+		List<TreeNode<Object>> children = new ArrayList<>();
 		TLAbstractFacet abstractFacet = getEntity();
 		
 		if (abstractFacet instanceof TLFacet) {

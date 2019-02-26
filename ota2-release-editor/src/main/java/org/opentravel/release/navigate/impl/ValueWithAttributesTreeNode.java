@@ -68,9 +68,9 @@ public class ValueWithAttributesTreeNode extends TreeNode<TLValueWithAttributes>
 		List<NodeProperty> props = new ArrayList<>();
 		TLValueWithAttributes vwa = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return vwa.getName(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( vwa ); } ) );
-		props.add( new NodeProperty( "parentType", () -> { return getEntityDisplayName( vwa.getParentType() ); } ) );
+		props.add( new NodeProperty( "name", vwa::getName ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( vwa ) ) );
+		props.add( new NodeProperty( "parentType", () -> getEntityDisplayName( vwa.getParentType() ) ) );
 		return props;
 	}
 
@@ -78,8 +78,8 @@ public class ValueWithAttributesTreeNode extends TreeNode<TLValueWithAttributes>
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
-		List<TreeNode<?>> children = new ArrayList<>();
+    protected List<TreeNode<Object>> initializeChildren() {
+		List<TreeNode<Object>> children = new ArrayList<>();
 		
 		for (TLAttribute attribute : getEntity().getAttributes()) {
 			children.add( treeNodeFactory.newTreeNode( attribute ) );

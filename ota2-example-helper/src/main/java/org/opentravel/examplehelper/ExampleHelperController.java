@@ -21,16 +21,19 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.BrowseRepositoryDialogController;
+import org.opentravel.application.common.OtmApplicationException;
 import org.opentravel.application.common.StatusType;
+import org.opentravel.application.common.SyntaxHighlightBuilder;
+import org.opentravel.application.common.XmlHighlightBuilder;
 import org.opentravel.schemacompiler.codegen.example.ExampleBuilder;
 import org.opentravel.schemacompiler.codegen.example.ExampleDocumentBuilder;
 import org.opentravel.schemacompiler.codegen.example.ExampleGeneratorOptions;
@@ -52,6 +55,7 @@ import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLModel;
 import org.opentravel.schemacompiler.model.TLOperation;
 import org.opentravel.schemacompiler.model.TLResource;
+import org.opentravel.schemacompiler.model.TLService;
 import org.opentravel.schemacompiler.repository.Project;
 import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.ProjectManager;
@@ -66,6 +70,8 @@ import org.opentravel.schemacompiler.validate.FindingMessageFormat;
 import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 import org.opentravel.schemacompiler.xml.XMLPrettyPrinter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -74,12 +80,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -94,18 +97,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeItem.TreeModificationEvent;
-import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableColumn.CellDataFeatures;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.ChoiceBoxTreeTableCell;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 /**
  * JavaFX controller class for the OTA2 Example Helper application.
@@ -115,6 +114,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
 	public static final String FXML_FILE = "/ota2-example-helper.fxml";
 	
 	private static final FacetCodegenDelegateFactory facetDelegateFactory = new FacetCodegenDelegateFactory( null );
+    private static final Logger log = LoggerFactory.getLogger( ExampleHelperController.class );
 	
 	@FXML private TextField libraryText;
 	@FXML private ChoiceBox<String> bindingStyleChoice;
@@ -152,7 +152,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
 			availabilityChecker.pingAllRepositories( true );
 			
 		} catch (RepositoryException e) {
-			e.printStackTrace( System.out );
+		    log.error( "Error creating default repository manager.", e );
 		}
 	}
 	
@@ -166,67 +166,81 @@ public class ExampleHelperController extends AbstractMainWindowController {
 		File initialDirectory = (modelFile != null) ?
 				modelFile.getParentFile() : userSettings.getLastModelFile().getParentFile();
 		FileChooser chooser = newFileChooser( "Import from OTP", initialDirectory,
-				new String[] { "*.otp", "OTM Project Files (*.otp)" },
-				new String[] { "*.otr", "OTM Release Files (*.otr)" },
-				new String[] { "*.otm", "OTM Library Files (*.otm)" },
-				new String[] { "*.*", "All Files (*.*)" } );
+		        OTP_EXTENSION_FILTER, OTR_EXTENSION_FILTER, OTM_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
 		File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 		
 		if ((selectedFile != null) && selectedFile.exists()) {
 			Runnable r = new BackgroundTask( "Loading Model: " + selectedFile.getName(), StatusType.INFO ) {
-				public void execute() throws Throwable {
-					try {
-						ValidationFindings findings;
-						TLModel newModel = null;
-						
-						if (selectedFile.getName().endsWith(".otr")) {
-							ReleaseManager manager = new ReleaseManager( repositoryManager );
-							
-							findings = new ValidationFindings();
-							manager.loadRelease( selectedFile, findings );
-							newModel = manager.getModel();
-							
-						} else if (selectedFile.getName().endsWith(".otp")) {
-							ProjectManager manager = new ProjectManager( false );
-							
-							findings = new ValidationFindings();
-							manager.loadProject( selectedFile, findings );
-							newModel = manager.getModel();
-							
-						} else { // assume OTM library file
-					        LibraryInputSource<InputStream> libraryInput = new LibraryStreamInputSource( selectedFile );
-					        LibraryModelLoader<InputStream> modelLoader = new LibraryModelLoader<InputStream>();
-					        
-					        findings = modelLoader.loadLibraryModel( libraryInput );
-							newModel = modelLoader.getLibraryModel();
-						}
-						
-						if ((findings == null) || !findings.hasFinding( FindingType.ERROR )) {
-							model = newModel;
-							modelFile = selectedFile;
-							updateEntityChoices();
-							
-						} else {
-							System.out.println(selectedFile.getName() + " - Error/Warning Messages:");
-
-							for (String message : findings.getAllValidationMessages(FindingMessageFormat.IDENTIFIED_FORMAT)) {
-								System.out.println("  " + message);
-							}
-							throw new LibraryLoaderException("Validation errors detected in model (see log for DETAILS)");
-						}
-						
-					} finally {
-						userSettings.setLastModelFile( selectedFile );
-						userSettings.save();
-						updateControlStates();
-					}
+				public void execute() throws OtmApplicationException {
+				    loadModelFromFile( selectedFile, userSettings );
 				}
+
 			};
 			
 			new Thread( r ).start();
 		}
 	}
 	
+    /**
+     * Loads a model from the selected file.
+     * 
+     * @param selectedFile  the library, project, or release selected by the user
+     * @param userSettings  the user's preference settings
+     * @throws OtmApplicationException  thrown if an error occurs while loading the model
+     */
+    private void loadModelFromFile(File selectedFile, UserSettings userSettings) throws OtmApplicationException {
+        try {
+            ValidationFindings findings;
+            TLModel newModel = null;
+            
+            if (selectedFile.getName().endsWith(".otr")) {
+                ReleaseManager manager = new ReleaseManager( repositoryManager );
+                
+                findings = new ValidationFindings();
+                manager.loadRelease( selectedFile, findings );
+                newModel = manager.getModel();
+                
+            } else if (selectedFile.getName().endsWith(".otp")) {
+                ProjectManager manager = new ProjectManager( false );
+                
+                findings = new ValidationFindings();
+                manager.loadProject( selectedFile, findings );
+                newModel = manager.getModel();
+                
+            } else { // assume OTM library file
+                LibraryInputSource<InputStream> libraryInput = new LibraryStreamInputSource( selectedFile );
+                LibraryModelLoader<InputStream> modelLoader = new LibraryModelLoader<>();
+                
+                findings = modelLoader.loadLibraryModel( libraryInput );
+                newModel = modelLoader.getLibraryModel();
+            }
+            
+            if ((findings == null) || !findings.hasFinding( FindingType.ERROR )) {
+                model = newModel;
+                modelFile = selectedFile;
+                updateEntityChoices();
+                
+            } else {
+                if (log.isWarnEnabled()) {
+                    log.warn( String.format( "%s - Error/Warning Messages:", selectedFile.getName() ) );
+
+                    for (String message : findings.getAllValidationMessages(FindingMessageFormat.IDENTIFIED_FORMAT)) {
+                        log.warn( String.format( "  %s", message ) );
+                    }
+                }
+                throw new LibraryLoaderException("Validation errors detected in model (see log for DETAILS)");
+            }
+            
+        } catch (Exception e) {
+            throw new OtmApplicationException( e.getMessage(), e );
+            
+        } finally {
+            userSettings.setLastModelFile( selectedFile );
+            userSettings.save();
+            updateControlStates();
+        }
+    }
+    
 	/**
 	 * Called when the user clicks the button to load a new project, release, or
 	 * library from a remote repository.
@@ -246,35 +260,10 @@ public class ExampleHelperController extends AbstractMainWindowController {
 				
 				if (selectedItem != null) {
 					Runnable r = new BackgroundTask( "Loading Model: " + selectedItem.getFilename(), StatusType.INFO ) {
-						public void execute() throws Throwable {
-							try {
-								if (RepositoryItemType.LIBRARY.isItemType( selectedItem.getFilename() )) {
-									ProjectManager projectManager = new ProjectManager( new TLModel(), false, repositoryManager );
-									Project tempProject = projectManager.newProject( File.createTempFile( "tempProject", ".otp" ),
-											"http://EXAMPLE-helper.com/project/temp", "Temp Project", null );
-									ProjectItem item = projectManager.addManagedProjectItem( selectedItem, tempProject );
-									
-									model = projectManager.getModel();
-									modelFile = URLUtils.toFile( item.getContent().getLibraryUrl() );
-									
-								} else { // must be a release
-									ReleaseManager releaseManager = new ReleaseManager( repositoryManager );
-									ValidationFindings findings = new ValidationFindings();
-									
-									releaseManager.loadRelease( selectedItem, findings );
-									
-									if (findings.hasFinding( FindingType.ERROR )) {
-										throw new LibraryLoaderException("Validation errors detected in model (see log for DETAILS)");
-									}
-									model = releaseManager.getModel();
-									modelFile = URLUtils.toFile( releaseManager.getRelease().getReleaseUrl() );
-								}
-								updateEntityChoices();
-								
-							} finally {
-								updateControlStates();
-							}
+						public void execute() throws OtmApplicationException {
+							loadModelFromRepository( selectedItem );
 						}
+
 					};
 					
 					new Thread( r ).start();
@@ -283,11 +272,51 @@ public class ExampleHelperController extends AbstractMainWindowController {
 		}
 	}
 	
+    /**
+     * Loads a model associated with the selected repository item from a remote repository.
+     * 
+     * @param selectedItem  the repository item selected by the user
+     * @throws OtmApplicationException  thrown if an error occurs while loading the model
+     */
+    private void loadModelFromRepository(RepositoryItem selectedItem)
+            throws OtmApplicationException {
+        try {
+            if (RepositoryItemType.LIBRARY.isItemType( selectedItem.getFilename() )) {
+                ProjectManager projectManager = new ProjectManager( new TLModel(), false, repositoryManager );
+                Project tempProject = projectManager.newProject( File.createTempFile( "tempProject", ".otp" ),
+                        "http://EXAMPLE-helper.com/project/temp", "Temp Project", null );
+                ProjectItem item = projectManager.addManagedProjectItem( selectedItem, tempProject );
+                
+                model = projectManager.getModel();
+                modelFile = URLUtils.toFile( item.getContent().getLibraryUrl() );
+                
+            } else { // must be a release
+                ReleaseManager releaseManager = new ReleaseManager( repositoryManager );
+                ValidationFindings findings = new ValidationFindings();
+                
+                releaseManager.loadRelease( selectedItem, findings );
+                
+                if (findings.hasFinding( FindingType.ERROR )) {
+                    throw new LibraryLoaderException("Validation errors detected in model (see log for DETAILS)");
+                }
+                model = releaseManager.getModel();
+                modelFile = URLUtils.toFile( releaseManager.getRelease().getReleaseUrl() );
+            }
+            updateEntityChoices();
+            
+        } catch (Exception e) {
+            throw new OtmApplicationException( e.getMessage(), e );
+            
+        } finally {
+            updateControlStates();
+        }
+    }
+    
 	/**
 	 * Called when the user changes the default binding style.
 	 */
 	private void handleBindingStyleChange() {
-		String selectedStyle = (String) bindingStyleChoice.getValue();
+		String selectedStyle = bindingStyleChoice.getValue();
 		String currentStyle = CompilerExtensionRegistry.getActiveExtension();
 
 		if ((selectedStyle != null) && !selectedStyle.equals(currentStyle)) {
@@ -302,65 +331,114 @@ public class ExampleHelperController extends AbstractMainWindowController {
 		// Collect the selectable objects for the combo-box
 		if (model != null) {
 			for (TLLibrary library : model.getUserDefinedLibraries()) {
-				for (TLBusinessObject bo : library.getBusinessObjectTypes()) {
-					selectableObjects.add( new OTMObjectChoice( bo ) );
-					
-					for (TLContextualFacet facet : bo.getQueryFacets()) {
-						selectableObjects.add( new OTMObjectChoice( facet ) );
-					}
-					for (TLContextualFacet facet : bo.getUpdateFacets()) {
-						selectableObjects.add( new OTMObjectChoice( facet ) );
-					}
-				}
-				for (TLCoreObject core : library.getCoreObjectTypes()) {
-					selectableObjects.add( new OTMObjectChoice( core ) );
-				}
-				for (TLChoiceObject choice : library.getChoiceObjectTypes()) {
-					selectableObjects.add( new OTMObjectChoice( choice ) );
-				}
-				for (TLResource resource : library.getResourceTypes()) {
-					for (TLActionFacet actionFacet : resource.getActionFacets()) {
-						NamedEntity payloadType = ResourceCodegenUtils.getPayloadType( actionFacet );
-						
-						if ((payloadType instanceof TLActionFacet)
-								&& !ResourceCodegenUtils.isTemplateActionFacet( actionFacet )) {
-							selectableObjects.add( new OTMObjectChoice( actionFacet ) );
-						}
-					}
-				}
-				if (library.getService() != null) {
-					for (TLOperation op : library.getService().getOperations()) {
-						if (facetDelegateFactory.getDelegate( op.getRequest() ).hasContent()) {
-							selectableObjects.add( new OTMObjectChoice( op.getRequest() ) );
-						}
-						if (facetDelegateFactory.getDelegate( op.getResponse() ).hasContent()) {
-							selectableObjects.add( new OTMObjectChoice( op.getResponse() ) );
-						}
-						if (facetDelegateFactory.getDelegate( op.getNotification() ).hasContent()) {
-							selectableObjects.add( new OTMObjectChoice( op.getNotification() ) );
-						}
-					}
-				}
+				addBusinessObjectChoices( library.getBusinessObjectTypes(), selectableObjects );
+				addCoreObjectChoices( library.getCoreObjectTypes(), selectableObjects );
+				addChoiceObjectChoices( library.getChoiceObjectTypes(), selectableObjects );
+				addResourceChoices( library.getResourceTypes(), selectableObjects );
+				addServiceChoices( library.getService(), selectableObjects );
 			}
 			
 			// Sort the objects in alphabetical order according to their display label
-			Collections.sort( selectableObjects, new Comparator<OTMObjectChoice>() {
-				public int compare(OTMObjectChoice item1, OTMObjectChoice item2) {
-					return item1.toString().compareTo( item2.toString() );
-				}
-			});
+			Collections.sort( selectableObjects,
+			        (item1, item2) -> item1.toString().compareTo( item2.toString() ) );
 		}
 		
-		Platform.runLater( new Runnable() {
-			public void run() {
-				entityChoice.setItems( FXCollections.observableArrayList( selectableObjects ) );
-				
-				if (selectableObjects.size() > 0) {
-					entityChoice.setValue( selectableObjects.get( 0 ) );
-				}
-			}
+		Platform.runLater( () -> {
+            entityChoice.setItems( FXCollections.observableArrayList( selectableObjects ) );
+            
+            if (selectableObjects.isEmpty()) {
+                entityChoice.setValue( selectableObjects.get( 0 ) );
+            }
 		} );
 	}
+
+    /**
+     * Adds selectable choices from the given business objects.
+     * 
+     * @param entityList  the list of business objects
+     * @param selectableObjects  the list of user-selectable options
+     */
+    private void addBusinessObjectChoices(List<TLBusinessObject> entityList, List<OTMObjectChoice> selectableObjects) {
+        for (TLBusinessObject bo : entityList) {
+            selectableObjects.add( new OTMObjectChoice( bo ) );
+            
+            for (TLContextualFacet facet : bo.getQueryFacets()) {
+                selectableObjects.add( new OTMObjectChoice( facet ) );
+            }
+            for (TLContextualFacet facet : bo.getUpdateFacets()) {
+                selectableObjects.add( new OTMObjectChoice( facet ) );
+            }
+        }
+    }
+
+    /**
+     * Adds selectable choices from the given core objects.
+     * 
+     * @param entityList  the list of core objects
+     * @param selectableObjects  the list of user-selectable options
+     */
+    private void addCoreObjectChoices(List<TLCoreObject> entityList, List<OTMObjectChoice> selectableObjects) {
+        for (TLCoreObject core : entityList) {
+            selectableObjects.add( new OTMObjectChoice( core ) );
+        }
+    }
+
+    /**
+     * Adds selectable choices from the given choice objects.
+     * 
+     * @param entityList  the list of choice objects
+     * @param selectableObjects  the list of user-selectable options
+     */
+    private void addChoiceObjectChoices(List<TLChoiceObject> entityList, List<OTMObjectChoice> selectableObjects) {
+        for (TLChoiceObject choice : entityList) {
+            selectableObjects.add( new OTMObjectChoice( choice ) );
+            
+            for (TLContextualFacet facet : choice.getChoiceFacets()) {
+                selectableObjects.add( new OTMObjectChoice( facet ) );
+            }
+        }
+    }
+
+    /**
+     * Adds selectable choices from the given resources.
+     * 
+     * @param entityList  the list of resources
+     * @param selectableObjects  the list of user-selectable options
+     */
+    private void addResourceChoices(List<TLResource> entityList, List<OTMObjectChoice> selectableObjects) {
+        for (TLResource resource : entityList) {
+            for (TLActionFacet actionFacet : resource.getActionFacets()) {
+                NamedEntity payloadType = ResourceCodegenUtils.getPayloadType( actionFacet );
+                
+                if ((payloadType instanceof TLActionFacet)
+                        && !ResourceCodegenUtils.isTemplateActionFacet( actionFacet )) {
+                    selectableObjects.add( new OTMObjectChoice( actionFacet ) );
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds selectable choices from operations of the given service.
+     * 
+     * @param service  the service from which to add operation facet choices
+     * @param selectableObjects  the list of user-selectable options
+     */
+    private void addServiceChoices(TLService service, List<OTMObjectChoice> selectableObjects) {
+        if (service != null) {
+            for (TLOperation op : service.getOperations()) {
+                if (facetDelegateFactory.getDelegate( op.getRequest() ).hasContent()) {
+                    selectableObjects.add( new OTMObjectChoice( op.getRequest() ) );
+                }
+                if (facetDelegateFactory.getDelegate( op.getResponse() ).hasContent()) {
+                    selectableObjects.add( new OTMObjectChoice( op.getResponse() ) );
+                }
+                if (facetDelegateFactory.getDelegate( op.getNotification() ).hasContent()) {
+                    selectableObjects.add( new OTMObjectChoice( op.getNotification() ) );
+                }
+            }
+        }
+    }
 	
 	/**
 	 * Called when the entity selection has been modified by the user.
@@ -375,12 +453,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
 			treeView.setRoot( new EntityMemberTreeItem( rootNode ) );
 			facetSelections = treeBuilder.getFacetSelections();
 			selectedObject = selection.getOtmObject();
-			
-			facetSelections.setListener( new FacetSelectionListener() {
-				public void facetSelectionChanged(EntityFacetSelection modifiedSelection) {
-					refreshExample();
-				}
-			});
+			facetSelections.setListener( s -> refreshExample() );
 			
 		} else {
 			if (facetSelections != null) {
@@ -397,54 +470,48 @@ public class ExampleHelperController extends AbstractMainWindowController {
 	 * Refreshes the contents of the EXAMPLE text viewer.
 	 */
 	private void refreshExample() {
-		Platform.runLater( new Runnable() {
-			public void run() {
-				if ((model != null) && (selectedObject != null)) {
-					try {
-						double yScroll = (selectedObject != oldSelectedObject) ? 0.0 : previewScrollPane.estimatedScrollYProperty().getValue();
-						ExampleGeneratorOptions options = new ExampleGeneratorOptions();
-						ByteArrayOutputStream out = new ByteArrayOutputStream();
-						SyntaxHighlightBuilder highlightingBuilder;
-						
-						facetSelections.configureExampleOptions( options );
-						options.setMaxRepeat( repeatCountSpinner.getValue() );
-						options.setSuppressOptionalFields( suppressOptionalFields.isSelected() );
-						
-						if (xmlRadio.isSelected()) {
-							ExampleBuilder<Document> builder = new ExampleDocumentBuilder( options ).setModelElement( selectedObject );
-							Document domDocument = builder.buildTree();
-							
-							highlightingBuilder = new XmlHighlightBuilder();
-							new XMLPrettyPrinter().formatDocument( domDocument, out );
-							
-						} else { // json selected
-							ExampleJsonBuilder exampleBuilder = new ExampleJsonBuilder( options );
-							ObjectMapper mapper = new ObjectMapper().enable( SerializationFeature.INDENT_OUTPUT );
-							JsonNode node;
-							
-							highlightingBuilder = new JsonHighlightBuilder();
-							exampleBuilder.setModelElement( selectedObject );
-							node = exampleBuilder.buildTree();
-							mapper.writeValue( out, node );
-						}
-						previewPane.replaceText( new String( out.toByteArray(), "UTF-8" ) );
-						previewPane.setStyleSpans( 0, highlightingBuilder.computeHighlighting( previewPane.getText() ) );
-						Platform.runLater( new Runnable() {
-							public void run() {
-								previewScrollPane.estimatedScrollYProperty().setValue( yScroll );
-							}
-						} );
-						
-					} catch (Throwable e) {
-						previewPane.replaceText( "-- Error Generating Example Output --");
-						e.printStackTrace( System.out );
-					} 
-					
-				} else {
-					previewPane.replaceText( "" );
-				}
-				oldSelectedObject = selectedObject;
-			}
+		Platform.runLater( () -> {
+            if ((model != null) && (selectedObject != null)) {
+                try {
+                    double yScroll = (selectedObject != oldSelectedObject) ? 0.0 : previewScrollPane.estimatedScrollYProperty().getValue();
+                    ExampleGeneratorOptions options = new ExampleGeneratorOptions();
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    SyntaxHighlightBuilder highlightingBuilder;
+                    
+                    facetSelections.configureExampleOptions( options );
+                    options.setMaxRepeat( repeatCountSpinner.getValue() );
+                    options.setSuppressOptionalFields( suppressOptionalFields.isSelected() );
+                    
+                    if (xmlRadio.isSelected()) {
+                        ExampleBuilder<Document> builder = new ExampleDocumentBuilder( options ).setModelElement( selectedObject );
+                        Document domDocument = builder.buildTree();
+                        
+                        highlightingBuilder = new XmlHighlightBuilder();
+                        new XMLPrettyPrinter().formatDocument( domDocument, out );
+                        
+                    } else { // json selected
+                        ExampleJsonBuilder exampleBuilder = new ExampleJsonBuilder( options );
+                        ObjectMapper mapper = new ObjectMapper().enable( SerializationFeature.INDENT_OUTPUT );
+                        JsonNode node;
+                        
+                        highlightingBuilder = new JsonHighlightBuilder();
+                        exampleBuilder.setModelElement( selectedObject );
+                        node = exampleBuilder.buildTree();
+                        mapper.writeValue( out, node );
+                    }
+                    previewPane.replaceText( new String( out.toByteArray(), StandardCharsets.UTF_8 ) );
+                    previewPane.setStyleSpans( 0, highlightingBuilder.computeHighlighting( previewPane.getText() ) );
+                    Platform.runLater( () -> previewScrollPane.estimatedScrollYProperty().setValue( yScroll ) );
+                    
+                } catch (Exception e) {
+                    previewPane.replaceText( "-- Error Generating Example Output --");
+                    log.error( "Error Generating Example Output", e );
+                } 
+                
+            } else {
+                previewPane.replaceText( "" );
+            }
+            oldSelectedObject = selectedObject;
 		} );
 	}
 	
@@ -458,18 +525,20 @@ public class ExampleHelperController extends AbstractMainWindowController {
 		UserSettings userSettings = UserSettings.load();
 		FileChooser chooser = newFileChooser( "Save Example Output",
 				userSettings.getLastExampleFolder(),
-				xmlSelected ? new String[] { "*.xml", "XML Files (*.xml)" } :
-							  new String[] { "*.json", "JSON Files (*.json)" } );
+				xmlSelected ? XML_EXTENSION_FILTER : JSON_EXTENSION_FILTER );
 		File targetFile = chooser.showSaveDialog( getPrimaryStage() );
 		
 		if (targetFile != null) {
 			Runnable r = new BackgroundTask( "Saving Report", StatusType.INFO ) {
-				protected void execute() throws Throwable {
+				protected void execute() throws OtmApplicationException {
 					try {
 						try (Writer out = new FileWriter( targetFile )) {
 							out.write( previewPane.getText() );
 						}
 						
+                    } catch (Exception e) {
+                        throw new OtmApplicationException( e.getMessage(), e );
+                        
 					} finally {
 						userSettings.setLastExampleFolder( targetFile.getParentFile() );
 						userSettings.save();
@@ -486,11 +555,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
 	 */
 	@Override
 	protected void updateControlStates() {
-		Platform.runLater( new Runnable() {
-			public void run() {
-				libraryText.setText( (modelFile == null) ? "" : modelFile.getName() );
-			}
-		} );
+		Platform.runLater( () -> libraryText.setText( (modelFile == null) ? "" : modelFile.getName() ) );
 	}
 	
 	/**
@@ -498,18 +563,16 @@ public class ExampleHelperController extends AbstractMainWindowController {
 	 */
 	@Override
 	protected void setStatusMessage(String message, StatusType statusType, boolean disableControls) {
-		Platform.runLater( new Runnable() {
-			public void run() {
-				statusBarLabel.setText( message );
-				libraryText.disableProperty().set( disableControls );
-				bindingStyleChoice.disableProperty().set( disableControls );
-				entityChoice.disableProperty().set( disableControls );
-				repeatCountSpinner.disableProperty().set( disableControls );
-				xmlRadio.disableProperty().set( disableControls );
-				jsonRadio.disableProperty().set( disableControls );
-				treeView.disableProperty().set( disableControls );
-				saveButton.disableProperty().set( disableControls );
-			}
+		Platform.runLater( () -> {
+            statusBarLabel.setText( message );
+            libraryText.disableProperty().set( disableControls );
+            bindingStyleChoice.disableProperty().set( disableControls );
+            entityChoice.disableProperty().set( disableControls );
+            repeatCountSpinner.disableProperty().set( disableControls );
+            xmlRadio.disableProperty().set( disableControls );
+            jsonRadio.disableProperty().set( disableControls );
+            treeView.disableProperty().set( disableControls );
+            saveButton.disableProperty().set( disableControls );
 		});
 	}
 	
@@ -537,67 +600,36 @@ public class ExampleHelperController extends AbstractMainWindowController {
 		// Configure listeners to capture interactions with the visual controls
 		bindingStyleChoice.setItems( FXCollections.observableArrayList( bindingStyles ) );
 		bindingStyleChoice.setValue( defaultStyle );
-		bindingStyleChoice.valueProperty().addListener( new ChangeListener<String>() {
-			public void changed(ObservableValue<? extends String>
-						observable, String oldValue, String newValue) {
-				handleBindingStyleChange();
-			}
-		} );
+		bindingStyleChoice.valueProperty().addListener(
+		        (observable, oldValue, newValue) -> handleBindingStyleChange() );
 		
 		repeatCountSpinner.setValueFactory(
 				new IntegerSpinnerValueFactory( 1, 3, settings.getRepeatCount(), 1 ) );
-		repeatCountSpinner.valueProperty().addListener( new ChangeListener<Integer>() {
-			public void changed(ObservableValue<? extends Integer>
-						observable, Integer oldValue, Integer newValue) {
-				refreshExample();
-			}
-		} );
+		repeatCountSpinner.valueProperty().addListener(
+                (observable, oldValue, newValue) -> refreshExample() );
 		
-		suppressOptionalFields.selectedProperty().addListener( new ChangeListener<Boolean>() {
-			public void changed(ObservableValue<? extends Boolean>
-						observable, Boolean oldValue, Boolean newValue) {
-				refreshExample();
-			}
-		} );
+		suppressOptionalFields.selectedProperty().addListener(
+		        (observable, oldValue, newValue) -> refreshExample() );
 		
-		entityChoice.valueProperty().addListener( new ChangeListener<OTMObjectChoice>() {
-			public void changed(ObservableValue<? extends OTMObjectChoice>
-						observable, OTMObjectChoice oldValue, OTMObjectChoice newValue) {
-				entitySelectionChanged();
-			}
-		} );
+		entityChoice.valueProperty().addListener(
+		        (observable, oldValue, newValue) -> entitySelectionChanged() );
 		
-		xmlRadio.selectedProperty().addListener( new ChangeListener<Boolean>() {
-			public void changed(ObservableValue<? extends Boolean>
-						observable, Boolean oldValue, Boolean newValue) {
-				refreshExample();
-			}
-		} );
+		xmlRadio.selectedProperty().addListener(
+                (observable, oldValue, newValue) -> refreshExample() );
 		
-		objectPropertyColumn.setCellValueFactory(new Callback<CellDataFeatures<EntityMemberNode,String>, ObservableValue<String>>() {
-			public ObservableValue<String> call(CellDataFeatures<EntityMemberNode,String> nodeFeatures) {
-				return new ReadOnlyObjectWrapper<String>( nodeFeatures.getValue().getValue().getName() );
-			}
-		});
-		facetSelectionColumn.setCellValueFactory(new Callback<CellDataFeatures<EntityMemberNode,String>, ObservableValue<String>>() {
-			public ObservableValue<String> call(CellDataFeatures<EntityMemberNode,String> nodeFeatures) {
+		objectPropertyColumn.setCellValueFactory( nodeFeatures ->
+		        new ReadOnlyObjectWrapper<>( nodeFeatures.getValue().getValue().getName() ) );
+		facetSelectionColumn.setCellValueFactory( nodeFeatures -> {
 				String selectedFacet = nodeFeatures.getValue().getValue().getFacetSelection().getSelectedFacetName();
-				return (selectedFacet == null) ? null : new ReadOnlyObjectWrapper<String>( selectedFacet );
-			}
-		});
-		facetSelectionColumn.setCellFactory(new Callback<TreeTableColumn<EntityMemberNode,String>,TreeTableCell<EntityMemberNode,String>>() {
-			public TreeTableCell<EntityMemberNode,String> call(TreeTableColumn<EntityMemberNode,String> column) {
-				return new FacetSelectCell();
-			}
-		});
+				return (selectedFacet == null) ? null : new ReadOnlyObjectWrapper<>( selectedFacet );
+		    });
+		facetSelectionColumn.setCellFactory( column -> new FacetSelectCell() );
 		facetSelectionColumn.setEditable( true );
 		treeView.setEditable( true );
 		
-		previewPane.textProperty().addListener( new ChangeListener<String>() {
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				saveButton.setDisable( (newValue == null) || (newValue.length() == 0) );
-			}
-		});
+		previewPane.textProperty().addListener( 
+                (observable, oldValue, newValue) ->
+                saveButton.setDisable( (newValue == null) || (newValue.length() == 0) ) );
 		
 		saveButton.setDisable( true );
 		
@@ -667,23 +699,18 @@ public class ExampleHelperController extends AbstractMainWindowController {
 	 * Table cell that allows the user to select a facet from the available list
 	 * for substitutable OTM entities.
 	 */
+	@SuppressWarnings("squid:MaximumInheritanceDepth") // Unavoidable since the base class is from core JavaFXx
 	private class FacetSelectCell extends ChoiceBoxTreeTableCell<EntityMemberNode,String> {
 		
 		/**
 		 * Default constructor.
 		 */
 		public FacetSelectCell() {
-			setOnMouseEntered( new EventHandler<MouseEvent>() {
-			    public void handle(MouseEvent me) {
-			    	boolean isEditable = FacetSelectCell.this.isEditable();
-			    	FacetSelectCell.this.getScene().setCursor( isEditable ? Cursor.HAND : Cursor.DEFAULT );
-			    }
+			setOnMouseEntered( me -> {
+                boolean isEditable = FacetSelectCell.this.isEditable();
+                FacetSelectCell.this.getScene().setCursor( isEditable ? Cursor.HAND : Cursor.DEFAULT );
 			} );
-			setOnMouseExited( new EventHandler<MouseEvent>() {
-			    public void handle(MouseEvent me) {
-			    	FacetSelectCell.this.getScene().setCursor( Cursor.DEFAULT );
-			    }
-			} );
+			setOnMouseExited( me -> FacetSelectCell.this.getScene().setCursor( Cursor.DEFAULT ) );
 		}
 
 		/**

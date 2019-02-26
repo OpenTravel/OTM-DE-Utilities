@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.examplehelper;
+package org.opentravel.application.common;
 
 import java.util.Collection;
 

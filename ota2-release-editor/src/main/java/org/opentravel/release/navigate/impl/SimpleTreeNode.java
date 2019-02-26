@@ -67,37 +67,37 @@ public class SimpleTreeNode extends TreeNode<TLSimple> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLSimple simple = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return simple.getName(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( simple ); } ) );
-		props.add( new NodeProperty( "parentType", () -> { return getEntityDisplayName( simple.getParentType() ); } ) );
-		props.add( new NodeProperty( "listTypeInd", () -> { return simple.isListTypeInd() + ""; } ) );
+		props.add( new NodeProperty( "name", simple::getName ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( simple ) ) );
+		props.add( new NodeProperty( "parentType", () -> getEntityDisplayName( simple.getParentType() ) ) );
+		props.add( new NodeProperty( "listTypeInd", () -> simple.isListTypeInd() + "" ) );
 		
 		if (simple.getPattern() != null) {
-			props.add( new NodeProperty( "pattern", () -> { return simple.getPattern(); } ) );
+			props.add( new NodeProperty( "pattern", simple::getPattern ) );
 		}
 		if (simple.getMinLength() >= 0) {
-			props.add( new NodeProperty( "minLength", () -> { return simple.getMinLength() + ""; } ) );
+			props.add( new NodeProperty( "minLength", () -> simple.getMinLength() + "" ) );
 		}
 		if (simple.getMaxLength() >= 0) {
-			props.add( new NodeProperty( "maxLength", () -> { return simple.getMaxLength() + ""; } ) );
+			props.add( new NodeProperty( "maxLength", () -> simple.getMaxLength() + "" ) );
 		}
 		if (simple.getFractionDigits() >= 0) {
-			props.add( new NodeProperty( "fractionDigits", () -> { return simple.getFractionDigits() + ""; } ) );
+			props.add( new NodeProperty( "fractionDigits", () -> simple.getFractionDigits() + "" ) );
 		}
 		if (simple.getTotalDigits() >= 0) {
-			props.add( new NodeProperty( "totalDigits", () -> { return simple.getTotalDigits() + ""; } ) );
+			props.add( new NodeProperty( "totalDigits", () -> simple.getTotalDigits() + "" ) );
 		}
 		if (simple.getMinInclusive() != null) {
-			props.add( new NodeProperty( "minInclusive", () -> { return simple.getMinInclusive() + ""; } ) );
+			props.add( new NodeProperty( "minInclusive", () -> simple.getMinInclusive() + "" ) );
 		}
 		if (simple.getMaxInclusive() != null) {
-			props.add( new NodeProperty( "maxInclusive", () -> { return simple.getMaxInclusive() + ""; } ) );
+			props.add( new NodeProperty( "maxInclusive", () -> simple.getMaxInclusive() + "" ) );
 		}
 		if (simple.getMinExclusive() != null) {
-			props.add( new NodeProperty( "minExclusive", () -> { return simple.getMinExclusive() + ""; } ) );
+			props.add( new NodeProperty( "minExclusive", () -> simple.getMinExclusive() + "" ) );
 		}
 		if (simple.getMaxExclusive() != null) {
-			props.add( new NodeProperty( "maxExclusive", () -> { return simple.getMaxExclusive() + ""; } ) );
+			props.add( new NodeProperty( "maxExclusive", () -> simple.getMaxExclusive() + "" ) );
 		}
 		return props;
 	}
@@ -106,7 +106,7 @@ public class SimpleTreeNode extends TreeNode<TLSimple> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
+    protected List<TreeNode<Object>> initializeChildren() {
 		return Collections.emptyList();
 	}
 	

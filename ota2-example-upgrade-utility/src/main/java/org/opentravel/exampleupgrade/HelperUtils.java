@@ -39,6 +39,11 @@ public class HelperUtils {
 	private static VersionScheme otaVersionScheme;
 	
 	/**
+	 * Private constructor to prevent instantiation.
+	 */
+	private HelperUtils() {}
+	
+	/**
 	 * Returns a QName for the given DOM element.
 	 * 
 	 * @param domElement  the DOM element for which to return a qualified name
@@ -155,8 +160,8 @@ public class HelperUtils {
 			VersionSchemeFactory factory = VersionSchemeFactory.getInstance();
 			otaVersionScheme = factory.getVersionScheme( factory.getDefaultVersionScheme() );
 			
-		} catch (Throwable t) {
-			throw new ExceptionInInitializerError(t);
+		} catch (Exception e) {
+			throw new ExceptionInInitializerError(e);
 		}
 	}
 	

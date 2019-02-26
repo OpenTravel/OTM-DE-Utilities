@@ -21,6 +21,8 @@ import java.io.IOException;
 
 import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.saver.LibrarySaveException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -40,6 +42,8 @@ public class NewReleaseDialogController {
 	
 	public static final String FXML_FILE = "/new-release-dialog.fxml";
 	
+    private static final Logger log = LoggerFactory.getLogger( NewReleaseDialogController.class );
+    
 	private Stage dialogStage;
 	
 	@FXML private TextField releaseDirectory;
@@ -77,7 +81,7 @@ public class NewReleaseDialogController {
 			controller.initialize( dialogStage, initialDirectory );
 			
 		} catch (IOException e) {
-			e.printStackTrace( System.out );
+		    log.error( "Error creating new-release dialog.", e );
 		}
 		return controller;
 	}
@@ -153,15 +157,9 @@ public class NewReleaseDialogController {
 			releaseDirectory.setText( initialDirectory.getAbsolutePath() );
 			this.releaseFolder = initialDirectory;
 		}
-		releaseDirectory.textProperty().addListener( (observable, oldValue, newValue) -> {
-			validateFields();
-		} );
-		releaseName.textProperty().addListener( (observable, oldValue, newValue) -> {
-			validateFields();
-		} );
-		releaseBaseNamespace.textProperty().addListener( (observable, oldValue, newValue) -> {
-			validateFields();
-		} );
+		releaseDirectory.textProperty().addListener( (observable, oldValue, newValue) -> validateFields() );
+		releaseName.textProperty().addListener( (observable, oldValue, newValue) -> validateFields() );
+		releaseBaseNamespace.textProperty().addListener( (observable, oldValue, newValue) -> validateFields() );
 		okButton.setDisable( true );
 		this.dialogStage = dialogStage;
 	}

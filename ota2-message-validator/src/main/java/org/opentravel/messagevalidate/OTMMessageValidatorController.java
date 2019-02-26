@@ -21,13 +21,17 @@ import java.io.File;
 import java.io.PrintStream;
 
 import org.opentravel.application.common.AbstractMainWindowController;
+import org.opentravel.application.common.OtmApplicationException;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.schemacompiler.ioc.CompilerExtensionRegistry;
 import org.opentravel.schemacompiler.task.CompileAllCompilerTask;
+import org.opentravel.schemacompiler.util.FileUtils;
 import org.opentravel.schemacompiler.util.SchemaCompilerException;
 import org.opentravel.schemacompiler.validate.FindingMessageFormat;
 import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -46,6 +50,8 @@ public class OTMMessageValidatorController extends AbstractMainWindowController 
 	
 	public static final String FXML_FILE = "/ota2-message-validator.fxml";
 	
+    private static final Logger log = LoggerFactory.getLogger( OTMMessageValidatorController.class );
+    
 	@FXML private TextField projectFilename;
 	@FXML private TextField messageFilename;
 	@FXML private TextArea validationOutput;
@@ -68,18 +74,20 @@ public class OTMMessageValidatorController extends AbstractMainWindowController 
 	@FXML public void handleSelectProjectFile(ActionEvent event) {
 		FileChooser chooser = newFileChooser( "Select OTM Project",
 				userSettings.getProjectFolder(),
-				new String[] { "*.otp", "OTM Project Files (*.otp)" },
-				new String[] { "*.*", "All Files (*.*)" } );
+				OTP_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
 		File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 		
 		if (selectedFile != null) {
 			Runnable r = new BackgroundTask( "Loading Project: " + selectedFile.getName(), StatusType.INFO ) {
-				public void execute() throws Throwable {
+				public void execute() throws OtmApplicationException {
 					try {
 						projectFile = selectedFile;
 						setFilenameText( selectedFile.getName(), projectFilename );
 						generateSchemas();
 						
+                    } catch (Exception e) {
+                        throw new OtmApplicationException( e.getMessage(), e );
+                        
 					} finally {
 						userSettings.setProjectFolder( selectedFile.getParentFile() );
 						userSettings.save();
@@ -99,18 +107,20 @@ public class OTMMessageValidatorController extends AbstractMainWindowController 
 	@FXML public void handleSelectMessageFile(ActionEvent event) {
 		FileChooser chooser = newFileChooser( "Select Message to Validate",
 				userSettings.getMessageFolder(),
-				new String[] { "*.xml", "XML Message Files (*.xml)" },
-				new String[] { "*.json", "JSON Message Files (*.json)" } );
+				XML_EXTENSION_FILTER, JSON_EXTENSION_FILTER );
 		File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 		
 		if (selectedFile != null) {
 			Runnable r = new BackgroundTask( "Validating Message File: " + selectedFile.getName(), StatusType.INFO ) {
-				public void execute() throws Throwable {
+				public void execute() throws OtmApplicationException {
 					try {
 						messageFile = selectedFile;
 						setFilenameText( selectedFile.getName(), messageFilename );
 						handleValidateMessage( null );
 						
+                    } catch (Exception e) {
+                        throw new OtmApplicationException( e.getMessage(), e );
+                        
 					} finally {
 						userSettings.setMessageFolder( selectedFile.getParentFile() );
 						userSettings.save();
@@ -129,12 +139,17 @@ public class OTMMessageValidatorController extends AbstractMainWindowController 
 	 */
 	@FXML public void handleValidateMessage(ActionEvent event) {
 		Runnable r = new BackgroundTask( "Validating Message...", StatusType.INFO ) {
-			public void execute() throws Throwable {
-				ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
-				
-				new MessageValidator( codegenFolder, new PrintStream( bytesOut ) )
-						.validate( messageFile );
-				validationOutput.setText( new String( bytesOut.toByteArray() ) );
+			public void execute() throws OtmApplicationException {
+			    try {
+	                ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+	                
+	                new MessageValidator( codegenFolder, new PrintStream( bytesOut ) )
+	                        .validate( messageFile );
+	                validationOutput.setText( new String( bytesOut.toByteArray() ) );
+			        
+                } catch (Exception e) {
+                    throw new OtmApplicationException( e.getMessage(), e );
+			    }
 			}
 		};
 		
@@ -148,25 +163,29 @@ public class OTMMessageValidatorController extends AbstractMainWindowController 
 	 * @throws SchemaCompilerException  thrown if an error occurs or the model
 	 *									contains validation errors
 	 */
-	private void generateSchemas() throws SchemaCompilerException {
+    private void generateSchemas() throws SchemaCompilerException {
         CompileAllCompilerTask compilerTask = new CompileAllCompilerTask();
-		ValidationFindings findings;
-		
-		CompilerExtensionRegistry.setActiveExtension( "OTA2" );
-		
-		codegenFolder = getOutputFolder();
+        ValidationFindings findings;
+        
+        CompilerExtensionRegistry.setActiveExtension( "OTA2" );
+        
+        codegenFolder = getOutputFolder();
         codegenFolder.mkdirs();
-		compilerTask.applyTaskOptions( new ValidationCompileOptions( codegenFolder ) );
-		findings = compilerTask.compileOutput( projectFile );
-		
-        if (findings.hasFinding(FindingType.ERROR)) {
-        	System.out.println("ERROR MESSAGES:");
-        	for (String message : findings.getValidationMessages( FindingType.ERROR, FindingMessageFormat.IDENTIFIED_FORMAT )) {
-        		System.out.println("  " + message);
-        	}
-        	throw new SchemaCompilerException("Errors in OTM model (see console for DETAILS).");
+        compilerTask.applyTaskOptions( new ValidationCompileOptions( codegenFolder ) );
+        findings = compilerTask.compileOutput( projectFile );
+        
+        if (findings.hasFinding( FindingType.ERROR )) {
+            if (log.isErrorEnabled()) {
+                log.error( "ERROR MESSAGES:" );
+                
+                for (String message : findings.getValidationMessages( FindingType.ERROR,
+                        FindingMessageFormat.IDENTIFIED_FORMAT )) {
+                    log.error( String.format( "  %s", message ) );
+                }
+            }
+            throw new SchemaCompilerException( "Errors in OTM model (see console for DETAILS)." );
         }
-	}
+    }
 	
 	/**
 	 * Returns the location of the schema generation output folder.  If the folder
@@ -201,7 +220,7 @@ public class OTMMessageValidatorController extends AbstractMainWindowController 
 					deleteFolderContents( folderMember );
 				}
 			}
-			folderLocation.delete();
+			FileUtils.delete( folderLocation );
 		}
 	}
 	
@@ -212,11 +231,7 @@ public class OTMMessageValidatorController extends AbstractMainWindowController 
 	 * @param textField  the text field to which the value will be assigned
 	 */
 	private void setFilenameText(String filenameValue, TextField textField) {
-		Platform.runLater( new Runnable() {
-			public void run() {
-				textField.setText( filenameValue );
-			}
-		});
+		Platform.runLater( () -> textField.setText( filenameValue ) );
 	}
 	
 	/**
@@ -224,15 +239,13 @@ public class OTMMessageValidatorController extends AbstractMainWindowController 
 	 */
 	@Override
 	protected void setStatusMessage(String message, StatusType statusType, boolean disableControls) {
-		Platform.runLater( new Runnable() {
-			public void run() {
-				statusBarLabel.setText( message );
-				projectFilename.disableProperty().set( disableControls );
-				projectButton.disableProperty().set( disableControls );
-				messageFilename.disableProperty().set( disableControls );
-				messageButton.disableProperty().set( disableControls );
-				validateButton.disableProperty().set( disableControls );
-			}
+		Platform.runLater( () -> {
+            statusBarLabel.setText( message );
+            projectFilename.disableProperty().set( disableControls );
+            projectButton.disableProperty().set( disableControls );
+            messageFilename.disableProperty().set( disableControls );
+            messageButton.disableProperty().set( disableControls );
+            validateButton.disableProperty().set( disableControls );
 		});
 	}
 	
@@ -241,13 +254,11 @@ public class OTMMessageValidatorController extends AbstractMainWindowController 
 	 */
 	@Override
 	protected void updateControlStates() {
-		Platform.runLater( new Runnable() {
-			public void run() {
-				boolean projectSelected = (projectFile != null) && projectFile.exists();
-				boolean messageSelected = (messageFile != null) && messageFile.exists();
-				
-				validateButton.disableProperty().set( !projectSelected || !messageSelected );
-			}
+		Platform.runLater( () -> {
+            boolean projectSelected = (projectFile != null) && projectFile.exists();
+            boolean messageSelected = (messageFile != null) && messageFile.exists();
+            
+            validateButton.disableProperty().set( !projectSelected || !messageSelected );
 		});
 	}
 	

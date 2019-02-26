@@ -67,9 +67,9 @@ public class ActionResponseTreeNode extends TreeNode<TLActionResponse> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLActionResponse response = getEntity();
 		
-		props.add( new NodeProperty( "statusCodes", () -> { return getDisplayStatusCodes(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( response ); } ) );
-		props.add( new NodeProperty( "payloadType", () -> { return getEntityDisplayName( response.getPayloadType() ); } ) );
+		props.add( new NodeProperty( "statusCodes", this::getDisplayStatusCodes ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( response ) ) );
+		props.add( new NodeProperty( "payloadType", () -> getEntityDisplayName( response.getPayloadType() ) ) );
 		return props;
 	}
 
@@ -77,7 +77,7 @@ public class ActionResponseTreeNode extends TreeNode<TLActionResponse> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
+    protected List<TreeNode<Object>> initializeChildren() {
 		return Collections.emptyList();
 	}
 	

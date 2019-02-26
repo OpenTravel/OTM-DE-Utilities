@@ -68,10 +68,10 @@ public class BusinessObjectTreeNode extends TreeNode<TLBusinessObject> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLBusinessObject bo = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return bo.getName(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( bo ); } ) );
-		props.add( new NodeProperty( "extends", () -> { return getExtensionName( bo ); } ) );
-		props.add( new NodeProperty( "notExtendable", () -> { return bo.isNotExtendable() + ""; } ) );
+		props.add( new NodeProperty( "name", bo::getName ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( bo ) ) );
+		props.add( new NodeProperty( "extends", () -> getExtensionName( bo ) ) );
+		props.add( new NodeProperty( "notExtendable", () -> bo.isNotExtendable() + "" ) );
 		return props;
 	}
 
@@ -79,8 +79,8 @@ public class BusinessObjectTreeNode extends TreeNode<TLBusinessObject> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
-		List<TreeNode<?>> children = new ArrayList<>();
+    protected List<TreeNode<Object>> initializeChildren() {
+		List<TreeNode<Object>> children = new ArrayList<>();
 		TLBusinessObject bo = getEntity();
 		
 		for (TLAlias alias : bo.getAliases()) {

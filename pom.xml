@@ -20,6 +20,7 @@
 		<module>ota2-message-validator</module>
 		<module>ota2-example-upgrade-utility</module>
 		<module>ota2-app-launcher</module>
+		<module>utilities-test-aggregate</module>
 	</modules>
 
 	<properties>
@@ -37,6 +38,11 @@
 		
 		<!-- Plugin Versions -->
 		<license.plugin.version>2.10</license.plugin.version>
+
+		<!-- Sonar -->
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+		<sonar.exclusions>${project.build.directory}/generated-sources/**</sonar.exclusions>
+		<sonar.jacoco.reportPaths>${project.basedir}/../test-aggregate/target/jacoco.exec</sonar.jacoco.reportPaths>
 	</properties>
 
 	<build>
@@ -67,6 +73,18 @@
 						<id>attach-sources</id>
 						<goals>
 							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
 						</goals>
 					</execution>
 				</executions>

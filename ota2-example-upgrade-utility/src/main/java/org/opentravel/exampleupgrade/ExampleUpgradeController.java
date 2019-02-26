@@ -22,6 +22,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,7 +37,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.opentravel.application.common.AbstractMainWindowController;
+import org.opentravel.application.common.OtmApplicationException;
 import org.opentravel.application.common.StatusType;
+import org.opentravel.application.common.SyntaxHighlightBuilder;
+import org.opentravel.application.common.XmlHighlightBuilder;
 import org.opentravel.schemacompiler.codegen.example.ExampleGeneratorOptions;
 import org.opentravel.schemacompiler.ioc.CompilerExtensionRegistry;
 import org.opentravel.schemacompiler.loader.LibraryInputSource;
@@ -59,6 +63,8 @@ import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 import org.opentravel.schemacompiler.visitor.ModelNavigator;
 import org.opentravel.schemacompiler.xml.XMLPrettyPrinter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import javafx.application.Platform;
@@ -97,7 +103,6 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -107,7 +112,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-
 /**
  * JavaFX controller class for the OTA2 Example Upgrade Utility application.
  */
@@ -116,6 +120,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 	public static final String FXML_FILE = "/ota2-EXAMPLE-upgrade.fxml";
 	
 	private static final DataFormat DRAG_FORMAT = new DataFormat("application/ota2-original-dom-node");
+    private static final Logger log = LoggerFactory.getLogger( ExampleUpgradeController.class );
 	
     @FXML private TextField libraryText;
     @FXML private Tooltip libraryTooltip;
@@ -171,75 +176,13 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 		File initialDirectory = (modelFile != null) ?
 				modelFile.getParentFile() : UserSettings.load().getLastModelFile().getParentFile();
 		FileChooser chooser = newFileChooser( "Select OTM Library or Project", initialDirectory,
-				new String[] { "*.otp", "OTM Project Files (*.otp)" },
-				new String[] { "*.otr", "OTM Release Files (*.otr)" },
-				new String[] { "*.otm", "OTM Libraries Files (*.otm)" },
-				new String[] { "*.*", "All Files (*.*)" } );
+		        OTP_EXTENSION_FILTER, OTR_EXTENSION_FILTER, OTM_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
 		File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 		
 		if ((selectedFile != null) && selectedFile.exists()) {
 			Runnable r = new BackgroundTask( "Loading Model: " + selectedFile.getName(), StatusType.INFO ) {
-				public void execute() throws Throwable {
-					try {
-						ValidationFindings findings;
-						TLModel newModel = null;
-						
-						if (selectedFile.getName().endsWith(".otp")) {
-							ProjectManager manager = new ProjectManager( false );
-							
-							findings = new ValidationFindings();
-							manager.loadProject( selectedFile, findings );
-							
-							newModel = manager.getModel();
-							
-						} else if (selectedFile.getName().endsWith(".otr")) {
-							ReleaseManager releaseManager = new ReleaseManager( RepositoryManager.getDefault() );
-							
-							findings = new ValidationFindings();
-							releaseManager.loadRelease( selectedFile, findings );
-							
-							if (findings.hasFinding( FindingType.ERROR )) {
-								throw new LibraryLoaderException("Validation errors detected in model (see log for DETAILS)");
-							}
-							newModel = releaseManager.getModel();
-							
-						} else { // assume OTM library file
-					        LibraryInputSource<InputStream> libraryInput = new LibraryStreamInputSource( selectedFile );
-					        LibraryModelLoader<InputStream> modelLoader = new LibraryModelLoader<InputStream>();
-					        
-					        findings = modelLoader.loadLibraryModel( libraryInput );
-							newModel = modelLoader.getLibraryModel();
-						}
-						
-						if ((findings == null) || !findings.hasFinding( FindingType.ERROR )) {
-							QNameCandidateVisitor visitor = new QNameCandidateVisitor();
-							
-							model = newModel;
-							modelFile = selectedFile;
-							userSettings.setLastModelFile( modelFile );
-							
-							// Scan the model to pre-populate tables with lists of potential entity
-							// selections for the EXAMPLE root element.
-							new ModelNavigator( visitor ).navigate( model );
-							familyMatches = visitor.getFamilyMatches();
-							allElementsByBaseNS = visitor.getAllElementsByBaseNS();
-							
-							populateFacetSelections();
-							rebuildEntityChoices();
-							
-						} else {
-							System.out.println(selectedFile.getName() + " - Error/Warning Messages:");
-
-							for (String message : findings.getAllValidationMessages(FindingMessageFormat.IDENTIFIED_FORMAT)) {
-								System.out.println("  " + message);
-							}
-							throw new LibraryLoaderException("Validation errors detected in model (see log for DETAILS)");
-						}
-						
-					} finally {
-						updateControlStates();
-						userSettings.save();
-					}
+				public void execute() throws OtmApplicationException {
+					loadModel( selectedFile );
 				}
 			};
 			
@@ -247,41 +190,117 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 		}
 	}
 	
+    /**
+     * Loads a model from the selected file.
+     * 
+     * @param selectedFile  the OTM library or project that was selected by the user
+     * @throws OtmApplicationException  thrown if an error occurs while loading the model
+     */
+    private void loadModel(File selectedFile) throws OtmApplicationException {
+        try {
+            ValidationFindings findings;
+            TLModel newModel = null;
+            
+            if (selectedFile.getName().endsWith(".otp")) {
+                ProjectManager manager = new ProjectManager( false );
+                
+                findings = new ValidationFindings();
+                manager.loadProject( selectedFile, findings );
+                
+                newModel = manager.getModel();
+                
+            } else if (selectedFile.getName().endsWith(".otr")) {
+                ReleaseManager releaseManager = new ReleaseManager( RepositoryManager.getDefault() );
+                
+                findings = new ValidationFindings();
+                releaseManager.loadRelease( selectedFile, findings );
+                
+                if (findings.hasFinding( FindingType.ERROR )) {
+                    throw new LibraryLoaderException("Validation errors detected in model (see log for DETAILS)");
+                }
+                newModel = releaseManager.getModel();
+                
+            } else { // assume OTM library file
+                LibraryInputSource<InputStream> libraryInput = new LibraryStreamInputSource( selectedFile );
+                LibraryModelLoader<InputStream> modelLoader = new LibraryModelLoader<>();
+                
+                findings = modelLoader.loadLibraryModel( libraryInput );
+                newModel = modelLoader.getLibraryModel();
+            }
+            
+            if ((findings == null) || !findings.hasFinding( FindingType.ERROR )) {
+                QNameCandidateVisitor visitor = new QNameCandidateVisitor();
+                
+                model = newModel;
+                modelFile = selectedFile;
+                userSettings.setLastModelFile( modelFile );
+                
+                // Scan the model to pre-populate tables with lists of potential entity
+                // selections for the EXAMPLE root element.
+                new ModelNavigator( visitor ).navigate( model );
+                familyMatches = visitor.getFamilyMatches();
+                allElementsByBaseNS = visitor.getAllElementsByBaseNS();
+                
+                populateFacetSelections();
+                rebuildEntityChoices();
+                
+            } else {
+                if (log.isWarnEnabled()) {
+                    log.warn( String.format( "%s - Error/Warning Messages:", selectedFile.getName() ) );
+
+                    for (String message : findings.getAllValidationMessages(FindingMessageFormat.IDENTIFIED_FORMAT)) {
+                        log.warn( String.format( "  %s", message ) );
+                    }
+                }
+                throw new LibraryLoaderException("Validation errors detected in model (see log for DETAILS)");
+            }
+            
+        } catch (Exception e) {
+            throw new OtmApplicationException( e.getMessage(), e );
+            
+        } finally {
+            updateControlStates();
+            userSettings.save();
+        }
+    }
+    
 	/**
 	 * Rebuilds the contents of the entity selection maps.
 	 */
 	private void rebuildEntityChoices() {
-		if ((originalDocument != null) && (model != null)) {
-			QName rootName = HelperUtils.getElementName( originalDocument.getDocumentElement() );
-			String rootBaseNS = HelperUtils.getBaseNamespace( rootName.getNamespaceURI() );
-			List<OTMObjectChoice> candidateEntities = getCandidateEntities( rootName, rootBaseNS );
-			if (candidateEntities == null) candidateEntities = new ArrayList<>();
-			List<OTMObjectChoice> selectableObjects = new ArrayList<>();
-			OTMObjectChoice exactMatch = null, _exactMatch;
-			
-			// Build the list of candidate entities
-			for (OTMObjectChoice objectChoice : candidateEntities) {
-				if (objectChoice.getOtmObjectName().equals( rootName )) {
-					exactMatch = objectChoice;
-				}
-				selectableObjects.add( objectChoice );
-			}
-			
-			if (exactMatch != null) {
-				_exactMatch = exactMatch;
-				
-			} else {
-				_exactMatch = (selectableObjects.size() > 0) ? selectableObjects.get( 0 ) : null;
-			}
-			
-			Platform.runLater( () -> {
-				entityChoice.setItems( FXCollections.observableArrayList( selectableObjects ) );
-				
-				if (_exactMatch != null) {
-					entityChoice.setValue( _exactMatch );
-				}
-			});
+		if ((originalDocument == null) || (model == null)) {
+		    return;
 		}
+        QName rootName = HelperUtils.getElementName( originalDocument.getDocumentElement() );
+        String rootBaseNS = HelperUtils.getBaseNamespace( rootName.getNamespaceURI() );
+        List<OTMObjectChoice> candidateEntities = getCandidateEntities( rootName, rootBaseNS );
+        if (candidateEntities == null) candidateEntities = new ArrayList<>();
+        List<OTMObjectChoice> selectableObjects = new ArrayList<>();
+        OTMObjectChoice exactMatch = null;
+        OTMObjectChoice tempExactMatch;
+        
+        // Build the list of candidate entities
+        for (OTMObjectChoice objectChoice : candidateEntities) {
+            if (objectChoice.getOtmObjectName().equals( rootName )) {
+                exactMatch = objectChoice;
+            }
+            selectableObjects.add( objectChoice );
+        }
+        
+        if (exactMatch != null) {
+            tempExactMatch = exactMatch;
+            
+        } else {
+            tempExactMatch = (!selectableObjects.isEmpty()) ? selectableObjects.get( 0 ) : null;
+        }
+        
+        Platform.runLater( () -> {
+            entityChoice.setItems( FXCollections.observableArrayList( selectableObjects ) );
+            
+            if (tempExactMatch != null) {
+                entityChoice.setValue( tempExactMatch );
+            }
+        });
 	}
 	
 	/**
@@ -303,10 +322,8 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 			}
 		}
 		
-		Platform.runLater( () -> {
-			facetSelectionTableView.setItems(
-					FXCollections.observableArrayList( facetSelections.getAllFacetSelections() ) );
-		});
+		Platform.runLater( () -> facetSelectionTableView.setItems(
+					FXCollections.observableArrayList( facetSelections.getAllFacetSelections() ) ) );
 	}
 	
 	/**
@@ -347,13 +364,12 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 		File initialDirectory = (exampleFolder != null) ?
 				exampleFolder : UserSettings.load().getLastExampleFolder();
 		FileChooser chooser = newFileChooser( "Save Example Output", initialDirectory,
-				new String[] { "*.xml", "XML Files (*.xml)" },
-				new String[] { "*.json", "JSON Files (*.json)" } );
+		        XML_EXTENSION_FILTER, JSON_EXTENSION_FILTER );
 		File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 		
 		if ((selectedFile != null) && selectedFile.exists()) {
 			Runnable r = new BackgroundTask( "Loading Example Document: " + selectedFile.getName(), StatusType.INFO ) {
-				public void execute() throws Throwable {
+				public void execute() throws OtmApplicationException {
 					try {
 						if (selectedFile.getName().endsWith(".xml")) {
 							DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -364,15 +380,18 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 							rebuildEntityChoices();
 							
 						} else if (selectedFile.getName().endsWith(".json")) {
-							throw new Exception("JSON documents not yet supported.");
+							throw new OtmApplicationException("JSON documents not yet supported.");
 							
 						} else {
-							throw new Exception("Unknown EXAMPLE file format: " + selectedFile.getName());
+							throw new OtmApplicationException("Unknown EXAMPLE file format: " + selectedFile.getName());
 						}
 						exampleFile = selectedFile;
 						exampleFolder = exampleFile.getParentFile();
 						userSettings.setLastExampleFolder( exampleFolder );
 						
+                    } catch (Exception e) {
+                        throw new OtmApplicationException( e.getMessage(), e );
+                        
 					} finally {
 						updateControlStates();
 						userSettings.save();
@@ -416,7 +435,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 				
 			} catch (Exception e) {
 				previewPane.replaceText( "-- Error Generating Example Output --");
-				e.printStackTrace( System.out );
+				log.error( "Error Generating Example Output", e );
 			}
 		});
 	}
@@ -442,13 +461,13 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 					highlightingBuilder = new XmlHighlightBuilder();
 				}
 				
-				previewPane.replaceText( new String( out.toByteArray(), "UTF-8" ) );
+				previewPane.replaceText( new String( out.toByteArray(), StandardCharsets.UTF_8 ) );
 				previewPane.setStyleSpans( 0, highlightingBuilder.computeHighlighting( previewPane.getText() ) );
 				previewScrollPane.estimatedScrollYProperty().setValue( yScroll );
 				
 			} catch (Exception e) {
 				previewPane.replaceText( "-- Error Generating Example Output --");
-				e.printStackTrace( System.out );
+				log.error( "Error Generating Example Output", e );
 			}
 		});
 	}
@@ -485,7 +504,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 			}
 			
 		} catch (IOException e) {
-			e.printStackTrace( System.out );
+		    log.error( "Error displaying selection strategy dialog.", e );
 		}
 	}
 	
@@ -514,26 +533,26 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 	 * @param event  the action event that triggered this method call
 	 */
 	@FXML public void saveExampleOutput(ActionEvent event) {
-		boolean xmlSelected = true;
-		UserSettings userSettings = UserSettings.load();
+		UserSettings settings = UserSettings.load();
 		FileChooser chooser = newFileChooser( "Save Example Output",
-				userSettings.getLastExampleFolder(),
-				xmlSelected ? new String[] { "*.xml", "XML Files (*.xml)" } :
-							  new String[] { "*.json", "JSON Files (*.json)" } );
+				userSettings.getLastExampleFolder(), XML_EXTENSION_FILTER );
 		File targetFile = chooser.showSaveDialog( getPrimaryStage() );
 		
 		if (targetFile != null) {
 			Runnable r = new BackgroundTask( "Saving Report", StatusType.INFO ) {
-				protected void execute() throws Throwable {
+				protected void execute() throws OtmApplicationException {
 					try {
 						try (Writer out = new FileWriter( targetFile )) {
 							out.write( previewPane.getText() );
 						}
 						upgradeDocumentDirty = false;
 						
+                    } catch (Exception e) {
+                        throw new OtmApplicationException( e.getMessage(), e );
+                        
 					} finally {
-						userSettings.setLastExampleFolder( targetFile.getParentFile() );
-						userSettings.save();
+					    settings.setLastExampleFolder( targetFile.getParentFile() );
+					    settings.save();
 					}
 				}
 			};
@@ -589,14 +608,14 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 			controller.showAndWait();
 			
 		} catch (IOException e) {
-			e.printStackTrace( System.out );
+		    log.error( "Error displaying legend dialog.", e );
 		}
 	}
 	/**
 	 * Called when the user changes the default binding style.
 	 */
 	private void handleBindingStyleChange() {
-		String selectedStyle = (String) bindingStyleChoice.getValue();
+		String selectedStyle = bindingStyleChoice.getValue();
 		String currentStyle = CompilerExtensionRegistry.getActiveExtension();
 
 		if ((selectedStyle != null) && !selectedStyle.equals(currentStyle)) {
@@ -604,136 +623,31 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 		}
 	}
 	
-	/**
-	 * Displays the context menu, allowing the user to select different options
-	 * depending upon the state of the selected item.
-	 * 
-	 * @param selectedItem  the tree item for which to display the context menu
-	 * @param screenX  the screen X coordinate where the context menu should be displayed
-	 * @param screenY  the screen Y coordinate where the context menu should be displayed
-	 */
-	private void displayContextMenu(TreeItem<DOMTreeUpgradeNode> selectedItem,
-			double screenX, double screenY) {
-		DOMTreeUpgradeNode selectedNode = selectedItem.getValue();
-		List<MenuItem> menuItems = new ArrayList<>();
-		MenuItem menuItem;
-		
-		switch (selectedNode.getMatchType()) {
-			case MISSING:
-				menuItem = new MenuItem( "Auto-Generate Content" );
-				menuItem.setOnAction( e -> {
-					handleAutoGenerateContent( selectedItem );
-				});
-				menuItems.add( menuItem );
-				break;
-			case NONE:
-				menuItem = new MenuItem( "Re-Generate Content" );
-				menuItem.setOnAction( e -> {
-					handleAutoGenerateContent( selectedItem );
-				});
-				menuItems.add( menuItem );
-			case MANUAL:
-				menuItem = new MenuItem( "Clear Content" );
-				menuItem.setOnAction( e -> {
-					handleClearContent( selectedItem );
-				});
-				menuItems.add( menuItem );
-				break;
-			default:
-				menuItem = null;
-				break;
-		}
-		
-		if (!menuItems.isEmpty()) {
-			upgradeContextMenu = new ContextMenu();
-			
-			upgradeContextMenu.getItems().addAll( menuItems );
-			upgradeContextMenu.show( upgradedTreeView, screenX, screenY );
-			upgradeContextMenu.setOnAction( e -> {
-				upgradeContextMenu = null;
-			});
-		}
-	}
-	
-	/**
-	 * Handles a drag-n-drop event in which a node from the original DOM tree is dropped
-	 * onto the upgrade tree.
-	 * 
-	 * @param originalItem  the tree item from the original DOM document
-	 * @param upgradeItem  the tree item from the upgrade DOM document
-	 */
-	private void handleDragDropEvent(TreeItem<DOMTreeOriginalNode> originalItem,
-			TreeItem<DOMTreeUpgradeNode> upgradeItem) {
-		try {
-			TreeItem<DOMTreeUpgradeNode> newUpgradeItem =
-					new UpgradeTreeBuilder( upgradeDocument, getExampleOptions() )
-							.replaceUpgradeDOMBranch( upgradeItem, originalItem.getValue().getDomNode() );
-			
-			if (newUpgradeItem.getParent() == null) {
-				upgradedTreeView.setRoot( newUpgradeItem );
-			}
-			updatePreviewPane( false );
-			refreshBranch( originalItem );
-			upgradeDocumentDirty = true;
-			
-		} catch (Exception e) {
-			Alert errorDialog = new Alert( AlertType.ERROR );
-			
-			e.printStackTrace( System.out );
-			errorDialog.setTitle( "Error" );
-			errorDialog.setHeaderText( null );
-			errorDialog.setContentText( HelperUtils.getErrorMessage( e ) );
-			errorDialog.showAndWait();
-		}
-	}
-	
-	/**
-	 * Called when the user has elected to auto-generate content for a missing
-	 * node in the upgrade tree.
-	 * 
-	 * @param upgradeItem  the upgrade tree item from which to start auto-generating content
-	 */
-	private void handleAutoGenerateContent(TreeItem<DOMTreeUpgradeNode> upgradeItem) {
-		try {
-			TreeItem<DOMTreeUpgradeNode> newUpgradeItem =
-					new UpgradeTreeBuilder( upgradeDocument, getExampleOptions() )
-							.replaceUpgradeDOMBranch( upgradeItem, null );
-			
-			if (newUpgradeItem.getParent() == null) {
-				upgradedTreeView.setRoot( newUpgradeItem );
-			}
-			updatePreviewPane( false );
-			upgradeDocumentDirty = true;
-			
-		} catch (Exception e) {
-			Alert errorDialog = new Alert( AlertType.ERROR );
-			
-			e.printStackTrace( System.out );
-			errorDialog.setTitle( "Error" );
-			errorDialog.setHeaderText( null );
-			errorDialog.setContentText( HelperUtils.getErrorMessage( e ) );
-			errorDialog.showAndWait();
-		}
-	}
-	
-	/**
-	 * Called when the user has elected to clear the content of a node in
-	 * the upgrade tree.
-	 * 
-	 * @param upgradeItem  the upgrade tree item from which to start auto-generating content
-	 */
-	private void handleClearContent(TreeItem<DOMTreeUpgradeNode> upgradeItem) {
-		TreeItem<DOMTreeUpgradeNode> newUpgradeItem =
-				new UpgradeTreeBuilder( upgradeDocument, getExampleOptions() )
-						.clearUpgradeDOMBranch( upgradeItem );
-		
-		if (newUpgradeItem.getParent() == null) {
-			upgradedTreeView.setRoot( newUpgradeItem );
-		}
-		updatePreviewPane( false );
-		upgradeDocumentDirty = true;
-	}
-	
+    /**
+     * Called when a selection change occurs in the 'upgradedTreeView' control.
+     * 
+     * @param newValue  the new value that was selected
+     */
+    private void handleUpgradedItemSelectionChange(TreeItem<DOMTreeUpgradeNode> newValue) {
+        DOMTreeUpgradeNode treeNode = (newValue == null) ? null : newValue.getValue();
+        NamedEntity selectedEntity = (treeNode == null) ? null : treeNode.getOtmEntity();
+        EntityFacetSelection facetSelection;
+        
+        if (selectedEntity instanceof TLAlias) {
+            selectedEntity = ((TLAlias) selectedEntity).getOwningEntity();
+        }
+        if (selectedEntity instanceof TLFacet) {
+            selectedEntity = ((TLFacet) selectedEntity).getOwningEntity();
+        }
+        facetSelection = (selectedEntity == null) ?
+                null : facetSelections.getFacetSelection( selectedEntity );
+        
+        if (facetSelection != null) {
+            facetSelectionTableView.getSelectionModel().select( facetSelection );
+            facetSelectionTableView.scrollTo( facetSelection );
+        }
+    }
+    
 	/**
 	 * @see org.opentravel.application.common.AbstractMainWindowController#updateControlStates()
 	 */
@@ -776,7 +690,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 			expandParent |= childResult;
 		}
 		treeItem.setExpanded( expandParent ); // Expand this nodes if any children requested it
-		return expandParent | !ExampleMatchType.isMatch( treeItem.getValue().getMatchType() );
+		return expandParent || !ExampleMatchType.isMatch( treeItem.getValue().getMatchType() );
 	}
 	
 	/**
@@ -794,7 +708,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 			expandParent |= childResult;
 		}
 		treeItem.setExpanded( expandParent ); // Expand this nodes if any children requested it
-		return expandParent | (treeItem.getValue().getReferenceStatus() == ReferenceStatus.NOT_REFERENCED);
+		return expandParent || (treeItem.getValue().getReferenceStatus() == ReferenceStatus.NOT_REFERENCED);
 	}
 	
 	/**
@@ -847,12 +761,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 	 */
 	@Override
 	protected void initialize(Stage primaryStage) {
-		List<String> bindingStyles = CompilerExtensionRegistry.getAvailableExtensionIds();
-		String defaultStyle = CompilerExtensionRegistry.getActiveExtension();
-		UserSettings settings = UserSettings.load();
-		
 		super.initialize( primaryStage );
-		this.userSettings = settings;
 		
 		// Since the preview pane is a custom component, we have to configure it manually
 		previewPane = new CodeArea();
@@ -865,144 +774,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 		AnchorPane.setLeftAnchor(pane, 0.0D);
 		AnchorPane.setRightAnchor(pane, 0.0D);
 		
-		// Configure listeners to capture interactions with the visual controls
-		bindingStyleChoice.setItems( FXCollections.observableArrayList( bindingStyles ) );
-		bindingStyleChoice.setValue( defaultStyle );
-		bindingStyleChoice.valueProperty().addListener(
-				(observable, oldValue, newValue) -> handleBindingStyleChange() );
-		
-		repeatCountSpinner.setValueFactory(
-				new IntegerSpinnerValueFactory( 1, 3, settings.getRepeatCount(), 1 ) );
-		
-		otmObjectColumn.setCellValueFactory( cellData -> {
-			return new ReadOnlyObjectWrapper<String>(
-					HelperUtils.getDisplayName( cellData.getValue().getEntityType(), true ) );
-		});
-		otmObjectColumn.prefWidthProperty().bind( facetSelectionTableView.widthProperty().divide(2) );
-		
-		facetSelectionColumn.setCellValueFactory( cellData -> {
-			String cellValue = cellData.getValue().getSelectedFacetName();
-			return (cellValue == null) ? null : new ReadOnlyObjectWrapper<String>( cellValue );
-		});
-		facetSelectionColumn.setCellFactory( cellData -> {
-			return new FacetSelectCell();
-		});
-		facetSelectionColumn.prefWidthProperty().bind( facetSelectionTableView.widthProperty().divide(2) );
-		
-		entityChoice.valueProperty().addListener( ( observable, oldValue, newValue ) -> {
-			if (oldValue != newValue) {
-				populateExampleContent( true );
-			}
-		});
-		
-		originalTreeView.setCellFactory( tv -> new StyledTreeCell<DOMTreeOriginalNode>() {
-			{
-				setOnDragDetected(new EventHandler<MouseEvent>() {
-	                public void handle(MouseEvent mouseEvent) {
-	    				TreeItem<DOMTreeOriginalNode> item = getTreeItem();
-	    				
-	    				if ((item != null) && (item.getValue() != null)) {
-		    				Dragboard dragboard = startDragAndDrop( TransferMode.COPY );
-	    					Map<DataFormat,Object> dbContent = new HashMap<>();
-	    					
-	    					dragItem = item;
-	    					dragId = UUID.randomUUID().toString();
-	    					dbContent.put( DRAG_FORMAT, dragId );
-	    					dragboard.setContent( dbContent );
-	    				}
-	                }
-	            });
-			}
-			protected List<String> getConditionalStyleClasses() {
-				return ReferenceStatus.getAllStyleClasses();
-			}
-			protected String getConditionalStyleClass() {
-				TreeItem<DOMTreeOriginalNode> item = getTreeItem();
-				return (item == null) ? null : item.getValue().getReferenceStatus().getStyleClass();
-			}
-		});
-		
-		upgradedTreeView.setCellFactory( tv -> new StyledTreeCell<DOMTreeUpgradeNode>() {
-			{
-				setOnDragOver( dragEvent -> {
-					DOMTreeUpgradeNode value = getItem();
-					
-					if ((value != null) && (!ExampleMatchType.isMatch( value.getMatchType() )
-							|| (value.getMatchType() == ExampleMatchType.MANUAL))) {
-	                	dragEvent.acceptTransferModes( TransferMode.COPY );
-	                	setEffect( new Lighting() );
-					}
-	            });
-				setOnDragExited( dragEvent -> {
-					Platform.runLater( () -> {
-						setEffect( null );
-					});
-				});
-				setOnDragDropped(new EventHandler<DragEvent>() {
-	                public void handle(DragEvent dragEvent) {
-	                	Dragboard dragboard = dragEvent.getDragboard();
-	                	TreeItem<DOMTreeOriginalNode> dragItem = ExampleUpgradeController.this.dragItem;
-	                	TreeItem<DOMTreeUpgradeNode> dropItem = getTreeItem();
-	                	
-	                	if ((dropItem != null) && (dropItem.getValue() != null)
-	                			&& dragboard.hasContent( DRAG_FORMAT )) {
-	                		Object dropId = dragboard.getContent( DRAG_FORMAT );
-	                		
-	                		if (dropId.equals( dragId )) {
-	                			ExampleUpgradeController.this.dragItem = null;
-	                			handleDragDropEvent( dragItem, dropItem );
-		                		dragEvent.setDropCompleted( true );
-	                		}
-	                	}
-	                }
-	            });
-				setOnMouseReleased(new EventHandler<MouseEvent>() {
-					public void handle(MouseEvent event) {
-						if (event.getButton() == MouseButton.SECONDARY) {
-							TreeItem<DOMTreeUpgradeNode> selectedItem = getTreeItem();
-							
-							if (selectedItem != null) {
-								displayContextMenu( selectedItem, event.getScreenX(), event.getScreenY() );
-							}
-						}
-					}
-				});
-				setOnMousePressed( event -> {
-					if (upgradeContextMenu != null) {
-						upgradeContextMenu.hide();
-						upgradeContextMenu = null;
-					}
-				});
-			}
-			protected List<String> getConditionalStyleClasses() {
-				return ExampleMatchType.getAllStyleClasses();
-			}
-			protected String getConditionalStyleClass() {
-				TreeItem<DOMTreeUpgradeNode> item = getTreeItem();
-				return (item == null) ? null : item.getValue().getMatchType().getStyleClass();
-			}
-		});
-		
-		upgradedTreeView.getSelectionModel().selectedItemProperty().addListener(
-				(observable, oldValue, newValue) -> {
-					DOMTreeUpgradeNode treeNode = (newValue == null) ? null : newValue.getValue();
-					NamedEntity selectedEntity = (treeNode == null) ? null : treeNode.getOtmEntity();
-					EntityFacetSelection facetSelection;
-					
-					if (selectedEntity instanceof TLAlias) {
-						selectedEntity = ((TLAlias) selectedEntity).getOwningEntity();
-					}
-					if (selectedEntity instanceof TLFacet) {
-						selectedEntity = ((TLFacet) selectedEntity).getOwningEntity();
-					}
-					facetSelection = (selectedEntity == null) ?
-							null : facetSelections.getFacetSelection( selectedEntity );
-					
-					if (facetSelection != null) {
-						facetSelectionTableView.getSelectionModel().select( facetSelection );
-						facetSelectionTableView.scrollTo( facetSelection );
-					}
-				});
+        configureListeners();
 		
 		ObservableList<String> stylesheets = getPrimaryStage().getScene().getStylesheets();
 		final EventHandler<WindowEvent> existingOnClose = getPrimaryStage().getOnCloseRequest();
@@ -1011,30 +783,71 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 		stylesheets.add( ExampleUpgradeController.class.getResource( "/styles/json-highlighting.css" ).toExternalForm() );
 		stylesheets.add( ExampleUpgradeController.class.getResource( "/styles/tree-styles.css" ).toExternalForm() );
 		
-		getPrimaryStage().setOnCloseRequest( new EventHandler<WindowEvent>() {
-			public void handle(WindowEvent event) {
-				if ((upgradeDocument != null) && upgradeDocumentDirty) {
-					Alert confirmDialog = new Alert( AlertType.CONFIRMATION );
-					
-					confirmDialog.setTitle( "Unsaved Changes" );
-					confirmDialog.setHeaderText( null );
-					confirmDialog.setContentText(
-							"Your upgraded EXAMPLE document has unsaved changes.  "
-							+ "Click 'Ok' to save now or 'Cancel' to exit without saving.");
-					confirmDialog.showAndWait();
-					
-					if (confirmDialog.getResult() == ButtonType.OK) {
-						saveExampleOutput( null );
-					}
-				}
-				if (existingOnClose != null) {
-					existingOnClose.handle( event );
-				}
-			}
+		getPrimaryStage().setOnCloseRequest( event -> {
+            if ((upgradeDocument != null) && upgradeDocumentDirty) {
+                Alert confirmDialog = new Alert( AlertType.CONFIRMATION );
+                
+                confirmDialog.setTitle( "Unsaved Changes" );
+                confirmDialog.setHeaderText( null );
+                confirmDialog.setContentText(
+                        "Your upgraded EXAMPLE document has unsaved changes.  "
+                        + "Click 'Ok' to save now or 'Cancel' to exit without saving.");
+                confirmDialog.showAndWait();
+                
+                if (confirmDialog.getResult() == ButtonType.OK) {
+                    saveExampleOutput( null );
+                }
+            }
+            if (existingOnClose != null) {
+                existingOnClose.handle( event );
+            }
 		});
 		updateControlStates();
 	}
-	
+
+    /**
+     * Configure listeners to capture interactions with the visual controls.
+     */
+    private void configureListeners() {
+        List<String> bindingStyles = CompilerExtensionRegistry.getAvailableExtensionIds();
+        String defaultStyle = CompilerExtensionRegistry.getActiveExtension();
+        UserSettings settings = UserSettings.load();
+        
+        this.userSettings = settings;
+		bindingStyleChoice.setItems( FXCollections.observableArrayList( bindingStyles ) );
+		bindingStyleChoice.setValue( defaultStyle );
+		bindingStyleChoice.valueProperty().addListener(
+				(observable, oldValue, newValue) -> handleBindingStyleChange() );
+		
+		repeatCountSpinner.setValueFactory(
+				new IntegerSpinnerValueFactory( 1, 3, settings.getRepeatCount(), 1 ) );
+		
+		otmObjectColumn.setCellValueFactory( cellData ->
+		        new ReadOnlyObjectWrapper<String>(
+					HelperUtils.getDisplayName( cellData.getValue().getEntityType(), true ) ) );
+		otmObjectColumn.prefWidthProperty().bind( facetSelectionTableView.widthProperty().divide(2) );
+		
+		facetSelectionColumn.setCellValueFactory( cellData -> {
+			String cellValue = cellData.getValue().getSelectedFacetName();
+			return (cellValue == null) ? null : new ReadOnlyObjectWrapper<String>( cellValue );
+		});
+		facetSelectionColumn.setCellFactory( cellData -> new FacetSelectCell() );
+		facetSelectionColumn.prefWidthProperty().bind( facetSelectionTableView.widthProperty().divide(2) );
+		
+		entityChoice.valueProperty().addListener( ( observable, oldValue, newValue ) -> {
+			if (oldValue != newValue) {
+				populateExampleContent( true );
+			}
+		});
+		
+		originalTreeView.setCellFactory( tv -> new OriginalTreeViewCellFactory() );
+		
+		upgradedTreeView.setCellFactory( tv -> new UpgradedTreeViewCellFactory() );
+		
+		upgradedTreeView.getSelectionModel().selectedItemProperty().addListener(
+				(observable, oldValue, newValue) -> handleUpgradedItemSelectionChange( newValue ) );
+    }
+
 	/**
 	 * Returns the set of options that should be used when generating unmatched sections
 	 * of the upgraded EXAMPLE tree.
@@ -1053,23 +866,18 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 	 * Table cell that allows the user to select a facet from the available list
 	 * for substitutable OTM entities.
 	 */
+    @SuppressWarnings("squid:MaximumInheritanceDepth") // Unavoidable since the base class is from core JavaFXx
 	private class FacetSelectCell extends ChoiceBoxTableCell<EntityFacetSelection,String> {
 		
 		/**
 		 * Default constructor.
 		 */
 		public FacetSelectCell() {
-			setOnMouseEntered( new EventHandler<MouseEvent>() {
-			    public void handle(MouseEvent me) {
-			    	boolean isEditable = FacetSelectCell.this.isEditable();
-			    	FacetSelectCell.this.getScene().setCursor( isEditable ? Cursor.HAND : Cursor.DEFAULT );
-			    }
+			setOnMouseEntered( me -> {
+                boolean isEditable = FacetSelectCell.this.isEditable();
+                FacetSelectCell.this.getScene().setCursor( isEditable ? Cursor.HAND : Cursor.DEFAULT );
 			} );
-			setOnMouseExited( new EventHandler<MouseEvent>() {
-			    public void handle(MouseEvent me) {
-			    	FacetSelectCell.this.getScene().setCursor( Cursor.DEFAULT );
-			    }
-			} );
+			setOnMouseExited( me -> FacetSelectCell.this.getScene().setCursor( Cursor.DEFAULT ) );
 		}
 
 		/**
@@ -1113,7 +921,6 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 				itemList = (facetSelection == null) ? null : facetSelection.getFacetNames(); 
 				
 				editable = (itemList != null) && (itemList.size() > 1);
-				if (!editable) itemList = null;
 			}
 			setEditable( editable );
 			setStyle( editable ? "-fx-font-weight:bold;" : null );
@@ -1122,4 +929,250 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
 		
 	}
 	
+    /**
+     * Cell factory for the original tree view component.
+     */
+    @SuppressWarnings("squid:MaximumInheritanceDepth") // Unavoidable since the base class is from core JavaFXx
+    private class OriginalTreeViewCellFactory extends StyledTreeCell<DOMTreeOriginalNode> {
+        
+        /**
+         * Default constructor.
+         */
+        public OriginalTreeViewCellFactory() {
+            setOnDragDetected( mouseEvent -> {
+                TreeItem<DOMTreeOriginalNode> item = getTreeItem();
+                
+                if ((item != null) && (item.getValue() != null)) {
+                    Dragboard dragboard = startDragAndDrop( TransferMode.COPY );
+                    Map<DataFormat,Object> dbContent = new HashMap<>();
+                    
+                    dragItem = item;
+                    dragId = UUID.randomUUID().toString();
+                    dbContent.put( DRAG_FORMAT, dragId );
+                    dragboard.setContent( dbContent );
+                }
+            });
+        }
+        
+        /**
+         * @see org.opentravel.exampleupgrade.StyledTreeCell#getConditionalStyleClasses()
+         */
+        @Override
+        protected List<String> getConditionalStyleClasses() {
+            return ReferenceStatus.getAllStyleClasses();
+        }
+        
+        /**
+         * @see org.opentravel.exampleupgrade.StyledTreeCell#getConditionalStyleClass()
+         */
+        @Override
+        protected String getConditionalStyleClass() {
+            TreeItem<DOMTreeOriginalNode> item = getTreeItem();
+            return (item == null) ? null : item.getValue().getReferenceStatus().getStyleClass();
+        }
+    }
+    
+    /**
+     * Cell factory for the original tree view component.
+     */
+    @SuppressWarnings("squid:MaximumInheritanceDepth") // Unavoidable since the base class is from core JavaFXx
+    private class UpgradedTreeViewCellFactory extends StyledTreeCell<DOMTreeUpgradeNode> {
+        
+        /**
+         * Default constructor.
+         */
+        public UpgradedTreeViewCellFactory() {
+            setOnDragOver( dragEvent -> {
+                DOMTreeUpgradeNode value = getItem();
+                
+                if ((value != null) && (!ExampleMatchType.isMatch( value.getMatchType() )
+                        || (value.getMatchType() == ExampleMatchType.MANUAL))) {
+                    dragEvent.acceptTransferModes( TransferMode.COPY );
+                    setEffect( new Lighting() );
+                }
+            });
+            setOnDragExited( dragEvent -> Platform.runLater( () -> setEffect( null ) ) );
+            setOnDragDropped( this::handleDragDropEvent );
+            setOnMouseReleased( event -> {
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    TreeItem<DOMTreeUpgradeNode> selectedItem = getTreeItem();
+                    
+                    if (selectedItem != null) {
+                        displayContextMenu( selectedItem, event.getScreenX(), event.getScreenY() );
+                    }
+                }
+            });
+            setOnMousePressed( event -> {
+                if (upgradeContextMenu != null) {
+                    upgradeContextMenu.hide();
+                    upgradeContextMenu = null;
+                }
+            });
+        }
+
+        /**
+         * Called when a drag/drop event occurs within this cell.
+         * 
+         * @param dragEvent  the drag event that was dropped on this cell
+         */
+        private void handleDragDropEvent(DragEvent dragEvent) {
+            Dragboard dragboard = dragEvent.getDragboard();
+            TreeItem<DOMTreeOriginalNode> origDragItem = ExampleUpgradeController.this.dragItem;
+            TreeItem<DOMTreeUpgradeNode> dropItem = getTreeItem();
+            
+            if ((dropItem != null) && (dropItem.getValue() != null)
+                    && dragboard.hasContent( DRAG_FORMAT )) {
+                Object dropId = dragboard.getContent( DRAG_FORMAT );
+                
+                if (dropId.equals( dragId )) {
+                    ExampleUpgradeController.this.dragItem = null;
+                    handleDragDropEvent( origDragItem, dropItem );
+                    dragEvent.setDropCompleted( true );
+                }
+            }
+        }
+        
+        /**
+         * @see org.opentravel.exampleupgrade.StyledTreeCell#getConditionalStyleClasses()
+         */
+        @Override
+        protected List<String> getConditionalStyleClasses() {
+            return ExampleMatchType.getAllStyleClasses();
+        }
+        
+        /**
+         * @see org.opentravel.exampleupgrade.StyledTreeCell#getConditionalStyleClass()
+         */
+        @Override
+        protected String getConditionalStyleClass() {
+            TreeItem<DOMTreeUpgradeNode> item = getTreeItem();
+            return (item == null) ? null : item.getValue().getMatchType().getStyleClass();
+        }
+        
+        /**
+         * Displays the context menu, allowing the user to select different options
+         * depending upon the state of the selected item.
+         * 
+         * @param selectedItem  the tree item for which to display the context menu
+         * @param screenX  the screen X coordinate where the context menu should be displayed
+         * @param screenY  the screen Y coordinate where the context menu should be displayed
+         */
+        private void displayContextMenu(TreeItem<DOMTreeUpgradeNode> selectedItem,
+                double screenX, double screenY) {
+            DOMTreeUpgradeNode selectedNode = selectedItem.getValue();
+            List<MenuItem> menuItems = new ArrayList<>();
+            MenuItem menuItem;
+            
+            switch (selectedNode.getMatchType()) {
+                case MISSING:
+                    menuItem = new MenuItem( "Auto-Generate Content" );
+                    menuItem.setOnAction( e -> handleAutoGenerateContent( selectedItem ) );
+                    menuItems.add( menuItem );
+                    break;
+                case NONE:
+                    menuItem = new MenuItem( "Re-Generate Content" );
+                    menuItem.setOnAction( e -> handleAutoGenerateContent( selectedItem ) );
+                    menuItems.add( menuItem );
+                    menuItem = new MenuItem( "Clear Content" );
+                    menuItem.setOnAction( e -> handleClearContent( selectedItem ) );
+                    menuItems.add( menuItem );
+                    break;
+                case MANUAL:
+                    menuItem = new MenuItem( "Clear Content" );
+                    menuItem.setOnAction( e -> handleClearContent( selectedItem ) );
+                    menuItems.add( menuItem );
+                    break;
+                default:
+                    break;
+            }
+            
+            if (!menuItems.isEmpty()) {
+                upgradeContextMenu = new ContextMenu();
+                
+                upgradeContextMenu.getItems().addAll( menuItems );
+                upgradeContextMenu.show( upgradedTreeView, screenX, screenY );
+                upgradeContextMenu.setOnAction( e -> upgradeContextMenu = null );
+            }
+        }
+        
+        /**
+         * Handles a drag-n-drop event in which a node from the original DOM tree is dropped
+         * onto the upgrade tree.
+         * 
+         * @param originalItem  the tree item from the original DOM document
+         * @param upgradeItem  the tree item from the upgrade DOM document
+         */
+        private void handleDragDropEvent(TreeItem<DOMTreeOriginalNode> originalItem,
+                TreeItem<DOMTreeUpgradeNode> upgradeItem) {
+            try {
+                TreeItem<DOMTreeUpgradeNode> newUpgradeItem =
+                        new UpgradeTreeBuilder( upgradeDocument, getExampleOptions() )
+                                .replaceUpgradeDOMBranch( upgradeItem, originalItem.getValue().getDomNode() );
+                
+                if (newUpgradeItem.getParent() == null) {
+                    upgradedTreeView.setRoot( newUpgradeItem );
+                }
+                updatePreviewPane( false );
+                refreshBranch( originalItem );
+                upgradeDocumentDirty = true;
+                
+            } catch (Exception e) {
+                Alert errorDialog = new Alert( AlertType.ERROR );
+                
+                log.error( "Error handling drag/drop event.", e );
+                errorDialog.setTitle( "Error" );
+                errorDialog.setHeaderText( null );
+                errorDialog.setContentText( HelperUtils.getErrorMessage( e ) );
+                errorDialog.showAndWait();
+            }
+        }
+        
+        /**
+         * Called when the user has elected to auto-generate content for a missing
+         * node in the upgrade tree.
+         * 
+         * @param upgradeItem  the upgrade tree item from which to start auto-generating content
+         */
+        private void handleAutoGenerateContent(TreeItem<DOMTreeUpgradeNode> upgradeItem) {
+            try {
+                TreeItem<DOMTreeUpgradeNode> newUpgradeItem =
+                        new UpgradeTreeBuilder( upgradeDocument, getExampleOptions() )
+                                .replaceUpgradeDOMBranch( upgradeItem, null );
+                
+                if (newUpgradeItem.getParent() == null) {
+                    upgradedTreeView.setRoot( newUpgradeItem );
+                }
+                updatePreviewPane( false );
+                upgradeDocumentDirty = true;
+                
+            } catch (Exception e) {
+                Alert errorDialog = new Alert( AlertType.ERROR );
+                
+                log.error( "Error generating example content.", e );
+                errorDialog.setTitle( "Error" );
+                errorDialog.setHeaderText( null );
+                errorDialog.setContentText( HelperUtils.getErrorMessage( e ) );
+                errorDialog.showAndWait();
+            }
+        }
+        
+        /**
+         * Called when the user has elected to clear the content of a node in
+         * the upgrade tree.
+         * 
+         * @param upgradeItem  the upgrade tree item from which to start auto-generating content
+         */
+        private void handleClearContent(TreeItem<DOMTreeUpgradeNode> upgradeItem) {
+            TreeItem<DOMTreeUpgradeNode> newUpgradeItem =
+                    new UpgradeTreeBuilder( upgradeDocument, getExampleOptions() )
+                            .clearUpgradeDOMBranch( upgradeItem );
+            
+            if (newUpgradeItem.getParent() == null) {
+                upgradedTreeView.setRoot( newUpgradeItem );
+            }
+            updatePreviewPane( false );
+            upgradeDocumentDirty = true;
+        }
+        
+    }
 }

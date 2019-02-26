@@ -67,9 +67,9 @@ public class IndicatorTreeNode extends TreeNode<TLIndicator> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLIndicator indicator = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return indicator.getName(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( indicator ); } ) );
-		props.add( new NodeProperty( "publishAsElement", () -> { return indicator.isPublishAsElement() + ""; } ) );
+		props.add( new NodeProperty( "name", indicator::getName ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( indicator ) ) );
+		props.add( new NodeProperty( "publishAsElement", () -> indicator.isPublishAsElement() + "" ) );
 		return props;
 	}
 	
@@ -77,7 +77,7 @@ public class IndicatorTreeNode extends TreeNode<TLIndicator> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
+    protected List<TreeNode<Object>> initializeChildren() {
 		return Collections.emptyList();
 	}
 	

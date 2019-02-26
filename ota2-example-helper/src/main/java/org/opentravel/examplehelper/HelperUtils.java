@@ -27,6 +27,11 @@ import org.opentravel.schemacompiler.model.TLLibrary;
  */
 public class HelperUtils {
 	
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private HelperUtils() {}
+    
 	/**
 	 * Returns a display name label for the given OTM entity.
 	 * 

@@ -66,7 +66,7 @@ public class AliasTreeNode extends TreeNode<TLAlias> {
 	public List<NodeProperty> getProperties() {
 		List<NodeProperty> props = new ArrayList<>();
 		
-		props.add( new NodeProperty( "name", () -> { return getEntity().getName(); } ) );
+		props.add( new NodeProperty( "name", () -> getEntity().getName() ) );
 		return props;
 	}
 	
@@ -74,7 +74,7 @@ public class AliasTreeNode extends TreeNode<TLAlias> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
+    protected List<TreeNode<Object>> initializeChildren() {
 		return Collections.emptyList();
 	}
 	

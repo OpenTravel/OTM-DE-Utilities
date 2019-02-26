@@ -92,23 +92,32 @@ public class EntityFacetSelection {
 		}
 		
 		// If facets were found, add them to the configuration for this selection instance
-		if ((facetOwner != null) && (facetList != null) && (facetList.size() > 0)) {
-			for (TLFacet facet : facetList) {
-				String facetName = HelperUtils.getDisplayName( facet, false );
-				
-				if ((facet.getFacetType() == TLFacetType.SUMMARY)
-						|| (facet.getFacetType() == TLFacetType.SHARED)) {
-					this.selectedFacetName = facetName;
-				}
-				facetsByName.put( facetName, facet );
-				facetNames.add( facetName );
-			}
-			if (this.selectedFacetName == null) {
-				this.selectedFacetName = facetNames.get( 0 );
-			}
-		}
+        initSelectableFacets( facetList );
 	}
 	
+    /**
+     * Initializes the list of selectable facets from the list provided.
+     * 
+     * @param facetList  the list of facets from which the user can select
+     */
+    private void initSelectableFacets(List<TLFacet> facetList) {
+        if ((facetOwner != null) && (facetList != null) && !facetList.isEmpty()) {
+            for (TLFacet facet : facetList) {
+                String facetName = HelperUtils.getDisplayName( facet, false );
+                
+                if ((facet.getFacetType() == TLFacetType.SUMMARY)
+                        || (facet.getFacetType() == TLFacetType.SHARED)) {
+                    this.selectedFacetName = facetName;
+                }
+                facetsByName.put( facetName, facet );
+                facetNames.add( facetName );
+            }
+            if (this.selectedFacetName == null) {
+                this.selectedFacetName = facetNames.get( 0 );
+            }
+        }
+    }
+    
 	/**
 	 * Returns the type of OTM entity to which this facet selection applies.
 	 *

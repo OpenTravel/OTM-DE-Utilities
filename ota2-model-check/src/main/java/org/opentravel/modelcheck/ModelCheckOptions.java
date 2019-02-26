@@ -153,10 +153,11 @@ public class ModelCheckOptions {
 	 */
 	static {
 		try {
-			configureDefaultOptions( defaultOptions = new ModelCheckOptions() );
+		    defaultOptions = new ModelCheckOptions();
+			configureDefaultOptions( defaultOptions );
 			
-		} catch (Throwable t) {
-			throw new ExceptionInInitializerError(t);
+		} catch (Exception e) {
+			throw new ExceptionInInitializerError( e );
 		}
 	}
 	

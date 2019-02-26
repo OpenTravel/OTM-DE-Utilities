@@ -68,11 +68,11 @@ public class ActionFacetTreeNode extends TreeNode<TLActionFacet> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLActionFacet facet = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return facet.getName(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( facet ); } ) );
-		props.add( new NodeProperty( "referenceType", () -> { return MessageBuilder.formatMessage( facet.getReferenceType().toString() ); } ) );
-		props.add( new NodeProperty( "repeat", () -> { return facet.getReferenceRepeat() + ""; } ) );
-		props.add( new NodeProperty( "businessObject", () -> { return getEntityDisplayName( facet.getBasePayload() ); } ) );
+		props.add( new NodeProperty( "name", facet::getName ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( facet ) ) );
+		props.add( new NodeProperty( "referenceType", () -> MessageBuilder.formatMessage( facet.getReferenceType().toString() ) ) );
+		props.add( new NodeProperty( "repeat", () -> facet.getReferenceRepeat() + "" ) );
+		props.add( new NodeProperty( "businessObject", () -> getEntityDisplayName( facet.getBasePayload() ) ) );
 		return props;
 	}
 
@@ -80,7 +80,7 @@ public class ActionFacetTreeNode extends TreeNode<TLActionFacet> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
+    protected List<TreeNode<Object>> initializeChildren() {
 		return Collections.emptyList();
 	}
 

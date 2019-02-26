@@ -38,6 +38,11 @@ public class Validator {
 	private static final String INVALID_URI            = "INVALID_URI";
 	private static final String INVALID_VERSION_ID     = "INVALID_VERSION_ID";
 	
+    /**
+     * Private constructor to prevent instantiation of this class.
+     */
+    private Validator() {}
+    
 	/**
 	 * Validates the contents of the given text field.  Returns true if the field's
 	 * value is valid; false on error.
@@ -149,8 +154,8 @@ public class Validator {
 			VersionSchemeFactory factory = VersionSchemeFactory.getInstance();
 			versionScheme = factory.getVersionScheme( factory.getDefaultVersionScheme() );
 			
-		} catch (Throwable t) {
-			throw new ExceptionInInitializerError( t );
+		} catch (Exception e) {
+			throw new ExceptionInInitializerError( e );
 		}
 	}
 	

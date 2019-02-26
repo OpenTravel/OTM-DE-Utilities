@@ -67,10 +67,10 @@ public class ParamGroupTreeNode extends TreeNode<TLParamGroup> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLParamGroup paramGroup = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return paramGroup.getName(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( paramGroup ); } ) );
-		props.add( new NodeProperty( "idGroup", () -> { return paramGroup.isIdGroup() + ""; } ) );
-		props.add( new NodeProperty( "facetRef", () -> { return getEntityDisplayName( paramGroup.getFacetRef() ); } ) );
+		props.add( new NodeProperty( "name", paramGroup::getName ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( paramGroup ) ) );
+		props.add( new NodeProperty( "idGroup", () -> paramGroup.isIdGroup() + "" ) );
+		props.add( new NodeProperty( "facetRef", () -> getEntityDisplayName( paramGroup.getFacetRef() ) ) );
 		return props;
 	}
 
@@ -78,8 +78,8 @@ public class ParamGroupTreeNode extends TreeNode<TLParamGroup> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
-		List<TreeNode<?>> children = new ArrayList<>();
+    protected List<TreeNode<Object>> initializeChildren() {
+		List<TreeNode<Object>> children = new ArrayList<>();
 		TLParamGroup paramGroup = getEntity();
 		
 		for (TLParameter entity : paramGroup.getParameters()) {

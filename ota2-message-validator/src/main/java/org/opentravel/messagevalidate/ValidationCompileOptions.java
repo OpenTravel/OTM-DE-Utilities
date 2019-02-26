@@ -73,11 +73,11 @@ public class ValidationCompileOptions implements CompileAllTaskOptions {
 	}
 	
 	public Integer getExampleMaxRepeat() {
-		return new Integer(2);
+		return 2;
 	}
 	
 	public Integer getExampleMaxDepth() {
-		return new Integer(2);
+		return 2;
 	}
 	
 	public boolean isSuppressOptionalFields() {
@@ -113,6 +113,7 @@ public class ValidationCompileOptions implements CompileAllTaskOptions {
 	}
 	
 	public void applyTaskOptions(CommonCompilerTaskOptions taskOptions) {
+	    // No action required
 	}
 
 }

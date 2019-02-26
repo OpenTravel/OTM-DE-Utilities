@@ -71,27 +71,28 @@ public class LibraryTreeNode extends TreeNode<TLLibrary> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLLibrary library = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return library.getName(); } ) );
-		props.add( new NodeProperty( "namespace", () -> { return library.getNamespace(); } ) );
-		props.add( new NodeProperty( "prefix", () -> { return library.getPrefix(); } ) );
-		props.add( new NodeProperty( "version", () -> { return library.getVersion(); } ) );
-		props.add( new NodeProperty( "status", () -> { return MessageBuilder.formatMessage( library.getStatus().toString() ); } ) );
-		props.add( new NodeProperty( "comments", () -> { return library.getComments(); } ) );
+		props.add( new NodeProperty( "name", library::getName ) );
+		props.add( new NodeProperty( "namespace", library::getNamespace ) );
+		props.add( new NodeProperty( "prefix", library::getPrefix ) );
+		props.add( new NodeProperty( "version", library::getVersion ) );
+		props.add( new NodeProperty( "status", () -> MessageBuilder.formatMessage( library.getStatus().toString() ) ) );
+		props.add( new NodeProperty( "comments", library::getComments ) );
 		return props;
 	}
 
 	/**
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
-	@Override
-	protected List<TreeNode<?>> initializeChildren() {
-		List<TreeNode<?>> children = new ArrayList<>();
+	@SuppressWarnings("unchecked")
+    @Override
+    protected List<TreeNode<Object>> initializeChildren() {
+		List<TreeNode<Object>> children = new ArrayList<>();
 		
 		for (FolderType folderType : FolderType.values()) {
 			TreeNode<?> folderNode = new LibraryFolderTreeNode( getEntity(), folderType, treeNodeFactory );
 			
 			if (!folderNode.getChildren().isEmpty()) {
-				children.add( folderNode );
+				children.add( (TreeNode<Object>) folderNode );
 			}
 		}
 		return children;

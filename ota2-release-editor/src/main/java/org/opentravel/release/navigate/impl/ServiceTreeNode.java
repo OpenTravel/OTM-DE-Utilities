@@ -67,8 +67,8 @@ public class ServiceTreeNode extends TreeNode<TLService> {
 		List<NodeProperty> props = new ArrayList<>();
 		TLService service = getEntity();
 		
-		props.add( new NodeProperty( "name", () -> { return service.getName(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( service ); } ) );
+		props.add( new NodeProperty( "name", service::getName ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( service ) ) );
 		return props;
 	}
 
@@ -76,8 +76,8 @@ public class ServiceTreeNode extends TreeNode<TLService> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
-		List<TreeNode<?>> children = new ArrayList<>();
+    protected List<TreeNode<Object>> initializeChildren() {
+		List<TreeNode<Object>> children = new ArrayList<>();
 		TLService service = getEntity();
 		
 		for (TLOperation operation : service.getOperations()) {

@@ -16,9 +16,10 @@
 
 package org.opentravel.release.undo;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Stack;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +35,8 @@ public class UndoManager {
     private static final Logger log = LoggerFactory.getLogger( UndoManager.class );
     
     private Set<UndoStatusListener> listeners = new HashSet<>();
-	private Stack<UndoableAction> undoStack = new Stack<>();
-	private Stack<UndoableAction> redoStack = new Stack<>();
+	private Deque<UndoableAction> undoStack = new ArrayDeque<>();
+	private Deque<UndoableAction> redoStack = new ArrayDeque<>();
 	private boolean executionDisabled = false;
 	private int maxUndoCount;
 	
@@ -82,8 +83,8 @@ public class UndoManager {
 				executionDisabled = true;
 				successInd = action.execute();
 				
-			} catch (Throwable t) {
-				log.error("Unexpected error during action execution (discarding undo/redo history).", t);
+			} catch (Exception e) {
+				log.error("Unexpected error during action execution (discarding undo/redo history).", e);
 				
 			} finally {
 				executionDisabled = false;
@@ -91,22 +92,7 @@ public class UndoManager {
 			
 			// If successful, either push the action onto the undo stack or merge it with the top item
 			if (successInd) {
-				UndoableAction previousAction = undoStack.isEmpty() ? null : undoStack.peek();
-				
-				if ((previousAction != null) && previousAction.canMerge( action )) {
-					try {
-						previousAction.merge( action );
-						
-					} catch (Throwable t) {
-						log.error("Unexpected error merging undo action (discarding undo/redo history).", t);
-						purge();
-					}
-					
-				} else {
-					undoStack.push( action );
-					truncateUndoRedoStacks();
-				}
-				redoStack.clear();
+				pushOrMergeAction( action );
 				
 			} else {
 				purge(); // Purge the undo/redo history if something went wrong
@@ -116,6 +102,30 @@ public class UndoManager {
 		}
 		return successInd;
 	}
+
+    /**
+     * Either push the action onto the undo stack or merge it with the top item.
+     * 
+     * @param action  the action to be pushed or merged onto the stack
+     */
+    private void pushOrMergeAction(UndoableAction action) {
+        UndoableAction previousAction = undoStack.isEmpty() ? null : undoStack.peek();
+        
+        if ((previousAction != null) && previousAction.canMerge( action )) {
+        	try {
+        		previousAction.merge( action );
+        		
+        	} catch (Exception e) {
+        		log.error("Unexpected error merging undo action (discarding undo/redo history).", e);
+        		purge();
+        	}
+        	
+        } else {
+        	undoStack.push( action );
+        	truncateUndoRedoStacks();
+        }
+        redoStack.clear();
+    }
 	
 	/**
 	 * Returns true if at least one action exists on the undo stack.
@@ -142,14 +152,15 @@ public class UndoManager {
 			
 			try {
 				executionDisabled = true;
+				successInd = action.executeUndo();
 				
-				if (successInd = action.executeUndo()) {
+				if (successInd) {
 					redoStack.push( action );
 					truncateUndoRedoStacks();
 				}
 				
-			} catch (Throwable t) {
-				log.error("Unexpected error during undo execution (discarding undo/redo history).", t);
+			} catch (Exception e) {
+				log.error("Unexpected error during undo execution (discarding undo/redo history).", e);
 				successInd = false;
 				
 			} finally {
@@ -192,14 +203,15 @@ public class UndoManager {
 			
 			try {
 				executionDisabled = true;
+				successInd = action.executeRedo();
 				
-				if (successInd = action.executeRedo()) {
+				if (successInd) {
 					undoStack.push( action );
 					truncateUndoRedoStacks();
 				}
 				
-			} catch (Throwable t) {
-				log.error("Unexpected error during redo execution (discarding undo/redo history).", t);
+			} catch (Exception e) {
+				log.error("Unexpected error during redo execution (discarding undo/redo history).", e);
 				successInd = false;
 				
 			} finally {
@@ -237,10 +249,10 @@ public class UndoManager {
 	private void truncateUndoRedoStacks() {
 		if (maxUndoCount > 0) {
 			while (undoStack.size() > maxUndoCount) {
-				undoStack.remove( 0 );
+			    undoStack.removeFirst();
 			}
 			while (redoStack.size() > maxUndoCount) {
-				redoStack.remove( 0 );
+			    redoStack.removeFirst();
 			}
 		}
 	}
@@ -252,7 +264,7 @@ public class UndoManager {
 	 *
 	 * @return int
 	 */
-	public int getMaxUndoCount() {
+	public synchronized int getMaxUndoCount() {
 		return maxUndoCount;
 	}
 	

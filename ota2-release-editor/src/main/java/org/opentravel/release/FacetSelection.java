@@ -30,6 +30,7 @@ import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLActionFacet;
 import org.opentravel.schemacompiler.model.TLAlias;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
+import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLComplexTypeBase;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLFacet;
@@ -39,6 +40,8 @@ import org.opentravel.schemacompiler.model.TLModel;
 import org.opentravel.schemacompiler.model.TLOperation;
 import org.opentravel.schemacompiler.transform.SymbolTable;
 import org.opentravel.schemacompiler.transform.symbols.SymbolTableFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents the available facets and the current facet selection for a particular
@@ -47,6 +50,8 @@ import org.opentravel.schemacompiler.transform.symbols.SymbolTableFactory;
  */
 public class FacetSelection {
 	
+    private static final Logger log = LoggerFactory.getLogger( FacetSelection.class );
+    
 	private NamedEntity entityType;
 	private TLFacetOwner facetOwner;
 	private String selectedFacetName;
@@ -98,41 +103,58 @@ public class FacetSelection {
 		List<QName> ownerNames = new ArrayList<>();
 		
 		// Search the model for all possible substitution groups
-		for (TLLibrary library : model.getUserDefinedLibraries()) {
-			for (TLBusinessObject businessObject : library.getBusinessObjectTypes())  {
-				facetOwnerMap.put( getQName( businessObject ), businessObject );
-				
-				for (TLContextualFacet facet : businessObject.getQueryFacets()) {
-					facetOwnerMap.put( getQName( facet ), facet );
-				}
-				for (TLContextualFacet facet : businessObject.getUpdateFacets()) {
-					facetOwnerMap.put( getQName( facet ), facet );
-				}
-			}
-			for (NamedEntity libraryMember : library.getChoiceObjectTypes())  {
-				facetOwnerMap.put( getQName( libraryMember ), libraryMember );
-			}
-			for (NamedEntity libraryMember : library.getCoreObjectTypes())  {
-				facetOwnerMap.put( getQName( libraryMember ), libraryMember );
-			}
-		}
-		ownerNames.addAll( facetOwnerMap.keySet() );
-		Collections.sort( ownerNames, new QNameComparator() );
+		findSubstitutionGroups( model, facetOwnerMap, ownerNames );
 		
 		// Construct a facet selection for all substitution groups with multiple choices
 		for (QName ownerName : ownerNames) {
-			NamedEntity facetOwner = facetOwnerMap.get( ownerName );
-			QName facetSelection = facetSelections.get( ownerName );
-			FacetSelection selection = new FacetSelection( facetOwner, facetSelection, symbolTable );
-			// TODO: In case of IllegalArgumentException, go with a blank/null facet selection
-			
-			if (selection.getFacetNames().size() > 1) {
-				selectionList.add( selection );
-			}
+		    try {
+	            NamedEntity facetOwner = facetOwnerMap.get( ownerName );
+	            QName facetSelection = facetSelections.get( ownerName );
+	            FacetSelection selection = new FacetSelection( facetOwner, facetSelection, symbolTable );
+	            
+	            if (selection.getFacetNames().size() > 1) {
+	                selectionList.add( selection );
+	            }
+		        
+		    } catch (IllegalArgumentException e) {
+		        log.warn( String.format( "Error building facet selection for owner '%s'", ownerName ), e );
+		    }
 		}
 		
 		return selectionList;
 	}
+
+    /**
+     * Searches the given model to find all of the possible substitution groups.
+     * 
+     * @param model  the model to search
+     * @param facetOwnerMap  the map of owner names to substitution group facets being constructed
+     * @param ownerNames  the list of owner names with substitution groups being constructed
+     */
+    private static void findSubstitutionGroups(TLModel model, Map<QName,NamedEntity> facetOwnerMap,
+            List<QName> ownerNames) {
+        for (TLLibrary library : model.getUserDefinedLibraries()) {
+			for (TLBusinessObject businessObject : library.getBusinessObjectTypes())  {
+			    if (businessObject != null) {
+	                facetOwnerMap.put( getQName( businessObject ), businessObject );
+	                businessObject.getCustomFacets().forEach( f -> facetOwnerMap.put( getQName( f ), f ) );
+	                businessObject.getQueryFacets().forEach( f -> facetOwnerMap.put( getQName( f ), f ) );
+	                businessObject.getUpdateFacets().forEach( f -> facetOwnerMap.put( getQName( f ), f ) );
+			    }
+			}
+			for (TLChoiceObject choiceObject : library.getChoiceObjectTypes())  {
+			    if (choiceObject != null) {
+	                facetOwnerMap.put( getQName( choiceObject ), choiceObject );
+	                choiceObject.getChoiceFacets().forEach( f -> facetOwnerMap.put( getQName( f ), f ) );
+			    }
+			}
+			for (NamedEntity coreObject : library.getCoreObjectTypes())  {
+                facetOwnerMap.put( getQName( coreObject ), coreObject );
+			}
+		}
+		ownerNames.addAll( facetOwnerMap.keySet() );
+		Collections.sort( ownerNames, new QNameComparator() );
+    }
 	
 	/**
 	 * Returns a map of qualified names representing the given list of facet selections.
@@ -291,7 +313,7 @@ public class FacetSelection {
 		}
 		
 		// If facets were found, add them to the configuration for this selection instance
-		if ((facetOwner != null) && (facetList != null) && (facetList.size() > 0)) {
+		if ((facetOwner != null) && (facetList != null) && !facetList.isEmpty()) {
 			for (TLFacet facet : facetList) {
 				String facetName = Utils.getDisplayName( facet, false );
 				
@@ -322,12 +344,13 @@ public class FacetSelection {
 		boolean isValid = (facet.getOwningEntity() == owner);
 		
 		if (!isValid && (facet instanceof TLContextualFacet)) {
-			while (!isValid && (facet != null)) {
+			while (!isValid) {
 				TLFacetOwner ctxOwner = facet.getOwningEntity();
 				
 				if (ctxOwner instanceof TLContextualFacet) {
 					facet = (TLContextualFacet) ctxOwner;
 				}
+				isValid = (facet.getOwningEntity() == owner);
 			}
 		}
 		return isValid;

@@ -69,10 +69,10 @@ public class ParentRefTreeNode extends TreeNode<TLResourceParentRef> {
 		TLResourceParentRef parentRef = getEntity();
 		TLParamGroup parentParamGroup = parentRef.getParentParamGroup();
 		
-		props.add( new NodeProperty( "parentName", () -> { return getEntityDisplayName( parentRef.getParentResource() ); } ) );
-		props.add( new NodeProperty( "parentParamGroup", () -> { return (parentParamGroup == null) ? "" : parentParamGroup.getName(); } ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> { return getDescription( parentRef ); } ) );
-		props.add( new NodeProperty( "pathTemplate", () -> { return parentRef.getPathTemplate(); } ) );
+		props.add( new NodeProperty( "parentName", () -> getEntityDisplayName( parentRef.getParentResource() ) ) );
+		props.add( new NodeProperty( "parentParamGroup", () -> (parentParamGroup == null) ? "" : parentParamGroup.getName() ) );
+		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( parentRef ) ) );
+		props.add( new NodeProperty( "pathTemplate", parentRef::getPathTemplate ) );
 		return props;
 	}
 
@@ -80,7 +80,7 @@ public class ParentRefTreeNode extends TreeNode<TLResourceParentRef> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
+    protected List<TreeNode<Object>> initializeChildren() {
 		return Collections.emptyList();
 	}
 

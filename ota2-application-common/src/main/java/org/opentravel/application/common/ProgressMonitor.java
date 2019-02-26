@@ -75,11 +75,7 @@ public class ProgressMonitor {
 	 * percent-complete value.
 	 */
 	private void updateProgressIndicator() {
-		Platform.runLater( new Runnable() {
-			public void run() {
-				progressInd.setProgress( ((double) cumulativeWork) / ((double) totalWork) );
-			}
-		});
+	    Platform.runLater( () -> progressInd.setProgress( ((double) cumulativeWork) / ((double) totalWork) ) );
 	}
 	
 }

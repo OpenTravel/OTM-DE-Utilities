@@ -24,6 +24,8 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import org.opentravel.application.common.AbstractUserSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Persists settings for the <code>ModelCheck</code> application between sessions.
@@ -33,6 +35,7 @@ public class UserSettings extends AbstractUserSettings {
 	private static final String USER_SETTINGS_FILE = "/.ota2/.mc-settings.properties";
 	
 	private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
+    private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
 	
 	private File projectFolder;
 	private File reportFolder;
@@ -58,9 +61,8 @@ public class UserSettings extends AbstractUserSettings {
 				settings = new UserSettings();
 				settings.load( usProps );
 				
-			} catch(Throwable t) {
-				t.printStackTrace( System.out );
-				System.out.println("Error loading settings from prior session (using defaults).");
+			} catch (Exception e) {
+			    log.warn( "Error loading settings from prior session (using defaults).", e );
 				settings = getDefaultSettings();
 			}
 			
@@ -84,8 +86,7 @@ public class UserSettings extends AbstractUserSettings {
 			usProps.store( out, null );
 			
 		} catch(IOException e) {
-			System.out.println("Error saving user settings...");
-			e.printStackTrace( System.out );
+		    log.error( "Error saving user settings.", e );
 		}
 	}
 	
@@ -111,11 +112,11 @@ public class UserSettings extends AbstractUserSettings {
 	@Override
 	protected void load(Properties settingsProps) {
 		String currentFolder = System.getProperty( "user.dir" );
-		String projectFolder = settingsProps.getProperty( "projectFolder", currentFolder );
-		String reportFolder = settingsProps.getProperty( "reportFolder", currentFolder );
+		String prjFolder = settingsProps.getProperty( "projectFolder", currentFolder );
+		String rptFolder = settingsProps.getProperty( "reportFolder", currentFolder );
 		
-		setProjectFolder( new File( projectFolder ) );
-		setReportFolder( new File( reportFolder ) );
+		setProjectFolder( new File( prjFolder ) );
+		setReportFolder( new File( rptFolder ) );
 		modelCheckOptions.loadOptions( settingsProps );
 		super.load( settingsProps );
 	}

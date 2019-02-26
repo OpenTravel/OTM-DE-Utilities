@@ -24,4 +24,9 @@ public class Images {
 	
 	public static final Image launcherIcon = new Image( Images.class.getResourceAsStream( "/images/otm_upversion_helper.png" ) );
 	
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private Images() {}
+    
 }

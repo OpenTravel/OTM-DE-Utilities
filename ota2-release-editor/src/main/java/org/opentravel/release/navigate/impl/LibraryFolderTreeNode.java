@@ -25,17 +25,7 @@ import org.opentravel.release.MessageBuilder;
 import org.opentravel.release.NodeProperty;
 import org.opentravel.release.navigate.TreeNode;
 import org.opentravel.release.navigate.TreeNodeFactory;
-import org.opentravel.schemacompiler.model.TLBusinessObject;
-import org.opentravel.schemacompiler.model.TLChoiceObject;
-import org.opentravel.schemacompiler.model.TLClosedEnumeration;
-import org.opentravel.schemacompiler.model.TLContextualFacet;
-import org.opentravel.schemacompiler.model.TLCoreObject;
-import org.opentravel.schemacompiler.model.TLExtensionPointFacet;
 import org.opentravel.schemacompiler.model.TLLibrary;
-import org.opentravel.schemacompiler.model.TLOpenEnumeration;
-import org.opentravel.schemacompiler.model.TLResource;
-import org.opentravel.schemacompiler.model.TLSimple;
-import org.opentravel.schemacompiler.model.TLValueWithAttributes;
 
 import javafx.scene.image.Image;
 
@@ -45,7 +35,7 @@ import javafx.scene.image.Image;
  */
 public class LibraryFolderTreeNode extends TreeNode<TLLibrary> {
 	
-	public static enum FolderType { COMPLEX_TYPES, SIMPLE_TYPES, RESOURCES, SERVICES }
+	public enum FolderType { COMPLEX_TYPES, SIMPLE_TYPES, RESOURCES, SERVICES }
 	
 	private FolderType folderType;
 	
@@ -68,7 +58,7 @@ public class LibraryFolderTreeNode extends TreeNode<TLLibrary> {
 		try {
 			return MessageBuilder.formatMessage( folderType.toString() );
 			
-		} catch (Throwable t) {
+		} catch (Exception e) {
 			return "???";
 		}
 	}
@@ -93,50 +83,32 @@ public class LibraryFolderTreeNode extends TreeNode<TLLibrary> {
 	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
 	 */
 	@Override
-	protected List<TreeNode<?>> initializeChildren() {
-		List<TreeNode<?>> children = new ArrayList<>();
+    protected List<TreeNode<Object>> initializeChildren() {
+		List<TreeNode<Object>> children = new ArrayList<>();
 		TLLibrary library = getEntity();
 		
 		switch (folderType) {
 			case COMPLEX_TYPES:
-				for (TLValueWithAttributes entity : library.getValueWithAttributesTypes()) {
-					children.add( treeNodeFactory.newTreeNode( entity ) );
-				}
-				for (TLCoreObject entity : library.getCoreObjectTypes()) {
-					children.add( treeNodeFactory.newTreeNode( entity ) );
-				}
-				for (TLChoiceObject entity : library.getChoiceObjectTypes()) {
-					children.add( treeNodeFactory.newTreeNode( entity ) );
-				}
-				for (TLBusinessObject entity : library.getBusinessObjectTypes()) {
-					children.add( treeNodeFactory.newTreeNode( entity ) );
-				}
-				for (TLContextualFacet entity : library.getContextualFacetTypes()) {
-					if (!entity.isLocalFacet()) {
-						children.add( treeNodeFactory.newTreeNode( entity ) );
-					}
-				}
-				for (TLExtensionPointFacet entity : library.getExtensionPointFacetTypes()) {
-					children.add( treeNodeFactory.newTreeNode( entity ) );
-				}
+			    library.getValueWithAttributesTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
+                library.getCoreObjectTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
+                library.getChoiceObjectTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
+                library.getBusinessObjectTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
+                library.getContextualFacetTypes().forEach( e -> {
+                    if (e.isLocalFacet()) {
+                        treeNodeFactory.newTreeNode( e );
+                    }
+                } );
+                library.getExtensionPointFacetTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
 				break;
 				
 			case SIMPLE_TYPES:
-				for (TLSimple entity : library.getSimpleTypes()) {
-					children.add( treeNodeFactory.newTreeNode( entity ) );
-				}
-				for (TLClosedEnumeration entity : library.getClosedEnumerationTypes()) {
-					children.add( treeNodeFactory.newTreeNode( entity ) );
-				}
-				for (TLOpenEnumeration entity : library.getOpenEnumerationTypes()) {
-					children.add( treeNodeFactory.newTreeNode( entity ) );
-				}
+                library.getSimpleTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
+                library.getClosedEnumerationTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
+                library.getOpenEnumerationTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
 				break;
 				
 			case RESOURCES:
-				for (TLResource entity : library.getResourceTypes()) {
-					children.add( treeNodeFactory.newTreeNode( entity ) );
-				}
+                library.getResourceTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
 				break;
 				
 			case SERVICES:
@@ -154,6 +126,6 @@ public class LibraryFolderTreeNode extends TreeNode<TLLibrary> {
 	@Override
 	public boolean sortChildren() {
 		return false;
-	};
+	}
 	
 }
