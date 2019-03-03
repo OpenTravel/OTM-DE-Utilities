@@ -21,10 +21,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBElement;
 
@@ -38,6 +41,7 @@ import org.opentravel.ns.ota2.project_v01_00.ProjectItemType;
 import org.opentravel.ns.ota2.project_v01_00.ProjectType;
 import org.opentravel.ns.ota2.project_v01_00.RepositoryRefType;
 import org.opentravel.ns.ota2.project_v01_00.RepositoryReferencesType;
+import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.repository.RemoteRepository;
 import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryAvailabilityChecker;
@@ -56,8 +60,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -68,8 +74,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.ImageView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -91,6 +97,10 @@ public class UpversionHelperController extends AbstractMainWindowController {
 	@FXML private MenuItem promoteOrDemoteMenu;
 	@FXML private ChoiceBox<String> repositoryChoice;
 	@FXML private ChoiceBox<String> namespaceChoice;
+	@FXML private CheckBox latestVersionsCheckbox;
+	@FXML private Label versionFilterLabel;
+	@FXML private TextField versionFilterText;
+	@FXML private ChoiceBox<StatusChoice> statusFilterChoice;
 	@FXML private Button addButton;
 	@FXML private Button removeButton;
 	@FXML private TableView<RepositoryItemWrapper> candidateLibrariesTable;
@@ -109,6 +119,9 @@ public class UpversionHelperController extends AbstractMainWindowController {
 	
 	private RepositoryManager repositoryManager;
 	private RepositoryAvailabilityChecker availabilityChecker;
+	private List<RepositoryItem> selectedNamespaceItems = new ArrayList<>();
+	private List<RepositoryItem> selectedNamespaceLatestVersions = new ArrayList<>();
+	private Map<String,Pattern> versionFilterPatterns = new HashMap<>();
 	
 	/**
 	 * Default constructor.
@@ -415,6 +428,17 @@ public class UpversionHelperController extends AbstractMainWindowController {
 	}
 	
 	/**
+	 * Called when the user changes the checkbox state of the 'Latest Versions'
+	 * control.
+	 * 
+	 * @param event  the action event that triggered this method call
+	 */
+	@FXML public void latestVersionFilterChanged(ActionEvent event) {
+		updateControlStates();
+		applyCandidateItemFilters();
+	}
+	
+	/**
 	 * Called when the user clicks the menu to exit the application.
 	 * 
 	 * @param event  the action event that triggered this method call
@@ -474,11 +498,9 @@ public class UpversionHelperController extends AbstractMainWindowController {
 	                    String rid = repositoryChoice.getSelectionModel().getSelectedItem();
 	                    Repository repository = repositoryManager.getRepository( rid );
                         List<String> candidateNamespaces = getCandidateNamespaces();
-	                    List<RepositoryItemWrapper> candidateItems = getCandidateRepositoryItems(
-	                            repository, candidateNamespaces );
 	                    
-	                    Platform.runLater( () ->
-	                        candidateLibrariesTable.setItems( FXCollections.observableList( candidateItems ) ) );
+	                    loadSelectedNamespaceItems( repository, candidateNamespaces );
+	                    applyCandidateItemFilters();
 				        
 	                } catch (Exception e) {
 	                    throw new OtmApplicationException( e );
@@ -497,32 +519,6 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		}
 	}
 	
-    /**
-     * Retrieves all candidate repository items from the selected namespaces of the given repository.
-     * 
-     * @param repository  the repository from which to retrieve candidate repository items
-     * @param candidateNamespaces  the list of candidate namespaces from the user's current selection
-     * @return List<RepositoryItemWrapper>
-     * @throws RepositoryException  thrown if an error occurs while accessing the remote repository
-     */
-    private List<RepositoryItemWrapper> getCandidateRepositoryItems(Repository repository,
-            List<String> candidateNamespaces) throws RepositoryException {
-        List<RepositoryItemWrapper> selectedItems = selectedLibrariesTable.getItems();
-        List<RepositoryItemWrapper> candidateItems = new ArrayList<>();
-        
-        for (String candidateNS : candidateNamespaces) {
-            List<RepositoryItem> items = repository.listItems( candidateNS, null, true );
-            
-            for (RepositoryItem item : items) {
-                if (!selectedItems.contains( item )) {
-                    candidateItems.add( new RepositoryItemWrapper( item ) );
-                }
-            }
-        }
-        Collections.sort( candidateItems );
-        return candidateItems;
-    }
-    
 	/**
 	 * Returns the list of candidate namespaces that are either equal to
 	 * or sub-namespaces of the currently selected namespace.
@@ -544,6 +540,104 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		return candidateNamespaces;
 	}
 	
+    /**
+     * Retrieves all candidate repository items from the selected namespaces of the given repository.
+     * 
+     * @param repository  the repository from which to retrieve candidate repository items
+     * @param candidateNamespaces  the list of candidate namespaces from the user's current selection
+     * @throws RepositoryException  thrown if an error occurs while accessing the remote repository
+     */
+    private void loadSelectedNamespaceItems(Repository repository,
+            List<String> candidateNamespaces) throws RepositoryException {
+    	List<RepositoryItem> latestItems = new ArrayList<>();
+    	List<RepositoryItem> nsItems = new ArrayList<>();
+    	
+        for (String candidateNS : candidateNamespaces) {
+        	List<RepositoryItem> itemList = repository.listItems( candidateNS, null, false );
+        	Set<String> libraryNames = new HashSet<>();
+        	
+        	for (RepositoryItem item : itemList) {
+            	if (!libraryNames.contains( item.getLibraryName() )) {
+            		libraryNames.add( item.getLibraryName() );
+            		latestItems.add( item );
+            	}
+                nsItems.add( item );
+        	}
+        }
+        selectedNamespaceLatestVersions = latestItems;
+        selectedNamespaceItems = nsItems;
+    }
+    
+    /**
+     * Applies the current version and status filters to the list of repository items
+     * for the currently selected namespace.  All items that match the filter criteria
+     * will be populated in the <code>candidateLibrariesTable</code> (except for those
+     * items that have already been moved to the <code>selectedLibrariesTable</code>.
+     */
+    private void applyCandidateItemFilters() {
+        List<RepositoryItemWrapper> selectedItems = selectedLibrariesTable.getItems();
+        List<RepositoryItemWrapper> candidateItems = new ArrayList<>();
+        
+        for (RepositoryItem item : selectedNamespaceItems) {
+        	RepositoryItemWrapper itemWrapper = new RepositoryItemWrapper( item );
+        	
+            if (!selectedItems.contains( itemWrapper )
+            		&& isFilterMatch( itemWrapper.getItem() )) {
+                candidateItems.add( itemWrapper );
+            }
+        }
+        Collections.sort( candidateItems );
+        
+        Platform.runLater( () ->
+        		candidateLibrariesTable.setItems( FXCollections.observableList( candidateItems ) ) );
+    }
+    
+    /**
+     * Returns true if the given repository item matches the filter criteria specified by
+     * the user.
+     * 
+     * @param item  the repository item to evaluate
+     * @return boolean
+     */
+    private boolean isFilterMatch(RepositoryItem item) {
+    	TLLibraryStatus statusFilter = statusFilterChoice.getSelectionModel().getSelectedItem().getStatus();
+    	boolean filterMatch = (statusFilter == null) || (statusFilter == item.getStatus());
+    	
+    	if (filterMatch) {
+    		if (latestVersionsCheckbox.isSelected()) {
+    			filterMatch = selectedNamespaceLatestVersions.contains( item );
+    			
+    		} else {
+    			Pattern versionFilter = getVersionFilterPattern();
+    			
+    			filterMatch = (versionFilter != null) &&
+    					versionFilter.matcher( item.getVersion() ).matches();
+    		}
+    	}
+    	return filterMatch;
+    }
+    
+    /**
+     * Returns the regular expression pattern to use for verifying a filter match against a
+     * user-specified pattern.
+     * 
+     * @return Pattern
+     */
+    private Pattern getVersionFilterPattern() {
+    	String  filterText = versionFilterText.getText() + "*";
+    	String filterRegex = filterText.replace( ".", "\\." ).replace( "*", ".*?" );
+    	
+    	if (!versionFilterPatterns.containsKey( filterRegex )) {
+    		try {
+    			versionFilterPatterns.put( filterRegex, Pattern.compile( filterRegex ) );
+				
+    		} catch (Exception e) {
+    			versionFilterPatterns.put( filterRegex, null );
+    		}
+    	}
+    	return versionFilterPatterns.get( filterRegex );
+    }
+    
 	/**
 	 * @see org.opentravel.application.common.AbstractMainWindowController#setStatusMessage(java.lang.String, org.opentravel.application.common.StatusType, boolean)
 	 */
@@ -557,7 +651,8 @@ public class UpversionHelperController extends AbstractMainWindowController {
 				List<MenuItem> menus = Arrays.asList( importMenu, exportMenu, upversionMenu, promoteOrDemoteMenu );
 				List<Control> controls = Arrays.asList( repositoryChoice, namespaceChoice,
 						addButton, removeButton, candidateLibrariesTable,
-						selectedLibrariesTable, upversionButton, promoteOrDemoteButton );
+						selectedLibrariesTable, upversionButton, promoteOrDemoteButton,
+						latestVersionsCheckbox, versionFilterText, statusFilterChoice );
 				
 				menus.forEach( m -> m.setDisable( true ) );
 				controls.forEach( c -> c.setDisable( true ) );
@@ -577,6 +672,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
 			boolean selectedItemsEmpty = selectedLibrariesTable.getItems().isEmpty();
 			boolean candidateItemSelected = !candidateLibrariesTable.getSelectionModel().getSelectedItems().isEmpty();
 			boolean selectedItemSelected = !selectedLibrariesTable.getSelectionModel().getSelectedItems().isEmpty();
+			boolean latestVersionsSelected = latestVersionsCheckbox.isSelected();
 			
 			importMenu.setDisable( false );
 			exportMenu.setDisable( selectedItemsEmpty );
@@ -591,6 +687,10 @@ public class UpversionHelperController extends AbstractMainWindowController {
 			removeButton.setDisable( !selectedItemSelected );
 			upversionButton.setDisable( selectedItemsEmpty );
 			promoteOrDemoteButton.setDisable( selectedItemsEmpty );
+			versionFilterLabel.setDisable( latestVersionsSelected );
+			versionFilterText.setDisable( latestVersionsSelected );
+			latestVersionsCheckbox.setDisable( false );
+			statusFilterChoice.setDisable( false );
 		} );
 	}
 
@@ -602,11 +702,15 @@ public class UpversionHelperController extends AbstractMainWindowController {
 	protected void initialize(Stage primaryStage) {
 		super.initialize(primaryStage);
 		
-		// Configure listeners for choice boxes
+		// Configure listeners for choice/text boxes
 		repositoryChoice.valueProperty().addListener(
 		        (observable, oldValue, newValue) -> repositorySelectionChanged() );
 		namespaceChoice.valueProperty().addListener(
 		        (observable, oldValue, newValue) -> namespaceSelectionChanged() );
+		versionFilterText.textProperty().addListener(
+		        (observable, oldValue, newValue) -> applyCandidateItemFilters() );
+		statusFilterChoice.valueProperty().addListener(
+		        (observable, oldValue, newValue) -> applyCandidateItemFilters() );
 		
 		// Configure cell values and tooltips for table views
 		Callback<CellDataFeatures<RepositoryItemWrapper,String>, ObservableValue<String>> nameColumnValueFactory =
@@ -673,6 +777,15 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		selectedStatusColumn.prefWidthProperty().bind( selectedLibrariesTable.widthProperty().multiply(0.2) );
 		
 		// Initialize data and control states
+		ObservableList<StatusChoice> statusChoices = FXCollections.observableArrayList();
+		
+		for (TLLibraryStatus status : TLLibraryStatus.values()) {
+			statusChoices.add( new StatusChoice( status ) );
+		}
+		statusChoices.add( 0, new StatusChoice( null ) );
+		statusFilterChoice.setItems( statusChoices );
+		statusFilterChoice.getSelectionModel().select( 0 );
+		latestVersionsCheckbox.setSelected( true );
 		candidateLibrariesTable.setItems( FXCollections.emptyObservableList() );
 		selectedLibrariesTable.setItems( FXCollections.emptyObservableList() );
 		updateControlStates();
@@ -684,6 +797,45 @@ public class UpversionHelperController extends AbstractMainWindowController {
 			repositoryChoice.setItems( repositoryIds );
 			repositoryChoice.getSelectionModel().select( 0 );
 		} );
+	}
+	
+	/**
+	 * Provides a selectable value and display label for library statuses.
+	 */
+	private static class StatusChoice {
+		
+		private TLLibraryStatus status;
+		private String label;
+		
+		/**
+		 * Constructor that specifies the library status that can be selected.
+		 * 
+		 * @param status  the library status value
+		 */
+		public StatusChoice(TLLibraryStatus status) {
+			String labelKey = ( status == null ) ? "ANY_STATUS" : status.toString();
+			
+			this.status = status;
+			this.label = MessageBuilder.formatMessage( labelKey );
+		}
+
+		/**
+		 * Returns library status value.
+		 *
+		 * @return TLLibraryStatus
+		 */
+		public TLLibraryStatus getStatus() {
+			return status;
+		}
+
+		/**
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+			return label;
+		}
+		
 	}
 	
 }

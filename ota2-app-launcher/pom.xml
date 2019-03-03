@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	
+
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>ota2-app-launcher</artifactId>
 	<packaging>jar</packaging>
 	<name>OTA2.0 Utility Application Launcher</name>
-	
+
 	<parent>
 		<groupId>org.opentravel.otm</groupId>
 		<artifactId>ota2-utilities-parent-pom</artifactId>
@@ -17,7 +17,7 @@
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 		<maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
 	</properties>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>org.opentravel.otm</groupId>
@@ -63,6 +63,11 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.controlsfx</groupId>
+			<artifactId>controlsfx</artifactId>
+			<version>8.40.14</version>
 		</dependency>
 	</dependencies>
 

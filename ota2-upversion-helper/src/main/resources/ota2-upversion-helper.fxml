@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -10,6 +11,7 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -70,8 +72,11 @@
          <children>
             <GridPane>
               <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" />
-                  <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="75.0" />
+                  <ColumnConstraints hgrow="ALWAYS" minWidth="100.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="ALWAYS" minWidth="100.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="75.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
@@ -83,9 +88,9 @@
                         <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
                      </padding>
                   </Label>
-                  <ChoiceBox fx:id="namespaceChoice" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <ChoiceBox fx:id="namespaceChoice" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1">
                      <GridPane.margin>
-                        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                        <Insets bottom="3.0" left="3.0" right="23.0" top="3.0" />
                      </GridPane.margin>
                   </ChoiceBox>
                   <Label text="Select Repository">
@@ -98,7 +103,35 @@
                         <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
                      </GridPane.margin>
                   </ChoiceBox>
+                  <Label fx:id="versionFilterLabel" text="Version Filter" GridPane.columnIndex="3">
+                     <GridPane.margin>
+                        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <Label text="Status Filter" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                     <GridPane.margin>
+                        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <TextField fx:id="versionFilterText" prefColumnCount="8" GridPane.columnIndex="4" GridPane.vgrow="SOMETIMES">
+                     <GridPane.margin>
+                        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                     </GridPane.margin>
+                  </TextField>
+                  <ChoiceBox fx:id="statusFilterChoice" GridPane.columnIndex="4" GridPane.rowIndex="1">
+                     <GridPane.margin>
+                        <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+                     </GridPane.margin>
+                  </ChoiceBox>
+                  <CheckBox fx:id="latestVersionsCheckbox" mnemonicParsing="false" onAction="#latestVersionFilterChanged" text="Latest Versions" GridPane.columnIndex="2" GridPane.halignment="RIGHT">
+                     <GridPane.margin>
+                        <Insets bottom="3.0" left="3.0" right="23.0" top="3.0" />
+                     </GridPane.margin>
+                  </CheckBox>
                </children>
+               <padding>
+                  <Insets right="10.0" />
+               </padding>
             </GridPane>
             <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="50.0" minWidth="50.0" VBox.vgrow="ALWAYS">
               <columnConstraints>

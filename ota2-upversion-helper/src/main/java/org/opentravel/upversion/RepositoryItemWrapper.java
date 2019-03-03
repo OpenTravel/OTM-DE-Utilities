@@ -39,6 +39,15 @@ public class RepositoryItemWrapper implements RepositoryItem, Comparable<Reposit
 	public RepositoryItemWrapper(RepositoryItem item) {
 		this.item = item;
 	}
+	
+	/**
+	 * Returns the underlying "unwrapped" repository item.
+	 * 
+	 * @return RepositoryItem
+	 */
+	public RepositoryItem getItem() {
+		return item;
+	}
 
 	/**
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
