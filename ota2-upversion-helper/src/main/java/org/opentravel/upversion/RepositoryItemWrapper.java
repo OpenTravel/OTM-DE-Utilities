@@ -23,6 +23,9 @@ import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryItemState;
 
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableBooleanValue;
+
 /**
  * Wrapper facade for the <code>RepositoryItem</code> interface that is extended
  * to support equality checking and comparisons for sorting.
@@ -30,6 +33,7 @@ import org.opentravel.schemacompiler.repository.RepositoryItemState;
 public class RepositoryItemWrapper implements RepositoryItem, Comparable<RepositoryItemWrapper> {
 	
 	private RepositoryItem item;
+	private SimpleBooleanProperty selected = new SimpleBooleanProperty();
 	
 	/**
 	 * Constructor that supplies the repository item to be wrapped.
@@ -40,6 +44,33 @@ public class RepositoryItemWrapper implements RepositoryItem, Comparable<Reposit
 		this.item = item;
 	}
 	
+	/**
+	 * Returns the selected property for this item.
+	 * 
+	 * @return ObservableBooleanValue
+	 */
+	public ObservableBooleanValue selectedProperty() {
+		return selected;
+	}
+	
+	/**
+	 * Returns true if the item is selected.
+	 *
+	 * @return boolean
+	 */
+	public boolean isSelected() {
+		return selected.get();
+	}
+
+	/**
+	 * Assigns the boolean value to indicate whether the item is selected.
+	 *
+	 * @param selected  the boolean value to assign
+	 */
+	public void setSelected(boolean selected) {
+		this.selected.set( selected );
+	}
+
 	/**
 	 * Returns the underlying "unwrapped" repository item.
 	 * 

@@ -18,6 +18,9 @@ package org.opentravel.application.common;
 
 import java.io.File;
 
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -127,6 +130,43 @@ public abstract class AbstractMainWindowController {
 		return chooser;
 	}
 	
+	/**
+	 * Displays a modal error dialog with the title and message provided.
+	 * 
+	 * @param title  the title of the error dialog
+	 * @param message  the error message to display
+	 */
+	protected void showErrorDialog(String title, String message) {
+		Platform.runLater( () -> {
+			Alert errorDialog = new Alert( AlertType.ERROR );
+			
+			errorDialog.setTitle( title );
+		    errorDialog.setContentText( message );
+			errorDialog.setHeaderText( null );
+		    errorDialog.showAndWait();
+		});
+	}
+	
+    /**
+     * Returns a user-readable error message for the given exception.
+     * 
+     * @param e  the exception for which to create a formatted error message
+     * @return String
+     */
+    protected String getErrorMessage(Exception e) {
+    	Throwable rootCause = e;
+    	String message = null;
+    	
+    	while ((message == null) && (rootCause != null)) {
+    		message = rootCause.getMessage();
+    		rootCause = rootCause.getCause();
+    	}
+    	if (message == null) {
+    		message = (e == null) ? "Unknown Error" : e.getClass().getSimpleName();
+    	}
+    	return message;
+    }
+    
 	/**
 	 * Abstract class that executes a background task in a non-UI thread.
 	 */

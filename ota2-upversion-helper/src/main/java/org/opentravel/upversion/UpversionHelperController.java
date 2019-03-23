@@ -49,11 +49,19 @@ import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.schemacompiler.repository.impl.ProjectFileUtils;
+import org.opentravel.schemacompiler.util.SchemaCompilerException;
+import org.opentravel.schemacompiler.validate.FindingMessageFormat;
+import org.opentravel.schemacompiler.validate.FindingType;
+import org.opentravel.schemacompiler.validate.ValidationException;
+import org.opentravel.schemacompiler.validate.ValidationFinding;
+import org.opentravel.schemacompiler.validate.ValidationFindings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -66,6 +74,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
@@ -76,6 +85,8 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -95,6 +106,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
 	@FXML private MenuItem exportMenu;
 	@FXML private MenuItem upversionMenu;
 	@FXML private MenuItem promoteOrDemoteMenu;
+	@FXML private MenuItem validationMenu;
 	@FXML private ChoiceBox<String> repositoryChoice;
 	@FXML private ChoiceBox<String> namespaceChoice;
 	@FXML private CheckBox latestVersionsCheckbox;
@@ -108,11 +120,17 @@ public class UpversionHelperController extends AbstractMainWindowController {
 	@FXML private TableColumn<RepositoryItemWrapper,String> candidateVersionColumn;
 	@FXML private TableColumn<RepositoryItemWrapper,String> candidateStatusColumn;
 	@FXML private TableView<RepositoryItemWrapper> selectedLibrariesTable;
+	@FXML private TableColumn<RepositoryItemWrapper,Boolean> selectedCheckboxColumn;
 	@FXML private TableColumn<RepositoryItemWrapper,String> selectedNameColumn;
 	@FXML private TableColumn<RepositoryItemWrapper,String> selectedVersionColumn;
 	@FXML private TableColumn<RepositoryItemWrapper,String> selectedStatusColumn;
+	@FXML private TableView<ValidationFinding> validationTable;
+	@FXML private TableColumn<ValidationFinding,ImageView> validationLevelColumn;
+	@FXML private TableColumn<ValidationFinding,String> validationComponentColumn;
+	@FXML private TableColumn<ValidationFinding,String> validationDescriptionColumn;
 	@FXML private Button upversionButton;
 	@FXML private Button promoteOrDemoteButton;
+	@FXML private Hyperlink validationLink;
 	@FXML private ImageView statusBarIcon;
 	@FXML private Label statusBarLabel;
 	@FXML private ProgressBar upversionProgressBar;
@@ -122,6 +140,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
 	private List<RepositoryItem> selectedNamespaceItems = new ArrayList<>();
 	private List<RepositoryItem> selectedNamespaceLatestVersions = new ArrayList<>();
 	private Map<String,Pattern> versionFilterPatterns = new HashMap<>();
+	private boolean validationDirty = false;
 	
 	/**
 	 * Default constructor.
@@ -254,7 +273,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
             otp.setName( otpFile.getName().replace( ".otp", "" ) );
             otp.setProjectId( (projectId != null) ? projectId : "http://www.opentravel.org" );
             
-            for (RepositoryItem item : selectedLibrariesTable.getItems()) {
+            for (RepositoryItem item : getSelectedItems()) {
                 ManagedProjectItemType pi = new ManagedProjectItemType();
                 Repository itemRepo = item.getRepository();
                 ObjectFactory objFactory = new ObjectFactory();
@@ -301,8 +320,10 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		ObservableList<RepositoryItemWrapper> selectedLibraries =
 				FXCollections.observableArrayList( selectedLibrariesTable.getItems() );
 		
+		validationDirty = true;
 		candidateLibraries.removeAll( selectedItems );
 		candidateLibrariesTable.getSelectionModel().clearSelection();
+		selectedItems.forEach( w -> w.setSelected( true ) );
 		selectedLibraries.addAll( selectedItems );
 		Collections.sort( selectedLibraries );
 		selectedLibrariesTable.setItems( selectedLibraries );
@@ -321,11 +342,16 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		ObservableList<RepositoryItemWrapper> candidateLibraries =
 				FXCollections.observableArrayList( candidateLibrariesTable.getItems() );
 		
+		validationDirty = true;
 		selectedLibraries.removeAll( selectedItems );
 		selectedLibrariesTable.getSelectionModel().clearSelection();
 		candidateLibraries.addAll( selectedItems );
 		Collections.sort( candidateLibraries );
 		candidateLibrariesTable.setItems( candidateLibraries );
+		
+		if (selectedLibrariesTable.getItems().isEmpty()) {
+			displayValidationFindings( null );
+		}
 	}
 	
 	/**
@@ -357,37 +383,69 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		if (confirmPurgeExistingFiles) {
 			Runnable r = new BackgroundTask( "Upversioning selected files...", StatusType.INFO ) {
 				public void execute() throws OtmApplicationException {
-					try {
-						List<RepositoryItem> selectedItems = new ArrayList<>( selectedLibrariesTable.getItems() );
-						ProgressMonitor monitor = new ProgressMonitor( upversionProgressBar );
-						UpversionOrchestrator orchestrator = new UpversionOrchestrator();
-						
-						Platform.runLater( () -> upversionProgressBar.setDisable( false ) );
-						
-						orchestrator
-							.setRepositoryManager( repositoryManager )
-							.setOldVersions( selectedItems )
-							.setOutputFolder( selectedFolder )
-							.setProjectId( "http://www.travelport.com" )
-							.setProgressMonitor( monitor )
-							.createNewVersions();
-							
-						Platform.runLater( () -> {
-                            upversionProgressBar.setDisable( true );
-                            upversionProgressBar.setProgress( 0.0 );
-						});
-						
-					} catch (Exception e) {
-					    throw new OtmApplicationException( e );
-					    
-					} finally {
-						userSettings.setOutputFolder( selectedFolder );
-						userSettings.save();
-					}
+					upversionSelectedLibraries(selectedFolder, userSettings);
 				}
 			};
 			
 			new Thread( r ).start();
+		}
+	}
+	
+	/**
+	 * Performs the up-versioning of all libraries selected by the user.
+	 * 
+	 * @param selectedFolder  the folder where the up-versioned libraries will be saved
+	 * @param userSettings  the user's current preference settings
+	 */
+	private void upversionSelectedLibraries(File selectedFolder, UserSettings userSettings) {
+		String errorMessage = null;
+		
+		try {
+			ProgressMonitor monitor = new ProgressMonitor( upversionProgressBar );
+			UpversionOrchestrator orchestrator = new UpversionOrchestrator();
+			List<RepositoryItem> upversionLibraries = new ArrayList<>();
+			List<RepositoryItem> supportingLibraries = new ArrayList<>();
+			
+			for (RepositoryItemWrapper item : selectedLibrariesTable.getItems()) {
+				if (item.isSelected()) {
+					upversionLibraries.add( item.getItem() );
+					
+				} else {
+					supportingLibraries.add( item.getItem() );
+				}
+			}
+			
+			Platform.runLater( () -> upversionProgressBar.setDisable( false ) );
+			
+			orchestrator
+				.setRepositoryManager( repositoryManager )
+				.setOldVersions( upversionLibraries )
+				.setSupportingLibraries( supportingLibraries )
+				.setOutputFolder( selectedFolder )
+				.setProjectId( "http://www.travelport.com" )
+				.setProgressMonitor( monitor )
+				.createNewVersions();
+				
+		} catch (ValidationException e) {
+			errorMessage = "The model contains one or more validation errors.";
+			displayValidationFindings( e.getFindings() );
+			
+		} catch (Exception e) {
+			errorMessage = String.format(
+					"An error occurred during the up-version processing:%n%n%s",
+					getErrorMessage( e ) );
+		    
+		} finally {
+			Platform.runLater( () -> {
+                upversionProgressBar.setDisable( true );
+                upversionProgressBar.setProgress( 0.0 );
+			});
+			userSettings.setOutputFolder( selectedFolder );
+			userSettings.save();
+			
+			if (errorMessage != null) {
+				showErrorDialog( "Up-Versioning Error", errorMessage );
+			}
 		}
 	}
 	
@@ -436,6 +494,63 @@ public class UpversionHelperController extends AbstractMainWindowController {
 	@FXML public void latestVersionFilterChanged(ActionEvent event) {
 		updateControlStates();
 		applyCandidateItemFilters();
+	}
+	
+	/**
+	 * Called when the user clicks the link to validate the selected libraries.
+	 * 
+	 * @param event  the action event that triggered this method call
+	 */
+	@FXML public void validationLinkClicked(ActionEvent event) {
+		Runnable r = new BackgroundTask( "Validating selected libraries...", StatusType.INFO ) {
+			public void execute() throws OtmApplicationException {
+				try {
+					List<RepositoryItem> itemList = new ArrayList<>( selectedLibrariesTable.getItems() );
+					ValidationFindings findings = null;
+					
+					Platform.runLater( () -> upversionProgressBar.setDisable( false ) );
+					
+					if (!itemList.isEmpty()) {
+						findings = new ValidationOrchestrator()
+								.setRepositoryManager( repositoryManager )
+								.setRepositoryItems( itemList )
+								.setProgressMonitor( new ProgressMonitor( upversionProgressBar ) )
+								.runValidation();
+					}
+					displayValidationFindings( findings );
+					
+				} catch (SchemaCompilerException e) {
+					showErrorDialog( "Unexpected Error",
+							"An error occurred during model validation: " +
+									getErrorMessage( e ) );
+					
+				} finally {
+					Platform.runLater( () -> {
+		                upversionProgressBar.setDisable( true );
+		                upversionProgressBar.setProgress( 0.0 );
+					});
+				}
+			}
+		};
+		
+		new Thread( r ).start();
+	}
+	
+	/**
+	 * Displays the given list of validation findings to the user.
+	 * 
+	 * @param findings  the validation findings to display
+	 */
+	private void displayValidationFindings(ValidationFindings findings) {
+		if (findings != null) {
+			validationTable.setItems(
+					FXCollections.observableArrayList( findings.getAllFindingsAsList() ) );
+			
+		} else {
+			validationTable.setItems( FXCollections.emptyObservableList() );
+		}
+		validationDirty = false;
+		updateControlStates();
 	}
 	
 	/**
@@ -638,6 +753,23 @@ public class UpversionHelperController extends AbstractMainWindowController {
     	return versionFilterPatterns.get( filterRegex );
     }
     
+    /**
+     * Returns the list of repository items from the selected-libraries table
+     * that have been selected/checked by the user.
+     * 
+     * @return List<RepositoryItem>
+     */
+    private List<RepositoryItem> getSelectedItems() {
+    	List<RepositoryItem> itemList = new ArrayList<>();
+    	
+		for (RepositoryItemWrapper item : selectedLibrariesTable.getItems()) {
+			if (item.isSelected()) {
+				itemList.add( item.getItem() );
+			}
+		}
+    	return itemList;
+    }
+    
 	/**
 	 * @see org.opentravel.application.common.AbstractMainWindowController#setStatusMessage(java.lang.String, org.opentravel.application.common.StatusType, boolean)
 	 */
@@ -669,7 +801,8 @@ public class UpversionHelperController extends AbstractMainWindowController {
 	@Override
 	protected void updateControlStates() {
 		Platform.runLater( () -> {
-			boolean selectedItemsEmpty = selectedLibrariesTable.getItems().isEmpty();
+			boolean selectedItemsEmpty = getSelectedItems().isEmpty();
+			boolean allowValidation = validationDirty && !selectedLibrariesTable.getItems().isEmpty();
 			boolean candidateItemSelected = !candidateLibrariesTable.getSelectionModel().getSelectedItems().isEmpty();
 			boolean selectedItemSelected = !selectedLibrariesTable.getSelectionModel().getSelectedItems().isEmpty();
 			boolean latestVersionsSelected = latestVersionsCheckbox.isSelected();
@@ -678,6 +811,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
 			exportMenu.setDisable( selectedItemsEmpty );
 			upversionMenu.setDisable( selectedItemsEmpty );
 			promoteOrDemoteMenu.setDisable( selectedItemsEmpty );
+			validationMenu.setDisable( !allowValidation );
 			
 			repositoryChoice.setDisable( false );
 			namespaceChoice.setDisable( false );
@@ -685,6 +819,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
 			selectedLibrariesTable.setDisable( false );
 			addButton.setDisable( !candidateItemSelected );
 			removeButton.setDisable( !selectedItemSelected );
+			validationLink.setDisable( !allowValidation );
 			upversionButton.setDisable( selectedItemsEmpty );
 			promoteOrDemoteButton.setDisable( selectedItemsEmpty );
 			versionFilterLabel.setDisable( latestVersionsSelected );
@@ -693,7 +828,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
 			statusFilterChoice.setDisable( false );
 		} );
 	}
-
+	
 	/**
 	 * @see org.opentravel.application.common.AbstractMainWindowController#initialize(javafx.stage.Stage)
 	 */
@@ -748,6 +883,13 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		candidateLibrariesTable.setRowFactory( rowFactory );
 		candidateLibrariesTable.getSelectionModel().selectedItemProperty().addListener(
 				(observable, oldValue, newValue) -> updateControlStates() );
+		
+		selectedCheckboxColumn.setCellFactory( CheckBoxTableCell.forTableColumn( i -> {
+			ObservableBooleanValue selectedProperty =
+					selectedLibrariesTable.getItems().get( i ).selectedProperty();
+			selectedProperty.addListener( l -> updateControlStates() );
+			return selectedProperty;
+		} ) );
 		selectedNameColumn.setCellValueFactory( nameColumnValueFactory );
 		selectedVersionColumn.setCellValueFactory( versionColumnValueFactory );
 		selectedStatusColumn.setCellValueFactory( statusColumnValueFactory );
@@ -760,6 +902,8 @@ public class UpversionHelperController extends AbstractMainWindowController {
 		candidateLibrariesTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
 		selectedLibrariesTable.setPlaceholder( new Label("") );
 		selectedLibrariesTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
+		validationTable.setPlaceholder( new Label("") );
+		validationTable.getSelectionModel().setSelectionMode( SelectionMode.SINGLE );
 		
 		// Assign proportional column widths and diable resizing/reordering
 		List<TableColumn<?,?>> columns = Arrays.asList( candidateNameColumn, candidateStatusColumn,
@@ -769,12 +913,28 @@ public class UpversionHelperController extends AbstractMainWindowController {
 			column.setResizable( false );
 			column.setSortable( false );
 		}
-		candidateNameColumn.prefWidthProperty().bind( candidateLibrariesTable.widthProperty().multiply(0.6) );
+		candidateNameColumn.prefWidthProperty().bind( candidateLibrariesTable.widthProperty().multiply(0.6).subtract( 1 ) );
 		candidateVersionColumn.prefWidthProperty().bind( candidateLibrariesTable.widthProperty().multiply(0.2) );
 		candidateStatusColumn.prefWidthProperty().bind( candidateLibrariesTable.widthProperty().multiply(0.2) );
-		selectedNameColumn.prefWidthProperty().bind( selectedLibrariesTable.widthProperty().multiply(0.6) );
-		selectedVersionColumn.prefWidthProperty().bind( candidateLibrariesTable.widthProperty().multiply(0.2) );
-		selectedStatusColumn.prefWidthProperty().bind( selectedLibrariesTable.widthProperty().multiply(0.2) );
+		selectedNameColumn.prefWidthProperty().bind( selectedLibrariesTable.widthProperty().multiply(0.6).subtract( 14 ) );
+		selectedVersionColumn.prefWidthProperty().bind( selectedLibrariesTable.widthProperty().multiply(0.2).subtract( 6 ) );
+		selectedStatusColumn.prefWidthProperty().bind( selectedLibrariesTable.widthProperty().multiply(0.2).subtract( 6 ) );
+		
+		validationLevelColumn.setCellValueFactory( nodeFeatures -> {
+			FindingType findingType = nodeFeatures.getValue().getType();
+			Image image = (findingType == FindingType.WARNING) ?
+					StatusType.WARNING.getIcon() : StatusType.ERROR.getIcon();
+			
+			return new SimpleObjectProperty<ImageView>(new ImageView(image));
+		});
+		validationComponentColumn.setCellValueFactory( nodeFeatures ->
+			new ReadOnlyStringWrapper( nodeFeatures.getValue().getSource().getValidationIdentity() )
+		);
+		validationDescriptionColumn.setCellValueFactory( nodeFeatures ->
+			new ReadOnlyStringWrapper( nodeFeatures.getValue().getFormattedMessage( FindingMessageFormat.BARE_FORMAT ) )
+		);
+		validationComponentColumn.prefWidthProperty().bind( validationTable.widthProperty().multiply(0.4) );
+		validationDescriptionColumn.prefWidthProperty().bind( validationTable.widthProperty().multiply(0.6).subtract(20) );
 		
 		// Initialize data and control states
 		ObservableList<StatusChoice> statusChoices = FXCollections.observableArrayList();

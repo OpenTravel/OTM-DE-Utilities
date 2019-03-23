@@ -45,6 +45,10 @@ import org.opentravel.schemacompiler.transform.util.ModelReferenceResolver;
 import org.opentravel.schemacompiler.util.FileUtils;
 import org.opentravel.schemacompiler.util.SchemaCompilerException;
 import org.opentravel.schemacompiler.util.URLUtils;
+import org.opentravel.schemacompiler.validate.FindingType;
+import org.opentravel.schemacompiler.validate.ValidationException;
+import org.opentravel.schemacompiler.validate.ValidationFindings;
+import org.opentravel.schemacompiler.validate.compile.TLModelCompileValidator;
 import org.opentravel.schemacompiler.version.MajorVersionHelper;
 import org.opentravel.schemacompiler.version.VersionChain;
 import org.opentravel.schemacompiler.version.VersionChainFactory;
@@ -68,7 +72,8 @@ public class UpversionOrchestrator {
 	private static VersionSchemeFactory vsFactory = VersionSchemeFactory.getInstance();
 	
 	private RepositoryManager repositoryManager;
-	private List<RepositoryItem> oldVersions;
+	private List<RepositoryItem> oldVersions = new ArrayList<>();
+	private List<RepositoryItem> supportingLibraries = new ArrayList<>();
 	private File outputFolder;
 	private String projectId = DEFAULT_PROJECT_ID;
 	private String projectFilename = DEFAULT_PROJECT_FILENAME;
@@ -147,6 +152,18 @@ public class UpversionOrchestrator {
 	}
 
 	/**
+	 * Assigns the list of repository items that must be included in the model for
+	 * reference and validation purposes, but that should NOT be up-versioned.
+	 *
+	 * @param supportingLibraries  the list of old-version repository items
+	 * @return UpversionOrchestrator
+	 */
+	public UpversionOrchestrator setSupportingLibraries(List<RepositoryItem> supportingLibraries) {
+		this.supportingLibraries = supportingLibraries;
+		return this;
+	}
+
+	/**
 	 * Assigns the progress monitor that will report on task percent-complete.
 	 *
 	 * @param monitor  progress monitor that will report on task percent-complete (may be null)
@@ -164,34 +181,44 @@ public class UpversionOrchestrator {
 	 * @throws SchemaCompilerException  thrown if an error occurs while creating the new versions
 	 */
 	public List<TLLibrary> createNewVersions() throws SchemaCompilerException {
-		// Validate the state of the orchestrator to make sure we can proceed
-		if (repositoryManager == null) {
-			repositoryManager = RepositoryManager.getDefault();
-		}
-		if (outputFolder == null) {
-			throw new SchemaCompilerException("Output folder location for new-version files not assigned.");
-		}
-		if ((oldVersions == null) || oldVersions.isEmpty()) {
-			throw new SchemaCompilerException("Old library versions not provided for up-version processing.");
-		}
-		purgeOldLibraries();
+		boolean success = false;
 		
-		// Run the up-version orchestration process and save the new-version libraries
-		if (monitor != null) {
-			monitor.taskStarted( (oldVersions.size() * 3) + 2L );
+		try {
+			// Validate the state of the orchestrator to make sure we can proceed
+			if (repositoryManager == null) {
+				repositoryManager = RepositoryManager.getDefault();
+			}
+			if (outputFolder == null) {
+				throw new SchemaCompilerException("Output folder location for new-version files not assigned.");
+			}
+			if ((oldVersions == null) || oldVersions.isEmpty()) {
+				throw new SchemaCompilerException("Old library versions not provided for up-version processing.");
+			}
+			purgeExistingLibraries();
+			
+			// Run the up-version orchestration process and save the new-version libraries
+			if (monitor != null) {
+				monitor.taskStarted( (oldVersions.size() * 3) + supportingLibraries.size() + 2L );
+			}
+			List<TLLibrary> oldVersionLibraries = loadOldVersions();
+			validateOldVersionLibraries( oldVersionLibraries );
+			UpversionRegistry registry = buildNewLibraryVersions( oldVersionLibraries );
+			
+			updateTypeReferences( registry );
+			saveLibraries( registry.getAllNewVersions() );
+			createNewVersionProjectFile( registry.getAllNewVersions() );
+			success = true;
+			
+			if (monitor != null) {
+				monitor.taskCompleted();
+			}
+			return new ArrayList<>( registry.getAllNewVersions() );
+			
+		} finally {
+			if (!success && (outputFolder != null)) {
+				purgeExistingLibraries();
+			}
 		}
-		List<TLLibrary> oldVersionLibraries = loadOldVersions();
-		validateOldVersionLibraries( oldVersionLibraries );
-		UpversionRegistry registry = buildNewLibraryVersions( oldVersionLibraries );
-		
-		updateTypeReferences( registry );
-		saveLibraries( registry.getAllNewVersions() );
-		createNewVersionProjectFile( registry.getAllNewVersions() );
-		
-		if (monitor != null) {
-			monitor.taskCompleted();
-		}
-		return new ArrayList<>( registry.getAllNewVersions() );
 	}
 	
 	/**
@@ -227,18 +254,24 @@ public class UpversionOrchestrator {
 			Project oldVersionProject = projectManager.newProject(
 					File.createTempFile( "old", ".otp" ), DEFAULT_PROJECT_ID, "OldVersions", null );
 			List<TLLibrary> oldVersionLibraries = new ArrayList<>();
+			List<RepositoryItem> allItems = new ArrayList<>();
 			
-			for (RepositoryItem item : oldVersions) {
+			allItems.addAll( oldVersions );
+			allItems.addAll( supportingLibraries );
+			
+			for (RepositoryItem item : allItems) {
 				Repository repository = item.getRepository();
-				ProjectItem pItem;
 				
 				if (repository instanceof RemoteRepository) {
 					((RemoteRepository) repository).downloadContent( item, true );
 				}
-				pItem = projectManager.addManagedProjectItem( item, oldVersionProject );
-				oldVersionLibraries.add( (TLLibrary) pItem.getContent() );
+				if (oldVersions.contains( item )) {
+					ProjectItem pItem = projectManager.addManagedProjectItem( item, oldVersionProject );
+					oldVersionLibraries.add( (TLLibrary) pItem.getContent() );
+				}
 				reportWorkUnitCompleted();
 			}
+			
 			projectManager.saveProject( oldVersionProject );
 			return oldVersionLibraries;
 			
@@ -251,7 +284,7 @@ public class UpversionOrchestrator {
 	 * Deletes all files from the output folder that end with an '.otp' or '.otm'
 	 * extension.  If any sub-folders exist, they are not purged by this method.
 	 */
-	private void purgeOldLibraries() {
+	private void purgeExistingLibraries() {
 		if (outputFolder.exists()) {
 			outputFolder.mkdirs();
 		}
@@ -315,7 +348,8 @@ public class UpversionOrchestrator {
 			finalFilename = newVersionFilename.replace( ".otm", "-" + suffix + ".otm" );
 			suffix++;
 		}
-		return new File( outputFolder, newVersionFilename );
+		newVersionFilenames.add( finalFilename );
+		return new File( outputFolder, finalFilename );
 	}
 	
 	/**
@@ -402,9 +436,14 @@ public class UpversionOrchestrator {
 			throw new SchemaCompilerException("No old-version libraries specified.");
 		}
 		TLModel model = oldVersionLibraries.get( 0 ).getOwningModel();
+		ValidationFindings findings = TLModelCompileValidator.validateModel( model );
 		VersionChainFactory chainFactory = new VersionChainFactory( model );
 		StringBuilder errorDetails = new StringBuilder();
 		boolean hasError = false;
+		
+		if (findings.hasFinding( FindingType.ERROR )) {
+			throw new ValidationException( findings );
+		}
 		
 		for (TLLibrary library : oldVersionLibraries) {
 			VersionChain<TLLibrary> libraryChain = chainFactory.getVersionChain( library );
