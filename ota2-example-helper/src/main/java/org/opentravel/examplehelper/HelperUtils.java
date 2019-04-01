@@ -16,41 +16,41 @@
 
 package org.opentravel.examplehelper;
 
-import javax.xml.namespace.QName;
-
 import org.opentravel.schemacompiler.codegen.util.XsdCodegenUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLLibrary;
+
+import javax.xml.namespace.QName;
 
 /**
  * Static utility methods for the Example Helper application.
  */
 public class HelperUtils {
-	
+
     /**
      * Private constructor to prevent instantiation.
      */
     private HelperUtils() {}
-    
-	/**
-	 * Returns a display name label for the given OTM entity.
-	 * 
-	 * @param entity  the entity for which to return a display name
-	 * @param showPrefix  flag indicating whether the owning library's prefix should be included in the label
-	 * @return String
-	 */
-	public static String getDisplayName(NamedEntity entity, boolean showPrefix) {
-		TLLibrary library = (TLLibrary) entity.getOwningLibrary();
-		QName elementName = XsdCodegenUtils.getGlobalElementName(entity);
-		String localName = (elementName != null) ? elementName.getLocalPart() : entity.getLocalName();
-		StringBuilder displayName = new StringBuilder();
-		
-		if (showPrefix && (library.getPrefix() != null)) {
-			displayName.append( library.getPrefix() ).append( ":" );
-		}
-		displayName.append( localName );
-		
-		return displayName.toString();
-	}
-	
+
+    /**
+     * Returns a display name label for the given OTM entity.
+     * 
+     * @param entity the entity for which to return a display name
+     * @param showPrefix flag indicating whether the owning library's prefix should be included in the label
+     * @return String
+     */
+    public static String getDisplayName(NamedEntity entity, boolean showPrefix) {
+        TLLibrary library = (TLLibrary) entity.getOwningLibrary();
+        QName elementName = XsdCodegenUtils.getGlobalElementName( entity );
+        String localName = (elementName != null) ? elementName.getLocalPart() : entity.getLocalName();
+        StringBuilder displayName = new StringBuilder();
+
+        if (showPrefix && (library.getPrefix() != null)) {
+            displayName.append( library.getPrefix() ).append( ":" );
+        }
+        displayName.append( localName );
+
+        return displayName.toString();
+    }
+
 }

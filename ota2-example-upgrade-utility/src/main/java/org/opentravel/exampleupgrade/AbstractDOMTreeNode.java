@@ -26,58 +26,60 @@ import javafx.scene.image.Image;
  * Tree node that encapsulates a single node from the a DOM tree structure.
  */
 public abstract class AbstractDOMTreeNode {
-	
-	protected static final Image attributeIcon = new Image( AbstractDOMTreeNode.class.getResourceAsStream( "/images/nattrib.gif" ) );
-	protected static final Image elementIcon = new Image( AbstractDOMTreeNode.class.getResourceAsStream( "/images/nelem.gif" ) );
-	
-	private Node domNode;
-	private String label;
-	
-	/**
-	 * Constructor that supplies the DOM attribute or element to be displayed.
-	 * 
-	 * @param domNode  the DOM node instance
-	 * @param label  the label for the node (if not specified, a default label will be assigned)
-	 */
-	public AbstractDOMTreeNode(Node domNode, String label) {
-		String nodeValue;
-		String nvDisplay;
-		
-		if (domNode instanceof Attr) {
-			nodeValue = ((Attr) domNode).getValue();
-			
-		} else { // must be an Element
-			nodeValue = HelperUtils.getElementTextValue( (Element) domNode );
-		}
-		nvDisplay = (nodeValue == null) ? "" : (" = " + nodeValue);
-		this.domNode = domNode;
-		this.label = (label != null) ? label : (domNode.getNodeName() + nvDisplay);
-	}
-	
-	/**
-	 * Returns the DOM node instance.
-	 *
-	 * @return Node
-	 */
-	public Node getDomNode() {
-		return domNode;
-	}
-	
-	/**
-	 * Returns the display label for this node.
-	 *
-	 * @return String
-	 */
-	public String getLabel() {
-		return label;
-	}
-	
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return label;
-	}
-	
+
+    protected static final Image attributeIcon =
+        new Image( AbstractDOMTreeNode.class.getResourceAsStream( "/images/nattrib.gif" ) );
+    protected static final Image elementIcon =
+        new Image( AbstractDOMTreeNode.class.getResourceAsStream( "/images/nelem.gif" ) );
+
+    private Node domNode;
+    private String label;
+
+    /**
+     * Constructor that supplies the DOM attribute or element to be displayed.
+     * 
+     * @param domNode the DOM node instance
+     * @param label the label for the node (if not specified, a default label will be assigned)
+     */
+    public AbstractDOMTreeNode(Node domNode, String label) {
+        String nodeValue;
+        String nvDisplay;
+
+        if (domNode instanceof Attr) {
+            nodeValue = ((Attr) domNode).getValue();
+
+        } else { // must be an Element
+            nodeValue = HelperUtils.getElementTextValue( (Element) domNode );
+        }
+        nvDisplay = (nodeValue == null) ? "" : (" = " + nodeValue);
+        this.domNode = domNode;
+        this.label = (label != null) ? label : (domNode.getNodeName() + nvDisplay);
+    }
+
+    /**
+     * Returns the DOM node instance.
+     *
+     * @return Node
+     */
+    public Node getDomNode() {
+        return domNode;
+    }
+
+    /**
+     * Returns the display label for this node.
+     *
+     * @return String
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return label;
+    }
+
 }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.examplehelper;
 
 import org.opentravel.application.common.OTA2ApplicationProvider;
@@ -23,17 +24,17 @@ import org.opentravel.application.common.OTA2LauncherTabSpec;
  * Application provider for the Example Helper application.
  */
 public class ExampleHelperApplicationProvider implements OTA2ApplicationProvider {
-	
-	private static final OTA2ApplicationSpec spec = new OTA2ApplicationSpec(
-			"Example Helper", "Assists with the generation of EXAMPLE XML and JSON messages",
-			10, OTA2LauncherTabSpec.RELEASED_TAB, Images.launcherIcon, ExampleHelperApplication.class );
-	
-	/**
-	 * @see org.opentravel.application.common.OTA2ApplicationProvider#getApplicationSpec()
-	 */
-	@Override
-	public OTA2ApplicationSpec getApplicationSpec() {
-		return spec;
-	}
-	
+
+    private static final OTA2ApplicationSpec spec =
+        new OTA2ApplicationSpec( "Example Helper", "Assists with the generation of EXAMPLE XML and JSON messages", 10,
+            OTA2LauncherTabSpec.RELEASED_TAB, Images.launcherIcon, ExampleHelperApplication.class );
+
+    /**
+     * @see org.opentravel.application.common.OTA2ApplicationProvider#getApplicationSpec()
+     */
+    @Override
+    public OTA2ApplicationSpec getApplicationSpec() {
+        return spec;
+    }
+
 }

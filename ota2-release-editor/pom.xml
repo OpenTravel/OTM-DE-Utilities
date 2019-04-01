@@ -15,6 +15,7 @@
 	<properties>
 		<appVersion>${project.version}-${maven.build.timestamp}</appVersion>
 		<maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
+		<checkstyle.config>${basedir}/../checkstyle.xml</checkstyle.config>
 	</properties>
 	
 	<dependencies>

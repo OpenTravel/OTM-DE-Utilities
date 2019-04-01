@@ -16,10 +16,6 @@
 
 package org.opentravel.release.navigate.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.opentravel.application.common.Images;
 import org.opentravel.release.MessageBuilder;
 import org.opentravel.release.NodeProperty;
@@ -28,61 +24,66 @@ import org.opentravel.release.navigate.TreeNodeFactory;
 import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLParamGroup;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import javafx.scene.image.Image;
 
 /**
  * Tree node that represents a <code>TLActionRequest</code> instance.
  */
 public class ActionRequestTreeNode extends TreeNode<TLActionRequest> {
-	
-	/**
-	 * Constructor that specifies the OTM entity for this node.
-	 * 
-	 * @param entity  the OTM entity represented by this node
-	 * @param factory  the factory that created this node
-	 */
-	public ActionRequestTreeNode(TLActionRequest entity, TreeNodeFactory factory) {
-		super(entity, factory);
-	}
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getLabel()
-	 */
-	@Override
-	public String getLabel() {
-		return "Request";
-	}
+    /**
+     * Constructor that specifies the OTM entity for this node.
+     * 
+     * @param entity the OTM entity represented by this node
+     * @param factory the factory that created this node
+     */
+    public ActionRequestTreeNode(TLActionRequest entity, TreeNodeFactory factory) {
+        super( entity, factory );
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getIcon()
-	 */
-	@Override
-	public Image getIcon() {
-		return Images.requestIcon;
-	}
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getLabel()
+     */
+    @Override
+    public String getLabel() {
+        return "Request";
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getProperties()
-	 */
-	@Override
-	public List<NodeProperty> getProperties() {
-		List<NodeProperty> props = new ArrayList<>();
-		TLActionRequest request = getEntity();
-		TLParamGroup paramGroup = request.getParamGroup();
-		
-		props.add( new NodeProperty( "method", () -> MessageBuilder.formatMessage( request.getHttpMethod().toString() ) ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( request ) ) );
-		props.add( new NodeProperty( "paramGroup", () -> (paramGroup == null) ? "" : paramGroup.getName() ) );
-		props.add( new NodeProperty( "payloadType", () -> getEntityDisplayName( request.getPayloadType() ) ) );
-		return props;
-	}
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getIcon()
+     */
+    @Override
+    public Image getIcon() {
+        return Images.requestIcon;
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
-	 */
-	@Override
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getProperties()
+     */
+    @Override
+    public List<NodeProperty> getProperties() {
+        List<NodeProperty> props = new ArrayList<>();
+        TLActionRequest request = getEntity();
+        TLParamGroup paramGroup = request.getParamGroup();
+
+        props.add(
+            new NodeProperty( "method", () -> MessageBuilder.formatMessage( request.getHttpMethod().toString() ) ) );
+        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( request ) ) );
+        props.add( new NodeProperty( "paramGroup", () -> (paramGroup == null) ? "" : paramGroup.getName() ) );
+        props.add( new NodeProperty( "payloadType", () -> getEntityDisplayName( request.getPayloadType() ) ) );
+        return props;
+    }
+
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
+     */
+    @Override
     protected List<TreeNode<Object>> initializeChildren() {
-		return Collections.emptyList();
-	}
+        return Collections.emptyList();
+    }
 
 }

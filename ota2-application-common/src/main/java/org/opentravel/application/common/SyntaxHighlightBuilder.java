@@ -16,21 +16,21 @@
 
 package org.opentravel.application.common;
 
-import java.util.Collection;
-
 import org.fxmisc.richtext.model.StyleSpans;
+
+import java.util.Collection;
 
 /**
  * Computes the highlighting spans for a BLOCK of text based upon its syntax and content.
  */
 public interface SyntaxHighlightBuilder {
-	
-	/**
-	 * Computes the highlighting spans for the given text.
-	 * 
-	 * @param text  the text for which to compute the highlighting
-	 * @return StyleSpans<Collection<String>>
-	 */
-	public StyleSpans<Collection<String>> computeHighlighting(String text);
-	
+
+    /**
+     * Computes the highlighting spans for the given text.
+     * 
+     * @param text the text for which to compute the highlighting
+     * @return StyleSpans&lt;Collection&lt;String&gt;&gt;
+     */
+    public StyleSpans<Collection<String>> computeHighlighting(String text);
+
 }

@@ -12,6 +12,10 @@
 		<version>4.0-SNAPSHOT</version>
 	</parent>
 
+	<properties>
+		<checkstyle.config>${basedir}/../checkstyle.xml</checkstyle.config>
+	</properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.opentravel.otm</groupId>

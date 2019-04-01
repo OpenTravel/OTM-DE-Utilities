@@ -17,18 +17,18 @@
 package org.opentravel.release.undo;
 
 /**
- * Listener that is notified by the <code>UndoManager</code> when the status
- * of the 'canUndo()' or 'canRedo()' statuses have changed.
+ * Listener that is notified by the <code>UndoManager</code> when the status of the 'canUndo()' or 'canRedo()' statuses
+ * have changed.
  */
 @FunctionalInterface
 public interface UndoStatusListener {
-	
-	/**
-	 * Called when the status of the 'canUndo()' or 'canRedo()' status has
-	 * changed on the given <code>UndoManager</code>.
-	 * 
-	 * @param manager  the manager whose status has changed
-	 */
-	public void undoStatusChanged(UndoManager manager);
-	
+
+    /**
+     * Called when the status of the 'canUndo()' or 'canRedo()' status has changed on the given
+     * <code>UndoManager</code>.
+     * 
+     * @param manager the manager whose status has changed
+     */
+    public void undoStatusChanged(UndoManager manager);
+
 }

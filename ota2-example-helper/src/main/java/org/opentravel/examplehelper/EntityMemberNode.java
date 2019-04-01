@@ -22,81 +22,81 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents a single tree node for an OTM entity structure from which a user may choose
- * a substitution group facet if choices are available.
+ * Represents a single tree node for an OTM entity structure from which a user may choose a substitution group facet if
+ * choices are available.
  */
 public class EntityMemberNode {
-	
-	private String name;
-	private EntityFacetSelection facetSelection;
-	private EntityMemberNode parentNode;
-	private Map<String,List<EntityMemberNode>> childrenByFacet = new HashMap<>();
-	
-	/**
-	 * Constructs a new tree node instance.
-	 * 
-	 * @param name  the name of the tree node
-	 * @param facetSelection  the facet selection instance for the node
-	 * @param entityType  the type of the OTM entity represented by this node
-	 */
-	public EntityMemberNode(String name, EntityFacetSelection facetSelection) {
-		this.name = name;
-		this.facetSelection = facetSelection;
-	}
-	
-	/**
-	 * Returns the name of this node.
-	 *
-	 * @return String
-	 */
-	public String getName() {
-		return name;
-	}
-	
-	/**
-	 * Returns the facet selection instance for the node.
-	 *
-	 * @return EntityFacetSelection
-	 */
-	public EntityFacetSelection getFacetSelection() {
-		return facetSelection;
-	}
 
-	/**
-	 * Returns the parent of this node.
-	 *
-	 * @return EntityMemberNode
-	 */
-	public EntityMemberNode getParentNode() {
-		return parentNode;
-	}
-	
-	/**
-	 * Returns the children of this node within the context of the specified facet.  If no
-	 * such facet exists, this method will return an empty list.
-	 *
-	 * @return List<EntityMemberNode>
-	 */
-	public List<EntityMemberNode> getChildren(String facetName) {
-		List<EntityMemberNode> children = childrenByFacet.get( facetName );
-		return (children == null) ? new ArrayList<>() : children;
-	}
-	
-	/**
-	 * Adds a child to this node under the specified facet name.
-	 * 
-	 * @param facetName  the facet name for the new node
-	 * @param childNode  the child node to be added
-	 */
-	public void addChild(String facetName, EntityMemberNode childNode) {
-		if (!facetSelection.getFacetNames().contains( facetName )) {
-			throw new IllegalArgumentException("Invalid facet name for child node: " + facetName);
-		}
-		childrenByFacet.computeIfAbsent( facetName, fn -> childrenByFacet.put( fn, new ArrayList<>() ) );
-		List<EntityMemberNode> children = childrenByFacet.get( facetName );
-		
-		childNode.parentNode = this;
-		children.add( childNode );
-	}
-	
+    private String name;
+    private EntityFacetSelection facetSelection;
+    private EntityMemberNode parentNode;
+    private Map<String,List<EntityMemberNode>> childrenByFacet = new HashMap<>();
+
+    /**
+     * Constructs a new tree node instance.
+     * 
+     * @param name the name of the tree node
+     * @param facetSelection the facet selection instance for the node
+     */
+    public EntityMemberNode(String name, EntityFacetSelection facetSelection) {
+        this.name = name;
+        this.facetSelection = facetSelection;
+    }
+
+    /**
+     * Returns the name of this node.
+     *
+     * @return String
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Returns the facet selection instance for the node.
+     *
+     * @return EntityFacetSelection
+     */
+    public EntityFacetSelection getFacetSelection() {
+        return facetSelection;
+    }
+
+    /**
+     * Returns the parent of this node.
+     *
+     * @return EntityMemberNode
+     */
+    public EntityMemberNode getParentNode() {
+        return parentNode;
+    }
+
+    /**
+     * Returns the children of this node within the context of the specified facet. If no such facet exists, this method
+     * will return an empty list.
+     *
+     * @param facetName the name of the facet children to return
+     * @return List&lt;EntityMemberNode&gt;
+     */
+    public List<EntityMemberNode> getChildren(String facetName) {
+        List<EntityMemberNode> children = childrenByFacet.get( facetName );
+        return (children == null) ? new ArrayList<>() : children;
+    }
+
+    /**
+     * Adds a child to this node under the specified facet name.
+     * 
+     * @param facetName the facet name for the new node
+     * @param childNode the child node to be added
+     */
+    public void addChild(String facetName, EntityMemberNode childNode) {
+        if (!facetSelection.getFacetNames().contains( facetName )) {
+            throw new IllegalArgumentException( "Invalid facet name for child node: " + facetName );
+        }
+        childrenByFacet.computeIfAbsent( facetName, fn -> childrenByFacet.put( fn, new ArrayList<>() ) );
+        List<EntityMemberNode> children = childrenByFacet.get( facetName );
+
+        childNode.parentNode = this;
+        children.add( childNode );
+    }
+
 }

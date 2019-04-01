@@ -13,7 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.launcher;
+
+import org.apache.commons.lang3.StringUtils;
+import org.opentravel.application.common.AbstractMainWindowController;
+import org.opentravel.application.common.AbstractOTMApplication;
+import org.opentravel.application.common.OTA2ApplicationProvider;
+import org.opentravel.application.common.OTA2ApplicationSpec;
+import org.opentravel.application.common.OTA2LauncherTabSpec;
+import org.opentravel.application.common.OtmApplicationException;
+import org.opentravel.application.common.OtmApplicationRuntimeException;
+import org.opentravel.application.common.StatusType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,18 +40,6 @@ import java.util.ServiceLoader;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-import org.apache.commons.lang3.StringUtils;
-import org.opentravel.application.common.AbstractMainWindowController;
-import org.opentravel.application.common.AbstractOTMApplication;
-import org.opentravel.application.common.OTA2ApplicationProvider;
-import org.opentravel.application.common.OTA2ApplicationSpec;
-import org.opentravel.application.common.OTA2LauncherTabSpec;
-import org.opentravel.application.common.OtmApplicationException;
-import org.opentravel.application.common.OtmApplicationRuntimeException;
-import org.opentravel.application.common.StatusType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -66,93 +67,97 @@ import javafx.stage.Stage;
  */
 public class LauncherController extends AbstractMainWindowController {
 
-	public static final String FXML_FILE = "/ota2-launcher.fxml";
-	
+    public static final String FXML_FILE = "/ota2-launcher.fxml";
+
     private static final Logger log = LoggerFactory.getLogger( LauncherController.class );
-    
-	private static final String APP_CLASS_KEY   = "appClass";
-	private static final String APP_PROCESS_KEY = "appProcess";
-	private static final String MSG_ALREADY_RUNNING_TITLE   = "alert.alreadyRunning.title";
-	private static final String MSG_ALREADY_RUNNING_MESSAGE = "alert.alreadyRunning.message";
-	private static final String MSG_LAUNCH_TITLE            = "task.launch.title";
-	private static final String MSG_LAUNCH_ERROR            = "task.launch.error";
-	
-	@FXML private TabPane tabPane;
-	@FXML private ImageView statusBarIcon;
-	@FXML private Label statusBarLabel;
-	
-	/**
-	 * Called when the user clicks the menu to edit the global proxy settings
-	 * 
-	 * @param event  the action event that triggered this method call
-	 */
-	@FXML public void editProxySettings(ActionEvent event) {
-		ProxySettingsDialogController controller = null;
-		try {
-			FXMLLoader loader = new FXMLLoader( LauncherController.class.getResource(
-					ProxySettingsDialogController.FXML_FILE ) );
-			BorderPane page = loader.load();
-			Stage dialogStage = new Stage();
-			Scene scene = new Scene( page );
-			
-			dialogStage.setTitle( "Network Proxy Settings" );
-			dialogStage.initModality( Modality.WINDOW_MODAL );
-			dialogStage.initOwner( getPrimaryStage() );
-			dialogStage.setScene( scene );
-			
-			controller = loader.getController();
-			controller.setDialogStage( dialogStage );
-			controller.showAndWait();
-			
-		} catch (IOException e) {
-		    log.error( "Error launching the proxy settings dialog.", e );
-		}
-	}
-	
-	/**
-	 * Called when the user clicks one of the utility application buttons
-	 * to launch it.
-	 * 
-	 * @param event  the action event that triggered this method call
-	 */
-	@SuppressWarnings("unchecked")
-	@FXML
-	public void launchUtilityApp(ActionEvent event) {
-		Button sourceButton = (Button) event.getSource();
-		Class<? extends AbstractOTMApplication> appClass = (Class<? extends AbstractOTMApplication>)
-				sourceButton.getProperties().get( APP_CLASS_KEY );
-		Process appProcess = (Process) sourceButton.getProperties().get( APP_PROCESS_KEY );
-		
-		if ((appProcess != null) && appProcess.isAlive()) {
-			Alert alert = new Alert( AlertType.INFORMATION );
-			
-			alert.setTitle( MessageBuilder.formatMessage( MSG_ALREADY_RUNNING_TITLE ) );
-			alert.setHeaderText( MessageBuilder.getDisplayName( appClass ) );
-			alert.setContentText( MessageBuilder.formatMessage( MSG_ALREADY_RUNNING_MESSAGE ) );
-			alert.showAndWait();
-			
-		} else {
-			String statusMessage = MessageBuilder.formatMessage( MSG_LAUNCH_TITLE, MessageBuilder.getDisplayName( appClass ) );
-			Runnable r = new BackgroundTask( statusMessage, StatusType.INFO ) {
-				public void execute() throws OtmApplicationException {
-				    launchApplicationProcess( sourceButton, appClass );
-				}
-			};
-			
-			sourceButton.getProperties().remove( APP_PROCESS_KEY );
-			new Thread( r ).start();
-		}
-	}
-	
+
+    private static final String APP_CLASS_KEY = "appClass";
+    private static final String APP_PROCESS_KEY = "appProcess";
+    private static final String MSG_ALREADY_RUNNING_TITLE = "alert.alreadyRunning.title";
+    private static final String MSG_ALREADY_RUNNING_MESSAGE = "alert.alreadyRunning.message";
+    private static final String MSG_LAUNCH_TITLE = "task.launch.title";
+    private static final String MSG_LAUNCH_ERROR = "task.launch.error";
+
+    @FXML
+    private TabPane tabPane;
+    @FXML
+    private ImageView statusBarIcon;
+    @FXML
+    private Label statusBarLabel;
+
+    /**
+     * Called when the user clicks the menu to edit the global proxy settings
+     * 
+     * @param event the action event that triggered this method call
+     */
+    @FXML
+    public void editProxySettings(ActionEvent event) {
+        ProxySettingsDialogController controller = null;
+        try {
+            FXMLLoader loader =
+                new FXMLLoader( LauncherController.class.getResource( ProxySettingsDialogController.FXML_FILE ) );
+            BorderPane page = loader.load();
+            Stage dialogStage = new Stage();
+            Scene scene = new Scene( page );
+
+            dialogStage.setTitle( "Network Proxy Settings" );
+            dialogStage.initModality( Modality.WINDOW_MODAL );
+            dialogStage.initOwner( getPrimaryStage() );
+            dialogStage.setScene( scene );
+
+            controller = loader.getController();
+            controller.setDialogStage( dialogStage );
+            controller.showAndWait();
+
+        } catch (IOException e) {
+            log.error( "Error launching the proxy settings dialog.", e );
+        }
+    }
+
+    /**
+     * Called when the user clicks one of the utility application buttons to launch it.
+     * 
+     * @param event the action event that triggered this method call
+     */
+    @SuppressWarnings("unchecked")
+    @FXML
+    public void launchUtilityApp(ActionEvent event) {
+        Button sourceButton = (Button) event.getSource();
+        Class<? extends AbstractOTMApplication> appClass =
+            (Class<? extends AbstractOTMApplication>) sourceButton.getProperties().get( APP_CLASS_KEY );
+        Process appProcess = (Process) sourceButton.getProperties().get( APP_PROCESS_KEY );
+
+        if ((appProcess != null) && appProcess.isAlive()) {
+            Alert alert = new Alert( AlertType.INFORMATION );
+
+            alert.setTitle( MessageBuilder.formatMessage( MSG_ALREADY_RUNNING_TITLE ) );
+            alert.setHeaderText( MessageBuilder.getDisplayName( appClass ) );
+            alert.setContentText( MessageBuilder.formatMessage( MSG_ALREADY_RUNNING_MESSAGE ) );
+            alert.showAndWait();
+
+        } else {
+            String statusMessage =
+                MessageBuilder.formatMessage( MSG_LAUNCH_TITLE, MessageBuilder.getDisplayName( appClass ) );
+            Runnable r = new BackgroundTask( statusMessage, StatusType.INFO ) {
+                public void execute() throws OtmApplicationException {
+                    launchApplicationProcess( sourceButton, appClass );
+                }
+            };
+
+            sourceButton.getProperties().remove( APP_PROCESS_KEY );
+            new Thread( r ).start();
+        }
+    }
+
     /**
      * Spawns an external Java process for the selected application.
      * 
-     * @param sourceButton  the button that was clicked by the user to launch an application
-     * @param appClass  the JavaFX application class for the utility being launched
-     * @throws OtmApplicationException  thrown if an error occurs while launching the application
+     * @param sourceButton the button that was clicked by the user to launch an application
+     * @param appClass the JavaFX application class for the utility being launched
+     * @throws OtmApplicationException thrown if an error occurs while launching the application
      */
-    private void launchApplicationProcess(Button sourceButton,
-            Class<? extends AbstractOTMApplication> appClass) throws OtmApplicationException {
+    private void launchApplicationProcess(Button sourceButton, Class<? extends AbstractOTMApplication> appClass)
+        throws OtmApplicationException {
         try {
             String javaHome = System.getProperty( "java.home" );
             String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
@@ -161,11 +166,11 @@ public class LauncherController extends AbstractMainWindowController {
             List<String> cmds = new ArrayList<>( Arrays.asList( javaBin, "-cp", classpath ) );
             ProcessBuilder builder;
             Process newProcess;
-            
+
             // Configure proxy settings (if necessary)
             if (!settings.isUseProxy()) {
                 cmds.add( "-Dhttp.proxyHost=" + settings.getProxyHost() );
-                
+
                 if (settings.getProxyPort() != null) {
                     cmds.add( "-Dhttp.proxyPort=" + settings.getProxyPort() );
                 }
@@ -173,195 +178,194 @@ public class LauncherController extends AbstractMainWindowController {
                     cmds.add( "-Dhttp.nonProxyHosts=" + settings.getNonProxyHosts() );
                 }
             }
-            
+
             // Build and execute the command to start the new sub-process
             cmds.add( appClass.getCanonicalName() );
             builder = new ProcessBuilder( cmds );
             builder.redirectErrorStream( true );
             builder.redirectOutput( Redirect.to( getLogFile( appClass ) ) );
             newProcess = builder.start();
-            
+
             // Wait five seconds before checking the status
             sleep( 5000 );
-            
+
             // Finish up by saving the running process or reporting an error
             if (newProcess.isAlive()) {
                 sourceButton.getProperties().put( APP_PROCESS_KEY, newProcess );
-                
+
             } else {
-                throw new OtmApplicationRuntimeException( MessageBuilder.formatMessage(
-                        MSG_LAUNCH_ERROR, MessageBuilder.getDisplayName( appClass ) ) );
+                throw new OtmApplicationRuntimeException(
+                    MessageBuilder.formatMessage( MSG_LAUNCH_ERROR, MessageBuilder.getDisplayName( appClass ) ) );
             }
-            
+
         } catch (Exception e) {
             throw new OtmApplicationException( e.getMessage(), e );
         }
     }
-    
+
     /**
      * Causes the current thread to sleep for the specified number of milliseconds.
      * 
-     * @param durationMillis  the duration (in millis) to sleep
+     * @param durationMillis the duration (in millis) to sleep
      */
     private void sleep(long durationMillis) {
         try {
             Thread.sleep( durationMillis );
-            
+
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
-    
-	/**
-	 * Called when the user clicks the menu to display the about-application
-	 * dialog.
-	 * 
-	 * @param event  the action event that triggered this method call
-	 */
-	@FXML public void aboutApplication(ActionEvent event) {
-		AboutDialogController.createAboutDialog( getPrimaryStage() ).showAndWait();
-	}
-	
-	/**
-	 * Called when the user clicks the menu to exit the application.
-	 * 
-	 * @param event  the action event that triggered this method call
-	 */
-	@FXML public void exitApplication(ActionEvent event) {
-		getPrimaryStage().close();
-	}
-	
-	/**
-	 * @see org.opentravel.application.common.AbstractMainWindowController#setStatusMessage(java.lang.String, org.opentravel.application.common.StatusType, boolean)
-	 */
-	@Override
-	protected void setStatusMessage(String message, StatusType statusType, boolean disableControls) {
-		Platform.runLater( () -> {
-			statusBarLabel.setText( message );
-			statusBarIcon.setImage( (statusType == null) ? null : statusType.getIcon() );
-		} );
-	}
 
-	/**
-	 * @see org.opentravel.application.common.AbstractMainWindowController#updateControlStates()
-	 */
-	@Override
-	protected void updateControlStates() {
-		// No action required
-	}
+    /**
+     * Called when the user clicks the menu to display the about-application dialog.
+     * 
+     * @param event the action event that triggered this method call
+     */
+    @FXML
+    public void aboutApplication(ActionEvent event) {
+        AboutDialogController.createAboutDialog( getPrimaryStage() ).showAndWait();
+    }
 
-	/**
-	 * @see org.opentravel.application.common.AbstractMainWindowController#initialize(javafx.stage.Stage)
-	 */
-	@Override
-	protected void initialize(Stage primaryStage) {
-		Map<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>> appsByTab = getApplicationsByTab();
-		
-		super.initialize( primaryStage );
-		
-		for (Entry<OTA2LauncherTabSpec, SortedSet<OTA2ApplicationSpec>> entry : appsByTab.entrySet()) {
-		    OTA2LauncherTabSpec tabSpec = entry.getKey();
-			TilePane buttonPane = newTab( tabSpec.getName() );
-			
-			for (OTA2ApplicationSpec appSpec : entry.getValue()) {
-				buttonPane.getChildren().add( newAppIcon(
-						appSpec.getApplicationClass(), appSpec.getLaunchIcon() ) );
-			}
-		}
-	}
-	
-	/**
-	 * Returns the list of <code>OTA2ApplicationSpec</code>s organized by tab.
-	 * 
-	 * @return Map<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>>
-	 */
-	private Map<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>> getApplicationsByTab() {
-		ServiceLoader<OTA2ApplicationProvider> loader = ServiceLoader.load( OTA2ApplicationProvider.class );
-		Map<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>> appsByTab = new TreeMap<>();
-		
-		for (OTA2ApplicationProvider provider : loader) {
-			OTA2ApplicationSpec spec = provider.getApplicationSpec();
-			SortedSet<OTA2ApplicationSpec> appSpecs = appsByTab.get( spec.getLauncherTab() );
-			
-			if (appSpecs == null) {
-				appSpecs = new TreeSet<>();
-				appsByTab.put( spec.getLauncherTab(), appSpecs );
-			}
-			appSpecs.add( spec );
-		}
-		return appsByTab;
-	}
-	
-	/**
-	 * Creates a new launcher tab with the specified name and returns the content
-	 * pane for the tab.
-	 * 
-	 * @param name  the name of the tab to create
-	 * @return TilePane
-	 */
-	private TilePane newTab(String name) {
-		Tab tab = new Tab( name );
-		StackPane tabContent = new StackPane();
-		TilePane buttonPane = new TilePane();
-		
-		buttonPane.setHgap( 25.0 );
-		buttonPane.setVgap( 25.0 );
-		buttonPane.setPrefRows( 1 );
-		buttonPane.setPrefColumns( 1 );
-		buttonPane.setPadding( new Insets( 25.0, 25.0, 25.0, 25.0 ) );
-		
-		tabContent.getChildren().add( buttonPane );
-		tab.setContent( tabContent );
-		tabPane.getTabs().add( tab );
-		
-		return buttonPane;
-	}
-	
-	/**
-	 * Constructs a new utility application icon that will launch the given application class
-	 * when the button is clicked.
-	 * 
-	 * @param appClass  the JavaFX application class to use when launching the utility
-	 * @param image  the image icon to display on the button
-	 * @return Button
-	 */
-	private Button newAppIcon(Class<? extends AbstractOTMApplication> appClass, Image image) {
-		ImageView buttonImg = new ImageView();
-		Button appButton = new Button();
-		
-		buttonImg.setImage( image );
-		appButton.setText( MessageBuilder.getDisplayName( appClass ) );
-		appButton.setGraphic( buttonImg );
-		appButton.setContentDisplay( ContentDisplay.TOP );
-		appButton.setOnAction( this::launchUtilityApp );
-		appButton.getProperties().put( APP_CLASS_KEY, appClass );
-		return appButton;
-	}
-	
-	/**
-	 * Returns the file to which the given application class's log output should
-	 * be directed.
-	 * 
-	 * @param appClass  the utility application class for which to return a log file
-	 * @return File
-	 */
-	private File getLogFile(Class<?> appClass) {
-		return new File( getLogFolder(), appClass.getSimpleName() + ".log" );
-	}
-	
-	/**
-	 * Returns the folder location for utility application log files.
-	 * 
-	 * @return File
-	 */
-	private File getLogFolder() {
-		String currentFolder = System.getProperty( "user.dir" );
-		File targetFolder = new File( currentFolder + "/target" );
-		File rootFolder = targetFolder.exists() ? targetFolder : new File( currentFolder );
-		File logFolder = new File( rootFolder + "/logs" );
-		
-		logFolder.mkdirs();
-		return logFolder;
-	}
-	
+    /**
+     * Called when the user clicks the menu to exit the application.
+     * 
+     * @param event the action event that triggered this method call
+     */
+    @FXML
+    public void exitApplication(ActionEvent event) {
+        getPrimaryStage().close();
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractMainWindowController#setStatusMessage(java.lang.String,
+     *      org.opentravel.application.common.StatusType, boolean)
+     */
+    @Override
+    protected void setStatusMessage(String message, StatusType statusType, boolean disableControls) {
+        Platform.runLater( () -> {
+            statusBarLabel.setText( message );
+            statusBarIcon.setImage( (statusType == null) ? null : statusType.getIcon() );
+        } );
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractMainWindowController#updateControlStates()
+     */
+    @Override
+    protected void updateControlStates() {
+        // No action required
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractMainWindowController#initialize(javafx.stage.Stage)
+     */
+    @Override
+    protected void initialize(Stage primaryStage) {
+        Map<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>> appsByTab = getApplicationsByTab();
+
+        super.initialize( primaryStage );
+
+        for (Entry<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>> entry : appsByTab.entrySet()) {
+            OTA2LauncherTabSpec tabSpec = entry.getKey();
+            TilePane buttonPane = newTab( tabSpec.getName() );
+
+            for (OTA2ApplicationSpec appSpec : entry.getValue()) {
+                buttonPane.getChildren().add( newAppIcon( appSpec.getApplicationClass(), appSpec.getLaunchIcon() ) );
+            }
+        }
+    }
+
+    /**
+     * Returns the list of <code>OTA2ApplicationSpec</code>s organized by tab.
+     * 
+     * @return Map&lt;OTA2LauncherTabSpec,SortedSet&lt;OTA2ApplicationSpec&gt;&gt;
+     */
+    private Map<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>> getApplicationsByTab() {
+        ServiceLoader<OTA2ApplicationProvider> loader = ServiceLoader.load( OTA2ApplicationProvider.class );
+        Map<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>> appsByTab = new TreeMap<>();
+
+        for (OTA2ApplicationProvider provider : loader) {
+            OTA2ApplicationSpec spec = provider.getApplicationSpec();
+            SortedSet<OTA2ApplicationSpec> appSpecs = appsByTab.get( spec.getLauncherTab() );
+
+            if (appSpecs == null) {
+                appSpecs = new TreeSet<>();
+                appsByTab.put( spec.getLauncherTab(), appSpecs );
+            }
+            appSpecs.add( spec );
+        }
+        return appsByTab;
+    }
+
+    /**
+     * Creates a new launcher tab with the specified name and returns the content pane for the tab.
+     * 
+     * @param name the name of the tab to create
+     * @return TilePane
+     */
+    private TilePane newTab(String name) {
+        Tab tab = new Tab( name );
+        StackPane tabContent = new StackPane();
+        TilePane buttonPane = new TilePane();
+
+        buttonPane.setHgap( 25.0 );
+        buttonPane.setVgap( 25.0 );
+        buttonPane.setPrefRows( 1 );
+        buttonPane.setPrefColumns( 1 );
+        buttonPane.setPadding( new Insets( 25.0, 25.0, 25.0, 25.0 ) );
+
+        tabContent.getChildren().add( buttonPane );
+        tab.setContent( tabContent );
+        tabPane.getTabs().add( tab );
+
+        return buttonPane;
+    }
+
+    /**
+     * Constructs a new utility application icon that will launch the given application class when the button is
+     * clicked.
+     * 
+     * @param appClass the JavaFX application class to use when launching the utility
+     * @param image the image icon to display on the button
+     * @return Button
+     */
+    private Button newAppIcon(Class<? extends AbstractOTMApplication> appClass, Image image) {
+        ImageView buttonImg = new ImageView();
+        Button appButton = new Button();
+
+        buttonImg.setImage( image );
+        appButton.setText( MessageBuilder.getDisplayName( appClass ) );
+        appButton.setGraphic( buttonImg );
+        appButton.setContentDisplay( ContentDisplay.TOP );
+        appButton.setOnAction( this::launchUtilityApp );
+        appButton.getProperties().put( APP_CLASS_KEY, appClass );
+        return appButton;
+    }
+
+    /**
+     * Returns the file to which the given application class's log output should be directed.
+     * 
+     * @param appClass the utility application class for which to return a log file
+     * @return File
+     */
+    private File getLogFile(Class<?> appClass) {
+        return new File( getLogFolder(), appClass.getSimpleName() + ".log" );
+    }
+
+    /**
+     * Returns the folder location for utility application log files.
+     * 
+     * @return File
+     */
+    private File getLogFolder() {
+        String currentFolder = System.getProperty( "user.dir" );
+        File targetFolder = new File( currentFolder + "/target" );
+        File rootFolder = targetFolder.exists() ? targetFolder : new File( currentFolder );
+        File logFolder = new File( rootFolder + "/logs" );
+
+        logFolder.mkdirs();
+        return logFolder;
+    }
+
 }

@@ -16,10 +16,6 @@
 
 package org.opentravel.release.navigate.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.opentravel.application.common.Images;
 import org.opentravel.release.NodeProperty;
 import org.opentravel.release.navigate.TreeNode;
@@ -28,79 +24,84 @@ import org.opentravel.schemacompiler.model.TLAbstractEnumeration;
 import org.opentravel.schemacompiler.model.TLClosedEnumeration;
 import org.opentravel.schemacompiler.model.TLOpenEnumeration;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import javafx.scene.image.Image;
 
 /**
  * Abstract tree node that represents a <code>TLAbstractEnumeration</code> instance.
  */
 public abstract class EnumerationTreeNode<E extends TLAbstractEnumeration> extends TreeNode<E> {
-	
-	/**
-	 * Tree node that represents a <code>TLClosedEnumeration</code> instance.
-	 */
-	public static class ClosedEnumerationTreeNode extends EnumerationTreeNode<TLClosedEnumeration> {
-		public ClosedEnumerationTreeNode(TLClosedEnumeration entity, TreeNodeFactory factory) {
-			super(entity, factory);
-		}
-	}
-	
-	/**
-	 * Tree node that represents a <code>TLOpenEnumeration</code> instance.
-	 */
-	public static class OpenEnumerationTreeNode extends EnumerationTreeNode<TLOpenEnumeration> {
-		public OpenEnumerationTreeNode(TLOpenEnumeration entity, TreeNodeFactory factory) {
-			super(entity, factory);
-		}
-	}
-	
-	/**
-	 * Constructor that specifies the OTM entity for this node.
-	 * 
-	 * @param entity  the OTM entity represented by this node
-	 * @param factory  the factory that created this node
-	 */
-	public EnumerationTreeNode(E entity, TreeNodeFactory factory) {
-		super( entity, factory );
-	}
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getLabel()
-	 */
-	@Override
-	public String getLabel() {
-		return getEntity().getLocalName();
-	}
+    /**
+     * Tree node that represents a <code>TLClosedEnumeration</code> instance.
+     */
+    public static class ClosedEnumerationTreeNode extends EnumerationTreeNode<TLClosedEnumeration> {
+        public ClosedEnumerationTreeNode(TLClosedEnumeration entity, TreeNodeFactory factory) {
+            super( entity, factory );
+        }
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getIcon()
-	 */
-	@Override
-	public Image getIcon() {
-		return Images.enumerationIcon;
-	}
+    /**
+     * Tree node that represents a <code>TLOpenEnumeration</code> instance.
+     */
+    public static class OpenEnumerationTreeNode extends EnumerationTreeNode<TLOpenEnumeration> {
+        public OpenEnumerationTreeNode(TLOpenEnumeration entity, TreeNodeFactory factory) {
+            super( entity, factory );
+        }
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getProperties()
-	 */
-	@Override
-	public List<NodeProperty> getProperties() {
-		List<NodeProperty> props = new ArrayList<>();
-		TLAbstractEnumeration enumeration = getEntity();
-		
-		props.add( new NodeProperty( "name", enumeration::getName ) );
-		props.add( new NodeProperty( "enumType",() -> (enumeration instanceof TLOpenEnumeration) ? "Open" : "Closed" ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( enumeration ) ) );
-		props.add( new NodeProperty( "extends", () -> getExtensionName( enumeration ) ) );
-		return props;
-	}
+    /**
+     * Constructor that specifies the OTM entity for this node.
+     * 
+     * @param entity the OTM entity represented by this node
+     * @param factory the factory that created this node
+     */
+    public EnumerationTreeNode(E entity, TreeNodeFactory factory) {
+        super( entity, factory );
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
-	 */
-	@Override
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getLabel()
+     */
+    @Override
+    public String getLabel() {
+        return getEntity().getLocalName();
+    }
+
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getIcon()
+     */
+    @Override
+    public Image getIcon() {
+        return Images.enumerationIcon;
+    }
+
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getProperties()
+     */
+    @Override
+    public List<NodeProperty> getProperties() {
+        List<NodeProperty> props = new ArrayList<>();
+        TLAbstractEnumeration enumeration = getEntity();
+
+        props.add( new NodeProperty( "name", enumeration::getName ) );
+        props.add(
+            new NodeProperty( "enumType", () -> (enumeration instanceof TLOpenEnumeration) ? "Open" : "Closed" ) );
+        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( enumeration ) ) );
+        props.add( new NodeProperty( "extends", () -> getExtensionName( enumeration ) ) );
+        return props;
+    }
+
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
+     */
+    @Override
     protected List<TreeNode<Object>> initializeChildren() {
-		// TODO: Add enumeration value children
-		return Collections.emptyList();
-	}
+        // TODO: Add enumeration value children
+        return Collections.emptyList();
+    }
 
 }

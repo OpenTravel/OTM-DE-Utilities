@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.examplehelper;
 
 import javafx.scene.image.Image;
@@ -21,12 +22,13 @@ import javafx.scene.image.Image;
  * Constant definitions for images that are used in the launcher application.
  */
 public class Images {
-	
-	public static final Image launcherIcon = new Image( Images.class.getResourceAsStream( "/images/otm_example_helper.png" ) );
-	
+
+    public static final Image launcherIcon =
+        new Image( Images.class.getResourceAsStream( "/images/otm_example_helper.png" ) );
+
     /**
      * Private constructor to prevent instantiation.
      */
     private Images() {}
-    
+
 }

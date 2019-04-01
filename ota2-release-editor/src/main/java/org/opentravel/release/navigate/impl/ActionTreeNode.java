@@ -16,9 +16,6 @@
 
 package org.opentravel.release.navigate.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.opentravel.application.common.Images;
 import org.opentravel.release.NodeProperty;
 import org.opentravel.release.navigate.TreeNode;
@@ -26,69 +23,72 @@ import org.opentravel.release.navigate.TreeNodeFactory;
 import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLActionResponse;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.scene.image.Image;
 
 /**
  * Tree node that represents a <code>TLAction</code> instance.
  */
 public class ActionTreeNode extends TreeNode<TLAction> {
-	
-	/**
-	 * Constructor that specifies the OTM entity for this node.
-	 * 
-	 * @param entity  the OTM entity represented by this node
-	 * @param factory  the factory that created this node
-	 */
-	public ActionTreeNode(TLAction entity, TreeNodeFactory factory) {
-		super(entity, factory);
-	}
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getLabel()
-	 */
-	@Override
-	public String getLabel() {
-		return getEntity().getActionId();
-	}
+    /**
+     * Constructor that specifies the OTM entity for this node.
+     * 
+     * @param entity the OTM entity represented by this node
+     * @param factory the factory that created this node
+     */
+    public ActionTreeNode(TLAction entity, TreeNodeFactory factory) {
+        super( entity, factory );
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getIcon()
-	 */
-	@Override
-	public Image getIcon() {
-		return Images.actionIcon;
-	}
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getLabel()
+     */
+    @Override
+    public String getLabel() {
+        return getEntity().getActionId();
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getProperties()
-	 */
-	@Override
-	public List<NodeProperty> getProperties() {
-		List<NodeProperty> props = new ArrayList<>();
-		TLAction action = getEntity();
-		
-		props.add( new NodeProperty( "actionId", action::getActionId ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( action ) ) );
-		props.add( new NodeProperty( "commonAction", () -> action.isCommonAction() + "" ) );
-		return props;
-	}
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getIcon()
+     */
+    @Override
+    public Image getIcon() {
+        return Images.actionIcon;
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
-	 */
-	@Override
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getProperties()
+     */
+    @Override
+    public List<NodeProperty> getProperties() {
+        List<NodeProperty> props = new ArrayList<>();
+        TLAction action = getEntity();
+
+        props.add( new NodeProperty( "actionId", action::getActionId ) );
+        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( action ) ) );
+        props.add( new NodeProperty( "commonAction", () -> action.isCommonAction() + "" ) );
+        return props;
+    }
+
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
+     */
+    @Override
     protected List<TreeNode<Object>> initializeChildren() {
-		List<TreeNode<Object>> children = new ArrayList<>();
-		TLAction action = getEntity();
-		
-		if (action.getRequest() != null) {
-			children.add( treeNodeFactory.newTreeNode( action.getRequest() ) );
-		}
-		
-		for (TLActionResponse entity : action.getResponses()) {
-			children.add( treeNodeFactory.newTreeNode( entity ) );
-		}
-		return children;
-	}
+        List<TreeNode<Object>> children = new ArrayList<>();
+        TLAction action = getEntity();
+
+        if (action.getRequest() != null) {
+            children.add( treeNodeFactory.newTreeNode( action.getRequest() ) );
+        }
+
+        for (TLActionResponse entity : action.getResponses()) {
+            children.add( treeNodeFactory.newTreeNode( entity ) );
+        }
+        return children;
+    }
 
 }

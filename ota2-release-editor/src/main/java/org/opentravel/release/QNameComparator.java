@@ -24,34 +24,33 @@ import javax.xml.namespace.QName;
  * Comparator that sorts qualified names by namespace then by local name.
  */
 public class QNameComparator implements Comparator<QName> {
-	
-	/**
-	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-	 */
-	@Override
-	public int compare(QName qn1, QName qn2) {
-		String ns1 = nullToBlank( (qn1 == null) ? null : qn1.getNamespaceURI() );
-		String ns2 = nullToBlank( (qn2 == null) ? null : qn2.getNamespaceURI() );
-		int result = ns1.compareTo( ns2 );
-		
-		if (result == 0) {
-			String local1 = nullToBlank( (qn1 == null) ? null : qn1.getLocalPart() );
-			String local2 = nullToBlank( (qn2 == null) ? null : qn2.getLocalPart() );
-			
-			result = local1.compareTo( local2 );
-		}
-		return result;
-	}
-	
-	/**
-	 * If the given string is null, returns an empty string.  Otherwise, returns
-	 * the original string.
-	 * 
-	 * @param str  the string to be processed
-	 * @return String
-	 */
-	private String nullToBlank(String str) {
-		return (str == null) ? "" : str;
-	}
-	
+
+    /**
+     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+     */
+    @Override
+    public int compare(QName qn1, QName qn2) {
+        String ns1 = nullToBlank( (qn1 == null) ? null : qn1.getNamespaceURI() );
+        String ns2 = nullToBlank( (qn2 == null) ? null : qn2.getNamespaceURI() );
+        int result = ns1.compareTo( ns2 );
+
+        if (result == 0) {
+            String local1 = nullToBlank( (qn1 == null) ? null : qn1.getLocalPart() );
+            String local2 = nullToBlank( (qn2 == null) ? null : qn2.getLocalPart() );
+
+            result = local1.compareTo( local2 );
+        }
+        return result;
+    }
+
+    /**
+     * If the given string is null, returns an empty string. Otherwise, returns the original string.
+     * 
+     * @param str the string to be processed
+     * @return String
+     */
+    private String nullToBlank(String str) {
+        return (str == null) ? "" : str;
+    }
+
 }

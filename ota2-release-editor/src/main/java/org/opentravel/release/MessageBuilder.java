@@ -25,37 +25,38 @@ import java.util.ResourceBundle;
  * Utility methods for constructing and formatting localized messages.
  */
 public class MessageBuilder {
-	
-	private static final ResourceBundle messageBundle = ResourceBundle.getBundle( "ota2-release-messages", Locale.getDefault() );
-	
+
+    private static final ResourceBundle messageBundle =
+        ResourceBundle.getBundle( "ota2-release-messages", Locale.getDefault() );
+
     /**
      * Private constructor to prevent instantiation of this class.
      */
     private MessageBuilder() {}
-    
-	/**
-	 * Returns the text for the given error or warning message.
-	 * 
-	 * @param messageKey  the message key for which to return the human-readable text
-	 * @param messageParams  substitution parameters for the message
-	 * @return String
-	 */
-	public static String formatMessage(String messageKey, Object... messageParams) {
-		String formattedMessage;
-		try {
-			String messageText = messageBundle.getString( messageKey );
-			
-			if (messageText != null) {
-				formattedMessage = MessageFormat.format( messageText, messageParams );
-				
-			} else {
-				formattedMessage = messageKey;
-			}
-			
-		} catch (MissingResourceException e) {
-			formattedMessage = messageKey;
-		}
-		return formattedMessage;
-	}
-	
+
+    /**
+     * Returns the text for the given error or warning message.
+     * 
+     * @param messageKey the message key for which to return the human-readable text
+     * @param messageParams substitution parameters for the message
+     * @return String
+     */
+    public static String formatMessage(String messageKey, Object... messageParams) {
+        String formattedMessage;
+        try {
+            String messageText = messageBundle.getString( messageKey );
+
+            if (messageText != null) {
+                formattedMessage = MessageFormat.format( messageText, messageParams );
+
+            } else {
+                formattedMessage = messageKey;
+            }
+
+        } catch (MissingResourceException e) {
+            formattedMessage = messageKey;
+        }
+        return formattedMessage;
+    }
+
 }

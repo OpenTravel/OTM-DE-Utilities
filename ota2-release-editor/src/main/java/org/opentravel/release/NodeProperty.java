@@ -20,52 +20,52 @@ package org.opentravel.release;
  * Encapsulates a single property of a <code>TreeNode</code>.
  */
 public class NodeProperty {
-	
-	private String name;
-	private String value;
-	
-	/**
-	 * Constructor that specifies the property name and value.
-	 * 
-	 * @param propertyNameKey  the resource bundle key for the property name
-	 * @param valueProvider  provides the value for the node property
-	 */
-	public NodeProperty(String propertyNameKey, ValueProvider valueProvider) {
-		this.name = MessageBuilder.formatMessage( "propertyName." + propertyNameKey );
-		
-		try {
-			this.value = valueProvider.getValue();
-			
-		} catch (Exception e) {
-			this.value = "";
-		}
-	}
-	
-	/**
-	 * Returns the property name.
-	 *
-	 * @return String
-	 */
-	public String getName() {
-		return name;
-	}
-	
-	/**
-	 * Returns the value of property.
-	 *
-	 * @return String
-	 */
-	public String getValue() {
-		return value;
-	}
-	
-	/**
-	 * Interface used to provide a value for the node property.
-	 */
-	public static interface ValueProvider {
-		
-		public String getValue();
-		
-	}
-	
+
+    private String name;
+    private String value;
+
+    /**
+     * Constructor that specifies the property name and value.
+     * 
+     * @param propertyNameKey the resource bundle key for the property name
+     * @param valueProvider provides the value for the node property
+     */
+    public NodeProperty(String propertyNameKey, ValueProvider valueProvider) {
+        this.name = MessageBuilder.formatMessage( "propertyName." + propertyNameKey );
+
+        try {
+            this.value = valueProvider.getValue();
+
+        } catch (Exception e) {
+            this.value = "";
+        }
+    }
+
+    /**
+     * Returns the property name.
+     *
+     * @return String
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Returns the value of property.
+     *
+     * @return String
+     */
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * Interface used to provide a value for the node property.
+     */
+    public static interface ValueProvider {
+
+        public String getValue();
+
+    }
+
 }

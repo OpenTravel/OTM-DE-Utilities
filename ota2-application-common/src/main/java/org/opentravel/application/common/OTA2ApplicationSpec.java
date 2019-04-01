@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.application.common;
 
 import javafx.scene.image.Image;
@@ -21,116 +22,115 @@ import javafx.scene.image.Image;
  * Provides launcher configuration settings for an OTA2 application.
  */
 public class OTA2ApplicationSpec implements Comparable<OTA2ApplicationSpec> {
-	
-	private String name;
-	private String description;
-	private int priority;
-	private OTA2LauncherTabSpec launcherTab;
-	private Image launchIcon;
-	private Class<? extends AbstractOTMApplication> applicationClass;
-	
-	/**
-	 * Full constructor.
-	 * 
-	 * @param name  the name of the application
-	 * @param DESCRIPTION  a brief DESCRIPTION of the application
-	 * @param priority  the priority that indicates the order of applications in the launcher tab
-	 * @param launcherTab  the spec for the tab where the application's launch button should be displayed
-	 * @param launchIcon  the icon to display on the launch button for the application
-	 * @param applicationClass  the application class to be called when launching the application
-	 */
-	public OTA2ApplicationSpec(String name, String description, int priority, OTA2LauncherTabSpec launcherTab,
-			Image launchIcon, Class<? extends AbstractOTMApplication> applicationClass) {
-		this.name = name;
-		this.description = description;
-		this.launcherTab = launcherTab;
-		this.launchIcon = launchIcon;
-		this.applicationClass = applicationClass;
-	}
 
-	/**
-	 * Returns the name of the application.
-	 *
-	 * @return String
-	 */
-	public String getName() {
-		return name;
-	}
+    private String name;
+    private String description;
+    private int priority;
+    private OTA2LauncherTabSpec launcherTab;
+    private Image launchIcon;
+    private Class<? extends AbstractOTMApplication> applicationClass;
 
-	/**
-	 * Returns a brief DESCRIPTION of the application.
-	 *
-	 * @return String
-	 */
-	public String getDescription() {
-		return description;
-	}
+    /**
+     * Full constructor.
+     * 
+     * @param name the name of the application
+     * @param description a brief description of the application
+     * @param priority the priority that indicates the order of applications in the launcher tab
+     * @param launcherTab the spec for the tab where the application's launch button should be displayed
+     * @param launchIcon the icon to display on the launch button for the application
+     * @param applicationClass the application class to be called when launching the application
+     */
+    public OTA2ApplicationSpec(String name, String description, int priority, OTA2LauncherTabSpec launcherTab,
+        Image launchIcon, Class<? extends AbstractOTMApplication> applicationClass) {
+        this.name = name;
+        this.description = description;
+        this.launcherTab = launcherTab;
+        this.launchIcon = launchIcon;
+        this.applicationClass = applicationClass;
+    }
 
-	/**
-	 * Returns the spec for the tab where the application's launch button should be displayed.
-	 *
-	 * @return OTA2LauncherTabSpec
-	 */
-	public OTA2LauncherTabSpec getLauncherTab() {
-		return launcherTab;
-	}
+    /**
+     * Returns the name of the application.
+     *
+     * @return String
+     */
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * Returns the icon to display on the launch button for the application.
-	 *
-	 * @return Image
-	 */
-	public Image getLaunchIcon() {
-		return launchIcon;
-	}
+    /**
+     * Returns a brief description of the application.
+     *
+     * @return String
+     */
+    public String getDescription() {
+        return description;
+    }
 
-	/**
-	 * Returns the application class to be called when launching the application.
-	 *
-	 * @return Class<? extends AbstractOTMApplication>
-	 */
-	public Class<? extends AbstractOTMApplication> getApplicationClass() {
-		return applicationClass;
-	}
+    /**
+     * Returns the spec for the tab where the application's launch button should be displayed.
+     *
+     * @return OTA2LauncherTabSpec
+     */
+    public OTA2LauncherTabSpec getLauncherTab() {
+        return launcherTab;
+    }
 
-	/**
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return priority;
-	}
+    /**
+     * Returns the icon to display on the launch button for the application.
+     *
+     * @return Image
+     */
+    public Image getLaunchIcon() {
+        return launchIcon;
+    }
 
-	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		return (obj instanceof OTA2ApplicationSpec)
-				&& (this.compareTo( (OTA2ApplicationSpec) obj ) == 0);
-	}
-	
-	/**
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	@Override
-	public int compareTo(OTA2ApplicationSpec other) {
-		int result;
-		
-		if (other == null) {
-			result = 1;
-		} else if (this.priority == other.priority) {
-			if (other.name == null) {
-				result = 1;
-			} else if (this.name == null) {
-				result = -1;
-			} else {
-				result = this.name.compareTo( other.name );
-			}
-		} else {
-			result = (this.priority < other.priority) ? -1 : 1;
-		}
-		return result;
-	}
+    /**
+     * Returns the application class to be called when launching the application.
+     *
+     * @return Class&lt;? extends AbstractOTMApplication&gt;
+     */
+    public Class<? extends AbstractOTMApplication> getApplicationClass() {
+        return applicationClass;
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return priority;
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof OTA2ApplicationSpec) && (this.compareTo( (OTA2ApplicationSpec) obj ) == 0);
+    }
+
+    /**
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(OTA2ApplicationSpec other) {
+        int result;
+
+        if (other == null) {
+            result = 1;
+        } else if (this.priority == other.priority) {
+            if (other.name == null) {
+                result = 1;
+            } else if (this.name == null) {
+                result = -1;
+            } else {
+                result = this.name.compareTo( other.name );
+            }
+        } else {
+            result = (this.priority < other.priority) ? -1 : 1;
+        }
+        return result;
+    }
 
 }

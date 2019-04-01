@@ -23,38 +23,38 @@ import org.opentravel.application.common.AbstractUserSettings;
  * JavaFX application for the OTM Upversion Helper.
  */
 public class UpversionHelperApplication extends AbstractOTMApplication {
-	
-	/**
-	 * Main method invoked from the command-line.
-	 * 
-	 * @param args the command-line arguments
-	 */
-	public static void main(String[] args) {
-		launch(args);
-	}
-	
-	/**
-	 * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowFxmlLocation()
-	 */
-	@Override
-	protected String getMainWindowFxmlLocation() {
-		return UpversionHelperController.FXML_FILE;
-	}
 
-	/**
-	 * @see org.opentravel.application.common.AbstractOTMApplication#getUserSettings()
-	 */
-	@Override
-	protected AbstractUserSettings getUserSettings() {
-		return UserSettings.load();
-	}
+    /**
+     * Main method invoked from the command-line.
+     * 
+     * @param args the command-line arguments
+     */
+    public static void main(String[] args) {
+        launch( args );
+    }
 
-	/**
-	 * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowTitle()
-	 */
-	@Override
-	protected String getMainWindowTitle() {
-		return "OTM Upversion Helper";
-	}
+    /**
+     * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowFxmlLocation()
+     */
+    @Override
+    protected String getMainWindowFxmlLocation() {
+        return UpversionHelperController.FXML_FILE;
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractOTMApplication#getUserSettings()
+     */
+    @Override
+    protected AbstractUserSettings getUserSettings() {
+        return UserSettings.load();
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowTitle()
+     */
+    @Override
+    protected String getMainWindowTitle() {
+        return "OTM Upversion Helper";
+    }
 
 }

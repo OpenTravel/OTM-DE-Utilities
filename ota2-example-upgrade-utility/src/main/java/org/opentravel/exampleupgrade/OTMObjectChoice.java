@@ -16,59 +16,59 @@
 
 package org.opentravel.exampleupgrade;
 
-import javax.xml.namespace.QName;
-
 import org.opentravel.schemacompiler.model.NamedEntity;
 
+import javax.xml.namespace.QName;
+
 /**
- * Wrapper class that encapsulates an OTM entity and its global XML element name
- * as a selectable item in the visual display.
+ * Wrapper class that encapsulates an OTM entity and its global XML element name as a selectable item in the visual
+ * display.
  */
 public class OTMObjectChoice {
-	
-	private NamedEntity otmObject;
-	private QName otmObjectName;
-	private String displayName;
 
-	/**
-	 * Constructor that provides the OTM object.
-	 * 
-	 * @param otmObject  the OTM object instance
-	 * @param otmObjectName  the global element name of the OTM object
-	 */
-	public OTMObjectChoice(NamedEntity otmObject, QName otmObjectName) {
-		String prefix = otmObject.getOwningLibrary().getPrefix();
-		
-		this.otmObject = otmObject;
-		this.otmObjectName = otmObjectName;
-		this.displayName = ((prefix == null) ? "" : (prefix + ":")) + otmObjectName.getLocalPart();
-	}
+    private NamedEntity otmObject;
+    private QName otmObjectName;
+    private String displayName;
 
-	/**
-	 * Returns the OTM object instance.
-	 *
-	 * @return NamedEntity
-	 */
-	public NamedEntity getOtmObject() {
-		return otmObject;
-	}
+    /**
+     * Constructor that provides the OTM object.
+     * 
+     * @param otmObject the OTM object instance
+     * @param otmObjectName the global element name of the OTM object
+     */
+    public OTMObjectChoice(NamedEntity otmObject, QName otmObjectName) {
+        String prefix = otmObject.getOwningLibrary().getPrefix();
 
-	/**
-	 * Returns the global element name of the OTM object.
-	 *
-	 * @return QName
-	 */
-	public QName getOtmObjectName() {
-		return otmObjectName;
-	}
+        this.otmObject = otmObject;
+        this.otmObjectName = otmObjectName;
+        this.displayName = ((prefix == null) ? "" : (prefix + ":")) + otmObjectName.getLocalPart();
+    }
 
-	/**
-	 * Returns the display name for the OTM object in the combo-box.
-	 *
-	 * @return String
-	 */
-	public String toString() {
-		return displayName;
-	}
+    /**
+     * Returns the OTM object instance.
+     *
+     * @return NamedEntity
+     */
+    public NamedEntity getOtmObject() {
+        return otmObject;
+    }
+
+    /**
+     * Returns the global element name of the OTM object.
+     *
+     * @return QName
+     */
+    public QName getOtmObjectName() {
+        return otmObjectName;
+    }
+
+    /**
+     * Returns the display name for the OTM object in the combo-box.
+     *
+     * @return String
+     */
+    public String toString() {
+        return displayName;
+    }
 
 }

@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.application.common;
 
 /**
  * Exception that is thrown when a runtime exception occurs in an OTM-DE application.
  */
 public class OtmApplicationRuntimeException extends RuntimeException {
-    
+
     private static final long serialVersionUID = -8077949368246401642L;
 
     /**
      * Default constructor.
      */
-    public OtmApplicationRuntimeException() {
-    }
-    
+    public OtmApplicationRuntimeException() {}
+
     /**
      * Constructs an exception with the specified message.
      * 
@@ -36,7 +36,7 @@ public class OtmApplicationRuntimeException extends RuntimeException {
     public OtmApplicationRuntimeException(String message) {
         super( message );
     }
-    
+
     /**
      * Constructs an exception with the specified underlying cause.
      * 
@@ -45,7 +45,7 @@ public class OtmApplicationRuntimeException extends RuntimeException {
     public OtmApplicationRuntimeException(Throwable cause) {
         super( cause );
     }
-    
+
     /**
      * Constructs an exception with the specified message and underlying cause.
      * 
@@ -55,5 +55,5 @@ public class OtmApplicationRuntimeException extends RuntimeException {
     public OtmApplicationRuntimeException(String message, Throwable cause) {
         super( message, cause );
     }
-    
+
 }
