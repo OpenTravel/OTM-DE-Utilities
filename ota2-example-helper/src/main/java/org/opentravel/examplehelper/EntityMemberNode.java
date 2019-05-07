@@ -92,8 +92,7 @@ public class EntityMemberNode {
         if (!facetSelection.getFacetNames().contains( facetName )) {
             throw new IllegalArgumentException( "Invalid facet name for child node: " + facetName );
         }
-        childrenByFacet.computeIfAbsent( facetName, fn -> childrenByFacet.put( fn, new ArrayList<>() ) );
-        List<EntityMemberNode> children = childrenByFacet.get( facetName );
+        List<EntityMemberNode> children = childrenByFacet.computeIfAbsent( facetName, fn -> new ArrayList<>() );
 
         childNode.parentNode = this;
         children.add( childNode );

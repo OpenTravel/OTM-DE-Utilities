@@ -28,6 +28,7 @@ public class Images {
         new Image( Images.class.getResourceAsStream( "/images/repository.gif" ) );
     public static final Image rootNSIcon = new Image( Images.class.getResourceAsStream( "/images/rootNS.gif" ) );
     public static final Image baseNSIcon = new Image( Images.class.getResourceAsStream( "/images/baseNS.gif" ) );
+    public static final Image assemblyIcon = new Image( Images.class.getResourceAsStream( "/images/assembly.gif" ) );
     public static final Image releaseIcon = new Image( Images.class.getResourceAsStream( "/images/release.gif" ) );
     public static final Image libraryIcon = new Image( Images.class.getResourceAsStream( "/images/library.png" ) );
     public static final Image folderIcon = new Image( Images.class.getResourceAsStream( "/images/folder.gif" ) );

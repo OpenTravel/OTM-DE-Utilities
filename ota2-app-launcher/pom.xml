@@ -115,6 +115,23 @@
 					</descriptors>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>com.coderplus.maven.plugins</groupId>
+				<artifactId>copy-rename-maven-plugin</artifactId>
+				<version>1.0.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<sourceFile>${project.build.directory}/${project.artifactId}-${project.version}-bin.zip</sourceFile>
+							<destinationFile>${project.build.directory}/${project.artifactId}.zip</destinationFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 

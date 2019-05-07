@@ -134,13 +134,10 @@ public class BrowseRepositoryDialogController {
                     treeItem.getChildren().clear();
 
                     for (RepositoryItem repoItem : repoItemList) {
-                        Image icon =
-                            RepositoryItemType.RELEASE.isItemType( repoItem.getFilename() ) ? Images.releaseIcon
-                                : Images.libraryIcon;
                         TreeItem<RepositoryTreeNode> libraryItem = new TreeItem<>(
                             new RepositoryTreeNode( repoItem.getFilename() + " (" + repoItem.getVersion() + ")",
                                 repoItem ),
-                            new ImageView( icon ) );
+                            new ImageView( getItemIcon( repoItem ) ) );
 
                         treeItem.getChildren().add( libraryItem );
                     }
@@ -161,6 +158,31 @@ public class BrowseRepositoryDialogController {
     private void handleTreeItemSelection(TreeItem<RepositoryTreeNode> treeItem) {
         selectedRepositoryItem = treeItem.getValue().getItem();
         okButton.setDisable( selectedRepositoryItem == null );
+    }
+
+    /**
+     * Returns an icon representation of the given repository item's file type.
+     * 
+     * @param item the item for which to return an icon image
+     * @return Image
+     */
+    private Image getItemIcon(RepositoryItem item) {
+        RepositoryItemType itemType = RepositoryItemType.fromFilename( item.getFilename() );
+        Image icon;
+
+        switch (itemType) {
+            case ASSEMBLY:
+                icon = Images.assemblyIcon;
+                break;
+            case RELEASE:
+                icon = Images.releaseIcon;
+                break;
+            case LIBRARY:
+            default:
+                icon = Images.libraryIcon;
+                break;
+        }
+        return icon;
     }
 
     /**

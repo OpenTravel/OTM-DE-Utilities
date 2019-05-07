@@ -105,12 +105,11 @@ public class QNameCandidateVisitor extends ModelElementVisitorAdapter {
             QName baseNSName = new QName( baseNS, baseObjectLocalName );
             OTMObjectChoice objectChoice = new OTMObjectChoice( entity, entityName );
 
-            baseFamilyMatches.computeIfAbsent( baseNSName,
-                nsName -> baseFamilyMatches.put( nsName, new ArrayList<>() ) );
-            List<OTMObjectChoice> baseNSMatchList = baseFamilyMatches.get( baseNSName );
 
-            allElementsByBaseNS.computeIfAbsent( baseNS, ns -> allElementsByBaseNS.put( ns, new ArrayList<>() ) );
-            List<OTMObjectChoice> allElementsBaseNSList = allElementsByBaseNS.get( baseNS );
+            List<OTMObjectChoice> baseNSMatchList =
+                baseFamilyMatches.computeIfAbsent( baseNSName, nsName -> new ArrayList<>() );
+            List<OTMObjectChoice> allElementsBaseNSList =
+                allElementsByBaseNS.computeIfAbsent( baseNS, ns -> new ArrayList<>() );
 
             baseNSMatchList.add( objectChoice );
             allElementsBaseNSList.add( objectChoice );
