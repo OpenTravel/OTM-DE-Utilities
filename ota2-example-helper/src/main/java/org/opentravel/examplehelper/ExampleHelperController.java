@@ -618,7 +618,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
         bindingStyleChoice.valueProperty()
             .addListener( (observable, oldValue, newValue) -> handleBindingStyleChange() );
 
-        repeatCountSpinner.setValueFactory( new IntegerSpinnerValueFactory( 1, 3, settings.getRepeatCount(), 1 ) );
+        repeatCountSpinner.setValueFactory( new IntegerSpinnerValueFactory( 1, 1000, settings.getRepeatCount(), 1 ) );
         repeatCountSpinner.valueProperty().addListener( (observable, oldValue, newValue) -> refreshExample() );
 
         suppressOptionalFields.selectedProperty().addListener( (observable, oldValue, newValue) -> refreshExample() );

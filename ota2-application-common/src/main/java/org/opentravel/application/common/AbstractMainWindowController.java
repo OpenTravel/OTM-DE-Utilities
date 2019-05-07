@@ -16,6 +16,9 @@
 
 package org.opentravel.application.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 
 import javafx.application.Platform;
@@ -43,6 +46,8 @@ public abstract class AbstractMainWindowController {
     protected static final ExtensionFilter HTML_EXTENSION_FILTER =
         new ExtensionFilter( "HTML Files (*.html)", "*.html" );
     protected static final ExtensionFilter ALL_EXTENSION_FILTER = new ExtensionFilter( "All Files (*.*)", "*.*" );
+
+    private static final Logger log = LoggerFactory.getLogger( AbstractMainWindowController.class );
 
     private Stage primaryStage;
 
@@ -209,8 +214,9 @@ public abstract class AbstractMainWindowController {
 
                 try {
                     setStatusMessage( "ERROR: " + errorMessage, StatusType.ERROR, false );
+                    log.error( errorMessage, e );
                     updateControlStates();
-                    Thread.sleep( 1000 );
+                    Thread.sleep( 5000 );
 
                 } catch (InterruptedException e2) {
                     Thread.currentThread().interrupt();
