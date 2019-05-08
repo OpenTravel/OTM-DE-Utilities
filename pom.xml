@@ -204,6 +204,12 @@
 			</snapshots>
 			<layout>default</layout>
 		</repository>
+		<repository>
+			<id>jboss-eap-repository</id>
+			<name>JBoss EAP Maven repository</name>
+			<url>https://maven.repository.redhat.com/ga/</url>
+			<layout>default</layout>
+		</repository>
 	</repositories>
 
 </project>
