@@ -18,11 +18,26 @@ package org.opentravel.diffutil;
 
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.AbstractUserSettings;
+import org.opentravel.schemacompiler.repository.RepositoryManager;
 
 /**
  * JavaFX application for the OTM-Diff Utility.
  */
 public class OTMDiffApplication extends AbstractOTMApplication {
+
+    /**
+     * Default constructor.
+     */
+    public OTMDiffApplication() {}
+
+    /**
+     * Constructor that provides the manager that should be used when accessing remote OTM repositories.
+     * 
+     * @param repositoryManager
+     */
+    public OTMDiffApplication(RepositoryManager repositoryManager) {
+        super( repositoryManager );
+    }
 
     /**
      * Main method invoked from the command-line.

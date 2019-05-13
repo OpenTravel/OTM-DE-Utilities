@@ -16,6 +16,9 @@
 
 package org.opentravel.application.common;
 
+import org.opentravel.schemacompiler.repository.RepositoryException;
+import org.opentravel.schemacompiler.repository.RepositoryManager;
+
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -33,6 +36,32 @@ import javafx.stage.Stage;
  * Base class for all OTM JavaFX applications.
  */
 public abstract class AbstractOTMApplication extends Application {
+
+    private RepositoryManager repositoryManager;
+    private AbstractMainWindowController controller;
+
+    /**
+     * Default constructor.
+     */
+    public AbstractOTMApplication() {}
+
+    /**
+     * Constructor that provides the manager that should be used when accessing remote OTM repositories.
+     * 
+     * @param repositoryManager
+     */
+    public AbstractOTMApplication(RepositoryManager repositoryManager) {
+        this.repositoryManager = repositoryManager;
+    }
+
+    /**
+     * Returns the main window controller for this application.
+     * 
+     * @return AbstractMainWindowController
+     */
+    public AbstractMainWindowController getController() {
+        return controller;
+    }
 
     /**
      * Returns the classpath location of the FXML file for the application's main window.
@@ -59,7 +88,6 @@ public abstract class AbstractOTMApplication extends Application {
             FXMLLoader loader =
                 new FXMLLoader( AbstractOTMApplication.class.getResource( getMainWindowFxmlLocation() ) );
             Parent root = loader.load();
-            AbstractMainWindowController controller = loader.getController();
             AbstractUserSettings userSettings = getUserSettings();
 
             validateWindowLocation( userSettings );
@@ -79,10 +107,17 @@ public abstract class AbstractOTMApplication extends Application {
                     new Dimension( scene.widthProperty().intValue(), scene.heightProperty().intValue() ) );
                 settings.save();
             } );
+
+            if (repositoryManager == null) {
+                repositoryManager = RepositoryManager.getDefault();
+            }
+
+            controller = loader.getController();
+            controller.setRepositoryManager( repositoryManager );
             controller.initialize( primaryStage );
             primaryStage.show();
 
-        } catch (IOException e) {
+        } catch (RepositoryException | IOException e) {
             throw new OtmApplicationRuntimeException( "Unable to initialize JavaFX application.", e );
         }
     }

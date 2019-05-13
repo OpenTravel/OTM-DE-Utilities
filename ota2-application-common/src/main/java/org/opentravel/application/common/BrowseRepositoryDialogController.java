@@ -54,6 +54,7 @@ public class BrowseRepositoryDialogController {
     private Stage dialogStage;
     private boolean okSelected = false;
     private RepositoryItemType itemTypeFilter;
+    private RepositoryManager repositoryManager;
     private RepositoryItem selectedRepositoryItem;
 
     @FXML
@@ -67,10 +68,11 @@ public class BrowseRepositoryDialogController {
      * @param title the title of the dialog box
      * @param itemTypeFilter the type filter to apply for repository items
      * @param stage the stage that will own the new dialog
+     * @param repositoryManager the manager that should be used for accessing remote repositories
      * @return BrowseRepositoryDialogController
      */
     public static BrowseRepositoryDialogController createDialog(String title, RepositoryItemType itemTypeFilter,
-        Stage stage) {
+        Stage stage, RepositoryManager repositoryManager) {
         BrowseRepositoryDialogController controller = null;
         try {
             FXMLLoader loader = new FXMLLoader( BrowseRepositoryDialogController.class.getResource( FXML_FILE ) );
@@ -83,15 +85,35 @@ public class BrowseRepositoryDialogController {
             dialogStage.initOwner( stage );
             dialogStage.setScene( scene );
 
+
             controller = loader.getController();
             controller.setDialogStage( dialogStage );
             controller.setItemTypeFilter( itemTypeFilter );
+            controller.repositoryManager = repositoryManager;
             controller.initializeTreeView();
 
         } catch (IOException e) {
             log.error( "Error constructing Browse Repository dialog.", e );
         }
         return controller;
+    }
+
+    /**
+     * Returns the repository manager for this controller.
+     *
+     * @return RepositoryManager
+     */
+    public RepositoryManager getRepositoryManager() {
+        return repositoryManager;
+    }
+
+    /**
+     * Assigns the repository manager for this controller.
+     *
+     * @param repositoryManager the repository manager to assign
+     */
+    public void setRepositoryManager(RepositoryManager repositoryManager) {
+        this.repositoryManager = repositoryManager;
     }
 
     /**
@@ -190,8 +212,7 @@ public class BrowseRepositoryDialogController {
      */
     private void initializeTreeView() {
         try {
-            RepositoryManager manager = RepositoryManager.getDefault();
-            List<RemoteRepository> remoteRepositories = manager.listRemoteRepositories();
+            List<RemoteRepository> remoteRepositories = repositoryManager.listRemoteRepositories();
             TreeItem<RepositoryTreeNode> rootItem =
                 new TreeItem<>( new RepositoryTreeNode( "OTM Repositories", null ), new ImageView( Images.rootIcon ) );
 

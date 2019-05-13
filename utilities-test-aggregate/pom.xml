@@ -24,6 +24,11 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
+			<artifactId>ota2-app-launcher</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>ota2-release-editor</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -37,6 +42,8 @@
 			<artifactId>ota2-diff-utility</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- Experimental apps excluded from test coverage report. -->
+		<!--
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ota2-upversion-helper</artifactId>
@@ -57,11 +64,7 @@
 			<artifactId>ota2-example-upgrade-utility</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>ota2-app-launcher</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+		-->
 	</dependencies>
 
 	<build>
@@ -69,7 +72,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.19.1</version>
 				<configuration>
 					<!-- Jacoco prepare-agent builds some command-line params without -->
 					<!-- which jacoco will not instrument. Hence it is important to add -->
@@ -77,6 +79,7 @@
 					<argLine>${argLine} -Xms256m -Xmx2048m</argLine>
 					<forkCount>1</forkCount>
 					<runOrder>random</runOrder>
+					<skip>true</skip>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -114,13 +117,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>

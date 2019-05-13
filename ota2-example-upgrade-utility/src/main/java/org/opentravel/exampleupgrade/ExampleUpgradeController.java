@@ -19,6 +19,7 @@ package org.opentravel.exampleupgrade;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.opentravel.application.common.AbstractMainWindowController;
+import org.opentravel.application.common.FileChooserDelegate;
 import org.opentravel.application.common.OtmApplicationException;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.application.common.SyntaxHighlightBuilder;
@@ -39,7 +40,6 @@ import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLModel;
 import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.schemacompiler.repository.ReleaseManager;
-import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.schemacompiler.validate.FindingMessageFormat;
 import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
@@ -107,7 +107,6 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -200,8 +199,8 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
     public void selectLibrary(ActionEvent event) {
         File initialDirectory =
             (modelFile != null) ? modelFile.getParentFile() : UserSettings.load().getLastModelFile().getParentFile();
-        FileChooser chooser = newFileChooser( "Select OTM Library or Project", initialDirectory, OTP_EXTENSION_FILTER,
-            OTR_EXTENSION_FILTER, OTM_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
+        FileChooserDelegate chooser = newFileChooser( "Select OTM Library or Project", initialDirectory,
+            OTP_EXTENSION_FILTER, OTR_EXTENSION_FILTER, OTM_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
         File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 
         if ((selectedFile != null) && selectedFile.exists()) {
@@ -235,7 +234,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
                 newModel = manager.getModel();
 
             } else if (selectedFile.getName().endsWith( ".otr" )) {
-                ReleaseManager releaseManager = new ReleaseManager( RepositoryManager.getDefault() );
+                ReleaseManager releaseManager = new ReleaseManager( getRepositoryManager() );
 
                 findings = new ValidationFindings();
                 releaseManager.loadRelease( selectedFile, findings );
@@ -393,7 +392,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
     @FXML
     public void selectExampleFile(ActionEvent event) {
         File initialDirectory = (exampleFolder != null) ? exampleFolder : UserSettings.load().getLastExampleFolder();
-        FileChooser chooser =
+        FileChooserDelegate chooser =
             newFileChooser( "Save Example Output", initialDirectory, XML_EXTENSION_FILTER, JSON_EXTENSION_FILTER );
         File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 
@@ -568,7 +567,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
     @FXML
     public void saveExampleOutput(ActionEvent event) {
         UserSettings settings = UserSettings.load();
-        FileChooser chooser =
+        FileChooserDelegate chooser =
             newFileChooser( "Save Example Output", userSettings.getLastExampleFolder(), XML_EXTENSION_FILTER );
         File targetFile = chooser.showSaveDialog( getPrimaryStage() );
 
@@ -1073,17 +1072,17 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
                 TreeItem<DOMTreeUpgradeNode> newUpgradeItem =
                     new UpgradeTreeBuilder( upgradeDocument, getExampleOptions() ).replaceUpgradeDOMBranch( upgradeItem,
                         originalItem.getValue().getDomNode() );
-        
+
                 if (newUpgradeItem.getParent() == null) {
                     upgradedTreeView.setRoot( newUpgradeItem );
                 }
                 updatePreviewPane( false );
                 refreshBranch( originalItem );
                 upgradeDocumentDirty = true;
-        
+
             } catch (Exception e) {
                 Alert errorDialog = new Alert( AlertType.ERROR );
-        
+
                 log.error( "Error handling drag/drop event.", e );
                 errorDialog.setTitle( "Error" );
                 errorDialog.setHeaderText( null );

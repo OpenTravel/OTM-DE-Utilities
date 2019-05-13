@@ -18,7 +18,6 @@ package org.opentravel.upversion;
 
 import org.opentravel.application.common.ProgressMonitor;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
-import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.upversion.LibraryStatusOrchestrator.StatusAction;
@@ -87,9 +86,11 @@ public class PromoteDemoteDialogController {
      * 
      * @param selectedLibraries the list of selected libraries to be processed
      * @param stage the stage that will own the new dialog
+     * @param repositoryManager the manager to use for accessing remote OTM repositories
      * @return PromoteDemoteDialogController
      */
-    public static PromoteDemoteDialogController createDialog(List<RepositoryItem> selectedLibraries, Stage stage) {
+    public static PromoteDemoteDialogController createDialog(List<RepositoryItem> selectedLibraries, Stage stage,
+        RepositoryManager repositoryManager) {
         PromoteDemoteDialogController controller = null;
         try {
             FXMLLoader loader = new FXMLLoader( PromoteDemoteDialogController.class.getResource( FXML_FILE ) );
@@ -104,11 +105,11 @@ public class PromoteDemoteDialogController {
             dialogStage.setScene( scene );
 
             controller = loader.getController();
-            controller.orchestrator.setRepositoryManager( RepositoryManager.getDefault() );
+            controller.orchestrator.setRepositoryManager( repositoryManager );
             controller.setSelectedLibraries( selectedLibraries );
             controller.setDialogStage( dialogStage );
 
-        } catch (IOException | RepositoryException e) {
+        } catch (IOException e) {
             log.error( "Error creating promote/demote dialog.", e );
         }
         return controller;

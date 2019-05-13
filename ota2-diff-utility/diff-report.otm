@@ -1,0 +1,163 @@
+<html>
+<head>
+	<title>OTM Model Comparison Report</title>
+	<style>
+body {
+	background-color: #ffffff !important;
+	color: #353833 !important;
+	font-family: Arial, Helvetica, sans-serif !important;
+	font-size: 1.0em;
+	margin: 20;
+}
+a:link, a:visited {
+	text-decoration: none;
+	color: #0000A0;
+}
+h1 {
+	font-size: 1.4em;
+}
+h2 {
+	font-size: 1.3em;
+	margin-bottom: 2px;
+}
+h3 {
+	font-size: 1.2em;
+	margin-bottom: 0px;
+}
+h4 {
+	font-size: 1.1em;
+	margin-bottom: 0px;
+}
+small {
+	font-size: 0.75em;
+	margin-bottom: 0px;
+}
+table {
+    border-collapse: collapse;
+	border: 1px solid black;
+}
+table th, td {
+	font-size: 0.9em;
+	border-top: 0px solid black;
+	border-bottom: 0px solid black;
+	border-left: 1px solid #aaaaaa;
+	padding: 3px;
+}
+table tr th {
+	background-color: black;
+	color: white;
+	text-align: left;
+}
+.headerTable {
+    border-collapse: collapse;
+	border: 0px solid black;
+}
+.headerTableTh {
+	border-left: 0px solid #aaaaaa;
+	font-weight: bold;
+}
+.headerTableTd {
+	border-left: 0px solid #aaaaaa;
+}
+.rowColor {
+	background-color: #ffffff;
+}
+.altColor {
+	background-color: #eeeeef;
+}
+.toggleLink {
+	cursor: pointer;
+	text-decoration: none;
+	color: #0000A0;
+}
+.fieldDetails {
+	margin: 0px 0px 0px 0px;
+	padding-left: 20px;
+}
+	</style>
+</head>
+<body>
+
+<h1>OTM Comparison Report</h1>
+
+<table class="headerTable">
+	<tr>
+		<td class="headerTableTh">Old Library Version:</td>
+		<td class="headerTableTd">
+			test-model-old.otm
+								</td>
+	</tr><tr>
+		<td class="headerTableTh">New Library Version:</td>
+		<td class="headerTableTd">
+			test-model-new.otm
+								</td>
+	</tr><tr>
+		<td class="headerTableTh">Report Date/Time:</td>
+		<td class="headerTableTd">May 13, 2019 &amp; 12:53PM CDT</td>
+	</tr>
+</table>
+
+<h2>Library: pkg3:test_library</h2>
+<table width="80%">
+	<tr>
+		<th>Change Description</th>
+		<th>Old Value</th>
+		<th>New Value</th>
+	</tr>
+				<tr class="rowColor">
+			<td>Entity Modified</td>
+							<td colspan="2">pkg3:SampleBusinessObject (<a href="#pkg3$test_library$SampleBusinessObject">View Details</a>)</td>
+					</tr>
+		 	</table>
+
+
+	<br><a name="pkg3$test_library$SampleBusinessObject" />
+	<h4>Modified Entity: SampleBusinessObject</h4>
+	<small>[ pkg3:test_library ]</small>
+			<table width="80%">
+	<tr>
+		<th>Change Description</th>
+		<th>Old Value</th>
+		<th>New Value</th>
+	</tr>
+				<tr class="rowColor">
+			<td>Field Modified</td>
+							<td colspan="2">oid
+					<div id="pkg3$test_library$SampleBusinessObject_ID$oid">
+						<ul class="fieldDetails">
+													<li>Base type changed from "xsd:int" to "xsd:string"</li>
+												</ul>
+					</div>
+				</td>
+					</tr>
+		 			<tr class="altColor">
+			<td>Field Modified</td>
+							<td colspan="2">summaryName
+					<div id="pkg3$test_library$SampleBusinessObject_Summary$summaryName">
+						<ul class="fieldDetails">
+													<li>Cardinality changes from "0" to "5"</li>
+												</ul>
+					</div>
+				</td>
+					</tr>
+		 			<tr class="rowColor">
+			<td>Field Modified</td>
+							<td colspan="2">summaryName
+					<div id="pkg3$test_library$SampleBusinessObject_Query_Test$summaryName">
+						<ul class="fieldDetails">
+													<li>Cardinality changes from "0" to "10"</li>
+												</ul>
+					</div>
+				</td>
+					</tr>
+		 	</table>
+
+
+
+<p/><br/><p/><br/><p/><br/><p/><br/><p/><br/>
+<p/><br/><p/><br/><p/><br/><p/><br/><p/><br/>
+<p/><br/><p/><br/><p/><br/><p/><br/><p/><br/>
+<p/><br/><p/><br/><p/><br/><p/><br/><p/><br/>
+
+</body>
+</html>

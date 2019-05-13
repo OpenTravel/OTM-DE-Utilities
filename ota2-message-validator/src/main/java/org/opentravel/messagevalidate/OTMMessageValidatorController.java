@@ -17,6 +17,7 @@
 package org.opentravel.messagevalidate;
 
 import org.opentravel.application.common.AbstractMainWindowController;
+import org.opentravel.application.common.FileChooserDelegate;
 import org.opentravel.application.common.OtmApplicationException;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.schemacompiler.ioc.CompilerExtensionRegistry;
@@ -40,7 +41,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 /**
@@ -80,7 +80,7 @@ public class OTMMessageValidatorController extends AbstractMainWindowController 
      */
     @FXML
     public void handleSelectProjectFile(ActionEvent event) {
-        FileChooser chooser = newFileChooser( "Select OTM Project", userSettings.getProjectFolder(),
+        FileChooserDelegate chooser = newFileChooser( "Select OTM Project", userSettings.getProjectFolder(),
             OTP_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
         File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 
@@ -113,7 +113,7 @@ public class OTMMessageValidatorController extends AbstractMainWindowController 
      */
     @FXML
     public void handleSelectMessageFile(ActionEvent event) {
-        FileChooser chooser = newFileChooser( "Select Message to Validate", userSettings.getMessageFolder(),
+        FileChooserDelegate chooser = newFileChooser( "Select Message to Validate", userSettings.getMessageFolder(),
             XML_EXTENSION_FILTER, JSON_EXTENSION_FILTER );
         File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 

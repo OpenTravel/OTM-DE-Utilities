@@ -17,6 +17,8 @@
 package org.opentravel.upversion;
 
 import org.opentravel.application.common.AbstractMainWindowController;
+import org.opentravel.application.common.DirectoryChooserDelegate;
+import org.opentravel.application.common.FileChooserDelegate;
 import org.opentravel.application.common.OtmApplicationException;
 import org.opentravel.application.common.ProgressMonitor;
 import org.opentravel.application.common.StatusType;
@@ -32,7 +34,6 @@ import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryAvailabilityChecker;
 import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
-import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.schemacompiler.repository.impl.ProjectFileUtils;
 import org.opentravel.schemacompiler.util.SchemaCompilerException;
 import org.opentravel.schemacompiler.validate.FindingMessageFormat;
@@ -40,8 +41,6 @@ import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.validate.ValidationException;
 import org.opentravel.schemacompiler.validate.ValidationFinding;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -88,8 +87,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -99,8 +96,6 @@ import javafx.util.Callback;
 public class UpversionHelperController extends AbstractMainWindowController {
 
     public static final String FXML_FILE = "/ota2-upversion-helper.fxml";
-
-    private static final Logger log = LoggerFactory.getLogger( UpversionHelperController.class );
 
     @FXML
     private MenuItem importMenu;
@@ -167,7 +162,6 @@ public class UpversionHelperController extends AbstractMainWindowController {
     @FXML
     private ProgressBar upversionProgressBar;
 
-    private RepositoryManager repositoryManager;
     private RepositoryAvailabilityChecker availabilityChecker;
     private List<RepositoryItem> selectedNamespaceItems = new ArrayList<>();
     private List<RepositoryItem> selectedNamespaceLatestVersions = new ArrayList<>();
@@ -178,14 +172,8 @@ public class UpversionHelperController extends AbstractMainWindowController {
      * Default constructor.
      */
     public UpversionHelperController() {
-        try {
-            repositoryManager = RepositoryManager.getDefault();
-            availabilityChecker = RepositoryAvailabilityChecker.getInstance( repositoryManager );
-            availabilityChecker.pingAllRepositories( true );
-
-        } catch (RepositoryException e) {
-            log.error( "Error creating default repository item instance.", e );
-        }
+        availabilityChecker = RepositoryAvailabilityChecker.getInstance( getRepositoryManager() );
+        availabilityChecker.pingAllRepositories( true );
     }
 
     /**
@@ -196,7 +184,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
     @FXML
     public void importFromOTP(ActionEvent event) {
         UserSettings userSettings = UserSettings.load();
-        FileChooser chooser = newFileChooser( "Import from OTM Project", userSettings.getProjectFolder(),
+        FileChooserDelegate chooser = newFileChooser( "Import from OTM Project", userSettings.getProjectFolder(),
             OTP_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
         File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 
@@ -245,7 +233,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
             if (piValue instanceof ManagedProjectItemType) {
                 try {
                     ManagedProjectItemType pi = (ManagedProjectItemType) piValue;
-                    Repository repository = repositoryManager.getRepository( pi.getRepository() );
+                    Repository repository = getRepositoryManager().getRepository( pi.getRepository() );
                     RepositoryItem item =
                         repository.getRepositoryItem( pi.getBaseNamespace(), pi.getFilename(), pi.getVersion() );
 
@@ -270,7 +258,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
     @FXML
     public void exportToOTP(ActionEvent event) {
         UserSettings userSettings = UserSettings.load();
-        FileChooser chooser = newFileChooser( "Export to OTM Project", userSettings.getProjectFolder(),
+        FileChooserDelegate chooser = newFileChooser( "Export to OTM Project", userSettings.getProjectFolder(),
             OTP_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
         File selectedFile = chooser.showSaveDialog( getPrimaryStage() );
 
@@ -391,7 +379,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
     @FXML
     public void upversionSelectedLibraries(ActionEvent event) {
         UserSettings userSettings = UserSettings.load();
-        DirectoryChooser chooser =
+        DirectoryChooserDelegate chooser =
             newDirectoryChooser( "Select Upversion Output Folder", userSettings.getOutputFolder() );
         File selectedFolder = chooser.showDialog( getPrimaryStage() );
         boolean confirmPurgeExistingFiles = !UpversionOrchestrator.hasExistingFiles( selectedFolder );
@@ -446,7 +434,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
 
             Platform.runLater( () -> upversionProgressBar.setDisable( false ) );
 
-            orchestrator.setRepositoryManager( repositoryManager ).setOldVersions( upversionLibraries )
+            orchestrator.setRepositoryManager( getRepositoryManager() ).setOldVersions( upversionLibraries )
                 .setSupportingLibraries( supportingLibraries ).setOutputFolder( selectedFolder )
                 .setProjectId( "http://www.travelport.com" ).setProgressMonitor( monitor ).createNewVersions();
 
@@ -480,10 +468,11 @@ public class UpversionHelperController extends AbstractMainWindowController {
     @FXML
     public void promoteOrDemoteSelectedLibraries(ActionEvent event) {
         List<RepositoryItem> selectedItems = new ArrayList<>( selectedLibrariesTable.getItems() );
-        PromoteDemoteDialogController.createDialog( selectedItems, getPrimaryStage() ).showAndWait();
+        PromoteDemoteDialogController.createDialog( selectedItems, getPrimaryStage(), getRepositoryManager() )
+            .showAndWait();
         ObservableList<RepositoryItemWrapper> refreshedItems = FXCollections.observableArrayList();
 
-        repositoryManager.resetDownloadCache();
+        getRepositoryManager().resetDownloadCache();
 
         for (RepositoryItem item : selectedItems) {
             try {
@@ -493,7 +482,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
                 if (itemRepo instanceof RemoteRepository) {
                     ((RemoteRepository) itemRepo).downloadContent( item, true );
                 }
-                rItem = repositoryManager.getRepositoryItem( item.getBaseNamespace(), item.getFilename(),
+                rItem = getRepositoryManager().getRepositoryItem( item.getBaseNamespace(), item.getFilename(),
                     item.getVersion() );
                 refreshedItems.add( new RepositoryItemWrapper( rItem ) );
 
@@ -535,7 +524,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
                     Platform.runLater( () -> upversionProgressBar.setDisable( false ) );
 
                     if (!itemList.isEmpty()) {
-                        findings = new ValidationOrchestrator().setRepositoryManager( repositoryManager )
+                        findings = new ValidationOrchestrator().setRepositoryManager( getRepositoryManager() )
                             .setRepositoryItems( itemList )
                             .setProgressMonitor( new ProgressMonitor( upversionProgressBar ) ).runValidation();
                     }
@@ -601,7 +590,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
             public void execute() throws OtmApplicationException {
                 try {
                     String rid = repositoryChoice.getSelectionModel().getSelectedItem();
-                    Repository repository = repositoryManager.getRepository( rid );
+                    Repository repository = getRepositoryManager().getRepository( rid );
                     List<String> baseNamespaces = repository.listBaseNamespaces();
 
                     baseNamespaces.add( 0, null );
@@ -631,7 +620,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
                     public void execute() throws OtmApplicationException {
                         try {
                             String rid = repositoryChoice.getSelectionModel().getSelectedItem();
-                            Repository repository = repositoryManager.getRepository( rid );
+                            Repository repository = getRepositoryManager().getRepository( rid );
                             List<String> candidateNamespaces = getCandidateNamespaces();
 
                             loadSelectedNamespaceItems( repository, candidateNamespaces );
@@ -968,7 +957,7 @@ public class UpversionHelperController extends AbstractMainWindowController {
         primaryStage.showingProperty().addListener( (observable, oldValue, newValue) -> {
             ObservableList<String> repositoryIds = FXCollections.observableArrayList();
 
-            repositoryManager.listRemoteRepositories().forEach( r -> repositoryIds.add( r.getId() ) );
+            getRepositoryManager().listRemoteRepositories().forEach( r -> repositoryIds.add( r.getId() ) );
             repositoryChoice.setItems( repositoryIds );
             repositoryChoice.getSelectionModel().select( 0 );
         } );

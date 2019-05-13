@@ -61,14 +61,14 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.controlsfx</groupId>
 			<artifactId>controlsfx</artifactId>
-			<version>8.40.14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opentravel.otm</groupId>
+			<artifactId>ota2-utilities-testutil</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -118,7 +118,6 @@
 			<plugin>
 				<groupId>com.coderplus.maven.plugins</groupId>
 				<artifactId>copy-rename-maven-plugin</artifactId>
-				<version>1.0.1</version>
 				<executions>
 					<execution>
 						<goals>

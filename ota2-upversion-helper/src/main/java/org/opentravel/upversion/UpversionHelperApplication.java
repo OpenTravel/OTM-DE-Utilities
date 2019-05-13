@@ -18,11 +18,26 @@ package org.opentravel.upversion;
 
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.AbstractUserSettings;
+import org.opentravel.schemacompiler.repository.RepositoryManager;
 
 /**
  * JavaFX application for the OTM Upversion Helper.
  */
 public class UpversionHelperApplication extends AbstractOTMApplication {
+
+    /**
+     * Default constructor.
+     */
+    public UpversionHelperApplication() {}
+
+    /**
+     * Constructor that provides the manager that should be used when accessing remote OTM repositories.
+     * 
+     * @param repositoryManager
+     */
+    public UpversionHelperApplication(RepositoryManager repositoryManager) {
+        super( repositoryManager );
+    }
 
     /**
      * Main method invoked from the command-line.

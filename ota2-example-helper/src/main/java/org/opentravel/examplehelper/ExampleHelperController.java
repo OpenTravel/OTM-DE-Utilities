@@ -20,6 +20,7 @@ import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.BrowseRepositoryDialogController;
+import org.opentravel.application.common.FileChooserDelegate;
 import org.opentravel.application.common.OtmApplicationException;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.application.common.SyntaxHighlightBuilder;
@@ -51,10 +52,8 @@ import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.schemacompiler.repository.ReleaseManager;
 import org.opentravel.schemacompiler.repository.RepositoryAvailabilityChecker;
-import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryItemType;
-import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.schemacompiler.util.URLUtils;
 import org.opentravel.schemacompiler.validate.FindingMessageFormat;
 import org.opentravel.schemacompiler.validate.FindingType;
@@ -103,7 +102,6 @@ import javafx.scene.control.cell.ChoiceBoxTreeTableCell;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 /**
@@ -147,7 +145,6 @@ public class ExampleHelperController extends AbstractMainWindowController {
     private VirtualizedScrollPane<?> previewScrollPane;
     private CodeArea previewPane;
 
-    private RepositoryManager repositoryManager;
     private RepositoryAvailabilityChecker availabilityChecker;
     private File modelFile;
     private File exampleFolder;
@@ -160,14 +157,8 @@ public class ExampleHelperController extends AbstractMainWindowController {
      * Default constructor.
      */
     public ExampleHelperController() {
-        try {
-            repositoryManager = RepositoryManager.getDefault();
-            availabilityChecker = RepositoryAvailabilityChecker.getInstance( repositoryManager );
-            availabilityChecker.pingAllRepositories( true );
-
-        } catch (RepositoryException e) {
-            log.error( "Error creating default repository manager.", e );
-        }
+        availabilityChecker = RepositoryAvailabilityChecker.getInstance( getRepositoryManager() );
+        availabilityChecker.pingAllRepositories( true );
     }
 
     /**
@@ -180,7 +171,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
         UserSettings userSettings = UserSettings.load();
         File initialDirectory =
             (modelFile != null) ? modelFile.getParentFile() : userSettings.getLastModelFile().getParentFile();
-        FileChooser chooser = newFileChooser( "Import from OTP", initialDirectory, OTP_EXTENSION_FILTER,
+        FileChooserDelegate chooser = newFileChooser( "Import from OTP", initialDirectory, OTP_EXTENSION_FILTER,
             OTR_EXTENSION_FILTER, OTM_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
         File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 
@@ -209,7 +200,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
             TLModel newModel = null;
 
             if (selectedFile.getName().endsWith( ".otr" )) {
-                ReleaseManager manager = new ReleaseManager( repositoryManager );
+                ReleaseManager manager = new ReleaseManager( getRepositoryManager() );
 
                 findings = new ValidationFindings();
                 manager.loadRelease( selectedFile, findings );
@@ -264,8 +255,8 @@ public class ExampleHelperController extends AbstractMainWindowController {
     @FXML
     public void selectFromRepository(ActionEvent event) {
         if (availabilityChecker.pingAllRepositories( false )) {
-            BrowseRepositoryDialogController controller =
-                BrowseRepositoryDialogController.createDialog( "Open Library or Release", null, getPrimaryStage() );
+            BrowseRepositoryDialogController controller = BrowseRepositoryDialogController
+                .createDialog( "Open Library or Release", null, getPrimaryStage(), getRepositoryManager() );
 
             controller.showAndWait();
 
@@ -295,7 +286,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
     private void loadModelFromRepository(RepositoryItem selectedItem) throws OtmApplicationException {
         try {
             if (RepositoryItemType.LIBRARY.isItemType( selectedItem.getFilename() )) {
-                ProjectManager projectManager = new ProjectManager( new TLModel(), false, repositoryManager );
+                ProjectManager projectManager = new ProjectManager( new TLModel(), false, getRepositoryManager() );
                 Project tempProject = projectManager.newProject( File.createTempFile( "tempProject", ".otp" ),
                     "http://EXAMPLE-helper.com/project/temp", "Temp Project", null );
                 ProjectItem item = projectManager.addManagedProjectItem( selectedItem, tempProject );
@@ -304,7 +295,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
                 modelFile = URLUtils.toFile( item.getContent().getLibraryUrl() );
 
             } else { // must be a release
-                ReleaseManager releaseManager = new ReleaseManager( repositoryManager );
+                ReleaseManager releaseManager = new ReleaseManager( getRepositoryManager() );
                 ValidationFindings findings = new ValidationFindings();
 
                 releaseManager.loadRelease( selectedItem, findings );
@@ -538,7 +529,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
     public void saveExampleOutput(ActionEvent event) {
         boolean xmlSelected = xmlRadio.isSelected();
         UserSettings userSettings = UserSettings.load();
-        FileChooser chooser = newFileChooser( "Save Example Output", userSettings.getLastExampleFolder(),
+        FileChooserDelegate chooser = newFileChooser( "Save Example Output", userSettings.getLastExampleFolder(),
             xmlSelected ? XML_EXTENSION_FILTER : JSON_EXTENSION_FILTER );
         File targetFile = chooser.showSaveDialog( getPrimaryStage() );
 

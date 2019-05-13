@@ -16,6 +16,7 @@
 
 package org.opentravel.application.common;
 
+import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +25,6 @@ import java.io.File;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
@@ -49,7 +48,36 @@ public abstract class AbstractMainWindowController {
 
     private static final Logger log = LoggerFactory.getLogger( AbstractMainWindowController.class );
 
+    private NativeComponentBuilder nativeComponentBuilder = new DefaultNativeComponentBuilder();
+    private RepositoryManager repositoryManager;
     private Stage primaryStage;
+
+    /**
+     * Assigns a new <code>NativeComponentBuilder</code> for this controller. To be used for testing purposes only.
+     * 
+     * @param nativeComponentBuilder the new component builder instance to assign
+     */
+    public void setNativeComponentBuilder(NativeComponentBuilder nativeComponentBuilder) {
+        this.nativeComponentBuilder = nativeComponentBuilder;
+    }
+
+    /**
+     * Returns the repository manager for this controller.
+     *
+     * @return RepositoryManager
+     */
+    public RepositoryManager getRepositoryManager() {
+        return repositoryManager;
+    }
+
+    /**
+     * Assigns the repository manager for this controller.
+     *
+     * @param repositoryManager the repository manager to assign
+     */
+    public void setRepositoryManager(RepositoryManager repositoryManager) {
+        this.repositoryManager = repositoryManager;
+    }
 
     /**
      * Returns the primary stage for the window associated with this controller.
@@ -90,27 +118,11 @@ public abstract class AbstractMainWindowController {
      * @param initialDirectory the initial directory location for the chooser
      * @param extensionFilters two-element arrays that specify the file extension and extension description (in that
      *        order)
-     * @return FileChooser
+     * @return FileChooserDelegate
      */
-    protected FileChooser newFileChooser(String title, File initialDirectory, ExtensionFilter... extensionFilters) {
-        FileChooser chooser = new FileChooser();
-        File directory = initialDirectory;
-
-        // Make sure the initial directory for the chooser exists
-        while ((directory != null) && !directory.exists()) {
-            directory = directory.getParentFile();
-        }
-        if (directory == null) {
-            directory = new File( System.getProperty( "user.home" ) );
-        }
-
-        chooser.setTitle( title );
-        chooser.setInitialDirectory( directory );
-
-        for (ExtensionFilter filter : extensionFilters) {
-            chooser.getExtensionFilters().add( filter );
-        }
-        return chooser;
+    protected FileChooserDelegate newFileChooser(String title, File initialDirectory,
+        ExtensionFilter... extensionFilters) {
+        return nativeComponentBuilder.newFileChooser( title, initialDirectory, extensionFilters );
     }
 
     /**
@@ -118,23 +130,10 @@ public abstract class AbstractMainWindowController {
      * 
      * @param title the title of the new directory chooser
      * @param initialDirectory the initial directory location for the chooser
-     * @return DirectoryChooser
+     * @return DirectoryChooserDelegate
      */
-    protected DirectoryChooser newDirectoryChooser(String title, File initialDirectory) {
-        DirectoryChooser chooser = new DirectoryChooser();
-        File directory = initialDirectory;
-
-        // Make sure the initial directory for the chooser exists
-        while ((directory != null) && !directory.exists()) {
-            directory = directory.getParentFile();
-        }
-        if (directory == null) {
-            directory = new File( System.getProperty( "user.home" ) );
-        }
-
-        chooser.setTitle( title );
-        chooser.setInitialDirectory( directory );
-        return chooser;
+    protected DirectoryChooserDelegate newDirectoryChooser(String title, File initialDirectory) {
+        return nativeComponentBuilder.newDirectoryChooser( title, initialDirectory );
     }
 
     /**

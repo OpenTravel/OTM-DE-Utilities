@@ -86,7 +86,7 @@ public class UserSettings extends AbstractUserSettings {
         String olFolder = settingsProps.getProperty( "oldLibraryFolder", currentFolder );
         String nlFolder = settingsProps.getProperty( "newLibraryFolder", currentFolder );
         String rptFolder = settingsProps.getProperty( "reportFolder", currentFolder );
-    
+
         setOldProjectFolder( new File( opFolder ) );
         setNewProjectFolder( new File( npFolder ) );
         setOldLibraryFolder( new File( olFolder ) );
@@ -126,7 +126,7 @@ public class UserSettings extends AbstractUserSettings {
         String olFolder = (oldLibraryFolder == null) ? currentFolder : oldLibraryFolder.getAbsolutePath();
         String nlFolder = (newLibraryFolder == null) ? currentFolder : newLibraryFolder.getAbsolutePath();
         String rptFolder = (reportFolder == null) ? currentFolder : reportFolder.getAbsolutePath();
-    
+
         settingsProps.put( "oldProjectFolder", opFolder );
         settingsProps.put( "newProjectFolder", npFolder );
         settingsProps.put( "oldLibraryFolder", olFolder );
@@ -151,6 +151,7 @@ public class UserSettings extends AbstractUserSettings {
         settings.setNewProjectFolder( new File( userHomeDirectory ) );
         settings.setOldLibraryFolder( new File( userHomeDirectory ) );
         settings.setNewLibraryFolder( new File( userHomeDirectory ) );
+        settings.setReportFolder( new File( userHomeDirectory ) );
         settings.compareOptions = new ModelCompareOptions();
         return settings;
     }

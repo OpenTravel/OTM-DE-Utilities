@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.web.WebView?>
 
-<BorderPane prefHeight="394.0" prefWidth="563.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.diffutil.DiffUtilityController">
+<BorderPane prefHeight="394.0" prefWidth="563.0" xmlns="http://javafx.com/javafx/8.0.90" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.diffutil.DiffUtilityController">
    <top>
       <TabPane prefHeight="178.0" prefWidth="563.0" tabClosingPolicy="UNAVAILABLE">
          <tabs>
@@ -262,7 +262,7 @@
    <bottom>
       <HBox prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <Button mnemonicParsing="false" onAction="#editSettings">
+            <Button fx:id="settingsButton" mnemonicParsing="false" onAction="#editSettings">
                <HBox.margin>
                   <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                </HBox.margin>

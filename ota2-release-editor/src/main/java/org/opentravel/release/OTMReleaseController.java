@@ -18,6 +18,8 @@ package org.opentravel.release;
 
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.BrowseRepositoryDialogController;
+import org.opentravel.application.common.DirectoryChooserDelegate;
+import org.opentravel.application.common.FileChooserDelegate;
 import org.opentravel.application.common.OtmApplicationException;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.release.NewReleaseDialogController.NewReleaseInfo;
@@ -44,7 +46,6 @@ import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryItemCommit;
 import org.opentravel.schemacompiler.repository.RepositoryItemType;
-import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.schemacompiler.saver.LibrarySaveException;
 import org.opentravel.schemacompiler.task.CompileAllCompilerTask;
 import org.opentravel.schemacompiler.util.URLUtils;
@@ -112,8 +113,6 @@ import javafx.scene.control.cell.ChoiceBoxTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import jfxtras.scene.control.LocalDateTimeTextField;
@@ -269,7 +268,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
     private Label timeZoneLabel;
     private Button applyToAllButton;
 
-    private RepositoryManager repositoryManager;
     private RepositoryAvailabilityChecker availabilityChecker;
     private UndoManager undoManager = new UndoManager();
     private boolean managedRelease = false;
@@ -287,14 +285,8 @@ public class OTMReleaseController extends AbstractMainWindowController {
      * Default constructor.
      */
     public OTMReleaseController() {
-        try {
-            repositoryManager = RepositoryManager.getDefault();
-            availabilityChecker = RepositoryAvailabilityChecker.getInstance( repositoryManager );
-            availabilityChecker.pingAllRepositories( true );
-
-        } catch (RepositoryException e) {
-            log.error( "Error creating default release manager.", e );
-        }
+        availabilityChecker = RepositoryAvailabilityChecker.getInstance( getRepositoryManager() );
+        availabilityChecker.pingAllRepositories( true );
     }
 
     /**
@@ -330,7 +322,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
             NewReleaseInfo releaseInfo = controller.showDialog();
 
             if (releaseInfo != null) {
-                ReleaseManager newReleaseManager = new ReleaseManager( repositoryManager );
+                ReleaseManager newReleaseManager = new ReleaseManager( getRepositoryManager() );
                 File newReleaseFile = newReleaseManager.getNewReleaseFile( releaseInfo.getReleaseName(),
                     releaseInfo.getReleaseDirectory() );
 
@@ -388,7 +380,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
         if (confirmCloseRelease()) {
             closeRelease();
         }
-        FileChooser chooser =
+        FileChooserDelegate chooser =
             newFileChooser( "Open", userSettings.getReleaseFolder(), OTR_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
         File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 
@@ -396,7 +388,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
             Runnable r = new BackgroundTask( "Loading Release: " + selectedFile.getName(), StatusType.INFO ) {
                 public void execute() throws OtmApplicationException {
                     try {
-                        ReleaseManager manager = new ReleaseManager( repositoryManager );
+                        ReleaseManager manager = new ReleaseManager( getRepositoryManager() );
 
                         validationFindings = new ValidationFindings();
                         manager.loadRelease( selectedFile, validationFindings );
@@ -430,8 +422,8 @@ public class OTMReleaseController extends AbstractMainWindowController {
             closeRelease();
         }
         if (availabilityChecker.pingAllRepositories( false )) {
-            BrowseRepositoryDialogController controller = BrowseRepositoryDialogController
-                .createDialog( "Open Managed Release", RepositoryItemType.RELEASE, getPrimaryStage() );
+            BrowseRepositoryDialogController controller = BrowseRepositoryDialogController.createDialog(
+                "Open Managed Release", RepositoryItemType.RELEASE, getPrimaryStage(), getRepositoryManager() );
 
             controller.showAndWait();
 
@@ -442,7 +434,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
                     Runnable r = new BackgroundTask( "Loading Managed Release...", StatusType.INFO ) {
                         public void execute() throws OtmApplicationException {
                             try {
-                                ReleaseManager manager = new ReleaseManager( repositoryManager );
+                                ReleaseManager manager = new ReleaseManager( getRepositoryManager() );
 
                                 validationFindings = new ValidationFindings();
                                 manager.loadRelease( selectedItem, validationFindings );
@@ -474,8 +466,8 @@ public class OTMReleaseController extends AbstractMainWindowController {
         if (confirmCloseRelease()) {
             closeRelease();
         }
-        FileChooser chooser = newFileChooser( "Import from OTP", userSettings.getReleaseFolder(), OTP_EXTENSION_FILTER,
-            ALL_EXTENSION_FILTER );
+        FileChooserDelegate chooser = newFileChooser( "Import from OTP", userSettings.getReleaseFolder(),
+            OTP_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
         File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 
         if ((selectedFile != null) && (selectedFile != releaseFile)) {
@@ -483,7 +475,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
                 public void execute() throws OtmApplicationException {
                     try {
                         ValidationFindings findings = new ValidationFindings();
-                        ReleaseManager newReleaseManager = new ReleaseManager( repositoryManager );
+                        ReleaseManager newReleaseManager = new ReleaseManager( getRepositoryManager() );
 
                         newReleaseManager.importFromProject( selectedFile, findings );
                         OTMReleaseController.this.releaseManager = newReleaseManager;
@@ -540,7 +532,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
     @FXML
     public void saveReleaseFileAs(ActionEvent event) {
         if ((releaseManager != null) && confirmCloseRelease()) {
-            DirectoryChooser chooser = newDirectoryChooser( "Save As Folder", userSettings.getReleaseFolder() );
+            DirectoryChooserDelegate chooser = newDirectoryChooser( "Save As Folder", userSettings.getReleaseFolder() );
             File selectedFolder = chooser.showDialog( getPrimaryStage() );
 
             if (selectedFolder != null) {
@@ -671,8 +663,8 @@ public class OTMReleaseController extends AbstractMainWindowController {
     @FXML
     public void addPrincipalLibrary(ActionEvent event) {
         if (releaseManager != null) {
-            BrowseRepositoryDialogController controller = BrowseRepositoryDialogController
-                .createDialog( "Add Principle Library", RepositoryItemType.LIBRARY, getPrimaryStage() );
+            BrowseRepositoryDialogController controller = BrowseRepositoryDialogController.createDialog(
+                "Add Principle Library", RepositoryItemType.LIBRARY, getPrimaryStage(), getRepositoryManager() );
 
             controller.showAndWait();
 
@@ -853,7 +845,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
                 public void execute() throws OtmApplicationException {
                     try {
                         ReleaseItem releaseItem = releaseManager.publishRelease( repository );
-                        ReleaseManager manager = new ReleaseManager( repositoryManager );
+                        ReleaseManager manager = new ReleaseManager( getRepositoryManager() );
 
                         validationFindings = new ValidationFindings();
                         manager.loadRelease( releaseItem, validationFindings );
@@ -881,7 +873,8 @@ public class OTMReleaseController extends AbstractMainWindowController {
     @FXML
     public void newReleaseVersion(ActionEvent event) {
         if ((releaseManager != null) && managedRelease) {
-            DirectoryChooser chooser = newDirectoryChooser( "New Version Folder", userSettings.getReleaseFolder() );
+            DirectoryChooserDelegate chooser =
+                newDirectoryChooser( "New Version Folder", userSettings.getReleaseFolder() );
             File selectedFolder = chooser.showDialog( getPrimaryStage() );
 
             if (selectedFolder != null) {
@@ -925,7 +918,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
     @FXML
     public void unpublishRelease(ActionEvent event) {
         if ((releaseManager != null) && managedRelease) {
-            DirectoryChooser chooser =
+            DirectoryChooserDelegate chooser =
                 newDirectoryChooser( "Unpublish to Local Folder", userSettings.getReleaseFolder() );
             File selectedFolder = chooser.showDialog( getPrimaryStage() );
 
@@ -1632,7 +1625,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
         maxRecursionDepthSpinner.setValueFactory( new IntegerSpinnerValueFactory( 1, 3, 3, 1 ) );
 
         // Initialize the list of repository menu items
-        List<RemoteRepository> repositories = repositoryManager.listRemoteRepositories();
+        List<RemoteRepository> repositories = getRepositoryManager().listRemoteRepositories();
 
         for (RemoteRepository repository : repositories) {
             try {

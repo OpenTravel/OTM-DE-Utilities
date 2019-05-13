@@ -18,11 +18,26 @@ package org.opentravel.examplehelper;
 
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.AbstractUserSettings;
+import org.opentravel.schemacompiler.repository.RepositoryManager;
 
 /**
  * JavaFX application for the OTA2 Example Helpere Utility.
  */
 public class ExampleHelperApplication extends AbstractOTMApplication {
+
+    /**
+     * Default constructor.
+     */
+    public ExampleHelperApplication() {}
+
+    /**
+     * Constructor that provides the manager that should be used when accessing remote OTM repositories.
+     * 
+     * @param repositoryManager
+     */
+    public ExampleHelperApplication(RepositoryManager repositoryManager) {
+        super( repositoryManager );
+    }
 
     /**
      * Main method invoked from the command-line.

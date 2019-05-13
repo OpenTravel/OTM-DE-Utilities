@@ -18,6 +18,7 @@ package org.opentravel.diffutil;
 
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.BrowseRepositoryDialogController;
+import org.opentravel.application.common.FileChooserDelegate;
 import org.opentravel.application.common.OtmApplicationException;
 import org.opentravel.application.common.OtmApplicationRuntimeException;
 import org.opentravel.application.common.StatusType;
@@ -84,7 +85,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
-import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -152,6 +152,8 @@ public class DiffUtilityController extends AbstractMainWindowController {
     @FXML
     private Button saveReportButton;
     @FXML
+    private Button settingsButton;
+    @FXML
     private Label statusBarLabel;
 
     private File oldProjectOrReleaseFile;
@@ -176,7 +178,7 @@ public class DiffUtilityController extends AbstractMainWindowController {
      */
     @FXML
     public void selectOldProject(ActionEvent event) {
-        FileChooser chooser = newFileChooser( "Select Old Project or Release Version",
+        FileChooserDelegate chooser = newFileChooser( "Select Old Project or Release Version",
             userSettings.getOldProjectFolder(), new ExtensionFilter( "OTM Project Files (*.otp)", "*.otp" ),
             new ExtensionFilter( "OTM Release Files (*.otr)", "*.otr" ),
             new ExtensionFilter( "All Files (*.*)", "*.*" ) );
@@ -199,7 +201,7 @@ public class DiffUtilityController extends AbstractMainWindowController {
      */
     @FXML
     public void selectNewProject(ActionEvent event) {
-        FileChooser chooser = newFileChooser( "Select New Project or Release Version",
+        FileChooserDelegate chooser = newFileChooser( "Select New Project or Release Version",
             userSettings.getNewProjectFolder(), OTP_EXTENSION_FILTER, OTM_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
         File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 
@@ -220,8 +222,8 @@ public class DiffUtilityController extends AbstractMainWindowController {
      */
     @FXML
     public void selectOldRelease(ActionEvent event) {
-        BrowseRepositoryDialogController controller = BrowseRepositoryDialogController
-            .createDialog( "Select Old Release Version", RepositoryItemType.RELEASE, getPrimaryStage() );
+        BrowseRepositoryDialogController controller = BrowseRepositoryDialogController.createDialog(
+            "Select Old Release Version", RepositoryItemType.RELEASE, getPrimaryStage(), getRepositoryManager() );
 
         if (controller != null) {
             controller.showAndWait();
@@ -242,8 +244,8 @@ public class DiffUtilityController extends AbstractMainWindowController {
      */
     @FXML
     public void selectNewRelease(ActionEvent event) {
-        BrowseRepositoryDialogController controller = BrowseRepositoryDialogController
-            .createDialog( "Select New Release Version", RepositoryItemType.RELEASE, getPrimaryStage() );
+        BrowseRepositoryDialogController controller = BrowseRepositoryDialogController.createDialog(
+            "Select New Release Version", RepositoryItemType.RELEASE, getPrimaryStage(), getRepositoryManager() );
 
         if (controller != null) {
             controller.showAndWait();
@@ -264,7 +266,7 @@ public class DiffUtilityController extends AbstractMainWindowController {
      */
     @FXML
     public void selectOldLibraryFromFile(ActionEvent event) {
-        FileChooser chooser = newFileChooser( "Select Old Library Version", userSettings.getOldLibraryFolder(),
+        FileChooserDelegate chooser = newFileChooser( "Select Old Library Version", userSettings.getOldLibraryFolder(),
             OTM_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
         File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 
@@ -304,8 +306,8 @@ public class DiffUtilityController extends AbstractMainWindowController {
      */
     @FXML
     public void selectOldLibraryFromRepo(ActionEvent event) {
-        BrowseRepositoryDialogController controller = BrowseRepositoryDialogController
-            .createDialog( "Select Old Library Version", RepositoryItemType.LIBRARY, getPrimaryStage() );
+        BrowseRepositoryDialogController controller = BrowseRepositoryDialogController.createDialog(
+            "Select Old Library Version", RepositoryItemType.LIBRARY, getPrimaryStage(), getRepositoryManager() );
 
         if (controller != null) {
             controller.showAndWait();
@@ -346,7 +348,7 @@ public class DiffUtilityController extends AbstractMainWindowController {
      */
     @FXML
     public void selectNewLibraryFromFile(ActionEvent event) {
-        FileChooser chooser = newFileChooser( "Select New Library Version", userSettings.getNewLibraryFolder(),
+        FileChooserDelegate chooser = newFileChooser( "Select New Library Version", userSettings.getNewLibraryFolder(),
             OTM_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
         File selectedFile = chooser.showOpenDialog( getPrimaryStage() );
 
@@ -386,8 +388,8 @@ public class DiffUtilityController extends AbstractMainWindowController {
      */
     @FXML
     public void selectNewLibraryFromRepo(ActionEvent event) {
-        BrowseRepositoryDialogController controller = BrowseRepositoryDialogController
-            .createDialog( "Select New Library Version", RepositoryItemType.LIBRARY, getPrimaryStage() );
+        BrowseRepositoryDialogController controller = BrowseRepositoryDialogController.createDialog(
+            "Select New Library Version", RepositoryItemType.LIBRARY, getPrimaryStage(), getRepositoryManager() );
 
         if (controller != null) {
             controller.showAndWait();
@@ -430,8 +432,8 @@ public class DiffUtilityController extends AbstractMainWindowController {
      */
     @FXML
     public void saveReport(ActionEvent event) {
-        FileChooser chooser = newFileChooser( "Save Report", userSettings.getReportFolder(), HTML_EXTENSION_FILTER,
-            ALL_EXTENSION_FILTER );
+        FileChooserDelegate chooser = newFileChooser( "Save Report", userSettings.getReportFolder(),
+            HTML_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
         File targetFile = chooser.showSaveDialog( getPrimaryStage() );
 
         if (targetFile != null) {
@@ -840,7 +842,7 @@ public class DiffUtilityController extends AbstractMainWindowController {
         LibraryInputSource<InputStream> libraryInput;
 
         if (itemCommit == null) {
-            RepositoryManager repositoryManager = RepositoryManager.getDefault();
+            RepositoryManager repositoryManager = getRepositoryManager();
             URL libraryUrl = repositoryManager.getContentLocation( libraryItem );
 
             libraryInput = new LibraryStreamInputSource( libraryUrl );
@@ -1016,8 +1018,8 @@ public class DiffUtilityController extends AbstractMainWindowController {
      */
     private boolean compareReleases(ValidationFindings oldFindings, ValidationFindings newFindings)
         throws RepositoryException, IOException {
-        ReleaseManager oldReleaseManager = new ReleaseManager();
-        ReleaseManager newReleaseManager = new ReleaseManager();
+        ReleaseManager oldReleaseManager = new ReleaseManager( getRepositoryManager() );
+        ReleaseManager newReleaseManager = new ReleaseManager( getRepositoryManager() );
         boolean logFindings = false;
 
         if (oldProjectOrReleaseFile != null) {
