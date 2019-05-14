@@ -193,19 +193,17 @@ public class LauncherController extends AbstractMainWindowController {
             builder.redirectErrorStream( true );
             builder.redirectOutput( Redirect.to( getLogFile( appClass ) ) );
             newProcess = builder.start();
-            sleep( 1000 );
+            sourceButton.getProperties().put( APP_PROCESS_KEY, newProcess );
 
-            // Save the running process or report an error
-            if (newProcess.isAlive()) {
-                sourceButton.getProperties().put( APP_PROCESS_KEY, newProcess );
+            // Wait five seconds before exiting to give the app time to finish launching
+            sleep( 5000 );
 
-            } else {
+            // Report an error if the process failed to start
+            if (!newProcess.isAlive()) {
+                sourceButton.getProperties().put( APP_PROCESS_KEY, null );
                 throw new OtmApplicationRuntimeException(
                     MessageBuilder.formatMessage( MSG_LAUNCH_ERROR, MessageBuilder.getDisplayName( appClass ) ) );
             }
-
-            // Wait five seconds before exiting to give the app time to finish launching
-            sleep( 4000 );
 
         } catch (Exception e) {
             throw new OtmApplicationException( e.getMessage(), e );
