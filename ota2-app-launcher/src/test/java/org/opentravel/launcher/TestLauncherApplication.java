@@ -19,6 +19,7 @@ package org.opentravel.launcher;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 import static org.testfx.api.FxAssert.verifyThat;
 
 import org.junit.Test;
@@ -48,11 +49,12 @@ public class TestLauncherApplication extends AbstractFxTest {
     @Test
     public void testAboutDialog() throws Exception {
         robot.clickOn( "Help" ).clickOn( "About" );
-        robot.targetWindow( "About" ).clickOn( "Close" );// .type( KeyCode.ENTER );
+        robot.targetWindow( "About" ).clickOn( "Close" );
     }
 
     @Test
     public void testLaunchApplication() throws Exception {
+        assumeFalse( TestFxMode.isCIBuildEnvironment() );
         LauncherController controller = (LauncherController) application.getController();
         Process duProcess;
 

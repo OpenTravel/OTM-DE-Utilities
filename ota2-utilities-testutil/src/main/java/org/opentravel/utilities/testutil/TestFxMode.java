@@ -58,4 +58,13 @@ public class TestFxMode {
         }
     }
 
+    /**
+     * Returns true if the current build/test environment is running on the distributed CI platform.
+     * 
+     * @return boolean
+     */
+    public static boolean isCIBuildEnvironment() {
+        return Boolean.valueOf( System.getProperty( "ciBuildEnv", "false" ) );
+    }
+
 }
