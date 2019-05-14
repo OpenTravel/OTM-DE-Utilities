@@ -193,6 +193,7 @@ public class LauncherController extends AbstractMainWindowController {
             builder.redirectErrorStream( true );
             builder.redirectOutput( Redirect.to( getLogFile( appClass ) ) );
             newProcess = builder.start();
+            sleep( 1000 );
 
             // Save the running process or report an error
             if (newProcess.isAlive()) {
@@ -204,7 +205,7 @@ public class LauncherController extends AbstractMainWindowController {
             }
 
             // Wait five seconds before exiting to give the app time to finish launching
-            sleep( 5000 );
+            sleep( 4000 );
 
         } catch (Exception e) {
             throw new OtmApplicationException( e.getMessage(), e );
