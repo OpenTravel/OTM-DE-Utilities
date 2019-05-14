@@ -39,6 +39,7 @@
 		<junit.version>4.12</junit.version>
 		<testfx.version>4.0.15-alpha</testfx.version>
 		<monocle.version>8u76-b04</monocle.version>
+		<loadui.version>3.1.2</loadui.version>
 		<mockito.version>2.23.4</mockito.version>
 		
 		<!-- Plugin Versions -->
@@ -333,6 +334,11 @@
 				<groupId>org.testfx</groupId>
 				<artifactId>openjfx-monocle</artifactId>
 				<version>${monocle.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.loadui</groupId>
+				<artifactId>testFx</artifactId>
+				<version>${loadui.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>

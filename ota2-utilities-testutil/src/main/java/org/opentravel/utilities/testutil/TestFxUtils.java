@@ -16,14 +16,20 @@
 
 package org.opentravel.utilities.testutil;
 
+import org.loadui.testfx.utils.KeyCodeUtils;
 import org.testfx.api.FxRobot;
+import org.testfx.api.FxRobotInterface;
 import org.testfx.matcher.base.NodeMatchers;
 import org.testfx.util.WaitForAsyncUtils;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
@@ -33,10 +39,45 @@ import javafx.scene.input.KeyCode;
  */
 public class TestFxUtils {
 
+    private static final Map<Character,KeyCode> SPECIAL_CHARS_MAP;
+
     /**
      * Private constructor to prevent instantiation.
      */
     private TestFxUtils() {}
+
+    /**
+     * Types the given text into the control currently in focus.
+     * 
+     * @param robot the robot to use for typing the text
+     * @param text the text to be typed
+     */
+    public static void typeText(FxRobotInterface robot, String textFxQuery, String text, boolean eraseText) {
+        if (eraseText) {
+            Object control = robot.lookup( textFxQuery ).query();
+
+            if (control instanceof TextInputControl) {
+                ((TextInputControl) control).setText( "" );
+            }
+        }
+        robot.clickOn( textFxQuery );
+
+        for (int i = 0; i < text.length(); i++) {
+            if (SPECIAL_CHARS_MAP.containsKey( text.charAt( i ) )) {
+                robot.press( KeyCode.SHIFT ).press( SPECIAL_CHARS_MAP.get( text.charAt( i ) ) )
+                    .release( SPECIAL_CHARS_MAP.get( text.charAt( i ) ) ).release( KeyCode.SHIFT );
+            } else {
+                char typed = text.charAt( i );
+                KeyCode identified = KeyCodeUtils.findKeyCode( typed );
+
+                if (Character.isUpperCase( typed )) {
+                    robot.press( KeyCode.SHIFT ).type( identified ).release( KeyCode.SHIFT );
+                } else {
+                    robot.type( identified );
+                }
+            }
+        }
+    }
 
     /**
      * Uses the TestFX robot provided to select the various target values from the tree view. Each target value is
@@ -102,6 +143,35 @@ public class TestFxUtils {
         }
         WaitForAsyncUtils.waitForFxEvents();
         return result;
+    }
+
+    /**
+     * Static initialization tasks.
+     */
+    static {
+        Map<Character,KeyCode> specialChars = new HashMap<Character,KeyCode>();
+
+        specialChars.put( '~', KeyCode.BACK_QUOTE );
+        specialChars.put( '!', KeyCode.DIGIT1 );
+        specialChars.put( '@', KeyCode.DIGIT2 );
+        specialChars.put( '#', KeyCode.DIGIT3 );
+        specialChars.put( '$', KeyCode.DIGIT4 );
+        specialChars.put( '%', KeyCode.DIGIT5 );
+        specialChars.put( '^', KeyCode.DIGIT6 );
+        specialChars.put( '&', KeyCode.DIGIT7 );
+        specialChars.put( '*', KeyCode.DIGIT8 );
+        specialChars.put( '(', KeyCode.DIGIT9 );
+        specialChars.put( ')', KeyCode.DIGIT0 );
+        specialChars.put( '_', KeyCode.MINUS );
+        specialChars.put( '+', KeyCode.EQUALS );
+        specialChars.put( '{', KeyCode.BRACELEFT );
+        specialChars.put( '}', KeyCode.BRACERIGHT );
+        specialChars.put( ':', KeyCode.SEMICOLON );
+        specialChars.put( '"', KeyCode.QUOTE );
+        specialChars.put( '<', KeyCode.COMMA );
+        specialChars.put( '>', KeyCode.PERIOD );
+        specialChars.put( '?', KeyCode.SLASH );
+        SPECIAL_CHARS_MAP = Collections.unmodifiableMap( specialChars );
     }
 
 }

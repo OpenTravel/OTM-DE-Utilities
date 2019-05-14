@@ -42,6 +42,7 @@ public abstract class AbstractFxTest extends AbstractRepositoryTest {
     protected static RepositoryManager repoManager;
 
     protected Stage primaryStage;
+    protected AbstractOTMApplication application;
     protected FileChooserDelegate mockFileChooser;
     protected DirectoryChooserDelegate mockDirectoryChooser;
 
@@ -50,7 +51,6 @@ public abstract class AbstractFxTest extends AbstractRepositoryTest {
         Class<? extends AbstractOTMApplication> applicationClass = getApplicationClass();
         try {
             MockNativeComponentBuilder componentBuilder = new MockNativeComponentBuilder();
-            AbstractOTMApplication application;
 
             if (repoManager != null) {
                 Constructor<? extends AbstractOTMApplication> constructor =

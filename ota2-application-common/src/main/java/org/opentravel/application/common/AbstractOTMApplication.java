@@ -37,6 +37,9 @@ import javafx.stage.Stage;
  */
 public abstract class AbstractOTMApplication extends Application {
 
+    private static boolean DISABLE_DISPLAY =
+        Boolean.valueOf( System.getProperty( "otm.utilities.disableDisplay", "false" ) );
+
     private RepositoryManager repositoryManager;
     private AbstractMainWindowController controller;
 
@@ -115,7 +118,10 @@ public abstract class AbstractOTMApplication extends Application {
             controller = loader.getController();
             controller.setRepositoryManager( repositoryManager );
             controller.initialize( primaryStage );
-            primaryStage.show();
+
+            if (!DISABLE_DISPLAY) {
+                primaryStage.show();
+            }
 
         } catch (RepositoryException | IOException e) {
             throw new OtmApplicationRuntimeException( "Unable to initialize JavaFX application.", e );

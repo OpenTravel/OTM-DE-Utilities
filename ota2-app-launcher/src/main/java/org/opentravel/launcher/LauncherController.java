@@ -85,6 +85,9 @@ public class LauncherController extends AbstractMainWindowController {
     @FXML
     private Label statusBarLabel;
 
+    private List<Button> launchButtons = new ArrayList<>();
+    private boolean launchHeadless = false;
+
     /**
      * Called when the user clicks the menu to edit the global proxy settings
      * 
@@ -179,6 +182,11 @@ public class LauncherController extends AbstractMainWindowController {
                 }
             }
 
+            // Configure for headless/hidden operation (if necessary)
+            if (isLaunchHeadless()) {
+                cmds.add( "-Dotm.utilities.disableDisplay=true" );
+            }
+
             // Build and execute the command to start the new sub-process
             cmds.add( appClass.getCanonicalName() );
             builder = new ProcessBuilder( cmds );
@@ -186,10 +194,7 @@ public class LauncherController extends AbstractMainWindowController {
             builder.redirectOutput( Redirect.to( getLogFile( appClass ) ) );
             newProcess = builder.start();
 
-            // Wait five seconds before checking the status
-            sleep( 5000 );
-
-            // Finish up by saving the running process or reporting an error
+            // Save the running process or report an error
             if (newProcess.isAlive()) {
                 sourceButton.getProperties().put( APP_PROCESS_KEY, newProcess );
 
@@ -197,6 +202,9 @@ public class LauncherController extends AbstractMainWindowController {
                 throw new OtmApplicationRuntimeException(
                     MessageBuilder.formatMessage( MSG_LAUNCH_ERROR, MessageBuilder.getDisplayName( appClass ) ) );
             }
+
+            // Wait five seconds before exiting to give the app time to finish launching
+            sleep( 5000 );
 
         } catch (Exception e) {
             throw new OtmApplicationException( e.getMessage(), e );
@@ -215,6 +223,25 @@ public class LauncherController extends AbstractMainWindowController {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    /**
+     * Returns the running process associated with the specified launch button (should be used for testing purposes
+     * only). If no such process exists, null will be returned.
+     * 
+     * @param launchButtonTitle the title of the launch button for which the process will be returned
+     * @return Process
+     */
+    protected Process getProcess(String launchButtonTitle) {
+        Process process = null;
+
+        for (Button launchButton : launchButtons) {
+            if (launchButton.getText().equals( launchButtonTitle )) {
+                process = (Process) launchButton.getProperties().get( APP_PROCESS_KEY );
+                break;
+            }
+        }
+        return process;
     }
 
     /**
@@ -271,7 +298,10 @@ public class LauncherController extends AbstractMainWindowController {
             TilePane buttonPane = newTab( tabSpec.getName() );
 
             for (OTA2ApplicationSpec appSpec : entry.getValue()) {
-                buttonPane.getChildren().add( newAppIcon( appSpec.getApplicationClass(), appSpec.getLaunchIcon() ) );
+                Button launchButton = newAppIcon( appSpec.getApplicationClass(), appSpec.getLaunchIcon() );
+
+                buttonPane.getChildren().add( launchButton );
+                launchButtons.add( launchButton );
             }
         }
     }
@@ -366,6 +396,24 @@ public class LauncherController extends AbstractMainWindowController {
 
         logFolder.mkdirs();
         return logFolder;
+    }
+
+    /**
+     * Returns the flag indicating whether apps should be launched in headless/hidden mode (for testing purposes only).
+     *
+     * @return boolean
+     */
+    protected boolean isLaunchHeadless() {
+        return launchHeadless;
+    }
+
+    /**
+     * Assigns the flag indicating whether apps should be launched in headless/hidden mode (for testing purposes only).
+     *
+     * @param launchHeadless the boolean value to assign
+     */
+    protected void setLaunchHeadless(boolean launchHeadless) {
+        this.launchHeadless = launchHeadless;
     }
 
 }

@@ -42,13 +42,13 @@
 			<artifactId>ota2-diff-utility</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- Experimental apps excluded from test coverage report. -->
-		<!--
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ota2-upversion-helper</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- Experimental apps excluded from test coverage report. -->
+		<!--
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ota2-model-check</artifactId>

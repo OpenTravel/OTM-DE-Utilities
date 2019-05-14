@@ -16,42 +16,111 @@
 
 package org.opentravel.launcher;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.opentravel.utilities.testutil.TestFxMode;
-import org.testfx.api.FxToolkit;
-import org.testfx.framework.junit.ApplicationRule;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.testfx.api.FxAssert.verifyThat;
 
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
+import org.junit.Test;
+import org.opentravel.application.common.AbstractOTMApplication;
+import org.opentravel.utilities.testutil.AbstractFxTest;
+import org.opentravel.utilities.testutil.TestFxMode;
+import org.opentravel.utilities.testutil.TestFxUtils;
+import org.testfx.api.FxRobot;
+import org.testfx.matcher.base.NodeMatchers;
+import org.testfx.util.WaitForAsyncUtils;
+
+import javafx.scene.control.CheckBox;
+import javafx.scene.input.KeyCode;
 
 /**
  * Verifies the correct operation of the OTM-DE-Utilities launcher application.
  */
-public class TestLauncherApplication {
+public class TestLauncherApplication extends AbstractFxTest {
 
-    public static final boolean RUN_HEADLESS = true;
+    public static final boolean RUN_HEADLESS = false;
 
-    @Rule
-    public ApplicationRule robot = new ApplicationRule( stage -> {
-        new LauncherApplication().start( stage );
-        primaryStage = stage;
-    } );
+    @Test
+    public void testOpenAndClose() throws Exception {
+        robot.clickOn( "File" ).clickOn( "Exit" );
+    }
 
-    private Stage primaryStage;
+    @Test
+    public void testAboutDialog() throws Exception {
+        robot.clickOn( "Help" ).clickOn( "About" );
+        robot.targetWindow( "About" ).clickOn( "Close" );// .type( KeyCode.ENTER );
+    }
+
+    @Test
+    public void testLaunchApplication() throws Exception {
+        LauncherController controller = (LauncherController) application.getController();
+        Process duProcess;
+
+        // Launch an application process
+        controller.setLaunchHeadless( true );
+        robot.clickOn( "Diff Utility" );
+        WaitForAsyncUtils.waitForFxEvents();
+        Thread.sleep( 5000 );
+        duProcess = controller.getProcess( "Diff Utility" );
+        assertNotNull( duProcess );
+
+        // Attempt to launch again (should not error or launch a new process)
+        robot.clickOn( "Diff Utility" );
+        WaitForAsyncUtils.waitForFxEvents();
+        assertEquals( duProcess, controller.getProcess( "Diff Utility" ) );
+        robot.targetWindow( "Already Running" ).type( KeyCode.ENTER );
+
+        duProcess.destroyForcibly(); // Clean up the external process that was launched
+    }
+
+    @Test
+    public void testEditProxySettings() throws Exception {
+        UserSettings settings;
+        boolean useProxyInd;
+        FxRobot dialogRobot;
+
+        robot.clickOn( "File" ).clickOn( "Proxy Settings..." );
+        WaitForAsyncUtils.waitForFxEvents();
+        dialogRobot = robot.targetWindow( "Network Proxy Settings" );
+
+        dialogRobot.clickOn( "#useProxyCB" );
+        WaitForAsyncUtils.waitForFxEvents();
+        useProxyInd = ((CheckBox) dialogRobot.lookup( "#useProxyCB" ).query()).isSelected();
+
+        if (!useProxyInd) {
+            dialogRobot.clickOn( "#useProxyCB" );
+        }
+        TestFxUtils.typeText( robot, "#proxyHostText", "proxy.opentravel.org", true );
+        TestFxUtils.typeText( robot, "#proxyPortText", "8080", true );
+
+        TestFxUtils.typeText( robot, "#nonProxyHostsText", "*.opentravel@org", true );
+        verifyThat( "#okButton", NodeMatchers.isDisabled() );
+
+        TestFxUtils.typeText( robot, "#nonProxyHostsText", "opentravel.*", true );
+        verifyThat( "#okButton", NodeMatchers.isEnabled() );
+        robot.clickOn( "#okButton" );
+        WaitForAsyncUtils.waitForFxEvents();
+
+        settings = UserSettings.load();
+        assertTrue( settings.isUseProxy() );
+        assertEquals( "proxy.opentravel.org", settings.getProxyHost() );
+        assertEquals( 8080, settings.getProxyPort().intValue() );
+        assertEquals( "opentravel.*", settings.getNonProxyHosts() );
+    }
+
+    /**
+     * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
+     */
+    @Override
+    protected Class<? extends AbstractOTMApplication> getApplicationClass() {
+        return LauncherApplication.class;
+    }
 
     /**
      * Configure headless/normal mode for TestFX execution.
      */
     static {
         TestFxMode.setHeadless( RUN_HEADLESS );
-    }
-
-    @Test
-    public void testOpenAndClose() throws Exception {
-        // TODO: Assert that correct appliation buttons exist
-        FxToolkit.setupFixture(
-            () -> primaryStage.fireEvent( new WindowEvent( primaryStage, WindowEvent.WINDOW_CLOSE_REQUEST ) ) );
     }
 
 }
