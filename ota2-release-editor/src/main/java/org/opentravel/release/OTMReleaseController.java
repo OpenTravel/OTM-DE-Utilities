@@ -282,14 +282,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
     private UserSettings userSettings;
 
     /**
-     * Default constructor.
-     */
-    public OTMReleaseController() {
-        availabilityChecker = RepositoryAvailabilityChecker.getInstance( getRepositoryManager() );
-        availabilityChecker.pingAllRepositories( true );
-    }
-
-    /**
      * Called when the user clicks the button to undo a previous action.
      * 
      * @param event the action event that triggered this method call
@@ -317,8 +309,8 @@ public class OTMReleaseController extends AbstractMainWindowController {
     @FXML
     public void newReleaseFile(ActionEvent event) {
         try {
-            NewReleaseDialogController controller =
-                NewReleaseDialogController.createNewReleaseDialog( userSettings.getReleaseFolder(), getPrimaryStage() );
+            NewReleaseDialogController controller = NewReleaseDialogController.createNewReleaseDialog(
+                userSettings.getReleaseFolder(), getPrimaryStage(), getNativeComponentBuilder() );
             NewReleaseInfo releaseInfo = controller.showDialog();
 
             if (releaseInfo != null) {
@@ -377,7 +369,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
      */
     @FXML
     public void openReleaseFile(ActionEvent event) {
-        if (confirmCloseRelease()) {
+        if (confirmCloseRelease( "Close Release" )) {
             closeRelease();
         }
         FileChooserDelegate chooser =
@@ -418,7 +410,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
      */
     @FXML
     public void openManagedRelease(ActionEvent event) {
-        if (confirmCloseRelease()) {
+        if (confirmCloseRelease( "Close Release" )) {
             closeRelease();
         }
         if (availabilityChecker.pingAllRepositories( false )) {
@@ -463,7 +455,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
      */
     @FXML
     public void importFromProject(ActionEvent event) {
-        if (confirmCloseRelease()) {
+        if (confirmCloseRelease( "Close Release" )) {
             closeRelease();
         }
         FileChooserDelegate chooser = newFileChooser( "Import from OTP", userSettings.getReleaseFolder(),
@@ -531,7 +523,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
      */
     @FXML
     public void saveReleaseFileAs(ActionEvent event) {
-        if ((releaseManager != null) && confirmCloseRelease()) {
+        if (releaseManager != null) {
             DirectoryChooserDelegate chooser = newDirectoryChooser( "Save As Folder", userSettings.getReleaseFolder() );
             File selectedFolder = chooser.showDialog( getPrimaryStage() );
 
@@ -598,7 +590,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
      */
     @FXML
     public void closeReleaseFile(ActionEvent event) {
-        if (confirmCloseRelease()) {
+        if (confirmCloseRelease( "Close Release" )) {
             closeRelease();
         }
     }
@@ -989,18 +981,19 @@ public class OTMReleaseController extends AbstractMainWindowController {
      * If a release is loaded and has been modified, the user is prompted to confirm the close and allowed to save the
      * release if desired.
      * 
+     * @param closeTitle the title of the close dialog that will be displayed
      * @return boolean
      */
-    private boolean confirmCloseRelease() {
+    private boolean confirmCloseRelease(String closeTitle) {
         boolean confirmClose = true;
 
         if ((releaseManager != null) && !managedRelease && releaseDirty) {
             Alert alert = new Alert( AlertType.CONFIRMATION );
             Optional<ButtonType> dialogResult;
 
-            alert.setTitle( "Exit Application" );
+            alert.setTitle( closeTitle );
             alert.setHeaderText( null );
-            alert.setContentText( "The current release has been modified.  Save before exiting?" );
+            alert.setContentText( "The current release has been modified.  Save before closing?" );
 
             alert.getButtonTypes().setAll( ButtonType.YES, ButtonType.NO, ButtonType.CANCEL );
             dialogResult = alert.showAndWait();
@@ -1053,7 +1046,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
      * @return boolean
      */
     public boolean closeApplication() {
-        boolean confirmClose = confirmCloseRelease();
+        boolean confirmClose = confirmCloseRelease( "Exit Application" );
 
         if (confirmClose) {
             UserSettings settings = UserSettings.load();
@@ -1616,6 +1609,8 @@ public class OTMReleaseController extends AbstractMainWindowController {
         String defaultStyle = CompilerExtensionRegistry.getActiveExtension();
         UserSettings settings = UserSettings.load();
 
+        availabilityChecker = RepositoryAvailabilityChecker.getInstance( getRepositoryManager() );
+        availabilityChecker.pingAllRepositories( false );
         super.initialize( primaryStage );
 
         // Initialize the possible values in choice groups and spinners
@@ -1644,12 +1639,14 @@ public class OTMReleaseController extends AbstractMainWindowController {
 
         // Initialize the default effective date controls
         defaultEffectiveDate = new LocalDateTimeTextField();
+        defaultEffectiveDate.setId( "defaultEffectiveDate" );
         defaultEffectiveDate.setPrefWidth( 180.0D );
         defaultEffectiveDate.setPadding( new Insets( 3, 0, 0, 0 ) );
         timeZoneLabel = new Label( ZoneId.systemDefault().getDisplayName( TextStyle.SHORT, Locale.getDefault() ) + " ("
             + ZoneId.systemDefault().toString() + ")" );
         timeZoneLabel.setPadding( new Insets( 8, 5, 5, 5 ) );
         applyToAllButton = new Button( "Apply to all members..." );
+        applyToAllButton.setId( "applyToAllButton" );
         effectiveDateHBox.getChildren().add( defaultEffectiveDate );
         effectiveDateHBox.getChildren().add( timeZoneLabel );
         effectiveDateHBox.getChildren().add( applyToAllButton );

@@ -69,7 +69,7 @@ public class BusinessObjectTreeNode extends TreeNode<TLBusinessObject> {
         TLBusinessObject bo = getEntity();
 
         props.add( new NodeProperty( "name", bo::getName ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( bo ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( bo ) ) );
         props.add( new NodeProperty( "extends", () -> getExtensionName( bo ) ) );
         props.add( new NodeProperty( "notExtendable", () -> bo.isNotExtendable() + "" ) );
         return props;

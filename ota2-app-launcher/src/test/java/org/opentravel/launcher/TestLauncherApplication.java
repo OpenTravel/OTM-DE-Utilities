@@ -39,7 +39,7 @@ import javafx.scene.input.KeyCode;
  */
 public class TestLauncherApplication extends AbstractFxTest {
 
-    public static final boolean RUN_HEADLESS = false;
+    public static final boolean RUN_HEADLESS = true;
 
     @Test
     public void testOpenAndClose() throws Exception {
@@ -92,13 +92,13 @@ public class TestLauncherApplication extends AbstractFxTest {
         if (!useProxyInd) {
             dialogRobot.clickOn( "#useProxyCB" );
         }
-        TestFxUtils.typeText( robot, "#proxyHostText", "proxy.opentravel.org", true );
-        TestFxUtils.typeText( robot, "#proxyPortText", "8080", true );
+        TestFxUtils.typeText( robot, "#proxyHostText", "proxy.opentravel.org" );
+        TestFxUtils.typeText( robot, "#proxyPortText", "8080" );
 
-        TestFxUtils.typeText( robot, "#nonProxyHostsText", "*.opentravel@org", true );
+        TestFxUtils.typeText( robot, "#nonProxyHostsText", "*.opentravel@org" );
         verifyThat( "#okButton", NodeMatchers.isDisabled() );
 
-        TestFxUtils.typeText( robot, "#nonProxyHostsText", "opentravel.*", true );
+        TestFxUtils.typeText( robot, "#nonProxyHostsText", "opentravel.*" );
         verifyThat( "#okButton", NodeMatchers.isEnabled() );
         robot.clickOn( "#okButton" );
         WaitForAsyncUtils.waitForFxEvents();

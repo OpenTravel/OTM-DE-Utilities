@@ -29,6 +29,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -50,17 +51,21 @@ public class TestFxUtils {
      * Types the given text into the control currently in focus.
      * 
      * @param robot the robot to use for typing the text
+     * @param textFxQuery the query string for the JavaFX text control
      * @param text the text to be typed
      */
-    public static void typeText(FxRobotInterface robot, String textFxQuery, String text, boolean eraseText) {
-        if (eraseText) {
-            Object control = robot.lookup( textFxQuery ).query();
+    public static void typeText(FxRobotInterface robot, String textFxQuery, String text) {
+        Object control = robot.lookup( textFxQuery ).query();
 
-            if (control instanceof TextInputControl) {
-                ((TextInputControl) control).setText( "" );
+        robot.clickOn( textFxQuery );
+
+        if (control instanceof TextInputControl) {
+            int charCount = ((TextInputControl) control).getText().length();
+
+            for (int i = 0; i < charCount; i++) {
+                robot.type( KeyCode.BACK_SPACE );
             }
         }
-        robot.clickOn( textFxQuery );
 
         for (int i = 0; i < text.length(); i++) {
             if (SPECIAL_CHARS_MAP.containsKey( text.charAt( i ) )) {
@@ -76,6 +81,30 @@ public class TestFxUtils {
                     robot.type( identified );
                 }
             }
+        }
+    }
+
+    /**
+     * Expands and navigates all members of the specified tree view on the UI.
+     * 
+     * @param robot the TestFX robot that will perform the navigation
+     * @param treeviewFxid the JavaFX query ID of the tree view to navigate
+     */
+    public static void navigateTreeView(FxRobot robot, String treeviewFxid) {
+        TreeView<?> treeView = robot.lookup( treeviewFxid ).query();
+        TreeItem<?> lastSelectedItem = null;
+        TreeItem<?> selectedItem;
+
+        robot.clickOn( treeviewFxid );
+        WaitForAsyncUtils.waitForFxEvents();
+        treeView.getSelectionModel().select( 0 );
+        selectedItem = treeView.getSelectionModel().getSelectedItem();
+
+        while (selectedItem != lastSelectedItem) {
+            robot.type( KeyCode.RIGHT );
+            robot.type( KeyCode.DOWN );
+            lastSelectedItem = selectedItem;
+            selectedItem = treeView.getSelectionModel().getSelectedItem();
         }
     }
 
@@ -119,6 +148,28 @@ public class TestFxUtils {
                 throw new AssertionError( "Target value not found in tree view: " + targetValues[i] );
             }
         }
+    }
+
+    /**
+     * Adjusts the scroll position of a scroll pane.
+     * 
+     * @param robot the robot to use for control lookups
+     * @param fxScrollPaneQuery the FX query string for the scroll pane
+     * @param verticalPct the percentage where the pane's scroll bar should be set
+     */
+    public static void setScrollPosition(FxRobot robot, String fxScrollPaneQuery, double verticalPct) {
+        ScrollPane scrollPane = (ScrollPane) robot.lookup( fxScrollPaneQuery ).query();
+        scrollPane.setVvalue( (scrollPane.getVmax() - scrollPane.getVmin()) * verticalPct );
+    }
+
+    /**
+     * Sets the UI focus on the specified control.
+     * 
+     * @param robot the robot to use for control lookups
+     * @param fxQuery
+     */
+    public static void setFocus(FxRobot robot, String fxQuery) {
+        WaitForAsyncUtils.asyncFx( () -> robot.lookup( fxQuery ).query().requestFocus() );
     }
 
     /**

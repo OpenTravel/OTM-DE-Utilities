@@ -69,7 +69,7 @@ public class ActionFacetTreeNode extends TreeNode<TLActionFacet> {
         TLActionFacet facet = getEntity();
 
         props.add( new NodeProperty( "name", facet::getName ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( facet ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( facet ) ) );
         props.add( new NodeProperty( "referenceType",
             () -> MessageBuilder.formatMessage( facet.getReferenceType().toString() ) ) );
         props.add( new NodeProperty( "repeat", () -> facet.getReferenceRepeat() + "" ) );

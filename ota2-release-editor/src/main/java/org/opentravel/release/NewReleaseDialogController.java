@@ -16,6 +16,8 @@
 
 package org.opentravel.release;
 
+import org.opentravel.application.common.DirectoryChooserDelegate;
+import org.opentravel.application.common.NativeComponentBuilder;
 import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.saver.LibrarySaveException;
 import org.slf4j.Logger;
@@ -31,7 +33,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -47,16 +48,17 @@ public class NewReleaseDialogController {
     private Stage dialogStage;
 
     @FXML
-    private TextField releaseDirectory;
+    private TextField newReleaseDirectory;
     @FXML
-    private TextField releaseName;
+    private TextField newReleaseName;
     @FXML
-    private TextField releaseBaseNamespace;
+    private TextField newReleaseBaseNamespace;
     @FXML
-    private Button releaseDirectoryButton;
+    private Button newReleaseDirectoryButton;
     @FXML
     private Button okButton;
 
+    private NativeComponentBuilder nativeComponentBuilder;
     private File releaseFolder;
     private boolean okSelected = false;
 
@@ -67,7 +69,8 @@ public class NewReleaseDialogController {
      * @param stage the stage that will own the new dialog
      * @return NewReleaseDialogController
      */
-    public static NewReleaseDialogController createNewReleaseDialog(File initialDirectory, Stage stage) {
+    public static NewReleaseDialogController createNewReleaseDialog(File initialDirectory, Stage stage,
+        NativeComponentBuilder nativeComponentBuilder) {
         NewReleaseDialogController controller = null;
         try {
             FXMLLoader loader = new FXMLLoader( NewReleaseDialogController.class.getResource( FXML_FILE ) );
@@ -81,6 +84,7 @@ public class NewReleaseDialogController {
             dialogStage.setScene( scene );
 
             controller = loader.getController();
+            controller.nativeComponentBuilder = nativeComponentBuilder;
             controller.initialize( dialogStage, initialDirectory );
 
         } catch (IOException e) {
@@ -96,7 +100,7 @@ public class NewReleaseDialogController {
      */
     @FXML
     public void selectReleaseDirectory(ActionEvent event) {
-        DirectoryChooser chooser = new DirectoryChooser();
+        DirectoryChooserDelegate chooser;
         File selectedFolder;
 
         // Make sure the initial directory for the chooser exists
@@ -106,13 +110,11 @@ public class NewReleaseDialogController {
         if (releaseFolder == null) {
             releaseFolder = new File( System.getProperty( "user.home" ) );
         }
-
-        chooser.setTitle( "Select Release Directory" );
-        chooser.setInitialDirectory( releaseFolder );
+        chooser = nativeComponentBuilder.newDirectoryChooser( "Select Release Directory", releaseFolder );
         selectedFolder = chooser.showDialog( dialogStage );
 
         if (selectedFolder != null) {
-            releaseDirectory.setText( selectedFolder.getAbsolutePath() );
+            newReleaseDirectory.setText( selectedFolder.getAbsolutePath() );
             releaseFolder = selectedFolder;
         }
     }
@@ -144,9 +146,9 @@ public class NewReleaseDialogController {
     private void validateFields() {
         boolean isValid = true;
 
-        isValid &= Validator.validateTextField( releaseDirectory, "release directory", -1, true );
-        isValid &= Validator.validateTextField( releaseName, "release name", 256, true );
-        isValid &= Validator.validateURLTextField( releaseBaseNamespace, "base namespace", true );
+        isValid &= Validator.validateTextField( newReleaseDirectory, "release directory", -1, true );
+        isValid &= Validator.validateTextField( newReleaseName, "release name", 256, true );
+        isValid &= Validator.validateURLTextField( newReleaseBaseNamespace, "base namespace", true );
         okButton.setDisable( !isValid );
     }
 
@@ -158,12 +160,12 @@ public class NewReleaseDialogController {
      */
     private void initialize(Stage dialogStage, File initialDirectory) {
         if (initialDirectory != null) {
-            releaseDirectory.setText( initialDirectory.getAbsolutePath() );
+            newReleaseDirectory.setText( initialDirectory.getAbsolutePath() );
             this.releaseFolder = initialDirectory;
         }
-        releaseDirectory.textProperty().addListener( (observable, oldValue, newValue) -> validateFields() );
-        releaseName.textProperty().addListener( (observable, oldValue, newValue) -> validateFields() );
-        releaseBaseNamespace.textProperty().addListener( (observable, oldValue, newValue) -> validateFields() );
+        newReleaseDirectory.textProperty().addListener( (observable, oldValue, newValue) -> validateFields() );
+        newReleaseName.textProperty().addListener( (observable, oldValue, newValue) -> validateFields() );
+        newReleaseBaseNamespace.textProperty().addListener( (observable, oldValue, newValue) -> validateFields() );
         okButton.setDisable( true );
         this.dialogStage = dialogStage;
     }
@@ -181,7 +183,8 @@ public class NewReleaseDialogController {
         dialogStage.showAndWait();
 
         if (okSelected) {
-            releaseInfo = new NewReleaseInfo( releaseFolder, releaseName.getText(), releaseBaseNamespace.getText() );
+            releaseInfo =
+                new NewReleaseInfo( releaseFolder, newReleaseName.getText(), newReleaseBaseNamespace.getText() );
         }
         return releaseInfo;
     }

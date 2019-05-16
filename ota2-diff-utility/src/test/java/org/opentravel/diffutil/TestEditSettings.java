@@ -16,7 +16,8 @@
 
 package org.opentravel.diffutil;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.utilities.testutil.AbstractFxTest;
@@ -65,12 +66,9 @@ public class TestEditSettings extends AbstractFxTest {
         dialogRobot.clickOn( "Ok" );
 
         settings = UserSettings.load();
-        Assert.assertEquals( suppressFieldVersionChanges,
-            settings.getCompareOptions().isSuppressFieldVersionChanges() );
-        Assert.assertEquals( suppressLibraryPropertyChanges,
-            settings.getCompareOptions().isSuppressLibraryPropertyChanges() );
-        Assert.assertEquals( suppressDocumentationChanges,
-            settings.getCompareOptions().isSuppressDocumentationChanges() );
+        assertEquals( suppressFieldVersionChanges, settings.getCompareOptions().isSuppressFieldVersionChanges() );
+        assertEquals( suppressLibraryPropertyChanges, settings.getCompareOptions().isSuppressLibraryPropertyChanges() );
+        assertEquals( suppressDocumentationChanges, settings.getCompareOptions().isSuppressDocumentationChanges() );
     }
 
     /**

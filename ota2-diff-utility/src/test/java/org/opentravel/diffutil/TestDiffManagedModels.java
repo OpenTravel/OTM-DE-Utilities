@@ -109,10 +109,8 @@ public class TestDiffManagedModels extends AbstractFxTest {
 
     @Test
     public void testCompareUnmanagedReleases() throws Exception {
-        File oldProjectFile =
-            new File( System.getProperty( "user.dir" ), "/src/test/resources/test-models/test-release-old.otr" );
-        File newProjectFile =
-            new File( System.getProperty( "user.dir" ), "/src/test/resources/test-models/test-release-new.otr" );
+        File oldProjectFile = new File( wipFolder.get(), "/test-release-old.otr" );
+        File newProjectFile = new File( wipFolder.get(), "/test-release-new.otr" );
 
         when( mockFileChooser.showOpenDialog( any() ) ).thenReturn( oldProjectFile, newProjectFile );
 

@@ -69,7 +69,7 @@ public class ChoiceObjectTreeNode extends TreeNode<TLChoiceObject> {
         TLChoiceObject choice = getEntity();
 
         props.add( new NodeProperty( "name", choice::getName ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( choice ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( choice ) ) );
         props.add( new NodeProperty( "extends", () -> getExtensionName( choice ) ) );
         props.add( new NodeProperty( "notExtendable", () -> choice.isNotExtendable() + "" ) );
         return props;

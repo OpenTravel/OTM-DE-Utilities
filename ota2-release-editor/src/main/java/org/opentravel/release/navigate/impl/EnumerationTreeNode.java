@@ -90,7 +90,7 @@ public abstract class EnumerationTreeNode<E extends TLAbstractEnumeration> exten
         props.add( new NodeProperty( "name", enumeration::getName ) );
         props.add(
             new NodeProperty( "enumType", () -> (enumeration instanceof TLOpenEnumeration) ? "Open" : "Closed" ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( enumeration ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( enumeration ) ) );
         props.add( new NodeProperty( "extends", () -> getExtensionName( enumeration ) ) );
         return props;
     }

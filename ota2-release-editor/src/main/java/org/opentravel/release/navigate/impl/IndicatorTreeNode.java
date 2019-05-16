@@ -68,7 +68,7 @@ public class IndicatorTreeNode extends TreeNode<TLIndicator> {
         TLIndicator indicator = getEntity();
 
         props.add( new NodeProperty( "name", indicator::getName ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( indicator ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( indicator ) ) );
         props.add( new NodeProperty( "publishAsElement", () -> indicator.isPublishAsElement() + "" ) );
         return props;
     }

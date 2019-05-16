@@ -1,1 +1,0 @@
-Template folder for the work-in-process files used during unit testing of the application.

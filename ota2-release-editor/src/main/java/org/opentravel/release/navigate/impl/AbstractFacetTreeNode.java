@@ -92,7 +92,7 @@ public class AbstractFacetTreeNode<E extends TLAbstractFacet> extends TreeNode<E
         TLAbstractFacet facet = getEntity();
 
         props.add( new NodeProperty( "name", () -> MessageBuilder.formatMessage( facet.getFacetType().toString() ) ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( facet ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( facet ) ) );
 
         if (facet instanceof TLContextualFacet) {
             TLContextualFacet ctxFacet = (TLContextualFacet) facet;

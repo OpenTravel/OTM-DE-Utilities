@@ -69,7 +69,7 @@ public class ValueWithAttributesTreeNode extends TreeNode<TLValueWithAttributes>
         TLValueWithAttributes vwa = getEntity();
 
         props.add( new NodeProperty( "name", vwa::getName ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( vwa ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( vwa ) ) );
         props.add( new NodeProperty( "parentType", () -> getEntityDisplayName( vwa.getParentType() ) ) );
         return props;
     }

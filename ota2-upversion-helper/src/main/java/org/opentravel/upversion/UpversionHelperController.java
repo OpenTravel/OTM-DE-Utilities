@@ -169,14 +169,6 @@ public class UpversionHelperController extends AbstractMainWindowController {
     private boolean validationDirty = false;
 
     /**
-     * Default constructor.
-     */
-    public UpversionHelperController() {
-        availabilityChecker = RepositoryAvailabilityChecker.getInstance( getRepositoryManager() );
-        availabilityChecker.pingAllRepositories( true );
-    }
-
-    /**
      * Called when the user clicks the menu import selected libraries from an OTM project (OTP) file.
      * 
      * @param event the action event that triggered this method call
@@ -838,6 +830,8 @@ public class UpversionHelperController extends AbstractMainWindowController {
     @Override
     @SuppressWarnings("squid:MaximumInheritanceDepth") // Unavoidable since the base class is from core JavaFXx
     protected void initialize(Stage primaryStage) {
+        availabilityChecker = RepositoryAvailabilityChecker.getInstance( getRepositoryManager() );
+        availabilityChecker.pingAllRepositories( false );
         super.initialize( primaryStage );
 
         // Configure listeners for choice/text boxes

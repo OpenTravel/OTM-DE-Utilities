@@ -72,7 +72,7 @@ public class ActionRequestTreeNode extends TreeNode<TLActionRequest> {
 
         props.add(
             new NodeProperty( "method", () -> MessageBuilder.formatMessage( request.getHttpMethod().toString() ) ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( request ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( request ) ) );
         props.add( new NodeProperty( "paramGroup", () -> (paramGroup == null) ? "" : paramGroup.getName() ) );
         props.add( new NodeProperty( "payloadType", () -> getEntityDisplayName( request.getPayloadType() ) ) );
         return props;

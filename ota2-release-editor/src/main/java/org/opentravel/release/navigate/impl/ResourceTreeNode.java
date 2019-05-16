@@ -71,7 +71,7 @@ public class ResourceTreeNode extends TreeNode<TLResource> {
         TLResource resource = getEntity();
 
         props.add( new NodeProperty( "name", resource::getName ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( resource ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( resource ) ) );
         props.add( new NodeProperty( "extends", () -> getExtensionName( resource ) ) );
         props.add( new NodeProperty( "abstract", () -> resource.isAbstract() + "" ) );
         props.add( new NodeProperty( "basePath", resource::getBasePath ) );

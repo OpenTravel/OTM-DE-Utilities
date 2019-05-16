@@ -68,7 +68,7 @@ public class ElementTreeNode extends TreeNode<TLProperty> {
         TLProperty element = getEntity();
 
         props.add( new NodeProperty( "name", element::getName ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( element ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( element ) ) );
         props.add( new NodeProperty( "type", () -> getEntityDisplayName( element.getType() ) ) );
         props.add( new NodeProperty( "isReference", () -> element.isReference() + "" ) );
         props.add( new NodeProperty( "repeat", () -> element.getRepeat() + "" ) );

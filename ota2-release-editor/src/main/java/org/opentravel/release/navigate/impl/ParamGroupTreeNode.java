@@ -68,7 +68,7 @@ public class ParamGroupTreeNode extends TreeNode<TLParamGroup> {
         TLParamGroup paramGroup = getEntity();
 
         props.add( new NodeProperty( "name", paramGroup::getName ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( paramGroup ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( paramGroup ) ) );
         props.add( new NodeProperty( "idGroup", () -> paramGroup.isIdGroup() + "" ) );
         props.add( new NodeProperty( "facetRef", () -> getEntityDisplayName( paramGroup.getFacetRef() ) ) );
         return props;

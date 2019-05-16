@@ -92,26 +92,26 @@ public class LibraryFolderTreeNode extends TreeNode<TLLibrary> {
 
         switch (folderType) {
             case COMPLEX_TYPES:
-                library.getValueWithAttributesTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
-                library.getCoreObjectTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
-                library.getChoiceObjectTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
-                library.getBusinessObjectTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
+                library.getValueWithAttributesTypes().forEach( e -> children.add( treeNodeFactory.newTreeNode( e ) ) );
+                library.getCoreObjectTypes().forEach( e -> children.add( treeNodeFactory.newTreeNode( e ) ) );
+                library.getChoiceObjectTypes().forEach( e -> children.add( treeNodeFactory.newTreeNode( e ) ) );
+                library.getBusinessObjectTypes().forEach( e -> children.add( treeNodeFactory.newTreeNode( e ) ) );
                 library.getContextualFacetTypes().forEach( e -> {
                     if (e.isLocalFacet()) {
-                        treeNodeFactory.newTreeNode( e );
+                        children.add( treeNodeFactory.newTreeNode( e ) );
                     }
                 } );
-                library.getExtensionPointFacetTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
+                library.getExtensionPointFacetTypes().forEach( e -> children.add( treeNodeFactory.newTreeNode( e ) ) );
                 break;
 
             case SIMPLE_TYPES:
-                library.getSimpleTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
-                library.getClosedEnumerationTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
-                library.getOpenEnumerationTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
+                library.getSimpleTypes().forEach( e -> children.add( treeNodeFactory.newTreeNode( e ) ) );
+                library.getClosedEnumerationTypes().forEach( e -> children.add( treeNodeFactory.newTreeNode( e ) ) );
+                library.getOpenEnumerationTypes().forEach( e -> children.add( treeNodeFactory.newTreeNode( e ) ) );
                 break;
 
             case RESOURCES:
-                library.getResourceTypes().forEach( e -> treeNodeFactory.newTreeNode( e ) );
+                library.getResourceTypes().forEach( e -> children.add( treeNodeFactory.newTreeNode( e ) ) );
                 break;
 
             case SERVICES:

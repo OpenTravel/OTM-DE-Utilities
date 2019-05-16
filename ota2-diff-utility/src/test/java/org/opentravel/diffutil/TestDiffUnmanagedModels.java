@@ -51,10 +51,8 @@ public class TestDiffUnmanagedModels extends AbstractFxTest {
 
     @Test
     public void testCompareUnmanagedLibraries() throws Exception {
-        File oldLibraryFile =
-            new File( System.getProperty( "user.dir" ), "/src/test/resources/test-models/test-model-old.otm" );
-        File newLibraryFile =
-            new File( System.getProperty( "user.dir" ), "/src/test/resources/test-models/test-model-new.otm" );
+        File oldLibraryFile = new File( wipFolder.get(), "/test-model-old.otm" );
+        File newLibraryFile = new File( wipFolder.get(), "/test-model-new.otm" );
         File saveFile = new File( wipFolder.get(), "/diff-report.otm" );
 
         when( mockFileChooser.showOpenDialog( any() ) ).thenReturn( oldLibraryFile, newLibraryFile );
@@ -91,10 +89,8 @@ public class TestDiffUnmanagedModels extends AbstractFxTest {
 
     @Test
     public void testCompareLibraryEntities() throws Exception {
-        File oldLibraryFile =
-            new File( System.getProperty( "user.dir" ), "/src/test/resources/test-models/test-model-old.otm" );
-        File newLibraryFile =
-            new File( System.getProperty( "user.dir" ), "/src/test/resources/test-models/test-model-new.otm" );
+        File oldLibraryFile = new File( wipFolder.get(), "/test-model-old.otm" );
+        File newLibraryFile = new File( wipFolder.get(), "/test-model-new.otm" );
 
         when( mockFileChooser.showOpenDialog( any() ) ).thenReturn( oldLibraryFile, newLibraryFile );
 
@@ -124,10 +120,8 @@ public class TestDiffUnmanagedModels extends AbstractFxTest {
 
     @Test
     public void testCompareProjects() throws Exception {
-        File oldProjectFile =
-            new File( System.getProperty( "user.dir" ), "/src/test/resources/test-models/test-project-old.otp" );
-        File newProjectFile =
-            new File( System.getProperty( "user.dir" ), "/src/test/resources/test-models/test-project-new.otp" );
+        File oldProjectFile = new File( wipFolder.get(), "/test-project-old.otp" );
+        File newProjectFile = new File( wipFolder.get(), "/test-project-new.otp" );
 
         when( mockFileChooser.showOpenDialog( any() ) ).thenReturn( oldProjectFile, newProjectFile );
 
@@ -147,10 +141,8 @@ public class TestDiffUnmanagedModels extends AbstractFxTest {
 
     @Test
     public void testCompareProjects_validationError() throws Exception {
-        File oldProjectFile =
-            new File( System.getProperty( "user.dir" ), "/src/test/resources/test-models/test-project-old.otp" );
-        File newProjectFile =
-            new File( System.getProperty( "user.dir" ), "/src/test/resources/test-models/test-project-error.otp" );
+        File oldProjectFile = new File( wipFolder.get(), "/test-project-old.otp" );
+        File newProjectFile = new File( wipFolder.get(), "/test-project-error.otp" );
 
         when( mockFileChooser.showOpenDialog( any() ) ).thenReturn( oldProjectFile, newProjectFile );
 

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+	
+	<bean id="developmentRepository" class="java.lang.Boolean" scope="singleton">
+		<constructor-arg value="true" />
+	</bean>
+	
+	<bean id="repositoryLocation" class="java.io.File" scope="singleton">
+		<constructor-arg value="#{systemProperties['user.dir']}" />
+		<constructor-arg value="/target/test-workspace/#{systemProperties['test.class']}/test-repository" />
+	</bean>
+	
+	<bean id="searchIndexLocation" class="java.io.File" scope="singleton">
+		<constructor-arg value="#{systemProperties['user.dir']}" />
+		<constructor-arg value="/target/test-workspace/#{systemProperties['test.class']}/search-index" />
+	</bean>
+	
+	<!--
+		Repository Manager:
+		
+		The repository manager handles the basic interactions with the locally-hosted OTA2.0 repository.  Using
+		one of the options below, the repository manager can be configured for default handling of files or it
+		can use a Subversion repository to maintain a persistent record of all files and changes that are performed
+		by users of the repository web service.
+	-->
+	<bean id="repositoryManager" class="org.opentravel.schemacompiler.repository.RepositoryManager" scope="singleton">
+		<!--
+		 Uncomment for default repository file management.
+		-->
+		<constructor-arg ref="repositoryLocation" />
+		
+		<!--
+		 Uncomment for SVN persistence of repository files.
+		-->
+		<!--
+		<constructor-arg>
+			<bean class="org.opentravel.schemacompiler.repository.SVNRepositoryFileManager">
+				<constructor-arg ref="repositoryLocation" />
+				<constructor-arg ref="svnConfigFolder" />
+			</bean>
+		</constructor-arg>
+		-->
+	</bean>
+	
+	<!--
+		Repository Security Manager:
+		
+		Provides all authentication and authorization services required for secure operation of the OTA2.0
+		repository.
+	-->
+	<bean id="securityManager" class="org.opentravel.schemacompiler.security.impl.DefaultRepositorySecurityManager">
+		<constructor-arg ref="repositoryManager" />
+		<constructor-arg ref="authenticationProvider" />
+		<constructor-arg ref="authorizationProvider" />
+	</bean>
+	
+	<!--
+		Authentication Provider: (Default - File Authentication)
+		
+		The authentication provider component handles the validation of user ID's and passwords for remote
+		users of the OTA2.0 repository.  Supported implementations include locally-maintained user accounts
+		or JNDI authentication using a corporate LDAP environment.
+	-->
+	<!--
+	-->
+	<bean id="authenticationProvider" class="org.opentravel.schemacompiler.security.impl.FileAuthenticationProvider">
+		<property name="repositoryManager" ref="repositoryManager" />
+	</bean>
+	
+	<!--
+		Authorization Provider:
+		
+		Provides information about which operations a particular user is authorized to perform on a namespace
+		in the OTA2.0 repository.
+	-->
+	<bean id="authorizationProvider" class="org.opentravel.schemacompiler.security.impl.DefaultAuthorizationProvider">
+		<constructor-arg ref="repositoryManager" />
+	</bean>
+	
+	<!--
+		SVN Configuration Folder:
+		
+		If SVN persistence is selected above for the repository manager, this bean indicates the file system location
+		of the Subversion configuration folder.  Prior to launching the OTA2.0 repository web service, the SVN user
+		configuration must contain locally-stored credentials for the SVN repository where the files are hosted.
+	-->
+	<bean id="svnConfigFolder" class="java.io.File" scope="singleton">
+		<constructor-arg value="#{systemProperties['user.home']}" />
+		<constructor-arg value="/.subversion_ota" />
+	</bean>
+	
+	<!--
+		Indexing Service JMS Configuration:
+		
+		Optional configuration that defines the ActiveMQ connection factory and queues used to communicate with
+		the free-text indexing service.
+	-->
+	<!--
+	<bean id="localAMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<constructor-arg index="0" value="tcp://localhost:61616" />
+	</bean>
+	
+	<bean id="indexingConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+		<property name="targetConnectionFactory" ref="localAMQConnectionFactory" />
+		<property name="sessionCacheSize" value="10" />
+	</bean>
+
+	<bean id="indexingJobQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg index="0" value="otm.indexing.jobQueue" />
+	</bean>
+
+	<bean id="indexingJmsService" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="indexingConnectionFactory" />
+		<property name="defaultDestination" ref="indexingJobQueue" />
+		<property name="receiveTimeout" value="500" />
+	</bean>
+	-->
+	
+	<!--
+		Notification Service Configuration:
+		
+		Optional configuration that defines the implementation class for the notification service and the
+		JMS connection factory and queues used to publish notification events.
+	-->
+	<!--
+	<bean id="notificationService" class="org.opentravel.schemacompiler.notification.JMSNotificationService">
+		<constructor-arg ref="notificationJmsService" />
+	</bean>
+	
+    <bean id="destinationManager" class="com.mockrunner.jms.DestinationManager"/>
+    <bean id="configurationManager" class="com.mockrunner.jms.ConfigurationManager"/>
+
+    <bean id="notificationConnectionFactory" class="com.mockrunner.mock.jms.MockQueueConnectionFactory" >
+        <constructor-arg index="0" ref="destinationManager" />
+        <constructor-arg index="1" ref="configurationManager" />
+    </bean>
+    
+    <bean id="notificationTopic" factory-bean="destinationManager" factory-method="createTopic">
+        <constructor-arg index="0" value="otm.notification.topic" />
+    </bean>
+
+	<bean id="notificationJmsService" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="notificationConnectionFactory" />
+		<property name="defaultDestination" ref="notificationTopic" />
+		<property name="receiveTimeout" value="500" />
+	</bean>
+	-->
+	
+	<!--
+		Subscription Manager Configuration:
+		
+		Configuration settings used for subscriptions and email notifications.
+	-->
+	<!--
+	<bean id="subscriptionManager" class="org.opentravel.schemacompiler.subscription.SubscriptionManager">
+		<constructor-arg index="0" ref="repositoryManager" />
+		<property name="baseRepositoryUrl" value="http://www.repohostname.com:8181/ota2-repository-service" />
+		<property name="notificationDelay" value="1000" />
+		<property name="smtpConfig">
+			<bean class="org.opentravel.schemacompiler.subscription.SMTPConfig">
+				<property name="smtpHost" value="localhost" />
+				<property name="smtpPort" value="#{systemProperties['smtp.port']}" />
+				<property name="smtpUser" value="testuser" />
+				<property name="smtpPassword" value="password" />
+				<property name="timeout" value="5000" />
+				<property name="sslEnable" value="false" />
+				<property name="authEnable" value="true" />
+				<property name="startTlsEnable" value="true" />
+				<property name="senderAddress" value="testuser@opentravel.org" />
+				<property name="senderName" value="Test User" />
+				<property name="replyToAddress" value="replyToUser@opentravel.org" />
+				<property name="replyToName" value="Reply To User" />
+				<property name="ccRecipients">
+					<list>
+						<value>cc1@opentravel.org</value>
+						<value>cc2@opentravel.org</value>
+						<value>cc3@opentravel.org</value>
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	-->
+	
+</beans>

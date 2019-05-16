@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Library xmlns="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06 ../../../../main/resources/ota2-context/schemas/OTA2_LibraryModel_v1.6.0.xsd">
+    
+    <VersionScheme>OTA2</VersionScheme>
+    <Status>Draft</Status>
+    <Namespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/test/v1</Namespace>
+    <Prefix>pkg3</Prefix>
+    <Name>test_library</Name>
+    <Import namespace="http://www.w3.org/2001/XMLSchema" prefix="xsd"/>
+    <Import namespace="http://www.opentravel.org/OTM/Common/v0" prefix="ota"/>
+    <Context applicationContext="Test-applicationContext" context="Test"/>
+    <Comments>Sample Library</Comments>
+    
+    <Simple name="SampleString" type="xsd:string"/>
+    
+    <ValueWithAttrs name="SampleValueWithAttributes" type="">
+        <Attribute name="attr1" type="xsd:string"/>
+    </ValueWithAttrs>
+    
+    <CoreObject name="SimpleCore" notExtendable="true">
+        <Aliases/>
+        <Simple type="xsd:string"/>
+        <Summary>
+            <Attribute name="shouldBeIndicator" type="xsd:boolean"/>
+            <Indicator name="simpleIndicator" publishAsElement="false"/>
+        </Summary>
+        <Detail/>
+        <Roles>
+            <Role value="simple_role_1"/>
+            <Role value="simple_role_2"/>
+            <Role value="simple_role_3"/>
+        </Roles>
+    </CoreObject>
+    
+    <ChoiceObject name="SimpleChoice" notExtendable="false">
+        <Aliases>SimpleChoice_Alias1 SimpleChoice_Alias2</Aliases>
+        <Shared>
+            <Attribute name="id" type="xsd:ID"/>
+            <Attribute name="sharedAttribute" type="xsd:string"/>
+            <Element name="sharedElement" repeat="0" type="xsd:int"/>
+            <Indicator name="sharedIndicator" publishAsElement="false"/>
+        </Shared>
+    </ChoiceObject>
+    
+	<ContextualFacet name="ChoiceA" type="Choice" facetOwner="SimpleChoice">
+        <Attribute name="attributeA" type="xsd:string"/>
+        <Element name="elementA" repeat="0" type="xsd:int"/>
+        <Indicator name="indicatorA" publishAsElement="false"/>
+	</ContextualFacet>
+	
+	<ContextualFacet name="ChoiceB" type="Choice" facetOwner="SimpleChoice">
+        <Attribute name="attributeB" type="xsd:string"/>
+        <Element name="elementB" repeat="3" type="xsd:int"/>
+        <Indicator name="indicatorB" publishAsElement="false"/>
+	</ContextualFacet>
+	
+    <BusinessObject name="SampleBusinessObject" notExtendable="false">
+        <Aliases>AliasBusinessObject</Aliases>
+        <ID>
+            <Element name="oid" repeat="0" type="xsd:int"/>
+        </ID>
+        <Summary>
+            <Element name="summaryName" repeat="0" type="xsd:string"/>
+        </Summary>
+        <Detail>
+            <Element name="detailName" repeat="10" type="xsd:string"/>
+        </Detail>
+    </BusinessObject>
+    
+	<ContextualFacet name="Test" type="Query" facetOwner="SampleBusinessObject">
+        <Element name="queryName" repeat="10" type="xsd:string"/>
+	</ContextualFacet>
+	
+	<ContextualFacet name="Test" type="Update" facetOwner="SampleBusinessObject">
+        <Element name="updateName" repeat="10" type="xsd:string"/>
+	</ContextualFacet>
+	
+    <Resource name="SampleResource" businessObjectRef="SampleBusinessObject" basePath="/" abstract="false" firstClass="true">
+        <ActionFacet label="ObjectWrapper" referenceType="Optional" referenceFacet="Summary" basePayload="SimpleChoice" />
+        <Action actionId="Create" common="false">
+        	<ActionRequest httpMethod="POST" pathTemplate="/samples" payloadType="SampleResource_ObjectWrapper" mimeTypes="APPLICATION_XML APPLICATION_JSON"/>
+        	<ActionResponse statusCodes="200 204" payloadType="SampleResource_ObjectWrapper" mimeTypes="APPLICATION_XML APPLICATION_JSON"/>
+        </Action>
+    </Resource>
+    
+</Library>

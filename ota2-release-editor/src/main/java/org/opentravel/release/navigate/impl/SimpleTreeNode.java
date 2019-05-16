@@ -68,7 +68,7 @@ public class SimpleTreeNode extends TreeNode<TLSimple> {
         TLSimple simple = getEntity();
 
         props.add( new NodeProperty( "name", simple::getName ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( simple ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( simple ) ) );
         props.add( new NodeProperty( "parentType", () -> getEntityDisplayName( simple.getParentType() ) ) );
         props.add( new NodeProperty( "listTypeInd", () -> simple.isListTypeInd() + "" ) );
 

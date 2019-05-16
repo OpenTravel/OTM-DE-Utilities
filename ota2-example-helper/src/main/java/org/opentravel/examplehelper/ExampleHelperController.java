@@ -21,6 +21,7 @@ import org.fxmisc.richtext.CodeArea;
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.BrowseRepositoryDialogController;
 import org.opentravel.application.common.FileChooserDelegate;
+import org.opentravel.application.common.JsonHighlightBuilder;
 import org.opentravel.application.common.OtmApplicationException;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.application.common.SyntaxHighlightBuilder;
@@ -117,6 +118,10 @@ public class ExampleHelperController extends AbstractMainWindowController {
     @FXML
     private TextField libraryText;
     @FXML
+    private Button libraryFileButton;
+    @FXML
+    private Button libraryRepoButton;
+    @FXML
     private ChoiceBox<String> bindingStyleChoice;
     @FXML
     private ChoiceBox<OTMObjectChoice> entityChoice;
@@ -147,19 +152,10 @@ public class ExampleHelperController extends AbstractMainWindowController {
 
     private RepositoryAvailabilityChecker availabilityChecker;
     private File modelFile;
-    private File exampleFolder;
     private TLModel model;
     private NamedEntity selectedObject;
     private NamedEntity oldSelectedObject;
     private FacetSelections facetSelections;
-
-    /**
-     * Default constructor.
-     */
-    public ExampleHelperController() {
-        availabilityChecker = RepositoryAvailabilityChecker.getInstance( getRepositoryManager() );
-        availabilityChecker.pingAllRepositories( true );
-    }
 
     /**
      * Called when the user clicks the button to load a new project, release, or library file.
@@ -301,7 +297,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
                 releaseManager.loadRelease( selectedItem, findings );
 
                 if (findings.hasFinding( FindingType.ERROR )) {
-                    throw new LibraryLoaderException( "Validation errors detected in model (see log for DETAILS)" );
+                    throw new LibraryLoaderException( "Validation errors detected in model (see log for details)" );
                 }
                 model = releaseManager.getModel();
                 modelFile = URLUtils.toFile( releaseManager.getRelease().getReleaseUrl() );
@@ -593,6 +589,9 @@ public class ExampleHelperController extends AbstractMainWindowController {
         String defaultStyle = CompilerExtensionRegistry.getActiveExtension();
         UserSettings settings = UserSettings.load();
 
+        availabilityChecker = RepositoryAvailabilityChecker.getInstance( getRepositoryManager() );
+        availabilityChecker.pingAllRepositories( false );
+
         super.initialize( primaryStage );
 
         // Since the preview pane is a custom component, we have to configure it manually
@@ -637,21 +636,6 @@ public class ExampleHelperController extends AbstractMainWindowController {
             .add( ExampleHelperController.class.getResource( "/styles/xml-highlighting.css" ).toExternalForm() );
         primaryStage.getScene().getStylesheets()
             .add( ExampleHelperController.class.getResource( "/styles/json-highlighting.css" ).toExternalForm() );
-    }
-
-    /**
-     * Allows the controller to save any updates to the user settings prior to application close.
-     * 
-     * @param settings the user settings to be updated
-     */
-    public void updateUserSettings(UserSettings settings) {
-        if (modelFile != null) {
-            settings.setLastModelFile( modelFile );
-        }
-        if (exampleFolder != null) {
-            settings.setLastExampleFolder( exampleFolder );
-        }
-        settings.setRepeatCount( repeatCountSpinner.getValue() );
     }
 
     /**

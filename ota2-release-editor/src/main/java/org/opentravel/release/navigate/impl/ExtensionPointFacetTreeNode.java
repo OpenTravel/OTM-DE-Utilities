@@ -70,7 +70,7 @@ public class ExtensionPointFacetTreeNode extends TreeNode<TLExtensionPointFacet>
         TLExtensionPointFacet epf = getEntity();
 
         props.add( new NodeProperty( "extends", () -> getExtensionName( epf ) ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( epf ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( epf ) ) );
         return props;
     }
 

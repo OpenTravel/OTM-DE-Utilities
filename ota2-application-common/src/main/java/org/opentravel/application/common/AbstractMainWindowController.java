@@ -53,6 +53,15 @@ public abstract class AbstractMainWindowController {
     private Stage primaryStage;
 
     /**
+     * Returns the <code>NativeComponentBuilder</code> for this controller. To be used for testing purposes only.
+     *
+     * @return NativeComponentBuilder
+     */
+    public NativeComponentBuilder getNativeComponentBuilder() {
+        return nativeComponentBuilder;
+    }
+
+    /**
      * Assigns a new <code>NativeComponentBuilder</code> for this controller. To be used for testing purposes only.
      * 
      * @param nativeComponentBuilder the new component builder instance to assign

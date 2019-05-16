@@ -68,7 +68,7 @@ public class CoreObjectTreeNode extends TreeNode<TLCoreObject> {
         TLCoreObject core = getEntity();
 
         props.add( new NodeProperty( "name", core::getName ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( core ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( core ) ) );
         props.add( new NodeProperty( "extends", () -> getExtensionName( core ) ) );
         props.add( new NodeProperty( "notExtendable", () -> core.isNotExtendable() + "" ) );
         return props;

@@ -70,7 +70,7 @@ public class ParameterTreeNode extends TreeNode<TLParameter> {
         TLParameter param = getEntity();
 
         props.add( new NodeProperty( "name", this::getLabel ) );
-        props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( param ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( param ) ) );
         props.add(
             new NodeProperty( "location", () -> MessageBuilder.formatMessage( param.getLocation().toString() ) ) );
         return props;
