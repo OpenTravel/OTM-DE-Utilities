@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
-import org.opentravel.utilities.testutil.TestFxUtils;
 import org.testfx.util.WaitForAsyncUtils;
 
 import java.io.File;
@@ -61,15 +60,13 @@ public class TestDiffUnmanagedModels extends AbstractFxTest {
         robot.clickOn( "Compare Libraries" );
 
         robot.clickOn( "#oldLibraryFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
         verifyThat( "#oldLibraryFilename", hasText( oldLibraryFile.getName() ) );
 
         robot.clickOn( "#newLibraryFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
         verifyThat( "#newLibraryFilename", hasText( newLibraryFile.getName() ) );
 
         robot.clickOn( "#runLibraryButton" );
-        TestFxUtils.waitUntilEnabled( robot, "#runLibraryButton", 10 );
+        robot.waitForBackgroundTask( "#runLibraryButton" );
         WebView reportViewer = (WebView) robot.lookup( "#reportViewer" ).query();
         assertEquals( "OTM Model Comparison Report", reportViewer.getEngine().getTitle() );
 
@@ -97,11 +94,9 @@ public class TestDiffUnmanagedModels extends AbstractFxTest {
         robot.clickOn( "Compare Libraries" );
 
         robot.clickOn( "#oldLibraryFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
         verifyThat( "#oldLibraryFilename", hasText( oldLibraryFile.getName() ) );
 
         robot.clickOn( "#newLibraryFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
         verifyThat( "#newLibraryFilename", hasText( newLibraryFile.getName() ) );
 
         robot.clickOn( "#oldEntityChoice" );
@@ -113,7 +108,7 @@ public class TestDiffUnmanagedModels extends AbstractFxTest {
         robot.type( KeyCode.ENTER );
 
         robot.clickOn( "#runLibraryButton" );
-        TestFxUtils.waitUntilEnabled( robot, "#runLibraryButton", 10 );
+        robot.waitForBackgroundTask( "#runLibraryButton" );
         WebView reportViewer = (WebView) robot.lookup( "#reportViewer" ).query();
         assertEquals( "OTM Model Comparison Report", reportViewer.getEngine().getTitle() );
     }
@@ -126,15 +121,13 @@ public class TestDiffUnmanagedModels extends AbstractFxTest {
         when( mockFileChooser.showOpenDialog( any() ) ).thenReturn( oldProjectFile, newProjectFile );
 
         robot.clickOn( "#oldProjectFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
         verifyThat( "#oldProjectFilename", hasText( oldProjectFile.getName() ) );
 
         robot.clickOn( "#newProjectFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
         verifyThat( "#newProjectFilename", hasText( newProjectFile.getName() ) );
 
         robot.clickOn( "#runProjectButton" );
-        TestFxUtils.waitUntilEnabled( robot, "#runProjectButton", 10 );
+        robot.waitForBackgroundTask();
         WebView reportViewer = (WebView) robot.lookup( "#reportViewer" ).query();
         assertEquals( "OTM Model Comparison Report", reportViewer.getEngine().getTitle() );
     }
@@ -147,15 +140,13 @@ public class TestDiffUnmanagedModels extends AbstractFxTest {
         when( mockFileChooser.showOpenDialog( any() ) ).thenReturn( oldProjectFile, newProjectFile );
 
         robot.clickOn( "#oldProjectFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
         verifyThat( "#oldProjectFilename", hasText( oldProjectFile.getName() ) );
 
         robot.clickOn( "#newProjectFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
         verifyThat( "#newProjectFilename", hasText( newProjectFile.getName() ) );
 
         robot.clickOn( "#runProjectButton" );
-        TestFxUtils.waitUntilEnabled( robot, "#runProjectButton", 10 );
+        robot.waitForBackgroundTask();
         WebView reportViewer = (WebView) robot.lookup( "#reportViewer" ).query();
         assertNull( reportViewer.getEngine().getTitle() );
     }
@@ -166,6 +157,14 @@ public class TestDiffUnmanagedModels extends AbstractFxTest {
     @Override
     protected Class<? extends AbstractOTMApplication> getApplicationClass() {
         return OTMDiffApplication.class;
+    }
+
+    /**
+     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
+     */
+    @Override
+    protected String getBackgroundTaskNodeQuery() {
+        return "#runProjectButton";
     }
 
     /**

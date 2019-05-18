@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
-import org.opentravel.utilities.testutil.TestFxUtils;
 import org.testfx.util.WaitForAsyncUtils;
 
 import java.io.File;
@@ -56,8 +55,7 @@ public class TestExampleHelperUnmanaged extends AbstractFxTest {
         when( mockFileChooser.showSaveDialog( any() ) ).thenReturn( saveFile );
 
         robot.clickOn( "#libraryFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
-        TestFxUtils.waitUntilEnabled( robot, "#libraryText", 10 );
+        robot.waitForBackgroundTask();
 
         exerciseExampleConfiguration();
     }
@@ -69,7 +67,6 @@ public class TestExampleHelperUnmanaged extends AbstractFxTest {
         when( mockFileChooser.showOpenDialog( any() ) ).thenReturn( libraryFile );
 
         robot.clickOn( "#libraryFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
         verifyThat( "#libraryText", hasText( "" ) );
     }
 
@@ -82,8 +79,7 @@ public class TestExampleHelperUnmanaged extends AbstractFxTest {
         when( mockFileChooser.showSaveDialog( any() ) ).thenReturn( saveFile );
 
         robot.clickOn( "#libraryFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
-        TestFxUtils.waitUntilEnabled( robot, "#libraryText", 10 );
+        robot.waitForBackgroundTask();
 
         exerciseExampleConfiguration();
     }
@@ -103,15 +99,13 @@ public class TestExampleHelperUnmanaged extends AbstractFxTest {
 
         facetChoiceCell = (ChoiceBoxTreeTableCell<?,?>) robot.lookup( "SampleBusinessObjectSummary" ).query();
         robot.clickOn( facetChoiceCell );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.clickOn( facetChoiceCell );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.clickOn( facetChoiceCell );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.type( KeyCode.DOWN );
         robot.type( KeyCode.DOWN );
         robot.type( KeyCode.DOWN );
         robot.type( KeyCode.ENTER );
+        WaitForAsyncUtils.waitForFxEvents();
 
         robot.clickOn( "#bindingStyleChoice" );
         robot.type( KeyCode.DOWN );
@@ -119,9 +113,7 @@ public class TestExampleHelperUnmanaged extends AbstractFxTest {
         WaitForAsyncUtils.waitForFxEvents();
 
         robot.clickOn( "#jsonRadio" );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.clickOn( "#xmlRadio" );
-        WaitForAsyncUtils.waitForFxEvents();
 
         robot.clickOn( "#repeatCountSpinner" );
         robot.type( KeyCode.UP );
@@ -130,12 +122,10 @@ public class TestExampleHelperUnmanaged extends AbstractFxTest {
         WaitForAsyncUtils.waitForFxEvents();
 
         robot.clickOn( "#suppressOptionalFields" );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.clickOn( "#suppressOptionalFields" );
-        WaitForAsyncUtils.waitForFxEvents();
 
         robot.clickOn( "#saveButton" );
-        WaitForAsyncUtils.waitForFxEvents();
+        robot.waitForBackgroundTask();
     }
 
     /**
@@ -144,6 +134,14 @@ public class TestExampleHelperUnmanaged extends AbstractFxTest {
     @Override
     protected Class<? extends AbstractOTMApplication> getApplicationClass() {
         return ExampleHelperApplication.class;
+    }
+
+    /**
+     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
+     */
+    @Override
+    protected String getBackgroundTaskNodeQuery() {
+        return "#libraryText";
     }
 
     /**

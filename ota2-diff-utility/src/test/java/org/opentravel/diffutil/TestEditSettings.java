@@ -23,7 +23,6 @@ import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
 import org.testfx.api.FxRobot;
-import org.testfx.util.WaitForAsyncUtils;
 
 import javafx.scene.control.CheckBox;
 
@@ -34,14 +33,6 @@ public class TestEditSettings extends AbstractFxTest {
 
     public static final boolean RUN_HEADLESS = false;
 
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
-     */
-    @Override
-    protected Class<? extends AbstractOTMApplication> getApplicationClass() {
-        return OTMDiffApplication.class;
-    }
-
     @Test
     public void testCompareUnmanagedLibraries() throws Exception {
         boolean suppressFieldVersionChanges;
@@ -51,7 +42,6 @@ public class TestEditSettings extends AbstractFxTest {
         FxRobot dialogRobot;
 
         robot.clickOn( "#settingsButton" );
-        WaitForAsyncUtils.waitForFxEvents();
 
         dialogRobot = robot.targetWindow( "Model Comparison Options" );
         dialogRobot.clickOn( "#suppressFieldVersionChangesCB" );
@@ -69,6 +59,22 @@ public class TestEditSettings extends AbstractFxTest {
         assertEquals( suppressFieldVersionChanges, settings.getCompareOptions().isSuppressFieldVersionChanges() );
         assertEquals( suppressLibraryPropertyChanges, settings.getCompareOptions().isSuppressLibraryPropertyChanges() );
         assertEquals( suppressDocumentationChanges, settings.getCompareOptions().isSuppressDocumentationChanges() );
+    }
+
+    /**
+     * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
+     */
+    @Override
+    protected Class<? extends AbstractOTMApplication> getApplicationClass() {
+        return OTMDiffApplication.class;
+    }
+
+    /**
+     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
+     */
+    @Override
+    protected String getBackgroundTaskNodeQuery() {
+        return null;
     }
 
     /**

@@ -28,8 +28,6 @@ import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
-import org.opentravel.utilities.testutil.TestFxUtils;
-import org.testfx.util.WaitForAsyncUtils;
 
 import java.io.File;
 
@@ -60,29 +58,28 @@ public class TestDiffManagedModels extends AbstractFxTest {
         robot.clickOn( "Compare Libraries" );
 
         robot.clickOn( "#oldLibraryRepoButton" );
-        TestFxUtils.selectTreeItem( robot.targetWindow( "Select Old Library Version" ), "#repositoryTreeView",
-            "OTM Repositories", "OTA2.0 Test Repository", "http://www.OpenTravel.org",
-            "/ns/OTA2/SchemaCompiler/version-test", "Version_Test_1_0_0.otm (1.0.0)" );
+        robot.targetWindow( "Select Old Library Version" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
+            "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
+            "Version_Test_1_0_0.otm (1.0.0)" );
         robot.targetWindow( "Select Old Library Version" ).clickOn( "#okButton" );
 
-        WaitForAsyncUtils.waitForFxEvents();
         robot.clickOn( "#oldCommitChoice" );
         robot.type( KeyCode.DOWN );
         robot.type( KeyCode.ENTER );
 
         robot.clickOn( "#newLibraryRepoButton" );
-        TestFxUtils.selectTreeItem( robot.targetWindow( "Select New Library Version" ), "#repositoryTreeView",
-            "OTM Repositories", "OTA2.0 Test Repository", "http://www.OpenTravel.org",
-            "/ns/OTA2/SchemaCompiler/version-test", "Version_Test_1_1_0.otm (1.1.0)" );
+        robot.targetWindow( "Select New Library Version" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
+            "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
+            "Version_Test_1_1_0.otm (1.1.0)" );
         robot.targetWindow( "Select New Library Version" ).clickOn( "#okButton" );
 
-        WaitForAsyncUtils.waitForFxEvents();
         robot.clickOn( "#newCommitChoice" );
         robot.type( KeyCode.DOWN );
         robot.type( KeyCode.ENTER );
+        robot.waitForBackgroundTask( "#runLibraryButton" );
 
         robot.clickOn( "#runLibraryButton" );
-        TestFxUtils.waitUntilEnabled( robot, "#runLibraryButton", 10 );
+        robot.waitForBackgroundTask( "#runLibraryButton" );
         WebView reportViewer = (WebView) robot.lookup( "#reportViewer" ).query();
         assertEquals( "OTM Model Comparison Report", reportViewer.getEngine().getTitle() );
     }
@@ -90,19 +87,19 @@ public class TestDiffManagedModels extends AbstractFxTest {
     @Test
     public void testCompareManagedReleases() throws Exception {
         robot.clickOn( "#oldReleaseFileButton" );
-        TestFxUtils.selectTreeItem( robot.targetWindow( "Select Old Release Version" ), "#repositoryTreeView",
-            "OTM Repositories", "OTA2.0 Test Repository", "http://www.OpenTravel.org",
-            "/ns/OTA2/SchemaCompiler/version-test", "Version_Release_1_0_0.otr (1.0.0)" );
+        robot.targetWindow( "Select Old Release Version" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
+            "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
+            "Version_Release_1_0_0.otr (1.0.0)" );
         robot.targetWindow( "Select Old Release Version" ).clickOn( "#okButton" );
 
         robot.clickOn( "#newReleaseFileButton" );
-        TestFxUtils.selectTreeItem( robot.targetWindow( "Select New Release Version" ), "#repositoryTreeView",
-            "OTM Repositories", "OTA2.0 Test Repository", "http://www.OpenTravel.org",
-            "/ns/OTA2/SchemaCompiler/version-test", "Version_Release_1_1_0.otr (1.1.0)" );
+        robot.targetWindow( "Select New Release Version" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
+            "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
+            "Version_Release_1_1_0.otr (1.1.0)" );
         robot.targetWindow( "Select New Release Version" ).clickOn( "#okButton" );
 
         robot.clickOn( "#runProjectButton" );
-        TestFxUtils.waitUntilEnabled( robot, "#runProjectButton", 10 );
+        robot.waitForBackgroundTask();
         WebView reportViewer = (WebView) robot.lookup( "#reportViewer" ).query();
         assertEquals( "OTM Model Comparison Report", reportViewer.getEngine().getTitle() );
     }
@@ -115,15 +112,13 @@ public class TestDiffManagedModels extends AbstractFxTest {
         when( mockFileChooser.showOpenDialog( any() ) ).thenReturn( oldProjectFile, newProjectFile );
 
         robot.clickOn( "#oldProjectFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
         verifyThat( "#oldProjectFilename", hasText( oldProjectFile.getName() ) );
 
         robot.clickOn( "#newProjectFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
         verifyThat( "#newProjectFilename", hasText( newProjectFile.getName() ) );
 
         robot.clickOn( "#runProjectButton" );
-        TestFxUtils.waitUntilEnabled( robot, "#runProjectButton", 10 );
+        robot.waitForBackgroundTask();
         WebView reportViewer = (WebView) robot.lookup( "#reportViewer" ).query();
         assertEquals( "OTM Model Comparison Report", reportViewer.getEngine().getTitle() );
     }
@@ -134,6 +129,14 @@ public class TestDiffManagedModels extends AbstractFxTest {
     @Override
     protected Class<? extends AbstractOTMApplication> getApplicationClass() {
         return OTMDiffApplication.class;
+    }
+
+    /**
+     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
+     */
+    @Override
+    protected String getBackgroundTaskNodeQuery() {
+        return "#runProjectButton";
     }
 
     /**

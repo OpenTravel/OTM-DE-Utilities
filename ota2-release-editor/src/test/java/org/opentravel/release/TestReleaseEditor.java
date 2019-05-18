@@ -28,10 +28,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.utilities.testutil.AbstractFxTest;
+import org.opentravel.utilities.testutil.OtmFxRobot;
 import org.opentravel.utilities.testutil.TestFxMode;
-import org.opentravel.utilities.testutil.TestFxUtils;
-import org.testfx.api.FxRobot;
-import org.testfx.util.WaitForAsyncUtils;
 
 import java.io.File;
 
@@ -45,14 +43,14 @@ import javafx.scene.input.KeyCode;
  * Verifies the functions of the <code>ExampleHelper</code> application that require artifacts managed by a remote OTM
  * repository.
  */
-public class TestReleaseEditorUnmanaged extends AbstractFxTest {
+public class TestReleaseEditor extends AbstractFxTest {
 
     public static final boolean RUN_HEADLESS = false;
 
     @BeforeClass
     public static void setupTests() throws Exception {
-        setupWorkInProcessArea( TestReleaseEditorUnmanaged.class );
-        startTestServer( "versions-repository", 9483, repositoryConfig, true, false, TestReleaseEditorUnmanaged.class );
+        setupWorkInProcessArea( TestReleaseEditor.class );
+        startTestServer( "versions-repository", 9483, repositoryConfig, true, false, TestReleaseEditor.class );
         repoManager = repositoryManager.get();
     }
 
@@ -64,7 +62,7 @@ public class TestReleaseEditorUnmanaged extends AbstractFxTest {
     @Test
     public void testCreateUnmanagedRelease() throws Exception {
         File saveFile = new File( wipFolder.get(), "/TestCreateRelease_1_0_0.otr" );
-        FxRobot dialogRobot;
+        OtmFxRobot dialogRobot;
 
         when( mockDirectoryChooser.showDialog( any() ) ).thenReturn( saveFile.getParentFile() );
 
@@ -73,43 +71,40 @@ public class TestReleaseEditorUnmanaged extends AbstractFxTest {
 
         dialogRobot = robot.targetWindow( "New Release" );
         dialogRobot.clickOn( "#newReleaseDirectoryButton" );
-        TestFxUtils.typeText( dialogRobot, "#newReleaseName", "TestCreateRelease" );
-        TestFxUtils.typeText( dialogRobot, "#newReleaseBaseNamespace",
+        dialogRobot.write( "#newReleaseName", "TestCreateRelease" );
+        dialogRobot.write( "#newReleaseBaseNamespace",
             "http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/release-test" );
         dialogRobot.clickOn( "#okButton" );
-        WaitForAsyncUtils.waitForFxEvents();
 
         // Add a principle library
         robot.clickOn( "#addLibraryButton" );
-        TestFxUtils.selectTreeItem( robot.targetWindow( "Add Principle Library" ), "#repositoryTreeView",
-            "OTM Repositories", "OTA2.0 Test Repository", "http://www.OpenTravel.org",
-            "/ns/OTA2/SchemaCompiler/version-test", "Version_Test_1_1_0.otm (1.1.0)" );
+        robot.targetWindow( "Add Principle Library" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
+            "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
+            "Version_Test_1_1_0.otm (1.1.0)" );
         robot.targetWindow( "Add Principle Library" ).clickOn( "#okButton" );
-        WaitForAsyncUtils.waitForFxEvents();
 
         // Add another principle library, then remove it again
         robot.clickOn( "#addLibraryButton" );
-        TestFxUtils.selectTreeItem( robot.targetWindow( "Add Principle Library" ), "#repositoryTreeView",
-            "OTM Repositories", "OTA2.0 Test Repository", "http://www.OpenTravel.org",
-            "/ns/OTA2/SchemaCompiler/version-test", "Version_Test_1_1_1.otm (1.1.1)" );
+        robot.targetWindow( "Add Principle Library" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
+            "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
+            "Version_Test_1_1_1.otm (1.1.1)" );
         robot.targetWindow( "Add Principle Library" ).clickOn( "#okButton" );
-        WaitForAsyncUtils.waitForFxEvents();
+        robot.waitForBackgroundTask();
 
         robot.clickOn( "#principalTableView" ).type( KeyCode.DOWN );
         robot.clickOn( "#removeLibraryButton" );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.targetWindow( "Remove Principal Library" ).clickOn( "Yes" );
-        Thread.sleep( 5000 );
+        robot.waitForBackgroundTask();
 
         // Assign a default effective date
-        TestFxUtils.typeText( dialogRobot, "#defaultEffectiveDate", "May 15, 2019 4:00:00 PM" );
+        dialogRobot.write( "#defaultEffectiveDate", "May 15, 2019 4:00:00 PM" );
         robot.clickOn( "#applyToAllButton" );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.clickOn( "#reloadModelButton" );
-        WaitForAsyncUtils.waitForFxEvents();
+        robot.waitForBackgroundTask();
 
         // Save the release
         robot.clickOn( "File" ).clickOn( "Save" );
+        robot.waitForBackgroundTask();
         assertTrue( saveFile.exists() );
     }
 
@@ -122,40 +117,36 @@ public class TestReleaseEditorUnmanaged extends AbstractFxTest {
 
         // Open an existing library
         robot.clickOn( "#releaseFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
-        TestFxUtils.waitUntilEnabled( robot, "#releaseFileButton", 10 );
+        robot.waitForBackgroundTask();
         verifyThat( "#releaseFilename", hasText( releaseFile.getName() ) );
 
         // Navigate the tree that displays the model contents
-        TestFxUtils.navigateTreeView( robot, "#libraryTreeView" );
+        robot.navigateTreeView( "#libraryTreeView" );
 
         // Publish the release to an OTM repository
         robot.clickOn( "Repository" ).clickOn( "#publishReleaseMenu" ).clickOn( "OTA2.0 Test Repository" );
-        WaitForAsyncUtils.waitForFxEvents();
-        TestFxUtils.waitUntilEnabled( robot, "#releaseFilename", 10 );
+        robot.waitForBackgroundTask();
 
         // Unpublish the release and save it back to the local file system
         robot.clickOn( "Repository" ).clickOn( "#unpublishReleaseMenu" );
-        WaitForAsyncUtils.waitForFxEvents();
-        TestFxUtils.waitUntilEnabled( robot, "#releaseFilename", 10 );
+        robot.waitForBackgroundTask();
     }
 
     @Test
     public void testNewReleaseVersion() throws Exception {
         // Open a managed release
         robot.clickOn( "Repository" ).clickOn( "#openManagedMenu" );
-        TestFxUtils.selectTreeItem( robot.targetWindow( "Open Managed Release" ), "#repositoryTreeView",
-            "OTM Repositories", "OTA2.0 Test Repository", "http://www.OpenTravel.org",
-            "/ns/OTA2/SchemaCompiler/version-test", "Version_Release_1_1_0.otr (1.1.0)" );
+        robot.targetWindow( "Open Managed Release" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
+            "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
+            "Version_Release_1_1_0.otr (1.1.0)" );
         robot.targetWindow( "Open Managed Release" ).clickOn( "#okButton" );
-        WaitForAsyncUtils.waitForFxEvents();
 
         // Create a new (unmanaged) version of the release
         when( mockDirectoryChooser.showDialog( any() ) ).thenReturn( wipFolder.get() );
         robot.clickOn( "Repository" ).clickOn( "#newReleaseVersionMenu" );
 
         // Change the release version
-        TestFxUtils.typeText( robot, "#releaseVersion", "2.0.1" );
+        robot.write( "#releaseVersion", "2.0.1" );
 
         // Attempt to close the release (cancel to avoid losing changes)
         robot.clickOn( "File" ).clickOn( "#closeMenu" );
@@ -187,12 +178,12 @@ public class TestReleaseEditorUnmanaged extends AbstractFxTest {
             robot.clickOn( "#compileSwaggerCheckbox" );
             robot.clickOn( "#compileDocumentationCheckbox" );
         }
-        TestFxUtils.setScrollPosition( robot, "#optionsScrollPane", 0.5 );
-        TestFxUtils.typeText( robot, "#serviceEndpointUrl", "http://soap.opentravel.org" );
-        TestFxUtils.typeText( robot, "#baseResourceUrl", "http://rest.opentravel.org" );
+        robot.setScrollPosition( "#optionsScrollPane", 0.5 );
+        robot.write( "#serviceEndpointUrl", "http://soap.opentravel.org" );
+        robot.write( "#baseResourceUrl", "http://rest.opentravel.org" );
         robot.clickOn( "#suppressExtensionsCheckbox" );
         robot.clickOn( "#generateExamplesCheckbox" ).clickOn( "#generateExamplesCheckbox" );
-        TestFxUtils.setScrollPosition( robot, "#optionsScrollPane", 1.0 );
+        robot.setScrollPosition( "#optionsScrollPane", 1.0 );
         robot.clickOn( "#exampleMaxDetailCheckbox" );
         ((Spinner<?>) robot.lookup( "#maxRepeatSpinner" ).query()).decrement();
         ((Spinner<?>) robot.lookup( "#maxRecursionDepthSpinner" ).query()).decrement();
@@ -205,11 +196,8 @@ public class TestReleaseEditorUnmanaged extends AbstractFxTest {
         Thread.sleep( 250 ); // Wait for accordion to expand
         facetChoiceCell = (ChoiceBoxTableCell<?,?>) robot.lookup( "Substitution Group" ).query();
         robot.clickOn( facetChoiceCell );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.clickOn( facetChoiceCell );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.clickOn( facetChoiceCell );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.type( KeyCode.DOWN );
         robot.type( KeyCode.DOWN );
         robot.type( KeyCode.DOWN );
@@ -220,11 +208,8 @@ public class TestReleaseEditorUnmanaged extends AbstractFxTest {
         Thread.sleep( 250 ); // Wait for accordion to expand
         facetChoiceCell = (ChoiceBoxTableCell<?,?>) robot.lookup( "Latest Commit" ).query();
         robot.clickOn( facetChoiceCell );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.clickOn( facetChoiceCell );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.clickOn( facetChoiceCell );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.type( KeyCode.DOWN );
         robot.type( KeyCode.DOWN );
         robot.type( KeyCode.DOWN );
@@ -233,16 +218,13 @@ public class TestReleaseEditorUnmanaged extends AbstractFxTest {
         // Save the release to a new file (save-as)
         when( mockDirectoryChooser.showDialog( any() ) ).thenReturn( wipFolder.get() );
         robot.clickOn( "File" );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.clickOn( "#saveAsMenu" );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.targetWindow( "Confirm Overwrite" ).clickOn( "Yes" );
-        WaitForAsyncUtils.waitForFxEvents();
-        TestFxUtils.waitUntilEnabled( robot, "#releaseName", 10 );
+        robot.waitForBackgroundTask();
 
         // Compile the release
         robot.clickOn( "File" ).clickOn( "#compileMenu" );
-        TestFxUtils.waitUntilEnabled( robot, "#releaseName", 10 );
+        robot.waitForBackgroundTask();
     }
 
     @Test
@@ -254,8 +236,7 @@ public class TestReleaseEditorUnmanaged extends AbstractFxTest {
 
         // Open an unmanaged release file
         robot.clickOn( "#releaseFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
-        TestFxUtils.waitUntilEnabled( robot, "#releaseFileButton", 10 );
+        robot.waitForBackgroundTask();
 
         // Modify binding style and confirm undo/redo
         ChoiceBox<?> choiceBox;
@@ -269,10 +250,8 @@ public class TestReleaseEditorUnmanaged extends AbstractFxTest {
         updatedValue = choiceBox.getSelectionModel().getSelectedItem().toString();
 
         robot.clickOn( "Edit" ).clickOn( "#undoMenu" );
-        WaitForAsyncUtils.waitForFxEvents();
         assertEquals( originalValue, choiceBox.getSelectionModel().getSelectedItem().toString() );
         robot.clickOn( "Edit" ).clickOn( "#redoMenu" );
-        WaitForAsyncUtils.waitForFxEvents();
         assertEquals( updatedValue, choiceBox.getSelectionModel().getSelectedItem().toString() );
 
         // Modify the release version and confirm undo/redo
@@ -280,21 +259,19 @@ public class TestReleaseEditorUnmanaged extends AbstractFxTest {
 
         textField = robot.lookup( "#releaseVersion" ).query();
         originalValue = textField.getText();
-        TestFxUtils.typeText( robot, "#releaseVersion", "5.0.0" );
+        robot.write( "#releaseVersion", "5.0.0" );
         updatedValue = textField.getText();
 
         robot.clickOn( "Edit" ).clickOn( "#undoMenu" );
-        WaitForAsyncUtils.waitForFxEvents();
         assertEquals( originalValue, textField.getText() );
         robot.clickOn( "Edit" ).clickOn( "#redoMenu" );
-        WaitForAsyncUtils.waitForFxEvents();
         assertEquals( updatedValue, textField.getText() );
 
         // Modify max repeat and confirm undo/redo
         Spinner<?> spinner;
 
         robot.clickOn( "Compiler Options" );
-        TestFxUtils.setScrollPosition( robot, "#optionsScrollPane", 1.0 );
+        robot.setScrollPosition( "#optionsScrollPane", 1.0 );
         Thread.sleep( 250 ); // Wait for accordion to expand
         spinner = robot.lookup( "#maxRepeatSpinner" ).query();
         originalValue = spinner.getValue().toString();
@@ -302,10 +279,8 @@ public class TestReleaseEditorUnmanaged extends AbstractFxTest {
         updatedValue = spinner.getValue().toString();
 
         robot.clickOn( "Edit" ).clickOn( "#undoMenu" );
-        WaitForAsyncUtils.waitForFxEvents();
         assertEquals( originalValue, spinner.getValue().toString() );
         robot.clickOn( "Edit" ).clickOn( "#redoMenu" );
-        WaitForAsyncUtils.waitForFxEvents();
         assertEquals( updatedValue, spinner.getValue().toString() );
     }
 
@@ -313,7 +288,6 @@ public class TestReleaseEditorUnmanaged extends AbstractFxTest {
     public void testAboutDialog() throws Exception {
         // Open the application's About dialog
         robot.clickOn( "Help" ).clickOn( "#aboutMenu" );
-        WaitForAsyncUtils.waitForFxEvents();
         robot.targetWindow( "About" ).clickOn( "Close" );
 
         // Exit the application using the File->Exit menu selection
@@ -326,6 +300,14 @@ public class TestReleaseEditorUnmanaged extends AbstractFxTest {
     @Override
     protected Class<? extends AbstractOTMApplication> getApplicationClass() {
         return OTMReleaseApplication.class;
+    }
+
+    /**
+     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
+     */
+    @Override
+    protected String getBackgroundTaskNodeQuery() {
+        return "#releaseFileButton";
     }
 
     /**

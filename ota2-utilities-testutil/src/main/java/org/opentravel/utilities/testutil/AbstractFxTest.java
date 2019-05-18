@@ -24,7 +24,6 @@ import org.opentravel.application.common.FileChooserDelegate;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.schemacompiler.repository.testutil.AbstractRepositoryTest;
 import org.testfx.api.FxToolkit;
-import org.testfx.framework.junit.ApplicationRule;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -47,7 +46,7 @@ public abstract class AbstractFxTest extends AbstractRepositoryTest {
     protected DirectoryChooserDelegate mockDirectoryChooser;
 
     @Rule
-    public ApplicationRule robot = new ApplicationRule( stage -> {
+    public OtmFxRobot robot = new OtmFxRobot( stage -> {
         Class<? extends AbstractOTMApplication> applicationClass = getApplicationClass();
         try {
             MockNativeComponentBuilder componentBuilder = new MockNativeComponentBuilder();
@@ -69,7 +68,7 @@ public abstract class AbstractFxTest extends AbstractRepositoryTest {
         } catch (Exception e) {
             throw new AssertionError( "Error initializing JavaFX application: " + applicationClass.getName(), e );
         }
-    } );
+    }, getBackgroundTaskNodeQuery() );
 
     @After
     public void closeApplication() throws Exception {
@@ -77,6 +76,20 @@ public abstract class AbstractFxTest extends AbstractRepositoryTest {
             () -> primaryStage.fireEvent( new WindowEvent( primaryStage, WindowEvent.WINDOW_CLOSE_REQUEST ) ) );
     }
 
+    /**
+     * Returns the OTM utility application class that is being tested.
+     * 
+     * @return Class&lt;? extends AbstractOTMApplication&gt;
+     */
     protected abstract Class<? extends AbstractOTMApplication> getApplicationClass();
+
+    /**
+     * Returns the node query to use for locating the node that will indicate the existence or completion of a
+     * background task. The node that is specified should be one that is always disabled while the task is running and
+     * enabled after it has been completed.
+     *
+     * @return String
+     */
+    protected abstract String getBackgroundTaskNodeQuery();
 
 }

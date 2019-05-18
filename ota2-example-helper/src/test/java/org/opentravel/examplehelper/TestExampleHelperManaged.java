@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
-import org.opentravel.utilities.testutil.TestFxUtils;
 import org.testfx.util.WaitForAsyncUtils;
 
 import java.io.File;
@@ -55,11 +54,11 @@ public class TestExampleHelperManaged extends AbstractFxTest {
     @Test
     public void testLoadManagedLibrary() throws Exception {
         robot.clickOn( "#libraryRepoButton" );
-        TestFxUtils.selectTreeItem( robot.targetWindow( "Open Library or Release" ), "#repositoryTreeView",
-            "OTM Repositories", "OTA2.0 Test Repository", "http://www.OpenTravel.org",
-            "/ns/OTA2/SchemaCompiler/example-test", "Example_Test_1_0_0.otm (1.0.0)" );
+        robot.targetWindow( "Open Library or Release" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
+            "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/example-test",
+            "Example_Test_1_0_0.otm (1.0.0)" );
         robot.targetWindow( "Open Library or Release" ).clickOn( "#okButton" );
-        TestFxUtils.waitUntilEnabled( robot, "#libraryText", 10 );
+        robot.waitForBackgroundTask();
 
         selectFirstEntity();
     }
@@ -67,11 +66,11 @@ public class TestExampleHelperManaged extends AbstractFxTest {
     @Test
     public void testLoadManagedRelease() throws Exception {
         robot.clickOn( "#libraryRepoButton" );
-        TestFxUtils.selectTreeItem( robot.targetWindow( "Open Library or Release" ), "#repositoryTreeView",
-            "OTM Repositories", "OTA2.0 Test Repository", "http://www.OpenTravel.org",
-            "/ns/OTA2/SchemaCompiler/example-test", "Example_Release_1_0_0.otr (1.0.0)" );
+        robot.targetWindow( "Open Library or Release" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
+            "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/example-test",
+            "Example_Release_1_0_0.otr (1.0.0)" );
         robot.targetWindow( "Open Library or Release" ).clickOn( "#okButton" );
-        TestFxUtils.waitUntilEnabled( robot, "#libraryText", 10 );
+        robot.waitForBackgroundTask();
 
         selectFirstEntity();
     }
@@ -83,8 +82,6 @@ public class TestExampleHelperManaged extends AbstractFxTest {
         when( mockFileChooser.showOpenDialog( any() ) ).thenReturn( projectFile );
 
         robot.clickOn( "#libraryFileButton" );
-        WaitForAsyncUtils.waitForFxEvents();
-        TestFxUtils.waitUntilEnabled( robot, "#libraryText", 10 );
 
         selectFirstEntity();
     }
@@ -105,6 +102,14 @@ public class TestExampleHelperManaged extends AbstractFxTest {
     @Override
     protected Class<? extends AbstractOTMApplication> getApplicationClass() {
         return ExampleHelperApplication.class;
+    }
+
+    /**
+     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
+     */
+    @Override
+    protected String getBackgroundTaskNodeQuery() {
+        return "#libraryText";
     }
 
     /**

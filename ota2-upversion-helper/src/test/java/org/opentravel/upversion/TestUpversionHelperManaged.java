@@ -55,6 +55,14 @@ public class TestUpversionHelperManaged extends AbstractFxTest {
     }
 
     /**
+     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
+     */
+    @Override
+    protected String getBackgroundTaskNodeQuery() {
+        return null;
+    }
+
+    /**
      * Configure headless/normal mode for TestFX execution.
      */
     static {

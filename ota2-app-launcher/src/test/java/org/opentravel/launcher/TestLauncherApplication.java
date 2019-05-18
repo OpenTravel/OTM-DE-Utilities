@@ -26,10 +26,8 @@ import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
-import org.opentravel.utilities.testutil.TestFxUtils;
 import org.testfx.api.FxRobot;
 import org.testfx.matcher.base.NodeMatchers;
-import org.testfx.util.WaitForAsyncUtils;
 
 import javafx.scene.control.CheckBox;
 import javafx.scene.input.KeyCode;
@@ -61,14 +59,12 @@ public class TestLauncherApplication extends AbstractFxTest {
         // Launch an application process
         controller.setLaunchHeadless( true );
         robot.clickOn( "Diff Utility" );
-        WaitForAsyncUtils.waitForFxEvents();
         Thread.sleep( 5000 );
         duProcess = controller.getProcess( "Diff Utility" );
         assertNotNull( duProcess );
 
         // Attempt to launch again (should not error or launch a new process)
         robot.clickOn( "Diff Utility" );
-        WaitForAsyncUtils.waitForFxEvents();
         assertEquals( duProcess, controller.getProcess( "Diff Utility" ) );
         robot.targetWindow( "Already Running" ).type( KeyCode.ENTER );
 
@@ -82,26 +78,23 @@ public class TestLauncherApplication extends AbstractFxTest {
         FxRobot dialogRobot;
 
         robot.clickOn( "File" ).clickOn( "Proxy Settings..." );
-        WaitForAsyncUtils.waitForFxEvents();
         dialogRobot = robot.targetWindow( "Network Proxy Settings" );
 
         dialogRobot.clickOn( "#useProxyCB" );
-        WaitForAsyncUtils.waitForFxEvents();
         useProxyInd = ((CheckBox) dialogRobot.lookup( "#useProxyCB" ).query()).isSelected();
 
         if (!useProxyInd) {
             dialogRobot.clickOn( "#useProxyCB" );
         }
-        TestFxUtils.typeText( robot, "#proxyHostText", "proxy.opentravel.org" );
-        TestFxUtils.typeText( robot, "#proxyPortText", "8080" );
+        robot.write( "#proxyHostText", "proxy.opentravel.org" );
+        robot.write( "#proxyPortText", "8080" );
 
-        TestFxUtils.typeText( robot, "#nonProxyHostsText", "*.opentravel@org" );
+        robot.write( "#nonProxyHostsText", "*.opentravel@org" );
         verifyThat( "#okButton", NodeMatchers.isDisabled() );
 
-        TestFxUtils.typeText( robot, "#nonProxyHostsText", "opentravel.*" );
+        robot.write( "#nonProxyHostsText", "opentravel.*" );
         verifyThat( "#okButton", NodeMatchers.isEnabled() );
         robot.clickOn( "#okButton" );
-        WaitForAsyncUtils.waitForFxEvents();
 
         settings = UserSettings.load();
         assertTrue( settings.isUseProxy() );
@@ -116,6 +109,14 @@ public class TestLauncherApplication extends AbstractFxTest {
     @Override
     protected Class<? extends AbstractOTMApplication> getApplicationClass() {
         return LauncherApplication.class;
+    }
+
+    /**
+     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
+     */
+    @Override
+    protected String getBackgroundTaskNodeQuery() {
+        return null;
     }
 
     /**
