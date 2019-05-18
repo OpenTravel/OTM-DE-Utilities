@@ -57,7 +57,7 @@ public class TestDiffManagedModels extends AbstractFxTest {
     public void testCompareManagedLibraries() throws Exception {
         robot.clickOn( "Compare Libraries" );
 
-        robot.clickOn( "#oldLibraryRepoButton" );
+        robot.clickOn( "#oldLibraryRepoButton" ).sleep( 250 );
         robot.targetWindow( "Select Old Library Version" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
             "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
             "Version_Test_1_0_0.otm (1.0.0)" );
@@ -67,7 +67,7 @@ public class TestDiffManagedModels extends AbstractFxTest {
         robot.type( KeyCode.DOWN );
         robot.type( KeyCode.ENTER );
 
-        robot.clickOn( "#newLibraryRepoButton" );
+        robot.clickOn( "#newLibraryRepoButton" ).sleep( 250 );
         robot.targetWindow( "Select New Library Version" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
             "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
             "Version_Test_1_1_0.otm (1.1.0)" );
@@ -86,13 +86,13 @@ public class TestDiffManagedModels extends AbstractFxTest {
 
     @Test
     public void testCompareManagedReleases() throws Exception {
-        robot.clickOn( "#oldReleaseFileButton" );
+        robot.clickOn( "#oldReleaseFileButton" ).sleep( 250 );
         robot.targetWindow( "Select Old Release Version" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
             "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
             "Version_Release_1_0_0.otr (1.0.0)" );
         robot.targetWindow( "Select Old Release Version" ).clickOn( "#okButton" );
 
-        robot.clickOn( "#newReleaseFileButton" );
+        robot.clickOn( "#newReleaseFileButton" ).sleep( 250 );
         robot.targetWindow( "Select New Release Version" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
             "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
             "Version_Release_1_1_0.otr (1.1.0)" );

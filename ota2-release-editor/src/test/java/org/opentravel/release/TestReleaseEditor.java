@@ -77,14 +77,14 @@ public class TestReleaseEditor extends AbstractFxTest {
         dialogRobot.clickOn( "#okButton" );
 
         // Add a principle library
-        robot.clickOn( "#addLibraryButton" );
+        robot.clickOn( "#addLibraryButton" ).sleep( 250 );
         robot.targetWindow( "Add Principle Library" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
             "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
             "Version_Test_1_1_0.otm (1.1.0)" );
         robot.targetWindow( "Add Principle Library" ).clickOn( "#okButton" );
 
         // Add another principle library, then remove it again
-        robot.clickOn( "#addLibraryButton" );
+        robot.clickOn( "#addLibraryButton" ).sleep( 250 );
         robot.targetWindow( "Add Principle Library" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
             "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
             "Version_Test_1_1_1.otm (1.1.1)" );
@@ -135,7 +135,7 @@ public class TestReleaseEditor extends AbstractFxTest {
     @Test
     public void testNewReleaseVersion() throws Exception {
         // Open a managed release
-        robot.clickOn( "Repository" ).clickOn( "#openManagedMenu" );
+        robot.clickOn( "Repository" ).clickOn( "#openManagedMenu" ).sleep( 250 );
         robot.targetWindow( "Open Managed Release" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
             "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
             "Version_Release_1_1_0.otr (1.1.0)" );

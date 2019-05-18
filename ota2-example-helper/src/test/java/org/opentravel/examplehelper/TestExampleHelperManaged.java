@@ -53,7 +53,7 @@ public class TestExampleHelperManaged extends AbstractFxTest {
 
     @Test
     public void testLoadManagedLibrary() throws Exception {
-        robot.clickOn( "#libraryRepoButton" );
+        robot.clickOn( "#libraryRepoButton" ).sleep( 250 );
         robot.targetWindow( "Open Library or Release" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
             "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/example-test",
             "Example_Test_1_0_0.otm (1.0.0)" );
@@ -65,7 +65,7 @@ public class TestExampleHelperManaged extends AbstractFxTest {
 
     @Test
     public void testLoadManagedRelease() throws Exception {
-        robot.clickOn( "#libraryRepoButton" );
+        robot.clickOn( "#libraryRepoButton" ).sleep( 250 );
         robot.targetWindow( "Open Library or Release" ).selectTreeItem( "#repositoryTreeView", "OTM Repositories",
             "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/example-test",
             "Example_Release_1_0_0.otr (1.0.0)" );
