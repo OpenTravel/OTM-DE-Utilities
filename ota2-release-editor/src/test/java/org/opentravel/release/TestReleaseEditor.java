@@ -141,6 +141,7 @@ public class TestReleaseEditor extends AbstractFxTest {
             "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
             "Version_Release_1_1_0.otr (1.1.0)" );
         robot.targetWindow( "Open Managed Release" ).clickOn( "#okButton" );
+        robot.waitForBackgroundTask();
 
         // Create a new (unmanaged) version of the release
         when( mockDirectoryChooser.showDialog( any() ) ).thenReturn( wipFolder.get() );
