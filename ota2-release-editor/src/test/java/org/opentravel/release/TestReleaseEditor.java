@@ -82,6 +82,7 @@ public class TestReleaseEditor extends AbstractFxTest {
             "OTA2.0 Test Repository", "http://www.OpenTravel.org", "/ns/OTA2/SchemaCompiler/version-test",
             "Version_Test_1_1_0.otm (1.1.0)" );
         robot.targetWindow( "Add Principle Library" ).clickOn( "#okButton" );
+        robot.waitForBackgroundTask();
 
         // Add another principle library, then remove it again
         robot.clickOn( "#addLibraryButton" ).sleep( 250 );
