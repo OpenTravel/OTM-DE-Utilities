@@ -184,7 +184,7 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
     public OtmFxRobot write(String textInputQuery, String text, boolean eraseExistingText) {
         Node control = lookup( textInputQuery ).query();
 
-        clickOn( control );
+        clickOn( textInputQuery );
 
         if (eraseExistingText && (control instanceof TextInputControl)) {
             int charCount = ((TextInputControl) control).getText().length();

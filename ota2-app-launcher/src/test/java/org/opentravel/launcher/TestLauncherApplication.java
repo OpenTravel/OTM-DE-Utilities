@@ -86,6 +86,7 @@ public class TestLauncherApplication extends AbstractFxTest {
         if (!useProxyInd) {
             dialogRobot.clickOn( "#useProxyCB" );
         }
+        robot.sleep( 100 );
         dialogRobot.write( "#proxyHostText", "proxy.opentravel.org" );
         dialogRobot.write( "#proxyPortText", "8080" );
 
