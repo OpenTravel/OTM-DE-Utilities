@@ -25,8 +25,8 @@ import static org.testfx.api.FxAssert.verifyThat;
 import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.utilities.testutil.AbstractFxTest;
+import org.opentravel.utilities.testutil.OtmFxRobot;
 import org.opentravel.utilities.testutil.TestFxMode;
-import org.testfx.api.FxRobot;
 import org.testfx.matcher.base.NodeMatchers;
 
 import javafx.scene.control.CheckBox;
@@ -37,7 +37,7 @@ import javafx.scene.input.KeyCode;
  */
 public class TestLauncherApplication extends AbstractFxTest {
 
-    public static final boolean RUN_HEADLESS = true;
+    public static final boolean RUN_HEADLESS = false;
 
     @Test
     public void testOpenAndClose() throws Exception {
@@ -73,9 +73,9 @@ public class TestLauncherApplication extends AbstractFxTest {
 
     @Test
     public void testEditProxySettings() throws Exception {
+        OtmFxRobot dialogRobot;
         UserSettings settings;
         boolean useProxyInd;
-        FxRobot dialogRobot;
 
         robot.clickOn( "File" ).clickOn( "Proxy Settings..." );
         dialogRobot = robot.targetWindow( "Network Proxy Settings" );
@@ -86,15 +86,15 @@ public class TestLauncherApplication extends AbstractFxTest {
         if (!useProxyInd) {
             dialogRobot.clickOn( "#useProxyCB" );
         }
-        robot.write( "#proxyHostText", "proxy.opentravel.org" );
-        robot.write( "#proxyPortText", "8080" );
+        dialogRobot.write( "#proxyHostText", "proxy.opentravel.org" );
+        dialogRobot.write( "#proxyPortText", "8080" );
 
-        robot.write( "#nonProxyHostsText", "*.opentravel@org" );
+        dialogRobot.write( "#nonProxyHostsText", "*.opentravel@org" );
         verifyThat( "#okButton", NodeMatchers.isDisabled() );
 
-        robot.write( "#nonProxyHostsText", "opentravel.*" );
+        dialogRobot.write( "#nonProxyHostsText", "opentravel.*" );
         verifyThat( "#okButton", NodeMatchers.isEnabled() );
-        robot.clickOn( "#okButton" );
+        dialogRobot.clickOn( "#okButton" );
 
         settings = UserSettings.load();
         assertTrue( settings.isUseProxy() );
