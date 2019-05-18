@@ -187,7 +187,8 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
         clickOn( textInputQuery );
 
         if (eraseExistingText && (control instanceof TextInputControl)) {
-            int charCount = ((TextInputControl) control).getText().length();
+            String existingText = ((TextInputControl) control).getText();
+            int charCount = (existingText != null) ? existingText.length() : 0;
 
             for (int i = 0; i < charCount; i++) {
                 type( KeyCode.BACK_SPACE );
