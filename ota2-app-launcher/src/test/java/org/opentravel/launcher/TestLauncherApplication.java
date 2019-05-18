@@ -80,15 +80,20 @@ public class TestLauncherApplication extends AbstractFxTest {
         robot.clickOn( "File" ).clickOn( "Proxy Settings..." );
         dialogRobot = robot.targetWindow( "Network Proxy Settings" );
 
+        System.out.println( "After Lookup: " + dialogRobot );
         dialogRobot.clickOn( "#useProxyCB" );
         useProxyInd = ((CheckBox) dialogRobot.lookup( "#useProxyCB" ).query()).isSelected();
 
         if (!useProxyInd) {
             dialogRobot.clickOn( "#useProxyCB" );
         }
-        robot.sleep( 100 );
-        dialogRobot.write( "#proxyHostText", "proxy.opentravel.org" );
-        dialogRobot.write( "#proxyPortText", "8080" );
+        try {
+            System.out.println( "Before NPE: " + dialogRobot );
+            dialogRobot.write( "#proxyHostText", "proxy.opentravel.org" );
+            dialogRobot.write( "#proxyPortText", "8080" );
+        } catch (Exception e) {
+            e.printStackTrace( System.out );
+        }
 
         dialogRobot.write( "#nonProxyHostsText", "*.opentravel@org" );
         verifyThat( "#okButton", NodeMatchers.isDisabled() );
