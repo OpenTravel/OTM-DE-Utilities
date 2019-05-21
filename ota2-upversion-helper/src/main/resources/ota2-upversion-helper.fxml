@@ -33,7 +33,7 @@
             <items>
                   <MenuItem fx:id="importMenu" mnemonicParsing="false" onAction="#importFromOTP" text="Import from Project..." />
                   <MenuItem fx:id="exportMenu" mnemonicParsing="false" onAction="#exportToOTP" text="Export to Project..." />
-              <MenuItem mnemonicParsing="false" onAction="#exitApplication" text="Exit" />
+              <MenuItem fx:id="exitMenu" mnemonicParsing="false" onAction="#exitApplication" text="Exit" />
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="Actions">
@@ -45,7 +45,7 @@
             </Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#aboutApplication" text="About..." />
+              <MenuItem fx:id="aboutMenu" mnemonicParsing="false" onAction="#aboutApplication" text="About..." />
             </items>
           </Menu>
         </menus>

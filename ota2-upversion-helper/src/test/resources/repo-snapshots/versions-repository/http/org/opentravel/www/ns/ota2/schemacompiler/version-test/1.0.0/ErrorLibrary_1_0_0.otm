@@ -5,15 +5,14 @@
     
     <VersionScheme>OTA2</VersionScheme>
     <Status>Draft</Status>
-    <Namespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test/v01_01_01</Namespace>
-    <Prefix>vt010101</Prefix>
-    <Name>Version_Test</Name>
+    <Namespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test/v01_00</Namespace>
+    <Prefix>err-0100</Prefix>
+    <Name>ErrorLibrary</Name>
     <Import namespace="http://www.w3.org/2001/XMLSchema" prefix="xsd"/>
     <Import namespace="http://www.opentravel.org/OTM/Common/v0" prefix="ota"/>
-    <Import
-        fileHints="otm://test-repository/Version_Test_1_1_0.otm"
-        namespace="http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test/v01_01" prefix="vt0101"/>
-    <Context applicationContext="http://appcontext/context111" context="context111"/>
-    <Comments>Version Test Sample Library RED GREEN</Comments>
+    <Context applicationContext="http://appcontext/context100" context="context100"/>
+    <Comments>Upversion Test Library B</Comments>
+    
+    <Simple name="SimpleError" type="xsd:unknown" />
     
 </Library>

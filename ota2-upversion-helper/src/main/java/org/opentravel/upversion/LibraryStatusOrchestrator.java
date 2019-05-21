@@ -18,6 +18,8 @@ package org.opentravel.upversion;
 
 import org.opentravel.application.common.ProgressMonitor;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
+import org.opentravel.schemacompiler.repository.RemoteRepository;
+import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
@@ -159,6 +161,12 @@ public class LibraryStatusOrchestrator {
         // Process the status updates for all affected libraries
         for (RepositoryItem item : affectedItems) {
             try {
+                Repository itemRepo = item.getRepository();
+
+                if (itemRepo instanceof RemoteRepository) {
+                    ((RemoteRepository) itemRepo).downloadContent( item, true );
+                }
+
                 if (statusAction == StatusAction.PROMOTE) {
                     logMessage( "Promoting Library: %s", item.getFilename() );
                     repositoryManager.promote( item );

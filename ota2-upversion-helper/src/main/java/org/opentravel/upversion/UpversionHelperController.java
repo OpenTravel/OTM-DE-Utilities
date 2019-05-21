@@ -102,11 +102,15 @@ public class UpversionHelperController extends AbstractMainWindowController {
     @FXML
     private MenuItem exportMenu;
     @FXML
+    private MenuItem exitMenu;
+    @FXML
     private MenuItem upversionMenu;
     @FXML
     private MenuItem promoteOrDemoteMenu;
     @FXML
     private MenuItem validationMenu;
+    @FXML
+    private MenuItem aboutMenu;
     @FXML
     private ChoiceBox<String> repositoryChoice;
     @FXML
