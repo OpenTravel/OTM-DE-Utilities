@@ -92,8 +92,8 @@ public class TestUpversionHelper extends AbstractFxTest {
         validateCandidateLibraries( "LibraryB_1_0_0.otm-UNDER_REVIEW" );
 
         // Add the library to the selected items and then remove it
-        robot.clickOn( "LibraryB" ).clickOn( "#addButton" );
-        robot.clickOn( "LibraryB" ).clickOn( "#removeButton" );
+        robot.clickOn( "LibraryB (test-repository)" ).clickOn( "#addButton" );
+        robot.clickOn( "LibraryB (test-repository)" ).clickOn( "#removeButton" );
     }
 
     @Test
@@ -105,8 +105,8 @@ public class TestUpversionHelper extends AbstractFxTest {
         robot.waitForBackgroundTask();
 
         // Add both candidates to the list of selected libraries
-        robot.clickOn( "LibraryA" ).clickOn( "#addButton" );
-        robot.clickOn( "LibraryB" ).clickOn( "#addButton" );
+        robot.clickOn( "LibraryA (test-repository)" ).clickOn( "#addButton" );
+        robot.clickOn( "LibraryB (test-repository)" ).clickOn( "#addButton" );
 
         // Upversion the libraries and validate that they have been created on the local file system
         File upversionFolder = new File( wipFolder.get(), "/upversion-output" );
@@ -146,8 +146,8 @@ public class TestUpversionHelper extends AbstractFxTest {
         robot.waitForBackgroundTask();
 
         // Add both candidates to the list of selected libraries
-        robot.clickOn( "LibraryA" ).clickOn( "#addButton" );
-        robot.clickOn( "LibraryB" ).clickOn( "#addButton" );
+        robot.clickOn( "LibraryA (test-repository)" ).clickOn( "#addButton" );
+        robot.clickOn( "LibraryB (test-repository)" ).clickOn( "#addButton" );
 
         // Promote both of the selected libraries
         robot.clickOn( "#promoteOrDemoteButton" );
@@ -176,8 +176,8 @@ public class TestUpversionHelper extends AbstractFxTest {
         robot.clickOn( "File" ).clickOn( "#importMenu" );
 
         // Add the imported items to the selected libraries
-        robot.clickOn( "LibraryA" ).clickOn( "#addButton" );
-        robot.clickOn( "LibraryB" ).clickOn( "#addButton" );
+        robot.clickOn( "LibraryA (test-repository)" ).clickOn( "#addButton" );
+        robot.clickOn( "LibraryB (test-repository)" ).clickOn( "#addButton" );
 
         robot.clickOn( "File" ).clickOn( "#exportMenu" );
         assertTrue( exportProject.exists() );
@@ -195,7 +195,7 @@ public class TestUpversionHelper extends AbstractFxTest {
         robot.clickOn( "#latestVersionsCheckbox" );
         robot.clickOn( "#versionFilterText" ).write( "1" );
         waitForFxEvents();
-        robot.clickOn( "ErrorLibrary" ).clickOn( "#addButton" );
+        robot.clickOn( "ErrorLibrary (test-repository)" ).clickOn( "#addButton" );
         robot.clickOn( "#validationLink" );
 
         // Verifiy that the validation table contains a single error

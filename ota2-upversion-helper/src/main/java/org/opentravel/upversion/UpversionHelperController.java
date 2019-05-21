@@ -850,7 +850,8 @@ public class UpversionHelperController extends AbstractMainWindowController {
         Callback<CellDataFeatures<RepositoryItemWrapper,String>,ObservableValue<String>> nameColumnValueFactory =
             nodeFeatures -> {
                 RepositoryItem item = nodeFeatures.getValue();
-                return new ReadOnlyStringWrapper( (item == null) ? "" : item.getLibraryName() );
+                return new ReadOnlyStringWrapper(
+                    (item == null) ? "" : (item.getLibraryName() + " (" + item.getRepository().getId() + ")") );
             };
         Callback<CellDataFeatures<RepositoryItemWrapper,String>,ObservableValue<String>> versionColumnValueFactory =
             nodeFeatures -> {

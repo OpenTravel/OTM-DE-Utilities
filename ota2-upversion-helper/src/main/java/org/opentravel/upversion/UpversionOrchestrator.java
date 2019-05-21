@@ -191,6 +191,10 @@ public class UpversionOrchestrator {
             if ((oldVersions == null) || oldVersions.isEmpty()) {
                 throw new SchemaCompilerException( "Old library versions not provided for up-version processing." );
             }
+            if (!checkSameRepository()) {
+                throw new SchemaCompilerException(
+                    "All old library versions must originate from the same repository." );
+            }
             purgeExistingLibraries();
 
             // Run the up-version orchestration process and save the new-version libraries
@@ -234,6 +238,21 @@ public class UpversionOrchestrator {
             }
         }
         return existingFiles;
+    }
+
+    /**
+     * Verifies that all of the old-version libraries originate from the same repository. If so, true will be returned
+     * (false otherwise).
+     * 
+     * @return boolean
+     */
+    private boolean checkSameRepository() {
+        Set<String> repositoryIds = new HashSet<>();
+
+        for (RepositoryItem oldItem : oldVersions) {
+            repositoryIds.add( oldItem.getRepository().getId() );
+        }
+        return (repositoryIds.size() <= 1);
     }
 
     /**

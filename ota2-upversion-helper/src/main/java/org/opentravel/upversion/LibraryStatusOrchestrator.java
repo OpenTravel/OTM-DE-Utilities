@@ -27,7 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Orchestrates the promotion and demotion of OTM libraries from one status to another.
@@ -201,6 +203,8 @@ public class LibraryStatusOrchestrator {
      * @throws RepositoryException thrown if an error occurs while accessing the remote repository
      */
     private void validateStatusUpdates(List<RepositoryItem> affectedItems) throws RepositoryException {
+        Set<String> repositoryIds = new HashSet<>();
+
         if (fromStatus == null) {
             throw new RepositoryException( "The fromStatus value cannot be null." );
         }
@@ -217,6 +221,12 @@ public class LibraryStatusOrchestrator {
         }
         if (affectedItems.isEmpty()) {
             throw new RepositoryException( "No libraries found that match the selection criteria." );
+        }
+        for (RepositoryItem oldItem : affectedItems) {
+            repositoryIds.add( oldItem.getRepository().getId() );
+        }
+        if (repositoryIds.size() > 1) {
+            throw new RepositoryException( "All library versions must originate from the same repository." );
         }
     }
 
