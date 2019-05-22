@@ -72,6 +72,7 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
      * Constructor that specifies the consumer that will initialize the stage of the JavaFx application.
      * 
      * @param start the consumer to use when initializing the application stage
+     * @param backgroundTaskNodeQuery the TestFX node query string to assign
      */
     public OtmFxRobot(Consumer<Stage> start, String backgroundTaskNodeQuery) {
         this( start, doNothing -> {
@@ -83,6 +84,7 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
      * 
      * @param start the consumer to use when initializing the application stage
      * @param stop the consumer to use when shutting down the application stage
+     * @param backgroundTaskNodeQuery the TestFX node query string to assign
      */
     public OtmFxRobot(Consumer<Stage> start, Consumer<Stage> stop, String backgroundTaskNodeQuery) {
         this.backgroundTaskNodeQuery = backgroundTaskNodeQuery;
@@ -162,43 +164,6 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
     }
 
     /**
-     * Writes the text to the specified text control after first erasing the existing text value.
-     * 
-     * @param textInputQuery the node query for the JavaFX text input control
-     * @param text the text to be typed
-     * @return OtmFxRobot
-     */
-    public OtmFxRobot write(String textInputQuery, String text) {
-        write( textInputQuery, text, true );
-        return this;
-    }
-
-    /**
-     * Writes the text to the specified text control after optionally erasing the existing text value.
-     * 
-     * @param textInputQuery the node query for the JavaFX text input control
-     * @param text the text to be typed
-     * @param eraseExistingText flag indicating whether the existing text should be deleted before writing
-     * @return OtmFxRobot
-     */
-    public OtmFxRobot write(String textInputQuery, String text, boolean eraseExistingText) {
-        Node control = lookup( textInputQuery ).query();
-
-        clickOn( textInputQuery );
-
-        if (eraseExistingText && (control instanceof TextInputControl)) {
-            String existingText = ((TextInputControl) control).getText();
-            int charCount = (existingText != null) ? existingText.length() : 0;
-
-            for (int i = 0; i < charCount; i++) {
-                type( KeyCode.BACK_SPACE );
-            }
-        }
-        write( text );
-        return this;
-    }
-
-    /**
      * Expands and navigates all members of the specified tree view on the UI.
      * 
      * @param treeviewQuery the JavaFX query ID of the tree view to navigate
@@ -272,7 +237,7 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
      * @return OtmFxRobot
      */
     public OtmFxRobot setScrollPosition(String fxScrollPaneQuery, double verticalPct) {
-        ScrollPane scrollPane = (ScrollPane) lookup( fxScrollPaneQuery ).query();
+        ScrollPane scrollPane = lookup( fxScrollPaneQuery ).query();
 
         scrollPane.setVvalue( (scrollPane.getVmax() - scrollPane.getVmin()) * verticalPct );
         return this;
@@ -284,8 +249,8 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
      * @param fxQuery the query string for the control that will receive the focus
      * @return OtmFxRobot
      */
-    public OtmFxRobot setFocus(FxRobot robot, String fxQuery) {
-        WaitForAsyncUtils.asyncFx( () -> robot.lookup( fxQuery ).query().requestFocus() );
+    public OtmFxRobot setFocus(String fxQuery) {
+        WaitForAsyncUtils.asyncFx( () -> lookup( fxQuery ).query().requestFocus() );
         return this;
     }
 
@@ -293,7 +258,9 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
      * @see org.testfx.framework.junit.ApplicationFixture#init()
      */
     @Override
-    public void init() throws Exception {}
+    public void init() throws Exception {
+        // No action required for initialization
+    }
 
     /**
      * @see org.testfx.framework.junit.ApplicationFixture#start(javafx.stage.Stage)
@@ -503,6 +470,43 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
     }
 
     /**
+     * Writes the text to the specified text control after first erasing the existing text value.
+     * 
+     * @param textInputQuery the node query for the JavaFX text input control
+     * @param text the text to be typed
+     * @return OtmFxRobot
+     */
+    public OtmFxRobot write(String textInputQuery, String text) {
+        write( textInputQuery, text, true );
+        return this;
+    }
+
+    /**
+     * Writes the text to the specified text control after optionally erasing the existing text value.
+     * 
+     * @param textInputQuery the node query for the JavaFX text input control
+     * @param text the text to be typed
+     * @param eraseExistingText flag indicating whether the existing text should be deleted before writing
+     * @return OtmFxRobot
+     */
+    public OtmFxRobot write(String textInputQuery, String text, boolean eraseExistingText) {
+        Node control = lookup( textInputQuery ).query();
+    
+        clickOn( textInputQuery );
+    
+        if (eraseExistingText && (control instanceof TextInputControl)) {
+            String existingText = ((TextInputControl) control).getText();
+            int charCount = (existingText != null) ? existingText.length() : 0;
+    
+            for (int i = 0; i < charCount; i++) {
+                type( KeyCode.BACK_SPACE );
+            }
+        }
+        write( text );
+        return this;
+    }
+
+    /**
      * @see org.testfx.api.FxRobot#write(char)
      */
     @Override
@@ -593,20 +597,20 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
     }
 
     /**
-     * @see org.testfx.api.FxRobot#release(javafx.scene.input.KeyCode[])
-     */
-    @Override
-    public OtmFxRobot release(KeyCode... keys) {
-        super.release( keys );
-        return this;
-    }
-
-    /**
      * @see org.testfx.api.FxRobot#press(javafx.scene.input.MouseButton[])
      */
     @Override
     public OtmFxRobot press(MouseButton... buttons) {
         super.press( buttons );
+        return this;
+    }
+
+    /**
+     * @see org.testfx.api.FxRobot#release(javafx.scene.input.KeyCode[])
+     */
+    @Override
+    public OtmFxRobot release(KeyCode... keys) {
+        super.release( keys );
         return this;
     }
 
@@ -636,27 +640,6 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
     @Override
     public OtmFxRobot clickOn(PointQuery pointQuery, Motion motion, MouseButton... buttons) {
         super.clickOn( pointQuery, motion, buttons );
-        waitForFxEvents();
-        return this;
-    }
-
-    /**
-     * @see org.testfx.api.FxRobot#doubleClickOn(javafx.scene.input.MouseButton[])
-     */
-    @Override
-    public OtmFxRobot doubleClickOn(MouseButton... buttons) {
-        super.doubleClickOn( buttons );
-        waitForFxEvents();
-        return this;
-    }
-
-    /**
-     * @see org.testfx.api.FxRobot#doubleClickOn(org.testfx.service.query.PointQuery, org.testfx.robot.Motion,
-     *      javafx.scene.input.MouseButton[])
-     */
-    @Override
-    public OtmFxRobot doubleClickOn(PointQuery pointQuery, Motion motion, MouseButton... buttons) {
-        super.doubleClickOn( pointQuery, motion, buttons );
         waitForFxEvents();
         return this;
     }
@@ -868,6 +851,27 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
     }
 
     /**
+     * @see org.testfx.api.FxRobot#doubleClickOn(javafx.scene.input.MouseButton[])
+     */
+    @Override
+    public OtmFxRobot doubleClickOn(MouseButton... buttons) {
+        super.doubleClickOn( buttons );
+        waitForFxEvents();
+        return this;
+    }
+
+    /**
+     * @see org.testfx.api.FxRobot#doubleClickOn(org.testfx.service.query.PointQuery, org.testfx.robot.Motion,
+     *      javafx.scene.input.MouseButton[])
+     */
+    @Override
+    public OtmFxRobot doubleClickOn(PointQuery pointQuery, Motion motion, MouseButton... buttons) {
+        super.doubleClickOn( pointQuery, motion, buttons );
+        waitForFxEvents();
+        return this;
+    }
+
+    /**
      * @see org.testfx.api.FxRobot#doubleClickOn(double, double, org.testfx.robot.Motion,
      *      javafx.scene.input.MouseButton[])
      */
@@ -985,36 +989,6 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
     }
 
     /**
-     * @see org.testfx.api.FxRobot#drop()
-     */
-    @Override
-    public OtmFxRobot drop() {
-        super.drop();
-        waitForFxEvents();
-        return this;
-    }
-
-    /**
-     * @see org.testfx.api.FxRobot#dropTo(org.testfx.service.query.PointQuery)
-     */
-    @Override
-    public OtmFxRobot dropTo(PointQuery pointQuery) {
-        super.dropTo( pointQuery );
-        waitForFxEvents();
-        return this;
-    }
-
-    /**
-     * @see org.testfx.api.FxRobot#dropBy(double, double)
-     */
-    @Override
-    public OtmFxRobot dropBy(double x, double y) {
-        super.dropBy( x, y );
-        waitForFxEvents();
-        return this;
-    }
-
-    /**
      * @see org.testfx.api.FxRobot#drag(double, double, javafx.scene.input.MouseButton[])
      */
     @Override
@@ -1092,6 +1066,36 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
     @Override
     public <T extends Node> OtmFxRobot drag(Predicate<T> predicate, MouseButton... buttons) {
         super.drag( predicate, buttons );
+        return this;
+    }
+
+    /**
+     * @see org.testfx.api.FxRobot#drop()
+     */
+    @Override
+    public OtmFxRobot drop() {
+        super.drop();
+        waitForFxEvents();
+        return this;
+    }
+
+    /**
+     * @see org.testfx.api.FxRobot#dropBy(double, double)
+     */
+    @Override
+    public OtmFxRobot dropBy(double x, double y) {
+        super.dropBy( x, y );
+        waitForFxEvents();
+        return this;
+    }
+
+    /**
+     * @see org.testfx.api.FxRobot#dropTo(org.testfx.service.query.PointQuery)
+     */
+    @Override
+    public OtmFxRobot dropTo(PointQuery pointQuery) {
+        super.dropTo( pointQuery );
+        waitForFxEvents();
         return this;
     }
 
@@ -1186,20 +1190,20 @@ public class OtmFxRobot extends FxRobot implements ApplicationFixture, TestRule 
     }
 
     /**
-     * @see org.testfx.api.FxRobot#moveTo(org.testfx.service.query.PointQuery, org.testfx.robot.Motion)
-     */
-    @Override
-    public OtmFxRobot moveTo(PointQuery pointQuery, Motion motion) {
-        super.moveTo( pointQuery, motion );
-        return this;
-    }
-
-    /**
      * @see org.testfx.api.FxRobot#moveBy(double, double, org.testfx.robot.Motion)
      */
     @Override
     public OtmFxRobot moveBy(double x, double y, Motion motion) {
         super.moveBy( x, y, motion );
+        return this;
+    }
+
+    /**
+     * @see org.testfx.api.FxRobot#moveTo(org.testfx.service.query.PointQuery, org.testfx.robot.Motion)
+     */
+    @Override
+    public OtmFxRobot moveTo(PointQuery pointQuery, Motion motion) {
+        super.moveTo( pointQuery, motion );
         return this;
     }
 

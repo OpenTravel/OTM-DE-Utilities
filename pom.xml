@@ -64,7 +64,13 @@
 		<!-- Sonar -->
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<sonar.exclusions>${project.build.directory}/generated-sources/**</sonar.exclusions>
-		<sonar.jacoco.reportPaths>${project.basedir}/../test-aggregate/target/jacoco.exec</sonar.jacoco.reportPaths>
+		<sonar.coverage.exclusions>
+			src/main/java/org/opentravel/exampleupgrade/**,
+			src/main/java/org/opentravel/messagevalidate/**,
+			src/main/java/org/opentravel/modelcheck/**,
+			src/main/java/org/opentravel/utilities/testutil/**,
+		</sonar.coverage.exclusions>
+		<sonar.jacoco.reportPaths>${project.basedir}/../utilities-test-aggregate/target/jacoco.exec</sonar.jacoco.reportPaths>
 		<checkstyle.config>${basedir}/checkstyle.xml</checkstyle.config>
 	</properties>
 

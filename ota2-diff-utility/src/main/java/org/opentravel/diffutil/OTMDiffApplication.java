@@ -33,7 +33,7 @@ public class OTMDiffApplication extends AbstractOTMApplication {
     /**
      * Constructor that provides the manager that should be used when accessing remote OTM repositories.
      * 
-     * @param repositoryManager
+     * @param repositoryManager the repository manager instance
      */
     public OTMDiffApplication(RepositoryManager repositoryManager) {
         super( repositoryManager );

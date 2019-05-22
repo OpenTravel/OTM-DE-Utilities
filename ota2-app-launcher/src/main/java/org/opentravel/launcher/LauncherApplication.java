@@ -33,7 +33,7 @@ public class LauncherApplication extends AbstractOTMApplication {
     /**
      * Constructor that provides the manager that should be used when accessing remote OTM repositories.
      * 
-     * @param repositoryManager
+     * @param repositoryManager the repository manager instance to use
      */
     public LauncherApplication(RepositoryManager repositoryManager) {
         super( repositoryManager );

@@ -67,6 +67,7 @@ public class NewReleaseDialogController {
      * 
      * @param initialDirectory the initial directory for the release (may be null)
      * @param stage the stage that will own the new dialog
+     * @param nativeComponentBuilder the native component builder to use for when creating dialog's file chooser
      * @return NewReleaseDialogController
      */
     public static NewReleaseDialogController createNewReleaseDialog(File initialDirectory, Stage stage,

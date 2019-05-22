@@ -127,6 +127,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
     private static final String SUBSTITUTION_GROUP_CHOICE = "Substitution Group";
     private static final String BLANK_DATE_VALUE = "Latest Commit";
     private static final String DEFAULT_SUFFIX = " (Release Default)";
+    private static final String CLOSE_RELEASE = "Close Release";
 
     private static final Logger log = LoggerFactory.getLogger( OTMReleaseController.class );
 
@@ -369,7 +370,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
      */
     @FXML
     public void openReleaseFile(ActionEvent event) {
-        if (confirmCloseRelease( "Close Release" )) {
+        if (confirmCloseRelease( CLOSE_RELEASE )) {
             closeRelease();
         }
         FileChooserDelegate chooser =
@@ -410,7 +411,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
      */
     @FXML
     public void openManagedRelease(ActionEvent event) {
-        if (confirmCloseRelease( "Close Release" )) {
+        if (confirmCloseRelease( CLOSE_RELEASE )) {
             closeRelease();
         }
         if (availabilityChecker.pingAllRepositories( false )) {
@@ -455,7 +456,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
      */
     @FXML
     public void importFromProject(ActionEvent event) {
-        if (confirmCloseRelease( "Close Release" )) {
+        if (confirmCloseRelease( CLOSE_RELEASE )) {
             closeRelease();
         }
         FileChooserDelegate chooser = newFileChooser( "Import from OTP", userSettings.getReleaseFolder(),
@@ -590,7 +591,7 @@ public class OTMReleaseController extends AbstractMainWindowController {
      */
     @FXML
     public void closeReleaseFile(ActionEvent event) {
-        if (confirmCloseRelease( "Close Release" )) {
+        if (confirmCloseRelease( CLOSE_RELEASE )) {
             closeRelease();
         }
     }

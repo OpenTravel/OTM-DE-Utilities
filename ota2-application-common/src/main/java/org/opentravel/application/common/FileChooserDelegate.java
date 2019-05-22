@@ -43,90 +43,99 @@ public class FileChooserDelegate {
     }
 
     /**
-     * @see java.lang.Object#hashCode()
-     */
-    public int hashCode() {
-        return fileChooser.hashCode();
-    }
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    public boolean equals(Object obj) {
-        return fileChooser.equals( obj );
-    }
-
-    /**
-     * @see javafx.stage.FileChooser#setTitle(java.lang.String)
-     */
-    public final void setTitle(String value) {
-        fileChooser.setTitle( value );
-    }
-
-    /**
+     * Returns the dialog title.
+     * 
+     * @return String
      * @see javafx.stage.FileChooser#getTitle()
      */
-    public final String getTitle() {
+    public String getTitle() {
         return fileChooser.getTitle();
     }
 
     /**
+     * Assigns the dialog title.
+     * 
+     * @param title the title for the title
+     * @see javafx.stage.FileChooser#setTitle(java.lang.String)
+     */
+    public void setTitle(String title) {
+        fileChooser.setTitle( title );
+    }
+
+    /**
+     * Returns the title property of the dialog.
+     * 
+     * @return StringProperty
      * @see javafx.stage.FileChooser#titleProperty()
      */
-    public final StringProperty titleProperty() {
+    public StringProperty titleProperty() {
         return fileChooser.titleProperty();
     }
 
     /**
-     * @see javafx.stage.FileChooser#setInitialDirectory(java.io.File)
-     */
-    public final void setInitialDirectory(File value) {
-        fileChooser.setInitialDirectory( value );
-    }
-
-    /**
+     * Returns the initial directory of the chooser dialog.
+     * 
+     * @return File
      * @see javafx.stage.FileChooser#getInitialDirectory()
      */
-    public final File getInitialDirectory() {
+    public File getInitialDirectory() {
         return fileChooser.getInitialDirectory();
     }
 
     /**
+     * Assigns the initial directory of the chooser dialog.
+     * 
+     * @param folder the initial directory
+     * @see javafx.stage.FileChooser#setInitialDirectory(java.io.File)
+     */
+    public void setInitialDirectory(File folder) {
+        fileChooser.setInitialDirectory( folder );
+    }
+
+    /**
+     * Returns the initial directory property of the chooser.
+     * 
+     * @return ObjectProperty&lt;File&gt;
      * @see javafx.stage.FileChooser#initialDirectoryProperty()
      */
-    public final ObjectProperty<File> initialDirectoryProperty() {
+    public ObjectProperty<File> initialDirectoryProperty() {
         return fileChooser.initialDirectoryProperty();
     }
 
     /**
-     * @see javafx.stage.FileChooser#setInitialFileName(java.lang.String)
-     */
-    public final void setInitialFileName(String value) {
-        fileChooser.setInitialFileName( value );
-    }
-
-    /**
+     * Returns the initial filename selection for the chooser.
+     * 
+     * @return String
      * @see javafx.stage.FileChooser#getInitialFileName()
      */
-    public final String getInitialFileName() {
+    public String getInitialFileName() {
         return fileChooser.getInitialFileName();
     }
 
     /**
+     * Assigns the initial filename selection for the chooser.
+     * 
+     * @param filename the initially selected filename
+     * @see javafx.stage.FileChooser#setInitialFileName(java.lang.String)
+     */
+    public void setInitialFileName(String filename) {
+        fileChooser.setInitialFileName( filename );
+    }
+
+    /**
+     * Returns the initial filename property.
+     * 
+     * @return ObjectProperty&lt;String&gt;
      * @see javafx.stage.FileChooser#initialFileNameProperty()
      */
-    public final ObjectProperty<String> initialFileNameProperty() {
+    public ObjectProperty<String> initialFileNameProperty() {
         return fileChooser.initialFileNameProperty();
     }
 
     /**
-     * @see java.lang.Object#toString()
-     */
-    public String toString() {
-        return fileChooser.toString();
-    }
-
-    /**
+     * Returns the extension filters for the file dialog.
+     * 
+     * @return ObservableList&lt;ExtensionFilter&gt;
      * @see javafx.stage.FileChooser#getExtensionFilters()
      */
     public ObservableList<ExtensionFilter> getExtensionFilters() {
@@ -134,27 +143,40 @@ public class FileChooserDelegate {
     }
 
     /**
-     * @see javafx.stage.FileChooser#selectedExtensionFilterProperty()
-     */
-    public final ObjectProperty<ExtensionFilter> selectedExtensionFilterProperty() {
-        return fileChooser.selectedExtensionFilterProperty();
-    }
-
-    /**
-     * @see javafx.stage.FileChooser#setSelectedExtensionFilter(javafx.stage.FileChooser.ExtensionFilter)
-     */
-    public final void setSelectedExtensionFilter(ExtensionFilter filter) {
-        fileChooser.setSelectedExtensionFilter( filter );
-    }
-
-    /**
+     * Returns the selected extension filter from the dialog.
+     * 
+     * @return ExtensionFilter
      * @see javafx.stage.FileChooser#getSelectedExtensionFilter()
      */
-    public final ExtensionFilter getSelectedExtensionFilter() {
+    public ExtensionFilter getSelectedExtensionFilter() {
         return fileChooser.getSelectedExtensionFilter();
     }
 
     /**
+     * Assigns the selected extension filter from the dialog.
+     * 
+     * @param filter the selected extension filter
+     * @see javafx.stage.FileChooser#setSelectedExtensionFilter(javafx.stage.FileChooser.ExtensionFilter)
+     */
+    public void setSelectedExtensionFilter(ExtensionFilter filter) {
+        fileChooser.setSelectedExtensionFilter( filter );
+    }
+
+    /**
+     * Returns the selected extension filter property.
+     * 
+     * @return ObjectProperty&lt;ExtensionFilter&gt;
+     * @see javafx.stage.FileChooser#selectedExtensionFilterProperty()
+     */
+    public ObjectProperty<ExtensionFilter> selectedExtensionFilterProperty() {
+        return fileChooser.selectedExtensionFilterProperty();
+    }
+
+    /**
+     * Displays the file chooser dialog that allows selection of a single file.
+     * 
+     * @param ownerWindow the owning window for the chooser dialog
+     * @return File
      * @see javafx.stage.FileChooser#showOpenDialog(javafx.stage.Window)
      */
     public File showOpenDialog(Window ownerWindow) {
@@ -162,6 +184,10 @@ public class FileChooserDelegate {
     }
 
     /**
+     * Displays the file chooser dialog that allows selection of multiple files.
+     * 
+     * @param ownerWindow the owning window for the chooser dialog
+     * @return File
      * @see javafx.stage.FileChooser#showOpenMultipleDialog(javafx.stage.Window)
      */
     public List<File> showOpenMultipleDialog(Window ownerWindow) {
@@ -169,10 +195,45 @@ public class FileChooserDelegate {
     }
 
     /**
+     * Displays the file chooser dialog used for selecting a single save file.
+     * 
+     * @param ownerWindow the owning window for the chooser dialog
+     * @return File
      * @see javafx.stage.FileChooser#showSaveDialog(javafx.stage.Window)
      */
     public File showSaveDialog(Window ownerWindow) {
         return fileChooser.showSaveDialog( ownerWindow );
+    }
+
+    /**
+     * Returns the hash code of the directory chooser.
+     * 
+     * @return int
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        return fileChooser.hashCode();
+    }
+
+    /**
+     * Returns true if the given chooser is equal to this one.
+     * 
+     * @param obj the other object with which to compare this one
+     * @return boolean
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object obj) {
+        return fileChooser.equals( obj );
+    }
+
+    /**
+     * Returns a string representation of the object.
+     * 
+     * @return boolean
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        return fileChooser.toString();
     }
 
 }

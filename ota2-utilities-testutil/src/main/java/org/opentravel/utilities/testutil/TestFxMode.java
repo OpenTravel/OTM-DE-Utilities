@@ -31,6 +31,11 @@ public class TestFxMode {
     private static final String PRISM_TEXT = "prism.text";
 
     /**
+     * Private constructor to prevent instantiation.
+     */
+    private TestFxMode() {}
+
+    /**
      * Configures the system properties to run in headless or normal UI mode. If the system property 'headless' is
      * assigned, the value passed to this method is ignored in favor of the command-line directive.
      * 
@@ -53,8 +58,7 @@ public class TestFxMode {
             System.setProperty( PRISM_TEXT, "t2k" );
 
         } else {
-            Arrays.asList( TESTFX_ROBOT, TESTFX_HEADLESS, PRISM_ORDER, PRISM_TEXT )
-                .forEach( key -> System.clearProperty( key ) );
+            Arrays.asList( TESTFX_ROBOT, TESTFX_HEADLESS, PRISM_ORDER, PRISM_TEXT ).forEach( System::clearProperty );
         }
     }
 

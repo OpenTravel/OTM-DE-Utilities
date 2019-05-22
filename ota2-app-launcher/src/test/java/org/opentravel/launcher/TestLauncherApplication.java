@@ -59,7 +59,7 @@ public class TestLauncherApplication extends AbstractFxTest {
         // Launch an application process
         controller.setLaunchHeadless( true );
         robot.clickOn( "Diff Utility" );
-        Thread.sleep( 5000 );
+        robot.sleep( 5000 );
         duProcess = controller.getProcess( "Diff Utility" );
         assertNotNull( duProcess );
 

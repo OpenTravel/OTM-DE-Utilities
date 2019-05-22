@@ -40,55 +40,70 @@ public class DirectoryChooserDelegate {
     }
 
     /**
-     * @see javafx.stage.DirectoryChooser#setTitle(java.lang.String)
-     */
-    public final void setTitle(String value) {
-        directoryChooser.setTitle( value );
-    }
-
-    /**
+     * Returns the dialog title.
+     * 
+     * @return String
      * @see javafx.stage.DirectoryChooser#getTitle()
      */
-    public final String getTitle() {
+    public String getTitle() {
         return directoryChooser.getTitle();
     }
 
     /**
+     * Assigns the dialog title.
+     * 
+     * @param title the title for the title
+     * @see javafx.stage.DirectoryChooser#setTitle(java.lang.String)
+     */
+    public void setTitle(String title) {
+        directoryChooser.setTitle( title );
+    }
+
+    /**
+     * Returns the title property of the dialog.
+     * 
+     * @return StringProperty
      * @see javafx.stage.DirectoryChooser#titleProperty()
      */
-    public final StringProperty titleProperty() {
+    public StringProperty titleProperty() {
         return directoryChooser.titleProperty();
     }
 
     /**
-     * @see java.lang.Object#hashCode()
-     */
-    public int hashCode() {
-        return directoryChooser.hashCode();
-    }
-
-    /**
-     * @see javafx.stage.DirectoryChooser#setInitialDirectory(java.io.File)
-     */
-    public final void setInitialDirectory(File value) {
-        directoryChooser.setInitialDirectory( value );
-    }
-
-    /**
+     * Returns the initial directory of the chooser dialog.
+     * 
+     * @return File
      * @see javafx.stage.DirectoryChooser#getInitialDirectory()
      */
-    public final File getInitialDirectory() {
+    public File getInitialDirectory() {
         return directoryChooser.getInitialDirectory();
     }
 
     /**
+     * Assigns the initial directory of the chooser dialog.
+     * 
+     * @param folder the initial directory
+     * @see javafx.stage.DirectoryChooser#setInitialDirectory(java.io.File)
+     */
+    public void setInitialDirectory(File folder) {
+        directoryChooser.setInitialDirectory( folder );
+    }
+
+    /**
+     * Returns the initial directory property of the chooser.
+     * 
+     * @return ObjectProperty&lt;File&gt;
      * @see javafx.stage.DirectoryChooser#initialDirectoryProperty()
      */
-    public final ObjectProperty<File> initialDirectoryProperty() {
+    public ObjectProperty<File> initialDirectoryProperty() {
         return directoryChooser.initialDirectoryProperty();
     }
 
     /**
+     * Displays the directory chooser dialog.
+     * 
+     * @param ownerWindow the owning window for the chooser dialog
+     * @return File
      * @see javafx.stage.DirectoryChooser#showDialog(javafx.stage.Window)
      */
     public File showDialog(Window ownerWindow) {
@@ -96,6 +111,20 @@ public class DirectoryChooserDelegate {
     }
 
     /**
+     * Returns the hash code of the directory chooser.
+     * 
+     * @return int
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        return directoryChooser.hashCode();
+    }
+
+    /**
+     * Returns true if the given chooser is equal to this one.
+     * 
+     * @param obj the other object with which to compare this one
+     * @return boolean
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object obj) {
@@ -103,6 +132,9 @@ public class DirectoryChooserDelegate {
     }
 
     /**
+     * Returns a string representation of the object.
+     * 
+     * @return boolean
      * @see java.lang.Object#toString()
      */
     public String toString() {

@@ -166,7 +166,6 @@ public class UpversionHelperController extends AbstractMainWindowController {
     @FXML
     private ProgressBar upversionProgressBar;
 
-    private RepositoryAvailabilityChecker availabilityChecker;
     private List<RepositoryItem> selectedNamespaceItems = new ArrayList<>();
     private List<RepositoryItem> selectedNamespaceLatestVersions = new ArrayList<>();
     private Map<String,Pattern> versionFilterPatterns = new HashMap<>();
@@ -834,7 +833,9 @@ public class UpversionHelperController extends AbstractMainWindowController {
     @Override
     @SuppressWarnings("squid:MaximumInheritanceDepth") // Unavoidable since the base class is from core JavaFXx
     protected void initialize(Stage primaryStage) {
-        availabilityChecker = RepositoryAvailabilityChecker.getInstance( getRepositoryManager() );
+        RepositoryAvailabilityChecker availabilityChecker =
+            RepositoryAvailabilityChecker.getInstance( getRepositoryManager() );
+
         availabilityChecker.pingAllRepositories( false );
         super.initialize( primaryStage );
 

@@ -169,7 +169,7 @@ public class TestReleaseEditor extends AbstractFxTest {
 
         // Modify the compile options of the release
         robot.clickOn( "Compiler Options" );
-        Thread.sleep( 250 ); // Wait for accordion to expand
+        robot.sleep( 250 ); // Wait for accordion to expand
         robot.clickOn( "#bindingStyleChoice" );
         robot.type( KeyCode.DOWN ).type( KeyCode.ENTER );
 
@@ -195,7 +195,7 @@ public class TestReleaseEditor extends AbstractFxTest {
         ChoiceBoxTableCell<?,?> facetChoiceCell;
 
         robot.clickOn( "Substitution Groups (Example Facet Selections)" );
-        Thread.sleep( 250 ); // Wait for accordion to expand
+        robot.sleep( 250 ); // Wait for accordion to expand
         facetChoiceCell = (ChoiceBoxTableCell<?,?>) robot.lookup( "Substitution Group" ).query();
         robot.clickOn( facetChoiceCell );
         robot.clickOn( facetChoiceCell );
@@ -207,7 +207,7 @@ public class TestReleaseEditor extends AbstractFxTest {
 
         // Modify the library commit selections
         robot.clickOn( "Release Members" );
-        Thread.sleep( 250 ); // Wait for accordion to expand
+        robot.sleep( 250 ); // Wait for accordion to expand
         facetChoiceCell = (ChoiceBoxTableCell<?,?>) robot.lookup( "Latest Commit" ).query();
         robot.clickOn( facetChoiceCell );
         robot.clickOn( facetChoiceCell );
@@ -244,7 +244,7 @@ public class TestReleaseEditor extends AbstractFxTest {
         ChoiceBox<?> choiceBox;
 
         robot.clickOn( "Compiler Options" );
-        Thread.sleep( 250 ); // Wait for accordion to expand
+        robot.sleep( 250 ); // Wait for accordion to expand
         choiceBox = robot.lookup( "#bindingStyleChoice" ).query();
         originalValue = choiceBox.getSelectionModel().getSelectedItem().toString();
         robot.clickOn( "#bindingStyleChoice" );
@@ -274,7 +274,7 @@ public class TestReleaseEditor extends AbstractFxTest {
 
         robot.clickOn( "Compiler Options" );
         robot.setScrollPosition( "#optionsScrollPane", 1.0 );
-        Thread.sleep( 250 ); // Wait for accordion to expand
+        robot.sleep( 250 ); // Wait for accordion to expand
         spinner = robot.lookup( "#maxRepeatSpinner" ).query();
         originalValue = spinner.getValue().toString();
         spinner.decrement();

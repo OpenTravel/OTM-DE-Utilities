@@ -37,8 +37,8 @@ import javafx.stage.Stage;
  */
 public abstract class AbstractOTMApplication extends Application {
 
-    private static boolean DISABLE_DISPLAY =
-        Boolean.valueOf( System.getProperty( "otm.utilities.disableDisplay", "false" ) );
+    private static final boolean DISABLE_DISPLAY =
+        Boolean.parseBoolean( System.getProperty( "otm.utilities.disableDisplay", "false" ) );
 
     private RepositoryManager repositoryManager;
     private AbstractMainWindowController controller;
@@ -51,7 +51,7 @@ public abstract class AbstractOTMApplication extends Application {
     /**
      * Constructor that provides the manager that should be used when accessing remote OTM repositories.
      * 
-     * @param repositoryManager
+     * @param repositoryManager the repository manager instance
      */
     public AbstractOTMApplication(RepositoryManager repositoryManager) {
         this.repositoryManager = repositoryManager;

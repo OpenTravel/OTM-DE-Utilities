@@ -216,8 +216,8 @@ public class XYZSwaggerBindings implements CodeGenerationSwaggerBindings {
             globalResponseHeaders = initGlobalResponseHeaders();
             globalResponses = initGlobalResponses();
 
-        } catch (Throwable t) {
-            throw new ExceptionInInitializerError( t );
+        } catch (Exception e) {
+            throw new ExceptionInInitializerError( e );
         }
     }
 

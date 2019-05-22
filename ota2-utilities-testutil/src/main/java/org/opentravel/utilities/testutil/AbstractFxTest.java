@@ -27,6 +27,7 @@ import org.testfx.api.FxToolkit;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.concurrent.TimeoutException;
 
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -37,7 +38,7 @@ import javafx.stage.WindowEvent;
 public abstract class AbstractFxTest extends AbstractRepositoryTest {
 
     protected static File repositoryConfig =
-        new File( System.getProperty( "user.dir" ), "/src/test/resources/ota2-repository-config.xml" );
+        new File( System.getProperty( "user.dir" ) + "/src/test/resources/ota2-repository-config.xml" );
     protected static RepositoryManager repoManager;
 
     protected Stage primaryStage;
@@ -57,7 +58,7 @@ public abstract class AbstractFxTest extends AbstractRepositoryTest {
                 application = constructor.newInstance( repoManager );
 
             } else {
-                application = applicationClass.newInstance();
+                application = applicationClass.getConstructor().newInstance();
             }
             primaryStage = stage;
             application.start( stage );
@@ -71,7 +72,7 @@ public abstract class AbstractFxTest extends AbstractRepositoryTest {
     }, getBackgroundTaskNodeQuery() );
 
     @After
-    public void closeApplication() throws Exception {
+    public void closeApplication() throws TimeoutException {
         FxToolkit.setupFixture(
             () -> primaryStage.fireEvent( new WindowEvent( primaryStage, WindowEvent.WINDOW_CLOSE_REQUEST ) ) );
     }
