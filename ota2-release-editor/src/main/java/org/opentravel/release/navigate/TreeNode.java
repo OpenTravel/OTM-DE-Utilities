@@ -35,6 +35,7 @@ public abstract class TreeNode<E> {
 
     protected TreeNodeFactory treeNodeFactory;
     private List<TreeNode<Object>> children;
+    private TreeNode<Object> parent;
     private E entity;
 
     /**
@@ -100,11 +101,22 @@ public abstract class TreeNode<E> {
      * 
      * @return List&lt;TreeNode&lt;?&gt;&gt;
      */
+    @SuppressWarnings("unchecked")
     public List<TreeNode<Object>> getChildren() {
         if (children == null) {
             children = initializeChildren();
+            children.forEach( c -> c.parent = (TreeNode<Object>) TreeNode.this );
         }
         return children;
+    }
+
+    /**
+     * Returns the parent of this tree node (will be null for the root node of a tree).
+     * 
+     * @return TreeNode&lt;?&gt;
+     */
+    public TreeNode<Object> getParent() {
+        return parent;
     }
 
     /**

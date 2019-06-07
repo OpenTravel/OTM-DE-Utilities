@@ -97,7 +97,7 @@ public class LibraryFolderTreeNode extends TreeNode<TLLibrary> {
                 library.getChoiceObjectTypes().forEach( e -> children.add( treeNodeFactory.newTreeNode( e ) ) );
                 library.getBusinessObjectTypes().forEach( e -> children.add( treeNodeFactory.newTreeNode( e ) ) );
                 library.getContextualFacetTypes().forEach( e -> {
-                    if (e.isLocalFacet()) {
+                    if (!e.isLocalFacet()) {
                         children.add( treeNodeFactory.newTreeNode( e ) );
                     }
                 } );

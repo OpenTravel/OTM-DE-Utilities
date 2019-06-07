@@ -71,8 +71,24 @@ public class AbstractFacetTreeNode<E extends TLAbstractFacet> extends TreeNode<E
      */
     @Override
     public String getLabel() {
-        return (getEntity() instanceof TLContextualFacet) ? ((TLContextualFacet) getEntity()).getName()
-            : MessageBuilder.formatMessage( getEntity().getFacetType().toString() );
+        E entity = getEntity();
+        String label;
+
+        if (entity instanceof TLContextualFacet) {
+            TLContextualFacet facet = (TLContextualFacet) entity;
+            TreeNode<?> parent = getParent();
+
+            if (parent instanceof LibraryFolderTreeNode) {
+                label = facet.getLocalName();
+
+            } else {
+                label = facet.getName();
+            }
+
+        } else {
+            label = MessageBuilder.formatMessage( getEntity().getFacetType().toString() );
+        }
+        return label;
     }
 
     /**
