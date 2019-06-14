@@ -17,16 +17,15 @@
 package org.opentravel.examplehelper;
 
 /**
- * Interface for components that require notification when an entity facet
- * selection has been modified.
+ * Interface for components that require notification when an entity facet selection has been modified.
  */
 public interface FacetSelectionListener {
-	
-	/**
-	 * Called when the selected facet of the modified selection has been changed.
-	 * 
-	 * @param modifiedSelection  the facet selection that was modified
-	 */
-	public void facetSelectionChanged(EntityFacetSelection modifiedSelection);
-	
+
+    /**
+     * Called when the selected facet of the modified selection has been changed.
+     * 
+     * @param modifiedSelection the facet selection that was modified
+     */
+    public void facetSelectionChanged(EntityFacetSelection modifiedSelection);
+
 }

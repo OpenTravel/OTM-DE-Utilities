@@ -16,10 +16,6 @@
 
 package org.opentravel.release.navigate.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.opentravel.application.common.Images;
 import org.opentravel.release.MessageBuilder;
 import org.opentravel.release.NodeProperty;
@@ -27,60 +23,65 @@ import org.opentravel.release.navigate.TreeNode;
 import org.opentravel.release.navigate.TreeNodeFactory;
 import org.opentravel.schemacompiler.model.TLParameter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import javafx.scene.image.Image;
 
 /**
  * Tree node that represents a <code>TLParameter</code> instance.
  */
 public class ParameterTreeNode extends TreeNode<TLParameter> {
-	
-	/**
-	 * Constructor that specifies the OTM entity for this node.
-	 * 
-	 * @param entity  the OTM entity represented by this node
-	 * @param factory  the factory that created this node
-	 */
-	public ParameterTreeNode(TLParameter entity, TreeNodeFactory factory) {
-		super(entity, factory);
-	}
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getLabel()
-	 */
-	@Override
-	public String getLabel() {
-		TLParameter param = getEntity();
-		return (param.getFieldRef() == null) ? param.getFieldRefName() : param.getFieldRef().getName();
-	}
+    /**
+     * Constructor that specifies the OTM entity for this node.
+     * 
+     * @param entity the OTM entity represented by this node
+     * @param factory the factory that created this node
+     */
+    public ParameterTreeNode(TLParameter entity, TreeNodeFactory factory) {
+        super( entity, factory );
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getIcon()
-	 */
-	@Override
-	public Image getIcon() {
-		return Images.parameterIcon;
-	}
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getLabel()
+     */
+    @Override
+    public String getLabel() {
+        TLParameter param = getEntity();
+        return (param.getFieldRef() == null) ? param.getFieldRefName() : param.getFieldRef().getName();
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getProperties()
-	 */
-	@Override
-	public List<NodeProperty> getProperties() {
-		List<NodeProperty> props = new ArrayList<>();
-		TLParameter param = getEntity();
-		
-		props.add( new NodeProperty( "name", this::getLabel ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( param ) ) );
-		props.add( new NodeProperty( "location", () -> MessageBuilder.formatMessage( param.getLocation().toString() ) ) );
-		return props;
-	}
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getIcon()
+     */
+    @Override
+    public Image getIcon() {
+        return Images.parameterIcon;
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
-	 */
-	@Override
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getProperties()
+     */
+    @Override
+    public List<NodeProperty> getProperties() {
+        List<NodeProperty> props = new ArrayList<>();
+        TLParameter param = getEntity();
+
+        props.add( new NodeProperty( "name", this::getLabel ) );
+        props.add( new NodeProperty( "description", () -> getDescription( param ) ) );
+        props.add(
+            new NodeProperty( "location", () -> MessageBuilder.formatMessage( param.getLocation().toString() ) ) );
+        return props;
+    }
+
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
+     */
+    @Override
     protected List<TreeNode<Object>> initializeChildren() {
-		return Collections.emptyList();
-	}
+        return Collections.emptyList();
+    }
 
 }

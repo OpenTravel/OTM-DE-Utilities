@@ -100,12 +100,12 @@
                                     <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                  </HBox.margin>
                               </TextField>
-                              <Button mnemonicParsing="false" onAction="#selectLibrary" text="...">
+                              <Button fx:id="libraryFileButton" mnemonicParsing="false" onAction="#selectLibrary" text="...">
                                  <HBox.margin>
                                     <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                  </HBox.margin>
                               </Button>
-                              <Button maxWidth="15.0" mnemonicParsing="false" onAction="#selectFromRepository" prefHeight="25.0">
+                              <Button fx:id="libraryRepoButton" maxWidth="15.0" mnemonicParsing="false" onAction="#selectFromRepository" prefHeight="25.0">
                                  <HBox.margin>
                                     <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                  </HBox.margin>

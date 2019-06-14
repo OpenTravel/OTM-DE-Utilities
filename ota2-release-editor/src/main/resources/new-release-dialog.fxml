@@ -52,22 +52,22 @@
                         <Insets />
                      </GridPane.margin>
                   </Label>
-                  <TextField fx:id="releaseName" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <TextField fx:id="newReleaseName" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <GridPane.margin>
                         <Insets />
                      </GridPane.margin>
                   </TextField>
-                  <TextField fx:id="releaseBaseNamespace" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                  <TextField fx:id="newReleaseBaseNamespace" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <GridPane.margin>
                         <Insets />
                      </GridPane.margin>
                   </TextField>
-                  <Button fx:id="releaseDirectoryButton" mnemonicParsing="false" onAction="#selectReleaseDirectory" text="..." GridPane.columnIndex="2">
+                  <Button fx:id="newReleaseDirectoryButton" mnemonicParsing="false" onAction="#selectReleaseDirectory" text="..." GridPane.columnIndex="2">
                      <GridPane.margin>
                         <Insets left="5.0" />
                      </GridPane.margin>
                   </Button>
-                  <TextField fx:id="releaseDirectory" editable="false" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnIndex="1">
+                  <TextField fx:id="newReleaseDirectory" editable="false" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnIndex="1">
                      <GridPane.margin>
                         <Insets />
                      </GridPane.margin>

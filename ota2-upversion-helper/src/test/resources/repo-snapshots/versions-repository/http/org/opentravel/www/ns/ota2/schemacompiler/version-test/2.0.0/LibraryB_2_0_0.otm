@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Library xmlns="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06 OTA2_LibraryModel_v1.6.0.xsd">
+    
+    <VersionScheme>OTA2</VersionScheme>
+    <Status>Draft</Status>
+    <Namespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test/v02_00</Namespace>
+    <Prefix>b-0200</Prefix>
+    <Name>LibraryB</Name>
+    <Includes>LibraryA_2_0_0.otm</Includes>
+    <Import namespace="http://www.w3.org/2001/XMLSchema" prefix="xsd"/>
+    <Import namespace="http://www.opentravel.org/OTM/Common/v0" prefix="ota"/>
+    <Context applicationContext="http://appcontext/context100" context="context100"/>
+    <Comments>Upversion Test Library B</Comments>
+    
+    <Simple name="SimpleTypeB" type="SimpleTypeA" />
+    
+    <Enumeration_Open name="SampleOpenEnumB">
+        <Extension extends="SampleOpenEnumA" />
+        <Value literal="oneB" />
+        <Value literal="twoB" />
+        <Value literal="threeB" />
+    </Enumeration_Open>
+    
+    <Enumeration_Closed name="SampleClosedEnumB">
+        <Extension extends="SampleClosedEnumA" />
+        <Value literal="fourB" />
+        <Value literal="fiveB" />
+        <Value literal="sixB" />
+    </Enumeration_Closed>
+    
+    <ValueWithAttrs name="SampleValueWithAttributesB" type="SampleValueWithAttributesA">
+        <Attribute name="attr1B" type="SampleClosedEnumA"/>
+    </ValueWithAttrs>
+    
+    <CoreObject name="SimpleCoreB" notExtendable="true">
+        <Extension extends="SimpleCoreA" />
+        <Aliases/>
+        <Simple type="SimpleTypeA"/>
+        <Summary>
+            <Indicator name="simpleIndicatorB" publishAsElement="false"/>
+        </Summary>
+        <Detail/>
+        <Roles>
+            <Role value="simple_role_1B"/>
+            <Role value="simple_role_2B"/>
+            <Role value="simple_role_3B"/>
+        </Roles>
+    </CoreObject>
+    
+    <ChoiceObject name="SimpleChoiceB" notExtendable="false">
+        <Extension extends="SimpleChoiceA" />
+        <Aliases>SimpleChoiceB_Alias1 SimpleChoiceB_Alias2</Aliases>
+        <Shared>
+            <Attribute name="id" type="xsd:string"/>
+            <Attribute name="sharedAttribute" type="xsd:string"/>
+            <Element name="sharedElement" repeat="0" type="SimpleTypeA"/>
+            <Indicator name="sharedIndicator" publishAsElement="false"/>
+        </Shared>
+    </ChoiceObject>
+    
+	<ContextualFacet name="ChoiceAB" type="Choice" facetOwner="SimpleChoiceB">
+        <Attribute name="attributeA" type="xsd:string"/>
+        <Element name="elementA" repeat="0" type="xsd:int"/>
+        <Indicator name="indicatorA" publishAsElement="false"/>
+	</ContextualFacet>
+	
+	<ContextualFacet name="ChoiceBB" type="Choice" facetOwner="SimpleChoiceB">
+        <Attribute name="attributeB" type="xsd:string"/>
+        <Element name="elementB" repeat="3" type="xsd:int"/>
+        <Indicator name="indicatorB" publishAsElement="false"/>
+	</ContextualFacet>
+	
+    <BusinessObject name="EmptyBusinessObjectB" notExtendable="false">
+        <Extension extends="EmptyBusinessObjectA" />
+        <Aliases/>
+        <ID>
+            <Attribute name="messageIdB" type="xsd:string"/>
+            <Element name="empty_oidB" repeat="0" type="xsd:int"/>
+        </ID>
+        <Summary/>
+        <Detail/>
+    </BusinessObject>
+    
+    <BusinessObject name="SimpleBusinessObjectB" notExtendable="false">
+        <Extension extends="SimpleBusinessObjectA" />
+        <Aliases>SimpleBusinessObjectB_Alias1 SimpleBusinessObjectB_Alias2</Aliases>
+        <ID>
+            <Element name="sample_oidB" repeat="0" type="xsd:int"/>
+        </ID>
+        <Summary>
+            <Attribute name="simpleCoreBAttr" type="SimpleCoreB"/>
+            <Element name="summaryNameB" repeat="0" type="xsd:string"/>
+        </Summary>
+        <Detail>
+            <Element name="detailNameB" repeat="0" type="xsd:string"/>
+        </Detail>
+    </BusinessObject>
+
+	<ContextualFacet name="FindByNameB" type="Query" facetOwner="SimpleBusinessObjectB">
+		<Attribute name="queryAttribute" type="xsd:int" />
+		<Element name="lastName" repeat="0" type="xsd:string" />
+		<Element name="firstName" repeat="0" type="xsd:string" />
+		<Indicator name="queryIndicator" publishAsElement="false" />
+	</ContextualFacet>
+
+	<ContextualFacet name="FindByAgeB" type="Query" facetOwner="SimpleBusinessObjectB">
+		<Attribute name="queryAttribute" type="xsd:int" />
+		<Element name="age" repeat="0" type="xsd:int" />
+		<Indicator name="queryIndicator" publishAsElement="false" />
+	</ContextualFacet>
+
+	<ContextualFacet name="UpdateAgeB" type="Update" facetOwner="SimpleBusinessObjectB">
+		<Attribute name="updateAttribute" type="xsd:int" />
+		<Element name="age" repeat="0" type="xsd:int" />
+		<Indicator name="updateIndicator" publishAsElement="false" />
+	</ContextualFacet>
+
+	<ContextualFacet name="Test1" type="Custom" facetOwner="SimpleBusinessObjectA">
+		<Attribute name="attr1" type="xsd:int" />
+		<Element name="element1" repeat="0" type="xsd:string" />
+		<Indicator name="indicator1" publishAsElement="false" />
+	</ContextualFacet>
+
+	<ContextualFacet name="Test2" type="Custom" facetOwner="SimpleBusinessObjectA">
+		<Attribute name="attr1" type="xsd:int" />
+		<Element name="element1" repeat="0" type="xsd:string" />
+		<Indicator name="indicator1" publishAsElement="false" />
+	</ContextualFacet>
+	
+    <Resource name="ParamResourceB" businessObjectRef="EmptyBusinessObjectA" basePath="/services/EmptyResource"
+    			abstract="false" firstClass="true">
+        <Extension extends="ParentResourceA" />
+        <ParamGroup name="IDParameters" idGroup="true" facetName="EmptyBusinessObjectA_ID">
+        	<Parameter fieldName="empty_oidA" location="Path"/>
+        </ParamGroup>
+   	</Resource>
+   	
+    <Resource name="ParentResourceB" businessObjectRef="EmptyBusinessObjectB" basePath="/services/EmptyResource"
+    			abstract="false" firstClass="true">
+        <Extension extends="ParentResourceA" />
+        <ParamGroup name="IDParameters" idGroup="true" facetName="EmptyBusinessObjectB_ID">
+        	<Parameter fieldName="empty_oidB" location="Path"/>
+        </ParamGroup>
+   	</Resource>
+   	
+    <Resource name="SampleResourceB" businessObjectRef="SimpleBusinessObjectB" basePath="/" abstract="false" firstClass="true">
+    	<ResourceParentRef parent="ParentResourceB" parentParamGroup="IDParameters" pathTemplate="/parentA/{empty_oidA}/parentB/{empty_oidB}" />
+        <Extension extends="SampleResourceA" />
+        <ActionFacet label="ObjectWrapperB" referenceType="Optional" referenceFacet="Summary" basePayload="SimpleChoiceB" />
+        <Action actionId="CreateB" common="false">
+        	<ActionRequest httpMethod="POST" pathTemplate="/samplesB" payloadType="SampleResourceB_ObjectWrapperB" mimeTypes="APPLICATION_XML APPLICATION_JSON"/>
+        	<ActionResponse statusCodes="200 204" payloadType="SampleResourceB_ObjectWrapperB" mimeTypes="APPLICATION_XML APPLICATION_JSON"/>
+        </Action>
+    </Resource>
+    
+</Library>

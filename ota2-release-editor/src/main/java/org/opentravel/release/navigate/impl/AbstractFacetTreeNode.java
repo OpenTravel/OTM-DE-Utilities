@@ -16,9 +16,6 @@
 
 package org.opentravel.release.navigate.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.opentravel.application.common.Images;
 import org.opentravel.release.MessageBuilder;
 import org.opentravel.release.NodeProperty;
@@ -31,106 +28,126 @@ import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLIndicator;
 import org.opentravel.schemacompiler.model.TLProperty;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.scene.image.Image;
 
 /**
  * Abstract tree node that represents a <code>TLAbstractFacet</code> instance.
  */
 public class AbstractFacetTreeNode<E extends TLAbstractFacet> extends TreeNode<E> {
-	
-	/**
-	 * Tree node that represents a <code>TLFacet</code> instance.
-	 */
-	public static class FacetTreeNode extends AbstractFacetTreeNode<TLFacet> {
-		public FacetTreeNode(TLFacet entity, TreeNodeFactory factory) {
-			super(entity, factory);
-		}
-	}
-	/**
-	 * Tree node that represents a <code>TLContextualFacet</code> instance.
-	 */
-	public static class ContextualFacetTreeNode extends AbstractFacetTreeNode<TLContextualFacet> {
-		public ContextualFacetTreeNode(TLContextualFacet entity, TreeNodeFactory factory) {
-			super(entity, factory);
-		}
-	}
-	
-	/**
-	 * Constructor that specifies the OTM entity for this node.
-	 * 
-	 * @param entity  the OTM entity represented by this node
-	 * @param factory  the factory that created this node
-	 */
-	public AbstractFacetTreeNode(E entity, TreeNodeFactory factory) {
-		super(entity, factory);
-	}
-	
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getLabel()
-	 */
-	@Override
-	public String getLabel() {
-		return (getEntity() instanceof TLContextualFacet) ?
-				((TLContextualFacet) getEntity()).getName() :
-					MessageBuilder.formatMessage( getEntity().getFacetType().toString() );
-	}
-	
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getIcon()
-	 */
-	@Override
-	public Image getIcon() {
-		return (getEntity() instanceof TLContextualFacet) ? Images.contextualFacetIcon : Images.facetIcon;
-	}
-	
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getProperties()
-	 */
-	@Override
-	public List<NodeProperty> getProperties() {
-		List<NodeProperty> props = new ArrayList<>();
-		TLAbstractFacet facet = getEntity();
-		
-		props.add( new NodeProperty( "name", () -> MessageBuilder.formatMessage( facet.getFacetType().toString() ) ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( facet ) ) );
-		
-		if (facet instanceof TLContextualFacet) {
-			TLContextualFacet ctxFacet = (TLContextualFacet) facet;
-			
-			props.add( new NodeProperty( "localFacet", () -> ctxFacet.isLocalFacet() + "" ) );
-			props.add( new NodeProperty( "facetOwner", () -> getEntityDisplayName( ctxFacet.getOwningEntity() ) ) );
-			props.add( new NodeProperty( "owningLibrary", () -> getLibraryDisplayName( ctxFacet.getOwningLibrary() ) ) );
-		}
-		return props;
-	}
-	
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
-	 */
-	@Override
-	protected List<TreeNode<Object>> initializeChildren() {
-		List<TreeNode<Object>> children = new ArrayList<>();
-		TLAbstractFacet abstractFacet = getEntity();
-		
-		if (abstractFacet instanceof TLFacet) {
-			TLFacet facet = (TLFacet) abstractFacet;
-			
-			if (facet instanceof TLContextualFacet) {
-				for (TLContextualFacet childFacet : ((TLContextualFacet) facet).getChildFacets()) {
-					children.add( treeNodeFactory.newTreeNode( childFacet ) );
-				}
-			}
-			for (TLAttribute attribute : facet.getAttributes()) {
-				children.add( treeNodeFactory.newTreeNode( attribute ) );
-			}
-			for (TLProperty element : facet.getElements()) {
-				children.add( treeNodeFactory.newTreeNode( element ) );
-			}
-			for (TLIndicator indicator : facet.getIndicators()) {
-				children.add( treeNodeFactory.newTreeNode( indicator ) );
-			}
-		}
-		return children;
-	}
-	
+
+    /**
+     * Tree node that represents a <code>TLFacet</code> instance.
+     */
+    public static class FacetTreeNode extends AbstractFacetTreeNode<TLFacet> {
+        public FacetTreeNode(TLFacet entity, TreeNodeFactory factory) {
+            super( entity, factory );
+        }
+    }
+
+    /**
+     * Tree node that represents a <code>TLContextualFacet</code> instance.
+     */
+    public static class ContextualFacetTreeNode extends AbstractFacetTreeNode<TLContextualFacet> {
+        public ContextualFacetTreeNode(TLContextualFacet entity, TreeNodeFactory factory) {
+            super( entity, factory );
+        }
+    }
+
+    /**
+     * Constructor that specifies the OTM entity for this node.
+     * 
+     * @param entity the OTM entity represented by this node
+     * @param factory the factory that created this node
+     */
+    public AbstractFacetTreeNode(E entity, TreeNodeFactory factory) {
+        super( entity, factory );
+    }
+
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getLabel()
+     */
+    @Override
+    public String getLabel() {
+        E entity = getEntity();
+        String label;
+
+        if (entity instanceof TLContextualFacet) {
+            TLContextualFacet facet = (TLContextualFacet) entity;
+            TreeNode<?> parent = getParent();
+
+            if (parent instanceof LibraryFolderTreeNode) {
+                label = facet.getLocalName();
+
+            } else {
+                label = facet.getName();
+            }
+
+        } else {
+            label = MessageBuilder.formatMessage( getEntity().getFacetType().toString() );
+        }
+        return label;
+    }
+
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getIcon()
+     */
+    @Override
+    public Image getIcon() {
+        return (getEntity() instanceof TLContextualFacet) ? Images.contextualFacetIcon : Images.facetIcon;
+    }
+
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getProperties()
+     */
+    @Override
+    public List<NodeProperty> getProperties() {
+        List<NodeProperty> props = new ArrayList<>();
+        TLAbstractFacet facet = getEntity();
+
+        props.add( new NodeProperty( "name", () -> MessageBuilder.formatMessage( facet.getFacetType().toString() ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( facet ) ) );
+
+        if (facet instanceof TLContextualFacet) {
+            TLContextualFacet ctxFacet = (TLContextualFacet) facet;
+
+            props.add( new NodeProperty( "localFacet", () -> ctxFacet.isLocalFacet() + "" ) );
+            props.add( new NodeProperty( "facetOwner", () -> getEntityDisplayName( ctxFacet.getOwningEntity() ) ) );
+            props
+                .add( new NodeProperty( "owningLibrary", () -> getLibraryDisplayName( ctxFacet.getOwningLibrary() ) ) );
+        }
+        return props;
+    }
+
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
+     */
+    @Override
+    protected List<TreeNode<Object>> initializeChildren() {
+        List<TreeNode<Object>> children = new ArrayList<>();
+        TLAbstractFacet abstractFacet = getEntity();
+
+        if (abstractFacet instanceof TLFacet) {
+            TLFacet facet = (TLFacet) abstractFacet;
+
+            if (facet instanceof TLContextualFacet) {
+                for (TLContextualFacet childFacet : ((TLContextualFacet) facet).getChildFacets()) {
+                    children.add( treeNodeFactory.newTreeNode( childFacet ) );
+                }
+            }
+            for (TLAttribute attribute : facet.getAttributes()) {
+                children.add( treeNodeFactory.newTreeNode( attribute ) );
+            }
+            for (TLProperty element : facet.getElements()) {
+                children.add( treeNodeFactory.newTreeNode( element ) );
+            }
+            for (TLIndicator indicator : facet.getIndicators()) {
+                children.add( treeNodeFactory.newTreeNode( indicator ) );
+            }
+        }
+        return children;
+    }
+
 }

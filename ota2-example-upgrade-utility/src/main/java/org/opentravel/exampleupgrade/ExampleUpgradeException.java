@@ -13,48 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.exampleupgrade;
 
 /**
- * Thrown when an unrecoverable error occurs while upgrading an EXAMPLE to a
- * new model version.
+ * Thrown when an unrecoverable error occurs while upgrading an EXAMPLE to a new model version.
  */
 public class ExampleUpgradeException extends Exception {
 
-	private static final long serialVersionUID = -4706603662077623632L;
-	
-	/**
+    private static final long serialVersionUID = -4706603662077623632L;
+
+    /**
      * Default constructor.
      */
-    public ExampleUpgradeException() {
-    }
+    public ExampleUpgradeException() {}
 
     /**
      * Constructs an exception with the specified message.
      * 
-     * @param message  the exception message
+     * @param message the exception message
      */
     public ExampleUpgradeException(String message) {
-        super(message);
+        super( message );
     }
 
     /**
      * Constructs an exception with the specified underlying cause.
      * 
-     * @param cause  the underlying exception that caused this one
+     * @param cause the underlying exception that caused this one
      */
     public ExampleUpgradeException(Throwable cause) {
-        super(cause);
+        super( cause );
     }
 
     /**
      * Constructs an exception with the specified message and underlying cause.
      * 
-     * @param message  the exception message
-     * @param cause  the underlying exception that caused this one
+     * @param message the exception message
+     * @param cause the underlying exception that caused this one
      */
     public ExampleUpgradeException(String message, Throwable cause) {
-        super(message, cause);
+        super( message, cause );
     }
 
 }

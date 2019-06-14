@@ -19,34 +19,31 @@ package org.opentravel.application.common;
 import javafx.scene.image.Image;
 
 /**
- * Enumeration representing the type of message displayed in the status
- * BAR of an application.
+ * Enumeration representing the type of message displayed in the status BAR of an application.
  */
 @SuppressWarnings("squid:UnusedPrivateMethod") // Invalid finding
 public enum StatusType {
-	
-	INFO( Images.infoIcon ),
-	WARNING( Images.warningIcon ),
-	ERROR( Images.errorIcon );
-	
-	private Image icon;
-	
-	/**
-	 * Constructor that specifies the icon for this status type.
-	 * 
-	 * @param icon  the image to display for messages of this type
-	 */
-	private StatusType(Image icon) {
-		this.icon = icon;
-	}
-	
-	/**
-	 * Returns the icon image associated with this status type.
-	 * 
-	 * @return Image
-	 */
-	public Image getIcon() {
-		return icon;
-	}
-	
+
+    INFO(Images.infoIcon), WARNING(Images.warningIcon), ERROR(Images.errorIcon);
+
+    private Image icon;
+
+    /**
+     * Constructor that specifies the icon for this status type.
+     * 
+     * @param icon the image to display for messages of this type
+     */
+    private StatusType(Image icon) {
+        this.icon = icon;
+    }
+
+    /**
+     * Returns the icon image associated with this status type.
+     * 
+     * @return Image
+     */
+    public Image getIcon() {
+        return icon;
+    }
+
 }

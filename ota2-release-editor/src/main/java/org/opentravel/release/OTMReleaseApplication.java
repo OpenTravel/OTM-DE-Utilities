@@ -18,43 +18,58 @@ package org.opentravel.release;
 
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.AbstractUserSettings;
+import org.opentravel.schemacompiler.repository.RepositoryManager;
 
 /**
  * JavaFX application for the OTM Release Editor.
  */
 public class OTMReleaseApplication extends AbstractOTMApplication {
-	
-	/**
-	 * Main method invoked from the command-line.
-	 * 
-	 * @param args the command-line arguments
-	 */
-	public static void main(String[] args) {
-		launch(args);
-	}
-	
-	/**
-	 * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowFxmlLocation()
-	 */
-	@Override
-	protected String getMainWindowFxmlLocation() {
-		return OTMReleaseController.FXML_FILE;
-	}
 
-	/**
-	 * @see org.opentravel.application.common.AbstractOTMApplication#getUserSettings()
-	 */
-	@Override
-	protected AbstractUserSettings getUserSettings() {
-		return UserSettings.load();
-	}
+    /**
+     * Default constructor.
+     */
+    public OTMReleaseApplication() {}
 
-	/**
-	 * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowTitle()
-	 */
-	@Override
-	protected String getMainWindowTitle() {
-		return "OTM Release Editor";
-	}
+    /**
+     * Constructor that provides the manager that should be used when accessing remote OTM repositories.
+     * 
+     * @param repositoryManager the repository manager instance
+     */
+    public OTMReleaseApplication(RepositoryManager repositoryManager) {
+        super( repositoryManager );
+    }
+
+    /**
+     * Main method invoked from the command-line.
+     * 
+     * @param args the command-line arguments
+     */
+    public static void main(String[] args) {
+        launch( args );
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowFxmlLocation()
+     */
+    @Override
+    protected String getMainWindowFxmlLocation() {
+        return OTMReleaseController.FXML_FILE;
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractOTMApplication#getUserSettings()
+     */
+    @Override
+    protected AbstractUserSettings getUserSettings() {
+        return UserSettings.load();
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowTitle()
+     */
+    @Override
+    protected String getMainWindowTitle() {
+        return "OTM Release Editor";
+    }
 
 }

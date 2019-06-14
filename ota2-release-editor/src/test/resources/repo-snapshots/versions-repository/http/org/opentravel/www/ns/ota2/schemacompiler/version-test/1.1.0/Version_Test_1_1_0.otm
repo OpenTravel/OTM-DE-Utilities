@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Library xmlns="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06 OTA2_LibraryModel_v1.6.0.xsd">
+    
+    <VersionScheme>OTA2</VersionScheme>
+    <Status>Draft</Status>
+    <Namespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test/v01_01</Namespace>
+    <Prefix>vt0101</Prefix>
+    <Name>Version_Test</Name>
+    <Import namespace="http://www.w3.org/2001/XMLSchema" prefix="xsd"/>
+    <Import namespace="http://www.opentravel.org/OTM/Common/v0" prefix="ota"/>
+    <Import
+        fileHints="otm://test-repository/Version_Test_1_0_0.otm"
+        namespace="http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test/v01_00" prefix="vt0100"/>
+    <Context applicationContext="http://appcontext/context110" context="context110"/>
+    <Comments>Version Test Sample Library</Comments>
+    
+    <Simple name="SimpleType_01_01" type="xsd:string">
+        <Documentation>
+            <Description>RED GREEN</Description>
+        </Documentation>
+        <Example context="context110">example110</Example>
+    </Simple>
+    
+    <Simple maxLength="10" minLength="5" name="TestString" pattern="[A-Za-z]*" type="xsd:string"/>
+    
+    <Simple name="TestNumberOne" type="xsd:int" minInclusive="1" maxInclusive="10" />
+    
+    <Simple name="TestNumberTwo" type="xsd:int" minExclusive="0" maxExclusive="11" />
+    
+    <Simple name="TestNumberThree" type="xsd:decimal" fractionDigits="2" totalDigits="5" />
+    
+    <Enumeration_Open name="SampleOpenEnum">
+        <Value literal="one" />
+        <Value literal="two" />
+        <Value literal="three" />
+    </Enumeration_Open>
+    
+    <Enumeration_Closed name="SampleClosedEnum">
+        <Value literal="four" />
+        <Value literal="five" />
+        <Value literal="six" />
+    </Enumeration_Closed>
+    
+</Library>

@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.modelcheck;
+
+import org.opentravel.application.common.AbstractUserSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,163 +28,157 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
-import org.opentravel.application.common.AbstractUserSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Persists settings for the <code>ModelCheck</code> application between sessions.
  */
 public class UserSettings extends AbstractUserSettings {
-	
-	private static final String USER_SETTINGS_FILE = "/.ota2/.mc-settings.properties";
-	
-	private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
+
+    private static final String USER_SETTINGS_FILE = "/.ota2/.mc-settings.properties";
+
+    private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
     private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
-	
-	private File projectFolder;
-	private File reportFolder;
-	private ModelCheckOptions modelCheckOptions = new ModelCheckOptions();
-	
-	/**
-	 * Returns the user settings from the prior session.  If no prior settings exist,
-	 * default settings are returned.
-	 * 
-	 * @return UserSettings
-	 */
-	public static UserSettings load() {
-		UserSettings settings;
-		
-		if (!settingsFile.exists()) {
-			settings = getDefaultSettings();
-			
-		} else {
-			try (InputStream is = new FileInputStream( settingsFile )) {
-				Properties usProps = new Properties();
-				
-				usProps.load( is );
-				settings = new UserSettings();
-				settings.load( usProps );
-				
-			} catch (Exception e) {
-			    log.warn( "Error loading settings from prior session (using defaults).", e );
-				settings = getDefaultSettings();
-			}
-			
-			
-		}
-		return settings;
-	}
-	
-	/**
-	 * @see org.opentravel.application.common.AbstractUserSettings#save()
-	 */
-	@Override
-	public void save() {
-		if (!settingsFile.getParentFile().exists()) {
-			settingsFile.getParentFile().mkdirs();
-		}
-		try (OutputStream out = new FileOutputStream( settingsFile )) {
-			Properties usProps = new Properties();
-			
-			save( usProps );
-			usProps.store( out, null );
-			
-		} catch(IOException e) {
-		    log.error( "Error saving user settings.", e );
-		}
-	}
-	
-	/**
-	 * Returns the default user settings.
-	 * 
-	 * @return UserSettings
-	 */
-	public static UserSettings getDefaultSettings() {
-		String userHomeDirectory = System.getProperty( "user.home" );
-		UserSettings settings = new UserSettings();
-		
-		settings.setWindowPosition( settings.getDefaultWindowPosition() );
-		settings.setWindowSize( settings.getDefaultWindowSize() );
-		settings.setProjectFolder( new File( userHomeDirectory ) );
-		settings.modelCheckOptions = new ModelCheckOptions();
-		return settings;
-	}
 
-	/**
-	 * @see org.opentravel.application.common.AbstractUserSettings#load(java.util.Properties)
-	 */
-	@Override
-	protected void load(Properties settingsProps) {
-		String currentFolder = System.getProperty( "user.dir" );
-		String prjFolder = settingsProps.getProperty( "projectFolder", currentFolder );
-		String rptFolder = settingsProps.getProperty( "reportFolder", currentFolder );
-		
-		setProjectFolder( new File( prjFolder ) );
-		setReportFolder( new File( rptFolder ) );
-		modelCheckOptions.loadOptions( settingsProps );
-		super.load( settingsProps );
-	}
+    private File projectFolder;
+    private File reportFolder;
+    private ModelCheckOptions modelCheckOptions = new ModelCheckOptions();
 
-	/**
-	 * @see org.opentravel.application.common.AbstractUserSettings#save(java.util.Properties)
-	 */
-	@Override
-	protected void save(Properties settingsProps) {
-		String currentFolder = System.getProperty( "user.dir" );
-		String pFolder = (projectFolder == null) ? currentFolder : projectFolder.getAbsolutePath();
-		String rptFolder = (reportFolder == null) ? currentFolder : reportFolder.getAbsolutePath();
-		
-		settingsProps.put( "projectFolder", pFolder );
-		settingsProps.put( "reportFolder", rptFolder );
-		modelCheckOptions.saveOptions( settingsProps );
-		super.save( settingsProps );
-	}
+    /**
+     * Returns the user settings from the prior session. If no prior settings exist, default settings are returned.
+     * 
+     * @return UserSettings
+     */
+    public static UserSettings load() {
+        UserSettings settings;
 
-	/**
-	 * Returns the location of the project folder.
-	 *
-	 * @return File
-	 */
-	public File getProjectFolder() {
-		return projectFolder;
-	}
+        if (!settingsFile.exists()) {
+            settings = getDefaultSettings();
 
-	/**
-	 * Assigns the location of the project folder.
-	 *
-	 * @param projectFolder  the folder location to assign
-	 */
-	public void setProjectFolder(File projectFolder) {
-		this.projectFolder = projectFolder;
-	}
+        } else {
+            try (InputStream is = new FileInputStream( settingsFile )) {
+                Properties usProps = new Properties();
 
-	/**
-	 * Returns the location of the report folder.
-	 *
-	 * @return File
-	 */
-	public File getReportFolder() {
-		return reportFolder;
-	}
+                usProps.load( is );
+                settings = new UserSettings();
+                settings.load( usProps );
 
-	/**
-	 * Assigns the location of the report folder.
-	 *
-	 * @param reportFolder  the folder location to assign
-	 */
-	public void setReportFolder(File reportFolder) {
-		this.reportFolder = reportFolder;
-	}
+            } catch (Exception e) {
+                log.warn( "Error loading settings from prior session (using defaults).", e );
+                settings = getDefaultSettings();
+            }
 
-	/**
-	 * Returns the rules that should be enforced when performing model
-	 * check analysis.
-	 *
-	 * @return ModelCheckOptions
-	 */
-	public ModelCheckOptions getModelCheckOptions() {
-		return modelCheckOptions;
-	}
+
+        }
+        return settings;
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractUserSettings#load(java.util.Properties)
+     */
+    @Override
+    protected void load(Properties settingsProps) {
+        String currentFolder = System.getProperty( "user.dir" );
+        String prjFolder = settingsProps.getProperty( "projectFolder", currentFolder );
+        String rptFolder = settingsProps.getProperty( "reportFolder", currentFolder );
+    
+        setProjectFolder( new File( prjFolder ) );
+        setReportFolder( new File( rptFolder ) );
+        modelCheckOptions.loadOptions( settingsProps );
+        super.load( settingsProps );
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractUserSettings#save()
+     */
+    @Override
+    public void save() {
+        if (!settingsFile.getParentFile().exists()) {
+            settingsFile.getParentFile().mkdirs();
+        }
+        try (OutputStream out = new FileOutputStream( settingsFile )) {
+            Properties usProps = new Properties();
+
+            save( usProps );
+            usProps.store( out, null );
+
+        } catch (IOException e) {
+            log.error( "Error saving user settings.", e );
+        }
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractUserSettings#save(java.util.Properties)
+     */
+    @Override
+    protected void save(Properties settingsProps) {
+        String currentFolder = System.getProperty( "user.dir" );
+        String pFolder = (projectFolder == null) ? currentFolder : projectFolder.getAbsolutePath();
+        String rptFolder = (reportFolder == null) ? currentFolder : reportFolder.getAbsolutePath();
+    
+        settingsProps.put( "projectFolder", pFolder );
+        settingsProps.put( "reportFolder", rptFolder );
+        modelCheckOptions.saveOptions( settingsProps );
+        super.save( settingsProps );
+    }
+
+    /**
+     * Returns the default user settings.
+     * 
+     * @return UserSettings
+     */
+    public static UserSettings getDefaultSettings() {
+        String userHomeDirectory = System.getProperty( "user.home" );
+        UserSettings settings = new UserSettings();
+
+        settings.setWindowPosition( settings.getDefaultWindowPosition() );
+        settings.setWindowSize( settings.getDefaultWindowSize() );
+        settings.setProjectFolder( new File( userHomeDirectory ) );
+        settings.modelCheckOptions = new ModelCheckOptions();
+        return settings;
+    }
+
+    /**
+     * Returns the location of the project folder.
+     *
+     * @return File
+     */
+    public File getProjectFolder() {
+        return projectFolder;
+    }
+
+    /**
+     * Assigns the location of the project folder.
+     *
+     * @param projectFolder the folder location to assign
+     */
+    public void setProjectFolder(File projectFolder) {
+        this.projectFolder = projectFolder;
+    }
+
+    /**
+     * Returns the location of the report folder.
+     *
+     * @return File
+     */
+    public File getReportFolder() {
+        return reportFolder;
+    }
+
+    /**
+     * Assigns the location of the report folder.
+     *
+     * @param reportFolder the folder location to assign
+     */
+    public void setReportFolder(File reportFolder) {
+        this.reportFolder = reportFolder;
+    }
+
+    /**
+     * Returns the rules that should be enforced when performing model check analysis.
+     *
+     * @return ModelCheckOptions
+     */
+    public ModelCheckOptions getModelCheckOptions() {
+        return modelCheckOptions;
+    }
 
 }

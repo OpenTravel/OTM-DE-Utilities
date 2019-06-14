@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.examplehelper;
+
+import org.opentravel.application.common.AbstractUserSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,174 +28,169 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
-import org.opentravel.application.common.AbstractUserSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Persists settings for the <code>ExampleHelper</code> application between sessions.
  */
 public class UserSettings extends AbstractUserSettings {
-	
-	private static final String USER_SETTINGS_FILE = "/.ota2/.eh-settings.properties";
-	
-	private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
+
+    private static final String USER_SETTINGS_FILE = "/.ota2/.eh-settings.properties";
+
+    private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
     private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
-	
-	private int repeatCount;
-	private File lastModelFile;
-	private File lastExampleFolder;
-	
-	/**
-	 * Returns the user settings from the prior session.  If no prior settings exist,
-	 * default settings are returned.
-	 * 
-	 * @return UserSettings
-	 */
-	public static UserSettings load() {
-		UserSettings settings;
-		
-		if (!settingsFile.exists()) {
-			settings = getDefaultSettings();
-			
-		} else {
-			try (InputStream is = new FileInputStream( settingsFile )) {
-				Properties usProps = new Properties();
-				
-				usProps.load( is );
-				settings = new UserSettings();
-				settings.load( usProps );
-				
-			} catch(Exception e) {
-				log.warn( "Error loading settings from prior session (using defaults).", e );
-				settings = getDefaultSettings();
-			}
-			
-			
-		}
-		return settings;
-	}
-	
-	/**
-	 * @see org.opentravel.application.common.AbstractUserSettings#save()
-	 */
-	@Override
-	public void save() {
-		if (!settingsFile.getParentFile().exists()) {
-			settingsFile.getParentFile().mkdirs();
-		}
-		try (OutputStream out = new FileOutputStream( settingsFile )) {
-			Properties usProps = new Properties();
-			
-			save( usProps );
-			usProps.store( out, null );
-			
-		} catch(IOException e) {
-		    log.error( "Error saving user settings.", e );
-		}
-	}
-	
-	/**
-	 * Returns the default user settings.
-	 * 
-	 * @return UserSettings
-	 */
-	public static UserSettings getDefaultSettings() {
-		String userHomeDirectory = System.getProperty( "user.home" );
-		UserSettings settings = new UserSettings();
-		
-		settings.setWindowPosition( settings.getDefaultWindowPosition() );
-		settings.setWindowSize( settings.getDefaultWindowSize() );
-		settings.setRepeatCount( 2 );
-		settings.setLastModelFile( new File( userHomeDirectory + "/dummy-file.otm" ) );
-		settings.setLastExampleFolder( new File( userHomeDirectory ) );
-		return settings;
-	}
 
-	/**
-	 * @see org.opentravel.application.common.AbstractUserSettings#load(java.util.Properties)
-	 */
-	@Override
-	protected void load(Properties settingsProps) {
-		int rptCount = Integer.parseInt( settingsProps.getProperty( "repeatCount" ) );
-		String modelFile = settingsProps.getProperty( "lastModelFile" );
-		String exampleFolder = settingsProps.getProperty( "lastExampleFolder" );
-		
-		setRepeatCount( rptCount );
-		setLastModelFile( (modelFile == null) ? null : new File( modelFile ) );
-		setLastExampleFolder( (exampleFolder == null) ? null : new File( exampleFolder ) );
-		super.load( settingsProps );
-	}
+    private int repeatCount;
+    private File lastModelFile;
+    private File lastExampleFolder;
 
-	/**
-	 * @see org.opentravel.application.common.AbstractUserSettings#save(java.util.Properties)
-	 */
-	@Override
-	protected void save(Properties settingsProps) {
-		UserSettings defaultValues = getDefaultSettings();
-		String modelFile = (this.lastModelFile == null) ?
-				defaultValues.getLastModelFile().getAbsolutePath() : this.lastModelFile.getAbsolutePath();
-		String exampleFolder = (this.lastExampleFolder == null) ?
-				defaultValues.getLastExampleFolder().getAbsolutePath() : this.lastExampleFolder.getAbsolutePath();
-		
-		settingsProps.put( "repeatCount", repeatCount + "" );
-		settingsProps.put( "lastModelFile", modelFile );
-		settingsProps.put( "lastExampleFolder", exampleFolder );
-		super.save( settingsProps );
-	}
+    /**
+     * Returns the user settings from the prior session. If no prior settings exist, default settings are returned.
+     * 
+     * @return UserSettings
+     */
+    public static UserSettings load() {
+        UserSettings settings;
 
-	/**
-	 * Returns the value of the repeat-count spinner.
-	 *
-	 * @return int
-	 */
-	public int getRepeatCount() {
-		return repeatCount;
-	}
+        if (!settingsFile.exists()) {
+            settings = getDefaultSettings();
 
-	/**
-	 * Assigns the value of the repeat-count spinner.
-	 *
-	 * @param repeatCount  the repeat count value to assign
-	 */
-	public void setRepeatCount(int repeatCount) {
-		this.repeatCount = repeatCount;
-	}
+        } else {
+            try (InputStream is = new FileInputStream( settingsFile )) {
+                Properties usProps = new Properties();
 
-	/**
-	 * Returns the file location of the last OTM model that was opened.
-	 *
-	 * @return File
-	 */
-	public File getLastModelFile() {
-		return lastModelFile;
-	}
+                usProps.load( is );
+                settings = new UserSettings();
+                settings.load( usProps );
 
-	/**
-	 * Assigns the file location of the last OTM model that was opened.
-	 *
-	 * @param lastModelFile  the file location to assign
-	 */
-	public void setLastModelFile(File lastModelFile) {
-		this.lastModelFile = lastModelFile;
-	}
+            } catch (Exception e) {
+                log.warn( "Error loading settings from prior session (using defaults).", e );
+                settings = getDefaultSettings();
+            }
 
-	/**
-	 * Returns the folder location where the last EXAMPLE file was saved.
-	 *
-	 * @return File
-	 */
-	public File getLastExampleFolder() {
-		return lastExampleFolder;
-	}
 
-	/**
-	 * Assigns the folder location where the last EXAMPLE file was saved.
-	 *
-	 * @param lastExampleFolder  the folder location to assign
-	 */
-	public void setLastExampleFolder(File lastExampleFolder) {
-		this.lastExampleFolder = lastExampleFolder;
-	}
-	
+        }
+        return settings;
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractUserSettings#load(java.util.Properties)
+     */
+    @Override
+    protected void load(Properties settingsProps) {
+        int rptCount = Integer.parseInt( settingsProps.getProperty( "repeatCount" ) );
+        String modelFile = settingsProps.getProperty( "lastModelFile" );
+        String exampleFolder = settingsProps.getProperty( "lastExampleFolder" );
+    
+        setRepeatCount( rptCount );
+        setLastModelFile( (modelFile == null) ? null : new File( modelFile ) );
+        setLastExampleFolder( (exampleFolder == null) ? null : new File( exampleFolder ) );
+        super.load( settingsProps );
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractUserSettings#save()
+     */
+    @Override
+    public void save() {
+        if (!settingsFile.getParentFile().exists()) {
+            settingsFile.getParentFile().mkdirs();
+        }
+        try (OutputStream out = new FileOutputStream( settingsFile )) {
+            Properties usProps = new Properties();
+
+            save( usProps );
+            usProps.store( out, null );
+
+        } catch (IOException e) {
+            log.error( "Error saving user settings.", e );
+        }
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractUserSettings#save(java.util.Properties)
+     */
+    @Override
+    protected void save(Properties settingsProps) {
+        UserSettings defaultValues = getDefaultSettings();
+        String modelFile = (this.lastModelFile == null) ? defaultValues.getLastModelFile().getAbsolutePath()
+            : this.lastModelFile.getAbsolutePath();
+        String exampleFolder = (this.lastExampleFolder == null) ? defaultValues.getLastExampleFolder().getAbsolutePath()
+            : this.lastExampleFolder.getAbsolutePath();
+    
+        settingsProps.put( "repeatCount", repeatCount + "" );
+        settingsProps.put( "lastModelFile", modelFile );
+        settingsProps.put( "lastExampleFolder", exampleFolder );
+        super.save( settingsProps );
+    }
+
+    /**
+     * Returns the default user settings.
+     * 
+     * @return UserSettings
+     */
+    public static UserSettings getDefaultSettings() {
+        String userHomeDirectory = System.getProperty( "user.home" );
+        UserSettings settings = new UserSettings();
+
+        settings.setWindowPosition( settings.getDefaultWindowPosition() );
+        settings.setWindowSize( settings.getDefaultWindowSize() );
+        settings.setRepeatCount( 2 );
+        settings.setLastModelFile( new File( userHomeDirectory + "/dummy-file.otm" ) );
+        settings.setLastExampleFolder( new File( userHomeDirectory ) );
+        return settings;
+    }
+
+    /**
+     * Returns the value of the repeat-count spinner.
+     *
+     * @return int
+     */
+    public int getRepeatCount() {
+        return repeatCount;
+    }
+
+    /**
+     * Assigns the value of the repeat-count spinner.
+     *
+     * @param repeatCount the repeat count value to assign
+     */
+    public void setRepeatCount(int repeatCount) {
+        this.repeatCount = repeatCount;
+    }
+
+    /**
+     * Returns the file location of the last OTM model that was opened.
+     *
+     * @return File
+     */
+    public File getLastModelFile() {
+        return lastModelFile;
+    }
+
+    /**
+     * Assigns the file location of the last OTM model that was opened.
+     *
+     * @param lastModelFile the file location to assign
+     */
+    public void setLastModelFile(File lastModelFile) {
+        this.lastModelFile = lastModelFile;
+    }
+
+    /**
+     * Returns the folder location where the last EXAMPLE file was saved.
+     *
+     * @return File
+     */
+    public File getLastExampleFolder() {
+        return lastExampleFolder;
+    }
+
+    /**
+     * Assigns the folder location where the last EXAMPLE file was saved.
+     *
+     * @param lastExampleFolder the folder location to assign
+     */
+    public void setLastExampleFolder(File lastExampleFolder) {
+        this.lastExampleFolder = lastExampleFolder;
+    }
+
 }

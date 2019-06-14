@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.application.common;
 
 /**
  * Service provider used for the discovery of OTA2 utility applications.
  */
 public interface OTA2ApplicationProvider {
-	
-	/**
-	 * Returns the spec for the OTA2 utility application.
-	 * 
-	 * @return OTA2ApplicationSpec
-	 */
-	public OTA2ApplicationSpec getApplicationSpec();
-	
+
+    /**
+     * Returns the spec for the OTA2 utility application.
+     * 
+     * @return OTA2ApplicationSpec
+     */
+    public OTA2ApplicationSpec getApplicationSpec();
+
 }

@@ -17,77 +17,73 @@
 package org.opentravel.exampleupgrade;
 
 /**
- * Specifies the strategy that should be used to populate the OTM Object choice
- * box on the visual display.
+ * Specifies the strategy that should be used to populate the OTM Object choice box on the visual display.
  */
 public class SelectionStrategy {
-	
-	private static final SelectionStrategy defaultStrategy = new SelectionStrategy( Type.BASE_FAMILY, null );
-	
-	/**
-	 * Specifies the basic type of the object selection strategy.
-	 */
-	public enum Type {
-		
-		/**
-		 * Strategy that considers only those objects in the same base namespace
-		 * and substitution group hierarchy.
-		 */
-		BASE_FAMILY,
-		
-		/**
-		 * Strategy that considers only those objects in the same base namespace
-		 * as the original XML EXAMPLE document.
-		 */
-		EXAMPLE_NAMESPACE,
-		
-		/**
-		 * Strategy that considers only those objects in a user-specified base
-		 * namespace.
-		 */
-		USER_NAMESPACE
-		
-	}
-	
-	private Type strategyType;
-	private String userNamespace;
-	
-	/**
-	 * Full constructor.
-	 * 
-	 * @param strategyType  the basic type of the object selection strategy
-	 * @param userNamespace  the base namespace specified for the USER_NAMESPACE strategy
-	 */
-	public SelectionStrategy(Type strategyType, String userNamespace) {
-		this.strategyType = strategyType;
-		this.userNamespace = userNamespace;
-	}
-	
-	/**
-	 * Returns the default selection strategy.
-	 * 
-	 * @return SelectionStrategy
-	 */
-	public static SelectionStrategy getDefault() {
-		return defaultStrategy;
-	}
 
-	/**
-	 * Returns the basic type of the object selection strategy.
-	 *
-	 * @return Type
-	 */
-	public Type getStrategyType() {
-		return strategyType;
-	}
+    private static final SelectionStrategy defaultStrategy = new SelectionStrategy( Type.BASE_FAMILY, null );
 
-	/**
-	 * Returns the base namespace specified for the USER_NAMESPACE strategy.
-	 *
-	 * @return String
-	 */
-	public String getUserNamespace() {
-		return userNamespace;
-	}
-	
+    /**
+     * Specifies the basic type of the object selection strategy.
+     */
+    public enum Type {
+
+        /**
+         * Strategy that considers only those objects in the same base namespace and substitution group hierarchy.
+         */
+        BASE_FAMILY,
+
+        /**
+         * Strategy that considers only those objects in the same base namespace as the original XML EXAMPLE document.
+         */
+        EXAMPLE_NAMESPACE,
+
+        /**
+         * Strategy that considers only those objects in a user-specified base namespace.
+         */
+        USER_NAMESPACE
+
+    }
+
+    private Type strategyType;
+    private String userNamespace;
+
+    /**
+     * Full constructor.
+     * 
+     * @param strategyType the basic type of the object selection strategy
+     * @param userNamespace the base namespace specified for the USER_NAMESPACE strategy
+     */
+    public SelectionStrategy(Type strategyType, String userNamespace) {
+        this.strategyType = strategyType;
+        this.userNamespace = userNamespace;
+    }
+
+    /**
+     * Returns the default selection strategy.
+     * 
+     * @return SelectionStrategy
+     */
+    public static SelectionStrategy getDefault() {
+        return defaultStrategy;
+    }
+
+    /**
+     * Returns the basic type of the object selection strategy.
+     *
+     * @return Type
+     */
+    public Type getStrategyType() {
+        return strategyType;
+    }
+
+    /**
+     * Returns the base namespace specified for the USER_NAMESPACE strategy.
+     *
+     * @return String
+     */
+    public String getUserNamespace() {
+        return userNamespace;
+    }
+
 }

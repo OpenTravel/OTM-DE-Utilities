@@ -17,16 +17,15 @@
 package org.opentravel.release.undo;
 
 /**
- * Used by an <code>UndoableAction</code> to perform additional application-specific
- * work during the action's execution or an undo/redo operation.
+ * Used by an <code>UndoableAction</code> to perform additional application-specific work during the action's execution
+ * or an undo/redo operation.
  */
 @FunctionalInterface
 public interface ActionExecutionDelegate {
-	
-	/**
-	 * Perform additional application-specific work during the action's execution or an
-	 * undo/redo operation.
-	 */
-	public void execute();
-	
+
+    /**
+     * Perform additional application-specific work during the action's execution or an undo/redo operation.
+     */
+    public void execute();
+
 }

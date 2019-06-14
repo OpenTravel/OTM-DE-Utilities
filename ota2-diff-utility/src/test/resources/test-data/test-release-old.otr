@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<otr:Release xmlns:otr="http://www.OpenTravel.org/ns/OTA2/Release_v01_00">
+    <otr:ReleaseIdentity>
+        <otr:BaseNamespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test</otr:BaseNamespace>
+        <otr:Name>Version_Release</otr:Name>
+        <otr:Filename>TestRelease_1_0_0.otr</otr:Filename>
+        <otr:Version>1.0.0</otr:Version>
+    </otr:ReleaseIdentity>
+    <otr:Status>Draft</otr:Status>
+    <otr:Description>version</otr:Description>
+    <otr:PrincipalMembers>
+        <otr:ReleaseMember>
+            <otr:RepositoryID>test-repository</otr:RepositoryID>
+            <otr:BaseNamespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test</otr:BaseNamespace>
+            <otr:Namespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test/v01_01</otr:Namespace>
+            <otr:Filename>Version_Test_1_1_0.otm</otr:Filename>
+            <otr:LibraryName>Version_Test</otr:LibraryName>
+            <otr:Version>1.1.0</otr:Version>
+        </otr:ReleaseMember>
+    </otr:PrincipalMembers>
+    <otr:ReferencedMembers>
+        <otr:ReleaseMember>
+            <otr:RepositoryID>test-repository</otr:RepositoryID>
+            <otr:BaseNamespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test</otr:BaseNamespace>
+            <otr:Namespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test/v01_00</otr:Namespace>
+            <otr:Filename>Version_Test_1_0_0.otm</otr:Filename>
+            <otr:LibraryName>Version_Test</otr:LibraryName>
+            <otr:Version>1.0.0</otr:Version>
+        </otr:ReleaseMember>
+    </otr:ReferencedMembers>
+    <otr:CompileOption key="suppressOtmExtensions">false</otr:CompileOption>
+    <otr:CompileOption key="compileHtml">true</otr:CompileOption>
+    <otr:CompileOption key="compileSchemas">true</otr:CompileOption>
+    <otr:CompileOption key="compileJson">true</otr:CompileOption>
+    <otr:CompileOption key="generateMaxDetailsForExamples">true</otr:CompileOption>
+    <otr:CompileOption key="compileServices">true</otr:CompileOption>
+    <otr:CompileOption key="compileSwagger">true</otr:CompileOption>
+    <otr:CompileOption key="generateExamples">true</otr:CompileOption>
+</otr:Release>

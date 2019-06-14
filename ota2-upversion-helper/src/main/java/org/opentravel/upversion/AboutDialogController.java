@@ -16,10 +16,10 @@
 
 package org.opentravel.upversion;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -34,68 +34,69 @@ import javafx.stage.Stage;
  * Controller class for the About appication dialog.
  */
 public class AboutDialogController {
-	
-	public static final String FXML_FILE = "/uh-about-dialog.fxml";
-	
+
+    public static final String FXML_FILE = "/uh-about-dialog.fxml";
+
     private static final Logger log = LoggerFactory.getLogger( AboutDialogController.class );
-    
-	private Stage dialogStage;
-	
-	@FXML private Label buildNumberLabel;
-	
-	/**
-	 * Initializes the dialog stage and controller used to display the application-
-	 * about page.
-	 * 
-	 * @param stage  the stage that will own the new dialog
-	 * @return AboutDialogController
-	 */
-	public static AboutDialogController createAboutDialog(Stage stage) {
-		AboutDialogController controller = null;
-		try {
-			FXMLLoader loader = new FXMLLoader( AboutDialogController.class.getResource( FXML_FILE ) );
-			Parent page = loader.load();
-			Stage dialogStage = new Stage();
-			Scene scene = new Scene( page );
-			
-			dialogStage.setTitle( "About" );
-			dialogStage.initModality( Modality.WINDOW_MODAL );
-			dialogStage.initOwner( stage );
-			dialogStage.setScene( scene );
-			
-			controller = loader.getController();
-			controller.setDialogStage( dialogStage );
-			
-		} catch (IOException e) {
-		    log.error( "Error constructing about dialog.", e );
-		}
-		return controller;
-	}
-	
-	/**
-	 * Called when the user clicks the close button of the dialog.
-	 * 
-	 * @param event  the action event that triggered this method call
-	 */
-	@FXML public void closeSelected(ActionEvent event) {
-		dialogStage.close();
-	}
-	
-	/**
-	 * Assigns the stage for the dialog.
-	 *
-	 * @param dialogStage  the dialog stage to assign
-	 */
-	public void setDialogStage(Stage dialogStage) {
-		buildNumberLabel.setText( MessageBuilder.formatMessage( "BUILD_NUMBER" ) );
-		this.dialogStage = dialogStage;
-	}
-	
-	/**
-	 * @see javafx.stage.Stage#showAndWait()
-	 */
-	public void showAndWait() {
-		dialogStage.showAndWait();
-	}
+
+    private Stage dialogStage;
+
+    @FXML
+    private Label buildNumberLabel;
+
+    /**
+     * Initializes the dialog stage and controller used to display the application- about page.
+     * 
+     * @param stage the stage that will own the new dialog
+     * @return AboutDialogController
+     */
+    public static AboutDialogController createAboutDialog(Stage stage) {
+        AboutDialogController controller = null;
+        try {
+            FXMLLoader loader = new FXMLLoader( AboutDialogController.class.getResource( FXML_FILE ) );
+            Parent page = loader.load();
+            Stage dialogStage = new Stage();
+            Scene scene = new Scene( page );
+
+            dialogStage.setTitle( "About" );
+            dialogStage.initModality( Modality.WINDOW_MODAL );
+            dialogStage.initOwner( stage );
+            dialogStage.setScene( scene );
+
+            controller = loader.getController();
+            controller.setDialogStage( dialogStage );
+
+        } catch (IOException e) {
+            log.error( "Error constructing about dialog.", e );
+        }
+        return controller;
+    }
+
+    /**
+     * Called when the user clicks the close button of the dialog.
+     * 
+     * @param event the action event that triggered this method call
+     */
+    @FXML
+    public void closeSelected(ActionEvent event) {
+        dialogStage.close();
+    }
+
+    /**
+     * Assigns the stage for the dialog.
+     *
+     * @param dialogStage the dialog stage to assign
+     */
+    public void setDialogStage(Stage dialogStage) {
+        buildNumberLabel.setText( MessageBuilder.formatMessage( "BUILD_NUMBER" ) );
+        this.dialogStage = dialogStage;
+    }
+
+    /**
+     * @see javafx.stage.Stage#showAndWait()
+     */
+    public void showAndWait() {
+        dialogStage.showAndWait();
+    }
 
 }

@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	
+
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>ota2-app-launcher</artifactId>
 	<packaging>jar</packaging>
 	<name>OTA2.0 Utility Application Launcher</name>
-	
+
 	<parent>
 		<groupId>org.opentravel.otm</groupId>
 		<artifactId>ota2-utilities-parent-pom</artifactId>
@@ -16,8 +16,9 @@
 		<appVersion>${project.version}-${maven.build.timestamp}</appVersion>
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 		<maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
+		<checkstyle.config>${basedir}/../checkstyle.xml</checkstyle.config>
 	</properties>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>org.opentravel.otm</groupId>
@@ -68,6 +69,15 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.controlsfx</groupId>
+			<artifactId>controlsfx</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.opentravel.otm</groupId>
+			<artifactId>ota2-utilities-testutil</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -114,6 +124,22 @@
 						<descriptor>${project.basedir}/src/main/assembly/bin.xml</descriptor>
 					</descriptors>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.coderplus.maven.plugins</groupId>
+				<artifactId>copy-rename-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<sourceFile>${project.build.directory}/${project.artifactId}-${project.version}-bin.zip</sourceFile>
+							<destinationFile>${project.build.directory}/${project.artifactId}.zip</destinationFile>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

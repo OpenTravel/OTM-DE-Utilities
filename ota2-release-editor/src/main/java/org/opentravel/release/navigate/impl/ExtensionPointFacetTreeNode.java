@@ -16,9 +16,6 @@
 
 package org.opentravel.release.navigate.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.opentravel.application.common.Images;
 import org.opentravel.release.NodeProperty;
 import org.opentravel.release.navigate.TreeNode;
@@ -28,70 +25,73 @@ import org.opentravel.schemacompiler.model.TLExtensionPointFacet;
 import org.opentravel.schemacompiler.model.TLIndicator;
 import org.opentravel.schemacompiler.model.TLProperty;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.scene.image.Image;
 
 /**
  * Tree node that represents a <code>TLExtensionPointFacet</code> instance.
  */
 public class ExtensionPointFacetTreeNode extends TreeNode<TLExtensionPointFacet> {
-	
-	/**
-	 * Constructor that specifies the OTM entity for this node.
-	 * 
-	 * @param entity  the OTM entity represented by this node
-	 * @param factory  the factory that created this node
-	 */
-	public ExtensionPointFacetTreeNode(TLExtensionPointFacet entity, TreeNodeFactory factory) {
-		super(entity, factory);
-	}
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getLabel()
-	 */
-	@Override
-	public String getLabel() {
-		return getExtensionName( getEntity() );
-	}
+    /**
+     * Constructor that specifies the OTM entity for this node.
+     * 
+     * @param entity the OTM entity represented by this node
+     * @param factory the factory that created this node
+     */
+    public ExtensionPointFacetTreeNode(TLExtensionPointFacet entity, TreeNodeFactory factory) {
+        super( entity, factory );
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getIcon()
-	 */
-	@Override
-	public Image getIcon() {
-		return Images.extensionPointFacetIcon;
-	}
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getLabel()
+     */
+    @Override
+    public String getLabel() {
+        return getExtensionName( getEntity() );
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getProperties()
-	 */
-	@Override
-	public List<NodeProperty> getProperties() {
-		List<NodeProperty> props = new ArrayList<>();
-		TLExtensionPointFacet epf = getEntity();
-		
-		props.add( new NodeProperty( "extends", () -> getExtensionName( epf ) ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( epf ) ) );
-		return props;
-	}
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getIcon()
+     */
+    @Override
+    public Image getIcon() {
+        return Images.extensionPointFacetIcon;
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
-	 */
-	@Override
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getProperties()
+     */
+    @Override
+    public List<NodeProperty> getProperties() {
+        List<NodeProperty> props = new ArrayList<>();
+        TLExtensionPointFacet epf = getEntity();
+
+        props.add( new NodeProperty( "extends", () -> getExtensionName( epf ) ) );
+        props.add( new NodeProperty( "description", () -> getDescription( epf ) ) );
+        return props;
+    }
+
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
+     */
+    @Override
     protected List<TreeNode<Object>> initializeChildren() {
-		List<TreeNode<Object>> children = new ArrayList<>();
-		TLExtensionPointFacet epf = getEntity();
-		
-		for (TLAttribute attribute : epf.getAttributes()) {
-			children.add( treeNodeFactory.newTreeNode( attribute ) );
-		}
-		for (TLProperty element : epf.getElements()) {
-			children.add( treeNodeFactory.newTreeNode( element ) );
-		}
-		for (TLIndicator indicator : epf.getIndicators()) {
-			children.add( treeNodeFactory.newTreeNode( indicator ) );
-		}
-		return children;
-	}
+        List<TreeNode<Object>> children = new ArrayList<>();
+        TLExtensionPointFacet epf = getEntity();
+
+        for (TLAttribute attribute : epf.getAttributes()) {
+            children.add( treeNodeFactory.newTreeNode( attribute ) );
+        }
+        for (TLProperty element : epf.getElements()) {
+            children.add( treeNodeFactory.newTreeNode( element ) );
+        }
+        for (TLIndicator indicator : epf.getIndicators()) {
+            children.add( treeNodeFactory.newTreeNode( indicator ) );
+        }
+        return children;
+    }
 
 }

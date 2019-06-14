@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Library xmlns="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06 OTA2_LibraryModel_v1.6.0.xsd">
+    
+    <VersionScheme>OTA2</VersionScheme>
+    <Status>Draft</Status>
+    <Namespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test/v01_00</Namespace>
+    <Prefix>vt0100</Prefix>
+    <Name>Version_Test</Name>
+    <Import namespace="http://www.w3.org/2001/XMLSchema" prefix="xsd"/>
+    <Import namespace="http://www.opentravel.org/OTM/Common/v0" prefix="ota"/>
+    <Context applicationContext="http://appcontext/context100" context="context100"/>
+    <Comments>Version Test Sample Library</Comments>
+    
+    <Simple name="SimpleType_01_00" type="xsd:string">
+        <Documentation>
+            <Description>RED</Description>
+        </Documentation>
+        <Example context="context100">example100</Example>
+    </Simple>
+    
+    <ValueWithAttrs name="SampleValueWithAttributes" type="">
+        <Attribute name="attr1" type="xsd:string"/>
+    </ValueWithAttrs>
+    
+    <CoreObject name="SimpleCore" notExtendable="true">
+        <Aliases/>
+        <Simple type="xsd:string"/>
+        <Summary>
+            <Attribute name="shouldBeIndicator" type="xsd:boolean"/>
+            <Indicator name="simpleIndicator" publishAsElement="false"/>
+        </Summary>
+        <Detail/>
+        <Roles>
+            <Role value="simple_role_1"/>
+            <Role value="simple_role_2"/>
+            <Role value="simple_role_3"/>
+        </Roles>
+    </CoreObject>
+    
+    <ChoiceObject name="SimpleChoice" notExtendable="false">
+        <Documentation>
+            <Description>SimpleChoice-documentation-line_1</Description>
+        </Documentation>
+        <Equivalent context="context100">SimpleChoice-equivalent</Equivalent>
+        <Aliases>SimpleChoice_Alias1 SimpleChoice_Alias2</Aliases>
+        <Shared>
+            <Attribute name="id" type="xsd:ID"/>
+            <Attribute name="sharedAttribute" type="xsd:string"/>
+            <Element name="sharedElement" repeat="0" type="xsd:int"/>
+            <Indicator name="sharedIndicator" publishAsElement="false"/>
+        </Shared>
+    </ChoiceObject>
+    
+	<ContextualFacet name="ChoiceA" type="Choice" facetOwner="SimpleChoice">
+        <Attribute name="attributeA" type="xsd:string"/>
+        <Element name="elementA" repeat="0" type="xsd:int"/>
+        <Indicator name="indicatorA" publishAsElement="false"/>
+	</ContextualFacet>
+	
+	<ContextualFacet name="ChoiceB" type="Choice" facetOwner="SimpleChoice">
+        <Attribute name="attributeB" type="xsd:string"/>
+        <Element name="elementB" repeat="3" type="xsd:int"/>
+        <Indicator name="indicatorB" publishAsElement="false"/>
+	</ContextualFacet>
+	
+    <BusinessObject name="EmptyBusinessObject" notExtendable="false">
+        <Aliases/>
+        <ID>
+            <Attribute name="messageId" type="xsd:ID"/>
+            <Element name="empty_oid" repeat="0" type="xsd:int"/>
+        </ID>
+        <Summary/>
+        <Detail/>
+    </BusinessObject>
+    
+    <BusinessObject name="SimpleBusinessObject" notExtendable="false">
+        <Documentation>
+            <Description>SimpleBusinessObject-documentation-line_1</Description>
+        </Documentation>
+        <Equivalent context="context100">SimpleBusinessObject-equivalent</Equivalent>
+        <Extension extends="EmptyBusinessObject">
+            <Documentation>
+                <Description>Extension_EmptyBusinessObject-documentation-line_1</Description>
+            </Documentation>
+        </Extension>
+        <Aliases>SimpleBusinessObject_Alias1 SimpleBusinessObject_Alias2</Aliases>
+        <ID>
+            <Element name="sample_oid" repeat="0" type="xsd:int"/>
+        </ID>
+        <Summary>
+            <Attribute name="simpleCoreAttr" type="SimpleCore"/>
+            <Element name="summaryName" repeat="0" type="xsd:string"/>
+        </Summary>
+        <Detail>
+            <Element name="detailName" repeat="0" type="xsd:string"/>
+        </Detail>
+    </BusinessObject>
+
+	<ContextualFacet name="FindByName" type="Query" facetOwner="SimpleBusinessObject">
+		<Attribute name="queryAttribute" type="xsd:int" />
+		<Element name="lastName" repeat="0" type="xsd:string" />
+		<Element name="firstName" repeat="0" type="xsd:string" />
+		<Indicator name="queryIndicator" publishAsElement="false" />
+	</ContextualFacet>
+
+	<ContextualFacet name="FindByAge" type="Query" facetOwner="SimpleBusinessObject">
+		<Attribute name="queryAttribute" type="xsd:int" />
+		<Element name="age" repeat="0" type="xsd:int" />
+		<Indicator name="queryIndicator" publishAsElement="false" />
+	</ContextualFacet>
+
+	<ContextualFacet name="UpdateAge" type="Update" facetOwner="SimpleBusinessObject">
+		<Attribute name="updateAttribute" type="xsd:int" />
+		<Element name="age" repeat="0" type="xsd:int" />
+		<Indicator name="updateIndicator" publishAsElement="false" />
+	</ContextualFacet>
+
+	<ContextualFacet name="Test1" type="Custom" facetOwner="SimpleBusinessObject">
+		<Attribute name="attr1" type="xsd:int" />
+		<Element name="element1" repeat="0" type="xsd:string" />
+		<Indicator name="indicator1" publishAsElement="false" />
+	</ContextualFacet>
+
+	<ContextualFacet name="Test2" type="Custom" facetOwner="SimpleBusinessObject">
+		<Attribute name="attr1" type="xsd:int" />
+		<Element name="element1" repeat="0" type="xsd:string" />
+		<Indicator name="indicator1" publishAsElement="false" />
+	</ContextualFacet>
+	
+    <Resource name="ParentResource" businessObjectRef="EmptyBusinessObject" basePath="/services/EmptyResource"
+    			abstract="false" firstClass="true">
+        <ParamGroup name="IDParameters" idGroup="true" facetName="EmptyBusinessObject_ID">
+        	<Parameter fieldName="empty_oid" location="Path"/>
+        </ParamGroup>
+   	</Resource>
+   	
+    <Resource name="SampleResource" businessObjectRef="SimpleBusinessObject" basePath="/" abstract="false" firstClass="true">
+    	<ResourceParentRef parent="ParentResource" parentParamGroup="IDParameters" pathTemplate="/parent/{empty_oid}" />
+        <ActionFacet label="ObjectWrapper" referenceType="Optional" referenceFacet="Summary" basePayload="SimpleChoice" />
+        <Action actionId="Create" common="false">
+        	<ActionRequest httpMethod="POST" pathTemplate="/samples" payloadType="SampleResource_ObjectWrapper" mimeTypes="APPLICATION_XML APPLICATION_JSON"/>
+        	<ActionResponse statusCodes="200 204" payloadType="SampleResource_ObjectWrapper" mimeTypes="APPLICATION_XML APPLICATION_JSON"/>
+        </Action>
+    </Resource>
+    
+    <Service name="SimpleService">
+        <Operation Name="Operation" notExtendable="false">
+            <Request>
+                <Element name="ID" repeat="0" type="xsd:string"/>
+            </Request>
+            <Response>
+                <Element name="Value" repeat="0" type="xsd:int"/>
+            </Response>
+            <Notification/>
+        </Operation>
+    </Service>
+    
+</Library>

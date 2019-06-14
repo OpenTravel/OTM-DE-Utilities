@@ -18,43 +18,58 @@ package org.opentravel.examplehelper;
 
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.AbstractUserSettings;
+import org.opentravel.schemacompiler.repository.RepositoryManager;
 
 /**
  * JavaFX application for the OTA2 Example Helpere Utility.
  */
 public class ExampleHelperApplication extends AbstractOTMApplication {
-	
-	/**
-	 * Main method invoked from the command-line.
-	 * 
-	 * @param args the command-line arguments
-	 */
-	public static void main(String[] args) {
-		launch(args);
-	}
-	
-	/**
-	 * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowFxmlLocation()
-	 */
-	@Override
-	protected String getMainWindowFxmlLocation() {
-		return ExampleHelperController.FXML_FILE;
-	}
 
-	/**
-	 * @see org.opentravel.application.common.AbstractOTMApplication#getUserSettings()
-	 */
-	@Override
-	protected AbstractUserSettings getUserSettings() {
-		return UserSettings.load();
-	}
+    /**
+     * Default constructor.
+     */
+    public ExampleHelperApplication() {}
 
-	/**
-	 * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowTitle()
-	 */
-	@Override
-	protected String getMainWindowTitle() {
-		return "OTM-DE Example Helper";
-	}
+    /**
+     * Constructor that provides the manager that should be used when accessing remote OTM repositories.
+     * 
+     * @param repositoryManager the repository manager instance
+     */
+    public ExampleHelperApplication(RepositoryManager repositoryManager) {
+        super( repositoryManager );
+    }
+
+    /**
+     * Main method invoked from the command-line.
+     * 
+     * @param args the command-line arguments
+     */
+    public static void main(String[] args) {
+        launch( args );
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowFxmlLocation()
+     */
+    @Override
+    protected String getMainWindowFxmlLocation() {
+        return ExampleHelperController.FXML_FILE;
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractOTMApplication#getUserSettings()
+     */
+    @Override
+    protected AbstractUserSettings getUserSettings() {
+        return UserSettings.load();
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowTitle()
+     */
+    @Override
+    protected String getMainWindowTitle() {
+        return "OTM-DE Example Helper";
+    }
 
 }

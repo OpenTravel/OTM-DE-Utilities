@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.release;
+
+import org.opentravel.application.common.AbstractUserSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,126 +28,121 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
-import org.opentravel.application.common.AbstractUserSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Persists settings for the OTM Release Editor application between sessions.
  */
 public class UserSettings extends AbstractUserSettings {
-	
-	private static final String USER_SETTINGS_FILE = "/.ota2/.otr-settings.properties";
-	
-	private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
+
+    private static final String USER_SETTINGS_FILE = "/.ota2/.otr-settings.properties";
+
+    private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
     private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
-	
-	private File releaseFolder;
-	
-	/**
-	 * Returns the user settings from the prior session.  If no prior settings exist,
-	 * default settings are returned.
-	 * 
-	 * @return UserSettings
-	 */
-	public static UserSettings load() {
-		UserSettings settings;
-		
-		if (!settingsFile.exists()) {
-			settings = getDefaultSettings();
-			
-		} else {
-			try (InputStream is = new FileInputStream( settingsFile )) {
-				Properties usProps = new Properties();
-				
-				usProps.load( is );
-				settings = new UserSettings();
-				settings.load( usProps );
-				
-			} catch (Exception e) {
-			    log.warn( "Error loading settings from prior session (using defaults).", e );
-				settings = getDefaultSettings();
-			}
-			
-			
-		}
-		return settings;
-	}
-	
-	/**
-	 * @see org.opentravel.application.common.AbstractUserSettings#save()
-	 */
-	@Override
-	public void save() {
-		if (!settingsFile.getParentFile().exists()) {
-			settingsFile.getParentFile().mkdirs();
-		}
-		try (OutputStream out = new FileOutputStream( settingsFile )) {
-			Properties usProps = new Properties();
-			
-			save( usProps );
-			usProps.store( out, null );
-			
-		} catch(IOException e) {
-		    log.error( "Error saving user settings.", e );
-		}
-	}
-	
-	/**
-	 * Returns the default user settings.
-	 * 
-	 * @return UserSettings
-	 */
-	public static UserSettings getDefaultSettings() {
-		String userHomeDirectory = System.getProperty( "user.home" );
-		UserSettings settings = new UserSettings();
-		
-		settings.setWindowPosition( settings.getDefaultWindowPosition() );
-		settings.setWindowSize( settings.getDefaultWindowSize() );
-		settings.setReleaseFolder( new File( userHomeDirectory ) );
-		return settings;
-	}
 
-	/**
-	 * @see org.opentravel.application.common.AbstractUserSettings#load(java.util.Properties)
-	 */
-	@Override
-	protected void load(Properties settingsProps) {
-		String currentFolder = System.getProperty( "user.dir" );
-		String rlsFolder = settingsProps.getProperty( "releaseFolder", currentFolder );
-		
-		setReleaseFolder( new File( rlsFolder ) );
-		super.load( settingsProps );
-	}
+    private File releaseFolder;
 
-	/**
-	 * @see org.opentravel.application.common.AbstractUserSettings#save(java.util.Properties)
-	 */
-	@Override
-	protected void save(Properties settingsProps) {
-		String currentFolder = System.getProperty( "user.dir" );
-		String rFolder = (releaseFolder == null) ? currentFolder : releaseFolder.getAbsolutePath();
-		
-		settingsProps.put( "releaseFolder", rFolder );
-		super.save( settingsProps );
-	}
+    /**
+     * Returns the user settings from the prior session. If no prior settings exist, default settings are returned.
+     * 
+     * @return UserSettings
+     */
+    public static UserSettings load() {
+        UserSettings settings;
 
-	/**
-	 * Returns the location of the release folder.
-	 *
-	 * @return File
-	 */
-	public File getReleaseFolder() {
-		return releaseFolder;
-	}
+        if (!settingsFile.exists()) {
+            settings = getDefaultSettings();
 
-	/**
-	 * Assigns the location of the release folder.
-	 *
-	 * @param releaseFolder  the folder location to assign
-	 */
-	public void setReleaseFolder(File releaseFolder) {
-		this.releaseFolder = releaseFolder;
-	}
+        } else {
+            try (InputStream is = new FileInputStream( settingsFile )) {
+                Properties usProps = new Properties();
+
+                usProps.load( is );
+                settings = new UserSettings();
+                settings.load( usProps );
+
+            } catch (Exception e) {
+                log.warn( "Error loading settings from prior session (using defaults).", e );
+                settings = getDefaultSettings();
+            }
+
+
+        }
+        return settings;
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractUserSettings#load(java.util.Properties)
+     */
+    @Override
+    protected void load(Properties settingsProps) {
+        String currentFolder = System.getProperty( "user.dir" );
+        String rlsFolder = settingsProps.getProperty( "releaseFolder", currentFolder );
+    
+        setReleaseFolder( new File( rlsFolder ) );
+        super.load( settingsProps );
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractUserSettings#save()
+     */
+    @Override
+    public void save() {
+        if (!settingsFile.getParentFile().exists()) {
+            settingsFile.getParentFile().mkdirs();
+        }
+        try (OutputStream out = new FileOutputStream( settingsFile )) {
+            Properties usProps = new Properties();
+
+            save( usProps );
+            usProps.store( out, null );
+
+        } catch (IOException e) {
+            log.error( "Error saving user settings.", e );
+        }
+    }
+
+    /**
+     * @see org.opentravel.application.common.AbstractUserSettings#save(java.util.Properties)
+     */
+    @Override
+    protected void save(Properties settingsProps) {
+        String currentFolder = System.getProperty( "user.dir" );
+        String rFolder = (releaseFolder == null) ? currentFolder : releaseFolder.getAbsolutePath();
+    
+        settingsProps.put( "releaseFolder", rFolder );
+        super.save( settingsProps );
+    }
+
+    /**
+     * Returns the default user settings.
+     * 
+     * @return UserSettings
+     */
+    public static UserSettings getDefaultSettings() {
+        String userHomeDirectory = System.getProperty( "user.home" );
+        UserSettings settings = new UserSettings();
+
+        settings.setWindowPosition( settings.getDefaultWindowPosition() );
+        settings.setWindowSize( settings.getDefaultWindowSize() );
+        settings.setReleaseFolder( new File( userHomeDirectory ) );
+        return settings;
+    }
+
+    /**
+     * Returns the location of the release folder.
+     *
+     * @return File
+     */
+    public File getReleaseFolder() {
+        return releaseFolder;
+    }
+
+    /**
+     * Assigns the location of the release folder.
+     *
+     * @param releaseFolder the folder location to assign
+     */
+    public void setReleaseFolder(File releaseFolder) {
+        this.releaseFolder = releaseFolder;
+    }
 
 }

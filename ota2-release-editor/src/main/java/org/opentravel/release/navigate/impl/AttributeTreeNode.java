@@ -16,15 +16,15 @@
 
 package org.opentravel.release.navigate.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.opentravel.application.common.Images;
 import org.opentravel.release.NodeProperty;
 import org.opentravel.release.navigate.TreeNode;
 import org.opentravel.release.navigate.TreeNodeFactory;
 import org.opentravel.schemacompiler.model.TLAttribute;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javafx.scene.image.Image;
 
@@ -32,58 +32,58 @@ import javafx.scene.image.Image;
  * Tree node that represents a <code>TLAttribute</code> instance.
  */
 public class AttributeTreeNode extends TreeNode<TLAttribute> {
-	
-	/**
-	 * Constructor that specifies the OTM entity for this node.
-	 * 
-	 * @param entity  the OTM entity represented by this node
-	 * @param factory  the factory that created this node
-	 */
-	public AttributeTreeNode(TLAttribute entity, TreeNodeFactory factory) {
-		super(entity, factory);
-	}
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getLabel()
-	 */
-	@Override
-	public String getLabel() {
-		return getEntity().getName();
-	}
+    /**
+     * Constructor that specifies the OTM entity for this node.
+     * 
+     * @param entity the OTM entity represented by this node
+     * @param factory the factory that created this node
+     */
+    public AttributeTreeNode(TLAttribute entity, TreeNodeFactory factory) {
+        super( entity, factory );
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getIcon()
-	 */
-	@Override
-	public Image getIcon() {
-		return Images.attributeIcon;
-	}
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getLabel()
+     */
+    @Override
+    public String getLabel() {
+        return getEntity().getName();
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#getProperties()
-	 */
-	@Override
-	public List<NodeProperty> getProperties() {
-		List<NodeProperty> props = new ArrayList<>();
-		TLAttribute attribute = getEntity();
-		
-		props.add( new NodeProperty( "name", attribute::getName ) );
-		props.add( new NodeProperty( "DESCRIPTION", () -> getDescription( attribute ) ) );
-		props.add( new NodeProperty( "type", () -> getEntityDisplayName( attribute.getType() ) ) );
-		props.add( new NodeProperty( "isReference", () -> attribute.isReference() + "" ) );
-		if (attribute.isReference()) {
-			props.add( new NodeProperty( "referenceRepeat", () -> attribute.getReferenceRepeat() + "" ) );
-		}
-		props.add( new NodeProperty( "mandatory", () -> attribute.isMandatory() + "" ) );
-		return props;
-	}
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getIcon()
+     */
+    @Override
+    public Image getIcon() {
+        return Images.attributeIcon;
+    }
 
-	/**
-	 * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
-	 */
-	@Override
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#getProperties()
+     */
+    @Override
+    public List<NodeProperty> getProperties() {
+        List<NodeProperty> props = new ArrayList<>();
+        TLAttribute attribute = getEntity();
+
+        props.add( new NodeProperty( "name", attribute::getName ) );
+        props.add( new NodeProperty( "description", () -> getDescription( attribute ) ) );
+        props.add( new NodeProperty( "type", () -> getEntityDisplayName( attribute.getType() ) ) );
+        props.add( new NodeProperty( "isReference", () -> attribute.isReference() + "" ) );
+        if (attribute.isReference()) {
+            props.add( new NodeProperty( "referenceRepeat", () -> attribute.getReferenceRepeat() + "" ) );
+        }
+        props.add( new NodeProperty( "mandatory", () -> attribute.isMandatory() + "" ) );
+        return props;
+    }
+
+    /**
+     * @see org.opentravel.release.navigate.TreeNode#initializeChildren()
+     */
+    @Override
     protected List<TreeNode<Object>> initializeChildren() {
-		return Collections.emptyList();
-	}
-	
+        return Collections.emptyList();
+    }
+
 }

@@ -71,86 +71,84 @@ import org.opentravel.schemacompiler.model.TLValueWithAttributes;
  * Enumeration that indicates the type of a tree node.
  */
 public enum TreeNodeType {
-	
-	LIBRARY_TREE_NODE( TLLibrary.class, LibraryTreeNode.class ),
-	SIMPLE_TREE_NODE( TLSimple.class, SimpleTreeNode.class ),
-	CLOSED_ENUM_TREE_NODE( TLClosedEnumeration.class, ClosedEnumerationTreeNode.class ),
-	OPEN_ENUM_TREE_NODE( TLOpenEnumeration.class, OpenEnumerationTreeNode.class ),
-	VWA_TREE_NODE( TLValueWithAttributes.class, ValueWithAttributesTreeNode.class ),
-	CORE_OBJ_TREE_NODE( TLCoreObject.class, CoreObjectTreeNode.class ),
-	CHOICE_OBJ_TREE_NODE( TLChoiceObject.class, ChoiceObjectTreeNode.class ),
-	BUSINESS_OBJ_TREE_NODE( TLBusinessObject.class, BusinessObjectTreeNode.class ),
-	ALIAS_TREE_NODE( TLAlias.class, AliasTreeNode.class ),
-	FACET_TREE_NODE( TLFacet.class, FacetTreeNode.class ),
-	CTX_FACET_TREE_NODE( TLContextualFacet.class, ContextualFacetTreeNode.class ),
-	EP_FACET_TREE_NODE( TLExtensionPointFacet.class, ExtensionPointFacetTreeNode.class ),
-	ATTRIBUTE_TREE_NODE( TLAttribute.class, AttributeTreeNode.class ),
-	ELEMENT_TREE_NODE( TLProperty.class, ElementTreeNode.class ),
-	INDICATOR_TREE_NODE( TLIndicator.class, IndicatorTreeNode.class ),
-	SERVICE_TREE_NODE( TLService.class, ServiceTreeNode.class ),
-	OPERATION_TREE_NODE( TLOperation.class, OperationTreeNode.class ),
-	RESOURCE_TREE_NODE( TLResource.class, ResourceTreeNode.class ),
-	PARENT_REF_TREE_NODE( TLResourceParentRef.class, ParentRefTreeNode.class ),
-	PARAM_GROUP_TREE_NODE( TLParamGroup.class, ParamGroupTreeNode.class ),
-	PARAMETER_TREE_NODE( TLParameter.class, ParameterTreeNode.class ),
-	ACTION_FACET_TREE_NODE( TLActionFacet.class, ActionFacetTreeNode.class ),
-	ACTION_TREE_NODE( TLAction.class, ActionTreeNode.class ),
-	ACTION_REQUEST_TREE_NODE( TLActionRequest.class, ActionRequestTreeNode.class ),
-	ACTION_RESPONSE_TREE_NODE( TLActionResponse.class, ActionResponseTreeNode.class );
-	
-	private Class<?> entityClass;
-	private Class<? extends TreeNode<?>> nodeClass;
-	
-	/**
-	 * Constructor that specifies the associated entity type and the tree node
-	 * implementation class.
-	 * 
-	 * @param entityClass  the entity class associated with this tree node type
-	 * @param nodeClass  the tree node implementation class for this type
-	 */
-	private TreeNodeType(Class<?> entityClass, Class<? extends TreeNode<?>> nodeClass) {
-		this.entityClass = entityClass;
-		this.nodeClass = nodeClass;
-	}
 
-	/**
-	 * Returns the entity class associated with this tree node type.
-	 *
-	 * @return Class<?>
-	 */
-	public Class<?> getEntityClass() {
-		return entityClass;
-	}
+    LIBRARY_TREE_NODE(TLLibrary.class, LibraryTreeNode.class),
+    SIMPLE_TREE_NODE(TLSimple.class, SimpleTreeNode.class),
+    CLOSED_ENUM_TREE_NODE(TLClosedEnumeration.class, ClosedEnumerationTreeNode.class),
+    OPEN_ENUM_TREE_NODE(TLOpenEnumeration.class, OpenEnumerationTreeNode.class),
+    VWA_TREE_NODE(TLValueWithAttributes.class, ValueWithAttributesTreeNode.class),
+    CORE_OBJ_TREE_NODE(TLCoreObject.class, CoreObjectTreeNode.class),
+    CHOICE_OBJ_TREE_NODE(TLChoiceObject.class, ChoiceObjectTreeNode.class),
+    BUSINESS_OBJ_TREE_NODE(TLBusinessObject.class, BusinessObjectTreeNode.class),
+    ALIAS_TREE_NODE(TLAlias.class, AliasTreeNode.class),
+    FACET_TREE_NODE(TLFacet.class, FacetTreeNode.class),
+    CTX_FACET_TREE_NODE(TLContextualFacet.class, ContextualFacetTreeNode.class),
+    EP_FACET_TREE_NODE(TLExtensionPointFacet.class, ExtensionPointFacetTreeNode.class),
+    ATTRIBUTE_TREE_NODE(TLAttribute.class, AttributeTreeNode.class),
+    ELEMENT_TREE_NODE(TLProperty.class, ElementTreeNode.class),
+    INDICATOR_TREE_NODE(TLIndicator.class, IndicatorTreeNode.class),
+    SERVICE_TREE_NODE(TLService.class, ServiceTreeNode.class),
+    OPERATION_TREE_NODE(TLOperation.class, OperationTreeNode.class),
+    RESOURCE_TREE_NODE(TLResource.class, ResourceTreeNode.class),
+    PARENT_REF_TREE_NODE(TLResourceParentRef.class, ParentRefTreeNode.class),
+    PARAM_GROUP_TREE_NODE(TLParamGroup.class, ParamGroupTreeNode.class),
+    PARAMETER_TREE_NODE(TLParameter.class, ParameterTreeNode.class),
+    ACTION_FACET_TREE_NODE(TLActionFacet.class, ActionFacetTreeNode.class),
+    ACTION_TREE_NODE(TLAction.class, ActionTreeNode.class),
+    ACTION_REQUEST_TREE_NODE(TLActionRequest.class, ActionRequestTreeNode.class),
+    ACTION_RESPONSE_TREE_NODE(TLActionResponse.class, ActionResponseTreeNode.class);
 
-	/**
-	 * Returns the tree node implementation class for this type.
-	 *
-	 * @return Class<? extends TreeNode<?>>
-	 */
-	public Class<? extends TreeNode<?>> getNodeClass() {
-		return nodeClass;
-	}
-	
-	/**
-	 * Returns the tree node type associated with the given entity class.
-	 * 
-	 * @param entityClass  the entity class for which to return a tree node type
-	 * @return TreeNodeType
-	 */
-	public static TreeNodeType fromEntityType(Class<?> entityClass) {
-		TreeNodeType result = null;
-		
-		for (TreeNodeType nodeType : values()) {
-			if (entityClass.equals( nodeType.getEntityClass() )) {
-				result = nodeType;
-				break;
-			}
-		}
-		if (result == null) {
-			throw new IllegalArgumentException(
-					"Unknown tree node entity type: " + entityClass.getSimpleName());
-		}
-		return result;
-	}
-	
+    private Class<?> entityClass;
+    private Class<? extends TreeNode<?>> nodeClass;
+
+    /**
+     * Constructor that specifies the associated entity type and the tree node implementation class.
+     * 
+     * @param entityClass the entity class associated with this tree node type
+     * @param nodeClass the tree node implementation class for this type
+     */
+    private TreeNodeType(Class<?> entityClass, Class<? extends TreeNode<?>> nodeClass) {
+        this.entityClass = entityClass;
+        this.nodeClass = nodeClass;
+    }
+
+    /**
+     * Returns the entity class associated with this tree node type.
+     *
+     * @return Class&lt;?&gt;
+     */
+    public Class<?> getEntityClass() {
+        return entityClass;
+    }
+
+    /**
+     * Returns the tree node implementation class for this type.
+     *
+     * @return Class&lt;? extends TreeNode&lt;?&gt;&gt;
+     */
+    public Class<? extends TreeNode<?>> getNodeClass() {
+        return nodeClass;
+    }
+
+    /**
+     * Returns the tree node type associated with the given entity class.
+     * 
+     * @param entityClass the entity class for which to return a tree node type
+     * @return TreeNodeType
+     */
+    public static TreeNodeType fromEntityType(Class<?> entityClass) {
+        TreeNodeType result = null;
+
+        for (TreeNodeType nodeType : values()) {
+            if (entityClass.equals( nodeType.getEntityClass() )) {
+                result = nodeType;
+                break;
+            }
+        }
+        if (result == null) {
+            throw new IllegalArgumentException( "Unknown tree node entity type: " + entityClass.getSimpleName() );
+        }
+        return result;
+    }
+
 }

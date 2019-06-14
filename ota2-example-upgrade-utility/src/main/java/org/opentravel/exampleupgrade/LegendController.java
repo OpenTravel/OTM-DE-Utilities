@@ -25,39 +25,40 @@ import javafx.stage.Stage;
  * JavaFX controller class for the Legend dialog.
  */
 public class LegendController {
-	
-	public static final String FXML_FILE = "/legend.fxml";
-	
-	@FXML private WebView webView;
-	
-	private Stage dialogStage;
-	
-	/**
-	 * Called when the user clicks the close button.
-	 * 
-	 * @param event  the action event that triggered this method call
-	 */
-	@FXML public void handleCloseButton(ActionEvent event) {
-		dialogStage.close();
-	}
-	
-	/**
-	 * @see javafx.stage.Stage#showAndWait()
-	 */
-	public void showAndWait() {
-		dialogStage.showAndWait();
-	}
-	
-	/**
-	 * Initializes the dialog by assigning the HTML page to be displayed
-	 * in the web view.
-	 * 
-	 * @param dialogStage  the stage used to display the dialog
-	 * @param legendUrl  the URL of the HTML legend document
-	 */
-	public void initialize(Stage dialogStage, String legendUrl) {
-		this.dialogStage = dialogStage;
-		webView.getEngine().load( legendUrl );
-	}
-	
+
+    public static final String FXML_FILE = "/legend.fxml";
+
+    @FXML
+    private WebView webView;
+
+    private Stage dialogStage;
+
+    /**
+     * Called when the user clicks the close button.
+     * 
+     * @param event the action event that triggered this method call
+     */
+    @FXML
+    public void handleCloseButton(ActionEvent event) {
+        dialogStage.close();
+    }
+
+    /**
+     * @see javafx.stage.Stage#showAndWait()
+     */
+    public void showAndWait() {
+        dialogStage.showAndWait();
+    }
+
+    /**
+     * Initializes the dialog by assigning the HTML page to be displayed in the web view.
+     * 
+     * @param dialogStage the stage used to display the dialog
+     * @param legendUrl the URL of the HTML legend document
+     */
+    public void initialize(Stage dialogStage, String legendUrl) {
+        this.dialogStage = dialogStage;
+        webView.getEngine().load( legendUrl );
+    }
+
 }

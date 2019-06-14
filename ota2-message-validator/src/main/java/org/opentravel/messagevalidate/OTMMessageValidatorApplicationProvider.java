@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.messagevalidate;
 
 import org.opentravel.application.common.OTA2ApplicationProvider;
@@ -23,17 +24,17 @@ import org.opentravel.application.common.OTA2LauncherTabSpec;
  * Application provider for the Message Validator application.
  */
 public class OTMMessageValidatorApplicationProvider implements OTA2ApplicationProvider {
-	
-	private static final OTA2ApplicationSpec spec = new OTA2ApplicationSpec(
-			"Message Validator", "Verifies conformance of XML and JSON messages to an OTM model specification",
-			20, OTA2LauncherTabSpec.EXPERIMENTAL_TAB, Images.launcherIcon, OTMMessageValidatorApplication.class );
-	
-	/**
-	 * @see org.opentravel.application.common.OTA2ApplicationProvider#getApplicationSpec()
-	 */
-	@Override
-	public OTA2ApplicationSpec getApplicationSpec() {
-		return spec;
-	}
-	
+
+    private static final OTA2ApplicationSpec spec = new OTA2ApplicationSpec( "Message Validator",
+        "Verifies conformance of XML and JSON messages to an OTM model specification", 20,
+        OTA2LauncherTabSpec.EXPERIMENTAL_TAB, Images.launcherIcon, OTMMessageValidatorApplication.class );
+
+    /**
+     * @see org.opentravel.application.common.OTA2ApplicationProvider#getApplicationSpec()
+     */
+    @Override
+    public OTA2ApplicationSpec getApplicationSpec() {
+        return spec;
+    }
+
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<otp:LibraryHistory xmlns="http://www.w3.org/2001/XMLSchema" xmlns:otp="http://www.OpenTravel.org/ns/OTA2/RepositoryInfo_v01_00">
+    <otp:RepositoryItemIdentity>
+        <otp:BaseNamespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test</otp:BaseNamespace>
+        <otp:Filename>Version_Release_1_0_0.otm</otp:Filename>
+        <otp:Version>1.0.0</otp:Version>
+    </otp:RepositoryItemIdentity>
+    <otp:LibraryHistoryItem commitNumber="0" effectiveOn="2019-02-13T17:39:54.096-06:00" user="testuser" filename="Version_Release_1_0_0.otr.000">Initial publication.</otp:LibraryHistoryItem>
+</otp:LibraryHistory>

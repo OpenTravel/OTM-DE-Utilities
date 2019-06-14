@@ -25,98 +25,97 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 /**
- * Factory that handles the creation of <code>TreeItem</code> instances based
- * on OTM model components.
+ * Factory that handles the creation of <code>TreeItem</code> instances based on OTM model components.
  */
 public class TreeNodeFactory {
-	
-	/**
-	 * Constructs a new <code>TreeNode</code> for the given entity.
-	 * 
-	 * @param entity  the entity from which to construct the tree node
-	 * @return TreeItem<TreeNode<Object>>
-	 * @throws IllegalArgumentException  thrown if a node cannot be constructed for the given entity
-	 */
-	public TreeItem<TreeNode<Object>> newTree(Object entity) {
-		return newTree( newTreeNode( entity ) );
-	}
-	
-	/**
-	 * Recursively constructs a new tree of items for the given node.
-	 * 
-	 * @param node  the node for which to construct a tree
-	 * @return TreeItem<TreeNode<Object>>
-	 */
-	private TreeItem<TreeNode<Object>> newTree(TreeNode<Object> node) {
-		TreeItem<TreeNode<Object>> treeItem = new TreeItem<>( node );
-		Image nodeIcon = node.getIcon();
-		
-		if (nodeIcon != null) {
-			treeItem.setGraphic( new ImageView( nodeIcon ) );
-		}
-		
-		for (TreeNode<Object> child : node.getChildren()) {
-			treeItem.getChildren().add( newTree( child ) );
-		}
-		
-		return treeItem;
-	}
-	
-	/**
-	 * Constructs a new <code>TreeNode</code> for the given entity.
-	 * 
-	 * @param entity  the entity from which to construct the tree node
-	 * @return TreeItem<? extends TreeNode<E>>
-	 * @throws IllegalArgumentException  thrown if a node cannot be constructed for the given entity
-	 */
-	@SuppressWarnings("unchecked")
-	public <E> TreeNode<E> newTreeNode(E entity) {
-		Class<E> entityType = (Class<E>) entity.getClass();
-		TreeNodeType nodeType = TreeNodeType.fromEntityType( entityType );
-		Class<TreeNode<E>> nodeClass = (Class<TreeNode<E>>) nodeType.getNodeClass();
-		
-		try {
-			Constructor<TreeNode<E>> constructor =
-					nodeClass.getConstructor( entityType, TreeNodeFactory.class );
-			
-			return constructor.newInstance( entity, this );
-			
-		} catch (NoSuchMethodException | SecurityException e) {
-			throw new IllegalArgumentException(
-					"No qualifying constructor found for tree node class: " + nodeClass.getSimpleName(), e);
-			
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			throw new IllegalArgumentException(
-					"Error instantiating tree node class: " + nodeClass.getSimpleName(), e);
-		}
-	}
-	
-	/**
-	 * Returns a comparator that can be used for sorting sibling tree items.
-	 * 
-	 * @return Comparator<TreeItem<TreeNode<Object>>>
-	 */
-	public Comparator<TreeItem<TreeNode<Object>>> getComparator() {
-		return new TreeItemComparator();
-	}
-	
-	/**
-	 * Comparator used for sorting tree items creating by this factory.
-	 */
-	private static class TreeItemComparator implements Comparator<TreeItem<TreeNode<Object>>> {
 
-		/**
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
-		@Override
-		public int compare(TreeItem<TreeNode<Object>> item1, TreeItem<TreeNode<Object>> item2) {
-			String label1 = item1.getValue().getLabel();
-			String label2 = item2.getValue().getLabel();
-			
-			return label1.compareTo( label2 );
-		}
-		
-	}
-	
+    /**
+     * Constructs a new <code>TreeNode</code> for the given entity.
+     * 
+     * @param entity the entity from which to construct the tree node
+     * @return TreeItem&lt;TreeNode&lt;Object&gt;&gt;
+     * @throws IllegalArgumentException thrown if a node cannot be constructed for the given entity
+     */
+    public TreeItem<TreeNode<Object>> newTree(Object entity) {
+        return newTree( newTreeNode( entity ) );
+    }
+
+    /**
+     * Recursively constructs a new tree of items for the given node.
+     * 
+     * @param node the node for which to construct a tree
+     * @return TreeItem&lt;TreeNode&lt;Object&gt;&gt;
+     */
+    private TreeItem<TreeNode<Object>> newTree(TreeNode<Object> node) {
+        TreeItem<TreeNode<Object>> treeItem = new TreeItem<>( node );
+        Image nodeIcon = node.getIcon();
+
+        if (nodeIcon != null) {
+            treeItem.setGraphic( new ImageView( nodeIcon ) );
+        }
+
+        for (TreeNode<Object> child : node.getChildren()) {
+            treeItem.getChildren().add( newTree( child ) );
+        }
+
+        return treeItem;
+    }
+
+    /**
+     * Constructs a new <code>TreeNode</code> for the given entity.
+     * 
+     * @param entity the entity from which to construct the tree node
+     * @param <E> the type of entity represented by the new node
+     * @return TreeItem&lt;? extends TreeNode&lt;E&gt;&gt;
+     * @throws IllegalArgumentException thrown if a node cannot be constructed for the given entity
+     */
+    @SuppressWarnings("unchecked")
+    public <E> TreeNode<E> newTreeNode(E entity) {
+        Class<E> entityType = (Class<E>) entity.getClass();
+        TreeNodeType nodeType = TreeNodeType.fromEntityType( entityType );
+        Class<TreeNode<E>> nodeClass = (Class<TreeNode<E>>) nodeType.getNodeClass();
+
+        try {
+            Constructor<TreeNode<E>> constructor = nodeClass.getConstructor( entityType, TreeNodeFactory.class );
+
+            return constructor.newInstance( entity, this );
+
+        } catch (NoSuchMethodException | SecurityException e) {
+            throw new IllegalArgumentException(
+                "No qualifying constructor found for tree node class: " + nodeClass.getSimpleName(), e );
+
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+            | InvocationTargetException e) {
+            throw new IllegalArgumentException( "Error instantiating tree node class: " + nodeClass.getSimpleName(),
+                e );
+        }
+    }
+
+    /**
+     * Returns a comparator that can be used for sorting sibling tree items.
+     * 
+     * @return Comparator&lt;TreeItem&lt;TreeNode&lt;Object&gt;&gt;&gt;
+     */
+    public Comparator<TreeItem<TreeNode<Object>>> getComparator() {
+        return new TreeItemComparator();
+    }
+
+    /**
+     * Comparator used for sorting tree items creating by this factory.
+     */
+    private static class TreeItemComparator implements Comparator<TreeItem<TreeNode<Object>>> {
+
+        /**
+         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+         */
+        @Override
+        public int compare(TreeItem<TreeNode<Object>> item1, TreeItem<TreeNode<Object>> item2) {
+            String label1 = item1.getValue().getLabel();
+            String label2 = item2.getValue().getLabel();
+
+            return label1.compareTo( label2 );
+        }
+
+    }
+
 }

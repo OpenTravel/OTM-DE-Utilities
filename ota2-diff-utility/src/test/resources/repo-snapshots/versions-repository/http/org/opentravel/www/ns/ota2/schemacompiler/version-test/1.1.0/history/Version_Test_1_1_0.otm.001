@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Library xmlns="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06 OTA2_LibraryModel_v1.6.0.xsd">
+    
+    <VersionScheme>OTA2</VersionScheme>
+    <Status>Draft</Status>
+    <Namespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test/v01_01</Namespace>
+    <Prefix>vt0101</Prefix>
+    <Name>Version_Test</Name>
+    <Import namespace="http://www.w3.org/2001/XMLSchema" prefix="xsd"/>
+    <Import namespace="http://www.opentravel.org/OTM/Common/v0" prefix="ota"/>
+    <Context applicationContext="http://appcontext/context110" context="context110"/>
+    <Comments>Version Test Sample Library</Comments>
+    
+    <Simple name="SimpleType_01_01" type="xsd:string">
+        <Documentation>
+            <Description>RED GREEN</Description>
+        </Documentation>
+        <Example context="context110">example110</Example>
+    </Simple>
+    
+</Library>

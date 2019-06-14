@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.launcher;
 
 import java.io.File;
@@ -83,6 +84,9 @@ public class LauncherController extends AbstractMainWindowController {
 	private ImageView statusBarIcon;
 	@FXML
 	private Label statusBarLabel;
+
+	private List<Button> launchButtons = new ArrayList<>();
+	private boolean launchHeadless = false;
 
 	/**
 	 * Called when the user clicks the menu to edit the global proxy settings
@@ -184,21 +188,25 @@ public class LauncherController extends AbstractMainWindowController {
 				}
 			}
 
+			// Configure for headless/hidden operation (if necessary)
+			if (isLaunchHeadless()) {
+				cmds.add("-Dotm.utilities.disableDisplay=true");
+			}
+
 			// Build and execute the command to start the new sub-process
 			cmds.add(appClass.getCanonicalName());
 			builder = new ProcessBuilder(cmds);
 			builder.redirectErrorStream(true);
 			builder.redirectOutput(Redirect.to(getLogFile(appClass)));
 			newProcess = builder.start();
+			sourceButton.getProperties().put(APP_PROCESS_KEY, newProcess);
 
-			// Wait five seconds before checking the status
+			// Wait five seconds before exiting to give the app time to finish launching
 			sleep(5000);
 
-			// Finish up by saving the running process or reporting an error
-			if (newProcess.isAlive()) {
-				sourceButton.getProperties().put(APP_PROCESS_KEY, newProcess);
-
-			} else {
+			// Report an error if the process failed to start
+			if (!newProcess.isAlive()) {
+				sourceButton.getProperties().put(APP_PROCESS_KEY, null);
 				throw new OtmApplicationRuntimeException(
 						MessageBuilder.formatMessage(MSG_LAUNCH_ERROR, MessageBuilder.getDisplayName(appClass)));
 			}
@@ -221,6 +229,26 @@ public class LauncherController extends AbstractMainWindowController {
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
+	}
+
+	/**
+	 * Returns the running process associated with the specified launch button (should be used for testing purposes
+	 * only). If no such process exists, null will be returned.
+	 * 
+	 * @param launchButtonTitle
+	 *            the title of the launch button for which the process will be returned
+	 * @return Process
+	 */
+	protected Process getProcess(String launchButtonTitle) {
+		Process process = null;
+
+		for (Button launchButton : launchButtons) {
+			if (launchButton.getText().equals(launchButtonTitle)) {
+				process = (Process) launchButton.getProperties().get(APP_PROCESS_KEY);
+				break;
+			}
+		}
+		return process;
 	}
 
 	/**
@@ -279,7 +307,10 @@ public class LauncherController extends AbstractMainWindowController {
 			TilePane buttonPane = newTab(tabSpec.getName());
 
 			for (OTA2ApplicationSpec appSpec : entry.getValue()) {
-				buttonPane.getChildren().add(newAppIcon(appSpec.getApplicationClass(), appSpec.getLaunchIcon()));
+				Button launchButton = newAppIcon(appSpec.getApplicationClass(), appSpec.getLaunchIcon());
+
+				buttonPane.getChildren().add(launchButton);
+				launchButtons.add(launchButton);
 			}
 		}
 	}
@@ -287,7 +318,7 @@ public class LauncherController extends AbstractMainWindowController {
 	/**
 	 * Returns the list of <code>OTA2ApplicationSpec</code>s organized by tab.
 	 * 
-	 * @return Map<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>>
+	 * @return Map&lt;OTA2LauncherTabSpec,SortedSet&lt;OTA2ApplicationSpec&gt;&gt;
 	 */
 	private Map<OTA2LauncherTabSpec, SortedSet<OTA2ApplicationSpec>> getApplicationsByTab() {
 		ServiceLoader<OTA2ApplicationProvider> loader = ServiceLoader.load(OTA2ApplicationProvider.class);
@@ -378,6 +409,25 @@ public class LauncherController extends AbstractMainWindowController {
 
 		logFolder.mkdirs();
 		return logFolder;
+	}
+
+	/**
+	 * Returns the flag indicating whether apps should be launched in headless/hidden mode (for testing purposes only).
+	 *
+	 * @return boolean
+	 */
+	protected boolean isLaunchHeadless() {
+		return launchHeadless;
+	}
+
+	/**
+	 * Assigns the flag indicating whether apps should be launched in headless/hidden mode (for testing purposes only).
+	 *
+	 * @param launchHeadless
+	 *            the boolean value to assign
+	 */
+	protected void setLaunchHeadless(boolean launchHeadless) {
+		this.launchHeadless = launchHeadless;
 	}
 
 }

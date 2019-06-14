@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.upversion;
 
 import org.opentravel.application.common.OTA2ApplicationProvider;
@@ -23,17 +24,17 @@ import org.opentravel.application.common.OTA2LauncherTabSpec;
  * Application provider for the Upversion Helper application.
  */
 public class UpversionHelperApplicationProvider implements OTA2ApplicationProvider {
-	
-	private static final OTA2ApplicationSpec spec = new OTA2ApplicationSpec(
-			"Upversion Helper", "Bulk processor for creating new library versions and promote/demote operations",
-			40, OTA2LauncherTabSpec.RELEASED_TAB, Images.launcherIcon, UpversionHelperApplication.class );
-	
-	/**
-	 * @see org.opentravel.application.common.OTA2ApplicationProvider#getApplicationSpec()
-	 */
-	@Override
-	public OTA2ApplicationSpec getApplicationSpec() {
-		return spec;
-	}
-	
+
+    private static final OTA2ApplicationSpec spec = new OTA2ApplicationSpec( "Upversion Helper",
+        "Bulk processor for creating new library versions and promote/demote operations", 40,
+        OTA2LauncherTabSpec.RELEASED_TAB, Images.launcherIcon, UpversionHelperApplication.class );
+
+    /**
+     * @see org.opentravel.application.common.OTA2ApplicationProvider#getApplicationSpec()
+     */
+    @Override
+    public OTA2ApplicationSpec getApplicationSpec() {
+        return spec;
+    }
+
 }

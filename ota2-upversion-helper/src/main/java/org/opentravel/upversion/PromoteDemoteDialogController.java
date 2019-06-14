@@ -16,19 +16,18 @@
 
 package org.opentravel.upversion;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.opentravel.application.common.ProgressMonitor;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
-import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.upversion.LibraryStatusOrchestrator.StatusAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -49,207 +48,218 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
- * Controller for the promote/demote dialog used to change the state of
- * selected libraries.
+ * Controller for the promote/demote dialog used to change the state of selected libraries.
  */
 public class PromoteDemoteDialogController {
-	
-	public static final String FXML_FILE = "/promote-demote-dialog.fxml";
-	
+
+    public static final String FXML_FILE = "/promote-demote-dialog.fxml";
+
     private static final Logger log = LoggerFactory.getLogger( PromoteDemoteDialogController.class );
-    
-	@FXML HBox filterPanel;
-	@FXML RadioButton promoteRadio;
-	@FXML RadioButton demoteRadio;
-	@FXML ChoiceBox<EnumWrapper<TLLibraryStatus>> fromStatusChoice;
-	@FXML Label toStatusLabel;
-	@FXML Label affectedCountLabel;
-	@FXML Label totalCountLabel;
-	@FXML ProgressIndicator progressInd;
-	@FXML Button goCloseButton;
-	@FXML Button cancelButton;
-	
-	private LibraryStatusOrchestrator orchestrator = new LibraryStatusOrchestrator();
-	private boolean processingComplete = false;
-	private Stage dialogStage;
-	
-	/**
-	 * Initializes the dialog stage and controller used to display the promote/demote
-	 * libraries dialog.
-	 * 
-	 * @param selectedLibraries  the list of selected libraries to be processed
-	 * @param stage  the stage that will own the new dialog
-	 * @return PromoteDemoteDialogController
-	 */
-	public static PromoteDemoteDialogController createDialog(List<RepositoryItem> selectedLibraries, Stage stage) {
-		PromoteDemoteDialogController controller = null;
-		try {
-			FXMLLoader loader = new FXMLLoader( PromoteDemoteDialogController.class.getResource( FXML_FILE ) );
-			Parent page = loader.load();
-			Stage dialogStage = new Stage();
-			Scene scene = new Scene( page );
-			
-			dialogStage.setTitle( "Promote/Demote Libraries" );
-			dialogStage.initModality( Modality.WINDOW_MODAL );
-			dialogStage.setResizable( false );
-			dialogStage.initOwner( stage );
-			dialogStage.setScene( scene );
-			
-			controller = loader.getController();
-			controller.orchestrator.setRepositoryManager( RepositoryManager.getDefault() );
-			controller.setSelectedLibraries( selectedLibraries );
-			controller.setDialogStage( dialogStage );
-			
-		} catch (IOException | RepositoryException e) {
-		    log.error( "Error creating promote/demote dialog.", e );
-		}
-		return controller;
-	}
-	
-	/**
-	 * Assigns the list of selected libraries to be processed.
-	 * 
-	 * @param selectedLibraries  the list of selected libraries to be processed
-	 */
-	public void setSelectedLibraries(List<RepositoryItem> selectedLibraries) {
-		orchestrator.setLibraryVersions( selectedLibraries );
-		updateStatusChoices();
-		fromStatusChanged();
-	}
-	
-	/**
-	 * Called when the user clicks the promote button of the dialog.
-	 * 
-	 * @param event  the action event that triggered this method call
-	 */
-	@FXML public void promoteSelected(ActionEvent event) {
-		updateStatusChoices();
-	}
-	
-	/**
-	 * Called when the user clicks the demote button of the dialog.
-	 * 
-	 * @param event  the action event that triggered this method call
-	 */
-	@FXML public void demoteSelected(ActionEvent event) {
-		updateStatusChoices();
-	}
-	
-	/**
-	 * Called when the user clicks the Go/Close button of the dialog.
-	 * 
-	 * @param event  the action event that triggered this method call
-	 */
-	@FXML public void goCloseSelected(ActionEvent event) {
-		if (!processingComplete) {
-			Runnable r = ()-> {
+
+    @FXML
+    HBox filterPanel;
+    @FXML
+    RadioButton promoteRadio;
+    @FXML
+    RadioButton demoteRadio;
+    @FXML
+    ChoiceBox<EnumWrapper<TLLibraryStatus>> fromStatusChoice;
+    @FXML
+    Label toStatusLabel;
+    @FXML
+    Label affectedCountLabel;
+    @FXML
+    Label totalCountLabel;
+    @FXML
+    ProgressIndicator progressInd;
+    @FXML
+    Button goCloseButton;
+    @FXML
+    Button cancelButton;
+
+    private LibraryStatusOrchestrator orchestrator = new LibraryStatusOrchestrator();
+    private boolean processingComplete = false;
+    private Stage dialogStage;
+
+    /**
+     * Initializes the dialog stage and controller used to display the promote/demote libraries dialog.
+     * 
+     * @param selectedLibraries the list of selected libraries to be processed
+     * @param stage the stage that will own the new dialog
+     * @param repositoryManager the manager to use for accessing remote OTM repositories
+     * @return PromoteDemoteDialogController
+     */
+    public static PromoteDemoteDialogController createDialog(List<RepositoryItem> selectedLibraries, Stage stage,
+        RepositoryManager repositoryManager) {
+        PromoteDemoteDialogController controller = null;
+        try {
+            FXMLLoader loader = new FXMLLoader( PromoteDemoteDialogController.class.getResource( FXML_FILE ) );
+            Parent page = loader.load();
+            Stage dialogStage = new Stage();
+            Scene scene = new Scene( page );
+
+            dialogStage.setTitle( "Promote/Demote Libraries" );
+            dialogStage.initModality( Modality.WINDOW_MODAL );
+            dialogStage.setResizable( false );
+            dialogStage.initOwner( stage );
+            dialogStage.setScene( scene );
+
+            controller = loader.getController();
+            controller.orchestrator.setRepositoryManager( repositoryManager );
+            controller.setSelectedLibraries( selectedLibraries );
+            controller.setDialogStage( dialogStage );
+
+        } catch (IOException e) {
+            log.error( "Error creating promote/demote dialog.", e );
+        }
+        return controller;
+    }
+
+    /**
+     * Assigns the list of selected libraries to be processed.
+     * 
+     * @param selectedLibraries the list of selected libraries to be processed
+     */
+    public void setSelectedLibraries(List<RepositoryItem> selectedLibraries) {
+        orchestrator.setLibraryVersions( selectedLibraries );
+        updateStatusChoices();
+        fromStatusChanged();
+    }
+
+    /**
+     * Called when the user clicks the promote button of the dialog.
+     * 
+     * @param event the action event that triggered this method call
+     */
+    @FXML
+    public void promoteSelected(ActionEvent event) {
+        updateStatusChoices();
+    }
+
+    /**
+     * Called when the user clicks the demote button of the dialog.
+     * 
+     * @param event the action event that triggered this method call
+     */
+    @FXML
+    public void demoteSelected(ActionEvent event) {
+        updateStatusChoices();
+    }
+
+    /**
+     * Called when the user clicks the Go/Close button of the dialog.
+     * 
+     * @param event the action event that triggered this method call
+     */
+    @FXML
+    public void goCloseSelected(ActionEvent event) {
+        if (!processingComplete) {
+            Runnable r = () -> {
                 try {
                     ProgressMonitor monitor = new ProgressMonitor( progressInd );
-                    
+
                     Platform.runLater( () -> {
                         filterPanel.setDisable( true );
                         goCloseButton.setDisable( true );
                         cancelButton.setDisable( true );
                         progressInd.setDisable( false );
-                    });
-                    
-                    orchestrator
-                        .setProgressMonitor( monitor )
-                        .updateStatus();
-                    
+                    } );
+
+                    orchestrator.setProgressMonitor( monitor ).updateStatus();
+
                     Platform.runLater( () -> {
                         goCloseButton.setDisable( false );
                         goCloseButton.setText( "Close" );
                         processingComplete = true;
-                    });
-                    
+                    } );
+
                 } catch (Exception e) {
                     log.error( "Error updating library statuses", e );
                 }
-			};
-			
-			new Thread( r ).start();
-			
-		} else {
-			cancelSelected( event );
-		}
-	}
-	
-	/**
-	 * Called when the user clicks the cancel button of the dialog.
-	 * 
-	 * @param event  the action event that triggered this method call
-	 */
-	@FXML public void cancelSelected(ActionEvent event) {
-		dialogStage.close();
-	}
-	
-	/**
-	 * Assigns the stage for the dialog.
-	 *
-	 * @param dialogStage  the dialog stage to assign
-	 */
-	public void setDialogStage(Stage dialogStage) {
-		ToggleGroup tGroup = new ToggleGroup();
-		
-		promoteRadio.setToggleGroup( tGroup );
-		demoteRadio.setToggleGroup( tGroup );
-		promoteRadio.selectedProperty().set( true );
-		
-		fromStatusChoice.getSelectionModel().selectedItemProperty().addListener(
-				( observable, oldValue, newValue ) -> fromStatusChanged() );
-		
-		this.dialogStage = dialogStage;
-	}
-	
-	/**
-	 * @see javafx.stage.Stage#showAndWait()
-	 */
-	public void showAndWait() {
-		dialogStage.showAndWait();
-	}
-	
-	/**
-	 * Updates the contents of the status choice box based upon the selection
-	 * of the promote/demote radio buttons.
-	 */
-	private void updateStatusChoices() {
-		Platform.runLater( () -> {
+            };
+
+            new Thread( r ).start();
+
+        } else {
+            cancelSelected( event );
+        }
+    }
+
+    /**
+     * Called when the user clicks the cancel button of the dialog.
+     * 
+     * @param event the action event that triggered this method call
+     */
+    @FXML
+    public void cancelSelected(ActionEvent event) {
+        dialogStage.close();
+    }
+
+    /**
+     * Assigns the stage for the dialog.
+     *
+     * @param dialogStage the dialog stage to assign
+     */
+    public void setDialogStage(Stage dialogStage) {
+        ToggleGroup tGroup = new ToggleGroup();
+
+        promoteRadio.setToggleGroup( tGroup );
+        demoteRadio.setToggleGroup( tGroup );
+        promoteRadio.selectedProperty().set( true );
+
+        fromStatusChoice.getSelectionModel().selectedItemProperty()
+            .addListener( (observable, oldValue, newValue) -> fromStatusChanged() );
+
+        this.dialogStage = dialogStage;
+    }
+
+    /**
+     * @see javafx.stage.Stage#showAndWait()
+     */
+    public void showAndWait() {
+        dialogStage.showAndWait();
+    }
+
+    /**
+     * Updates the contents of the status choice box based upon the selection of the promote/demote radio buttons.
+     */
+    private void updateStatusChoices() {
+        Platform.runLater( () -> {
             ObservableList<EnumWrapper<TLLibraryStatus>> statusChoices = FXCollections.observableArrayList();
             EnumWrapper<TLLibraryStatus> selectedStatus = fromStatusChoice.getValue();
             List<TLLibraryStatus> statusList = new ArrayList<>();
-            
+
             if (promoteRadio.isSelected()) {
                 orchestrator.setStatusAction( StatusAction.PROMOTE );
-                statusList.addAll( Arrays.asList( TLLibraryStatus.DRAFT,
-                        TLLibraryStatus.UNDER_REVIEW, TLLibraryStatus.FINAL ) );
-                
+                statusList.addAll(
+                    Arrays.asList( TLLibraryStatus.DRAFT, TLLibraryStatus.UNDER_REVIEW, TLLibraryStatus.FINAL ) );
+
             } else {
                 orchestrator.setStatusAction( StatusAction.DEMOTE );
-                statusList.addAll( Arrays.asList( TLLibraryStatus.UNDER_REVIEW,
-                        TLLibraryStatus.FINAL, TLLibraryStatus.OBSOLETE ) );
+                statusList.addAll(
+                    Arrays.asList( TLLibraryStatus.UNDER_REVIEW, TLLibraryStatus.FINAL, TLLibraryStatus.OBSOLETE ) );
             }
             statusList.forEach( status -> statusChoices.add( new EnumWrapper<TLLibraryStatus>( status ) ) );
-            
+
             if ((selectedStatus == null) || !statusChoices.contains( selectedStatus )) {
                 selectedStatus = statusChoices.get( 0 );
             }
             fromStatusChoice.setItems( statusChoices );
-            
+
             if (selectedStatus != null) {
                 fromStatusChoice.getSelectionModel().select( selectedStatus );
             }
-		});
-	}
-	
-	/**
-	 * Called when the user changes the selection of the 'fromStatus' choice box.
-	 */
-	private void fromStatusChanged() {
-		Platform.runLater( () -> {
+        } );
+    }
+
+    /**
+     * Called when the user changes the selection of the 'fromStatus' choice box.
+     */
+    private void fromStatusChanged() {
+        Platform.runLater( () -> {
             EnumWrapper<TLLibraryStatus> selectedStatus = fromStatusChoice.getValue();
             TLLibraryStatus toStatus = orchestrator.setFromStatus( selectedStatus.getValue() ).getToStatus();
-            
+
             if (toStatus != null) {
                 toStatusLabel.setText( MessageBuilder.formatMessage( toStatus.toString() ) );
             } else {
@@ -257,7 +267,7 @@ public class PromoteDemoteDialogController {
             }
             affectedCountLabel.setText( orchestrator.getAffectedLibraryCount() + "" );
             totalCountLabel.setText( orchestrator.getTotalLibraryCount() + "" );
-		});
-	}
-	
+        } );
+    }
+
 }

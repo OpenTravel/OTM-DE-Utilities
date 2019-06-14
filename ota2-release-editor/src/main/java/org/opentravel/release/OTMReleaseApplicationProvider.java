@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.release;
 
 import org.opentravel.application.common.OTA2ApplicationProvider;
@@ -23,17 +24,17 @@ import org.opentravel.application.common.OTA2LauncherTabSpec;
  * Application provider for the OTM Release Editor application.
  */
 public class OTMReleaseApplicationProvider implements OTA2ApplicationProvider {
-	
-	private static final OTA2ApplicationSpec spec = new OTA2ApplicationSpec(
-			"Release Editor", "Creates stable release baselines of OTM model projects",
-			30, OTA2LauncherTabSpec.RELEASED_TAB, Images.launcherIcon, OTMReleaseApplication.class );
-	
-	/**
-	 * @see org.opentravel.application.common.OTA2ApplicationProvider#getApplicationSpec()
-	 */
-	@Override
-	public OTA2ApplicationSpec getApplicationSpec() {
-		return spec;
-	}
-	
+
+    private static final OTA2ApplicationSpec spec =
+        new OTA2ApplicationSpec( "Release Editor", "Creates stable release baselines of OTM model projects", 30,
+            OTA2LauncherTabSpec.RELEASED_TAB, Images.launcherIcon, OTMReleaseApplication.class );
+
+    /**
+     * @see org.opentravel.application.common.OTA2ApplicationProvider#getApplicationSpec()
+     */
+    @Override
+    public OTA2ApplicationSpec getApplicationSpec() {
+        return spec;
+    }
+
 }

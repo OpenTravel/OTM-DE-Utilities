@@ -16,104 +16,103 @@
 
 package org.opentravel.messagevalidate;
 
-import java.io.File;
-import java.net.URL;
-
 import org.opentravel.schemacompiler.task.CommonCompilerTaskOptions;
 import org.opentravel.schemacompiler.task.CompileAllTaskOptions;
 
+import java.io.File;
+import java.net.URL;
+
 /**
- * Default compiler options used when generating JSON and XML schemas for
- * message validation.
+ * Default compiler options used when generating JSON and XML schemas for message validation.
  */
 public class ValidationCompileOptions implements CompileAllTaskOptions {
-	
-	private File outputFolder;
-	
-	/**
-	 * Constructor that specifies the foler location for generated compiler output.
-	 * 
-	 * @param outputFolder  the folder where schema files will be compiled
-	 */
-	public ValidationCompileOptions(File outputFolder) {
-		this.outputFolder = outputFolder;
-	}
-	
-	/**
-	 * Returns the folder where schema files will be compiled.
-	 * 
-	 * @return String
-	 */
-	public String getOutputFolder() {
-		return outputFolder.getAbsolutePath();
-	}
-	
-	public boolean isCompileSchemas() {
-		return true;
-	}
-	
-	public boolean isCompileJsonSchemas() {
-		return true;
-	}
 
-	public URL getServiceLibraryUrl() {
-		return null;
-	}
-	
-	public String getServiceEndpointUrl() {
-		return null;
-	}
-	
-	public boolean isGenerateMaxDetailsForExamples() {
-		return true;
-	}
-	
-	public boolean isGenerateExamples() {
-		return false;
-	}
-	
-	public Integer getExampleMaxRepeat() {
-		return 2;
-	}
-	
-	public Integer getExampleMaxDepth() {
-		return 2;
-	}
-	
-	public boolean isSuppressOptionalFields() {
-		return false;
-	}
+    private File outputFolder;
 
-	public String getExampleContext() {
-		return null;
-	}
-	
-	public String getCatalogLocation() {
-		return null;
-	}
-	
-	public boolean isCompileServices() {
-		return false;
-	}
-	
-	public String getResourceBaseUrl() {
-		return null;
-	}
+    /**
+     * Constructor that specifies the foler location for generated compiler output.
+     * 
+     * @param outputFolder the folder where schema files will be compiled
+     */
+    public ValidationCompileOptions(File outputFolder) {
+        this.outputFolder = outputFolder;
+    }
 
-	public boolean isCompileSwagger() {
-		return false;
-	}
+    /**
+     * Returns the folder where schema files will be compiled.
+     * 
+     * @return String
+     */
+    public String getOutputFolder() {
+        return outputFolder.getAbsolutePath();
+    }
 
-	public boolean isSuppressOtmExtensions() {
-		return true;
-	}
-	
-	public boolean isCompileHtml() {
-		return false;
-	}
-	
-	public void applyTaskOptions(CommonCompilerTaskOptions taskOptions) {
-	    // No action required
-	}
+    public boolean isCompileSchemas() {
+        return true;
+    }
+
+    public boolean isCompileJsonSchemas() {
+        return true;
+    }
+
+    public URL getServiceLibraryUrl() {
+        return null;
+    }
+
+    public String getServiceEndpointUrl() {
+        return null;
+    }
+
+    public boolean isGenerateMaxDetailsForExamples() {
+        return true;
+    }
+
+    public boolean isGenerateExamples() {
+        return false;
+    }
+
+    public Integer getExampleMaxRepeat() {
+        return 2;
+    }
+
+    public Integer getExampleMaxDepth() {
+        return 2;
+    }
+
+    public boolean isSuppressOptionalFields() {
+        return false;
+    }
+
+    public String getExampleContext() {
+        return null;
+    }
+
+    public String getCatalogLocation() {
+        return null;
+    }
+
+    public boolean isCompileServices() {
+        return false;
+    }
+
+    public String getResourceBaseUrl() {
+        return null;
+    }
+
+    public boolean isCompileSwagger() {
+        return false;
+    }
+
+    public boolean isSuppressOtmExtensions() {
+        return true;
+    }
+
+    public boolean isCompileHtml() {
+        return false;
+    }
+
+    public void applyTaskOptions(CommonCompilerTaskOptions taskOptions) {
+        // No action required
+    }
 
 }

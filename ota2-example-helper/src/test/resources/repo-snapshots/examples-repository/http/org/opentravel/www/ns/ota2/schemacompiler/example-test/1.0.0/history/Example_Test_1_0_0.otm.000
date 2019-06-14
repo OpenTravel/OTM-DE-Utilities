@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Library xmlns="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06 OTA2_LibraryModel_v1.6.0.xsd">
+    
+    <VersionScheme>OTA2</VersionScheme>
+    <Status>Draft</Status>
+    <Namespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/example-test/v01_00</Namespace>
+    <Prefix>et0100</Prefix>
+    <Name>Example_Test</Name>
+    <Import namespace="http://www.w3.org/2001/XMLSchema" prefix="xsd"/>
+    <Import namespace="http://www.opentravel.org/OTM/Common/v0" prefix="ota"/>
+    <Context applicationContext="http://appcontext/context100" context="context100"/>
+    <Comments>Example Test Sample Library</Comments>
+    
+    <Simple name="SampleString" type="xsd:string"/>
+    
+    <ValueWithAttrs name="SampleValueWithAttributes" type="">
+        <Attribute name="attr1" type="xsd:string"/>
+    </ValueWithAttrs>
+    
+    <BusinessObject name="SampleBusinessObject" notExtendable="false">
+        <Aliases/>
+        <ID>
+            <Element name="oid" repeat="0" type="xsd:int"/>
+        </ID>
+        <Summary>
+            <Element name="summaryName" repeat="0" type="xsd:string"/>
+        </Summary>
+        <Detail>
+            <Element name="detailName" repeat="10" type="xsd:string"/>
+        </Detail>
+    </BusinessObject>
+    
+	<ContextualFacet name="Test" type="Query" facetOwner="SampleBusinessObject">
+        <Element name="summaryName" repeat="10" type="xsd:string"/>
+	</ContextualFacet>
+	
+    <Service name="SimpleService">
+        <Operation Name="Operation" notExtendable="false">
+            <Request>
+                <Element name="ID" repeat="0" type="xsd:string"/>
+            </Request>
+            <Response>
+                <Element name="Value" repeat="0" type="xsd:int"/>
+            </Response>
+            <Notification/>
+        </Operation>
+    </Service>
+    
+</Library>

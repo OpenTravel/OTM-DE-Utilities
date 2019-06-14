@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Library xmlns="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06 OTA2_LibraryModel_v1.6.0.xsd">
+    
+    <VersionScheme>OTA2</VersionScheme>
+    <Status>Final</Status>
+    <Namespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/version-test/v01_00</Namespace>
+    <Prefix>a-0100</Prefix>
+    <Name>LibraryA</Name>
+    <Import namespace="http://www.w3.org/2001/XMLSchema" prefix="xsd"/>
+    <Import namespace="http://www.opentravel.org/OTM/Common/v0" prefix="ota"/>
+    <Context applicationContext="http://appcontext/context100" context="context100"/>
+    <Comments>Upversion Test Library A</Comments>
+    
+    <Simple name="SimpleTypeA" type="xsd:string" />
+    
+    <Enumeration_Open name="SampleOpenEnumA">
+        <Value literal="oneA" />
+        <Value literal="twoA" />
+        <Value literal="threeA" />
+    </Enumeration_Open>
+    
+    <Enumeration_Closed name="SampleClosedEnumA">
+        <Value literal="fourA" />
+        <Value literal="fiveA" />
+        <Value literal="sixA" />
+    </Enumeration_Closed>
+    
+    <ValueWithAttrs name="SampleValueWithAttributesA" type="">
+        <Attribute name="attr1A" type="xsd:string"/>
+    </ValueWithAttrs>
+    
+    <CoreObject name="SimpleCoreA" notExtendable="true">
+        <Aliases/>
+        <Simple type="xsd:string"/>
+        <Summary>
+            <Indicator name="simpleIndicatorA" publishAsElement="false"/>
+        </Summary>
+        <Detail/>
+        <Roles>
+            <Role value="simple_role_1A"/>
+            <Role value="simple_role_2A"/>
+            <Role value="simple_role_3A"/>
+        </Roles>
+    </CoreObject>
+    
+    <ChoiceObject name="SimpleChoiceA" notExtendable="false">
+        <Aliases>SimpleChoiceA_Alias1 SimpleChoiceA_Alias2</Aliases>
+        <Shared>
+            <Attribute name="idA" type="xsd:ID"/>
+            <Attribute name="sharedAttributeA" type="xsd:string"/>
+            <Element name="sharedElementA" repeat="0" type="xsd:int"/>
+            <Indicator name="sharedIndicatorA" publishAsElement="false"/>
+        </Shared>
+    </ChoiceObject>
+    
+	<ContextualFacet name="ChoiceAA" type="Choice" facetOwner="SimpleChoiceA">
+        <Attribute name="attributeA" type="xsd:string"/>
+        <Element name="elementA" repeat="0" type="xsd:int"/>
+        <Indicator name="indicatorA" publishAsElement="false"/>
+	</ContextualFacet>
+	
+	<ContextualFacet name="ChoiceBA" type="Choice" facetOwner="SimpleChoiceA">
+        <Attribute name="attributeB" type="xsd:string"/>
+        <Element name="elementB" repeat="3" type="xsd:int"/>
+        <Indicator name="indicatorB" publishAsElement="false"/>
+	</ContextualFacet>
+	
+    <BusinessObject name="EmptyBusinessObjectA" notExtendable="false">
+        <Aliases/>
+        <ID>
+            <Attribute name="messageIdA" type="xsd:ID"/>
+            <Element name="empty_oidA" repeat="0" type="xsd:int"/>
+        </ID>
+        <Summary/>
+        <Detail/>
+    </BusinessObject>
+    
+    <BusinessObject name="SimpleBusinessObjectA" notExtendable="false">
+        <Aliases>SimpleBusinessObjectA_Alias1 SimpleBusinessObjectA_Alias2</Aliases>
+        <ID>
+            <Element name="sample_oidA" repeat="0" type="xsd:int"/>
+        </ID>
+        <Summary>
+            <Attribute name="simpleCoreAAttr" type="SimpleCoreA"/>
+            <Element name="summaryNameA" repeat="0" type="xsd:string"/>
+        </Summary>
+        <Detail>
+            <Element name="detailNameA" repeat="0" type="xsd:string"/>
+        </Detail>
+    </BusinessObject>
+
+	<ContextualFacet name="FindByNameA" type="Query" facetOwner="SimpleBusinessObjectA">
+		<Attribute name="queryAttribute" type="xsd:int" />
+		<Element name="lastName" repeat="0" type="xsd:string" />
+		<Element name="firstName" repeat="0" type="xsd:string" />
+		<Indicator name="queryIndicator" publishAsElement="false" />
+	</ContextualFacet>
+
+	<ContextualFacet name="FindByAgeA" type="Query" facetOwner="SimpleBusinessObjectA">
+		<Attribute name="queryAttribute" type="xsd:int" />
+		<Element name="age" repeat="0" type="xsd:int" />
+		<Indicator name="queryIndicator" publishAsElement="false" />
+	</ContextualFacet>
+
+	<ContextualFacet name="UpdateAgeA" type="Update" facetOwner="SimpleBusinessObjectA">
+		<Attribute name="updateAttribute" type="xsd:int" />
+		<Element name="age" repeat="0" type="xsd:int" />
+		<Indicator name="updateIndicator" publishAsElement="false" />
+	</ContextualFacet>
+
+    <Resource name="ParentResourceA" businessObjectRef="EmptyBusinessObjectA" basePath="/services/EmptyResource"
+    			abstract="false" firstClass="true">
+        <ParamGroup name="IDParameters" idGroup="true" facetName="EmptyBusinessObjectA_ID">
+        	<Parameter fieldName="empty_oidA" location="Path"/>
+        </ParamGroup>
+   	</Resource>
+   	
+    <Resource name="SampleResourceA" businessObjectRef="SimpleBusinessObjectA" basePath="/" abstract="false" firstClass="true">
+    	<ResourceParentRef parent="ParentResourceA" parentParamGroup="IDParameters" pathTemplate="/parent/{empty_oidA}" />
+        <ActionFacet label="ObjectWrapperA" referenceType="Optional" referenceFacet="Summary" basePayload="SimpleChoiceA" />
+        <Action actionId="CreateA" common="false">
+        	<ActionRequest httpMethod="POST" pathTemplate="/samplesA" payloadType="SampleResourceA_ObjectWrapperA" mimeTypes="APPLICATION_XML APPLICATION_JSON"/>
+        	<ActionResponse statusCodes="200 204" payloadType="SampleResourceA_ObjectWrapperA" mimeTypes="APPLICATION_XML APPLICATION_JSON"/>
+        </Action>
+    </Resource>
+    
+</Library>

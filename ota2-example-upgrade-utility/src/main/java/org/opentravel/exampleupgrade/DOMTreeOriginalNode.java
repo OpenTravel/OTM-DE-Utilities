@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.exampleupgrade;
 
 import org.w3c.dom.Attr;
@@ -28,76 +29,73 @@ import javafx.scene.image.ImageView;
  * Tree node that encapsulates a single node in the original DOM tree structure.
  */
 public class DOMTreeOriginalNode extends AbstractDOMTreeNode {
-	
-	protected static final String IS_REFERENCED_KEY = "isReferenced";
-	
-	/**
-	 * Constructor that specifies the DOM node and all required configuration information.
-	 * 
-	 * @param domNode  the DOM node instance
-	 */
-	public DOMTreeOriginalNode(Node domNode) {
-		super(domNode, null);
-	}
-	
-	/**
-	 * Constructs a new tree of <code>DOMTreeOriginalNode</code> objects based on the
-	 * DOM node provided.
-	 * 
-	 * @param domNode  the DOM node instance for which to create a tree
-	 * @return TreeItem<DOMTreeOriginalNode>
-	 */
-	public static TreeItem<DOMTreeOriginalNode> createTree(Node domNode) {
-		DOMTreeOriginalNode odn = new DOMTreeOriginalNode( domNode );
-		TreeItem<DOMTreeOriginalNode> treeItem = new TreeItem<>( odn );
-		Node domChild = domNode.getFirstChild();
-		Image nodeImage;
-		
-		if (domNode instanceof Element) {
-			NamedNodeMap attrs = ((Element) domNode).getAttributes();
-			int attrCount = attrs.getLength();
-			
-			for (int i = 0; i < attrCount; i++) {
-				Attr domAttr = (Attr) attrs.item( i );
-				
-				if (!domAttr.getNodeName().equals("xmlns")
-						&& !domAttr.getNodeName().contains(":")) {
-					treeItem.getChildren().add( createTree( domAttr ) );
-				}
-			}
-			nodeImage = elementIcon;
-			
-		} else { // must be an attribute
-			nodeImage = attributeIcon;
-		}
-		treeItem.setGraphic( new ImageView( nodeImage ) );
-		
-		while (domChild != null) {
-			if (domChild.getNodeType() == Node.ELEMENT_NODE) {
-				treeItem.getChildren().add( createTree( domChild ) );
-			}
-			domChild = domChild.getNextSibling();
-		}
-		return treeItem;
-	}
-	
-	/**
-	 * Returns the reference status for this node.
-	 * 
-	 * @return ReferenceStatus
-	 */
-	public ReferenceStatus getReferenceStatus() {
-		Node domNode = getDomNode();
-		Boolean refFlag = (domNode == null) ?
-				null : (Boolean) domNode.getUserData( IS_REFERENCED_KEY );
-		ReferenceStatus result;
-		
-		if ((refFlag != null) && refFlag) {
-			result = ReferenceStatus.REFERENCED;
-		} else {
-			result = ReferenceStatus.NOT_REFERENCED;
-		}
-		return result;
-	}
-	
+
+    protected static final String IS_REFERENCED_KEY = "isReferenced";
+
+    /**
+     * Constructor that specifies the DOM node and all required configuration information.
+     * 
+     * @param domNode the DOM node instance
+     */
+    public DOMTreeOriginalNode(Node domNode) {
+        super( domNode, null );
+    }
+
+    /**
+     * Constructs a new tree of <code>DOMTreeOriginalNode</code> objects based on the DOM node provided.
+     * 
+     * @param domNode the DOM node instance for which to create a tree
+     * @return TreeItem&lt;DOMTreeOriginalNode&gt;
+     */
+    public static TreeItem<DOMTreeOriginalNode> createTree(Node domNode) {
+        DOMTreeOriginalNode odn = new DOMTreeOriginalNode( domNode );
+        TreeItem<DOMTreeOriginalNode> treeItem = new TreeItem<>( odn );
+        Node domChild = domNode.getFirstChild();
+        Image nodeImage;
+
+        if (domNode instanceof Element) {
+            NamedNodeMap attrs = ((Element) domNode).getAttributes();
+            int attrCount = attrs.getLength();
+
+            for (int i = 0; i < attrCount; i++) {
+                Attr domAttr = (Attr) attrs.item( i );
+
+                if (!domAttr.getNodeName().equals( "xmlns" ) && !domAttr.getNodeName().contains( ":" )) {
+                    treeItem.getChildren().add( createTree( domAttr ) );
+                }
+            }
+            nodeImage = elementIcon;
+
+        } else { // must be an attribute
+            nodeImage = attributeIcon;
+        }
+        treeItem.setGraphic( new ImageView( nodeImage ) );
+
+        while (domChild != null) {
+            if (domChild.getNodeType() == Node.ELEMENT_NODE) {
+                treeItem.getChildren().add( createTree( domChild ) );
+            }
+            domChild = domChild.getNextSibling();
+        }
+        return treeItem;
+    }
+
+    /**
+     * Returns the reference status for this node.
+     * 
+     * @return ReferenceStatus
+     */
+    public ReferenceStatus getReferenceStatus() {
+        Node domNode = getDomNode();
+        Boolean refFlag = (domNode == null) ? null : (Boolean) domNode.getUserData( IS_REFERENCED_KEY );
+        ReferenceStatus result;
+
+        if ((refFlag != null) && refFlag) {
+            result = ReferenceStatus.REFERENCED;
+        } else {
+            result = ReferenceStatus.NOT_REFERENCED;
+        }
+        return result;
+    }
+
 }

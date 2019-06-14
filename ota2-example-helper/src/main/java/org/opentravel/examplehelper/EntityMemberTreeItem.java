@@ -26,69 +26,68 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 
 /**
- * Tree item that can be used to display a structure of <code>EntityMemberNode</code>s
- * in a JavaFX tree view.
+ * Tree item that can be used to display a structure of <code>EntityMemberNode</code>s in a JavaFX tree view.
  */
 public class EntityMemberTreeItem extends TreeItem<EntityMemberNode> {
-	
-	private Map<String,ObservableList<TreeItem<EntityMemberNode>>> childrenByFacetName = new HashMap<>();
-	
-	/**
-	 * Constructor that assigns the underlying node for this tree item.
-	 * 
-	 * @param node  the entity member node
-	 */
-	public EntityMemberTreeItem(EntityMemberNode node) {
-		List<String> facetNames = node.getFacetSelection().getFacetNames();
-		List<TreeItem<EntityMemberNode>> allChildren = new ArrayList<>();
-		
-		setValue( node );
-		setExpanded( true );
-		
-		if (facetNames != null) {
-			for (String facetName : facetNames) {
-				List<TreeItem<EntityMemberNode>> itemChildren = new ArrayList<>();
-				
-				for (EntityMemberNode childNode : node.getChildren( facetName )) {
-					EntityMemberTreeItem childItem = new EntityMemberTreeItem( childNode );
-					
-					itemChildren.add( childItem );
-					allChildren.add( childItem );
-				}
-				childrenByFacetName.put( facetName, FXCollections.observableArrayList( itemChildren ) );
-			}
-			super.getChildren().addAll( allChildren );
-		}
-	}
-	
-	/**
-	 * @see javafx.scene.control.TreeItem#getChildren()
-	 */
-	@Override
-	public ObservableList<TreeItem<EntityMemberNode>> getChildren() {
-		String selectedFacet = getValue().getFacetSelection().getSelectedFacetName();
-		ObservableList<TreeItem<EntityMemberNode>> children = null;
-		
-		if (selectedFacet == null) {
-			if (childrenByFacetName.size() == 1) {
-				children = childrenByFacetName.values().iterator().next();
-			}
-		} else {
-			children = childrenByFacetName.get( selectedFacet );
-		}
-		
-		if (children == null) {
-			children = FXCollections.observableArrayList();
-		}
-		return children;
-	}
 
-	/**
-	 * @see javafx.scene.control.TreeItem#isLeaf()
-	 */
-	@Override
-	public boolean isLeaf() {
-		return getChildren().isEmpty();
-	}
-	
+    private Map<String,ObservableList<TreeItem<EntityMemberNode>>> childrenByFacetName = new HashMap<>();
+
+    /**
+     * Constructor that assigns the underlying node for this tree item.
+     * 
+     * @param node the entity member node
+     */
+    public EntityMemberTreeItem(EntityMemberNode node) {
+        List<String> facetNames = node.getFacetSelection().getFacetNames();
+        List<TreeItem<EntityMemberNode>> allChildren = new ArrayList<>();
+
+        setValue( node );
+        setExpanded( true );
+
+        if (facetNames != null) {
+            for (String facetName : facetNames) {
+                List<TreeItem<EntityMemberNode>> itemChildren = new ArrayList<>();
+
+                for (EntityMemberNode childNode : node.getChildren( facetName )) {
+                    EntityMemberTreeItem childItem = new EntityMemberTreeItem( childNode );
+
+                    itemChildren.add( childItem );
+                    allChildren.add( childItem );
+                }
+                childrenByFacetName.put( facetName, FXCollections.observableArrayList( itemChildren ) );
+            }
+            super.getChildren().addAll( allChildren );
+        }
+    }
+
+    /**
+     * @see javafx.scene.control.TreeItem#getChildren()
+     */
+    @Override
+    public ObservableList<TreeItem<EntityMemberNode>> getChildren() {
+        String selectedFacet = getValue().getFacetSelection().getSelectedFacetName();
+        ObservableList<TreeItem<EntityMemberNode>> children = null;
+
+        if (selectedFacet == null) {
+            if (childrenByFacetName.size() == 1) {
+                children = childrenByFacetName.values().iterator().next();
+            }
+        } else {
+            children = childrenByFacetName.get( selectedFacet );
+        }
+
+        if (children == null) {
+            children = FXCollections.observableArrayList();
+        }
+        return children;
+    }
+
+    /**
+     * @see javafx.scene.control.TreeItem#isLeaf()
+     */
+    @Override
+    public boolean isLeaf() {
+        return getChildren().isEmpty();
+    }
+
 }

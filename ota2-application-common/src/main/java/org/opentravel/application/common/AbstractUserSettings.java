@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.opentravel.application.common;
 
 import java.awt.Dimension;
@@ -20,103 +21,104 @@ import java.awt.Point;
 import java.util.Properties;
 
 /**
- * Base class for user settings files that maintains common properties for window
- * location and dimensions.
+ * Base class for user settings files that maintains common properties for window location and dimensions.
  */
 public abstract class AbstractUserSettings {
-	
-	private Point windowPosition;
-	private Dimension windowSize;
-	
-	/**
-	 * Loads the common user settings from the given properties.
-	 * 
-	 * @param settingsProps  the properties that contain the common settings
-	 */
-	protected void load(Properties settingsProps) {
-		Point defaultPosition = getDefaultWindowPosition();
-		Dimension defaultSize = getDefaultWindowSize();
-		int windowPositionX = Integer.parseInt( settingsProps.getProperty( "windowPositionX", defaultPosition.x + "" ) );
-		int windowPositionY = Integer.parseInt( settingsProps.getProperty( "windowPositionY", defaultPosition.y + "" ) );
-		int windowWidth = Integer.parseInt( settingsProps.getProperty( "windowWidth", defaultSize.width + "" ) );
-		int windowHeight = Integer.parseInt( settingsProps.getProperty( "windowHeight", defaultSize.height + "" ) );
-		
-		setWindowPosition( new Point( windowPositionX, windowPositionY ) );
-		setWindowSize( new Dimension( windowWidth, windowHeight ) );
-	}
-	
-	/**
-	 * Saves the common user settings from the given properties.
-	 * 
-	 * @param settingsProps  the properties to which the common settings will be saved
-	 */
-	protected void save(Properties settingsProps) {
-		Point winPosition = (this.windowPosition == null) ? getDefaultWindowPosition() : this.windowPosition;
-		Dimension winSize = (this.windowSize == null) ? getDefaultWindowSize() : this.windowSize;
-		
-		settingsProps.put( "windowPositionX", winPosition.x + "" );
-		settingsProps.put( "windowPositionY", winPosition.y + "" );
-		settingsProps.put( "windowWidth", winSize.width + "" );
-		settingsProps.put( "windowHeight", winSize.height + "" );
-	}
-	
-	/**
-	 * Saves the settings in the user's home directory.
-	 */
-	public abstract void save();
-	
-	/**
-	 * Returns the location of the application window.
-	 *
-	 * @return Point
-	 */
-	public Point getWindowPosition() {
-		return windowPosition;
-	}
 
-	/**
-	 * Assigns the location of the application window.
-	 *
-	 * @param windowPosition  the window position to assign
-	 */
-	public void setWindowPosition(Point windowPosition) {
-		this.windowPosition = windowPosition;
-	}
-	
-	/**
-	 * Returns the default location of the application window position.
-	 * 
-	 * @return Point
-	 */
-	protected Point getDefaultWindowPosition() {
-		return new Point( 0, 0 );
-	}
-	
-	/**
-	 * Returns the size of the application window.
-	 *
-	 * @return Dimension
-	 */
-	public Dimension getWindowSize() {
-		return windowSize;
-	}
+    private Point windowPosition;
+    private Dimension windowSize;
 
-	/**
-	 * Assigns the size of the application window.
-	 *
-	 * @param windowSize  the window size to assign
-	 */
-	public void setWindowSize(Dimension windowSize) {
-		this.windowSize = windowSize;
-	}
+    /**
+     * Loads the common user settings from the given properties.
+     * 
+     * @param settingsProps the properties that contain the common settings
+     */
+    protected void load(Properties settingsProps) {
+        Point defaultPosition = getDefaultWindowPosition();
+        Dimension defaultSize = getDefaultWindowSize();
+        int windowPositionX =
+            Integer.parseInt( settingsProps.getProperty( "windowPositionX", defaultPosition.x + "" ) );
+        int windowPositionY =
+            Integer.parseInt( settingsProps.getProperty( "windowPositionY", defaultPosition.y + "" ) );
+        int windowWidth = Integer.parseInt( settingsProps.getProperty( "windowWidth", defaultSize.width + "" ) );
+        int windowHeight = Integer.parseInt( settingsProps.getProperty( "windowHeight", defaultSize.height + "" ) );
 
-	/**
-	 * Returns the default size of the application window.
-	 *
-	 * @return Dimension
-	 */
-	public Dimension getDefaultWindowSize() {
-		return new Dimension( 800, 600 );
-	}
+        setWindowPosition( new Point( windowPositionX, windowPositionY ) );
+        setWindowSize( new Dimension( windowWidth, windowHeight ) );
+    }
+
+    /**
+     * Saves the common user settings from the given properties.
+     * 
+     * @param settingsProps the properties to which the common settings will be saved
+     */
+    protected void save(Properties settingsProps) {
+        Point winPosition = (this.windowPosition == null) ? getDefaultWindowPosition() : this.windowPosition;
+        Dimension winSize = (this.windowSize == null) ? getDefaultWindowSize() : this.windowSize;
+
+        settingsProps.put( "windowPositionX", winPosition.x + "" );
+        settingsProps.put( "windowPositionY", winPosition.y + "" );
+        settingsProps.put( "windowWidth", winSize.width + "" );
+        settingsProps.put( "windowHeight", winSize.height + "" );
+    }
+
+    /**
+     * Saves the settings in the user's home directory.
+     */
+    public abstract void save();
+
+    /**
+     * Returns the location of the application window.
+     *
+     * @return Point
+     */
+    public Point getWindowPosition() {
+        return windowPosition;
+    }
+
+    /**
+     * Assigns the location of the application window.
+     *
+     * @param windowPosition the window position to assign
+     */
+    public void setWindowPosition(Point windowPosition) {
+        this.windowPosition = windowPosition;
+    }
+
+    /**
+     * Returns the default location of the application window position.
+     * 
+     * @return Point
+     */
+    protected Point getDefaultWindowPosition() {
+        return new Point( 0, 0 );
+    }
+
+    /**
+     * Returns the size of the application window.
+     *
+     * @return Dimension
+     */
+    public Dimension getWindowSize() {
+        return windowSize;
+    }
+
+    /**
+     * Assigns the size of the application window.
+     *
+     * @param windowSize the window size to assign
+     */
+    public void setWindowSize(Dimension windowSize) {
+        this.windowSize = windowSize;
+    }
+
+    /**
+     * Returns the default size of the application window.
+     *
+     * @return Dimension
+     */
+    public Dimension getDefaultWindowSize() {
+        return new Dimension( 800, 600 );
+    }
 
 }
