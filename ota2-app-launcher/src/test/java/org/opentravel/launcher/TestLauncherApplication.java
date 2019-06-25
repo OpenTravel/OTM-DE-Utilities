@@ -73,34 +73,48 @@ public class TestLauncherApplication extends AbstractFxTest {
 
     @Test
     public void testEditProxySettings() throws Exception {
-        OtmFxRobot dialogRobot;
-        UserSettings settings;
-        boolean useProxyInd;
+        UserSettings settings = UserSettings.load();
+        boolean origUseProxy = settings.isUseProxy();
+        String origProxyHost = settings.getProxyHost();
+        Integer origProxyPort = settings.getProxyPort();
+        String origNonProxyHosts = settings.getNonProxyHosts();
 
-        robot.clickOn( "File" ).clickOn( "Proxy Settings..." );
-        dialogRobot = robot.targetWindow( "Network Proxy Settings" );
+        try {
+            OtmFxRobot dialogRobot;
+            boolean useProxyInd;
 
-        dialogRobot.clickOn( "#useProxyCB" );
-        useProxyInd = ((CheckBox) dialogRobot.lookup( "#useProxyCB" ).query()).isSelected();
+            robot.clickOn( "File" ).clickOn( "Proxy Settings..." );
+            dialogRobot = robot.targetWindow( "Network Proxy Settings" );
 
-        if (!useProxyInd) {
             dialogRobot.clickOn( "#useProxyCB" );
+            useProxyInd = ((CheckBox) dialogRobot.lookup( "#useProxyCB" ).query()).isSelected();
+
+            if (!useProxyInd) {
+                dialogRobot.clickOn( "#useProxyCB" );
+            }
+            dialogRobot.write( "#proxyHostText", "proxy.opentravel.org" );
+            dialogRobot.write( "#proxyPortText", "8080" );
+
+            dialogRobot.write( "#nonProxyHostsText", "*.opentravel@org" );
+            verifyThat( "#okButton", NodeMatchers.isDisabled() );
+
+            dialogRobot.write( "#nonProxyHostsText", "opentravel.*" );
+            verifyThat( "#okButton", NodeMatchers.isEnabled() );
+            dialogRobot.clickOn( "#okButton" );
+
+            settings = UserSettings.load();
+            assertTrue( settings.isUseProxy() );
+            assertEquals( "proxy.opentravel.org", settings.getProxyHost() );
+            assertEquals( 8080, settings.getProxyPort().intValue() );
+            assertEquals( "opentravel.*", settings.getNonProxyHosts() );
+
+        } finally {
+            settings.setUseProxy( origUseProxy );
+            settings.setProxyHost( origProxyHost );
+            settings.setProxyPort( origProxyPort );
+            settings.setNonProxyHosts( origNonProxyHosts );
+            settings.save();
         }
-        dialogRobot.write( "#proxyHostText", "proxy.opentravel.org" );
-        dialogRobot.write( "#proxyPortText", "8080" );
-
-        dialogRobot.write( "#nonProxyHostsText", "*.opentravel@org" );
-        verifyThat( "#okButton", NodeMatchers.isDisabled() );
-
-        dialogRobot.write( "#nonProxyHostsText", "opentravel.*" );
-        verifyThat( "#okButton", NodeMatchers.isEnabled() );
-        dialogRobot.clickOn( "#okButton" );
-
-        settings = UserSettings.load();
-        assertTrue( settings.isUseProxy() );
-        assertEquals( "proxy.opentravel.org", settings.getProxyHost() );
-        assertEquals( 8080, settings.getProxyPort().intValue() );
-        assertEquals( "opentravel.*", settings.getNonProxyHosts() );
     }
 
     /**

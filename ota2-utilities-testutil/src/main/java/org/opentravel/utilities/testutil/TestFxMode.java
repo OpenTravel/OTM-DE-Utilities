@@ -52,6 +52,7 @@ public class TestFxMode {
         }
 
         if (runHeadless) {
+            System.setProperty( "headless.geometry", "1600x1200-32" );
             System.setProperty( TESTFX_HEADLESS, "true" );
             System.setProperty( TESTFX_ROBOT, "glass" );
             System.setProperty( PRISM_ORDER, "sw" );

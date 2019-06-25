@@ -38,7 +38,8 @@ public class TestFxBrowserUnmanaged extends AbstractFxTest {
 
     @Test
     public void dummyTest() throws Exception {
-        // Placeholder to force test initialization
+        robot.clickOn( "File" ).clickOn( "Exit" );
+        robot.targetWindow( "Exit" ).clickOn( "Exit" );
     }
 
     /**

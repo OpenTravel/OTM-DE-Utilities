@@ -115,7 +115,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
         stage = mainController.getStage();
         // handle window and other close request events
-        stage.setOnCloseRequest( this::appExit );
+        // stage.setOnCloseRequest( this::appExit );
         // For debugging, intercept and log DexEvents
         stage.setEventDispatcher( new DexEventDispatcher( stage.getEventDispatcher() ) );
 
