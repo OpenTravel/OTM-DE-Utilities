@@ -33,49 +33,51 @@ import javafx.stage.Stage;
  */
 public class ObjectEditorApp extends AbstractOTMApplication {
 
-    private static Log log = LogFactory.getLog( ObjectEditorApp.class );
+	private static Log log = LogFactory.getLog(ObjectEditorApp.class);
 
-    private static final String LAYOUT_FILE = "/OtmObjectEditorLayout.fxml";
-    private static final String APPLICATION_TITLE = "DEx - OpenTravel Development Environment Object Editor";
+	private static final String LAYOUT_FILE = "/OtmObjectEditorLayout.fxml";
+	private static final String APPLICATION_TITLE = "DEx - OpenTravel Development Environment Object Editor";
 
-    /**
-     * Default constructor.
-     */
-    public ObjectEditorApp() {}
+	/**
+	 * Default constructor.
+	 */
+	public ObjectEditorApp() {
+	}
 
-    /**
-     * Constructor that provides the manager that should be used when accessing remote OTM repositories.
-     * 
-     * @param repositoryManager the repository manager instance
-     */
-    public ObjectEditorApp(RepositoryManager repositoryManager) {
-        super( repositoryManager );
-    }
+	/**
+	 * Constructor that provides the manager that should be used when accessing remote OTM repositories.
+	 * 
+	 * @param repositoryManager
+	 *            the repository manager instance
+	 */
+	public ObjectEditorApp(RepositoryManager repositoryManager) {
+		super(repositoryManager);
+	}
 
+	public static void main(String[] args) {
+		launch(args); // start this application in its own window
+	}
 
-    public static void main(String[] args) {
-        launch( args ); // start this application in its own window
-    }
+	@Override
+	public void start(Stage primaryStage) {
+		super.start(primaryStage);
+		((ObjectEditorController) getController()).setStage(primaryStage);
+		primaryStage.getScene().getStylesheets().add("DavesViper.css");
+	}
 
-    @Override
-    public void start(Stage primaryStage) {
-        super.start( primaryStage );
-        primaryStage.getScene().getStylesheets().add( "DavesViper.css" );
-    }
+	@Override
+	protected String getMainWindowFxmlLocation() {
+		return LAYOUT_FILE;
+	}
 
-    @Override
-    protected String getMainWindowFxmlLocation() {
-        return LAYOUT_FILE;
-    }
+	@Override
+	protected String getMainWindowTitle() {
+		return APPLICATION_TITLE;
+	}
 
-    @Override
-    protected String getMainWindowTitle() {
-        return APPLICATION_TITLE;
-    }
-
-    @Override
-    protected AbstractUserSettings getUserSettings() {
-        return UserSettings.load();
-    }
+	@Override
+	protected AbstractUserSettings getUserSettings() {
+		return UserSettings.load();
+	}
 
 }
