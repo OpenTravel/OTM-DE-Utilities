@@ -1,5 +1,8 @@
 language: java
 jdk: oraclejdk11
+addons:
+  apt:
+    packages: openjfx
 install: true
 script: mvn -DciBuildEnv=true clean install
 cache:
