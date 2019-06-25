@@ -44,9 +44,6 @@ public class RepositoryTabController implements DexTabController {
     @FXML
     private RepositorySelectionController repositorySelectionController;
 
-    // protected RepositoryController repoController;
-    // private RepositoryAvailabilityChecker availabilityChecker;
-
     public RepositoryTabController() {
         log.debug( "Repository Tab Controller constructed." );
     }
@@ -62,11 +59,6 @@ public class RepositoryTabController implements DexTabController {
      */
     @Override
     public void configure(DexMainController parent) {
-        // super.setParent(parent);
-
-        // repositorySearchController.setParent(this);
-        // repositorySearchController.setStage();
-        // repositorySearchController.setRepository(null);
 
         // Set up the repository selection
         parent.addIncludedController( repositorySelectionController );

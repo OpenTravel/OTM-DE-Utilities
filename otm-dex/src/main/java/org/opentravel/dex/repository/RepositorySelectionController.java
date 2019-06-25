@@ -106,22 +106,22 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
         log.debug( "Repository choice has " + repositoryIds.size() + " items." );
     }
 
-    private RepositoryManager getRepoMgr() {
-        // // Set up repository access
-        RepositoryManager rm = null;
-        try {
-            rm = RepositoryManager.getDefault();
-            // availabilityChecker = RepositoryAvailabilityChecker.getInstance(repositoryManager);
-            // repoStatus = availabilityChecker.pingAllRepositories(true);
-        } catch (RepositoryException e) {
-            log.error( "Repository manager unavailable: " + e );
-        }
-        return rm;
-    }
+    // private RepositoryManager getRepoMgr() {
+    // // // Set up repository access
+    // RepositoryManager rm = null;
+    // try {
+    // rm = RepositoryManager.getDefault();
+    // // availabilityChecker = RepositoryAvailabilityChecker.getInstance(repositoryManager);
+    // // repoStatus = availabilityChecker.pingAllRepositories(true);
+    // } catch (RepositoryException e) {
+    // log.error( "Repository manager unavailable: " + e );
+    // }
+    // return rm;
+    // }
 
-    public RepositoryManager getRepositoryManager() {
-        return repositoryManager;
-    }
+    // public RepositoryManager getRepositoryManager() {
+    // return repositoryManager;
+    // }
 
     // @Override
     // public ReadOnlyObjectProperty<String> getSelectable() {
@@ -152,6 +152,7 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
 
     @Override
     public void post(RepositoryManager repositoryManager) throws Exception {
+        super.post( repositoryManager );
         if (repositoryManager != null)
             this.repositoryManager = repositoryManager;
         // does not really do anything -- the local repository acts as default manager.
@@ -191,16 +192,15 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
         super.configure( parent );
         eventPublisherNode = repositoryChoice;
 
-        repositoryManager = getRepoMgr();
+        repositoryManager = parent.getRepositoryManager();
+        // repositoryManager = getRepoMgr();
         configureRepositoryChoice();
 
         // initialize login Dialog Box using a new dynamic loader
-        loginDialogController = RepositoryLoginDialogContoller.init();
-        // FXMLLoader loader = new FXMLLoader(getClass().getResource(RepositoryLoginDialogContoller.LAYOUT_FILE));
-        // loginDialogController = RepositoryLoginDialogContoller.init(loader);
+        loginDialogController = RepositoryLoginDialogContoller.init( repositoryManager );
         addRepository.setOnAction( e -> addRepository() );
 
-        log.debug( "Repository Selection Stage set." );
+        log.debug( "Repository Selection configured." );
     }
 
 }

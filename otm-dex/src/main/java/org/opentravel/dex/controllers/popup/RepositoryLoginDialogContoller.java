@@ -70,13 +70,13 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
      * Note: This approach using a static stage and main controller hides the complexity from calling controller.
      * Otherwise, this code must migrate into the calling controller.
      * 
-     * @param loader FXML loaded for DialogBox.fxml
-     * @param mainController
+     * @param repositoryManager
      * @return dialog box controller or null
      */
-    public static RepositoryLoginDialogContoller init() {
+    public static RepositoryLoginDialogContoller init(RepositoryManager repositoryManager) {
         FXMLLoader loader = new FXMLLoader( RepositoryLoginDialogContoller.class.getResource( LAYOUT_FILE ) );
         RepositoryLoginDialogContoller controller = null;
+
         try {
             // Load the fxml file initialize controller it declares.
             Pane pane = loader.load();
@@ -93,6 +93,8 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
             throw new IllegalStateException(
                 "Error loading dialog box. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
         }
+        controller.setRepositoryManager( repositoryManager );
+        log.debug( "Repo Login Dialog controller initialized. " + repositoryManager );
         return controller;
     }
 
@@ -120,7 +122,12 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
     @FXML
     TextArea testResults;
 
-    RepositoryManager rMgr;
+    RepositoryManager repositoryManager;
+
+    public void setRepositoryManager(RepositoryManager repositoryManager) {
+        this.repositoryManager = repositoryManager;
+    }
+
     RemoteRepository selectedRemoteRepository = null; // Selected repository
 
     private void anonymousSelectionChanged() {
@@ -149,7 +156,7 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
         log.debug( "Configuring repository combo box." );
 
         ObservableList<String> repositoryIds = FXCollections.observableArrayList();
-        rMgr.listRemoteRepositories().forEach( r -> repositoryIds.add( r.getEndpointUrl() ) );
+        repositoryManager.listRemoteRepositories().forEach( r -> repositoryIds.add( r.getEndpointUrl() ) );
         loginURLCombo.setItems( repositoryIds );
         loginURLCombo.getSelectionModel().select( 0 );
 
@@ -178,7 +185,7 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
         if (selectedRemoteRepository != null) {
             if (!dialogButtonAnonymous.isSelected())
                 try {
-                    rMgr.setCredentials( selectedRemoteRepository, user, pwd );
+                    repositoryManager.setCredentials( selectedRemoteRepository, user, pwd );
                 } catch (RepositoryException e) {
                     postException( e );
                 }
@@ -242,13 +249,13 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
     }
 
     private RepositoryManager getRepositoryManager() {
-        if (rMgr == null)
+        if (repositoryManager == null)
             try {
-                rMgr = RepositoryManager.getDefault();
+                repositoryManager = RepositoryManager.getDefault();
             } catch (RepositoryException e) {
                 postException( e );
             }
-        return rMgr;
+        return repositoryManager;
     }
 
     private void postException(Exception e) {
@@ -281,7 +288,7 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
         // Try connecting
         String url = loginURLCombo.getValue();
         if (url != null && getRepositoryManager() != null)
-            selectedRemoteRepository = getRemoteRepository( rMgr, url );
+            selectedRemoteRepository = getRemoteRepository( repositoryManager, url );
 
         if (selectedRemoteRepository != null)
             loginRepoID.setText( selectedRemoteRepository.getDisplayName() );
@@ -303,7 +310,7 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
         dialogButtonTest.setOnAction( e -> doTest() );
 
         try {
-            rMgr = RepositoryManager.getDefault();
+            repositoryManager = RepositoryManager.getDefault();
         } catch (RepositoryException e1) {
             postException( e1 );
             return;

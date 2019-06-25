@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.common.ImageManager;
+import org.opentravel.dex.actions.DexActionManager;
 import org.opentravel.dex.actions.DexFullActionManager;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.events.DexEvent;
@@ -47,9 +48,12 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     private static Log log = LogFactory.getLog( DexMainControllerBase.class );
 
     protected DexMainController mainController;
-    protected ImageManager imageMgr;
-    protected OtmModelManager modelMgr;
-    protected DexFullActionManager actionMgr;
+    protected ImageManager imageMgr = null;
+    protected OtmModelManager modelMgr = null;
+    // protected RepositoryManager repositoryMgr = null;
+
+    // FIXME - should not maintain action manager
+    protected DexActionManager actionMgr;
 
     // preferences (improve as i use it)
     protected UserSettings userSettings;
@@ -170,18 +174,13 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
 
     @Override
     public RepositoryManager getRepositoryManager() {
-        return null;
+        return super.getRepositoryManager();
     }
 
     @Override
     public Stage getStage() {
         return stage;
     }
-
-    // @Override
-    // public ReadOnlyObjectProperty<?> getSelectable() {
-    // return null;
-    // }
 
     @Override
     public DexStatusController getStatusController() {

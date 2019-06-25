@@ -215,7 +215,8 @@ public class RepositoryViewerController extends DexMainControllerBase implements
 
     @Override
     public RepositoryManager getRepositoryManager() {
-        return repositorySelectionController.getRepositoryManager();
+        return super.getRepositoryManager();
+        // return repositorySelectionController.getRepositoryManager();
     }
 
 }
