@@ -50,7 +50,6 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     protected DexMainController mainController;
     protected ImageManager imageMgr = null;
     protected OtmModelManager modelMgr = null;
-    // protected RepositoryManager repositoryMgr = null;
 
     // FIXME - should not maintain action manager
     protected DexActionManager actionMgr;
@@ -106,24 +105,6 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         includedControllers.forEach( DexIncludedController::clear );
     }
 
-    // /**
-    // * Use the subscribers and publishers maps to set handlers
-    // */
-    // // TODO - do i need subscriber map? Can i just traverse all included controllers?
-    // protected void configureEventHandlersX() {
-    // if (!eventSubscribers.isEmpty())
-    // for (Entry<EventType<?>, List<DexIncludedController<?>>> entry : eventSubscribers.entrySet())
-    // // For each subscriber to this event type
-    // for (DexIncludedController<?> c : entry.getValue()) {
-    // // Get the handler from the subscriber
-    // EventType<? extends DexEvent> et = (EventType<? extends DexEvent>) entry.getKey();
-    // // EventHandler<DexEvent> handler = c::handler;
-    // if (eventPublishers.containsKey(entry.getValue()))
-    // for (DexIncludedController<?> publisher : eventPublishers.get(entry.getValue()))
-    // // Put handler in all publishers of this event
-    // publisher.setEventHandler(et, c::handleEvent);
-    // }
-    // }
 
     @SuppressWarnings("unchecked")
     protected void configureEventHandlers() {
@@ -138,18 +119,6 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
                             publisher.setEventHandler( dexET, c::handleEvent );
                     }
         }
-        // if (!eventSubscribers.isEmpty())
-        // for (Entry<EventType<?>, List<DexIncludedController<?>>> entry : eventSubscribers.entrySet())
-        // // For each subscriber to this event type
-        // for (DexIncludedController<?> c : entry.getValue()) {
-        // // Get the handler from the subscriber
-        // EventType<? extends DexEvent> et = (EventType<? extends DexEvent>) entry.getKey();
-        // // EventHandler<DexEvent> handler = c::handler;
-        // if (eventPublishers.containsKey(entry.getValue()))
-        // for (DexIncludedController<?> publisher : eventPublishers.get(entry.getValue()))
-        // // Put handler in all publishers of this event
-        // publisher.setEventHandler(et, c::eventHandler);
-        // }
     }
 
     public DialogBoxContoller getDialogBoxController() {
@@ -260,7 +229,8 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
      */
     protected void setMainController(DexMainController controller) {
         mainController = controller;
-        modelMgr.setStatusController( getStatusController() );
+        if (modelMgr != null)
+            modelMgr.setStatusController( getStatusController() );
     }
 
     /**

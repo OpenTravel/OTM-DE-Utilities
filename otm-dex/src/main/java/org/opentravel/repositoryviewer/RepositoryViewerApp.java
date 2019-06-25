@@ -59,6 +59,7 @@ public class RepositoryViewerApp extends AbstractOTMApplication {
     @Override
     public void start(Stage primaryStage) {
         super.start( primaryStage );
+        ((RepositoryViewerController) getController()).setStage( primaryStage );
         primaryStage.getScene().getStylesheets().add( "DavesViper.css" );
     }
 

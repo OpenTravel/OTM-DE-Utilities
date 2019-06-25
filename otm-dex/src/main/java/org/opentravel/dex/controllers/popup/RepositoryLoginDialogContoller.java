@@ -126,6 +126,7 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
 
     public void setRepositoryManager(RepositoryManager repositoryManager) {
         this.repositoryManager = repositoryManager;
+        log.warn( "Set repository manager to " + repositoryManager );
     }
 
     RemoteRepository selectedRemoteRepository = null; // Selected repository
@@ -250,11 +251,12 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
 
     private RepositoryManager getRepositoryManager() {
         if (repositoryManager == null)
-            try {
-                repositoryManager = RepositoryManager.getDefault();
-            } catch (RepositoryException e) {
-                postException( e );
-            }
+            log.warn( "Repository manger is null. Using default repository manager." );
+        try {
+            repositoryManager = RepositoryManager.getDefault();
+        } catch (RepositoryException e) {
+            postException( e );
+        }
         return repositoryManager;
     }
 
@@ -292,6 +294,10 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
 
         if (selectedRemoteRepository != null)
             loginRepoID.setText( selectedRemoteRepository.getDisplayName() );
+        else {
+            loginRepoID.setText( "No valid repository selected." );
+            log.warn( "Selected Remote Repository is null." );
+        }
 
         // Set check box to show success or failure
         repoOKCheckbox.setSelected( selectedRemoteRepository != null );

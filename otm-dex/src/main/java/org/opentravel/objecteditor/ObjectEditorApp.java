@@ -61,6 +61,11 @@ public class ObjectEditorApp extends AbstractOTMApplication {
         super.start( primaryStage );
         ((ObjectEditorController) getController()).setStage( primaryStage );
         primaryStage.getScene().getStylesheets().add( "DavesViper.css" );
+
+
+        if (getController().getRepositoryManager() == null)
+            throw new IllegalStateException( "Repository manager not available." );
+
     }
 
     @Override
