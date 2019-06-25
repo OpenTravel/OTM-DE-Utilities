@@ -21,6 +21,7 @@ import org.opentravel.application.common.DirectoryChooserDelegate;
 import org.opentravel.application.common.FileChooserDelegate;
 import org.opentravel.application.common.OtmApplicationException;
 import org.opentravel.application.common.ProgressMonitor;
+import org.opentravel.application.common.RepositoryItemWrapper;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.ns.ota2.project_v01_00.ManagedProjectItemType;
 import org.opentravel.ns.ota2.project_v01_00.ObjectFactory;

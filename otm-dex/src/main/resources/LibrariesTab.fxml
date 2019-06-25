@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<Tab fx:id="librariesTab" text="Libraries" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.library.LibrariesTabController">
+	<fx:include fx:id="librariesTreeTable" source="LibrariesTreeTable.fxml" VBox.vgrow="ALWAYS" />
+</Tab>

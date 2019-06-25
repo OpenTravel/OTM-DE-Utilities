@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="libraries" xmlns="http://javafx.com/javafx/8.0.162" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.library.LibrariesTreeTableController">
+    <children>
+       <TreeTableView fx:id="librariesTreeTable" VBox.vgrow="ALWAYS" />
+    </children>
+ </VBox>

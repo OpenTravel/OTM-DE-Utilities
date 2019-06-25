@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="memberWhereUsed"  xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.member.usage.WhereUsedTableController">
+   <children>
+      <TreeTableView fx:id="whereUsedTreeTable" prefHeight="641.0" prefWidth="1040.0" VBox.vgrow="ALWAYS"/>
+   </children>
+</VBox>

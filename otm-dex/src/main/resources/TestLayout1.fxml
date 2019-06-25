@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.web.WebView?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="OTM_FX.FxBrowser.DemoController">
+   <children>
+      <ToolBar prefHeight="40.0" prefWidth="200.0">
+         <effect>
+            <DropShadow />
+         </effect>
+         <items>
+            <MenuBar>
+              <menus>
+                <Menu mnemonicParsing="false" text="File">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="Close" />
+                        <MenuItem mnemonicParsing="false" onAction="#open" text="Open..." />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                    <MenuItem mnemonicParsing="false" onAction="#appExit" text="Exit" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Edit" />
+                <Menu mnemonicParsing="false" text="Help">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="About" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+            <MenuButton mnemonicParsing="false" text="Project (MenuButton)">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Default (MenuItem)" />
+                <MenuItem mnemonicParsing="false" text="Test (MenuItem)" />
+              </items>
+            </MenuButton>
+            <ToggleButton alignment="CENTER_RIGHT" mnemonicParsing="false" text="Link" />
+         </items>
+      </ToolBar>
+      <SplitPane dividerPositions="0.1838810641627543" prefHeight="160.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+        <items>
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints fillHeight="false" maxHeight="237.60000171661378" minHeight="10.0" prefHeight="183.99998779296874" valignment="TOP" vgrow="NEVER" />
+                  <RowConstraints maxHeight="607.2000061035156" minHeight="10.0" prefHeight="516.8000122070312" vgrow="ALWAYS" />
+              </rowConstraints>
+               <children>
+                  <AnchorPane prefHeight="182.0" prefWidth="232.0">
+                     <children>
+                        <ChoiceBox fx:id="LibrarySelector" accessibleRole="CHECK_MENU_ITEM" layoutX="41.0" layoutY="46.0" prefWidth="150.0" />
+                        <ButtonBar layoutX="25.0" layoutY="109.0">
+                           <buttons>
+                              <Button layoutX="135.0" layoutY="17.0" mnemonicParsing="false" text="Errors" />
+                              <Button layoutX="135.0" layoutY="17.0" mnemonicParsing="false" text="Editable" />
+                           </buttons>
+                        </ButtonBar>
+                        <ButtonBar layoutX="25.0" layoutY="142.0">
+                          <buttons>
+                            <Button mnemonicParsing="false" text="Complex" />
+                              <Button layoutX="135.0" layoutY="17.0" mnemonicParsing="false" text="Simple" />
+                          </buttons>
+                        </ButtonBar>
+                        <TextField layoutX="42.0" layoutY="78.0" />
+                        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="65.0" layoutY="-4.0" text="Selectors" textAlignment="CENTER">
+                           <font>
+                              <Font name="System Bold" size="24.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+                  <TreeView fx:id="treeView" prefHeight="592.0" prefWidth="195.2" showRoot="false" GridPane.rowIndex="1" />
+               </children>
+            </GridPane>
+            <TabPane tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab fx:id="memberTab" onSelectionChanged="#memberTabSelection" text="Facets and Properties">
+                     <content>
+                        <VBox prefHeight="502.0" prefWidth="367.0">
+                           <children>
+                              <ToolBar>
+                                <items>
+                                  <Button mnemonicParsing="false" prefWidth="55.0" styleClass="button-blue" text="Up" />
+                                    <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" prefWidth="55.0" styleClass="button-blue" text="Down" />
+                                    <Button layoutX="86.0" layoutY="10.0" mnemonicParsing="false" prefWidth="55.0" styleClass="button-red" text="Delete" />
+                                    <TextField fx:id="propertyName" onAction="#setName" promptText="Name" />
+                                    <ChoiceBox prefWidth="150.0" styleClass="button-blue" />
+                                </items>
+                              </ToolBar>
+                              <ToolBar layoutX="10.0" layoutY="10.0">
+                                 <items>
+                                    <TextField fx:id="propertyName1" onAction="#setName" promptText="Name" />
+                                    <ChoiceBox prefWidth="150.0" styleClass="button-blue" />
+                                    <Button mnemonicParsing="false" styleClass="button-blue" text="Assign Type" />
+                                    <CheckBox mnemonicParsing="false" text="Optional" />
+                                    <TextField fx:id="propertyName11" layoutX="10.0" layoutY="10.0" onAction="#setName" promptText="Name" text="Repeat" />
+                                    <TextField fx:id="propertyName111" layoutX="460.0" layoutY="10.0" onAction="#setName" promptText="Name" text="Example" />
+                                 </items>
+                              </ToolBar>
+                              <HBox fx:id="memberEditHbox" fillHeight="false" minHeight="-Infinity" VBox.vgrow="NEVER">
+                                 <padding>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </padding>
+                                 <opaqueInsets>
+                                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                                 </opaqueInsets>
+                              </HBox>
+                              <TableView fx:id="memberTable" VBox.vgrow="ALWAYS" />
+                           </children>
+                        </VBox>
+                     </content>
+                  </Tab>
+                  <Tab text="Where Used">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TreeTableView fx:id="treeTableView" prefHeight="584.0" prefWidth="1076.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columns>
+                                  <TreeTableColumn fx:id="FacetColumn" prefWidth="75.0" text="Facet" />
+                                  <TreeTableColumn fx:id="NameColumn" prefWidth="75.0" text="Name" />
+                                    <TreeTableColumn fx:id="RoleColumn" prefWidth="75.0" text="Role" />
+                                    <TreeTableColumn fx:id="TypeColumn" prefWidth="75.0" text="Type" />
+                                    <TreeTableColumn fx:id="DescriptionColumn" prefWidth="393.6000061035156" text="Description" />
+                                </columns>
+                              </TreeTableView>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
+                  <Tab fx:id="treeTableTab" onSelectionChanged="#memberTabSelection" text="Errors and Warnings">
+                     <content>
+                        <Accordion>
+                          <panes>
+                            <TitledPane animated="false" text="Table Tree">
+                                 <content>
+                                    <AnchorPane />
+                                 </content>
+                            </TitledPane>
+                            <TitledPane animated="false" text="to do">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                              </content>
+                            </TitledPane>
+                            <TitledPane animated="false" text="Web View">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <WebView fx:id="webView" prefHeight="590.0" prefWidth="1075.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                       </children></AnchorPane>
+                              </content>
+                            </TitledPane>
+                          </panes>
+                        </Accordion>
+                     </content>
+                  </Tab>
+                <Tab fx:id="libraryTab" text="Library">
+                     <content>
+                        <Pane prefHeight="431.0" prefWidth="591.0">
+                           <children>
+                              <RadioButton id="radioButton1" layoutX="54.0" layoutY="47.0" mnemonicParsing="false" onAction="#radioButton1" text="Radio 1">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="ButtonGroup1" />
+                                 </toggleGroup>
+                              </RadioButton>
+                              <RadioButton id="radioButton2" layoutX="54.0" layoutY="75.0" mnemonicParsing="false" onAction="#radioButton2" text="RadioButton2" toggleGroup="$ButtonGroup1" />
+                              <MenuButton layoutX="395.0" layoutY="44.0" mnemonicParsing="false" text="MenuButton">
+                                <items>
+                                  <MenuItem mnemonicParsing="false" text="Action 1" />
+                                  <MenuItem mnemonicParsing="false" text="Action 2" />
+                                </items>
+                              </MenuButton>
+                              <Slider layoutX="403.0" layoutY="107.0" />
+                              <ToggleButton layoutX="213.0" layoutY="43.0" mnemonicParsing="false" text="ToggleButton" />
+                              <ListView layoutX="38.0" layoutY="213.0" prefHeight="95.0" prefWidth="286.0" />
+                              <Button id="simpleButton" layoutX="426.0" layoutY="158.0" mnemonicParsing="false" onAction="#simpleButton" text="Button" />
+                              <PasswordField layoutX="382.0" layoutY="278.0" promptText="password" />
+                              <TextField layoutX="380.0" layoutY="245.0" promptText="User Name" />
+                              <Label layoutX="365.0" layoutY="203.0" text="Repository" />
+                              <Button id="simpleButton" layoutX="350.0" layoutY="142.0" mnemonicParsing="false" onAction="#simpleButton" styleClass="button-blue" text="Button" />
+                              <Button id="simpleButton" layoutX="501.0" layoutY="142.0" mnemonicParsing="false" onAction="#simpleButton" styleClass="button-red" text="Button" />
+                           </children>
+                        </Pane>
+                     </content>
+                  </Tab>
+              </tabs>
+            </TabPane>
+        </items>
+      </SplitPane>
+      <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="10.0">
+         <children>
+            <Label text="Status:">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+            <Label text="Label">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+            <Region HBox.hgrow="ALWAYS" />
+            <ProgressIndicator progress="0.0" />
+         </children>
+         <padding>
+            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+         </padding>
+      </HBox>
+   </children>
+</VBox>

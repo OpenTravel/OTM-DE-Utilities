@@ -47,6 +47,11 @@
 			<artifactId>ota2-upversion-helper</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>otm-dex</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- Experimental apps excluded from test coverage report. -->
 		<!--
 		<dependency>

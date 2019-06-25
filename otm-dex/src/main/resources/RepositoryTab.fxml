@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+	<Tab fx:id="repoTab" text="Repository" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.repository.RepositoryTabController">
+            <BorderPane VBox.vgrow="ALWAYS">
+               <center>
+                  <SplitPane dividerPositions="0.3" VBox.vgrow="ALWAYS">
+                     <items>
+					    <VBox>
+						   <children>
+							<!-- fx:include fx:id="repositorySearch" source="RepositorySearch.fxml" / -->
+							<fx:include fx:id="repositoryNamespacesTree" source="RepositoryNamespacesTree.fxml" VBox.vgrow="ALWAYS" />
+						   </children>
+						</VBox>
+                        <SplitPane dividerPositions="0.7" orientation="VERTICAL">
+                                <items>
+                                    <fx:include fx:id="namespaceLibrariesTreeTable" source="NamespaceLibrariesTreeTable.fxml" />
+                                    <fx:include fx:id="repositoryItemCommitHistories" source="RepositoryItemCommitHistories.fxml" />
+                                </items>
+                        </SplitPane>
+                     </items>
+                  </SplitPane>
+               </center>
+               <top>
+			      <fx:include fx:id="repositorySelection" source="RepositorySelection.fxml" />
+               </top>
+            </BorderPane>
+	</Tab>

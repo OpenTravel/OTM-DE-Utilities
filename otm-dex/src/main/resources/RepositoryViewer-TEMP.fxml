@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.objecteditor.RepositoryViewerController">
+   <children>
+      <ToolBar prefHeight="40.0" prefWidth="200.0">
+         <effect>
+            <DropShadow />
+         </effect>
+         <items>
+            <MenuBar>
+              <menus>
+                <Menu mnemonicParsing="false" text="File">
+                  <items>
+                    <MenuItem mnemonicParsing="false" onAction="#doClose" text="Close" />
+                        <MenuItem mnemonicParsing="false" onAction="#fileOpen" text="Open..." />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                    <MenuItem mnemonicParsing="false" onAction="#appExit" text="Exit" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Edit" />
+                <Menu mnemonicParsing="false" text="Help">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="About" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+            <Label text="Select Project">
+               <padding>
+                  <Insets left="50.0" right="5.0" />
+               </padding>
+            </Label>
+            <ComboBox fx:id="projectCombo" prefWidth="150.0" />
+         </items>
+      </ToolBar>
+      <SplitPane dividerPositions="0.23865414710485133" prefHeight="160.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+        <items>
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints fillHeight="false" maxHeight="237.60000171661378" minHeight="10.0" prefHeight="100.80000915527344" valignment="TOP" vgrow="NEVER" />
+                  <RowConstraints maxHeight="607.2000061035156" minHeight="10.0" prefHeight="599.1999908447266" vgrow="ALWAYS" />
+              </rowConstraints>
+               <children>
+                  <AnchorPane prefHeight="115.0" prefWidth="371.0" styleClass="menu-bar" stylesheets="@DavesViper.css" GridPane.vgrow="NEVER">
+                     <children>
+                        <ChoiceBox fx:id="librarySelector" accessibleRole="CHECK_BOX" layoutX="10.0" layoutY="18.0" prefWidth="150.0" AnchorPane.leftAnchor="10.0" />
+                        <TextField fx:id="libraryNameFilter" layoutX="10.0" layoutY="49.0" prefWidth="150.0" promptText="filter" AnchorPane.leftAnchor="10.0" />
+                        <MenuButton fx:id="libraryTypeMenu" layoutX="229.0" layoutY="18.0" mnemonicParsing="false" text="Type" AnchorPane.rightAnchor="10.0">
+                          <items>
+                            <MenuItem mnemonicParsing="false" text="ALL" />
+                            <MenuItem mnemonicParsing="false" text="Objects" />
+                              <MenuItem mnemonicParsing="false" text="Resources" />
+                              <MenuItem mnemonicParsing="false" text="Contextual Facets" />
+                              <MenuItem mnemonicParsing="false" text="Services" />
+                          </items>
+                        </MenuButton>
+                        <MenuButton fx:id="libraryStateMenu" accessibleRole="CHECK_BOX" layoutX="228.0" layoutY="49.0" mnemonicParsing="false" text="State" AnchorPane.rightAnchor="10.0">
+                           <items>
+                              <CheckMenuItem mnemonicParsing="false" text="Latest" />
+                              <CheckMenuItem mnemonicParsing="false" text="Editable" />
+                              <CheckMenuItem mnemonicParsing="false" text="Errors" />
+                           </items>
+                        </MenuButton>
+                     </children>
+                  </AnchorPane>
+                  <TreeTableView fx:id="navTreeTableView" prefHeight="609.0" prefWidth="302.0" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+               </children>
+            </GridPane>
+            <BorderPane>
+               <center>
+                  <SplitPane dividerPositions="0.2003853564547206">
+                     <items>
+                        <TreeView fx:id="repoTabRootNSs" prefHeight="631.0" prefWidth="302.0" />
+                        <VBox>
+                           <children>
+                              <HBox layoutX="10.0" layoutY="448.0" spacing="12.0">
+                                 <children>
+                                    <Label stylesheets="@DavesViper.css" text="Libraries" />
+                                    <Label layoutX="22.0" layoutY="10.0" stylesheets="@DavesViper.css" text="    " />
+                                    <Label layoutX="22.0" layoutY="10.0" stylesheets="@DavesViper.css" text="Permission: " />
+                                    <Label fx:id="nsLibraryTablePermissionLabel" text="permission" />
+                                 </children>
+                                 <padding>
+                                    <Insets left="12.0" right="12.0" />
+                                 </padding>
+                              </HBox>
+                              <TreeTableView fx:id="repoTabLibraryTreeTableView" prefHeight="314.0" prefWidth="753.0" tableMenuButtonVisible="true" />
+                              <Label stylesheets="@DavesViper.css" text="HIstory" />
+                              <TableView fx:id="repoTabLibraryHistoryView" prefHeight="161.0" prefWidth="753.0" tableMenuButtonVisible="true" />
+                              <HBox spacing="12.0">
+                                 <children>
+                                    <Label alignment="BOTTOM_LEFT" stylesheets="@DavesViper.css" text="Current Project" />
+                                    <Button layoutX="20.0" mnemonicParsing="false" prefWidth="60.0" styleClass="button-blue" stylesheets="@DavesViper.css" text="Select" />
+                                    <Button alignment="TOP_RIGHT" layoutX="150.0" mnemonicParsing="false" prefWidth="60.0" styleClass="button-red" stylesheets="@DavesViper.css" text="Remove" />
+                                 </children>
+                                 <padding>
+                                    <Insets left="12.0" right="12.0" />
+                                 </padding>
+                              </HBox>
+                              <TableView fx:id="selectedLibrariesTable1" prefHeight="200.0" prefWidth="306.0" />
+                           </children>
+                        </VBox>
+                     </items>
+                  </SplitPane>
+               </center>
+               <top>
+                  <ToolBar prefHeight="40.0" prefWidth="200.0" styleClass="tab-menu-bar" stylesheets="@DavesViper.css" BorderPane.alignment="CENTER">
+                    <items>
+                        <ChoiceBox fx:id="repoTabRepoChoice" prefWidth="150.0" />
+                        <TextField fx:id="repoTabRepoUserField" promptText="User Name" />
+                        <PasswordField promptText="password" />
+                      <Button mnemonicParsing="false" text="Add Repository" />
+                    </items>
+                  </ToolBar>
+               </top>
+            </BorderPane>
+        </items>
+      </SplitPane>
+      <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="10.0">
+         <children>
+            <Label text="Status:">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="statusLabel" text="Label">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+            <Region HBox.hgrow="ALWAYS" />
+            <ProgressIndicator fx:id="statusProgress" progress="0.0" />
+         </children>
+         <padding>
+            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+         </padding>
+      </HBox>
+   </children>
+</VBox>

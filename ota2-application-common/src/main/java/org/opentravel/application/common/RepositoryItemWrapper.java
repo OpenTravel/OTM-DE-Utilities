@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.upversion;
+package org.opentravel.application.common;
 
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.repository.Repository;

@@ -13,6 +13,7 @@
 	<modules>
 		<module>ota2-application-common</module>
 		<module>ota2-utilities-testutil</module>
+		<module>otm-dex</module>
 		<module>ota2-release-editor</module>
 		<module>ota2-example-helper</module>
 		<module>ota2-diff-utility</module>

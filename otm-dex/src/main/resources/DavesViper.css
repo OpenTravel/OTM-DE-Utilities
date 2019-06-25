@@ -1,0 +1,105 @@
+.root{
+    -fx-background-color: linear-gradient(#b8b8b8, #e8e8e8);
+}
+.label{
+    -fx-text-fill: #181818;
+    -fx-font-size: 12pt
+}
+.text{
+    -fx-text-fill: #984818;
+    -fx-font-size: 12pt
+}
+.bold-label{
+    -fx-font-weight: bold;
+}
+#.menu-bar .container .menu:openvertically .label .text {
+.menu-bar .container .menu:openvertically {
+    -fx-font-style: normal;
+    -fx-background-color: #D0D0D0;
+}
+.tab-menu-bar {
+    -fx-font-style: normal;
+    -fx-background-color: #7cafc2;
+}
+/** pseudo class overrides menu-button */
+.menu-button:openvertically .label {
+    -fx-font-size: 12pt;
+    -fx-font-style: oblique;
+}
+.toggle-button .text {
+    -fx-font-style: italic;
+}
+.button{
+    -fx-text-fill: #0F0F0F;
+    -fx-background-radius: 4;
+}
+.button-red{
+    -fx-background-color: #AB4642;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 4;
+}
+.button-blue{
+    -fx-background-color: #7cafc2;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 4;
+}
+#.tree-view, .tree-cell{
+    # -fx-background-color: #7cafc2;
+    #-fx-text-fill: #a03030;
+    #-fx-text-color: #a03000;
+#}
+.tree-cell:selected {
+    -fx-font-weight: bold ;
+    -fx-text-fill: #603030;
+}
+.tree-cell:hover {
+    -fx-text-fill: #E0E0E0;
+    -fx-background-color: #3c3fa2;
+}
+.tree-cell {
+    -fx-font-weight: bold ;
+}
+.tree-cell:leaf {
+    -fx-font-weight: normal ;
+}
+.tree {
+    -fx-font-weight: normal ;
+    -fx-text-fill: #603030;
+}
+.tree-table-cell:editable {
+    -fx-font-weight: bold ;
+    -fx-text-fill: #603030;
+}
+.tree-table-cell:inherited {
+    -fx-font-weight: italic ;
+    -fx-text-fill: #603030;
+}
+.split-pane {
+	-fx-padding: 1px
+}
+.tree-table-view {
+    -fx-font-weight: normal ;
+    -fx-text-fill: #603030;
+}
+.tree-table-row-cell {
+    -fx-font-weight: normal ;
+}
+.tree-table-row-cell:editable {
+    -fx-font-weight: bold ;
+}
+.tree-table-row-cell:inherited {
+    -fx-background-color: #f0f0f0;
+	-fx-font-style: italic ;
+}
+.tree-table-row-cell:divider {
+    -fx-background-color: #9ccfe2;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-style: italic ;
+}
+#.tree-table-row-cell:divider2 {
+#    -fx-background-color: #D0D0D0;
+#    -fx-font-weight: italic ;
+#}
+.tree-table-row-cell:empty {
+    -fx-background-color: transparent; /* hide cells which are not bound to a group */
+}
