@@ -56,7 +56,7 @@ public abstract class OtmFacet<T extends TLFacet> extends OtmModelElement<TLFace
     private OtmLibraryMember parent;
 
     public OtmFacet(T tl, OtmLibraryMember parent) {
-        super( tl, parent.getActionManager() );
+        super( tl );
         this.parent = parent;
     }
 
@@ -67,8 +67,8 @@ public abstract class OtmFacet<T extends TLFacet> extends OtmModelElement<TLFace
      * @param actionMgr
      */
     // The only time this is used is for operations - operationFacet/operations which are not library members
-    public OtmFacet(T tl, DexActionManager actionMgr) {
-        super( tl, actionMgr );
+    public OtmFacet(T tl) {
+        super( tl );
     }
 
     @Override

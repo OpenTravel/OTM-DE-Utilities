@@ -44,7 +44,7 @@ public class OtmOperation extends OtmModelElement<TLOperation> implements OtmChi
     private OtmServiceObject parent;
 
     public OtmOperation(TLOperation tlo, OtmServiceObject parent) {
-        super( tlo, parent.getActionManager() );
+        super( tlo );
         this.parent = parent;
     }
 
@@ -69,18 +69,6 @@ public class OtmOperation extends OtmModelElement<TLOperation> implements OtmChi
     public Icons getIconType() {
         return ImageManager.Icons.OPERATION;
     }
-
-    // @Override
-    // public Collection<OtmObject> getChildrenHierarchy() {
-    // Collection<OtmObject> ch = new ArrayList<>();
-    // // children.forEach(c -> {
-    // // if (c instanceof OtmIdFacet)
-    // // ch.add(c);
-    // // if (c instanceof OtmAlias)
-    // // ch.add(c);
-    // // });
-    // return ch;
-    // }
 
     @Override
     public void modelChildren() {

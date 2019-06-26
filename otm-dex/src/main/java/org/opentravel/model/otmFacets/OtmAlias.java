@@ -49,8 +49,7 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
      * @param tlBusinessObject
      */
     public OtmAlias(TLAlias tl, OtmLibraryMember parent) {
-        super( tl, parent.getActionManager() );
-        // log.debug("Created alias on " + parent);
+        super( tl );
         this.parent = parent;
 
         if (this.parent == null)

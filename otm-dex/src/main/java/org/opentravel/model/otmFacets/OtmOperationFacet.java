@@ -39,7 +39,7 @@ public class OtmOperationFacet extends OtmFacet<TLFacet> {
     /**
      */
     public OtmOperationFacet(TLFacet tl, OtmOperation parent) {
-        super( tl, parent.getActionManager() );
+        super( tl );
         this.parent = parent;
     }
 

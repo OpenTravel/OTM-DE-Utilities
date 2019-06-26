@@ -46,7 +46,7 @@ public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
     private OtmCoreObject parent;
 
     public OtmRoleEnumeration(TLRoleEnumeration tlo, OtmCoreObject parent) {
-        super( tlo, parent.getActionManager() );
+        super( tlo );
         this.parent = parent;
     }
 

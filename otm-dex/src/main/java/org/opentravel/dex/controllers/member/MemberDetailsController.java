@@ -264,6 +264,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             memberName.setText( "" );
             libraryName.setText( "" );
             baseTypeName.setText( "" );
+            memberDescription.setText( "" );
+            objectImageView.setImage( null );
         }
     }
 

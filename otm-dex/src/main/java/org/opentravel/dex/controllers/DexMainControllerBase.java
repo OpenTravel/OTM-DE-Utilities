@@ -127,12 +127,12 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         return dialogBoxController;
     }
 
-    @Override
-    public ImageManager getImageManager() {
-        if (imageMgr != null)
-            return imageMgr;
-        return mainController != null ? mainController.getImageManager() : null;
-    }
+    // @Override
+    // public ImageManager getImageManager() {
+    // if (imageMgr != null)
+    // return imageMgr;
+    // return mainController != null ? mainController.getImageManager() : null;
+    // }
 
     @Override
     public OtmModelManager getModelManager() {
@@ -215,6 +215,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         this.mainController = null;
 
         // Initialize managers
+        // TODO - use user settings to select which action manager to use
         actionMgr = new DexFullActionManager( this );
         modelMgr = new OtmModelManager( actionMgr );
         imageMgr = new ImageManager( primaryStage );
@@ -241,8 +242,6 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     public void setParent(DexMainController parent) {
         this.stage = parent.getStage();
         this.mainController = parent;
-        if (mainController.getImageManager() == null)
-            imageMgr = new ImageManager( stage );
     }
 
     // Required by AbstractApp...

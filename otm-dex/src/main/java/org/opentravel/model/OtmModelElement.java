@@ -94,21 +94,19 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     private SimpleStringProperty validationProperty;
     private ObjectProperty<ImageView> validationImageProperty;
 
-    private DexActionManager actionMgr = null;
-    private ImageManager imgMgr = null;
+    // private DexActionManager actionMgr = null;
 
-    public OtmModelElement(T tl, DexActionManager dexActionManager) {
+    // @Deprecated
+    // public OtmModelElement(T tl, DexActionManager dexActionManager) {
+    // this( tl );
+    // }
+
+    public OtmModelElement(T tl) {
         if (tl == null)
             throw new IllegalArgumentException( "Must have a tl element to create facade." );
         tlObject = tl;
         tl.addListener( new OtmModelElementListener( this ) );
         // checkListener();
-
-        // FIXME - cleaner way to get imgMgr. Only used for validation images
-        // It is NOT actionManager responsibility.
-        this.actionMgr = dexActionManager;
-        if (actionMgr != null && actionMgr.getMainController() != null)
-            imgMgr = actionMgr.getMainController().getImageManager();
     }
 
     // private void checkListener() {
@@ -177,7 +175,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     @Override
     public Image getIcon() {
         return ImageManager.getImage( this.getIconType() );
-        // return new ImageManager().get_OLD( this.getIconType() );
     }
 
     // @Override
@@ -212,8 +209,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         return getClass().getSimpleName();
     }
 
-    // @Override
-    // public abstract OtmLibraryMember getOwningMember();
 
     @Override
     public String getPrefix() {
@@ -345,20 +340,15 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     @Override
     public ImageView validationImage() {
-        // if (imgMgr == null)
-        // return null;
         if (isInherited())
             return null;
 
         isValid();
-        // if (findings != null) {
         if (findings.hasFinding( FindingType.ERROR ))
             return ImageManager.get( ImageManager.Icons.V_ERROR );
         if (findings.hasFinding( FindingType.WARNING ))
             return ImageManager.get( ImageManager.Icons.V_WARN );
         return ImageManager.get( ImageManager.Icons.V_OK );
-        // }
-        // return imgMgr.getView(ImageManager.Icons.RUN);
     }
 
     @Override

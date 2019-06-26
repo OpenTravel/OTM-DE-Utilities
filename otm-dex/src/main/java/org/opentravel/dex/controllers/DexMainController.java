@@ -16,7 +16,6 @@
 
 package org.opentravel.dex.controllers;
 
-import org.opentravel.common.ImageManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
@@ -47,10 +46,10 @@ public interface DexMainController extends DexController {
      */
     void addIncludedController(DexIncludedController<?> controller);
 
-    /**
-     * @return the image manager used by this controller
-     */
-    public ImageManager getImageManager();
+    // /**
+    // * @return the image manager used by this controller
+    // */
+    // public ImageManager getImageManager();
 
     /**
      * @return the model manager used by this controller or null

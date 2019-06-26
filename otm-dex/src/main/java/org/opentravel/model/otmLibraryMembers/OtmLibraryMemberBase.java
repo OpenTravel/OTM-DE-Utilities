@@ -72,12 +72,14 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     // A list of all members that have a descendant type user that assigned to this member and its descendants.
     protected List<OtmLibraryMember> whereUsed = null;
+    // private DexActionManager actionMgr = null;
 
     /**
      */
     public OtmLibraryMemberBase(T tl, OtmModelManager mgr) {
-        super( tl, mgr.getActionManager() );
+        super( tl );
         this.mgr = mgr;
+        // this.actionMgr = mgr.getActionManager();
     }
 
     @Override

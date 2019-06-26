@@ -114,7 +114,6 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
     public void configure(DexMainController parent) {
         checkNodes();
         this.mainController = parent;
-        // imageMgr = parent.getImageManager();
         log.debug( "Main controller set." );
     }
 

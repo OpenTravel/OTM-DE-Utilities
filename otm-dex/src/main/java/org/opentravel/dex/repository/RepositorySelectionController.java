@@ -106,28 +106,7 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
         log.debug( "Repository choice has " + repositoryIds.size() + " items." );
     }
 
-    // private RepositoryManager getRepoMgr() {
-    // // // Set up repository access
-    // RepositoryManager rm = null;
-    // try {
-    // rm = RepositoryManager.getDefault();
-    // // availabilityChecker = RepositoryAvailabilityChecker.getInstance(repositoryManager);
-    // // repoStatus = availabilityChecker.pingAllRepositories(true);
-    // } catch (RepositoryException e) {
-    // log.error( "Repository manager unavailable: " + e );
-    // }
-    // return rm;
-    // }
 
-    // public RepositoryManager getRepositoryManager() {
-    // return repositoryManager;
-    // }
-
-    // @Override
-    // public ReadOnlyObjectProperty<String> getSelectable() {
-    // return repositoryChoice.getSelectionModel().selectedItemProperty();
-    // }
-    // FIXME - use Events
 
     /**
      * @throws RepositoryException
@@ -193,7 +172,6 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
         eventPublisherNode = repositoryChoice;
 
         repositoryManager = parent.getRepositoryManager();
-        // repositoryManager = getRepoMgr();
         configureRepositoryChoice();
 
         // initialize login Dialog Box using a new dynamic loader

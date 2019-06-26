@@ -105,12 +105,6 @@ public class TypeSelectionContoller extends DexPopupControllerBase {
             throw new IllegalStateException( "Null FXML injected node." );
     }
 
-    // @Override
-    // public void doOK() {
-    // super.doOK();
-    // // Handle selection
-    // }
-
     public MemberAndProvidersDAO getSelected() {
         return memberTreeTableController.getSelected();
     }

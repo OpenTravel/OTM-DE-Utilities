@@ -298,12 +298,9 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
 
         // Decorate if possible
         if (controller != null && controller.getMainController() != null) {
-            ImageManager imageMgr = controller.getMainController().getImageManager();
-            if (imageMgr != null) {
-                ImageView graphic = ImageManager.get( element );
-                item.setGraphic( graphic );
-                Tooltip.install( graphic, getTooltip() );
-            }
+            ImageView graphic = ImageManager.get( element );
+            item.setGraphic( graphic );
+            Tooltip.install( graphic, getTooltip() );
         }
         return item;
     }

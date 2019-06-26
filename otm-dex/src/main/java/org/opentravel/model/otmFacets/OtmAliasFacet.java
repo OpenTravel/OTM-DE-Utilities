@@ -40,8 +40,7 @@ public class OtmAliasFacet extends OtmModelElement<TLAlias> implements OtmTypePr
      * @param tlBusinessObject
      */
     public OtmAliasFacet(TLAlias tl, OtmAlias parent) {
-        super( tl, parent.getActionManager() );
-        // log.debug("Created facet alias on " + parent);
+        super( tl );
         this.parent = parent;
 
         if (this.parent == null)

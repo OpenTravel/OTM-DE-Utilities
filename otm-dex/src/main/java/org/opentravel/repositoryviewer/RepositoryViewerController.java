@@ -116,81 +116,9 @@ public class RepositoryViewerController extends DexMainControllerBase implements
         log.debug( "Stage set." );
     }
 
-    // private void librarySelectionListener(TreeItem<RepoItemDAO> item) {
-    // if (item == null)
-    // return;
-    // log.debug( "Library selected: " + item.getValue() );
-    // try {
-    // repositoryItemCommitHistoriesController.post( item.getValue() );
-    // } catch (Exception e) {
-    // log.warn( "Could not post commit history: " + e.getLocalizedMessage() );
-    // }
-    // }
-
-    // /**
-    // * Handle namespace tree item selection by sending namespace to library table and clearing history.
-    // *
-    // * @param item
-    // */
-    // private void namespaceSelectionListener(TreeItem<NamespacesDAO> item) {
-    // if (item == null)
-    // return;
-    // log.debug( "New namespace tree item selected: " + item.getValue() );
-    // NamespacesDAO nsNode = item.getValue();
-    // if (nsNode.getRepository() != null) {
-    // try {
-    // namespaceLibrariesTreeTableController.post( nsNode );
-    // repositoryItemCommitHistoriesController.clear();
-    // } catch (Exception e) {
-    // postRepoError( e );
-    // }
-    // }
-    // }
-
-    // /**
-    // * Called when the user modifies the selection of the 'repositoryChoice' control.
-    // *
-    // * @throws RepositoryException
-    // */
-    // private void repositorySelectionChanged() {
-    // log.debug( "Selected new repository" );
-    // try {
-    // repositoryNamespacesTreeController.post( repositorySelectionController.getSelectedRepository() );
-    // // repositorySearchController.setRepository(repositorySelectionController.getSelectedRepository());
-    // } catch (Exception e) {
-    // log.warn( "Error posting repository: " + e.getLocalizedMessage() );
-    // postRepoError( e );
-    // }
-    // }
-
     protected void postRepoError(Exception e) {
         postError( e, "Error accessing repository." );
     }
 
-    // /**
-    // * @return
-    // */
-    // public RepositorySelectionController getRepositoryController() {
-    // return repositorySelectionController;
-    // }
-
-    // public RepositorySearchController getRepositorySearchController() {
-    // // return repositorySearchController;
-    // return null;
-    // }
-
-    // public Map<String,RepositoryItem> getRepositorySearchFilter() {
-    // return null;
-    // }
-
-    // public RepositoryNamespacesTreeController getRepositoryNamespacesController() {
-    // return repositoryNamespacesTreeController;
-    // }
-
-    // @Override
-    // public RepositoryManager getRepositoryManager() {
-    // return super.getRepositoryManager();
-    // // return repositorySelectionController.getRepositoryManager();
-    // }
 
 }
