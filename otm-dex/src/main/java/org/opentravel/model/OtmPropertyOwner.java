@@ -37,7 +37,18 @@ public interface OtmPropertyOwner extends OtmChildrenOwner {
     public OtmLibraryMember getOwningMember();
 
     /**
-     * Add the passed TL property/attribute/indicator then create OtmProperty
+     * Add the OtmProperty to the owner if the owner does not already contain it. If the child reports it is inherited
+     * (isInherited() = true) then it is added to inherited children.
+     * <p>
+     * Typically, the child will add itself when constructed with non-null parent.
+     * 
+     * @param child
+     * @return
+     */
+    public OtmProperty<?> add(OtmProperty<?> child);
+
+    /**
+     * Add the passed TL property/attribute/indicator to this and then create OtmProperty
      * 
      * @return the new OtmProperty
      */
@@ -54,4 +65,5 @@ public interface OtmPropertyOwner extends OtmChildrenOwner {
      */
     @Override
     public boolean isInherited();
+
 }

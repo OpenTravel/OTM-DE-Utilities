@@ -112,24 +112,26 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
         return OtmPropertyFactory.create( tl, this );
     }
 
-    private void addChild(OtmProperty<?> child) {
+    @Override
+    public OtmProperty<?> add(OtmProperty<?> child) {
         if (child != null) {
             // Make sure it has not already been added
             if (children == null)
                 children = new ArrayList<>();
             else if (contains( children, child ))
-                return;
+                return null;
 
             if (inheritedChildren == null)
                 inheritedChildren = new ArrayList<>();
             else if (contains( inheritedChildren, child ))
-                return;
+                return null;
 
             if (!child.isInherited())
                 children.add( child );
             else
                 inheritedChildren.add( child );
         }
+        return child;
     }
 
     private boolean contains(List<OtmObject> list, OtmObject child) {
@@ -228,8 +230,8 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
      */
     @Override
     public void modelChildren() {
-        getTL().getAttributes().forEach( tla -> addChild( OtmPropertyFactory.create( tla, this ) ) );
-        getTL().getIndicators().forEach( tli -> addChild( OtmPropertyFactory.create( tli, this ) ) );
+        getTL().getAttributes().forEach( tla -> OtmPropertyFactory.create( tla, this ) );
+        getTL().getIndicators().forEach( tli -> OtmPropertyFactory.create( tli, this ) );
     }
 
     @Override
@@ -275,10 +277,8 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
             inheritedChildren.clear(); // RE-model
 
         if (getBaseType() != null) {
-            PropertyCodegenUtils.getInheritedAttributes( getTL() )
-                .forEach( i -> addChild( OtmPropertyFactory.create( i, this ) ) );
-            PropertyCodegenUtils.getInheritedIndicators( getTL() )
-                .forEach( i -> addChild( OtmPropertyFactory.create( i, this ) ) );
+            PropertyCodegenUtils.getInheritedAttributes( getTL() ).forEach( i -> OtmPropertyFactory.create( i, this ) );
+            PropertyCodegenUtils.getInheritedIndicators( getTL() ).forEach( i -> OtmPropertyFactory.create( i, this ) );
 
             // log.debug("Modeled inherited children of " + this);
             for (OtmObject child : inheritedChildren)

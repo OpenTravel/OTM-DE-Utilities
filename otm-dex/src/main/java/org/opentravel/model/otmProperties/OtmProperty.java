@@ -37,6 +37,8 @@ public abstract class OtmProperty<T extends TLModelElement> extends OtmModelElem
     public OtmProperty(T tl, OtmPropertyOwner parent) {
         super( tl );
         this.parent = parent;
+        if (parent != null)
+            parent.add( this );
     }
 
     @Override

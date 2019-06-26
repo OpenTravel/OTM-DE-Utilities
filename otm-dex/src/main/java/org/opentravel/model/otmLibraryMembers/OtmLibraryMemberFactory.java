@@ -61,7 +61,7 @@ public class OtmLibraryMemberFactory {
         else if (tlMember instanceof TLChoiceObject)
             otmMember = new OtmChoiceObject( (TLChoiceObject) tlMember, manager );
         else if (tlMember instanceof TLCoreObject)
-            otmMember = new OtmCoreObject( (TLCoreObject) tlMember, manager );
+            otmMember = new OtmCore( (TLCoreObject) tlMember, manager );
         else if (tlMember instanceof TLSimple)
             otmMember = new OtmSimpleObject( (TLSimple) tlMember, manager );
         else if (tlMember instanceof TLOpenEnumeration)
@@ -95,7 +95,7 @@ public class OtmLibraryMemberFactory {
             return "Business Object";
         if (member instanceof OtmChoiceObject)
             return "Choice Object";
-        if (member instanceof OtmCoreObject)
+        if (member instanceof OtmCore)
             return "Core Object";
         if (member instanceof OtmValueWithAttributes)
             return "Value With Attributes";

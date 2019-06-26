@@ -25,7 +25,7 @@ import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLProperty;
 
 /**
- * Factory that resolves which type of indicator to create.
+ * Factory that resolves which type of property (indicator, element, attribute) to create.
  * 
  * @author dmh
  *

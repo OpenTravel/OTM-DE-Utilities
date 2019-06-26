@@ -27,7 +27,7 @@ import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.model.otmLibraryMembers.OtmCoreObject;
+import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 
@@ -205,7 +205,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         // OtmTypeProvider provider = null;
         typeLabel.setDisable( !(member instanceof OtmTypeUser) );
         typeLabel.setText( TYPELABEL );
-        if (member instanceof OtmCoreObject)
+        if (member instanceof OtmCore)
             typeLabel.setText( TYPELABELCORE );
         else if (member instanceof OtmValueWithAttributes)
             typeLabel.setText( TYPELABELVWA );

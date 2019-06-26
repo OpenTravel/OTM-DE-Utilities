@@ -26,9 +26,12 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmAlias;
+import org.opentravel.model.otmFacets.OtmListFacet;
 import org.opentravel.model.otmFacets.OtmSummaryFacet;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLCoreObject;
+import org.opentravel.schemacompiler.model.TLFacetType;
+import org.opentravel.schemacompiler.model.TLListFacet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,16 +48,16 @@ import javafx.beans.property.StringProperty;
  * @author Dave Hollander
  * 
  */
-public class OtmCoreObject extends OtmComplexObjects<TLCoreObject> implements OtmTypeUser {
-    private static Log log = LogFactory.getLog( OtmCoreObject.class );
+public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeUser {
+    private static Log log = LogFactory.getLog( OtmCore.class );
 
     private StringProperty assignedTypeProperty;
 
-    public OtmCoreObject(TLCoreObject tlo, OtmModelManager mgr) {
+    public OtmCore(TLCoreObject tlo, OtmModelManager mgr) {
         super( tlo, mgr );
     }
 
-    public OtmCoreObject(String name, OtmModelManager mgr) {
+    public OtmCore(String name, OtmModelManager mgr) {
         super( new TLCoreObject(), mgr );
         setName( name );
     }
@@ -81,15 +84,43 @@ public class OtmCoreObject extends OtmComplexObjects<TLCoreObject> implements Ot
      */
     @Override
     public void modelChildren() {
-        super.modelChildren();
+        super.modelChildren(); // Will model facets
         log.debug( "FIXME - Has " + children.size() + " children." );
         // Add
         // Role Enumeration - TLRoleEnumeration / TLRole
         children.add( new OtmRoleEnumeration( getTL().getRoleEnumeration(), this ) );
         // Simple Facet - TLSimpleFacet
-        // Simple List Facet - TLListFacet
-        // Summary List Facet - TLListFacet
-        // Detail List Facet - TLListFacet
+        children.add( new OtmListFacet( getTL().getSimpleListFacet(), this ) );
+        children.add( new OtmListFacet( getTL().getSummaryListFacet(), this ) );
+        children.add( new OtmListFacet( getTL().getDetailListFacet(), this ) );
+    }
+
+    public OtmRoleEnumeration getRoles() {
+        for (OtmObject c : getChildren())
+            if (c instanceof OtmRoleEnumeration)
+                return (OtmRoleEnumeration) c;
+        return null;
+    }
+
+    public OtmListFacet getDetailList() {
+        for (OtmObject c : getChildren())
+            if (c instanceof OtmListFacet && ((TLListFacet) c.getTL()).getFacetType() == TLFacetType.DETAIL)
+                return (OtmListFacet) c;
+        return null;
+    }
+
+    public OtmListFacet getSummaryList() {
+        for (OtmObject c : getChildren())
+            if (c instanceof OtmListFacet && ((TLListFacet) c.getTL()).getFacetType() == TLFacetType.SUMMARY)
+                return (OtmListFacet) c;
+        return null;
+    }
+
+    public OtmListFacet getSimpleList() {
+        for (OtmObject c : getChildren())
+            if (c instanceof OtmListFacet && ((TLListFacet) c.getTL()).getFacetType() == TLFacetType.SIMPLE)
+                return (OtmListFacet) c;
+        return null;
     }
 
     @Override
@@ -167,6 +198,7 @@ public class OtmCoreObject extends OtmComplexObjects<TLCoreObject> implements Ot
         if (getTL().getExtension() != null)
             log.warn( "TODO - model inherited children" );
     }
+
 
     // extends FacetOwners
     // implements ExtensionOwner, AliasOwner, Sortable, ContextualFacetOwnerInterface, VersionedObjectInterface {

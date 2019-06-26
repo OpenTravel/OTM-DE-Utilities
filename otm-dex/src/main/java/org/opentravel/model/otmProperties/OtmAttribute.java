@@ -45,14 +45,13 @@ public class OtmAttribute<T extends TLAttribute> extends OtmProperty<TLAttribute
     private StringProperty assignedTypeProperty;
 
     /**
-     * @param tlBusinessObject
+     * Create a new attribute and set the parent.
+     * 
+     * @param property owner of this attribute
      */
     public OtmAttribute(T tl, OtmPropertyOwner parent) {
         super( tl, parent );
         tlObject = tl;
-
-        if (!(tl instanceof TLAttribute))
-            throw new IllegalArgumentException( "OtmAttribute constructor not passed a tl attribute." );
     }
 
     @Override

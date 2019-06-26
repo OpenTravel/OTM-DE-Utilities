@@ -27,7 +27,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
-import org.opentravel.model.otmLibraryMembers.OtmCoreObject;
+import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResourceObject;
@@ -386,7 +386,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             else if (value.startsWith( CHOICE ))
                 classNameFilter = OtmChoiceObject.class.getSimpleName();
             else if (value.startsWith( CORE ))
-                classNameFilter = OtmCoreObject.class.getSimpleName();
+                classNameFilter = OtmCore.class.getSimpleName();
             else if (value.startsWith( SIMPLE ))
                 classNameFilter = OtmSimpleObject.class.getSimpleName();
             else if (value.startsWith( ENUMERATION ))

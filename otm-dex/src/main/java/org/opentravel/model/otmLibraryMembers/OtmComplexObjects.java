@@ -23,6 +23,8 @@ import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.otmFacets.OtmDetailFacet;
+import org.opentravel.model.otmFacets.OtmSummaryFacet;
 import org.opentravel.schemacompiler.model.TLComplexTypeBase;
 import org.opentravel.schemacompiler.model.TLLibraryMember;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -93,6 +95,26 @@ public abstract class OtmComplexObjects<T extends TLComplexTypeBase> extends Otm
     @Override
     public boolean isExpanded() {
         return true;
+    }
+
+    /**
+     * @return
+     */
+    public OtmSummaryFacet getSummary() {
+        for (OtmObject c : getChildren())
+            if (c instanceof OtmSummaryFacet)
+                return (OtmSummaryFacet) c;
+        return null;
+    }
+
+    /**
+     * @return
+     */
+    public OtmDetailFacet getDetail() {
+        for (OtmObject c : getChildren())
+            if (c instanceof OtmDetailFacet)
+                return (OtmDetailFacet) c;
+        return null;
     }
 
 }

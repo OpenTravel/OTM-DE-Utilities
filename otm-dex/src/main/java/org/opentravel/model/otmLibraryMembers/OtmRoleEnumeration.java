@@ -43,9 +43,9 @@ public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
     implements OtmTypeProvider, OtmChildrenOwner {
     private static Log log = LogFactory.getLog( OtmRoleEnumeration.class );
 
-    private OtmCoreObject parent;
+    private OtmCore parent;
 
-    public OtmRoleEnumeration(TLRoleEnumeration tlo, OtmCoreObject parent) {
+    public OtmRoleEnumeration(TLRoleEnumeration tlo, OtmCore parent) {
         super( tlo );
         this.parent = parent;
     }
@@ -66,12 +66,12 @@ public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
         return getParent().getLibrary();
     }
 
-    public OtmCoreObject getParent() {
+    public OtmCore getParent() {
         return parent;
     }
 
     @Override
-    public OtmCoreObject getOwningMember() {
+    public OtmCore getOwningMember() {
         return getParent();
     }
 
