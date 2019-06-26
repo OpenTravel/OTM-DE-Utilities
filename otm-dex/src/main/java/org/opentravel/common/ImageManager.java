@@ -78,19 +78,25 @@ public class ImageManager {
     /**
      * Use primary stage icons. Will throw npe if not initialized.
      */
-    public ImageManager() {
-        // Only used as to run get(OtmObject)
-    }
+    // public ImageManager() {
+    // // Only used as to run get(OtmObject)
+    // }
 
     public ImageManager(Stage primaryStage) {
         if (!initalized) {
+            // Load the application icon in the foreground, the rest in the background
+            if (primaryStage != null)
+                primaryStage.getIcons().add( new Image( Icons.APPLICATION.label ) );
+
             // All icons must be loaded into the stage and retained for reuse
             Image image;
             for (Icons icon : Icons.values()) {
                 try {
-                    image = new Image( icon.label );
+                    if (icon == Icons.APPLICATION)
+                        continue;
+                    // image = new Image( icon.label );
                     // Control height, width, ratio, smooth resize, in background
-                    // image = new Image(icon.label, 64, 64, true, true, true);
+                    image = new Image( icon.label, 16, 16, true, true, true );
                     if (primaryStage != null)
                         primaryStage.getIcons().add( image );
                     iconMap.put( icon, image );
@@ -102,25 +108,6 @@ public class ImageManager {
         initalized = true;
     }
 
-    // TEST - make a map of icon type and Image - use that map in getView()
-    // TODO - make this a child of modelManager and choose ONE api method
-    @Deprecated
-    public Image get_OLD(Icons icon) {
-        return icon != null ? iconMap.get( icon ) : null;
-        // return icon != null ? new Image(getClass().getResourceAsStream(icon.label)) : null;
-    }
-
-    /**
-     * Preferred method for getting an image view to represent an OTM object.
-     * 
-     * @param element OtmObject to select which type of icon
-     * @return new imageView containing the image associated with the icon or null if no icon image is found
-     */
-    @Deprecated
-    public ImageView get_OLD(OtmObject element) {
-        return get_OLD( element.getIconType() ) != null ? new ImageView( get_OLD( element.getIconType() ) ) : null;
-    }
-
     /**
      * Preferred method for getting an image view to represent an OTM object.
      * 
@@ -128,7 +115,7 @@ public class ImageManager {
      * @return new imageView containing the image associated with the icon or null if no icon image is found
      */
     public static ImageView get(OtmObject otm) {
-        return get( otm.getIconType() ) != null ? new ImageView( get( otm.getIconType() ) ) : null;
+        return getImage( otm.getIconType() ) != null ? new ImageView( getImage( otm.getIconType() ) ) : null;
     }
 
     /**
@@ -139,7 +126,7 @@ public class ImageManager {
      * @param icon is one of the icon types listed in the enumeration
      * @return a JavaFX node for the icon
      */
-    public static Image get(Icons icon) {
+    public static Image getImage(Icons icon) {
         return icon != null ? iconMap.get( icon ) : null;
         // return icon != null ? new Image(getClass().getResourceAsStream(icon.label)) : null;
     }
@@ -147,17 +134,49 @@ public class ImageManager {
     /**
      * Get an image view for a non-OTM object.
      * 
-     * @see #get_OLD(OtmObject)
+     * @see #get(OtmObject)
      * 
      * @param icon is one of the icon types listed in the enumeration
      * @return a JavaFX node for the icon
      */
-    @Deprecated
-    public ImageView getView(Icons icon) {
-        // Image i = get(icon);
-        // ImageView iv = new ImageView(i);
-        return new ImageView( get_OLD( icon ) );
+    public static ImageView get(Icons icon) {
+        return new ImageView( getImage( icon ) );
     }
+
+    // // TEST - make a map of icon type and Image - use that map in getView()
+    // // TODO - make this a child of modelManager and choose ONE api method
+    // @Deprecated
+    // public Image get_OLD(Icons icon) {
+    // return icon != null ? iconMap.get( icon ) : null;
+    // // return icon != null ? new Image(getClass().getResourceAsStream(icon.label)) : null;
+    // }
+    //
+    // /**
+    // * Preferred method for getting an image view to represent an OTM object.
+    // *
+    // * @param element OtmObject to select which type of icon
+    // * @return new imageView containing the image associated with the icon or null if no icon image is found
+    // */
+    // @Deprecated
+    // public ImageView get_OLD(OtmObject element) {
+    // return get_OLD( element.getIconType() ) != null ? new ImageView( get_OLD( element.getIconType() ) ) : null;
+    // }
+
+
+    // /**
+    // * Get an image view for a non-OTM object.
+    // *
+    // * @see #get_OLD(OtmObject)
+    // *
+    // * @param icon is one of the icon types listed in the enumeration
+    // * @return a JavaFX node for the icon
+    // */
+    // @Deprecated
+    // public ImageView getViewX(Icons icon) {
+    // // Image i = get(icon);
+    // // ImageView iv = new ImageView(i);
+    // return new ImageView( get_OLD( icon ) );
+    // }
 
     // /**
     // * @param Image
@@ -170,17 +189,17 @@ public class ImageManager {
     // return new ImageView(icon);
     // }
 
-    /**
-     * get an image view to represent an OTM object.
-     * 
-     * @param OtmModelElement
-     * 
-     * @return a JavaFX node for the icon
-     */
-    @Deprecated
-    public ImageView getView(OtmObject element) {
-        return new ImageView( element.getIcon() );
-    }
+    // /**
+    // * get an image view to represent an OTM object.
+    // *
+    // * @param OtmModelElement
+    // *
+    // * @return a JavaFX node for the icon
+    // */
+    // @Deprecated
+    // public ImageView getView(OtmObject element) {
+    // return new ImageView( element.getIcon() );
+    // }
 
     // Image imageOk = new Image(getClass().getResourceAsStream("/icons/BusinessObject.png"));
     // Image error = new Image(getClass().getResourceAsStream("/icons/error.gif"));

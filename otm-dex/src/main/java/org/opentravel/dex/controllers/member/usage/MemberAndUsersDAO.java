@@ -58,7 +58,7 @@ public class MemberAndUsersDAO implements DexDAO<OtmObject> {
 
     @Override
     public ImageView getIcon(ImageManager imageMgr) {
-        return imageMgr != null ? imageMgr.getView( otmObject ) : null;
+        return imageMgr != null ? ImageManager.get( otmObject ) : null;
     }
 
     @Override
@@ -125,23 +125,21 @@ public class MemberAndUsersDAO implements DexDAO<OtmObject> {
      * 
      * @return new tree item added to tree at the parent
      */
-    public TreeItem<MemberAndUsersDAO> createTreeItem(ImageManager imageMgr, TreeItem<MemberAndUsersDAO> parent) {
+    public TreeItem<MemberAndUsersDAO> createTreeItem(TreeItem<MemberAndUsersDAO> parent) {
         TreeItem<MemberAndUsersDAO> item = new TreeItem<>( this );
         item.setExpanded( false );
         if (parent != null)
             parent.getChildren().add( item );
 
         // Decorate if possible
-        if (imageMgr != null) {
-            ImageView graphic = imageMgr.getView( otmObject );
-            item.setGraphic( graphic );
-            Tooltip toolTip = new Tooltip();
-            if (otmObject instanceof OtmTypeUser && ((OtmTypeUser) otmObject).getAssignedType() != null)
-                toolTip.setText( "Uses " + ((OtmTypeUser) otmObject).getAssignedType().getNameWithPrefix() );
-            else
-                toolTip.setText( otmObject.getObjectTypeName() );
-            Tooltip.install( graphic, toolTip );
-        }
+        ImageView graphic = ImageManager.get( otmObject );
+        item.setGraphic( graphic );
+        Tooltip toolTip = new Tooltip();
+        if (otmObject instanceof OtmTypeUser && ((OtmTypeUser) otmObject).getAssignedType() != null)
+            toolTip.setText( "Uses " + ((OtmTypeUser) otmObject).getAssignedType().getNameWithPrefix() );
+        else
+            toolTip.setText( otmObject.getObjectTypeName() );
+        Tooltip.install( graphic, toolTip );
         return item;
     }
 

@@ -18,7 +18,6 @@ package org.opentravel.dex.controllers.member;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.common.ImageManager;
 import org.opentravel.common.cellfactories.ValidationMemberTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
@@ -156,22 +155,20 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         super.configure( parent );
         // log.debug("Configuring Member Tree Table.");
         eventPublisherNode = memberTreeController;
-        configure( parent.getModelManager(), parent.getImageManager(), treeEditingEnabled );
+        configure( parent.getModelManager(), treeEditingEnabled );
     }
 
     /**
      * Configure controller for use by non-main controllers.
      * 
      * @param modelMgr must not be null
-     * @param imageMgr may be null if no graphics are to presented.
      * @param editable sets tree editing enables
      */
-    public void configure(OtmModelManager modelMgr, ImageManager imageMgr, boolean editable) {
+    public void configure(OtmModelManager modelMgr, boolean editable) {
         if (modelMgr == null)
             throw new IllegalArgumentException(
                 "Model manager is null. Must configure member tree with model manager." );
 
-        this.imageMgr = imageMgr;
         this.currentModelMgr = modelMgr;
         this.treeEditingEnabled = editable;
 
@@ -219,7 +216,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             return;
 
         // Create item for the library member
-        TreeItem<MemberAndProvidersDAO> item = new MemberAndProvidersDAO( member ).createTreeItem( imageMgr, parent );
+        TreeItem<MemberAndProvidersDAO> item = new MemberAndProvidersDAO( member ).createTreeItem( parent );
 
         // Create and add items for children
         if (member instanceof OtmChildrenOwner)
@@ -231,8 +228,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
      */
     private void createChildrenItems(OtmChildrenOwner member, TreeItem<MemberAndProvidersDAO> parentItem) {
         member.getChildrenTypeProviders().forEach( p -> {
-            TreeItem<MemberAndProvidersDAO> cfItem =
-                new MemberAndProvidersDAO( p ).createTreeItem( imageMgr, parentItem );
+            TreeItem<MemberAndProvidersDAO> cfItem = new MemberAndProvidersDAO( p ).createTreeItem( parentItem );
 
             // Only user contextual facet for recursing
             if (p instanceof OtmContributedFacet && ((OtmContributedFacet) p).getContributor() != null)
@@ -244,24 +240,6 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         } );
     }
 
-    // /**
-    // * Create and add to tree with no conditional logic.
-    // *
-    // * @return new tree item added to tree at the parent
-    // */
-    // private TreeItem<MemberDAO> createTreeItem(OtmTypeProvider provider, TreeItem<MemberDAO> parent) {
-    // TreeItem<MemberDAO> item = new TreeItem<>(new MemberDAO(provider));
-    // item.setExpanded(false);
-    // if (parent != null)
-    // parent.getChildren().add(item);
-    // if (imageMgr != null) {
-    // ImageView graphic = imageMgr.getView(provider);
-    // item.setGraphic(graphic);
-    // Tooltip.install(graphic, new Tooltip(provider.getObjectTypeName()));
-    // }
-    // return item;
-    // }
-
     public MemberFilterController getFilter() {
         return filter;
     }
@@ -272,8 +250,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
 
     public MemberAndProvidersDAO getSelected() {
         return memberTree.getSelectionModel().getSelectedItem() != null
-            ? memberTree.getSelectionModel().getSelectedItem().getValue()
-            : null;
+            ? memberTree.getSelectionModel().getSelectedItem().getValue() : null;
     }
 
     private void handleEvent(DexFilterChangeEvent event) {

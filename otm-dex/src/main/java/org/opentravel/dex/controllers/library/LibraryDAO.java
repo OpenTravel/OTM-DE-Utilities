@@ -61,7 +61,7 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
 
     @Override
     public ImageView getIcon(ImageManager imageMgr) {
-        return imageMgr.getView( library.getIconType() );
+        return ImageManager.get( library.getIconType() );
     }
 
     @Override

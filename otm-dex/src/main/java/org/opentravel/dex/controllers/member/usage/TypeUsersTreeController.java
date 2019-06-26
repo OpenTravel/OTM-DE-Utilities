@@ -18,7 +18,6 @@ package org.opentravel.dex.controllers.member.usage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -92,22 +91,20 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmModelM
         super.configure( parent );
         // log.debug("Configuring Type Users Tree.");
         eventPublisherNode = memberWhereUsed;
-        configure( parent.getModelManager(), parent.getImageManager() );
+        configure( parent.getModelManager() );
     }
 
     /**
      * Configure controller for use by non-main controllers.
      * 
      * @param modelMgr must not be null
-     * @param imageMgr may be null if no graphics are to presented.
      * @param editable sets tree editing enables
      */
-    public void configure(OtmModelManager modelMgr, ImageManager imageMgr) {
+    public void configure(OtmModelManager modelMgr) {
         if (modelMgr == null)
             throw new IllegalArgumentException(
                 "Model manager is null. Must configure member tree with model manager." );
 
-        this.imageMgr = imageMgr;
 
         // Set the hidden root item
         root = new TreeItem<>();
@@ -135,8 +132,7 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmModelM
 
     public PropertiesDAO getSelected() {
         return typeUsersTree.getSelectionModel().getSelectedItem() != null
-            ? typeUsersTree.getSelectionModel().getSelectedItem().getValue()
-            : null;
+            ? typeUsersTree.getSelectionModel().getSelectedItem().getValue() : null;
     }
 
     private void handleEvent(DexMemberSelectionEvent event) {

@@ -95,7 +95,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
         Collection<OtmObject> hierarchy = new ArrayList<>();
-        getInheritedChildren().forEach( hierarchy::add );
+        if (getInheritedChildren() != null)
+            getInheritedChildren().forEach( hierarchy::add );
         getChildren().forEach( hierarchy::add );
         return hierarchy;
     }

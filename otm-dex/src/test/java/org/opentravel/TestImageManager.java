@@ -16,25 +16,31 @@
 
 package org.opentravel;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.TestEnumerations;
 import org.opentravel.model.otmLibraryMembers.OtmEnumerationClosed;
+import org.opentravel.objecteditor.ObjectEditorApp;
+import org.opentravel.utilities.testutil.AbstractFxTest;
 
-import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  * Verifies the functions of the <code>UserSettings</code> class.
  */
-public class TestImageManager {
+public class TestImageManager extends AbstractFxTest {
+
+    public static final boolean RUN_HEADLESS = true;
+
     private static Log log = LogFactory.getLog( TestImageManager.class );
 
     private static OtmModelManager staticModelManager = null;
@@ -45,48 +51,37 @@ public class TestImageManager {
     }
 
     @Test
-    public void testConstructor() {
-
-        // When stage is null
-        Stage stage = null;
-        // Then - errors logged but no npe
-        ImageManager imageMgr = new ImageManager( stage );
-
-        log.debug( "Done." );
-    }
-
-    @Test
-    @Ignore
-    // FIXME Test fails if not run in the correct order
     public void testStatic() {
         // Given the model manager and an OtmObject
         OtmEnumerationClosed oec = TestEnumerations.buildOtmEnumerationClosed( staticModelManager );
 
-        // When run before initialize
-        // ImageManager imageMgr = new ImageManager();
-
-        // Then null is returned.
-        assertNull( ImageManager.get( Icons.ATTRIBUTE ) );
-        assertNull( ImageManager.get( oec ) );
+        // Then image/imageview is returned.
+        ImageView iv1 = ImageManager.get( oec );
+        ImageView iv2 = ImageManager.get( Icons.LIBRARY );
+        Image im = ImageManager.getImage( Icons.Error );
+        assertNotNull( iv1 );
+        assertNotNull( iv2 );
+        assertNotNull( im );
+        assertNotNull( iv1.getImage() );
 
         log.debug( "Done." );
     }
 
-    @Test
-    @Ignore
-    // FIXME Test fails if not run in the correct order
-    public void testNotInitialized() {
-        // Given the model manager and an OtmObject
-        OtmEnumerationClosed oec = TestEnumerations.buildOtmEnumerationClosed( staticModelManager );
 
-        // When run before initialize
-        ImageManager imageMgr = new ImageManager();
+    /**
+     * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
+     */
+    @Override
+    protected Class<? extends AbstractOTMApplication> getApplicationClass() {
+        return ObjectEditorApp.class;
+    }
 
-        // Then null is returned.
-        assertNull( imageMgr.get_OLD( Icons.ATTRIBUTE ) );
-        assertNull( imageMgr.get_OLD( oec ) );
-
-        log.debug( "Done." );
+    /**
+     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
+     */
+    @Override
+    protected String getBackgroundTaskNodeQuery() {
+        return "#libraryText";
     }
 
 }

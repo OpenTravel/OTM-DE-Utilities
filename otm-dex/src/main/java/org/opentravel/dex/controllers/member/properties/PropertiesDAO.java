@@ -187,7 +187,7 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
 
     @Override
     public ImageView getIcon(ImageManager imageMgr) {
-        return imageMgr.getView( element );
+        return ImageManager.get( element );
     }
 
     @Override
@@ -300,7 +300,7 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
         if (controller != null && controller.getMainController() != null) {
             ImageManager imageMgr = controller.getMainController().getImageManager();
             if (imageMgr != null) {
-                ImageView graphic = imageMgr.getView( element );
+                ImageView graphic = ImageManager.get( element );
                 item.setGraphic( graphic );
                 Tooltip.install( graphic, getTooltip() );
             }

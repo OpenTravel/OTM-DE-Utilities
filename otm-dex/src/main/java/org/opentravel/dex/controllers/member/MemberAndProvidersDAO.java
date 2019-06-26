@@ -57,7 +57,7 @@ public class MemberAndProvidersDAO implements DexDAO<OtmObject> {
 
     @Override
     public ImageView getIcon(ImageManager imageMgr) {
-        return imageMgr != null ? imageMgr.get_OLD( otmObject ) : null;
+        return ImageManager.get( otmObject );
     }
 
     @Override
@@ -124,19 +124,16 @@ public class MemberAndProvidersDAO implements DexDAO<OtmObject> {
      * 
      * @return new tree item added to tree at the parent
      */
-    public TreeItem<MemberAndProvidersDAO> createTreeItem(ImageManager imageMgr,
-        TreeItem<MemberAndProvidersDAO> parent) {
+    public TreeItem<MemberAndProvidersDAO> createTreeItem(TreeItem<MemberAndProvidersDAO> parent) {
         TreeItem<MemberAndProvidersDAO> item = new TreeItem<>( this );
         item.setExpanded( false );
         if (parent != null)
             parent.getChildren().add( item );
 
         // Decorate if possible
-        if (imageMgr != null) {
-            ImageView graphic = imageMgr.getView( otmObject );
-            item.setGraphic( graphic );
-            Tooltip.install( graphic, new Tooltip( otmObject.getObjectTypeName() ) );
-        }
+        ImageView graphic = ImageManager.get( otmObject );
+        item.setGraphic( graphic );
+        Tooltip.install( graphic, new Tooltip( otmObject.getObjectTypeName() ) );
         return item;
     }
 

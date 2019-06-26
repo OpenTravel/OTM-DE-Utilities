@@ -176,7 +176,8 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     @Override
     public Image getIcon() {
-        return new ImageManager().get_OLD( this.getIconType() );
+        return ImageManager.getImage( this.getIconType() );
+        // return new ImageManager().get_OLD( this.getIconType() );
     }
 
     // @Override
@@ -217,8 +218,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     @Override
     public String getPrefix() {
         return getOwningMember() != null && getOwningMember().getLibrary() != null
-            ? getOwningMember().getLibrary().getPrefix()
-            : "---";
+            ? getOwningMember().getLibrary().getPrefix() : "---";
     }
 
     /**
@@ -345,18 +345,18 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     @Override
     public ImageView validationImage() {
-        if (imgMgr == null)
-            return null;
+        // if (imgMgr == null)
+        // return null;
         if (isInherited())
             return null;
 
         isValid();
         // if (findings != null) {
         if (findings.hasFinding( FindingType.ERROR ))
-            return imgMgr.getView( ImageManager.Icons.V_ERROR );
+            return ImageManager.get( ImageManager.Icons.V_ERROR );
         if (findings.hasFinding( FindingType.WARNING ))
-            return imgMgr.getView( ImageManager.Icons.V_WARN );
-        return imgMgr.getView( ImageManager.Icons.V_OK );
+            return ImageManager.get( ImageManager.Icons.V_WARN );
+        return ImageManager.get( ImageManager.Icons.V_OK );
         // }
         // return imgMgr.getView(ImageManager.Icons.RUN);
     }

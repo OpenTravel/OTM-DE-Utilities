@@ -18,7 +18,6 @@ package org.opentravel.dex.controllers.member.usage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -93,23 +92,20 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmModelManag
         super.configure( parent );
         // log.debug("Configuring Member Tree Table.");
         eventPublisherNode = memberWhereUsed;
-        configure( parent.getModelManager(), parent.getImageManager() );
+        configure( parent.getModelManager() );
     }
 
     /**
      * Configure controller for use by non-main controllers.
      * 
      * @param modelMgr must not be null
-     * @param imageMgr may be null if no graphics are to presented.
      * @param editable sets tree editing enables
      */
-    public void configure(OtmModelManager modelMgr, ImageManager imageMgr) {
+    public void configure(OtmModelManager modelMgr) {
         if (modelMgr == null)
             throw new IllegalArgumentException(
                 "Model manager is null. Must configure member tree with model manager." );
 
-        this.imageMgr = imageMgr;
-        // this.currentModelMgr = modelMgr;
 
         // Set the hidden root item
         root = new TreeItem<>();
@@ -145,7 +141,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmModelManag
 
         // Get all providers for this member
         Collection<OtmLibraryMember> whereUsed = member.getWhereUsed();
-        whereUsed.forEach( wu -> new MemberAndUsersDAO( wu ).createTreeItem( imageMgr, root ) );
+        whereUsed.forEach( wu -> new MemberAndUsersDAO( wu ).createTreeItem( root ) );
 
     }
 
@@ -155,8 +151,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmModelManag
 
     public MemberAndUsersDAO getSelected() {
         return usersTree.getSelectionModel().getSelectedItem() != null
-            ? usersTree.getSelectionModel().getSelectedItem().getValue()
-            : null;
+            ? usersTree.getSelectionModel().getSelectedItem().getValue() : null;
     }
 
     private void handleEvent(DexMemberSelectionEvent event) {

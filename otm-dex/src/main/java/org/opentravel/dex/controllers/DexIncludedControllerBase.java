@@ -18,7 +18,6 @@ package org.opentravel.dex.controllers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.common.ImageManager;
 import org.opentravel.dex.events.DexEvent;
 
 import java.util.Arrays;
@@ -46,7 +45,6 @@ import javafx.scene.control.TreeTableColumn;
 public abstract class DexIncludedControllerBase<C> implements DexIncludedController<C> {
     private static Log log = LogFactory.getLog( DexIncludedControllerBase.class );
 
-    protected ImageManager imageMgr;
     protected DexMainController mainController;
     protected C postedData;
 
@@ -116,7 +114,7 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
     public void configure(DexMainController parent) {
         checkNodes();
         this.mainController = parent;
-        imageMgr = parent.getImageManager();
+        // imageMgr = parent.getImageManager();
         log.debug( "Main controller set." );
     }
 

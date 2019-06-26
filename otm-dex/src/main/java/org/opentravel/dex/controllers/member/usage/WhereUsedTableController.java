@@ -153,22 +153,20 @@ public class WhereUsedTableController extends DexIncludedControllerBase<OtmModel
         super.configure( parent );
         log.debug( "Configuring Member Tree Table." );
         eventPublisherNode = memberWhereUsed;
-        configure( parent.getModelManager(), parent.getImageManager() );
+        configure( parent.getModelManager() );
     }
 
     /**
      * Configure controller for use by non-main controllers.
      * 
      * @param modelMgr must not be null
-     * @param imageMgr may be null if no graphics are to presented.
      * @param editable sets tree editing enables
      */
-    public void configure(OtmModelManager modelMgr, ImageManager imageMgr) {
+    public void configure(OtmModelManager modelMgr) {
         if (modelMgr == null)
             throw new IllegalArgumentException(
                 "Model manager is null. Must configure member tree with model manager." );
 
-        this.imageMgr = imageMgr;
         this.currentModelMgr = modelMgr;
 
         // Set the hidden root item
@@ -251,11 +249,9 @@ public class WhereUsedTableController extends DexIncludedControllerBase<OtmModel
         item.setExpanded( false );
         if (parent != null)
             parent.getChildren().add( item );
-        if (imageMgr != null) {
-            ImageView graphic = imageMgr.getView( provider );
-            item.setGraphic( graphic );
-            Tooltip.install( graphic, new Tooltip( provider.getObjectTypeName() ) );
-        }
+        ImageView graphic = ImageManager.get( provider );
+        item.setGraphic( graphic );
+        Tooltip.install( graphic, new Tooltip( provider.getObjectTypeName() ) );
         return item;
     }
 
@@ -269,8 +265,7 @@ public class WhereUsedTableController extends DexIncludedControllerBase<OtmModel
 
     public MemberAndProvidersDAO getSelected() {
         return whereUsedTreeTable.getSelectionModel().getSelectedItem() != null
-            ? whereUsedTreeTable.getSelectionModel().getSelectedItem().getValue()
-            : null;
+            ? whereUsedTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
     }
 
     private void handleEvent(DexFilterChangeEvent event) {

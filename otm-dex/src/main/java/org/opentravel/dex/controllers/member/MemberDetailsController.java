@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.member;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.ImageManager;
 import org.opentravel.dex.actions.DexActionManager.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -173,8 +174,9 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         // Collection<OtmTypeProvider> c = member.getChildrenTypeProviders();
 
         objectLabel.setTooltip( new Tooltip( member.getObjectTypeName() ) );
-        if (imageMgr != null)
-            objectImageView.setImage( imageMgr.get_OLD( member.getIconType() ) );
+        // if (imageMgr != null)
+        // objectImageView.setImage( imageMgr.get_OLD( member.getIconType() ) );
+        objectImageView.setImage( ImageManager.getImage( member.getIconType() ) );
         memberName.setEditable( member.isEditable() );
         memberName.setEditable( member.isEditable() );
         // memberName.textProperty().bind(member.nameProperty());

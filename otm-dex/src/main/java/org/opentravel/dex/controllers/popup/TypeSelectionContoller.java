@@ -140,7 +140,7 @@ public class TypeSelectionContoller extends DexPopupControllerBase {
         cancelButton.setOnAction( e -> doCancel() );
         selectButton.setOnAction( e -> doOK() );
 
-        memberTreeTableController.configure( modelManager, imageMgr, false );
+        memberTreeTableController.configure( modelManager, false );
         memberFilterController.configure( modelManager, this );
         memberTreeTableController.setFilter( memberFilterController );
 
