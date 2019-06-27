@@ -156,4 +156,12 @@ public class DexStatusController extends DexIncludedControllerBase<String> {
             Platform.runLater( () -> updateProgress( value ) );
 
     }
+
+    /**
+     * @return
+     * 
+     */
+    public int getQueueSize() {
+        return runningTasks.size();
+    }
 }
