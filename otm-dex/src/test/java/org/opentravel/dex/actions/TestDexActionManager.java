@@ -26,7 +26,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.actions.DexActionManager.DexActions;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.TestEnumerations;
+import org.opentravel.model.TestEnumerationClosed;
+import org.opentravel.model.TestEnumerationOpen;
 import org.opentravel.model.TestValueWithAttributes;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmEnumerationOpen;
@@ -61,8 +62,8 @@ public class TestDexActionManager {
         OtmModelManager mgr = new OtmModelManager( am );
 
         // Given an OtmObject
-        OtmEnumerationOpen openEnum = TestEnumerations.buildOtmEnumerationOpen( mgr );
-        OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtmValueWithAttributes( mgr );
+        OtmEnumerationOpen openEnum = TestEnumerationOpen.buildOtm( mgr );
+        OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtm( mgr );
         // Action Factory - type users all return actions
         for (DexActions action : DexActions.values()) {
             assertNotNull( "Must return an action for " + action.toString() + ".", am.actionFactory( action, vwa ) );
@@ -77,8 +78,8 @@ public class TestDexActionManager {
         assertTrue( am.getQueueSize() == 0 );
 
         // Given a OtmObjects
-        OtmEnumeration<?> closedEnum = TestEnumerations.buildOtmEnumerationClosed( mgr );
-        OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtmValueWithAttributes( mgr );
+        OtmEnumeration<?> closedEnum = TestEnumerationClosed.buildOtm( mgr );
+        OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtm( mgr );
 
         // Actions are atomic but hidden from controller API
         //
@@ -102,7 +103,7 @@ public class TestDexActionManager {
         am.run( DexActions.DESCRIPTIONCHANGE, null, null );
 
         // Should always be false
-        assertFalse( am.isEnabled( DexActions.DESCRIPTIONCHANGE, TestEnumerations.buildOtmEnumerationClosed( mgr ) ) );
+        assertFalse( am.isEnabled( DexActions.DESCRIPTIONCHANGE, TestEnumerationClosed.buildOtm( mgr ) ) );
         log.debug( "Done." );
     }
 }

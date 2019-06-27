@@ -80,8 +80,8 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmModelManag
      */
     @Override
     public void clear() {
-        usersTree.getRoot().getChildren().clear();
         postedMember = null;
+        usersTree.getRoot().getChildren().clear();
     }
 
     /**
@@ -161,7 +161,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmModelManag
 
     @Override
     public void handleEvent(Event event) {
-        // log.debug(event.getEventType() + " event received. Ignore? " + ignoreEvents);
+        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );

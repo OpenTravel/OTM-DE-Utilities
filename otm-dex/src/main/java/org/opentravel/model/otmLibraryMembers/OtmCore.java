@@ -85,7 +85,7 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
     @Override
     public void modelChildren() {
         super.modelChildren(); // Will model facets
-        log.debug( "FIXME - Has " + children.size() + " children." );
+        log.debug( "FIXME - Needs simple facet" );
         // Add
         // Role Enumeration - TLRoleEnumeration / TLRole
         children.add( new OtmRoleEnumeration( getTL().getRoleEnumeration(), this ) );

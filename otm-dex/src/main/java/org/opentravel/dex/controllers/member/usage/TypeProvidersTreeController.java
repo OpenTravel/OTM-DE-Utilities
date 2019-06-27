@@ -86,6 +86,7 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
      */
     @Override
     public void clear() {
+        postedMember = null;
         typeProvidersTree.getRoot().getChildren().clear();
     }
 
@@ -196,12 +197,12 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
 
     private void handleEvent(DexMemberSelectionEvent event) {
         if (!ignoreEvents)
-            select( event.getMember() );
+            post( event.getMember() );
     }
 
     @Override
     public void handleEvent(Event event) {
-        // log.debug(event.getEventType() + " event received. Ignore? " + ignoreEvents);
+        log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
@@ -266,12 +267,12 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
      */
     // @Override
     public void post(OtmLibraryMember member) {
+        clear();
+        postedMember = member;
         if (member == null)
             return;
-        postedMember = member;
-        clear();
 
-        // log.debug("Posting type providers to: " + member);
+        log.debug( "Posting type providers to: " + member );
         // TODO - organize by namespace then object
         member.getUsedTypes().forEach( u -> {
             TreeItem<MemberAndProvidersDAO> item = new TreeItem<>( new MemberAndProvidersDAO( u ) );
@@ -286,28 +287,28 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
         ignoreEvents = false;
     }
 
-    public void select(OtmLibraryMember otm) {
-        post( otm );
-        // if (otm != null) {
-        // for (TreeItem<MemberDAO> item : typeProvidersTree.getRoot().getChildren()) {
-        // if (item.getValue().getValue() == otm) {
-        // int row = typeProvidersTree.getRow(item);
-        // // This may not highlight the row if the event comes from or goes to a different controller.
-        // Platform.runLater(() -> {
-        // // ignoreEvents = true;
-        // typeProvidersTree.requestFocus();
-        // typeProvidersTree.getSelectionModel().clearAndSelect(row);
-        // typeProvidersTree.scrollTo(row);
-        // typeProvidersTree.getFocusModel().focus(row);
-        // // ignoreEvents = false;
-        // });
-        // log.debug("Selected " + otm.getName() + " in member tree.");
-        // return;
-        // }
-        // }
-        // log.debug(otm.getName() + " not found in member tree.");
-        // }
-    }
+    // public void select(OtmLibraryMember otm) {
+    // post( otm );
+    // if (otm != null) {
+    // for (TreeItem<MemberDAO> item : typeProvidersTree.getRoot().getChildren()) {
+    // if (item.getValue().getValue() == otm) {
+    // int row = typeProvidersTree.getRow(item);
+    // // This may not highlight the row if the event comes from or goes to a different controller.
+    // Platform.runLater(() -> {
+    // // ignoreEvents = true;
+    // typeProvidersTree.requestFocus();
+    // typeProvidersTree.getSelectionModel().clearAndSelect(row);
+    // typeProvidersTree.scrollTo(row);
+    // typeProvidersTree.getFocusModel().focus(row);
+    // // ignoreEvents = false;
+    // });
+    // log.debug("Selected " + otm.getName() + " in member tree.");
+    // return;
+    // }
+    // }
+    // log.debug(otm.getName() + " not found in member tree.");
+    // }
+    // }
 
     // public void setFilter(MemberFilterController filter) {
     // this.filter = filter;

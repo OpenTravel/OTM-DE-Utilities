@@ -105,8 +105,7 @@ public class MemberAndUsersDAO implements DexDAO<OtmObject> {
     }
 
     public void setName(String name) {
-        if (otmObject instanceof OtmLibraryMember)
-            otmObject.setName( name );
+        otmObject.setName( name );
     }
 
     @Override

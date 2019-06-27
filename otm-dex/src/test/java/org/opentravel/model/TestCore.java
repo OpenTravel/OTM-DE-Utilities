@@ -21,58 +21,40 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLCoreObject;
 import org.opentravel.schemacompiler.model.TLProperty;
 
-import java.util.List;
-
 /**
  * Verifies the functions of the <code>UserSettings</code> class.
  */
-public class TestCore {
+public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
     private static final String CORE_NAME = "TestCore";
 
     private static Log log = LogFactory.getLog( TestCore.class );
 
-    private static OtmModelManager staticModelManager = null;
-
-    @BeforeClass
-    public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null );
-    }
-
     @Test
     public void testConstructors() {
-        OtmCore core = buildOtmCore( staticModelManager );
-        assertNotNull( core );
-        assertTrue( core.getName().equals( CORE_NAME ) );
-        assertTrue( core.getTL() instanceof TLCoreObject );
-        assertTrue( core.getOwningMember() == core );
-
+        super.testConstructors( buildOtm( staticModelManager ) );
         log.debug( "Done." );
     }
 
 
     @Test
     public void testChildrenOwner() {
-        OtmChildrenOwner core = buildOtmCore( staticModelManager );
-        List<OtmObject> kids = core.getChildren();
-        assertTrue( !kids.isEmpty() );
+        super.testChildrenOwner( buildOtm( staticModelManager ) );
+    }
 
-        assertTrue( !core.getChildrenHierarchy().isEmpty() );
-        assertTrue( !core.getChildrenTypeProviders().isEmpty() );
-        assertTrue( !core.getDescendantsTypeUsers().isEmpty() );
-        assertTrue( !core.getDescendantsChildrenOwners().isEmpty() );
-        assertTrue( !core.getDescendantsTypeUsers().isEmpty() );
+    @Test
+    public void testTypeUser() {
+        super.testTypeUser( buildOtm( staticModelManager ) );
     }
 
     @Test
     public void testFacets() {
-        OtmCore core = buildOtmCore( staticModelManager );
+        OtmCore core = buildOtm( staticModelManager );
 
         assertNotNull( core.getSummary() );
         assertNotNull( core.getDetail() );
@@ -84,20 +66,25 @@ public class TestCore {
 
 
     @Test
-    public void testInheritance() {}
+    public void testInheritance() {
+        // TODO
+    }
 
-    public static OtmCore buildOtmCore(OtmModelManager mgr) {
-        OtmCore core = new OtmCore( buildTLCoreObject(), mgr );
+    /** ****************************************************** **/
+
+    public static OtmCore buildOtm(OtmModelManager mgr) {
+        OtmCore core = new OtmCore( buildTL(), mgr );
         assertNotNull( core );
+        core.setAssignedType( TestXsdSimple.buildOtm( mgr ) );
         core.getTL().getSummaryFacet().addAttribute( new TLAttribute() );
         core.getTL().getSummaryFacet().addElement( new TLProperty() );
-        // TODO - add value
+
         assertTrue( core.getChildren().size() > 3 );
         assertTrue( core.getSummary().getChildren().size() == 2 );
         return core;
     }
 
-    public static TLCoreObject buildTLCoreObject() {
+    public static TLCoreObject buildTL() {
         TLCoreObject tlCore = new TLCoreObject();
         tlCore.setName( CORE_NAME );
         return tlCore;

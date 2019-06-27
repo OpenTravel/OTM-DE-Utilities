@@ -17,51 +17,59 @@
 package org.opentravel.model;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentravel.TestUserSettings;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
+import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLValueWithAttributes;
 
 /**
  * Verifies the functions of the <code>UserSettings</code> class.
  */
-public class TestValueWithAttributes {
-    private static Log log = LogFactory.getLog( TestUserSettings.class );
+public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWithAttributes> {
+    // private static Log log = LogFactory.getLog( TestValueWithAttributes.class );
 
-    private static OtmModelManager staticModelManager = null;
-
-    @BeforeClass
-    public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null );
-    }
 
     @Test
     public void testConstructors() {
-        OtmValueWithAttributes vwa = new OtmValueWithAttributes( "fred", staticModelManager );
-        assertNotNull( vwa );
-        // TODO - test name
-
-        vwa = new OtmValueWithAttributes( buildTLValueWithAttributes(), staticModelManager );
-        assertNotNull( vwa );
-
-        log.debug( "Done." );
+        super.testConstructors( buildOtm( staticModelManager ) );
     }
 
-    public static OtmValueWithAttributes buildOtmValueWithAttributes(OtmModelManager mgr) {
-        OtmValueWithAttributes vwa = new OtmValueWithAttributes( buildTLValueWithAttributes(), mgr );
+    @Test
+    public void testTypeUser() {
+        super.testTypeUser( buildOtm( staticModelManager ) );
+    }
+
+    /** ****************************************************** **/
+
+    public static OtmValueWithAttributes buildOtm(OtmModelManager mgr) {
+        OtmValueWithAttributes vwa = new OtmValueWithAttributes( buildTL(), mgr );
         assertNotNull( vwa );
+
+        OtmTypeProvider p = vwa.getAssignedType();
         return vwa;
     }
 
-    public static TLValueWithAttributes buildTLValueWithAttributes() {
+    static String NAME = "TestVWA";
+
+    public static TLValueWithAttributes buildTL() {
         TLValueWithAttributes tlvwa = new TLValueWithAttributes();
-        tlvwa.setName( "TestVWA" );
-        // TODO - add attributes
-        // TODO - add value
+        tlvwa.setName( NAME );
+        tlvwa.setParentType( TestXsdSimple.buildOtm( staticModelManager ).getTL() );
+
+        // add attributes
+        int i = 1;
+        while (i < 5) {
+            TLAttribute tla = new TLAttribute();
+            tla.setName( NAME + i );
+            tla.setType( TestXsdSimple.buildTL() );
+            tlvwa.addAttribute( tla );
+            i++;
+        }
+
+        assertNotNull( tlvwa.getParentType() );
+        assertTrue( tlvwa.getAttributes().size() == i - 1 );
         return tlvwa;
     }
 }

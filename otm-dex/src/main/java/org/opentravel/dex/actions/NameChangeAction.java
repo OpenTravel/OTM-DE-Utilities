@@ -73,7 +73,7 @@ public class NameChangeAction extends DexStringAction {
         this.oldName = oldName;
         this.modifiedName = name;
         // Force upper case
-        if (otm instanceof OtmLibraryMember)
+        if (otm instanceof OtmObject)
             modifiedName = name.substring( 0, 1 ).toUpperCase() + name.substring( 1 );
 
         // Set value into model and GUI

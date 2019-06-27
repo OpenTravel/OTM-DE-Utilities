@@ -41,7 +41,7 @@ import javafx.scene.layout.VBox;
  * @author dmh
  *
  */
-public class TypeUsersTreeController extends DexIncludedControllerBase<OtmModelManager> implements DexController {
+public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibraryMember> implements DexController {
     private static Log log = LogFactory.getLog( TypeUsersTreeController.class );
 
     /*
@@ -54,8 +54,6 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmModelM
 
     TreeItem<PropertiesDAO> root; // Root of the navigation tree. Is displayed.
     private boolean ignoreEvents = false;
-
-    private OtmLibraryMember postedMember;
 
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
@@ -80,6 +78,7 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmModelM
      */
     @Override
     public void clear() {
+        postedData = null;
         typeUsersTree.getRoot().getChildren().clear();
     }
 
@@ -209,14 +208,14 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmModelM
     public void post(OtmLibraryMember member) {
         clear();
         if (member != null) {
-            postedMember = member;
+            postedData = member;
             new PropertiesDAO( member, this ).createChildrenItems( root, new MemberAndUserFilter() );
         }
     }
 
     @Override
     public void refresh() {
-        post( postedMember );
+        post( postedData );
         ignoreEvents = false;
     }
 

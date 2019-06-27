@@ -48,7 +48,7 @@ public class OtmXsdElement extends OtmLibraryMemberBase<XSDElement> implements O
 
     @Override
     public OtmLibrary getLibrary() {
-        OtmLibrary l = super.getLibrary();
+        // OtmLibrary l = super.getLibrary();
         return super.getLibrary();
     }
 

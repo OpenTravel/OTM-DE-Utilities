@@ -37,7 +37,7 @@ import java.util.List;
  * 
  */
 public abstract class OtmSimpleObjects<T extends TLLibraryMember> extends OtmLibraryMemberBase<TLLibraryMember>
-    implements OtmLibraryMember, OtmTypeProvider {
+    implements OtmObject, OtmTypeProvider {
     private static Log log = LogFactory.getLog( OtmSimpleObjects.class );
 
     public OtmSimpleObjects(T tl, OtmModelManager mgr) {

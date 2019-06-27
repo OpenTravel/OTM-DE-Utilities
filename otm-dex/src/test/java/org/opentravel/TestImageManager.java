@@ -26,7 +26,7 @@ import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.TestEnumerations;
+import org.opentravel.model.TestEnumerationClosed;
 import org.opentravel.model.otmLibraryMembers.OtmEnumerationClosed;
 import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.utilities.testutil.AbstractFxTest;
@@ -53,7 +53,7 @@ public class TestImageManager extends AbstractFxTest {
     @Test
     public void testStatic() {
         // Given the model manager and an OtmObject
-        OtmEnumerationClosed oec = TestEnumerations.buildOtmEnumerationClosed( staticModelManager );
+        OtmEnumerationClosed oec = TestEnumerationClosed.buildOtm( staticModelManager );
 
         // Then image/imageview is returned.
         ImageView iv1 = ImageManager.get( oec );

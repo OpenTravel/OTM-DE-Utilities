@@ -62,12 +62,12 @@ public interface OtmObject {
 
     public String getName();
 
+    public String getNamespace();
+
     /**
      * @return
      */
     public String getNameWithPrefix();
-
-    public String getNamespace();
 
     public String getObjectTypeName();
 
@@ -85,6 +85,14 @@ public interface OtmObject {
     public String getValidationFindingsAsString();
 
     public boolean isEditable();
+
+    /**
+     * Is the property inherited? Properties use the property specific TL Owner and compare with parent's TL object.
+     * Contributed facets are inherited when their contributor does not point back to the contributed facet.
+     * 
+     * @return true if inherited as indicated by different owners
+     */
+    public boolean isInherited();
 
     /**
      * Are there any warnings or errors in the findings?
@@ -127,12 +135,4 @@ public interface OtmObject {
     public ObjectProperty<ImageView> validationImageProperty();
 
     public StringProperty validationProperty();
-
-    /**
-     * Is the property inherited? Properties use the property specific TL Owner and compare with parent's TL object.
-     * Contributed facets are inherited when their contributor does not point back to the contributed facet.
-     * 
-     * @return true if inherited as indicated by different owners
-     */
-    public boolean isInherited();
 }

@@ -47,7 +47,7 @@ public class MemberAndProvidersDAO implements DexDAO<OtmObject> {
 
     protected OtmObject otmObject;
 
-    public MemberAndProvidersDAO(OtmLibraryMember member) {
+    public MemberAndProvidersDAO(OtmObject member) {
         this.otmObject = member;
     }
 
@@ -104,8 +104,7 @@ public class MemberAndProvidersDAO implements DexDAO<OtmObject> {
     }
 
     public void setName(String name) {
-        if (otmObject instanceof OtmLibraryMember)
-            otmObject.setName( name );
+        otmObject.setName( name );
     }
 
     @Override

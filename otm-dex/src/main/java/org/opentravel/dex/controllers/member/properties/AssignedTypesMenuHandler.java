@@ -66,13 +66,13 @@ public class AssignedTypesMenuHandler {
         // }
     }
 
-    public OtmLibraryMember findAssignedType(PropertiesDAO prop) {
+    public OtmObject findAssignedType(PropertiesDAO prop) {
         if (prop.getValue() instanceof OtmTypeUser) {
             OtmTypeUser user = (OtmTypeUser) prop.getValue();
             OtmObject otm = OtmModelElement.get( (TLModelElement) user.getAssignedTLType() );
-            if (otm != null && !(otm instanceof OtmLibraryMember))
+            if (otm != null && !(otm instanceof OtmObject))
                 otm = otm.getOwningMember();
-            return (OtmLibraryMember) otm;
+            return (OtmObject) otm;
         }
         return null;
     }

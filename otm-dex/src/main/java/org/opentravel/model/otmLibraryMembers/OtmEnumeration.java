@@ -19,6 +19,7 @@ package org.opentravel.model.otmLibraryMembers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmChildrenOwner;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmProperties.OtmEnumerationValue;
@@ -37,7 +38,7 @@ import java.util.ArrayList;
  */
 // NOTE - member filter depends on sub-types starting with this class name!
 public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
-    extends OtmLibraryMemberBase<TLAbstractEnumeration> implements OtmLibraryMember, OtmChildrenOwner {
+    extends OtmLibraryMemberBase<TLAbstractEnumeration> implements OtmObject, OtmChildrenOwner {
     private static Log log = LogFactory.getLog( OtmEnumeration.class );
 
     public OtmEnumeration(E tlo, OtmModelManager mgr) {

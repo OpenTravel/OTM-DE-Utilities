@@ -39,7 +39,7 @@ import javafx.beans.property.StringProperty;
  * 
  */
 public abstract class OtmComplexObjects<T extends TLComplexTypeBase> extends OtmLibraryMemberBase<TLLibraryMember>
-    implements OtmLibraryMember, OtmTypeProvider, OtmChildrenOwner {
+    implements OtmObject, OtmTypeProvider, OtmChildrenOwner {
     private static Log log = LogFactory.getLog( OtmComplexObjects.class );
 
     /**

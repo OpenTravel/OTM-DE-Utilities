@@ -142,6 +142,7 @@ public class WhereUsedTableController extends DexIncludedControllerBase<OtmModel
      */
     @Override
     public void clear() {
+        postedData = null;
         whereUsedTreeTable.getRoot().getChildren().clear();
     }
 

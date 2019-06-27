@@ -39,7 +39,7 @@ import java.util.List;
  * 
  */
 public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextualFacet>
-    implements OtmLibraryMember, OtmTypeProvider, OtmChildrenOwner {
+    implements OtmObject, OtmTypeProvider, OtmChildrenOwner {
     private static Log log = LogFactory.getLog( OtmContextualFacet.class );
 
     // The contributed facet that is child of a library member.
