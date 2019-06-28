@@ -84,9 +84,9 @@ public abstract class OtmFacet<T extends TLFacet> extends OtmAbstractFacet<TLFac
      */
     @Override
     public void modelChildren() {
-        getTL().getIndicators().forEach( i -> OtmPropertyFactory.create( i, this ) );
-        getTL().getAttributes().forEach( i -> OtmPropertyFactory.create( i, this ) );
-        getTL().getElements().forEach( i -> OtmPropertyFactory.create( i, this ) );
+        getTL().getIndicators().forEach( p -> OtmPropertyFactory.create( p, this ) );
+        getTL().getAttributes().forEach( p -> OtmPropertyFactory.create( p, this ) );
+        getTL().getElements().forEach( p -> OtmPropertyFactory.create( p, this ) );
     }
 
     @Override

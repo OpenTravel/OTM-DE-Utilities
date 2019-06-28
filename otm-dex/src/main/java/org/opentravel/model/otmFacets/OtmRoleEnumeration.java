@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.model.otmLibraryMembers;
+package org.opentravel.model.otmFacets;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,6 +26,8 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmLibraryMembers.OtmCore;
+import org.opentravel.model.otmProperties.OtmEnumerationValue;
 import org.opentravel.schemacompiler.model.TLRole;
 import org.opentravel.schemacompiler.model.TLRoleEnumeration;
 
@@ -48,6 +50,18 @@ public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
     public OtmRoleEnumeration(TLRoleEnumeration tlo, OtmCore parent) {
         super( tlo );
         this.parent = parent;
+    }
+
+    /**
+     * @see org.opentravel.model.OtmChildrenOwner#add(org.opentravel.model.OtmObject)
+     */
+    @Override
+    public OtmEnumerationValue add(OtmObject child) {
+        if (child instanceof OtmEnumerationValue && !children.contains( child )) {
+            children.add( child );
+            return (OtmEnumerationValue) child;
+        }
+        return null;
     }
 
     @Override

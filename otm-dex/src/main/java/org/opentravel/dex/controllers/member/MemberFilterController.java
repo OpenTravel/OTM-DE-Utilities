@@ -30,7 +30,7 @@ import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.otmLibraryMembers.OtmResourceObject;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmServiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
@@ -378,7 +378,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             if (value.isEmpty() || value.equals( ALL ))
                 classNameFilter = null;
             else if (value.startsWith( RESOURCE ))
-                classNameFilter = OtmResourceObject.class.getSimpleName();
+                classNameFilter = OtmResource.class.getSimpleName();
             else if (value.startsWith( SERVICE ))
                 classNameFilter = OtmServiceObject.class.getSimpleName();
             else if (value.startsWith( BUSINESS ))

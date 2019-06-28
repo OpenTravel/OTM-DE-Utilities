@@ -18,7 +18,7 @@ package org.opentravel.model;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Test;
+import org.junit.BeforeClass;
 import org.opentravel.model.otmLibraryMembers.OtmEnumerationOpen;
 import org.opentravel.schemacompiler.model.TLEnumValue;
 import org.opentravel.schemacompiler.model.TLOpenEnumeration;
@@ -28,23 +28,15 @@ import org.opentravel.schemacompiler.model.TLOpenEnumeration;
 public class TestEnumerationOpen extends TestOtmLibraryMemberBase<OtmEnumerationOpen> {
     // private static Log log = LogFactory.getLog( TestEnumerationOpen.class );
 
-    @Test
-    public void testConstructors() {
-        super.testConstructors( buildOtm( staticModelManager ) );
+    @BeforeClass
+    public static void beforeClass() {
+        staticModelManager = new OtmModelManager( null );
+        subject = buildOtm( staticModelManager );
+        baseObject = buildOtm( staticModelManager );
+        baseObject.setName( "BaseBO" );
     }
 
-
-    @Test
-    public void testInheritance() {
-        OtmEnumerationOpen oto_base = buildOtm( staticModelManager );
-        OtmEnumerationOpen oto_ex = buildOtm( staticModelManager );
-
-        // When extended
-        extendObject( oto_base, oto_ex );
-
-        testInheritance( oto_ex );
-    }
-
+    /** ****************************************************** **/
 
     public static OtmEnumerationOpen buildOtm(OtmModelManager mgr) {
         OtmEnumerationOpen oto = new OtmEnumerationOpen( buildTL(), mgr );

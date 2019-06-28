@@ -18,7 +18,7 @@ package org.opentravel.model;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Test;
+import org.junit.BeforeClass;
 import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
 import org.opentravel.schemacompiler.model.XSDSimpleType;
 import org.w3._2001.xmlschema.TopLevelSimpleType;
@@ -29,12 +29,27 @@ import org.w3._2001.xmlschema.TopLevelSimpleType;
 public class TestXsdSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
     private static Log log = LogFactory.getLog( TestXsdSimple.class );
 
-
-    @Test
-    public void testConstructors() {
-        super.testConstructors( buildOtm( staticModelManager ) );
+    @BeforeClass
+    public static void beforeClass() {
+        staticModelManager = new OtmModelManager( null );
+        subject = buildOtm( staticModelManager );
+        baseObject = buildOtm( staticModelManager );
+        baseObject.setName( "BaseSimple" );
     }
 
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Must override the base assumption that object will have children because this is the only library member that
+     * does not have children.
+     * 
+     * @see org.opentravel.model.TestOtmLibraryMemberBase#testChildrenOwner(org.opentravel.model.OtmChildrenOwner)
+     */
+    @Override
+    public void testChildrenOwner(OtmChildrenOwner otm) {
+        // NO-OP
+    }
 
     /** ****************************************************** **/
 

@@ -19,7 +19,7 @@ package org.opentravel.model;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
+import org.junit.BeforeClass;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLValueWithAttributes;
@@ -30,16 +30,16 @@ import org.opentravel.schemacompiler.model.TLValueWithAttributes;
 public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWithAttributes> {
     // private static Log log = LogFactory.getLog( TestValueWithAttributes.class );
 
+    static String NAME = "TestVWA";
 
-    @Test
-    public void testConstructors() {
-        super.testConstructors( buildOtm( staticModelManager ) );
+    @BeforeClass
+    public static void beforeClass() {
+        staticModelManager = new OtmModelManager( null );
+        subject = buildOtm( staticModelManager );
+        baseObject = buildOtm( staticModelManager );
+        baseObject.setName( "BaseVWA" );
     }
 
-    @Test
-    public void testTypeUser() {
-        super.testTypeUser( buildOtm( staticModelManager ) );
-    }
 
     /** ****************************************************** **/
 
@@ -51,7 +51,6 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
         return vwa;
     }
 
-    static String NAME = "TestVWA";
 
     public static TLValueWithAttributes buildTL() {
         TLValueWithAttributes tlvwa = new TLValueWithAttributes();

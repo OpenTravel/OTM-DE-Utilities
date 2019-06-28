@@ -48,6 +48,18 @@ public class OtmOperation extends OtmModelElement<TLOperation> implements OtmChi
         this.parent = parent;
     }
 
+    /**
+     * @see org.opentravel.model.OtmChildrenOwner#add(org.opentravel.model.OtmObject)
+     */
+    @Override
+    public OtmOperationFacet add(OtmObject child) {
+        if (child instanceof OtmOperationFacet && !children.contains( child )) {
+            children.add( child );
+            return (OtmOperationFacet) child;
+        }
+        return null;
+    }
+
     // public OtmOperation(String name, OtmLibraryMember parent) {
     // super(new TLOperation(), parent.getActionManager());
     // setName(name);

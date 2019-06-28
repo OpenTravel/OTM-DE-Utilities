@@ -27,6 +27,7 @@ import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmFacets.OtmListFacet;
+import org.opentravel.model.otmFacets.OtmRoleEnumeration;
 import org.opentravel.model.otmFacets.OtmSummaryFacet;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLCoreObject;

@@ -24,11 +24,12 @@ import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLModelElement;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,8 +39,7 @@ import java.util.List;
  * @author Dave Hollander
  * 
  */
-public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextualFacet>
-    implements OtmObject, OtmTypeProvider, OtmChildrenOwner {
+public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextualFacet> {
     private static Log log = LogFactory.getLog( OtmContextualFacet.class );
 
     // The contributed facet that is child of a library member.
@@ -47,8 +47,30 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
 
     public OtmContextualFacet(TLContextualFacet tl, OtmModelManager manager) {
         super( tl, manager );
-        // lazy evaluated modelChildren();
     }
+
+    @Override
+    public OtmProperty<?> add(OtmObject child) {
+        if (child instanceof OtmProperty) {
+            // Make sure it has not already been added
+            if (children == null)
+                children = new ArrayList<>();
+            else if (contains( children, child ))
+                return null;
+
+            if (inheritedChildren == null)
+                inheritedChildren = new ArrayList<>();
+            else if (contains( inheritedChildren, child ))
+                return null;
+
+            if (!child.isInherited())
+                children.add( child );
+            else
+                inheritedChildren.add( child );
+        }
+        return (OtmProperty<?>) child;
+    }
+
 
     /**
      * NOTE: detection of "ghost" inherited facets depends on Contributor will not have ghost set as where contributed.
@@ -70,11 +92,19 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         return whereContributed;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Contextual facet's properties that are children will be on the contributed facet since that extends OtmFacet
+     * 
+     * @see org.opentravel.model.otmLibraryMembers.OtmLibraryMemberBase#getChildren()
+     */
     @Override
     public List<OtmObject> getChildren() {
         // children.clear();
         if (children != null && children.isEmpty())
             modelChildren();
+
         // if (getWhereContributed() != null)
         // children.addAll(getWhereContributed().getChildren());
         // FIXME - what about children that are other contextual facets?

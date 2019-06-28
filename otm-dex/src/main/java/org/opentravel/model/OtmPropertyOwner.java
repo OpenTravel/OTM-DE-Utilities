@@ -45,7 +45,8 @@ public interface OtmPropertyOwner extends OtmChildrenOwner {
      * @param child
      * @return
      */
-    public OtmProperty<?> add(OtmProperty<?> child);
+    @Override
+    public OtmProperty<?> add(OtmObject child);
 
     /**
      * Add the passed TL property/attribute/indicator to this and then create OtmProperty

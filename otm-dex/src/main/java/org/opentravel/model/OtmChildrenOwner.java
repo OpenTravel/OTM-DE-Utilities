@@ -28,6 +28,17 @@ import java.util.List;
 public interface OtmChildrenOwner extends OtmObject {
 
     /**
+     * Safely add the OtmObject to the owner if the owner. Make sure the owner does not already contain it. If the child
+     * reports it is inherited (isInherited() = true) then it is added to inherited children.
+     * <p>
+     * Typically, the child will add itself when constructed unless parent is null.
+     * 
+     * @param child
+     * @return
+     */
+    public OtmObject add(OtmObject child);
+
+    /**
      * Get a list of all the children of this object. To allow lazy evaluation, implementations are expected to attempt
      * to model the children if the list is empty.
      * 

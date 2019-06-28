@@ -79,7 +79,7 @@ public class OtmLibraryMemberFactory {
         else if (tlMember instanceof TLService)
             otmMember = new OtmServiceObject( (TLService) tlMember, manager );
         else if (tlMember instanceof TLResource)
-            otmMember = new OtmResourceObject( (TLResource) tlMember, manager );
+            otmMember = new OtmResource( (TLResource) tlMember, manager );
         else if (tlMember instanceof XSDComplexType)
             // Skip Complex Types: for the built-ins they will have an associated element
             otmMember = null; // NO-OP

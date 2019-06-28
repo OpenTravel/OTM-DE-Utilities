@@ -33,9 +33,7 @@ public class OtmCustomFacet extends OtmContextualFacet {
     private static Log log = LogFactory.getLog( OtmCustomFacet.class );
 
     /**
-     * @param tlBusinessObject
      */
-    // public OtmCustomFacet(TLContextualFacet tl, OtmLibraryMember<?> parent) {
     public OtmCustomFacet(TLContextualFacet tl, OtmModelManager manager) {
         super( tl, manager );
 
@@ -43,11 +41,6 @@ public class OtmCustomFacet extends OtmContextualFacet {
             throw new IllegalArgumentException(
                 "Tried to create detail facet from wrong facet type: " + tl.getFacetType() );
     }
-
-    // @Override
-    // public String getPrefix() {
-    // return getTL().getOwningLibrary() != null ? getTL().getOwningLibrary().getPrefix() : "";
-    // }
 
     @Override
     public String setName(String text) {

@@ -19,15 +19,14 @@ package org.opentravel.model.otmLibraryMembers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmChildrenOwner;
-import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.otmFacets.OtmAbstractFacet;
 import org.opentravel.model.otmFacets.OtmDetailFacet;
 import org.opentravel.model.otmFacets.OtmSummaryFacet;
 import org.opentravel.schemacompiler.model.TLComplexTypeBase;
 import org.opentravel.schemacompiler.model.TLLibraryMember;
-import org.opentravel.schemacompiler.model.TLModelElement;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
@@ -54,16 +53,28 @@ public abstract class OtmComplexObjects<T extends TLComplexTypeBase> extends Otm
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * Use the extension class on the complex object to find the extends entity.
+     * @see org.opentravel.model.OtmChildrenOwner#add(org.opentravel.model.OtmObject)
      */
     @Override
-    public OtmObject getBaseType() {
-        if (getTL().getExtension() != null)
-            return OtmModelElement.get( (TLModelElement) getTL().getExtension().getExtendsEntity() );
+    public OtmAbstractFacet<?> add(OtmObject child) {
+        if (child instanceof OtmAbstractFacet<?> && !children.contains( child )) {
+            children.add( child );
+            return (OtmAbstractFacet<?>) child;
+        }
         return null;
     }
+
+    // /**
+    // * {@inheritDoc}
+    // * <p>
+    // * Use the extension class on the complex object to find the extends entity.
+    // */
+    // @Override
+    // public OtmObject getBaseType() {
+    // if (getTL().getExtension() != null)
+    // return OtmModelElement.get( (TLModelElement) getTL().getExtension().getExtendsEntity() );
+    // return null;
+    // }
 
     @Override
     public String getName() {

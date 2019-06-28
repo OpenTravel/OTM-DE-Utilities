@@ -74,6 +74,7 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
         super( tlo, mgr );
     }
 
+
     /**
      * {@inheritDoc}
      * <p>
@@ -95,9 +96,7 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
      */
     @Override
     public OtmValueWithAttributes getBaseType() {
-        if (getTL().getParentType() instanceof TLValueWithAttributes)
-            return (OtmValueWithAttributes) OtmModelElement.get( (TLModelElement) getTL().getParentType() );
-        return null;
+        return (OtmValueWithAttributes) super.getBaseType();
     }
 
     @Override
@@ -113,8 +112,8 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
     }
 
     @Override
-    public OtmProperty<?> add(OtmProperty<?> child) {
-        if (child != null) {
+    public OtmProperty<?> add(OtmObject child) {
+        if (child instanceof OtmProperty) {
             // Make sure it has not already been added
             if (children == null)
                 children = new ArrayList<>();
@@ -130,19 +129,11 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
                 children.add( child );
             else
                 inheritedChildren.add( child );
+            return (OtmProperty<?>) child;
         }
-        return child;
+        return null;
     }
 
-    private boolean contains(List<OtmObject> list, OtmObject child) {
-        if (list.contains( child ))
-            return true;
-        for (OtmObject c : list)
-            if (c.getTL() == child.getTL())
-                return true;
-
-        return false;
-    }
 
     /**
      * {@inheritDoc}

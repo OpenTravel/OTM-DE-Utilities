@@ -45,6 +45,17 @@ public class OtmServiceObject extends OtmLibraryMemberBase<TLService> {
     }
 
     @Override
+    public OtmOperation add(OtmObject child) {
+        if (child instanceof OtmOperation) {
+            if (!contains( children, child )) {
+                children.add( child );
+            }
+            return (OtmOperation) child;
+        }
+        return null;
+    }
+
+    @Override
     public String setName(String name) {
         getTL().setName( name );
         isValid( true );

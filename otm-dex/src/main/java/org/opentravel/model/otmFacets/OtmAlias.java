@@ -138,4 +138,16 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
         // TODO Auto-generated method stub
     }
 
+    /**
+     * @see org.opentravel.model.OtmChildrenOwner#add(org.opentravel.model.OtmObject)
+     */
+    @Override
+    public OtmAliasFacet add(OtmObject child) {
+        if (child instanceof OtmAliasFacet && !children.contains( child )) {
+            children.add( child );
+            return (OtmAliasFacet) child;
+        }
+        return null;
+    }
+
 }

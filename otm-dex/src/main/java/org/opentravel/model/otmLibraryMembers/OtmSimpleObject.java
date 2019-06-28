@@ -54,6 +54,7 @@ public class OtmSimpleObject extends OtmSimpleObjects<TLSimple> implements OtmTy
         super( tlo, mgr );
     }
 
+
     @Override
     public StringProperty assignedTypeProperty() {
         if (assignedTypeProperty == null) {

@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.schemacompiler.model.XSDElement;
@@ -44,6 +45,11 @@ public class OtmXsdElement extends OtmLibraryMemberBase<XSDElement> implements O
 
     public OtmXsdElement(XSDElement tlo, OtmModelManager mgr) {
         super( tlo, mgr );
+    }
+
+    @Override
+    public OtmObject add(OtmObject child) {
+        return null; // has no children to add
     }
 
     @Override

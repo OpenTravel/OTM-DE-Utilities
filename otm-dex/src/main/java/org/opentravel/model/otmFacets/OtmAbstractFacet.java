@@ -239,8 +239,8 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
     // }
 
     @Override
-    public OtmProperty<?> add(OtmProperty<?> child) {
-        if (child != null) {
+    public OtmProperty<?> add(OtmObject child) {
+        if (child instanceof OtmProperty) {
             // Make sure it has not already been added
             if (children == null)
                 children = new ArrayList<>();
@@ -257,7 +257,7 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
             else
                 inheritedChildren.add( child );
         }
-        return child;
+        return (OtmProperty<?>) child;
     }
 
     private boolean contains(List<OtmObject> list, OtmObject child) {

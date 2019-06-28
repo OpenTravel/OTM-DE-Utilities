@@ -36,6 +36,7 @@ import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLAlias;
 import org.opentravel.schemacompiler.model.TLAliasOwner;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
+import org.opentravel.schemacompiler.model.TLExtensionOwner;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLFacetOwner;
 import org.opentravel.schemacompiler.model.TLFacetType;
@@ -173,12 +174,31 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public OtmObject getBaseType() {
+        if (getTL() instanceof TLExtensionOwner && ((TLExtensionOwner) getTL()).getExtension() != null)
+            return OtmModelElement
+                .get( (TLModelElement) ((TLExtensionOwner) getTL()).getExtension().getExtendsEntity() );
         return null;
     }
 
     @Override
     public boolean contains(OtmObject o) {
         return children.contains( o );
+    }
+
+    /**
+     * Return true if the list contains the child or the list member.getTL() contains the child.getTL()
+     * 
+     * @param list
+     * @param child
+     * @return
+     */
+    protected boolean contains(List<OtmObject> list, OtmObject child) {
+        if (list.contains( child ))
+            return true;
+        for (OtmObject c : list)
+            if (c.getTL() == child.getTL())
+                return true;
+        return false;
     }
 
     @Override

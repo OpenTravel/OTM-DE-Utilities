@@ -51,6 +51,11 @@ public abstract class OtmSimpleObjects<T extends TLLibraryMember> extends OtmLib
     }
 
     @Override
+    public OtmObject add(OtmObject child) {
+        return null; // has no children to add
+    }
+
+    @Override
     public String getName() {
         return getTL().getLocalName();
     }

@@ -23,54 +23,51 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
+import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.schemacompiler.model.TLAttribute;
-import org.opentravel.schemacompiler.model.TLBusinessObject;
+import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLProperty;
 
 /**
- * Verifies the functions of the <code>OtmBusinessObject</code> class.
+ *
  */
-public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
-    private static final String BO_NAME = "Testbo";
+public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
+    private static final String CH_NAME = "TestChoice";
 
-    private static Log log = LogFactory.getLog( TestBusiness.class );
+    private static Log log = LogFactory.getLog( TestChoice.class );
 
     @BeforeClass
     public static void beforeClass() {
         staticModelManager = new OtmModelManager( null );
         subject = buildOtm( staticModelManager );
         baseObject = buildOtm( staticModelManager );
-        baseObject.setName( "BaseBO" );
+        baseObject.setName( "BaseCH" );
     }
 
     @Test
     public void testFacets() {
-        OtmBusinessObject bo = buildOtm( staticModelManager );
+        OtmChoiceObject ch = buildOtm( staticModelManager );
 
-        assertNotNull( bo.getSummary() );
-        assertNotNull( bo.getDetail() );
+        assertNotNull( ch.getShared() );
     }
-
 
 
     /** ****************************************************** **/
 
-    public static OtmBusinessObject buildOtm(OtmModelManager mgr) {
-        OtmBusinessObject bo = new OtmBusinessObject( buildTL(), mgr );
-        assertNotNull( bo );
-        bo.getTL().getSummaryFacet().addAttribute( new TLAttribute() );
-        bo.getTL().getSummaryFacet().addElement( new TLProperty() );
+    public static OtmChoiceObject buildOtm(OtmModelManager mgr) {
+        OtmChoiceObject ch = new OtmChoiceObject( buildTL(), mgr );
+        assertNotNull( ch );
+        ch.getTL().getSharedFacet().addAttribute( new TLAttribute() );
+        ch.getTL().getSharedFacet().addElement( new TLProperty() );
 
-        // TestCustomFacet.buildOtm( staticModelManager );
-        assertTrue( bo.getChildren().size() > 2 );
-        assertTrue( bo.getSummary().getChildren().size() == 2 );
-        return bo;
+        assertTrue( !ch.getChildren().isEmpty() );
+        assertTrue( ch.getShared().getChildren().size() == 2 );
+        return ch;
     }
 
-    public static TLBusinessObject buildTL() {
-        TLBusinessObject tlbo = new TLBusinessObject();
-        tlbo.setName( BO_NAME );
-        return tlbo;
+    public static TLChoiceObject buildTL() {
+        TLChoiceObject tlch = new TLChoiceObject();
+        tlch.setName( CH_NAME );
+        return tlch;
     }
 }

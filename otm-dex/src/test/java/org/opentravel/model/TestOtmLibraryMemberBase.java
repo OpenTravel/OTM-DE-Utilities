@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLExtension;
@@ -30,19 +31,40 @@ import org.opentravel.schemacompiler.model.TLExtensionOwner;
 import java.util.List;
 
 /**
- * Base test class for all otm objects.
+ * Base test class for all otm objects. Implementations must provide their own static, type specific, buildOtm() and
+ * buildTL() methods.
+ * <p>
+ * If <i>subject</i> is set in the before class, the following will be automatically run:
+ * <ul>
+ * <li>testConstructors
+ * <li>testChildrenOwner
+ * <li>testTypeUser
+ * <li>testWhereUsed
+ * <li>testInheritance - if baseObject is set
+ * </ul>
+ * Sub-types that do not conform to the tests, should override the test method.
+ * <p>
+ * Sub-types should test their own facets.
  */
 public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
-    // private static final String CORE_NAME = "TestCore";
 
     private static Log log = LogFactory.getLog( TestOtmLibraryMemberBase.class );
 
     protected static OtmModelManager staticModelManager = null;
+    protected static OtmLibraryMember subject;
+    protected static OtmLibraryMember baseObject;
 
     @BeforeClass
     public static void beforeClass() {
         staticModelManager = new OtmModelManager( null );
         log.debug( "Model manager created." );
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testConstructors() {
+        if (subject != null)
+            testConstructors( (L) subject );
     }
 
     /**
@@ -62,19 +84,34 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
     }
 
 
-    public void testChildrenOwner(L otm) {
-        if (otm instanceof OtmChildrenOwner) {
-            OtmChildrenOwner co = (OtmChildrenOwner) otm;
-            List<OtmObject> kids = co.getChildren();
-            assertTrue( !kids.isEmpty() );
+    @Test
+    public void testChildrenOwner() {
+        if (subject instanceof OtmChildrenOwner)
+            testChildrenOwner( (OtmChildrenOwner) subject );
+    }
 
-            assertTrue( !co.getChildrenHierarchy().isEmpty() );
-            assertTrue( !co.getChildrenTypeProviders().isEmpty() );
-            assertTrue( !co.getDescendantsTypeUsers().isEmpty() );
-            assertTrue( !co.getDescendantsChildrenOwners().isEmpty() );
-            assertTrue( !co.getDescendantsTypeUsers().isEmpty() );
-            log.debug( "Children owner methods OK." );
-        }
+    /**
+     * Test children, childrenHierarcy, and descendants access. Requires the object to have children.
+     * 
+     * @param otm
+     */
+    public void testChildrenOwner(OtmChildrenOwner otm) {
+        OtmChildrenOwner co = (OtmChildrenOwner) otm;
+        List<OtmObject> kids = co.getChildren();
+        assertTrue( !kids.isEmpty() );
+
+        assertTrue( !co.getChildrenHierarchy().isEmpty() );
+        assertNotNull( co.getChildrenTypeProviders() );
+        assertNotNull( co.getDescendantsTypeUsers() );
+        assertNotNull( co.getDescendantsChildrenOwners() );
+        assertNotNull( co.getDescendantsTypeUsers() );
+        log.debug( "Children owner methods OK." );
+    }
+
+    @Test
+    public void testTypeUser() {
+        if (subject instanceof OtmTypeUser)
+            testTypeUser( (OtmTypeUser) subject );
     }
 
     public void testTypeUser(OtmTypeUser tu) {
@@ -87,6 +124,27 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
         // assertTrue( !core.assignedTypeProperty().get().isEmpty() );
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testWhereUsed() {
+        if (subject != null)
+            testWhereUsed( (L) subject );
+    }
+
+    public void testWhereUsed(L otm) {
+        assertNotNull( otm.getUsedTypes() );
+        assertNotNull( otm.getWhereUsed() );
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testInheritance() {
+
+        if (subject != null && baseObject != null) {
+            extendObject( (L) baseObject, (L) subject );
+            testInheritance( (L) subject );
+        }
+    }
 
     public void testInheritance(L otm) {
         OtmObject base = otm.getBaseType();

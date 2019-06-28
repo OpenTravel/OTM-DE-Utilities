@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.schemacompiler.model.TLAttribute;
@@ -35,21 +36,12 @@ public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
 
     private static Log log = LogFactory.getLog( TestCore.class );
 
-    @Test
-    public void testConstructors() {
-        super.testConstructors( buildOtm( staticModelManager ) );
-        log.debug( "Done." );
-    }
-
-
-    @Test
-    public void testChildrenOwner() {
-        super.testChildrenOwner( buildOtm( staticModelManager ) );
-    }
-
-    @Test
-    public void testTypeUser() {
-        super.testTypeUser( buildOtm( staticModelManager ) );
+    @BeforeClass
+    public static void beforeClass() {
+        staticModelManager = new OtmModelManager( null );
+        subject = buildOtm( staticModelManager );
+        baseObject = buildOtm( staticModelManager );
+        baseObject.setName( "BaseCO" );
     }
 
     @Test
@@ -65,10 +57,6 @@ public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
     }
 
 
-    @Test
-    public void testInheritance() {
-        // TODO
-    }
 
     /** ****************************************************** **/
 

@@ -19,13 +19,11 @@ package org.opentravel.model.otmLibraryMembers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmChildrenOwner;
-import org.opentravel.model.OtmObject;
-import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmProperties.OtmEnumerationValue;
 import org.opentravel.schemacompiler.model.TLAbstractEnumeration;
 import org.opentravel.schemacompiler.model.TLEnumValue;
-import org.opentravel.schemacompiler.model.TLModelElement;
 
 import java.util.ArrayList;
 
@@ -51,15 +49,23 @@ public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
     }
 
     /**
+     * @see org.opentravel.model.OtmChildrenOwner#add(org.opentravel.model.OtmObject)
+     */
+    @Override
+    public OtmEnumerationValue add(OtmObject child) {
+        if (child instanceof OtmEnumerationValue && !children.contains( child )) {
+            children.add( child );
+            return (OtmEnumerationValue) child;
+        }
+        return null;
+    }
+
+    /**
     * 
     */
     @Override
     public OtmEnumeration<?> getBaseType() {
-        // TEST
-        TLModelElement baseTL = null;
-        if (getTL().getExtension() != null)
-            baseTL = (TLModelElement) getTL().getExtension().getExtendsEntity();
-        return baseTL instanceof TLAbstractEnumeration ? (OtmEnumeration<?>) OtmModelElement.get( baseTL ) : null;
+        return (OtmEnumeration<?>) super.getBaseType();
     }
 
     @Override
