@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:Library
+    xmlns:ns2="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06 OTA2_LibraryModel_v1.6.0.xsd">
+    
+    <ns2:VersionScheme>OTA2</ns2:VersionScheme>
+    <ns2:Status>Draft</ns2:Status>
+    <ns2:Namespace>http://sandbox/demo/steve/test/v0</ns2:Namespace>
+    <ns2:Prefix>t</ns2:Prefix>
+    <ns2:Name>EnumListTest</ns2:Name>
+    <ns2:Import namespace="http://www.opentravel.org/OTM/Common/v0" prefix="ota2"/>
+    <ns2:Context applicationContext="http://sandbox/demo/steve/test/v0" context="t"/>
+    
+    <ns2:Enumeration_Closed name="TestEnum">
+        <ns2:Value label="" literal="ONE"/>
+        <ns2:Value label="" literal="TWO"/>
+        <ns2:Value label="" literal="THREE"/>
+    </ns2:Enumeration_Closed>
+    
+    <ns2:Simple listTypeInd="true" name="TestEnumList" type="TestEnum"/>
+    
+    <ns2:CoreObject name="TestCore" notExtendable="false">
+        <ns2:Aliases/>
+        <ns2:Simple type="ota2:Empty"/>
+        <ns2:Summary>
+            <ns2:Attribute name="enumAttr" referenceRepeat="0" type="TestEnumList"/>
+        </ns2:Summary>
+        <ns2:Detail/>
+    </ns2:CoreObject>
+    
+    <ns2:Enumeration_Closed name="ce2">
+        <ns2:Value label="" literal="a"/>
+        <ns2:Value label="" literal="b"/>
+        <ns2:Value label="" literal="x"/>
+    </ns2:Enumeration_Closed>
+    
+    <ns2:Simple listTypeInd="true" name="ListOfCe2" type="ce2"/>
+    
+</ns2:Library>

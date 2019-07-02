@@ -216,10 +216,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     private HashMap<String,File> projectMap = new HashMap<>();
 
     public void configureProjectCombo() {
-        // TEST - use UserSettings
         DexFileHandler fileHandler = new DexFileHandler();
         File initialDirectory = userSettings.getLastProjectFolder();
-        // File initialDirectory = new File("C:\\Users\\dmh\\workspace\\OTM-DE_TestFiles");
         if (initialDirectory != null) {
             for (File file : fileHandler.getProjectList( initialDirectory )) {
                 projectMap.put( file.getName(), file );

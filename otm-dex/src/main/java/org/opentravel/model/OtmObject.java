@@ -60,6 +60,10 @@ public interface OtmObject {
      */
     public OtmLibrary getLibrary();
 
+    /**
+     * @return the named entity's local name
+     * 
+     **/
     public String getName();
 
     public String getNamespace();

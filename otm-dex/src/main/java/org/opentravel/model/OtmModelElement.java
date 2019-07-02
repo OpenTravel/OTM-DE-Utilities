@@ -188,6 +188,11 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         return getOwningMember() != null ? getOwningMember().getLibrary() : null;
     }
 
+    /**
+     * Return the named entity's local name
+     * 
+     * @see org.opentravel.model.OtmObject#getName()
+     */
     @Override
     public String getName() {
         return tlObject instanceof NamedEntity ? ((NamedEntity) tlObject).getLocalName() : NONAME;

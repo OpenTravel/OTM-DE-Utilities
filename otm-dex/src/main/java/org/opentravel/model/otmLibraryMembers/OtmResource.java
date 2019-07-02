@@ -23,7 +23,10 @@ import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
+import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionFacet;
+import org.opentravel.model.resource.OtmParameterGroup;
+import org.opentravel.model.resource.OtmParentRef;
 import org.opentravel.schemacompiler.model.TLResource;
 
 import java.util.ArrayList;
@@ -132,7 +135,11 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> {
         getTL().getParamGroups();
         getTL().getParentRefs();
 
-        getTL().getActionFacets().forEach( a -> new OtmActionFacet( a, this ) );;
+        getTL().getActionFacets().forEach( a -> new OtmActionFacet( a, this ) );
+        getTL().getActions().forEach( a -> new OtmAction( a, this ) );
+        getTL().getParamGroups().forEach( a -> new OtmParameterGroup( a, this ) );
+        getTL().getParentRefs().forEach( a -> new OtmParentRef( a, this ) );
+
         log.debug( "Modeled resource children" );
     }
 }

@@ -63,7 +63,8 @@ public class OpenProjectFileTask extends DexTaskBase<File> {
 
     @Override
     public void doIT() {
-        modelMgr.getTlModel();
+        log.debug( "Opening " + taskData.getName() );
+        // modelMgr.getTlModel();
         ProjectManager pm = new DexFileHandler().openProject( taskData, modelMgr.getTlModel(),
             new OpenProjectProgressMonitor( status ) );
         modelMgr.add( pm );
