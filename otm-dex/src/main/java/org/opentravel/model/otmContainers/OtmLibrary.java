@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * OTM Object for libraries.
+ * OTM Object for libraries. Does <b>NOT</b> provide access to members.
  * 
  * @author Dave Hollander
  * 
@@ -54,6 +54,11 @@ public class OtmLibrary {
         this.mgr = mgr;
         projectItems.add( pi );
         tlLib = pi.getContent();
+    }
+
+    public OtmLibrary(AbstractLibrary tl, OtmModelManager mgr) {
+        this.mgr = mgr;
+        tlLib = tl;
     }
 
     protected OtmLibrary(OtmModelManager mgr) {

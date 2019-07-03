@@ -23,17 +23,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractOTMApplication;
-import org.opentravel.common.DexFileHandler;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.objecteditor.ObjectEditorApp;
+import org.opentravel.schemacompiler.model.TLModel;
+import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
 
-import java.io.File;
 import java.util.Collection;
 
 /**
@@ -56,14 +57,10 @@ public class TestOtmModelManager extends AbstractFxTest {
 
     @Test
     public void testAddingManagedProject() throws Exception {
-        DexFileHandler fileHandler = new DexFileHandler();
-        OtmModelManager mgr = new OtmModelManager( null );
 
         // Given a project that uses the OpenTravel repository
-        File repoProject = new File( wipFolder.get(), "/" + FILE_TESTOPENTRAVELREPO );
-        assertNotNull( repoProject );
-        ProjectManager pm = fileHandler.openProject( repoProject, mgr.getTlModel(), null );
-        assertTrue( "Must have project items.", !pm.getAllProjectItems().isEmpty() );
+        OtmModelManager mgr = new OtmModelManager( null );
+        ProjectManager pm = TestDexFileHandler.loadManagedProject( mgr.getTlModel() );
 
         // When the project is added to the model manager
         mgr.add( pm );
@@ -81,6 +78,68 @@ public class TestOtmModelManager extends AbstractFxTest {
         mgr.getBaseNamespaces().forEach( b -> assertTrue( !mgr.getLibraryChain( b ).isEmpty() ) );
 
         mapTests( mgr );
+    }
+
+    @Test
+    public void testContains() {
+        // Given a project that uses the OpenTravel repository
+        OtmModelManager mgr = new OtmModelManager( null );
+        ProjectManager pm1 = TestDexFileHandler.loadManagedProject( mgr.getTlModel() );
+
+        // When the project is added to the model manager
+        mgr.add( pm1 );
+        // Then - model manager contains the libraries and members
+        checkContains( pm1, mgr );
+
+        // When second project is added to the model manager
+        ProjectManager pm2 = TestDexFileHandler.loadUnmanagedProject( mgr.getTlModel() );
+        mgr.add( pm2 );
+
+        // Then - model manager contains both libraries and all their members
+        checkContains( pm1, mgr );
+        checkContains( pm2, mgr );
+    }
+
+    @Test
+    public void testAddingLibrariesToEmptyModel() {
+        OtmModelManager mgr = new OtmModelManager( null );
+        TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr.getTlModel() );
+
+        // int initialMemberCount = mgr.getMembers().size();
+        log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
+            + " members." );
+        mgr.getTlModel().getUserDefinedLibraries().forEach( tlLib -> mgr.add( tlLib ) );
+        log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
+            + " members." );
+        assertTrue( !mgr.getLibraries().isEmpty() );
+    }
+
+    @Test
+    public void testAddingLibrariesModel() {
+        OtmModelManager mgr = new OtmModelManager( null );
+        TestDexFileHandler.loadUnmanagedProject( mgr.getTlModel() );
+        int initialMemberCount = mgr.getMembers().size();
+        TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr.getTlModel() );
+
+        // int initialMemberCount = mgr.getMembers().size();
+        log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
+            + " members." );
+        mgr.getTlModel().getUserDefinedLibraries().forEach( tlLib -> mgr.add( tlLib ) );
+        log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
+            + " members." );
+        assertTrue( mgr.getMembers().size() > initialMemberCount );
+    }
+
+    private void checkContains(ProjectManager pm, OtmModelManager mgr) {
+        pm.getAllProjectItems().forEach( pi -> {
+            assertTrue( "Must contain the tlLibrary in project item.", mgr.contains( pi.getContent() ) );
+            pi.getContent().getNamedMembers().forEach( lm -> {
+                assertTrue( "Must contain each named member.", mgr.contains( lm ) );
+                assertTrue( "Must contain Otm object from named member.",
+                    mgr.contains( (OtmLibraryMember) OtmModelElement.get( (TLModelElement) lm ) ) );
+            } );
+        } );
+
     }
 
     private void mapTests(OtmModelManager mgr) {
@@ -103,18 +162,17 @@ public class TestOtmModelManager extends AbstractFxTest {
     public void testAddingUnmangedProject() throws Exception {
 
         OtmModelManager mgr = new OtmModelManager( null );
-        DexFileHandler fileHandler = new DexFileHandler();
+        TLModel tlModel = mgr.getTlModel();
+        assertNotNull( tlModel );
 
         // Given a project that uses local library files
-        File localProject = new File( wipFolder.get(), "/" + FILE_TESTLOCAL );
-        assertNotNull( localProject );
-        ProjectManager pm = fileHandler.openProject( localProject, mgr.getTlModel(), null );
+        ProjectManager pm = TestDexFileHandler.loadUnmanagedProject( mgr.getTlModel() );
         assertTrue( "Must have project items.", !pm.getAllProjectItems().isEmpty() );
 
         // When the project is added to the model manager
         mgr.add( pm );
-        //
-        // // Then - Expect 6 libraries and 70 members
+
+        // Then - Expect 6 libraries and 70 members
         assertTrue( mgr.getLibraries().size() > 2 );
         assertTrue( !mgr.getMembers().isEmpty() );
         log.debug( "Read " + mgr.getMembers().size() + " members." );

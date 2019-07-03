@@ -27,6 +27,7 @@ import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.ObjectEditorApp;
+import org.opentravel.schemacompiler.model.TLModel;
 import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
@@ -42,9 +43,13 @@ public class TestDexFileHandler extends AbstractFxTest {
     public static final boolean RUN_HEADLESS = false;
     final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.
 
-    final static String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector
-    final static String FILE_TESTOPENTRAVELREPO = "TestOpenTravelRepo.otp";
-    final static String FILE_TESTLOCAL = "TestLocalFiles.otp";
+    public final static String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector
+    public final static String FILE_TESTOPENTRAVELREPO = "TestOpenTravelRepo.otp";
+    public final static String FILE_TESTLOCAL = "TestLocalFiles.otp";
+    public final static String FILE_TESTLOCALLIBRARY = "StandAloneLibrary.otm";
+    public final static String FILE_TESTLOCALLIBRARYBASE = "base_library.otm";
+    public final static String FILE_TESTLOCALLIBRARY1 = "facets1_library.otm";
+    public final static String FILE_TESTLOCALLIBRARY2 = "facets2_library.otm";
 
     @BeforeClass
     public static void setupTests() throws Exception {
@@ -55,17 +60,9 @@ public class TestDexFileHandler extends AbstractFxTest {
 
     @Test
     public void testOpenOTAProject() throws Exception {
-        File repoProject = new File( wipFolder.get(), "/" + FILE_TESTOPENTRAVELREPO );
-        assertNotNull( repoProject );
-
-        File localProject = new File( wipFolder.get(), "/" + FILE_TESTLOCAL );
-        assertNotNull( localProject );
-
-        OtmModelManager mgr = new OtmModelManager( null );
-        DexFileHandler fileHandler = new DexFileHandler();
-
         // When the OpenTravel repository is used in the project
-        ProjectManager pm = fileHandler.openProject( repoProject, mgr.getTlModel(), null );
+        OtmModelManager mgr = new OtmModelManager( null );
+        ProjectManager pm = loadManagedProject( mgr.getTlModel() );
         // When the project is added to the model manager
         mgr.add( pm );
 
@@ -77,15 +74,9 @@ public class TestDexFileHandler extends AbstractFxTest {
 
     @Test
     public void testOpenLocalProject() throws Exception {
-        File localProject = new File( wipFolder.get(), "/" + FILE_TESTLOCAL );
-        assertNotNull( localProject );
-
+        // When the local files are used in the project
         OtmModelManager mgr = new OtmModelManager( null );
-        DexFileHandler fileHandler = new DexFileHandler();
-
-        // When the OpenTravel repository is used in the project
-        ProjectManager pm = fileHandler.openProject( localProject, mgr.getTlModel(), null );
-        // When the project is added to the model manager
+        ProjectManager pm = loadUnmanagedProject( mgr.getTlModel() );
         mgr.add( pm );
 
         // Then - Expect libraries and members
@@ -93,11 +84,58 @@ public class TestDexFileHandler extends AbstractFxTest {
         assertTrue( !mgr.getMembers().isEmpty() );
         log.debug( "Read " + mgr.getMembers().size() + " members." );
     }
+
+    public static void loadLocalLibrary(String path, TLModel tlModel) {
+        File localLibrary = new File( wipFolder.get(), "/" + path );
+        assertNotNull( localLibrary );
+        assertTrue( localLibrary.exists() );
+
+        int initialLibCount = tlModel.getAllLibraries().size();
+        new DexFileHandler().openFile( localLibrary, tlModel );
+        assertTrue( tlModel.getAllLibraries().size() > initialLibCount );
+        log.debug( "Model now has " + tlModel.getAllLibraries().size() + " libraries." );
+    }
+
+    @Test
+    public void testOpenLocalLibrary() throws Exception {
+        OtmModelManager mgr = new OtmModelManager( null );
+
+        loadLocalLibrary( FILE_TESTLOCALLIBRARY, mgr.getTlModel() );
+        loadLocalLibrary( FILE_TESTLOCALLIBRARY1, mgr.getTlModel() );
+        loadLocalLibrary( FILE_TESTLOCALLIBRARY2, mgr.getTlModel() );
+
+    }
     // @AfterClass
     // public static void tearDownTests() throws Exception {
     // shutdownTestServer();
     // }
 
+
+    /**
+     * @return a project manager loaded from project that uses local library files
+     */
+    public static ProjectManager loadUnmanagedProject(TLModel tlModel) {
+        DexFileHandler fileHandler = new DexFileHandler();
+        File localProject = new File( wipFolder.get(), "/" + FILE_TESTLOCAL );
+        assertNotNull( localProject );
+
+        ProjectManager pm = fileHandler.openProject( localProject, tlModel, null );
+        return pm;
+    }
+
+    /**
+     * @return a project manager loaded from project that uses the OpenTravel repository
+     */
+    public static ProjectManager loadManagedProject(TLModel tlModel) {
+        DexFileHandler fileHandler = new DexFileHandler();
+
+        File repoProject = new File( wipFolder.get(), "/" + FILE_TESTOPENTRAVELREPO );
+        assertNotNull( repoProject );
+        ProjectManager pm = fileHandler.openProject( repoProject, tlModel, null );
+        assertTrue( "Must have project items.", !pm.getAllProjectItems().isEmpty() );
+        assertTrue( "Must have project items.", pm.getAllProjectItems().size() > 1 );
+        return pm;
+    }
 
     // x Add to the before class (change port number)
     // x Insert AfterClass from DiffUtil (for managed)

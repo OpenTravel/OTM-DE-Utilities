@@ -42,7 +42,7 @@ import javafx.stage.Stage;
 public class DexFileHandler extends AbstractMainWindowController {
     private static Log log = LogFactory.getLog( DexFileHandler.class );
 
-    ValidationFindings findings;
+    ValidationFindings findings = null;
 
     /**
      * Return a file selected by the user. Save the directory in the user settings.
@@ -86,29 +86,46 @@ public class DexFileHandler extends AbstractMainWindowController {
     }
 
     /**
-     * Open library file using library model loader
+     * Open library or project file using library model loader. Results in an updated model.
+     * <p>
+     * To open a project and receive the project manager, use
+     * {@link #openProject(File, TLModel, OpenProjectProgressMonitor)}
      *
      * @param selectedFile
      */
-    public void openFile(File selectedFile) {
+    public ValidationFindings openFile(File selectedFile, TLModel libraryModel) {
         if (selectedFile == null)
-            return;
-        log.debug( "Open selected file: " + selectedFile.getName() );
-        //
-        // if (selectedFile.getName().endsWith(".otp")) {
-        // ProjectManager manager = openProject(selectedFile, null);
-        // newModel = manager.getModel();
-        // } else { // assume OTM library file
-        LibraryInputSource<InputStream> libraryInput = new LibraryStreamInputSource( selectedFile );
-        try {
-            LibraryModelLoader<InputStream> modelLoader = new LibraryModelLoader<>();
-
-            findings = modelLoader.loadLibraryModel( libraryInput );
-            TLModel newModel = modelLoader.getLibraryModel();
-        } catch (LibraryLoaderException e) {
-            log.error( "Error loading model: " + e.getLocalizedMessage() );
-            // e.printStackTrace();
+            return null;
+        if (!selectedFile.canRead()) {
+            log.debug( "Can't read file: " + selectedFile.getAbsolutePath() );
+            // TODO - how to signal user of read error?
+            return null;
         }
+        log.debug( "Open selected file: " + selectedFile.getName() );
+        findings = null;
+
+        if (selectedFile.getName().endsWith( ".otp" )) {
+            openProject( selectedFile, libraryModel, null );
+        } else {
+            // Assure OTM library file
+            if (selectedFile.getName().endsWith( ".otm" )) {
+                LibraryInputSource<InputStream> libraryInput = new LibraryStreamInputSource( selectedFile );
+                try {
+                    LibraryModelLoader<InputStream> modelLoader = new LibraryModelLoader<>( libraryModel );
+                    // TLModel newModel = modelLoader.getLibraryModel();
+                    // log.debug( "Before open library count: " + newModel.getAllLibraries().size() );
+
+                    findings = modelLoader.loadLibraryModel( libraryInput );
+                    // newModel = modelLoader.getLibraryModel();
+                    // log.debug( "After open library count: " + newModel.getAllLibraries().size() );
+                } catch (LibraryLoaderException e) {
+                    log.error( "Error loading model: " + e.getLocalizedMessage() );
+                }
+            } else {
+                log.debug( "Invalid file extension: " + selectedFile.getName() );
+            }
+        }
+        return findings;
     }
     // }
 

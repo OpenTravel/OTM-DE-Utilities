@@ -70,10 +70,10 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     /**
      * TLContextualFacet or TLLibraryMember
      * <p>
-     * Not all library members implement the TLLibraryMember class. This method makes it easy to get a LibraryMember
-     * regardless of which type hierarchy it belongs.
+     * TLLibaryMember and TLContextualFacet extend LibraryMember. Both are OtmLibraryMembers. This convenience method
+     * makes it easy to get a LibraryMember regardless of which TL type hierarchy it belongs.
      * 
-     * @return
+     * @return the TLObject cast to LibraryMember
      */
     public LibraryMember getTlLM();
 

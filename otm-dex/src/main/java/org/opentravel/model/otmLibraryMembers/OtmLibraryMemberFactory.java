@@ -49,7 +49,14 @@ public class OtmLibraryMemberFactory {
         // NO-OP - only static methods
     }
 
-    public static OtmLibraryMember memberFactory(LibraryMember tlMember, OtmModelManager manager) {
+    /**
+     * Create OtmObject facade for the member and add to OtmModel.
+     * 
+     * @param tlMember
+     * @param manager
+     * @return the created OtmObject or null
+     */
+    public static OtmLibraryMember create(LibraryMember tlMember, OtmModelManager manager) {
         if (manager == null)
             throw new IllegalArgumentException( "Member factory must be passed a non-null manager." );
         // log.debug("Ready to create member for: " + tlMember.getLocalName() + " of type "

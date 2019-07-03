@@ -92,11 +92,7 @@ public class OtmModelManager implements TaskResultHandlerI {
         if (actionManager == null)
             this.actionMgr = new DexReadOnlyActionManager();
         this.actionMgr = actionManager;
-        // actionManager.setModelManager(this);
-        // this.statusController = statusController;
 
-        // Create a TL Model
-        // FIXME - this is not the model being used when adding projects
         try {
             tlModel = new TLModel();
         } catch (Exception e) {
@@ -105,17 +101,90 @@ public class OtmModelManager implements TaskResultHandlerI {
         // Tell model to track changes to maintain its type integrity
         tlModel.addListener( new ModelIntegrityChecker() );
         log.debug( "TL Model created and integrity checker added." );
-
-        // // Render the built-in libraries
-        // addBuiltInLibraries();
     }
 
     /**
+     * Simply add the member to the maps if it is not already in the maps.
+     * 
      * @param member
      */
     public void add(OtmLibraryMember member) {
-        if (member != null && member.getTL() instanceof LibraryMember)
+        if (member != null && member.getTL() instanceof LibraryMember && !contains( member.getTlLM() ))
             members.put( member.getTlLM(), member );
+    }
+
+
+    /**
+     * Add the TL library to the model if it is not already in the model. Adds all the members.
+     * <p>
+     * Does <b>not</b> resolve types. Does <b>not</b> validate the objects.
+     * 
+     * @see #startValidatingAndResolvingTasks()
+     * 
+     * @param library to add
+     * @return
+     */
+    public OtmLibrary add(AbstractLibrary absLibrary) {
+        return add( absLibrary, getVersionChainFactory() );
+    }
+
+    protected OtmLibrary add(AbstractLibrary absLibrary, VersionChainFactory versionChainFactory) {
+        if (absLibrary == null)
+            return null;
+        if (contains( absLibrary ))
+            return libraries.get( absLibrary );
+        OtmLibrary otmLibrary = new OtmLibrary( absLibrary, this );
+        libraries.put( absLibrary, otmLibrary );
+        // Map of base namespaces with all libraries in that namespace
+        if (absLibrary instanceof TLLibrary)
+            if (versionChainFactory != null)
+                baseNSManaged.put( otmLibrary.getNameWithBasenamespace(),
+                    versionChainFactory.getVersionChain( (TLLibrary) absLibrary ) );
+            else {
+                baseNSUnmanaged.put( otmLibrary.getNameWithBasenamespace(), otmLibrary );
+                log.debug( "Added unmanged base namespace: " + otmLibrary.getNameWithBasenamespace() );
+            }
+
+        // For each named member use the factory to create and add OtmObject
+        absLibrary.getNamedMembers().forEach( nm -> OtmLibraryMemberFactory.create( nm, this ) );
+
+        return otmLibrary;
+    }
+
+    /**
+     * NOTE - this is slow compared with {@link #contains(tlMember)}
+     * 
+     * @return true if the member exists as a value in the members map.
+     */
+    public boolean contains(OtmLibraryMember member) {
+        return member != null && members.containsValue( member );
+        // return member != null && member.getTL() instanceof LibraryMember && members.containsKey( member.getTlLM() );
+    }
+
+    /**
+     * @return true if the TL Library Member exists as a key in the members map.
+     */
+    public boolean contains(LibraryMember tlMember) {
+        return members.containsKey( tlMember );
+    }
+
+    public boolean contains(AbstractLibrary absLibrary) {
+        return absLibrary != null && libraries.containsKey( absLibrary );
+    }
+
+    /**
+     * Use the TL Model to attempt to get a version chain factory.
+     * 
+     * @return the factory or null if factory throws exception
+     */
+    private VersionChainFactory getVersionChainFactory() {
+        VersionChainFactory versionChainFactory = null;
+        try {
+            versionChainFactory = new VersionChainFactory( tlModel );
+        } catch (Exception e) {
+            log.debug( "Exception trying to construct version chain factory: " + e.getLocalizedMessage() );
+        }
+        return versionChainFactory;
     }
 
     /**
@@ -140,18 +209,17 @@ public class OtmModelManager implements TaskResultHandlerI {
         // Tell model to track changes to maintain its type integrity
         pm.getModel().addListener( new ModelIntegrityChecker() );
 
-        // Get the built in libraries
+        // Get the built in libraries, will do nothing if already added
         addBuiltInLibraries( pm.getModel() );
-        // TODO - check to see if built-ins are already loaded.
 
         // Get VersionChainFactory that provides a versionChain for each project item that lists the base namespace,
         // name and sorted set of version libraries
-        VersionChainFactory versionChainFactory = null;
-        try {
-            versionChainFactory = new VersionChainFactory( tlModel );
-        } catch (Exception e) {
-            log.debug( "Exception trying to construct version chain factory: " + e.getLocalizedMessage() );
-        }
+        VersionChainFactory versionChainFactory = getVersionChainFactory();
+        // try {
+        // versionChainFactory = new VersionChainFactory( tlModel );
+        // } catch (Exception e) {
+        // log.debug( "Exception trying to construct version chain factory: " + e.getLocalizedMessage() );
+        // }
 
         // Get Libraries - Libraries can belong to multiple projects.
         // Map will de-dup the entries based on baseNS and name.
@@ -160,18 +228,25 @@ public class OtmModelManager implements TaskResultHandlerI {
         }
 
         // Get Members
-        for (AbstractLibrary tlLib : tlModel.getAllLibraries()) {
-            for (LibraryMember tlMember : tlLib.getNamedMembers()) {
-                OtmLibraryMemberFactory.memberFactory( tlMember, this ); // creates and adds
-            }
-        }
+        // for (AbstractLibrary tlLib : tlModel.getAllLibraries()) {
+        // for (LibraryMember tlMember : tlLib.getNamedMembers()) {
+        // if (!contains( tlMember ))
+        // OtmLibraryMemberFactory.memberFactory( tlMember, this ); // creates and adds
+        // }
+        // }
 
+        startValidatingAndResolvingTasks();
+        log.debug( "Model has " + members.size() + " members." );
+    }
+
+    /**
+     * Start the validation and type resolver tasks. Use this model manager to handle results and its status controller.
+     */
+    public void startValidatingAndResolvingTasks() {
         // Start a background task to validate the objects
         new ValidateModelManagerItemsTask( this, this, statusController ).go();
         // Start a background task to resolve type relationships
         new TypeResolverTask( this, this, statusController ).go();
-
-        log.debug( "Model has " + members.size() + " members." );
     }
 
     /**
@@ -184,7 +259,7 @@ public class OtmModelManager implements TaskResultHandlerI {
             }
             libraries.put( tlLib, new OtmBuiltInLibrary( tlLib, this ) );
             for (LibraryMember tlMember : tlLib.getNamedMembers()) {
-                OtmLibraryMemberFactory.memberFactory( tlMember, this ); // creates and adds
+                OtmLibraryMemberFactory.create( tlMember, this ); // creates and adds
             }
         }
     }
@@ -208,30 +283,32 @@ public class OtmModelManager implements TaskResultHandlerI {
         AbstractLibrary absLibrary = pi.getContent();
         if (absLibrary == null)
             return;
-        for (AbstractLibrary l : libraries.keySet())
-            if (l.getNamespace().equals( absLibrary.getNamespace() ) && l.getName().equals( absLibrary.getName() )) {
-                log.debug( "Same URL found." );
-                // TODO - is this always the same as contains clause?
-                // libraries.get(l).add(pi);
-                // return;
-            }
+        // for (AbstractLibrary l : libraries.keySet())
+        // if (l.getNamespace().equals( absLibrary.getNamespace() ) && l.getName().equals( absLibrary.getName() )) {
+        // log.debug( "Same URL found." );
+        // // TODO - is this always the same as contains clause?
+        // // libraries.get(l).add(pi);
+        // // return;
+        // }
 
-        if (libraries.containsKey( absLibrary )) {
+        if (contains( absLibrary )) {
             // let the library track project as needed to know if the library is editable
             libraries.get( absLibrary ).add( pi );
         } else {
             // Add newly discovered library to the libraries and baseNS maps
-            OtmLibrary lib = new OtmLibrary( pi, this );
-            libraries.put( absLibrary, lib );
-            // Map of base namespaces with all libraries in that namespace
-            if (absLibrary instanceof TLLibrary)
-                if (versionChainFactory != null)
-                    baseNSManaged.put( lib.getNameWithBasenamespace(),
-                        versionChainFactory.getVersionChain( (TLLibrary) absLibrary ) );
-                else {
-                    baseNSUnmanaged.put( lib.getNameWithBasenamespace(), lib );
-                    log.debug( "Added unmanged base namespace: " + lib.getNameWithBasenamespace() );
-                }
+            // OtmLibrary lib = new OtmLibrary( pi, this );
+            OtmLibrary lib = add( absLibrary );
+            lib.add( pi );
+            // libraries.put( absLibrary, lib );
+            // // Map of base namespaces with all libraries in that namespace
+            // if (absLibrary instanceof TLLibrary)
+            // if (versionChainFactory != null)
+            // baseNSManaged.put( lib.getNameWithBasenamespace(),
+            // versionChainFactory.getVersionChain( (TLLibrary) absLibrary ) );
+            // else {
+            // baseNSUnmanaged.put( lib.getNameWithBasenamespace(), lib );
+            // log.debug( "Added unmanged base namespace: " + lib.getNameWithBasenamespace() );
+            // }
         }
     }
 
