@@ -48,6 +48,8 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     private MenuItem lockLibrary;
     private MenuItem unlockLibrary;
     private MenuItem whereUsed;
+    private MenuItem projectAdd;
+    private MenuItem projectRemove;
 
     // controller injected from FXML
     public LibraryRowFactory(LibrariesTreeTableController controller) {
@@ -63,12 +65,14 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         lockLibrary = new MenuItem( "Lock" );
         unlockLibrary = new MenuItem( "Unlock" );
         whereUsed = new MenuItem( "Show Where Used (future)" );
+        projectAdd = new MenuItem( "Add to project (future)" );
+        projectRemove = new MenuItem( "Remove from project (future)" );
 
         lockLibrary.setOnAction( e -> lockLibrary() );
         unlockLibrary.setOnAction( (e) -> unlockLibraryEventHandler() );
         whereUsed.setOnAction( this::addMemberEvent );
 
-        contextMenu.getItems().addAll( lockLibrary, unlockLibrary, whereUsed );
+        contextMenu.getItems().addAll( lockLibrary, unlockLibrary, whereUsed, projectAdd, projectRemove );
         setContextMenu( contextMenu );
 
         // Set style listener (css class)
@@ -123,6 +127,8 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
                 lockLibrary.setDisable( !library.canBeLocked() );
                 unlockLibrary.setDisable( !library.canBeUnlocked() );
                 whereUsed.setDisable( true );
+                projectAdd.setDisable( true );
+                projectRemove.setDisable( true );
             }
             // return n.getLibrary().getProjectItem().getState().equals(RepositoryItemState.MANAGED_WIP);
 

@@ -91,7 +91,7 @@ public class TestDexFileHandler extends AbstractFxTest {
         assertTrue( localLibrary.exists() );
 
         int initialLibCount = tlModel.getAllLibraries().size();
-        new DexFileHandler().openFile( localLibrary, tlModel );
+        new DexFileHandler().openFile( localLibrary, tlModel, null );
         assertTrue( tlModel.getAllLibraries().size() > initialLibCount );
         log.debug( "Model now has " + tlModel.getAllLibraries().size() + " libraries." );
     }

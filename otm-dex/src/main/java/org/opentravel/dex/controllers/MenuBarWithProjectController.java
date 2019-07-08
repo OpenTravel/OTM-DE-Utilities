@@ -24,6 +24,7 @@ import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.events.DexEventDispatcher;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
+import org.opentravel.dex.tasks.repository.OpenLibraryFileTask;
 import org.opentravel.dex.tasks.repository.OpenProjectFileTask;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
@@ -208,9 +209,16 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     }
 
     public void openFile(File selectedFile) {
-        getDialogBox().show( "Opening Project", "Please wait." );
-        new OpenProjectFileTask( selectedFile, modelMgr, this::handleTaskComplete,
-            mainController.getStatusController() ).go();
+        if (selectedFile.getName().endsWith( ".otm" )) {
+            getDialogBox().show( "Opening Library", "Please wait." );
+            new OpenLibraryFileTask( selectedFile, modelMgr, this::handleTaskComplete,
+                mainController.getStatusController() ).go();
+        } else {
+            // TODO - if project this else if library new OpenLibraryFileTask().go()
+            getDialogBox().show( "Opening Project", "Please wait." );
+            new OpenProjectFileTask( selectedFile, modelMgr, this::handleTaskComplete,
+                mainController.getStatusController() ).go();
+        }
     }
 
     private HashMap<String,File> projectMap = new HashMap<>();
@@ -254,7 +262,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     @Override
     public void handleTaskComplete(WorkerStateEvent event) {
-        if (event.getTarget() instanceof OpenProjectFileTask) {
+        if (event.getTarget() instanceof OpenProjectFileTask || event.getTarget() instanceof OpenLibraryFileTask) {
             dialogBox.close();
             fireEvent( new DexModelChangeEvent( modelMgr ) );
             mainController.refresh();

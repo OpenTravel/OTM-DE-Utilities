@@ -93,7 +93,7 @@ public class DexFileHandler extends AbstractMainWindowController {
      *
      * @param selectedFile
      */
-    public ValidationFindings openFile(File selectedFile, TLModel libraryModel) {
+    public ValidationFindings openFile(File selectedFile, TLModel libraryModel, OpenProjectProgressMonitor monitor) {
         if (selectedFile == null)
             return null;
         if (!selectedFile.canRead()) {

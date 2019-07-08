@@ -140,6 +140,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> {
         getTL().getParamGroups().forEach( a -> new OtmParameterGroup( a, this ) );
         getTL().getParentRefs().forEach( a -> new OtmParentRef( a, this ) );
 
-        log.debug( "Modeled resource children" );
+        log.debug( "Modeled resource children for " + getName() );
     }
 }
