@@ -25,18 +25,15 @@ import org.opentravel.application.common.StatusType;
 import org.opentravel.release.NewReleaseDialogController.NewReleaseInfo;
 import org.opentravel.release.navigate.TreeNode;
 import org.opentravel.release.navigate.TreeNodeFactory;
-import org.opentravel.release.undo.SpinnerUndoableAction;
 import org.opentravel.release.undo.TextInputUndoableAction;
 import org.opentravel.release.undo.UndoManager;
 import org.opentravel.release.undo.UndoableAction;
 import org.opentravel.release.undo.WritableValueUndoableAction;
-import org.opentravel.schemacompiler.ioc.CompilerExtensionRegistry;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.TLFacetOwner;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.repository.Release;
-import org.opentravel.schemacompiler.repository.ReleaseCompileOptions;
 import org.opentravel.schemacompiler.repository.ReleaseItem;
 import org.opentravel.schemacompiler.repository.ReleaseManager;
 import org.opentravel.schemacompiler.repository.ReleaseMember;
@@ -92,14 +89,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -213,36 +205,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
     private TableColumn<FacetSelection,String> facetOwnerColumn;
     @FXML
     private TableColumn<FacetSelection,String> facetSelectionColumn;
-    @FXML
-    private ScrollPane optionsScrollPane;
-    @FXML
-    private ChoiceBox<String> bindingStyleChoice;
-    @FXML
-    private CheckBox compileXmlSchemasCheckbox;
-    @FXML
-    private CheckBox compileServicesCheckbox;
-    @FXML
-    private CheckBox compileJsonSchemasCheckbox;
-    @FXML
-    private CheckBox compileSwaggerCheckbox;
-    @FXML
-    private CheckBox compileDocumentationCheckbox;
-    @FXML
-    private TextField serviceEndpointUrl;
-    @FXML
-    private TextField baseResourceUrl;
-    @FXML
-    private CheckBox suppressExtensionsCheckbox;
-    @FXML
-    private CheckBox generateExamplesCheckbox;
-    @FXML
-    private CheckBox exampleMaxDetailCheckbox;
-    @FXML
-    private Spinner<Integer> maxRepeatSpinner;
-    @FXML
-    private Spinner<Integer> maxRecursionDepthSpinner;
-    @FXML
-    private CheckBox suppressOptionalFieldsCheckbox;
     @FXML
     private TableView<ValidationFinding> validationTableView;
     @FXML
@@ -1028,7 +990,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
                     undoManager.disableActionExecution();
                     updateCommitHistories();
                     updateReleaseFields();
-                    updateCompilerOptions();
                     updateFacetSelections();
                     validateFields();
                     updateControlStates();
@@ -1115,20 +1076,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
                 reloadModelButton.setDisable( true );
                 principalTableView.setDisable( true );
                 referencedTableView.setDisable( true );
-                bindingStyleChoice.setDisable( true );
-                compileXmlSchemasCheckbox.setDisable( true );
-                compileServicesCheckbox.setDisable( true );
-                compileJsonSchemasCheckbox.setDisable( true );
-                compileSwaggerCheckbox.setDisable( true );
-                compileDocumentationCheckbox.setDisable( true );
-                serviceEndpointUrl.setDisable( true );
-                baseResourceUrl.setDisable( true );
-                suppressExtensionsCheckbox.setDisable( true );
-                generateExamplesCheckbox.setDisable( true );
-                exampleMaxDetailCheckbox.setDisable( true );
-                maxRepeatSpinner.setDisable( true );
-                maxRecursionDepthSpinner.setDisable( true );
-                suppressExtensionsCheckbox.setDisable( true );
                 facetSelectionTableView.setDisable( true );
                 validationTableView.setDisable( true );
                 libraryTreeView.setDisable( true );
@@ -1186,37 +1133,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
     }
 
     /**
-     * Called when a compiler option has been modified.
-     */
-    private void handleCompileOptionModified() {
-        ReleaseCompileOptions options = getCompileOptions();
-
-        if (options != null) {
-            boolean generateExamplesChanged = (options.isGenerateExamples() != generateExamplesCheckbox.isSelected());
-
-            options.setBindingStyle( bindingStyleChoice.getValue() );
-            options.setCompileSchemas( compileXmlSchemasCheckbox.isSelected() );
-            options.setCompileServices( compileServicesCheckbox.isSelected() );
-            options.setCompileJsonSchemas( compileJsonSchemasCheckbox.isSelected() );
-            options.setCompileSwagger( compileSwaggerCheckbox.isSelected() );
-            options.setCompileHtml( compileDocumentationCheckbox.isSelected() );
-            options.setServiceEndpointUrl( serviceEndpointUrl.textProperty().getValue() );
-            options.setResourceBaseUrl( baseResourceUrl.textProperty().getValue() );
-            options.setSuppressOtmExtensions( suppressExtensionsCheckbox.isSelected() );
-            options.setGenerateExamples( generateExamplesCheckbox.isSelected() );
-            options.setGenerateMaxDetailsForExamples( exampleMaxDetailCheckbox.isSelected() );
-            options.setExampleMaxRepeat( maxRepeatSpinner.getValue() );
-            options.setExampleMaxDepth( maxRecursionDepthSpinner.getValue() );
-            options.setSuppressOptionalFields( suppressOptionalFieldsCheckbox.isSelected() );
-
-            if (generateExamplesChanged) {
-                updateControlStates();
-            }
-            markReleaseDirty();
-        }
-    }
-
-    /**
      * @see org.opentravel.application.common.AbstractMainWindowController#updateControlStates()
      */
     @Override
@@ -1224,7 +1140,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
         Platform.runLater( () -> {
             boolean isReleaseLoaded = (releaseManager != null);
             boolean isEditableReleaseLoaded = isReleaseLoaded && !managedRelease;
-            boolean isGenerateExamples = (isReleaseLoaded && generateExamplesCheckbox.isSelected());
             boolean isSaveEnabled = (isEditableReleaseLoaded && releaseDirty && !hasError);
             boolean isSaveAsEnabled = (isEditableReleaseLoaded && !hasError);
             boolean isReloadModelEnabled = (isEditableReleaseLoaded && modelDirty && !hasError);
@@ -1270,20 +1185,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
             reloadModelButton.setDisable( !isReloadModelEnabled );
             principalTableView.setDisable( !isReleaseLoaded );
             referencedTableView.setDisable( !isReleaseLoaded );
-            bindingStyleChoice.setDisable( !isEditableReleaseLoaded );
-            compileXmlSchemasCheckbox.setDisable( !isEditableReleaseLoaded );
-            compileServicesCheckbox.setDisable( !isEditableReleaseLoaded );
-            compileJsonSchemasCheckbox.setDisable( !isEditableReleaseLoaded );
-            compileSwaggerCheckbox.setDisable( !isEditableReleaseLoaded );
-            compileDocumentationCheckbox.setDisable( !isEditableReleaseLoaded );
-            serviceEndpointUrl.setDisable( !isReleaseLoaded );
-            baseResourceUrl.setDisable( !isReleaseLoaded );
-            suppressExtensionsCheckbox.setDisable( !isEditableReleaseLoaded );
-            generateExamplesCheckbox.setDisable( !isEditableReleaseLoaded );
-            exampleMaxDetailCheckbox.setDisable( !(isGenerateExamples && !managedRelease) );
-            maxRepeatSpinner.setDisable( !isGenerateExamples );
-            maxRecursionDepthSpinner.setDisable( !isGenerateExamples );
-            suppressOptionalFieldsCheckbox.setDisable( !(isGenerateExamples && !managedRelease) );
             facetSelectionTableView.setDisable( !isReleaseLoaded );
             validationTableView.setDisable( !isReleaseLoaded );
             libraryTreeView.setDisable( !isReleaseLoaded );
@@ -1294,10 +1195,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
             releaseBaseNamespace.setEditable( !managedRelease );
             releaseVersion.setEditable( !managedRelease );
             releaseDescription.setEditable( !managedRelease );
-            serviceEndpointUrl.setEditable( !managedRelease );
-            baseResourceUrl.setEditable( !managedRelease );
-            maxRepeatSpinner.setEditable( !managedRelease );
-            maxRecursionDepthSpinner.setEditable( !managedRelease );
             principalTableView.setEditable( isEditableReleaseLoaded );
             referencedTableView.setEditable( isEditableReleaseLoaded );
             facetSelectionTableView.setEditable( isEditableReleaseLoaded );
@@ -1321,7 +1218,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
             try {
                 undoManager.disableActionExecution();
                 updateReleaseFields();
-                updateCompilerOptions();
                 updateFacetSelections();
                 updateCommitHistories();
                 updateModelTreeView();
@@ -1364,53 +1260,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
         releaseVersion.setText( (release == null) ? "" : release.getVersion() );
         releaseDescription.setText( (release == null) ? "" : release.getDescription() );
         defaultEffectiveDate.setLocalDateTime( effectiveDate );
-    }
-
-    /**
-     * Updates the visual fields related to the release's compiler options. This method must be called from within the
-     * UI thread.
-     */
-    private void updateCompilerOptions() {
-        Release release = getRelease();
-
-        if (release != null) {
-            ReleaseCompileOptions options = release.getCompileOptions();
-            String endpointUrl = options.getServiceEndpointUrl();
-            String resourceUrl = options.getResourceBaseUrl();
-            Integer maxRepeat = options.getExampleMaxRepeat();
-            Integer maxDepth = options.getExampleMaxDepth();
-
-            bindingStyleChoice.setValue( options.getBindingStyle() );
-            compileXmlSchemasCheckbox.setSelected( options.isCompileSchemas() );
-            compileServicesCheckbox.setSelected( options.isCompileServices() );
-            compileJsonSchemasCheckbox.setSelected( options.isCompileJsonSchemas() );
-            compileSwaggerCheckbox.setSelected( options.isCompileSwagger() );
-            compileDocumentationCheckbox.setSelected( options.isCompileHtml() );
-            serviceEndpointUrl.setText( (endpointUrl == null) ? "" : endpointUrl );
-            baseResourceUrl.setText( (resourceUrl == null) ? "" : resourceUrl );
-            suppressExtensionsCheckbox.setSelected( options.isSuppressOtmExtensions() );
-            generateExamplesCheckbox.setSelected( options.isGenerateExamples() );
-            exampleMaxDetailCheckbox.setSelected( options.isGenerateMaxDetailsForExamples() );
-            maxRepeatSpinner.getValueFactory().setValue( (maxRepeat == null) ? 3 : maxRepeat );
-            maxRecursionDepthSpinner.getValueFactory().setValue( (maxDepth == null) ? 3 : maxDepth );
-            suppressOptionalFieldsCheckbox.setSelected( options.isSuppressOptionalFields() );
-
-        } else {
-            bindingStyleChoice.setValue( CompilerExtensionRegistry.getActiveExtension() );
-            compileXmlSchemasCheckbox.setSelected( false );
-            compileServicesCheckbox.setSelected( false );
-            compileJsonSchemasCheckbox.setSelected( false );
-            compileSwaggerCheckbox.setSelected( false );
-            compileDocumentationCheckbox.setSelected( false );
-            serviceEndpointUrl.setText( "" );
-            baseResourceUrl.setText( "" );
-            suppressExtensionsCheckbox.setSelected( false );
-            generateExamplesCheckbox.setSelected( false );
-            exampleMaxDetailCheckbox.setSelected( false );
-            maxRepeatSpinner.getValueFactory().setValue( 3 );
-            maxRecursionDepthSpinner.getValueFactory().setValue( 3 );
-            suppressOptionalFieldsCheckbox.setSelected( false );
-        }
     }
 
     /**
@@ -1532,8 +1381,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
             isValid &= Validator.validateTextField( releaseName, "release name", 256, true );
             isValid &= Validator.validateURLTextField( releaseBaseNamespace, "base namespace", true );
             isValid &= Validator.validateVersionTextField( releaseVersion, "release version", true );
-            isValid &= Validator.validateURLTextField( serviceEndpointUrl, "service endpoint URL", false );
-            isValid &= Validator.validateURLTextField( baseResourceUrl, "base resource URL", false );
             hasError = !isValid;
 
             if (hasError != oldHasError) {
@@ -1549,8 +1396,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
             Validator.clearErrorMessage( releaseName );
             Validator.clearErrorMessage( releaseBaseNamespace );
             Validator.clearErrorMessage( releaseVersion );
-            Validator.clearErrorMessage( serviceEndpointUrl );
-            Validator.clearErrorMessage( baseResourceUrl );
         }
     }
 
@@ -1589,16 +1434,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
     }
 
     /**
-     * Returns the compiler options for the release or null if a release is not currently open.
-     * 
-     * @return ReleaseCompileOptions
-     */
-    private ReleaseCompileOptions getCompileOptions() {
-        Release release = getRelease();
-        return (release == null) ? null : release.getCompileOptions();
-    }
-
-    /**
      * Assigns the primary stage for the window associated with this controller and initializes all visual controls.
      *
      * @param primaryStage the primary stage for this controller
@@ -1606,19 +1441,11 @@ public class OTMReleaseController extends AbstractMainWindowController {
     @Override
     @SuppressWarnings("squid:MaximumInheritanceDepth") // Unavoidable since the base class is from core JavaFXx
     public void initialize(Stage primaryStage) {
-        List<String> bindingStyles = CompilerExtensionRegistry.getAvailableExtensionIds();
-        String defaultStyle = CompilerExtensionRegistry.getActiveExtension();
         UserSettings settings = UserSettings.load();
 
         availabilityChecker = RepositoryAvailabilityChecker.getInstance( getRepositoryManager() );
         availabilityChecker.pingAllRepositories( false );
         super.initialize( primaryStage );
-
-        // Initialize the possible values in choice groups and spinners
-        bindingStyleChoice.setItems( FXCollections.observableArrayList( bindingStyles ) );
-        bindingStyleChoice.setValue( defaultStyle );
-        maxRepeatSpinner.setValueFactory( new IntegerSpinnerValueFactory( 1, 3, 3, 1 ) );
-        maxRecursionDepthSpinner.setValueFactory( new IntegerSpinnerValueFactory( 1, 3, 3, 1 ) );
 
         // Initialize the list of repository menu items
         List<RemoteRepository> repositories = getRepositoryManager().listRemoteRepositories();
@@ -1680,57 +1507,6 @@ public class OTMReleaseController extends AbstractMainWindowController {
                 undoManager, () -> handleReleaseFieldModified( false ) ).submit() );
         principalTableView.getSelectionModel().selectedItemProperty()
             .addListener( (obs, oldSelection, newSelection) -> updateControlStates() );
-        bindingStyleChoice.valueProperty().addListener(
-            (observable, oldValue, newValue) -> new WritableValueUndoableAction<>( bindingStyleChoice.valueProperty(),
-                oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-        compileXmlSchemasCheckbox.selectedProperty()
-            .addListener( (observable, oldValue,
-                newValue) -> new WritableValueUndoableAction<>( compileXmlSchemasCheckbox.selectedProperty(), oldValue,
-                    undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-        compileServicesCheckbox.selectedProperty()
-            .addListener( (observable, oldValue,
-                newValue) -> new WritableValueUndoableAction<>( compileServicesCheckbox.selectedProperty(), oldValue,
-                    undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-        compileJsonSchemasCheckbox.selectedProperty()
-            .addListener( (observable, oldValue,
-                newValue) -> new WritableValueUndoableAction<>( compileJsonSchemasCheckbox.selectedProperty(), oldValue,
-                    undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-        compileSwaggerCheckbox.selectedProperty()
-            .addListener( (observable, oldValue,
-                newValue) -> new WritableValueUndoableAction<>( compileSwaggerCheckbox.selectedProperty(), oldValue,
-                    undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-        compileDocumentationCheckbox.selectedProperty()
-            .addListener( (observable, oldValue,
-                newValue) -> new WritableValueUndoableAction<>( compileDocumentationCheckbox.selectedProperty(),
-                    oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-        serviceEndpointUrl.textProperty().addListener(
-            (observable, oldValue, newValue) -> new WritableValueUndoableAction<>( serviceEndpointUrl.textProperty(),
-                oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-        baseResourceUrl.textProperty().addListener(
-            (observable, oldValue, newValue) -> new WritableValueUndoableAction<>( baseResourceUrl.textProperty(),
-                oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-        suppressExtensionsCheckbox.selectedProperty()
-            .addListener( (observable, oldValue,
-                newValue) -> new WritableValueUndoableAction<>( suppressExtensionsCheckbox.selectedProperty(), oldValue,
-                    undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-        generateExamplesCheckbox.selectedProperty()
-            .addListener( (observable, oldValue,
-                newValue) -> new WritableValueUndoableAction<>( generateExamplesCheckbox.selectedProperty(), oldValue,
-                    undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-        exampleMaxDetailCheckbox.selectedProperty()
-            .addListener( (observable, oldValue,
-                newValue) -> new WritableValueUndoableAction<>( exampleMaxDetailCheckbox.selectedProperty(), oldValue,
-                    undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-        maxRepeatSpinner.valueProperty()
-            .addListener( (observable, oldValue, newValue) -> new SpinnerUndoableAction<>( maxRepeatSpinner, oldValue,
-                undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-        maxRecursionDepthSpinner.valueProperty()
-            .addListener( (observable, oldValue, newValue) -> new SpinnerUndoableAction<>( maxRecursionDepthSpinner,
-                oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-        suppressOptionalFieldsCheckbox.selectedProperty()
-            .addListener( (observable, oldValue,
-                newValue) -> new WritableValueUndoableAction<>( suppressOptionalFieldsCheckbox.selectedProperty(),
-                    oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
         libraryTreeView.getSelectionModel().selectedItemProperty().addListener( event -> {
             TreeItem<TreeNode<Object>> treeItem = libraryTreeView.getSelectionModel().getSelectedItem();
             List<NodeProperty> nodeProps =

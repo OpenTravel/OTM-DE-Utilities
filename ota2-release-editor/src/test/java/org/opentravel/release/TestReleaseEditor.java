@@ -33,8 +33,6 @@ import org.opentravel.utilities.testutil.TestFxMode;
 
 import java.io.File;
 
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.ChoiceBoxTableCell;
 import javafx.scene.input.KeyCode;
@@ -167,30 +165,6 @@ public class TestReleaseEditor extends AbstractFxTest {
         when( mockFileChooser.showOpenDialog( any() ) ).thenReturn( projectFile );
         robot.clickOn( "File" ).clickOn( "#importMenu" );
 
-        // Modify the compile options of the release
-        robot.clickOn( "Compiler Options" );
-        robot.sleep( 250 ); // Wait for accordion to expand
-        robot.clickOn( "#bindingStyleChoice" );
-        robot.type( KeyCode.DOWN ).type( KeyCode.ENTER );
-
-        for (int i = 0; i < 2; i++) {
-            robot.clickOn( "#compileXmlSchemasCheckbox" );
-            robot.clickOn( "#compileServicesCheckbox" );
-            robot.clickOn( "#compileJsonSchemasCheckbox" );
-            robot.clickOn( "#compileSwaggerCheckbox" );
-            robot.clickOn( "#compileDocumentationCheckbox" );
-        }
-        robot.setScrollPosition( "#optionsScrollPane", 0.5 );
-        robot.write( "#serviceEndpointUrl", "http://soap.opentravel.org" );
-        robot.write( "#baseResourceUrl", "http://rest.opentravel.org" );
-        robot.clickOn( "#suppressExtensionsCheckbox" );
-        robot.clickOn( "#generateExamplesCheckbox" ).clickOn( "#generateExamplesCheckbox" );
-        robot.setScrollPosition( "#optionsScrollPane", 1.0 );
-        robot.clickOn( "#exampleMaxDetailCheckbox" );
-        ((Spinner<?>) robot.lookup( "#maxRepeatSpinner" ).query()).decrement();
-        ((Spinner<?>) robot.lookup( "#maxRecursionDepthSpinner" ).query()).decrement();
-        robot.clickOn( "#suppressOptionalFieldsCheckbox" );
-
         // Modify the facet selections of the release
         ChoiceBoxTableCell<?,?> facetChoiceCell;
 
@@ -240,22 +214,6 @@ public class TestReleaseEditor extends AbstractFxTest {
         robot.clickOn( "#releaseFileButton" );
         robot.waitForBackgroundTask();
 
-        // Modify binding style and confirm undo/redo
-        ChoiceBox<?> choiceBox;
-
-        robot.clickOn( "Compiler Options" );
-        robot.sleep( 250 ); // Wait for accordion to expand
-        choiceBox = robot.lookup( "#bindingStyleChoice" ).query();
-        originalValue = choiceBox.getSelectionModel().getSelectedItem().toString();
-        robot.clickOn( "#bindingStyleChoice" );
-        robot.type( KeyCode.DOWN ).type( KeyCode.ENTER );
-        updatedValue = choiceBox.getSelectionModel().getSelectedItem().toString();
-
-        robot.clickOn( "Edit" ).clickOn( "#undoMenu" );
-        assertEquals( originalValue, choiceBox.getSelectionModel().getSelectedItem().toString() );
-        robot.clickOn( "Edit" ).clickOn( "#redoMenu" );
-        assertEquals( updatedValue, choiceBox.getSelectionModel().getSelectedItem().toString() );
-
         // Modify the release version and confirm undo/redo
         TextField textField;
 
@@ -268,22 +226,6 @@ public class TestReleaseEditor extends AbstractFxTest {
         assertEquals( originalValue, textField.getText() );
         robot.clickOn( "Edit" ).clickOn( "#redoMenu" );
         assertEquals( updatedValue, textField.getText() );
-
-        // Modify max repeat and confirm undo/redo
-        Spinner<?> spinner;
-
-        robot.clickOn( "Compiler Options" );
-        robot.setScrollPosition( "#optionsScrollPane", 1.0 );
-        robot.sleep( 250 ); // Wait for accordion to expand
-        spinner = robot.lookup( "#maxRepeatSpinner" ).query();
-        originalValue = spinner.getValue().toString();
-        spinner.decrement();
-        updatedValue = spinner.getValue().toString();
-
-        robot.clickOn( "Edit" ).clickOn( "#undoMenu" );
-        assertEquals( originalValue, spinner.getValue().toString() );
-        robot.clickOn( "Edit" ).clickOn( "#redoMenu" );
-        assertEquals( updatedValue, spinner.getValue().toString() );
     }
 
     @Test
