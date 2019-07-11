@@ -24,6 +24,10 @@ import org.opentravel.dex.repository.RepositoryResultHandler;
 import org.opentravel.dex.tasks.repository.LockLibraryTask;
 import org.opentravel.dex.tasks.repository.UnlockLibraryTask;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.OtmProject;
+import org.opentravel.schemacompiler.repository.RepositoryItemState;
+
+import java.util.Collection;
 
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
@@ -71,12 +75,33 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         lockLibrary.setOnAction( e -> lockLibrary() );
         unlockLibrary.setOnAction( (e) -> unlockLibraryEventHandler() );
         whereUsed.setOnAction( this::addMemberEvent );
+        projectAdd.setOnAction( this::addToProject );
 
         contextMenu.getItems().addAll( lockLibrary, unlockLibrary, whereUsed, projectAdd, projectRemove );
         setContextMenu( contextMenu );
 
         // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
+    }
+
+    private void addToProject(ActionEvent e) {
+        OtmLibrary library = null;
+        if (controller.getSelectedItem() != null && controller.getSelectedItem().getValue() != null)
+            library = controller.getSelectedItem().getValue();
+        if (library == null)
+            return;
+
+        Collection<OtmProject> projects = library.getModelManager().getUserProjects();
+
+        if (projects.isEmpty())
+            return; // Nothing to do
+
+        // If there is only one project use it.
+        if (projects.size() <= 1)
+            for (OtmProject p : projects)
+                p.add( library );
+
+        // FIXME - post a dialog to select the project --OR-- create sub-menu
     }
 
     /**
@@ -127,7 +152,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
                 lockLibrary.setDisable( !library.canBeLocked() );
                 unlockLibrary.setDisable( !library.canBeUnlocked() );
                 whereUsed.setDisable( true );
-                projectAdd.setDisable( true );
+                projectAdd.setDisable( library.getState() != RepositoryItemState.UNMANAGED );
                 projectRemove.setDisable( true );
             }
             // return n.getLibrary().getProjectItem().getState().equals(RepositoryItemState.MANAGED_WIP);

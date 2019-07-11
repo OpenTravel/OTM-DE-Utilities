@@ -45,7 +45,7 @@ import javafx.scene.input.KeyCode;
 public class TestDExUnmanaged extends AbstractFxTest {
     private static Log log = LogFactory.getLog( TestDExUnmanaged.class );
 
-    public static final boolean RUN_HEADLESS = false;
+    public static final boolean RUN_HEADLESS = true;
     final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.
 
     final String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector
@@ -74,7 +74,9 @@ public class TestDExUnmanaged extends AbstractFxTest {
         robot.clickOn( "Libraries" );
         robot.clickOn( "Repository" );
         robot.clickOn( "Repository Login" );
-        robot.targetWindow( "Login Dialog" ).clickOn( "Cancel" );
+        // Fails to find window when running headless
+        if (!RUN_HEADLESS)
+            robot.targetWindow( "Login Dialog" ).clickOn( "Cancel" );
     }
 
     @Test

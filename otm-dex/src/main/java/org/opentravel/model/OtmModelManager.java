@@ -39,6 +39,7 @@ import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.repository.Project;
 import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.ProjectManager;
+import org.opentravel.schemacompiler.repository.impl.BuiltInProject;
 import org.opentravel.schemacompiler.version.VersionChain;
 import org.opentravel.schemacompiler.version.VersionChainFactory;
 
@@ -459,6 +460,18 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
     /**
+     * @return just user projects, not built-in
+     */
+    public List<OtmProject> getUserProjects() {
+        List<OtmProject> projectList = new ArrayList<>();
+        projects.values().forEach( p -> {
+            if (!(p.getTL() instanceof BuiltInProject))
+                projectList.add( p );
+        } );
+        return projectList;
+    }
+
+    /**
      * Get the TL Model used by this model manager.
      * 
      * @return
@@ -494,4 +507,5 @@ public class OtmModelManager implements TaskResultHandlerI {
     public void setStatusController(DexStatusController statusController) {
         this.statusController = statusController;
     }
+
 }

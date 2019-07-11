@@ -20,6 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.dex.actions.DexActionManager;
+import org.opentravel.dex.actions.DexReadOnlyActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryPermission;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
@@ -117,12 +119,24 @@ public class OtmLibrary {
         return ImageManager.Icons.LIBRARY;
     }
 
+    public DexActionManager getActionManager() {
+        // FIXME - action manager should be based on library state
+        return getModelManager().getActionManager();
+    }
+
     /**
      * A library is editable if any associated project item state is Managed_WIP -OR- unmanaged.
      * 
      * @return
      */
     public boolean isEditable() {
+        // log.debug( "State of " + getName() + " is " + getState().toString() );
+        // Can only edit if there is an appropriate action manager
+        if (getActionManager() instanceof DexReadOnlyActionManager)
+            return false;
+        // Can only edit Draft libraries
+        if (getStatus() != TLLibraryStatus.DRAFT)
+            return false;
         return getState() == RepositoryItemState.MANAGED_WIP || getState() == RepositoryItemState.UNMANAGED;
     }
 
@@ -146,7 +160,8 @@ public class OtmLibrary {
     }
 
     public String getStateName() {
-        return projectItems.isEmpty() ? "" : getState().toString();
+        return getState().toString();
+        // return projectItems.isEmpty() ? "" : getState().toString();
     }
 
     /**
@@ -156,7 +171,11 @@ public class OtmLibrary {
      */
     public RepositoryItemState getState() {
         RepositoryItemState state = RepositoryItemState.MANAGED_UNLOCKED; // the weakest state
-        if (projectItems != null)
+        if (projectItems != null) {
+            // If not in a project, it must be unmanaged.
+            if (projectItems.isEmpty())
+                return RepositoryItemState.UNMANAGED;
+
             for (ProjectItem pi : projectItems) {
                 // log.debug("state = " + pi.getState());
                 switch (pi.getState()) {
@@ -177,6 +196,7 @@ public class OtmLibrary {
                         return pi.getState();
                 }
             }
+        }
         return state;
     }
 

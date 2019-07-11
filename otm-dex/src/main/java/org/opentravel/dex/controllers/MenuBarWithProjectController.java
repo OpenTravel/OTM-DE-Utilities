@@ -209,15 +209,17 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     }
 
     public void openFile(File selectedFile) {
-        if (selectedFile.getName().endsWith( ".otm" )) {
-            getDialogBox().show( "Opening Library", "Please wait." );
-            new OpenLibraryFileTask( selectedFile, modelMgr, this::handleTaskComplete,
-                mainController.getStatusController() ).go();
-        } else {
-            // TODO - if project this else if library new OpenLibraryFileTask().go()
-            getDialogBox().show( "Opening Project", "Please wait." );
-            new OpenProjectFileTask( selectedFile, modelMgr, this::handleTaskComplete,
-                mainController.getStatusController() ).go();
+        if (selectedFile != null) {
+            if (selectedFile.getName().endsWith( ".otm" )) {
+                getDialogBox().show( "Opening Library", "Please wait." );
+                new OpenLibraryFileTask( selectedFile, modelMgr, this::handleTaskComplete,
+                    mainController.getStatusController() ).go();
+            } else {
+                // TODO - if project this else if library new OpenLibraryFileTask().go()
+                getDialogBox().show( "Opening Project", "Please wait." );
+                new OpenProjectFileTask( selectedFile, modelMgr, this::handleTaskComplete,
+                    mainController.getStatusController() ).go();
+            }
         }
     }
 

@@ -44,8 +44,21 @@ public class OtmProject {
         id = getTL().getProjectId();
     }
 
+    public void add(OtmLibrary library) {
+        try {
+            getTL().getProjectManager().addUnmanagedProjectItem( library.getTL(), getTL() );
+        } catch (RepositoryException e) {
+            log.warn( "Could not add library to project: " + e.getLocalizedMessage() );
+        }
+        log.debug( "Added " + library.getName() + " to " + getName() );
+    }
+
     public Icons getIconType() {
         return ImageManager.Icons.LIBRARY;
+    }
+
+    public String getName() {
+        return this.getTL().getName();
     }
 
     public Project getTL() {
