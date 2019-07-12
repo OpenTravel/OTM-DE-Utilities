@@ -224,11 +224,6 @@ public class OtmModelManager implements TaskResultHandlerI {
         // Get VersionChainFactory that provides a versionChain for each project item that lists the base namespace,
         // name and sorted set of version libraries
         VersionChainFactory versionChainFactory = getVersionChainFactory();
-        // try {
-        // versionChainFactory = new VersionChainFactory( tlModel );
-        // } catch (Exception e) {
-        // log.debug( "Exception trying to construct version chain factory: " + e.getLocalizedMessage() );
-        // }
 
         // Get Libraries - Libraries can belong to multiple projects.
         // Map will de-dup the entries based on baseNS and name.
@@ -236,16 +231,12 @@ public class OtmModelManager implements TaskResultHandlerI {
             add( pi, versionChainFactory );
         }
 
-        // Get Members
-        // for (AbstractLibrary tlLib : tlModel.getAllLibraries()) {
-        // for (LibraryMember tlMember : tlLib.getNamedMembers()) {
-        // if (!contains( tlMember ))
-        // OtmLibraryMemberFactory.memberFactory( tlMember, this ); // creates and adds
-        // }
-        // }
-
         startValidatingAndResolvingTasks();
         log.debug( "Model has " + members.size() + " members." );
+    }
+
+    public OtmProject getProject(String projectName) {
+        return projects.get( projectName );
     }
 
     /**

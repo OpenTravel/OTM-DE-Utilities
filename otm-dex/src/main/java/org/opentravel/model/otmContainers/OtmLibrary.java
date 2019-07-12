@@ -236,6 +236,13 @@ public class OtmLibrary {
         return names;
     }
 
+    public List<OtmProject> getProjects() {
+        List<OtmProject> projects = new ArrayList<>();
+        if (projectItems != null)
+            getProjectNames().forEach( pn -> projects.add( getModelManager().getProject( pn ) ) );
+        return projects;
+    }
+
     public void validate() {
         findings = TLModelCompileValidator.validateModelElement( getTL(), true );
     }

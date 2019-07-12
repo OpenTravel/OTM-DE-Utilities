@@ -24,11 +24,6 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.BuiltInLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
-import org.opentravel.schemacompiler.repository.Project;
-import org.opentravel.schemacompiler.repository.ProjectItem;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * OTM Object for libraries.
@@ -124,12 +119,12 @@ public class OtmBuiltInLibrary extends OtmLibrary {
     }
 
     // @Override
-    public List<Project> getProjects() {
-        for (ProjectItem pi : projectItems)
-            if (pi.getLockedByUser() != null)
-                return pi.memberOfProjects();
-        return Collections.emptyList();
-    }
+    // public List<Project> getProjects() {
+    // for (ProjectItem pi : projectItems)
+    // if (pi.getLockedByUser() != null)
+    // return pi.memberOfProjects();
+    // return Collections.emptyList();
+    // }
 
     // @Override
     // public void validate() {

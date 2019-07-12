@@ -22,6 +22,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmProject;
 
 import java.io.IOException;
+import java.util.List;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -63,6 +64,8 @@ public class SelectProjectDialogController extends DexPopupControllerBase {
     Button dialogButtonOK;
 
     private OtmModelManager modelManager;
+
+    private List<OtmProject> projects = null;
 
     protected static Stage dialogStage;
 
@@ -114,16 +117,18 @@ public class SelectProjectDialogController extends DexPopupControllerBase {
 
         dialogButtonCancel.setOnAction( e -> doCancel() );
         dialogButtonOK.setOnAction( e -> doOK() );
-        projectList.setOnMouseClicked( e -> doSelect( e ) );
+        projectList.setOnMouseClicked( this::doSelect );
         postHelp( helpText, dialogHelp );
 
         // Add items to the project list widget
-        if (modelManager != null)
-            modelManager.getUserProjects().forEach( p -> projectList.getItems().add( p ) );
+        if (projects == null && modelManager != null)
+            projects = modelManager.getUserProjects();
+        if (projects != null)
+            projects.forEach( p -> projectList.getItems().add( p ) );
     }
 
     /**
-     * Exit on double click
+     * Select and exit on double click
      * 
      * @param e
      */
@@ -139,6 +144,15 @@ public class SelectProjectDialogController extends DexPopupControllerBase {
      */
     public void setManager(OtmModelManager modelManager) {
         this.modelManager = modelManager;
+    }
+
+    /**
+     * If set, this list is used instead of model manager user projects
+     * 
+     * @param projectList
+     */
+    public void setProjectList(List<OtmProject> projectList) {
+        this.projects = projectList;
     }
 
     @Override

@@ -48,6 +48,10 @@ public class OtmProject {
         return getName();
     }
 
+    public void remove(OtmLibrary library) {
+        getTL().remove( library.getTL() );
+    }
+
     public void add(OtmLibrary library) {
         if (library != null) {
             try {

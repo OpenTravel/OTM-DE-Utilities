@@ -29,6 +29,7 @@ import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.schemacompiler.repository.RepositoryItemState;
 
 import java.util.Collection;
+import java.util.List;
 
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
@@ -70,19 +71,44 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         lockLibrary = new MenuItem( "Lock" );
         unlockLibrary = new MenuItem( "Unlock" );
         whereUsed = new MenuItem( "Show Where Used (future)" );
-        projectAdd = new MenuItem( "Add to project (future)" );
+        projectAdd = new MenuItem( "Add to project" );
         projectRemove = new MenuItem( "Remove from project (future)" );
 
         lockLibrary.setOnAction( e -> lockLibrary() );
         unlockLibrary.setOnAction( (e) -> unlockLibraryEventHandler() );
         whereUsed.setOnAction( this::addMemberEvent );
         projectAdd.setOnAction( this::addToProject );
+        projectRemove.setOnAction( this::removeLibrary );
 
         contextMenu.getItems().addAll( lockLibrary, unlockLibrary, whereUsed, projectAdd, projectRemove );
         setContextMenu( contextMenu );
 
         // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
+    }
+
+    private void removeLibrary(ActionEvent e) {
+        OtmLibrary library = null;
+        if (controller.getSelectedItem() != null && controller.getSelectedItem().getValue() != null)
+            library = controller.getSelectedItem().getValue();
+        if (library == null)
+            return;
+
+        List<OtmProject> projects = library.getProjects();
+        if (projects.isEmpty())
+            return;
+        if (projects.size() <= 1)
+            projects.get( 0 ).remove( library );
+        else {
+            SelectProjectDialogController spdc = SelectProjectDialogController.init();
+            spdc.setProjectList( projects );
+            spdc.showAndWait( "" );
+            if (spdc.getSelection() != null)
+                spdc.getSelection().remove( library );
+
+            // TODO - post selection dialog
+        }
+        controller.refresh();
     }
 
     private void addToProject(ActionEvent e) {
@@ -109,8 +135,8 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
             if (spdc.getSelection() != null)
                 spdc.getSelection().add( library );
         }
-        // TODO - should this be a task?
-        // TODO - should this throw event? I don't think so since other controllers will not care.
+        // should this be a task?
+        // should this throw event? I don't think so since other controllers will not care.
         controller.refresh();
     }
 
@@ -165,7 +191,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
                 unlockLibrary.setDisable( !library.canBeUnlocked() );
                 whereUsed.setDisable( true );
                 projectAdd.setDisable( library.getState() != RepositoryItemState.UNMANAGED );
-                projectRemove.setDisable( true );
+                projectRemove.setDisable( library.getProjects().isEmpty() );
             }
             // return n.getLibrary().getProjectItem().getState().equals(RepositoryItemState.MANAGED_WIP);
 
