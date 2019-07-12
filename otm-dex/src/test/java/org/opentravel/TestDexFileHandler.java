@@ -50,6 +50,7 @@ public class TestDexFileHandler extends AbstractFxTest {
     public final static String FILE_TESTLOCALLIBRARYBASE = "base_library.otm";
     public final static String FILE_TESTLOCALLIBRARY1 = "facets1_library.otm";
     public final static String FILE_TESTLOCALLIBRARY2 = "facets2_library.otm";
+    public final static String FILE_TESTLIBRARYNOTINPROJECT = "LibraryNotInProject.otm";
 
     @BeforeClass
     public static void setupTests() throws Exception {
@@ -120,6 +121,7 @@ public class TestDexFileHandler extends AbstractFxTest {
         assertNotNull( localProject );
 
         ProjectManager pm = fileHandler.openProject( localProject, tlModel, null );
+        log.debug( "Model now has " + tlModel.getAllLibraries().size() + " libraries." );
         return pm;
     }
 
@@ -134,6 +136,7 @@ public class TestDexFileHandler extends AbstractFxTest {
         ProjectManager pm = fileHandler.openProject( repoProject, tlModel, null );
         assertTrue( "Must have project items.", !pm.getAllProjectItems().isEmpty() );
         assertTrue( "Must have project items.", pm.getAllProjectItems().size() > 1 );
+        log.debug( "Model now has " + tlModel.getAllLibraries().size() + " libraries." );
         return pm;
     }
 

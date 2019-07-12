@@ -127,7 +127,7 @@ public class AssignedTypeChangeAction implements DexAction<OtmTypeProvider> {
         // Get the user's selected new provider
         MemberAndProvidersDAO selected = null;
         TypeSelectionContoller controller = TypeSelectionContoller.init();
-        controller.setManagers( modelMgr, imageMgr );
+        controller.setManager( modelMgr );
         if (controller.showAndWait( "MSG" ) == Results.OK) {
             selected = controller.getSelected();
             if (selected == null || selected.getValue() == null)

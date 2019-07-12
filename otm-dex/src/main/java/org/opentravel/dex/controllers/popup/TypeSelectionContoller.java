@@ -18,7 +18,6 @@ package org.opentravel.dex.controllers.popup;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.controllers.member.MemberTreeTableController;
@@ -95,7 +94,7 @@ public class TypeSelectionContoller extends DexPopupControllerBase {
 
     private OtmModelManager modelManager;
 
-    private ImageManager imageMgr;
+    // private ImageManager imageMgr;
 
     @Override
     public void checkNodes() {
@@ -122,9 +121,8 @@ public class TypeSelectionContoller extends DexPopupControllerBase {
         memberTreeTableController.refresh();
     }
 
-    public void setManagers(OtmModelManager model, ImageManager image) {
+    public void setManager(OtmModelManager model) {
         this.modelManager = model;
-        this.imageMgr = image;
     }
 
     @Override

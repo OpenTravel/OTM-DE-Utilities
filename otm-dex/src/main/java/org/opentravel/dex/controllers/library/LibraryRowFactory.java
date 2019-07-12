@@ -19,6 +19,7 @@ package org.opentravel.dex.controllers.library;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.controllers.popup.SelectProjectDialogController;
 import org.opentravel.dex.controllers.popup.UnlockLibraryDialogContoller;
 import org.opentravel.dex.repository.RepositoryResultHandler;
 import org.opentravel.dex.tasks.repository.LockLibraryTask;
@@ -100,9 +101,20 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         if (projects.size() <= 1)
             for (OtmProject p : projects)
                 p.add( library );
-
-        // FIXME - post a dialog to select the project --OR-- create sub-menu
+        else {
+            // post a dialog to select the project
+            SelectProjectDialogController spdc = SelectProjectDialogController.init();
+            spdc.setManager( library.getModelManager() );
+            spdc.showAndWait( "" );
+            if (spdc.getSelection() != null)
+                spdc.getSelection().add( library );
+        }
+        // TODO - should this be a task?
+        // TODO - should this throw event? I don't think so since other controllers will not care.
+        controller.refresh();
     }
+
+
 
     /**
      * Add a new member to the tree

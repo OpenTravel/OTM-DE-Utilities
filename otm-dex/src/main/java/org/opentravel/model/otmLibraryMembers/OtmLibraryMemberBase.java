@@ -158,7 +158,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     @Override
     public Collection<OtmTypeUser> getDescendantsTypeUsers() {
         memberTypeUsers.clear();
-        for (OtmObject child : getChildren()) {
+        List<OtmObject> children = new ArrayList<>( getChildren() );
+        for (OtmObject child : children) {
             if (child instanceof OtmTypeUser)
                 memberTypeUsers.add( (OtmTypeUser) child );
         }

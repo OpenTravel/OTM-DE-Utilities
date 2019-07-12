@@ -129,6 +129,14 @@ public class OtmModelManager implements TaskResultHandlerI {
         return add( absLibrary, getVersionChainFactory() );
     }
 
+    /**
+     * Check all the libraries in the TL Model and add those that have not already been added.
+     */
+    public void add() {
+        // Add will prevent duplicate entries
+        getTlModel().getUserDefinedLibraries().forEach( tlLib -> add( tlLib ) );
+    }
+
     protected OtmLibrary add(AbstractLibrary absLibrary, VersionChainFactory versionChainFactory) {
         if (absLibrary == null)
             return null;
@@ -507,5 +515,6 @@ public class OtmModelManager implements TaskResultHandlerI {
     public void setStatusController(DexStatusController statusController) {
         this.statusController = statusController;
     }
+
 
 }

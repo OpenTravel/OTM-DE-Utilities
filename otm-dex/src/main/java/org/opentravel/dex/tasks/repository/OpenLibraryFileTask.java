@@ -67,7 +67,8 @@ public class OpenLibraryFileTask extends DexTaskBase<File> {
         new DexFileHandler().openFile( taskData, modelMgr.getTlModel(), new OpenProjectProgressMonitor( status ) );
 
         // Add all the libraries -- model manager will ignore those already added
-        modelMgr.getTlModel().getUserDefinedLibraries().forEach( tlLib -> modelMgr.add( tlLib ) );
+        modelMgr.add();
+        // modelMgr.getTlModel().getUserDefinedLibraries().forEach( tlLib -> modelMgr.add( tlLib ) );
 
         // Now resolve types and validate again
         modelMgr.startValidatingAndResolvingTasks();

@@ -101,6 +101,18 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         result = Results.OK;
     }
 
+    /**
+     * 
+     * @return true if and only if the doOK() method was used to close the dialog.
+     */
+    public boolean okResult() {
+        return result.equals( Results.OK );
+    }
+
+    /**
+     * 
+     * @return result of OK or Cancel
+     */
     public Results getResult() {
         return result;
     }
