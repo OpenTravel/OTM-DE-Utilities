@@ -141,6 +141,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
 
     @Override
     public void refresh() {
+        log.debug( "Refreshing library tree table." );
         // create cells for libraries in a namespace. Latest at top, older ones under it.
         librariesTreeTable.getRoot().getChildren().clear();
         for (String baseNS : modelMgr.getBaseNamespaces()) {
@@ -157,7 +158,6 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
                 for (OtmLibrary lib : libs)
                     if (lib != latest)
                         createTreeItem( lib, latestItem );
-
         }
     }
 

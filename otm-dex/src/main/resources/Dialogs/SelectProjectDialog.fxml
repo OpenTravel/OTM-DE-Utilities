@@ -12,7 +12,7 @@
 
 <BorderPane fx:id="selectProjectDialog" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.popup.SelectProjectDialogController">
    <top>
-      <VBox styleClass="menu-bar" stylesheets="@DavesViper.css" BorderPane.alignment="CENTER">
+      <VBox styleClass="menu-bar" stylesheets="../@DavesViper.css" BorderPane.alignment="CENTER">
          <children>
             <Label fx:id="dialogTitleLabel" style="-fx-alignment: center;" styleClass="bold-label" stylesheets="@DavesViper.css" text="">
                <VBox.margin>

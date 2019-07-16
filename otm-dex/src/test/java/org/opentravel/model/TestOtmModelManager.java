@@ -53,17 +53,18 @@ public class TestOtmModelManager extends AbstractFxTest {
     @BeforeClass
     public static void setupTests() throws Exception {
         setupWorkInProcessArea( TestOtmModelManager.class );
+        repoManager = repositoryManager.get();
     }
 
     @Test
     public void testAddingManagedProject() throws Exception {
 
         // Given a project that uses the OpenTravel repository
-        OtmModelManager mgr = new OtmModelManager( null );
-        ProjectManager pm = TestDexFileHandler.loadManagedProject( mgr.getTlModel() );
+        OtmModelManager mgr = new OtmModelManager( null, repoManager );
+        TestDexFileHandler.loadManagedProject( mgr );
 
         // When the project is added to the model manager
-        mgr.add( pm );
+        mgr.addProjects();
 
         // Then - Expect 4 libraries and 63 members
         assertTrue( mgr.getLibraries().size() > 2 );
@@ -83,26 +84,24 @@ public class TestOtmModelManager extends AbstractFxTest {
     @Test
     public void testContains() {
         // Given a project that uses the OpenTravel repository
-        OtmModelManager mgr = new OtmModelManager( null );
-        ProjectManager pm1 = TestDexFileHandler.loadManagedProject( mgr.getTlModel() );
+        OtmModelManager mgr = new OtmModelManager( null, repoManager );
 
-        // When the project is added to the model manager
-        mgr.add( pm1 );
+        // When the project is loaded and added to the model manager
+        TestDexFileHandler.loadAndAddManagedProject( mgr );
+
         // Then - model manager contains the libraries and members
-        checkContains( pm1, mgr );
+        checkContains( mgr.getProjectManager(), mgr );
 
         // When second project is added to the model manager
-        ProjectManager pm2 = TestDexFileHandler.loadUnmanagedProject( mgr.getTlModel() );
-        mgr.add( pm2 );
+        TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
 
         // Then - model manager contains both libraries and all their members
-        checkContains( pm1, mgr );
-        checkContains( pm2, mgr );
+        checkContains( mgr.getProjectManager(), mgr );
     }
 
     @Test
     public void testAddingLibrariesToEmptyModel() {
-        OtmModelManager mgr = new OtmModelManager( null );
+        OtmModelManager mgr = new OtmModelManager( null, repoManager );
         TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr.getTlModel() );
 
         // int initialMemberCount = mgr.getMembers().size();
@@ -116,8 +115,8 @@ public class TestOtmModelManager extends AbstractFxTest {
 
     @Test
     public void testAddingLibrariesModel() {
-        OtmModelManager mgr = new OtmModelManager( null );
-        TestDexFileHandler.loadUnmanagedProject( mgr.getTlModel() );
+        OtmModelManager mgr = new OtmModelManager( null, repoManager );
+        TestDexFileHandler.loadUnmanagedProject( mgr );
         int initialMemberCount = mgr.getMembers().size();
         TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr.getTlModel() );
 
@@ -155,22 +154,23 @@ public class TestOtmModelManager extends AbstractFxTest {
         Collection<OtmProject> projects = mgr.getProjects();
         assertTrue( !projects.isEmpty() );
         mgr.getLibraries().forEach( l -> assertTrue( projects.contains( mgr.getManagingProject( l ) ) ) );
-
     }
 
     @Test
     public void testAddingUnmangedProject() throws Exception {
 
-        OtmModelManager mgr = new OtmModelManager( null );
+        OtmModelManager mgr = new OtmModelManager( null, repoManager );
         TLModel tlModel = mgr.getTlModel();
         assertNotNull( tlModel );
 
         // Given a project that uses local library files
-        ProjectManager pm = TestDexFileHandler.loadUnmanagedProject( mgr.getTlModel() );
-        assertTrue( "Must have project items.", !pm.getAllProjectItems().isEmpty() );
+        TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
+        assertTrue( "Must have project items.", !mgr.getProjectManager().getAllProjectItems().isEmpty() );
 
-        // When the project is added to the model manager
-        mgr.add( pm );
+        // Then - expect at least one project
+        Collection<OtmProject> p = mgr.getProjects();
+        assertTrue( mgr.getUserProjects().size() == 1 );
+        assertTrue( mgr.getProjects().size() == 2 );
 
         // Then - Expect 6 libraries and 70 members
         assertTrue( mgr.getLibraries().size() > 2 );

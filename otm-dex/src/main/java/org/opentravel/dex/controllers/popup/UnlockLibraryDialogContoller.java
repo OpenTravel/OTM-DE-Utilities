@@ -16,9 +16,6 @@
 
 package org.opentravel.dex.controllers.popup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.IOException;
 
 import javafx.fxml.FXML;
@@ -36,18 +33,14 @@ import javafx.stage.Stage;
 
 /**
  * Controller for unlock library dialog box pop-up menu.
- * <p>
- * This MUST be constructed by passing an FXMLLoader instance which needs access to default constructor.
  * 
  * @author dmh
  *
  */
 public class UnlockLibraryDialogContoller extends DexPopupControllerBase {
-    private static Log log = LogFactory.getLog( UnlockLibraryDialogContoller.class );
+    // private static Log log = LogFactory.getLog( UnlockLibraryDialogContoller.class );
 
     public static final String LAYOUT_FILE = "/UnlockLibraryDialog.fxml";
-
-    // private Results result = Results.OK;
 
     @FXML
     BorderPane dialogBox;

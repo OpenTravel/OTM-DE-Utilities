@@ -34,7 +34,7 @@ public abstract class DexPopupControllerBase implements DexPopupController {
     private static Log log = LogFactory.getLog( DexPopupControllerBase.class );
 
     public enum Results {
-        OK, CANCEL;
+        OK, CANCEL, ERROR;
     }
 
     // Define LAYOUT_FILE

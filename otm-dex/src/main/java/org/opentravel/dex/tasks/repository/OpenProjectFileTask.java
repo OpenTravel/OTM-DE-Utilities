@@ -24,7 +24,6 @@ import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.schemacompiler.repository.ProjectManager;
 
 import java.io.File;
 
@@ -64,10 +63,8 @@ public class OpenProjectFileTask extends DexTaskBase<File> {
     @Override
     public void doIT() {
         log.debug( "Opening " + taskData.getName() );
-        // modelMgr.getTlModel();
-        ProjectManager pm = new DexFileHandler().openProject( taskData, modelMgr.getTlModel(),
-            new OpenProjectProgressMonitor( status ) );
-        modelMgr.add( pm );
+        new DexFileHandler().openProject( taskData, modelMgr, new OpenProjectProgressMonitor( status ) );
+        modelMgr.addProjects( modelMgr.getProjectManager() );
     }
 
 }

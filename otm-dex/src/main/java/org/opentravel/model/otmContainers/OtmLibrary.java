@@ -28,7 +28,6 @@ import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.TLInclude;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
-import org.opentravel.schemacompiler.repository.Project;
 import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.RepositoryItemState;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
@@ -52,12 +51,6 @@ public class OtmLibrary {
 
     protected ValidationFindings findings;
 
-    public OtmLibrary(ProjectItem pi, OtmModelManager mgr) {
-        this.mgr = mgr;
-        projectItems.add( pi );
-        tlLib = pi.getContent();
-    }
-
     public OtmLibrary(AbstractLibrary tl, OtmModelManager mgr) {
         this.mgr = mgr;
         tlLib = tl;
@@ -65,6 +58,12 @@ public class OtmLibrary {
 
     protected OtmLibrary(OtmModelManager mgr) {
         this.mgr = mgr;
+    }
+
+    public OtmLibrary(ProjectItem pi, OtmModelManager mgr) {
+        this.mgr = mgr;
+        projectItems.add( pi );
+        tlLib = pi.getContent();
     }
 
     /**
@@ -82,6 +81,21 @@ public class OtmLibrary {
         log.debug( "Added project item to " + this.getName() + ". Now has " + projectItems.size() + " items." );
     }
 
+    /**
+     * @return
+     */
+    public boolean canBeLocked() {
+        if (getStatus() == TLLibraryStatus.DRAFT && getState() == RepositoryItemState.MANAGED_UNLOCKED
+            && getManagingProject() != null && getManagingProject().getPermission() != null)
+            return getManagingProject().getPermission().equals( RepositoryPermission.WRITE );
+        return false;
+    }
+
+    public boolean canBeUnlocked() {
+        // TODO - check to see if this is the user that locked it
+        return getState() == RepositoryItemState.MANAGED_LOCKED || getState() == RepositoryItemState.MANAGED_WIP;
+    }
+
     public boolean contains(AbstractLibrary aLib) {
         if (tlLib == aLib)
             return true;
@@ -91,63 +105,21 @@ public class OtmLibrary {
         return false;
     }
 
-    public AbstractLibrary getTL() {
-        return tlLib;
+    public DexActionManager getActionManager() {
+        // FIXME - action manager should be based on library state
+        return getModelManager().getActionManager();
+    }
+
+    public String getBaseNamespace() {
+        return projectItems.isEmpty() ? "" : projectItems.get( 0 ).getBaseNamespace();
     }
 
     public String getFullName() {
         return getTL() != null ? getTL().getNamespace() + "/" + getTL().getName() : null;
     }
 
-    public OtmModelManager getModelManager() {
-        return mgr;
-    }
-
-    public OtmProject getManagingProject() {
-        return mgr.getManagingProject( this );
-    }
-
-    public String getName() {
-        return getTL() != null ? getTL().getName() : "";
-    }
-
-    public String getPrefix() {
-        return getTL().getPrefix();
-    }
-
     public Icons getIconType() {
         return ImageManager.Icons.LIBRARY;
-    }
-
-    public DexActionManager getActionManager() {
-        // FIXME - action manager should be based on library state
-        return getModelManager().getActionManager();
-    }
-
-    /**
-     * A library is editable if any associated project item state is Managed_WIP -OR- unmanaged.
-     * 
-     * @return
-     */
-    public boolean isEditable() {
-        // log.debug( "State of " + getName() + " is " + getState().toString() );
-        // Can only edit if there is an appropriate action manager
-        if (getActionManager() instanceof DexReadOnlyActionManager)
-            return false;
-        // Can only edit Draft libraries
-        if (getStatus() != TLLibraryStatus.DRAFT)
-            return false;
-        return getState() == RepositoryItemState.MANAGED_WIP || getState() == RepositoryItemState.UNMANAGED;
-    }
-
-    /**
-     * @return actual status of TL Libraries otherwise DRAFT
-     */
-    public TLLibraryStatus getStatus() {
-        if (tlLib instanceof TLLibrary)
-            return ((TLLibrary) tlLib).getStatus();
-        else
-            return TLLibraryStatus.FINAL;
     }
 
     public List<OtmLibrary> getIncludes() {
@@ -159,9 +131,50 @@ public class OtmLibrary {
         return libs;
     }
 
-    public String getStateName() {
-        return getState().toString();
-        // return projectItems.isEmpty() ? "" : getState().toString();
+    public String getLockedBy() {
+        for (ProjectItem pi : projectItems)
+            if (pi.getLockedByUser() != null)
+                return pi.getLockedByUser();
+        return "";
+    }
+
+    public OtmProject getManagingProject() {
+        return mgr.getManagingProject( this );
+    }
+
+    public OtmModelManager getModelManager() {
+        return mgr;
+    }
+
+    public String getName() {
+        return getTL() != null ? getTL().getName() : "";
+    }
+
+    public String getNameWithBasenamespace() {
+        return getBaseNamespace() + "/" + getName();
+    }
+
+    public String getPrefix() {
+        return getTL().getPrefix();
+    }
+
+    /**
+     * Get the name(s) of the project(s) that contain this library.
+     * 
+     * @return new array of string containing the project names
+     */
+    public List<String> getProjectNames() {
+        List<String> names = new ArrayList<>();
+        getModelManager().getProjects( getTL() ).forEach( p -> names.add( p.getName() ) );
+        names.sort( null );
+        return names;
+    }
+
+    public List<OtmProject> getProjects() {
+        List<OtmProject> projects = new ArrayList<>();
+        if (projectItems != null)
+            getProjectNames().forEach( pn -> projects.add( getModelManager().getProject( pn ) ) );
+        return projects;
     }
 
     /**
@@ -200,51 +213,23 @@ public class OtmLibrary {
         return state;
     }
 
-    public String getNameWithBasenamespace() {
-        return getBaseNamespace() + "/" + getName();
-    }
-
-    public String getLockedBy() {
-        for (ProjectItem pi : projectItems)
-            if (pi.getLockedByUser() != null)
-                return pi.getLockedByUser();
-        return "";
-    }
-
-    public String getBaseNamespace() {
-        return projectItems.isEmpty() ? "" : projectItems.get( 0 ).getBaseNamespace();
-    }
-
-    public boolean isLatestVersion() {
-        return mgr.isLatest( this );
+    public String getStateName() {
+        return getState().toString();
+        // return projectItems.isEmpty() ? "" : getState().toString();
     }
 
     /**
-     * Get the name(s) of the project(s) that contain this library.
-     * 
-     * @return new array of string containing the project names
+     * @return actual status of TL Libraries otherwise DRAFT
      */
-    public List<String> getProjectNames() {
-        List<String> names = new ArrayList<>();
-        if (projectItems != null)
-            for (ProjectItem pi : projectItems) {
-                for (Project p : pi.memberOfProjects())
-                    if (!names.contains( p.getName() ))
-                        names.add( p.getName() );
-            }
-        names.sort( null );
-        return names;
+    public TLLibraryStatus getStatus() {
+        if (tlLib instanceof TLLibrary)
+            return ((TLLibrary) tlLib).getStatus();
+        else
+            return TLLibraryStatus.FINAL;
     }
 
-    public List<OtmProject> getProjects() {
-        List<OtmProject> projects = new ArrayList<>();
-        if (projectItems != null)
-            getProjectNames().forEach( pn -> projects.add( getModelManager().getProject( pn ) ) );
-        return projects;
-    }
-
-    public void validate() {
-        findings = TLModelCompileValidator.validateModelElement( getTL(), true );
+    public AbstractLibrary getTL() {
+        return tlLib;
     }
 
     /**
@@ -255,17 +240,26 @@ public class OtmLibrary {
     }
 
     /**
+     * A library is editable if any associated project item state is Managed_WIP -OR- unmanaged.
+     * 
      * @return
      */
-    public boolean canBeLocked() {
-        if (getStatus() == TLLibraryStatus.DRAFT && getState() == RepositoryItemState.MANAGED_UNLOCKED
-            && getManagingProject() != null && getManagingProject().getPermission() != null)
-            return getManagingProject().getPermission().equals( RepositoryPermission.WRITE );
-        return false;
+    public boolean isEditable() {
+        // log.debug( "State of " + getName() + " is " + getState().toString() );
+        // Can only edit if there is an appropriate action manager
+        if (getActionManager() instanceof DexReadOnlyActionManager)
+            return false;
+        // Can only edit Draft libraries
+        if (getStatus() != TLLibraryStatus.DRAFT)
+            return false;
+        return getState() == RepositoryItemState.MANAGED_WIP || getState() == RepositoryItemState.UNMANAGED;
     }
 
-    public boolean canBeUnlocked() {
-        // TODO - check to see if this is the user that locked it
-        return getState() == RepositoryItemState.MANAGED_LOCKED || getState() == RepositoryItemState.MANAGED_WIP;
+    public boolean isLatestVersion() {
+        return mgr.isLatest( this );
+    }
+
+    public void validate() {
+        findings = TLModelCompileValidator.validateModelElement( getTL(), true );
     }
 }

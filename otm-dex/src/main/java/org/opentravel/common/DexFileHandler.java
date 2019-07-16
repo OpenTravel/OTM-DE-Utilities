@@ -19,8 +19,10 @@ package org.opentravel.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.AbstractMainWindowController;
+import org.opentravel.application.common.DirectoryChooserDelegate;
 import org.opentravel.application.common.FileChooserDelegate;
 import org.opentravel.application.common.StatusType;
+import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.loader.LibraryInputSource;
 import org.opentravel.schemacompiler.loader.LibraryLoaderException;
@@ -41,6 +43,11 @@ import javafx.stage.Stage;
  */
 public class DexFileHandler extends AbstractMainWindowController {
     private static Log log = LogFactory.getLog( DexFileHandler.class );
+
+    public static final String PROJECT_FILE_EXTENSION = ".otp";
+    private static final String LIBRARY_FILE_EXTENSION = ".otm";
+    public static final String FILE_SEPARATOR = "/";
+
 
     ValidationFindings findings = null;
 
@@ -66,23 +73,44 @@ public class DexFileHandler extends AbstractMainWindowController {
         return selectedFile;
     }
 
-    // public ValidationFindings getFindings() {
-    // return findings;
-    // }
+    /**
+     * Return a directory selected by the user. Save the directory in the user settings.
+     * 
+     */
+    public File directoryChooser(Stage stage, String title, UserSettings settings) {
+        // Get the last directory used from settings
+        File initialDirectory = settings.getLastProjectFolder();
+
+        // Let user choose
+        DirectoryChooserDelegate chooser = newDirectoryChooser( title, initialDirectory );
+        File selectedFile = chooser.showDialog( stage );
+
+        // Save the directory used in user settings.
+        if (selectedFile != null) {
+            settings.setLastProjectFolder( selectedFile.getParentFile() );
+            settings.save();
+        }
+
+        return selectedFile;
+    }
 
     /**
      * @return a list of OTM Project files
      */
     public File[] getProjectList(File directory) {
         if (directory == null) {
-            directory = new File( System.getProperty( "user.home" ) );
+            directory = new File( getUserHome() );
             log.warn( "Used user home directory. Should have used directory from preferences." );
         }
         File[] projectFiles = {};
         if (directory.isDirectory()) {
-            projectFiles = directory.listFiles( f -> f.getName().endsWith( ".otp" ) );
+            projectFiles = directory.listFiles( f -> f.getName().endsWith( PROJECT_FILE_EXTENSION ) );
         }
         return projectFiles;
+    }
+
+    public static String getUserHome() {
+        return System.getProperty( "user.home" );
     }
 
     /**
@@ -93,42 +121,58 @@ public class DexFileHandler extends AbstractMainWindowController {
      *
      * @param selectedFile
      */
-    public ValidationFindings openFile(File selectedFile, TLModel libraryModel, OpenProjectProgressMonitor monitor) {
+    public ValidationFindings openFile(File selectedFile, OtmModelManager modelManager,
+        OpenProjectProgressMonitor monitor) {
+        findings = null;
+        if (selectedFile != null && selectedFile.canRead()) {
+            if (selectedFile.getName().endsWith( PROJECT_FILE_EXTENSION ))
+                openProject( selectedFile, modelManager, monitor );
+            else if (selectedFile.getName().endsWith( LIBRARY_FILE_EXTENSION ))
+                findings = openLibrary( selectedFile, modelManager.getTlModel(), monitor );
+        }
+        return findings;
+    }
+
+    // TODO - should be private or protected
+    public ValidationFindings openLibrary(File selectedFile, TLModel libraryModel, OpenProjectProgressMonitor monitor) {
         if (selectedFile == null)
             return null;
         if (!selectedFile.canRead()) {
             log.debug( "Can't read file: " + selectedFile.getAbsolutePath() );
-            // TODO - how to signal user of read error?
             return null;
         }
         log.debug( "Open selected file: " + selectedFile.getName() );
         findings = null;
 
-        if (selectedFile.getName().endsWith( ".otp" )) {
-            openProject( selectedFile, libraryModel, null );
-        } else {
-            // Assure OTM library file
-            if (selectedFile.getName().endsWith( ".otm" )) {
-                LibraryInputSource<InputStream> libraryInput = new LibraryStreamInputSource( selectedFile );
-                try {
-                    LibraryModelLoader<InputStream> modelLoader = new LibraryModelLoader<>( libraryModel );
-                    // TLModel newModel = modelLoader.getLibraryModel();
-                    // log.debug( "Before open library count: " + newModel.getAllLibraries().size() );
-
-                    findings = modelLoader.loadLibraryModel( libraryInput );
-                    // newModel = modelLoader.getLibraryModel();
-                    // log.debug( "After open library count: " + newModel.getAllLibraries().size() );
-                } catch (LibraryLoaderException e) {
-                    log.error( "Error loading model: " + e.getLocalizedMessage() );
-                }
-            } else {
-                log.debug( "Invalid file extension: " + selectedFile.getName() );
+        // Assure OTM library file
+        if (selectedFile.getName().endsWith( ".otm" )) {
+            LibraryInputSource<InputStream> libraryInput = new LibraryStreamInputSource( selectedFile );
+            try {
+                LibraryModelLoader<InputStream> modelLoader = new LibraryModelLoader<>( libraryModel );
+                findings = modelLoader.loadLibraryModel( libraryInput );
+            } catch (LibraryLoaderException e) {
+                log.error( "Error loading model: " + e.getLocalizedMessage() );
             }
+        } else {
+            log.debug( "Invalid file extension: " + selectedFile.getName() );
         }
+
         return findings;
     }
-    // }
 
+    public void openProject(File selectedProjectFile, OtmModelManager mgr, OpenProjectProgressMonitor monitor) {
+        if (selectedProjectFile.getName().endsWith( PROJECT_FILE_EXTENSION )) {
+            // Use project manager from TLModel
+            ProjectManager manager = mgr.getProjectManager();
+            try {
+                manager.loadProject( selectedProjectFile, findings, monitor );
+            } catch (Exception e) {
+                log.error( "Error Opening Project: " + e.getLocalizedMessage() );
+            }
+        }
+    }
+
+    @Deprecated
     public ProjectManager openProject(File selectedProjectFile, TLModel tlModel, OpenProjectProgressMonitor monitor) {
         // Use project manager from TLModel
         ProjectManager manager = null;

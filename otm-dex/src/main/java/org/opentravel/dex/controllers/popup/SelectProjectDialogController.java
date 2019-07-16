@@ -48,7 +48,7 @@ import javafx.stage.Stage;
 public class SelectProjectDialogController extends DexPopupControllerBase {
     private static Log log = LogFactory.getLog( SelectProjectDialogController.class );
 
-    public static final String LAYOUT_FILE = "/SelectProjectDialog.fxml";
+    public static final String LAYOUT_FILE = "/Dialogs/SelectProjectDialog.fxml";
 
     @FXML
     BorderPane selectProjectDialog;
@@ -155,10 +155,6 @@ public class SelectProjectDialogController extends DexPopupControllerBase {
         this.projects = projectList;
     }
 
-    @Override
-    public Results getResult() {
-        return result;
-    }
 
     /**
      * 

@@ -20,12 +20,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.model.OtmModelManager;
 import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryPermission;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.repository.Project;
 import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
+import org.opentravel.schemacompiler.saver.LibrarySaveException;
 
 /**
  * OTM Object Node for business objects. Project does NOT extend model element
@@ -38,8 +40,10 @@ public class OtmProject {
 
     Project tlProject;
     private String id;
+    private OtmModelManager modelManager;
 
-    public OtmProject(Project project) {
+    public OtmProject(Project project, OtmModelManager modelManager) {
+        this.modelManager = modelManager;
         this.tlProject = project;
         id = getTL().getProjectId();
     }
@@ -50,12 +54,27 @@ public class OtmProject {
 
     public void remove(OtmLibrary library) {
         getTL().remove( library.getTL() );
+        log.debug( "Removed " + library.getName() + " from " + getName() + "  Library now is in "
+            + library.getProjects().size() + " projects." );
+
+        // Shouldn't be needed, but is required to change file as of 7/16/2019
+        try {
+            getTL().getProjectManager().saveProject( getTL() );
+        } catch (LibrarySaveException e) {
+            log.error( "Error saving project: " + e.getLocalizedMessage() );
+        }
+
+        // // Test only safety check
+        // for (ProjectItem pi : getTL().getProjectItems())
+        // assert pi.getContent() != library.getTL();
     }
 
     public void add(OtmLibrary library) {
         if (library != null) {
             try {
-                ProjectItem pi = getTL().getProjectManager().addUnmanagedProjectItem( library.getTL(), getTL() );
+                // use modelManager's projectManager
+                ProjectItem pi = modelManager.getProjectManager().addUnmanagedProjectItem( library.getTL(), getTL() );
+                // ProjectItem pi = getTL().getProjectManager().addUnmanagedProjectItem( library.getTL(), getTL() );
                 library.add( pi ); // let the library know it is now part of this project
             } catch (RepositoryException e) {
                 log.warn( "Could not add library to project: " + e.getLocalizedMessage() );
@@ -110,4 +129,22 @@ public class OtmProject {
         }
         return false;
     }
+
+    public void setDefaultContextId(String defaultContextId) {
+        getTL().setDefaultContextId( emptyIfNull( defaultContextId ) );
+    }
+
+    public void setDescription(String description) {
+        getTL().setDescription( emptyIfNull( description ) );
+    }
+
+    public void setName(String name) {
+        getTL().setName( emptyIfNull( name ) );
+    }
+
+    private String emptyIfNull(String param) {
+        return param == null ? "" : param;
+    }
+
+
 }

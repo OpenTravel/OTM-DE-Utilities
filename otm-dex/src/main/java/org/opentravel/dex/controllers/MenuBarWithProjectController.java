@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.common.DialogBox;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
+import org.opentravel.dex.controllers.popup.NewProjectDialogController;
 import org.opentravel.dex.events.DexEventDispatcher;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
@@ -175,6 +176,13 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         // This is only run if the handler is not set.
         log.debug( "Close menu item selected." );
         getDialogBox().show( "Close", "Not Implemented" );
+    }
+
+    @FXML
+    void doNewProject(ActionEvent e) {
+        NewProjectDialogController npdc = NewProjectDialogController.init();
+        npdc.configure( modelMgr, userSettings );
+        npdc.showAndWait( "" );
     }
 
     @FXML

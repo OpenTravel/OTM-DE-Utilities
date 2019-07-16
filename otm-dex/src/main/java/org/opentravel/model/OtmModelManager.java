@@ -39,10 +39,12 @@ import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.repository.Project;
 import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.ProjectManager;
+import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.schemacompiler.repository.impl.BuiltInProject;
 import org.opentravel.schemacompiler.version.VersionChain;
 import org.opentravel.schemacompiler.version.VersionChainFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -80,6 +82,8 @@ public class OtmModelManager implements TaskResultHandlerI {
 
     private DexActionManager actionMgr;
     private DexStatusController statusController;
+    private ProjectManager projectManager;
+    private RepositoryManager repositoryManager;
 
     private TLModel tlModel = null;
 
@@ -89,6 +93,15 @@ public class OtmModelManager implements TaskResultHandlerI {
      * @param controller
      * @param actionManager action manager to assign to all members
      */
+    public OtmModelManager(DexActionManager actionManager, RepositoryManager repositoryManager) {
+        this( actionManager );
+        // Create a master project manager
+        projectManager = new ProjectManager( tlModel, true, repositoryManager );
+        this.repositoryManager = repositoryManager;
+    }
+
+    // Pass in the repo manager
+    @Deprecated
     public OtmModelManager(DexActionManager actionManager) {
         if (actionManager == null)
             this.actionMgr = new DexReadOnlyActionManager();
@@ -101,6 +114,7 @@ public class OtmModelManager implements TaskResultHandlerI {
         }
         // Tell model to track changes to maintain its type integrity
         tlModel.addListener( new ModelIntegrityChecker() );
+
         log.debug( "TL Model created and integrity checker added." );
     }
 
@@ -133,6 +147,9 @@ public class OtmModelManager implements TaskResultHandlerI {
      * Check all the libraries in the TL Model and add those that have not already been added.
      */
     public void add() {
+        // FIXME - make sure all the projects are registered and built
+        getProjectManager().getAllProjects();
+
         // Add will prevent duplicate entries
         getTlModel().getUserDefinedLibraries().forEach( tlLib -> add( tlLib ) );
     }
@@ -202,24 +219,20 @@ public class OtmModelManager implements TaskResultHandlerI {
      * 
      * @param pm
      */
-    public void add(ProjectManager pm) {
-        log.debug( "New project with " + pm.getModel().getAllLibraries().size() + " libraries" );
+    public void addProjects(ProjectManager pm) {
+        addProjects();
+    }
+
+    public void addProjects() {
+        // ProjectManager pm = projectManager;
+        log.debug( "New project with " + getTlModel().getAllLibraries().size() + " libraries" );
 
         // Add projects to project map
-        for (Project project : pm.getAllProjects())
-            projects.put( project.getName(), new OtmProject( project ) );
-
-        // TODO - model should be managed outside of add(Project) - this should only check to see if one exists.
-        if (pm.getModel() != tlModel)
-            log.debug( "Models are different" );
-        tlModel = pm.getModel();
-        // TODO - document how tlModel is managed.
-
-        // Tell model to track changes to maintain its type integrity
-        pm.getModel().addListener( new ModelIntegrityChecker() );
+        for (Project project : projectManager.getAllProjects())
+            projects.put( project.getName(), new OtmProject( project, this ) );
 
         // Get the built in libraries, will do nothing if already added
-        addBuiltInLibraries( pm.getModel() );
+        addBuiltInLibraries( getTlModel() );
 
         // Get VersionChainFactory that provides a versionChain for each project item that lists the base namespace,
         // name and sorted set of version libraries
@@ -227,8 +240,8 @@ public class OtmModelManager implements TaskResultHandlerI {
 
         // Get Libraries - Libraries can belong to multiple projects.
         // Map will de-dup the entries based on baseNS and name.
-        for (ProjectItem pi : pm.getAllProjectItems()) {
-            add( pi, versionChainFactory );
+        for (ProjectItem pi : projectManager.getAllProjectItems()) {
+            add( pi );
         }
 
         startValidatingAndResolvingTasks();
@@ -275,40 +288,21 @@ public class OtmModelManager implements TaskResultHandlerI {
      * base namespaces can have multiple libraries.
      * 
      * @param pi
-     * @param VersionChainFactory versionChainFactory = new VersionChainFactory(pi.getProjectManager().getModel());
      */
-    private void add(ProjectItem pi, VersionChainFactory versionChainFactory) {
+    private void add(ProjectItem pi) {
         if (pi == null)
             return;
         AbstractLibrary absLibrary = pi.getContent();
         if (absLibrary == null)
             return;
-        // for (AbstractLibrary l : libraries.keySet())
-        // if (l.getNamespace().equals( absLibrary.getNamespace() ) && l.getName().equals( absLibrary.getName() )) {
-        // log.debug( "Same URL found." );
-        // // TODO - is this always the same as contains clause?
-        // // libraries.get(l).add(pi);
-        // // return;
-        // }
 
         if (contains( absLibrary )) {
             // let the library track project as needed to know if the library is editable
             libraries.get( absLibrary ).add( pi );
         } else {
             // Add newly discovered library to the libraries and baseNS maps
-            // OtmLibrary lib = new OtmLibrary( pi, this );
             OtmLibrary lib = add( absLibrary );
             lib.add( pi );
-            // libraries.put( absLibrary, lib );
-            // // Map of base namespaces with all libraries in that namespace
-            // if (absLibrary instanceof TLLibrary)
-            // if (versionChainFactory != null)
-            // baseNSManaged.put( lib.getNameWithBasenamespace(),
-            // versionChainFactory.getVersionChain( (TLLibrary) absLibrary ) );
-            // else {
-            // baseNSUnmanaged.put( lib.getNameWithBasenamespace(), lib );
-            // log.debug( "Added unmanged base namespace: " + lib.getNameWithBasenamespace() );
-            // }
         }
     }
 
@@ -459,6 +453,20 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
     /**
+     * 
+     * @param library
+     * @return new list of projects that contain the library or empty list.
+     */
+    public List<OtmProject> getProjects(AbstractLibrary library) {
+        List<OtmProject> list = new ArrayList<>();
+        getProjects().forEach( p -> {
+            if (p.contains( library ))
+                list.add( p );
+        } );
+        return list;
+    }
+
+    /**
      * @return just user projects, not built-in
      */
     public List<OtmProject> getUserProjects() {
@@ -499,12 +507,66 @@ public class OtmModelManager implements TaskResultHandlerI {
         return true;
     }
 
+    /**
+     * @param projectFile
+     * @param required name the user-displayable name of the project
+     * @param optional defaultContextId Assigns the default context ID to use for EXAMPLE generation in this project.
+     * @param projectId the ID of the project, typically namespace being worked on. ProjectId must not already be in
+     *        use.
+     * @param description
+     * @return
+     */
+    public OtmProject newProject(File projectFile, String name, String defaultContextId, String projectId,
+        String description) {
+        if (projectFile == null || projectId == null || projectId.isEmpty())
+            throw new IllegalArgumentException( "Missing required argument(s) to create new project." );
+        // Verify the file exists and is writable
+        if (!projectFile.canWrite())
+            throw new IllegalArgumentException( "Project file is not writable." );
+
+        OtmProject op = null;
+
+        if (projectManager == null) {
+            // Try to find one to use - this should be dead code (7/15/2019)
+            for (OtmProject o : projects.values())
+                projectManager = o.getTL().getProjectManager();
+        }
+        if (projectManager == null)
+            throw new IllegalArgumentException( "Missing required project manager." );
+
+        log.debug( "Creating new project in file: " + projectFile.getAbsolutePath() );
+
+        Project p = new Project( projectManager );
+        try {
+            p.setProjectFile( projectFile );
+            p.setProjectId( projectId );
+
+            op = new OtmProject( p, this );
+            op.setDefaultContextId( defaultContextId );
+            op.setDescription( description );
+            op.setName( name );
+            // register project in projects map
+            projects.put( name, op );
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException( "Could not create valid project: " + e.getLocalizedMessage() );
+        }
+        return op;
+    }
+
+
     private void printLibraries() {
         libraries.entrySet().forEach( l -> log.debug( l.getValue().getName() ) );
     }
 
     public void setStatusController(DexStatusController statusController) {
         this.statusController = statusController;
+    }
+
+    /**
+     * @return
+     */
+    public ProjectManager getProjectManager() {
+        return projectManager;
     }
 
 

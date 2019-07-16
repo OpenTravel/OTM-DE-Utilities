@@ -72,7 +72,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         unlockLibrary = new MenuItem( "Unlock" );
         whereUsed = new MenuItem( "Show Where Used (future)" );
         projectAdd = new MenuItem( "Add to project" );
-        projectRemove = new MenuItem( "Remove from project (future)" );
+        projectRemove = new MenuItem( "Remove from project" );
 
         lockLibrary.setOnAction( e -> lockLibrary() );
         unlockLibrary.setOnAction( (e) -> unlockLibraryEventHandler() );
@@ -94,20 +94,25 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         if (library == null)
             return;
 
+        // Select one project
         List<OtmProject> projects = library.getProjects();
+        OtmProject project = null;
         if (projects.isEmpty())
             return;
         if (projects.size() <= 1)
-            projects.get( 0 ).remove( library );
+            project = projects.get( 0 );
         else {
+            // post selection dialog
             SelectProjectDialogController spdc = SelectProjectDialogController.init();
             spdc.setProjectList( projects );
             spdc.showAndWait( "" );
-            if (spdc.getSelection() != null)
-                spdc.getSelection().remove( library );
+            project = spdc.getSelection();
 
-            // TODO - post selection dialog
         }
+        // Remove the library from selected project
+        if (project != null)
+            project.remove( library );
+
         controller.refresh();
     }
 
@@ -119,24 +124,24 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
             return;
 
         Collection<OtmProject> projects = library.getModelManager().getUserProjects();
+        OtmProject project = null;
 
-        if (projects.isEmpty())
-            return; // Nothing to do
-
-        // If there is only one project use it.
+        // Select one project
         if (projects.size() <= 1)
             for (OtmProject p : projects)
-                p.add( library );
+                project = p;
         else {
             // post a dialog to select the project
             SelectProjectDialogController spdc = SelectProjectDialogController.init();
             spdc.setManager( library.getModelManager() );
             spdc.showAndWait( "" );
             if (spdc.getSelection() != null)
-                spdc.getSelection().add( library );
+                project = spdc.getSelection();
         }
-        // should this be a task?
-        // should this throw event? I don't think so since other controllers will not care.
+        // Add the library to the selected project
+        if (project != null)
+            project.add( library );
+
         controller.refresh();
     }
 

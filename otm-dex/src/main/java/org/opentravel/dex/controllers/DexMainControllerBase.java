@@ -21,13 +21,11 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.common.ImageManager;
-import org.opentravel.dex.actions.DexActionManager;
 import org.opentravel.dex.actions.DexFullActionManager;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
-import org.opentravel.schemacompiler.repository.RepositoryManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,10 +49,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     protected ImageManager imageMgr = null;
     protected OtmModelManager modelMgr = null;
 
-    // FIXME - should not maintain action manager
-    protected DexActionManager actionMgr;
-
-    // preferences (improve as i use it)
+    // preferences
     protected UserSettings userSettings;
 
     protected List<DexIncludedController<?>> includedControllers = new ArrayList<>();
@@ -81,7 +76,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         controller.configure( this );
 
         // Register any published event types
-        for (EventType et : controller.getPublishedEventTypes())
+        for (EventType<?> et : controller.getPublishedEventTypes())
             if (eventPublishers.containsKey( et )) {
                 eventPublishers.get( et ).add( controller );
             } else {
@@ -90,7 +85,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
                 eventPublishers.put( et, list );
             }
         // Register any subscribed event types
-        for (EventType et : controller.getSubscribedEventTypes())
+        for (EventType<?> et : controller.getSubscribedEventTypes())
             if (eventSubscribers.containsKey( et )) {
                 eventSubscribers.get( et ).add( controller );
             } else {
@@ -127,13 +122,6 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         return dialogBoxController;
     }
 
-    // @Override
-    // public ImageManager getImageManager() {
-    // if (imageMgr != null)
-    // return imageMgr;
-    // return mainController != null ? mainController.getImageManager() : null;
-    // }
-
     @Override
     public OtmModelManager getModelManager() {
         if (modelMgr != null)
@@ -141,10 +129,10 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         return mainController != null ? mainController.getModelManager() : null;
     }
 
-    @Override
-    public RepositoryManager getRepositoryManager() {
-        return super.getRepositoryManager();
-    }
+    // @Override
+    // public RepositoryManager getRepositoryManager() {
+    // return super.getRepositoryManager();
+    // }
 
     @Override
     public Stage getStage() {
@@ -216,8 +204,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
 
         // Initialize managers
         // TODO - use user settings to select which action manager to use
-        actionMgr = new DexFullActionManager( this );
-        modelMgr = new OtmModelManager( actionMgr );
+        modelMgr = new OtmModelManager( new DexFullActionManager( this ), getRepositoryManager() );
         imageMgr = new ImageManager( primaryStage );
 
         checkNodes();

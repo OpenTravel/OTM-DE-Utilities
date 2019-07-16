@@ -27,7 +27,6 @@ import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.objecteditor.ObjectEditorApp;
-import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
 
@@ -47,6 +46,7 @@ public class TestSelectProjectDialog extends AbstractFxTest {
     @BeforeClass
     public static void setupTests() throws Exception {
         setupWorkInProcessArea( TestSelectProjectDialog.class );
+        repoManager = repositoryManager.get();
     }
 
     @Test
@@ -55,13 +55,12 @@ public class TestSelectProjectDialog extends AbstractFxTest {
     }
 
     public OtmModelManager testSetup() {
-        OtmModelManager mgr = new OtmModelManager( null );
+        OtmModelManager mgr = new OtmModelManager( null, repoManager );
         // Givens - 2 projects and library that does not belong to project
         // Load first and second projects
-        ProjectManager pm = TestDexFileHandler.loadManagedProject( mgr.getTlModel() );
-        mgr.add( pm );
-        pm = TestDexFileHandler.loadUnmanagedProject( mgr.getTlModel() );
-        mgr.add( pm );
+        TestDexFileHandler.loadAndAddManagedProject( mgr );
+        TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
+
         assertTrue( mgr.getUserProjects().size() == 2 );
         int libraryCount = mgr.getLibraries().size();
         assertTrue( libraryCount > 0 );

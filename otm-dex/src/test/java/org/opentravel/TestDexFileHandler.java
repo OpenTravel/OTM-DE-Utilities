@@ -28,7 +28,6 @@ import org.opentravel.common.DexFileHandler;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.model.TLModel;
-import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
 
@@ -56,16 +55,16 @@ public class TestDexFileHandler extends AbstractFxTest {
     public static void setupTests() throws Exception {
         setupWorkInProcessArea( TestDexFileHandler.class );
         // startTestServer( "versions-repository", 9480, repositoryConfig, true, false, TestDexFileHandler.class );
-        // repoManager = repositoryManager.get();
+        repoManager = repositoryManager.get();
     }
 
     @Test
     public void testOpenOTAProject() throws Exception {
         // When the OpenTravel repository is used in the project
-        OtmModelManager mgr = new OtmModelManager( null );
-        ProjectManager pm = loadManagedProject( mgr.getTlModel() );
+        OtmModelManager mgr = new OtmModelManager( null, repoManager );
+        loadManagedProject( mgr );
         // When the project is added to the model manager
-        mgr.add( pm );
+        mgr.addProjects();
 
         // Then - Expect 4 libraries and 63 members
         assertTrue( mgr.getLibraries().size() > 2 );
@@ -76,9 +75,9 @@ public class TestDexFileHandler extends AbstractFxTest {
     @Test
     public void testOpenLocalProject() throws Exception {
         // When the local files are used in the project
-        OtmModelManager mgr = new OtmModelManager( null );
-        ProjectManager pm = loadUnmanagedProject( mgr.getTlModel() );
-        mgr.add( pm );
+        OtmModelManager mgr = new OtmModelManager( null, repoManager );
+        loadUnmanagedProject( mgr );
+        mgr.addProjects();
 
         // Then - Expect libraries and members
         assertTrue( mgr.getLibraries().size() > 2 );
@@ -92,14 +91,14 @@ public class TestDexFileHandler extends AbstractFxTest {
         assertTrue( localLibrary.exists() );
 
         int initialLibCount = tlModel.getAllLibraries().size();
-        new DexFileHandler().openFile( localLibrary, tlModel, null );
+        new DexFileHandler().openLibrary( localLibrary, tlModel, null );
         assertTrue( tlModel.getAllLibraries().size() > initialLibCount );
         log.debug( "Model now has " + tlModel.getAllLibraries().size() + " libraries." );
     }
 
     @Test
     public void testOpenLocalLibrary() throws Exception {
-        OtmModelManager mgr = new OtmModelManager( null );
+        OtmModelManager mgr = new OtmModelManager( null, repoManager );
 
         loadLocalLibrary( FILE_TESTLOCALLIBRARY, mgr.getTlModel() );
         loadLocalLibrary( FILE_TESTLOCALLIBRARY1, mgr.getTlModel() );
@@ -113,31 +112,47 @@ public class TestDexFileHandler extends AbstractFxTest {
 
 
     /**
-     * @return a project manager loaded from project that uses local library files
+     * 
+     * load project that uses local library files and add to model
      */
-    public static ProjectManager loadUnmanagedProject(TLModel tlModel) {
-        DexFileHandler fileHandler = new DexFileHandler();
-        File localProject = new File( wipFolder.get(), "/" + FILE_TESTLOCAL );
-        assertNotNull( localProject );
-
-        ProjectManager pm = fileHandler.openProject( localProject, tlModel, null );
-        log.debug( "Model now has " + tlModel.getAllLibraries().size() + " libraries." );
-        return pm;
+    public static void loadAndAddUnmanagedProject(OtmModelManager modelManager) {
+        loadUnmanagedProject( modelManager );
+        modelManager.addProjects();
     }
 
     /**
-     * @return a project manager loaded from project that uses the OpenTravel repository
+     * Load the project that uses local library files but do NOT add to the model.
+     * 
+     * @param modelManager
      */
-    public static ProjectManager loadManagedProject(TLModel tlModel) {
-        DexFileHandler fileHandler = new DexFileHandler();
+    public static void loadUnmanagedProject(OtmModelManager modelManager) {
+        File localProject = new File( wipFolder.get(), "/" + FILE_TESTLOCAL );
+        assertNotNull( localProject );
 
+        new DexFileHandler().openProject( localProject, modelManager, null );
+        log.debug( "Model now has " + modelManager.getTlModel().getAllLibraries().size() + " libraries." );
+    }
+
+
+    /**
+     * 
+     * load project that uses the OpenTravel repository and add to model
+     */
+    public static void loadAndAddManagedProject(OtmModelManager modelManager) {
+        loadManagedProject( modelManager );
+        modelManager.addProjects();
+    }
+
+    /**
+     * load project that uses the OpenTravel repository
+     */
+    public static void loadManagedProject(OtmModelManager modelManager) {
         File repoProject = new File( wipFolder.get(), "/" + FILE_TESTOPENTRAVELREPO );
         assertNotNull( repoProject );
-        ProjectManager pm = fileHandler.openProject( repoProject, tlModel, null );
-        assertTrue( "Must have project items.", !pm.getAllProjectItems().isEmpty() );
-        assertTrue( "Must have project items.", pm.getAllProjectItems().size() > 1 );
-        log.debug( "Model now has " + tlModel.getAllLibraries().size() + " libraries." );
-        return pm;
+        new DexFileHandler().openProject( repoProject, modelManager, null );
+        assertTrue( "Must have project items.", !modelManager.getProjectManager().getAllProjectItems().isEmpty() );
+        assertTrue( "Must have project items.", modelManager.getProjectManager().getAllProjectItems().size() > 1 );
+        log.debug( "Model now has " + modelManager.getTlModel().getAllLibraries().size() + " libraries." );
     }
 
     // x Add to the before class (change port number)
