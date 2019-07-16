@@ -56,7 +56,7 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null );
+        staticModelManager = new OtmModelManager( null, null );
         log.debug( "Model manager created." );
     }
 

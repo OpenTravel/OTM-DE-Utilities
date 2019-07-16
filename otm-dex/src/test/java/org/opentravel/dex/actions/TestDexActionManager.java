@@ -59,7 +59,7 @@ public class TestDexActionManager {
     @Test
     public void testActionFactory() {
         DexActionManager am = new DexReadOnlyActionManager();
-        OtmModelManager mgr = new OtmModelManager( am );
+        OtmModelManager mgr = new OtmModelManager( am, null );
 
         // Given an OtmObject
         OtmEnumerationOpen openEnum = TestEnumerationOpen.buildOtm( mgr );
@@ -74,7 +74,7 @@ public class TestDexActionManager {
     @Test
     public void testNameChangeAction() {
         DexActionManager am = new DexReadOnlyActionManager();
-        OtmModelManager mgr = new OtmModelManager( am );
+        OtmModelManager mgr = new OtmModelManager( am, null );
         assertTrue( am.getQueueSize() == 0 );
 
         // Given a OtmObjects
@@ -96,7 +96,7 @@ public class TestDexActionManager {
     @Test
     public void testReadOnlyActionManager() {
         DexActionManager am = new DexReadOnlyActionManager();
-        OtmModelManager mgr = new OtmModelManager( am );
+        OtmModelManager mgr = new OtmModelManager( am, null );
 
         // Should do nothing and have no side effects
         am.run( null, null, null );

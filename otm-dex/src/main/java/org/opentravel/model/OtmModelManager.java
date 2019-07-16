@@ -96,7 +96,10 @@ public class OtmModelManager implements TaskResultHandlerI {
     public OtmModelManager(DexActionManager actionManager, RepositoryManager repositoryManager) {
         this( actionManager );
         // Create a master project manager
-        projectManager = new ProjectManager( tlModel, true, repositoryManager );
+        if (repositoryManager != null)
+            projectManager = new ProjectManager( tlModel, true, repositoryManager );
+        else
+            projectManager = new ProjectManager( tlModel );
         this.repositoryManager = repositoryManager;
     }
 
