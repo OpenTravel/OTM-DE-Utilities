@@ -16,6 +16,8 @@
 
 package org.opentravel.model;
 
+import org.opentravel.model.otmLibraryMembers.OtmResource;
+
 /**
  * All children of resources (Actions, ActionFacets...) must implement this interface.
  * 
@@ -23,5 +25,13 @@ package org.opentravel.model;
  *
  */
 public interface OtmResourceChild extends OtmObject {
+
+    /**
+     * Get the Owning Resource library member.
+     * 
+     * @see org.opentravel.model.OtmObject#getOwningMember()
+     */
+    @Override
+    public OtmResource getOwningMember();
 
 }

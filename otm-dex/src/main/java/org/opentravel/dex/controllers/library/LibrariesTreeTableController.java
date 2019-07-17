@@ -149,7 +149,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
             OtmLibrary latest = null;
             Set<OtmLibrary> libs = modelMgr.getLibraryChain( baseNS );
             for (OtmLibrary lib : libs)
-                if (lib.isLatestVersion()) {
+                if (lib != null && lib.isLatestVersion()) {
                     latestItem = createTreeItem( lib, root );
                     latest = lib;
                 }

@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package org.opentravel.model;
+package org.opentravel.model.otmLibraryMembers;
 
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.model.OtmChildrenOwner;
+import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
@@ -58,7 +60,7 @@ public class TestCustomFacet extends TestOtmLibraryMemberBase<OtmContextualFacet
     }
 
     /**
-     * @see org.opentravel.model.TestOtmLibraryMemberBase#testChildrenOwner(org.opentravel.model.OtmChildrenOwner)
+     * @see org.opentravel.model.otmLibraryMembers.TestOtmLibraryMemberBase#testChildrenOwner(org.opentravel.model.OtmChildrenOwner)
      */
     @Override
     public void testChildrenOwner(OtmChildrenOwner otm) {

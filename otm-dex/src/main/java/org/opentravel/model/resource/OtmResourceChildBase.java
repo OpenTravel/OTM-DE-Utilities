@@ -18,7 +18,10 @@ package org.opentravel.model.resource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
+import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.model.TLModelElement;
 
@@ -31,79 +34,35 @@ import org.opentravel.schemacompiler.model.TLModelElement;
 public abstract class OtmResourceChildBase<C> extends OtmModelElement<TLModelElement> {
     private static Log log = LogFactory.getLog( OtmResourceChildBase.class );
 
-    protected OtmResource parent = null;
+    protected OtmResource owner = null;
+    protected OtmResourceChild parent = null;
 
     public OtmResourceChildBase(TLModelElement tlo, OtmResource parent) {
         super( tlo );
-        this.parent = parent;
+        this.owner = parent;
         if (parent != null)
             parent.add( this );
     }
 
-    @Override
-    public OtmResource getOwningMember() {
-        return parent;
+    public OtmResourceChildBase(TLModelElement tlo, OtmResourceChild parent) {
+        super( tlo );
+        this.parent = parent;
+        this.owner = parent.getOwningMember();
+        if (parent instanceof OtmChildrenOwner)
+            ((OtmChildrenOwner) parent).add( this );
     }
 
-    // public OtmResourceChildBase(TLResource tlo, OtmModelManager mgr) {
-    // super( tlo, mgr );
-    // }
-    //
-    // public OtmResourceChildBase(String name, OtmModelManager mgr) {
-    // super( new TLResource(), mgr );
-    // setName( name );
-    // }
-    //
-    // @Override
-    // public String setName(String name) {
-    // getTL().setName( name );
-    // isValid( true );
-    // return getName();
-    // }
-    //
-    // @Override
-    // public TLResource getTL() {
-    // return (TLResource) tlObject;
-    // }
-    //
-    // @Override
-    // public Icons getIconType() {
-    // return ImageManager.Icons.RESOURCE;
-    // }
-    //
-    // @Override
-    // public Collection<OtmObject> getChildrenHierarchy() {
-    // Collection<OtmObject> ch = new ArrayList<>();
-    // // children.forEach(c -> {
-    // // if (c instanceof OtmIdFacet)
-    // // ch.add(c);
-    // // if (c instanceof OtmAlias)
-    // // ch.add(c);
-    // // });
-    // return ch;
-    // }
-    //
-    //
-    // @Override
-    // public boolean isExpanded() {
-    // return true;
-    // }
-    //
-    // @Override
-    // public boolean isNameControlled() {
-    // return false;
-    // }
-    //
-    // /**
-    // * @see org.opentravel.model.otmLibraryMembers.OtmLibraryMemberBase#modelChildren()
-    // */
-    // @Override
-    // public void modelChildren() {
-    // getTL().getActionFacets();
-    // getTL().getActions();
-    // getTL().getParamGroups();
-    // getTL().getParentRefs();
-    //
-    // super.modelChildren();
-    // }
+    @Override
+    public OtmResource getOwningMember() {
+        return owner;
+    }
+
+    /**
+     * 
+     * @return resource or resourceChild parent
+     */
+    public OtmObject getParent() {
+        return owner;
+    }
+
 }

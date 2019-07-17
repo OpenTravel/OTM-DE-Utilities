@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.opentravel.model;
+package org.opentravel.model.otmLibraryMembers;
 
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.BeforeClass;
+import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmEnumerationOpen;
 import org.opentravel.schemacompiler.model.TLEnumValue;
 import org.opentravel.schemacompiler.model.TLOpenEnumeration;

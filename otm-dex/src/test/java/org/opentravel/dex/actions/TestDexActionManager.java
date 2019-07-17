@@ -26,12 +26,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.actions.DexActionManager.DexActions;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.TestEnumerationClosed;
-import org.opentravel.model.TestEnumerationOpen;
-import org.opentravel.model.TestValueWithAttributes;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmEnumerationOpen;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
+import org.opentravel.model.otmLibraryMembers.TestEnumerationClosed;
+import org.opentravel.model.otmLibraryMembers.TestEnumerationOpen;
+import org.opentravel.model.otmLibraryMembers.TestValueWithAttributes;
 
 /**
  * Verifies the functions of the <code>UserSettings</code> class.

@@ -94,22 +94,7 @@ public class OtmModelManager implements TaskResultHandlerI {
      * @param actionManager action manager to assign to all members
      */
     public OtmModelManager(DexActionManager actionManager, RepositoryManager repositoryManager) {
-        this( actionManager );
-        // Create a master project manager
-        if (repositoryManager != null)
-            projectManager = new ProjectManager( tlModel, true, repositoryManager );
-        else
-            projectManager = new ProjectManager( tlModel );
-        this.repositoryManager = repositoryManager;
-    }
-
-    // Pass in the repo manager
-    @Deprecated
-    public OtmModelManager(DexActionManager actionManager) {
-        if (actionManager == null)
-            this.actionMgr = new DexReadOnlyActionManager();
-        this.actionMgr = actionManager;
-
+        // Create a TL Model to manager
         try {
             tlModel = new TLModel();
         } catch (Exception e) {
@@ -118,8 +103,20 @@ public class OtmModelManager implements TaskResultHandlerI {
         // Tell model to track changes to maintain its type integrity
         tlModel.addListener( new ModelIntegrityChecker() );
 
+        // Create a master project manager
+        if (repositoryManager != null)
+            projectManager = new ProjectManager( tlModel, true, repositoryManager );
+        else
+            projectManager = new ProjectManager( tlModel );
+        this.repositoryManager = repositoryManager;
+
+        if (actionManager == null)
+            this.actionMgr = new DexReadOnlyActionManager();
+        this.actionMgr = actionManager;
+
         log.debug( "TL Model created and integrity checker added." );
     }
+
 
     /**
      * Simply add the member to the maps if it is not already in the maps.

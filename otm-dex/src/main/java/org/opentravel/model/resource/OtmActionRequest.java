@@ -21,8 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmResourceChild;
-import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.model.TLActionFacet;
+import org.opentravel.schemacompiler.model.TLActionRequest;
 
 /**
  * OTM Object for Resource objects.
@@ -30,41 +30,54 @@ import org.opentravel.schemacompiler.model.TLActionFacet;
  * @author Dave Hollander
  * 
  */
-public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implements OtmResourceChild {
-    private static Log log = LogFactory.getLog( OtmActionFacet.class );
+public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> implements OtmResourceChild {
+    private static Log log = LogFactory.getLog( OtmActionRequest.class );
 
-    public OtmActionFacet(TLActionFacet tla, OtmResource parent) {
+    public OtmActionRequest(TLActionRequest tla, OtmAction parent) {
         super( tla, parent );
 
-        // TODO
-        // tla.getReferenceFacetName();
-        // tla.getBasePayloadName();
-        // tla.getName();
-        // tla.getReferenceRepeat();
-        // tla.getReferenceType();
+        tla.getHttpMethod();
+        TLActionFacet tlf = tla.getPayloadType();
+        tla.getParamGroupName();
+    }
+
+    //
+    // public OtmActionFacet(String name, OtmResource parent) {
+    // super( new TLActionRequest(), parent );
+    // setName( name );
+    // }
+
+    /**
+     * @see org.opentravel.model.OtmModelElement#getName()
+     */
+    @Override
+    public String getName() {
+        if (getTL().getPayloadType() != null)
+            return getTL().getHttpMethod().toString() + " <" + getTL().getPayloadType().getName() + ">";
+        if (getTL().getParamGroup() != null)
+            return getTL().getHttpMethod().toString() + " ?" + getTL().getParamGroup().getName();
+        else
+            return getTL().getHttpMethod().toString();
+    }
+
+    @Override
+    public TLActionRequest getTL() {
+        return (TLActionRequest) tlObject;
     }
 
     @Override
     public Icons getIconType() {
-        return ImageManager.Icons.FACET;
+        return ImageManager.Icons.RESOURCE_REQUEST;
     }
 
-    public OtmActionFacet(String name, OtmResource parent) {
-        super( new TLActionFacet(), parent );
-        setName( name );
-    }
 
-    @Override
-    public String setName(String name) {
-        getTL().setName( name );
-        isValid( true );
-        return getName();
-    }
-
-    @Override
-    public TLActionFacet getTL() {
-        return (TLActionFacet) tlObject;
-    }
+    // @Override
+    // public String setName(String name) {
+    // getTL().setName( name );
+    // isValid( true );
+    // return getName();
+    // }
+    //
     //
     //
     // @Override

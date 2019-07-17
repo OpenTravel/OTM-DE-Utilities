@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.model;
+package org.opentravel.model.otmLibraryMembers;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLBusinessObject;

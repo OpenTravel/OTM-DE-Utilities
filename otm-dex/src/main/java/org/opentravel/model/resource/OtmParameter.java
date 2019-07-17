@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmResourceChild;
-import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.model.TLParameter;
 
 /**
@@ -33,8 +32,10 @@ import org.opentravel.schemacompiler.model.TLParameter;
 public class OtmParameter extends OtmResourceChildBase<TLParameter> implements OtmResourceChild {
     private static Log log = LogFactory.getLog( OtmParameter.class );
 
-    public OtmParameter(TLParameter tla, OtmResource parent) {
+    public OtmParameter(TLParameter tla, OtmParameterGroup parent) {
         super( tla, parent );
+
+        // tla.getFieldRefName();
     }
 
     @Override
@@ -42,35 +43,13 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
         return ImageManager.Icons.RESOURCE_PARAMETER;
     }
 
-    //
-    // public OtmActionFacet(String name, OtmModelManager mgr) {
-    // super( new TLResource(), mgr );
-    // setName( name );
-    // }
+    @Override
+    public TLParameter getTL() {
+        return (TLParameter) tlObject;
+    }
 
-    // @Override
-    // public String setName(String name) {
-    // getTL().setName( name );
-    // isValid( true );
-    // return getName();
-    // }
-    //
-    // @Override
-    // public TLResource getTL() {
-    // return (TLResource) tlObject;
-    // }
-    //
-    //
-    // @Override
-    // public Collection<OtmObject> getChildrenHierarchy() {
-    // Collection<OtmObject> ch = new ArrayList<>();
-    // // children.forEach(c -> {
-    // // if (c instanceof OtmIdFacet)
-    // // ch.add(c);
-    // // if (c instanceof OtmAlias)
-    // // ch.add(c);
-    // // });
-    // return ch;
-    // }
-    //
+    @Override
+    public String getName() {
+        return getTL().getFieldRefName();
+    }
 }

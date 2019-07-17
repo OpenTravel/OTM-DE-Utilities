@@ -25,10 +25,10 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
-import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 
 import javafx.event.Event;
@@ -55,8 +55,6 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
      */
     @FXML
     private VBox memberDetails;
-    // @FXML
-    // private ComboBox<String> memberLibrary;
     @FXML
     private TextField memberName;
     @FXML
@@ -84,7 +82,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     @FXML
     private TextField memberDescription;
 
-    private OtmModelManager modelMgr;
+    // private OtmModelManager modelMgr;
     private OtmLibraryMember selectedMember;
 
     private boolean ignoreClear = false;
@@ -202,6 +200,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         final String TYPELABEL = "Assigned Type";
         final String TYPELABELVWA = "Value Type";
         final String TYPELABELCORE = "Simple Type";
+        final String TYPELABELRESOURCE = "Exposed Object";
         // OtmTypeProvider provider = null;
         typeLabel.setDisable( !(member instanceof OtmTypeUser) );
         typeLabel.setText( TYPELABEL );
@@ -209,8 +208,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             typeLabel.setText( TYPELABELCORE );
         else if (member instanceof OtmValueWithAttributes)
             typeLabel.setText( TYPELABELVWA );
-        // else if (member instanceof OtmTypeUser)
-        // provider = ((OtmTypeUser) member).getAssignedType();
+        else if (member instanceof OtmResource)
+            typeLabel.setText( TYPELABELRESOURCE );
 
         // icon?
         if (member.getActionManager().isEnabled( DexActions.TYPECHANGE, member )) {

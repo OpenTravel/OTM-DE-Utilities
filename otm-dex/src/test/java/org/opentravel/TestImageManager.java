@@ -26,8 +26,8 @@ import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.TestEnumerationClosed;
 import org.opentravel.model.otmLibraryMembers.OtmEnumerationClosed;
+import org.opentravel.model.otmLibraryMembers.TestEnumerationClosed;
 import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 

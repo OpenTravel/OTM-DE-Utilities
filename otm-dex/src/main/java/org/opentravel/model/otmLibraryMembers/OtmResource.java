@@ -20,16 +20,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
+import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.model.resource.OtmParameterGroup;
 import org.opentravel.model.resource.OtmParentRef;
+import org.opentravel.schemacompiler.model.NamedEntity;
+import org.opentravel.schemacompiler.model.TLBusinessObject;
+import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLResource;
 
 import java.util.ArrayList;
+
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.StringProperty;
 
 /**
  * OTM Object for Resource objects.
@@ -37,7 +46,7 @@ import java.util.ArrayList;
  * @author Dave Hollander
  * 
  */
-public class OtmResource extends OtmLibraryMemberBase<TLResource> {
+public class OtmResource extends OtmLibraryMemberBase<TLResource> implements OtmTypeUser {
     private static Log log = LogFactory.getLog( OtmResource.class );
 
     public OtmResource(TLResource tlo, OtmModelManager mgr) {
@@ -48,8 +57,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> {
         super( new TLResource(), mgr );
         setName( name );
     }
-
-
 
     @Override
     public String setName(String name) {
@@ -100,7 +107,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> {
         return false;
     }
 
-
     @Override
     public OtmResourceChild add(OtmObject child) {
         if (child instanceof OtmResourceChild) {
@@ -130,16 +136,79 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> {
      */
     @Override
     public void modelChildren() {
-        // List<TLActionFacet> af = getTL().getActionFacets();
-        getTL().getActions();
-        getTL().getParamGroups();
-        getTL().getParentRefs();
-
         getTL().getActionFacets().forEach( a -> new OtmActionFacet( a, this ) );
         getTL().getActions().forEach( a -> new OtmAction( a, this ) );
         getTL().getParamGroups().forEach( a -> new OtmParameterGroup( a, this ) );
         getTL().getParentRefs().forEach( a -> new OtmParentRef( a, this ) );
 
         log.debug( "Modeled resource children for " + getName() );
+    }
+
+    /** ************************************** */
+    /**
+     * @see org.opentravel.model.OtmTypeUser#assignedTypeProperty()
+     */
+    @Override
+    public StringProperty assignedTypeProperty() {
+        String typeName = "";
+        if (getAssignedType() != null)
+            typeName = getAssignedType().getName();
+        return new ReadOnlyStringWrapper( typeName );
+    }
+
+    /**
+     * Returns the business object reference
+     * 
+     * @see org.opentravel.model.OtmTypeUser#getAssignedTLType()
+     */
+    @Override
+    public NamedEntity getAssignedTLType() {
+        return getTL().getBusinessObjectRef();
+    }
+
+    /**
+     * @see org.opentravel.model.OtmTypeUser#getAssignedType()
+     */
+    @Override
+    public OtmBusinessObject getAssignedType() {
+        return (OtmBusinessObject) OtmModelElement.get( (TLModelElement) getAssignedTLType() );
+    }
+
+    /**
+     * @see org.opentravel.model.OtmTypeUser#getTlAssignedTypeName()
+     */
+    @Override
+    public String getTlAssignedTypeName() {
+        return getTL().getBusinessObjectRefName();
+    }
+
+    /**
+     * @see org.opentravel.model.OtmTypeUser#setAssignedTLType(org.opentravel.schemacompiler.model.NamedEntity)
+     */
+    @Override
+    public NamedEntity setAssignedTLType(NamedEntity type) {
+        if (type instanceof TLBusinessObject) {
+            getTL().setBusinessObjectRef( (TLBusinessObject) type );
+            return type;
+        }
+        return null;
+    }
+
+    /**
+     * @see org.opentravel.model.OtmTypeUser#setAssignedType(org.opentravel.model.OtmTypeProvider)
+     */
+    @Override
+    public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
+        if (setAssignedTLType( (NamedEntity) type.getTL() ) != null)
+            return type;
+        return null;
+    }
+
+    /**
+     * @see org.opentravel.model.OtmTypeUser#setTLTypeName(java.lang.String)
+     */
+    @Override
+    public void setTLTypeName(String name) {
+        // no-op
     }
 }

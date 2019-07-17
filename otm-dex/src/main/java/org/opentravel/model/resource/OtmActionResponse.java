@@ -21,8 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmResourceChild;
-import org.opentravel.model.otmLibraryMembers.OtmResource;
-import org.opentravel.schemacompiler.model.TLActionFacet;
+import org.opentravel.schemacompiler.model.TLActionResponse;
 
 /**
  * OTM Object for Resource objects.
@@ -30,41 +29,43 @@ import org.opentravel.schemacompiler.model.TLActionFacet;
  * @author Dave Hollander
  * 
  */
-public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implements OtmResourceChild {
-    private static Log log = LogFactory.getLog( OtmActionFacet.class );
+public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> implements OtmResourceChild {
+    private static Log log = LogFactory.getLog( OtmActionResponse.class );
 
-    public OtmActionFacet(TLActionFacet tla, OtmResource parent) {
+    public OtmActionResponse(TLActionResponse tla, OtmAction parent) {
         super( tla, parent );
+    }
 
-        // TODO
-        // tla.getReferenceFacetName();
-        // tla.getBasePayloadName();
-        // tla.getName();
-        // tla.getReferenceRepeat();
-        // tla.getReferenceType();
+    // public OtmActionResponse(String name, OtmAction parent) {
+    // super( new TLActionResponse(), parent );
+    // setName( name );
+    // }
+
+    /**
+     * @see org.opentravel.model.OtmModelElement#getName()
+     */
+    @Override
+    public String getName() {
+        return getTL().getStatusCodes().toString() + "  " + getTL().getPayloadTypeName();
     }
 
     @Override
     public Icons getIconType() {
-        return ImageManager.Icons.FACET;
-    }
-
-    public OtmActionFacet(String name, OtmResource parent) {
-        super( new TLActionFacet(), parent );
-        setName( name );
+        return ImageManager.Icons.RESOURCE_RESPONSE;
     }
 
     @Override
-    public String setName(String name) {
-        getTL().setName( name );
-        isValid( true );
-        return getName();
+    public TLActionResponse getTL() {
+        return (TLActionResponse) tlObject;
     }
 
-    @Override
-    public TLActionFacet getTL() {
-        return (TLActionFacet) tlObject;
-    }
+    // @Override
+    // public String setName(String name) {
+    // getTL().setName( name );
+    // isValid( true );
+    // return getName();
+    // }
+    //
     //
     //
     // @Override
