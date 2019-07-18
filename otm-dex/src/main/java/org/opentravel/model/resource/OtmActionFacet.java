@@ -36,10 +36,8 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     public OtmActionFacet(TLActionFacet tla, OtmResource parent) {
         super( tla, parent );
 
-        // TODO
-        // tla.getReferenceFacetName();
+        // tla.getReferenceFacetName(); -
         // tla.getBasePayloadName();
-        // tla.getName();
         // tla.getReferenceRepeat();
         // tla.getReferenceType();
     }

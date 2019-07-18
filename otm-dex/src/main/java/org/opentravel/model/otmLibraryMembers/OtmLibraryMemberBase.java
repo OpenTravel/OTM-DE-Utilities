@@ -113,9 +113,10 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
      */
     @Override
     public Collection<OtmTypeProvider> getChildrenTypeProviders() {
-        if (getChildren() != null) {
+        List<OtmObject> kids = new ArrayList<>( getChildren() );
+        if (!kids.isEmpty()) {
             List<OtmTypeProvider> pChildren = new ArrayList<>();
-            for (OtmObject child : getChildren())
+            for (OtmObject child : kids)
                 if (child instanceof OtmTypeProvider)
                     pChildren.add( (OtmTypeProvider) child );
             return pChildren;
