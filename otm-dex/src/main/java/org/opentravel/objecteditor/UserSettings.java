@@ -141,6 +141,7 @@ public class UserSettings extends AbstractUserSettings {
         // settingsProps.put( "repeatCount", repeatCount + "" );
         // settingsProps.put( "lastModelFile", modelFile );
         settingsProps.put( PROJECT_DIRECTORY_LABEL, projectFolder );
+        settingsProps.put( HIDE_PROJECT_OPEN_DIALOG, Boolean.toString( hideProjectOpenDialog ) );
         super.save( settingsProps );
     }
 

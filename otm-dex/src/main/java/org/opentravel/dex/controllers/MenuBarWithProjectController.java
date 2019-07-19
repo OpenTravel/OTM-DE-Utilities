@@ -57,6 +57,10 @@ import javafx.stage.Stage;
 public class MenuBarWithProjectController extends DexIncludedControllerBase<String> implements TaskResultHandlerI {
     private static Log log = LogFactory.getLog( MenuBarWithProjectController.class );
 
+    //
+    // FIXME - need to add ability to unset user settings
+    //
+
     // FXML injected objects
     @FXML
     private ComboBox<String> projectCombo;
@@ -220,12 +224,12 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     public void openFile(File selectedFile) {
         if (selectedFile != null) {
             if (selectedFile.getName().endsWith( ".otm" )) {
-                if (userSettings.getHideOpenProjectDialog())
+                if (!userSettings.getHideOpenProjectDialog())
                     getDialogBox().show( "Opening Library", "Please wait." );
                 new OpenLibraryFileTask( selectedFile, modelMgr, this::handleTaskComplete,
                     mainController.getStatusController() ).go();
             } else {
-                if (userSettings.getHideOpenProjectDialog())
+                if (!userSettings.getHideOpenProjectDialog())
                     getDialogBox().show( "Opening Project", "Please wait." );
                 new OpenProjectFileTask( selectedFile, modelMgr, this::handleTaskComplete,
                     mainController.getStatusController() ).go();
@@ -271,7 +275,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     @Override
     public void handleTaskComplete(WorkerStateEvent event) {
         if (event.getTarget() instanceof OpenProjectFileTask || event.getTarget() instanceof OpenLibraryFileTask) {
-            dialogBox.close();
+            if (dialogBox != null)
+                dialogBox.close();
             fireEvent( new DexModelChangeEvent( modelMgr ) );
             mainController.refresh();
         }
