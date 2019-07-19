@@ -23,6 +23,7 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.popup.DexPopupController;
 import org.opentravel.dex.events.DexFilterChangeEvent;
 import org.opentravel.dex.events.DexLibrarySelectionEvent;
+import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
@@ -70,7 +71,8 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     private static final EventType[] publishedEvents =
         {DexFilterChangeEvent.FILTER_CHANGED, DexLibrarySelectionEvent.LIBRARY_SELECTED};
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents = {DexLibrarySelectionEvent.LIBRARY_SELECTED};
+    private static final EventType[] subscribedEvents =
+        {DexModelChangeEvent.MODEL_CHANGED, DexLibrarySelectionEvent.LIBRARY_SELECTED};
 
     private static final String ALL = "All Objects";
     private static final String BUSINESS = "Business";
@@ -236,6 +238,13 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     public void handleEvent(Event event) {
         if (event instanceof DexLibrarySelectionEvent)
             librarySelectionHandler( (DexLibrarySelectionEvent) event );
+        else if (event instanceof DexModelChangeEvent)
+            handleModelChange( (DexModelChangeEvent) event );
+    }
+
+    private void handleModelChange(DexModelChangeEvent e) {
+        modelMgr = e.getModelManager();
+        clear();
     }
 
     @Override
@@ -277,9 +286,11 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         // boolean valid = member.isValid();
         // boolean editable = member.isEditable();
         // boolean isLatest = member.getLibrary().isLatestVersion();
-        // log.debug("Is " + member.getName() + "version = " + member.getLibrary().getVersion() + " selected? "
-        // + member.getLibrary().isLatestVersion());
-
+        // if (member.getName().equals( "AcceptableGuarantee" )) {
+        // boolean lv = member.getLibrary().isLatestVersion();
+        // log.debug( "Is " + member.getName() + "version = " + member.getLibrary().getVersion() + " latest version? "
+        // + member.getLibrary().isLatestVersion() );
+        // }
         if (libraryFilter != null && !member.getLibrary().getName().startsWith( libraryFilter ))
             return false;
         if (textFilterValue != null && !member.getName().toLowerCase().startsWith( textFilterValue ))
@@ -295,6 +306,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         if (!builtIns && member.getLibrary().getTL() instanceof BuiltInLibrary)
             return false;
 
+        // log.debug( member.getName() + " passed filter." );
         // No filters applied OR passed all filters
         return true;
     }
@@ -305,7 +317,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             ignoreClear = true;
             librarySelector.getSelectionModel().select( event.getLibrary().getName() );
             fireFilterChangeEvent();
-            // log.debug("Set Library Filter to: " + libraryFilter);
+            log.debug( "Set Library Filter to: " + libraryFilter );
             ignoreClear = false;
         }
     }

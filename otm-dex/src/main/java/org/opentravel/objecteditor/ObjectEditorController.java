@@ -99,6 +99,9 @@ public class ObjectEditorController extends DexMainControllerBase {
             userSettings.setWindowSize( new Dimension( userSettings.getWindowSize().width, newValue.intValue() ) );
             userSettings.save();
         } );
+
+        // log.debug( "Hide dialog setting: " + userSettings.getHideOpenProjectDialog() );
+
         // TODO
         // Point position = userSettings.getWindowPosition();
 

@@ -18,7 +18,9 @@ package org.opentravel.model.otmFacets;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.actions.DexActionManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmOperation;
 import org.opentravel.schemacompiler.model.TLFacet;
 
@@ -31,9 +33,10 @@ import java.util.List;
  * @author Dave Hollander
  * 
  */
-public class OtmOperationFacet extends OtmFacet<TLFacet> {
+public class OtmOperationFacet extends OtmAbstractFacet<TLFacet> {
     private static Log log = LogFactory.getLog( OtmOperationFacet.class );
 
+    // This is the only facet whose parent is not an library member
     private OtmOperation parent;
 
     /**
@@ -50,6 +53,19 @@ public class OtmOperationFacet extends OtmFacet<TLFacet> {
         return children;
     }
 
+    public DexActionManager getActionManger() {
+        return parent.getActionManager();
+    }
+
+    public OtmOperation getParent() {
+        return parent;
+    }
+
+    @Override
+    public OtmLibraryMember getOwningMember() {
+        return getParent().getOwningMember();
+    }
+
     @Override
     public boolean isExpanded() {
         return false;
@@ -58,23 +74,6 @@ public class OtmOperationFacet extends OtmFacet<TLFacet> {
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
         return getChildren();
-        // Collection<OtmObject> hierarchy = new ArrayList<>();
-        // // TODO - add inherited properties
-        // children.forEach(c -> {
-        // if (c instanceof OtmProperty)
-        // hierarchy.add(c);
-        // });
-        // if (getParent() instanceof OtmChildrenOwner)
-        // getParent().getChildren().forEach(c -> {
-        // if (c instanceof OtmChoiceFacet)
-        // hierarchy.add(c);
-        // if (c instanceof OtmContributedFacet) {
-        // c = ((OtmContributedFacet) c).getContributor();
-        // if (c != null)
-        // hierarchy.add(c);
-        // }
-        // });
-        // return hierarchy;
     }
 
 }

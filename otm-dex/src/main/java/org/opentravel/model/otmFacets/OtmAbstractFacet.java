@@ -29,7 +29,17 @@ import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyFactory;
+import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
 import org.opentravel.schemacompiler.model.TLAbstractFacet;
+import org.opentravel.schemacompiler.model.TLAttribute;
+import org.opentravel.schemacompiler.model.TLAttributeOwner;
+import org.opentravel.schemacompiler.model.TLFacet;
+import org.opentravel.schemacompiler.model.TLIndicator;
+import org.opentravel.schemacompiler.model.TLIndicatorOwner;
+import org.opentravel.schemacompiler.model.TLModelElement;
+import org.opentravel.schemacompiler.model.TLProperty;
+import org.opentravel.schemacompiler.model.TLPropertyOwner;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,22 +56,50 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
     implements OtmPropertyOwner, OtmTypeProvider {
     private static Log log = LogFactory.getLog( OtmAbstractFacet.class );
 
-    private OtmLibraryMember parent;
+    // private OtmLibraryMember parent;
 
-    public OtmAbstractFacet(T tl, OtmLibraryMember parent) {
+    public OtmAbstractFacet(T tl) {
         super( tl );
-        this.parent = parent;
+    }
+
+    // /**
+    // * Create a facet for OtmOperations which are not library members
+    // *
+    // * @param tl
+    // * @param actionMgr
+    // */
+    // // The only time this is used is for operations - operationFacet/operations which are not library members
+    // public OtmAbstractFacet(T tl) {
+    // super( tl );
+    // }
+
+    @Override
+    public OtmProperty<?> add(TLModelElement tl) {
+        if (getTL() instanceof TLAttributeOwner && tl instanceof TLAttribute)
+            ((TLAttributeOwner) getTL()).addAttribute( (TLAttribute) tl );
+
+        if (getTL() instanceof TLIndicatorOwner && tl instanceof TLIndicator)
+            ((TLIndicatorOwner) getTL()).addIndicator( (TLIndicator) tl );
+
+        if (getTL() instanceof TLPropertyOwner && tl instanceof TLProperty)
+            ((TLPropertyOwner) getTL()).addElement( (TLProperty) tl );
+
+        return OtmPropertyFactory.create( tl, this );
     }
 
     /**
-     * Create a facet for OtmOperations which are not library members
-     * 
-     * @param tl
-     * @param actionMgr
+     * {@inheritDoc}
+     * <p>
+     * Creates properties to represent facet children.
      */
-    // The only time this is used is for operations - operationFacet/operations which are not library members
-    public OtmAbstractFacet(T tl) {
-        super( tl );
+    @Override
+    public void modelChildren() {
+        if (getTL() instanceof TLIndicatorOwner)
+            ((TLIndicatorOwner) getTL()).getIndicators().forEach( p -> OtmPropertyFactory.create( p, this ) );
+        if (getTL() instanceof TLAttributeOwner)
+            ((TLAttributeOwner) getTL()).getAttributes().forEach( p -> OtmPropertyFactory.create( p, this ) );
+        if (getTL() instanceof TLPropertyOwner)
+            ((TLPropertyOwner) getTL()).getElements().forEach( p -> OtmPropertyFactory.create( p, this ) );
     }
 
     @Override
@@ -74,23 +112,44 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
     }
 
     @Override
+    public void modelInheritedChildren() {
+        // Only model once
+        if (inheritedChildren == null)
+            inheritedChildren = new ArrayList<>();
+        else
+            inheritedChildren.clear(); // RE-model
+        // return;
+
+        // All properties, local and inherited
+        // List<TLProperty> inheritedElements = PropertyCodegenUtils.getInheritedProperties(getTL());
+
+        // Get only the directly inherited properties
+        if (getOwningMember().getBaseType() != null && getTL() instanceof TLFacet) {
+            PropertyCodegenUtils.getInheritedFacetProperties( (TLFacet) getTL() )
+                .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
+            PropertyCodegenUtils.getInheritedFacetAttributes( (TLFacet) getTL() )
+                .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
+            PropertyCodegenUtils.getInheritedFacetIndicators( (TLFacet) getTL() )
+                .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
+        }
+    }
+
+    @Override
     public List<OtmObject> getInheritedChildren() {
         modelInheritedChildren();
         return inheritedChildren;
     }
 
-    public DexActionManager getActionManger() {
-        return parent.getActionManager();
-    }
+    public abstract DexActionManager getActionManger();
 
-    public OtmLibraryMember getParent() {
-        return parent;
-    }
+    public abstract OtmObject getParent();
 
     @Override
     public boolean isInherited() {
         // log.debug("Is " + this + " inherited? " + !getParent().contains(this));
-        return !getParent().contains( this );
+        if (getParent() instanceof OtmLibraryMember)
+            return !((OtmLibraryMember) getParent()).contains( this );
+        return false;
     }
 
     @Override
@@ -169,10 +228,8 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
         return ImageManager.Icons.FACET;
     }
 
-    @Override
-    public OtmLibraryMember getOwningMember() {
-        return getParent();
-    }
+    // @Override
+    // public abstract OtmLibraryMember getOwningMember();
 
     // @Override
     // public OtmProperty<?> add(TLModelElement tl) {

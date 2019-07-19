@@ -110,7 +110,15 @@ public class OtmLibrary {
         return getModelManager().getActionManager();
     }
 
+    /**
+     * Get the base namespace from the first project item
+     * 
+     * @return
+     */
     public String getBaseNamespace() {
+        if (getTL() instanceof TLLibrary)
+            return ((TLLibrary) getTL()).getBaseNamespace();
+        // Fail-safe: if fails the instance test, try the PI
         return projectItems.isEmpty() ? "" : projectItems.get( 0 ).getBaseNamespace();
     }
 

@@ -35,6 +35,7 @@ public class UserSettings extends AbstractUserSettings {
 
     private static final String USER_SETTINGS_FILE = "/.ota2/.dex-settings.properties";
     private static final String PROJECT_DIRECTORY_LABEL = "lastProjectFolder";
+    private static final String HIDE_PROJECT_OPEN_DIALOG = "hideOpenProjectDialog";
 
     private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
     private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
@@ -42,6 +43,7 @@ public class UserSettings extends AbstractUserSettings {
     // private int repeatCount;
     // private File lastModelFile;
     private File lastProjectFile;
+    private boolean hideProjectOpenDialog;
 
     /**
      * Returns the user settings from the prior session. If no prior settings exist, default settings are returned.
@@ -103,6 +105,7 @@ public class UserSettings extends AbstractUserSettings {
         // settings.setRepeatCount( 2 );
         // settings.setLastModelFile( new File( userHomeDirectory + "/dummy-file.otm" ) );
         settings.setLastProjectFolder( new File( userHomeDirectory ) );
+        settings.setHideOpenProjectDialog( false );
         return settings;
     }
 
@@ -114,10 +117,13 @@ public class UserSettings extends AbstractUserSettings {
         // int rptCount = Integer.parseInt( settingsProps.getProperty( "repeatCount" ) );
         // String modelFile = settingsProps.getProperty( "lastModelFile" );
         String projectFolder = settingsProps.getProperty( PROJECT_DIRECTORY_LABEL );
+        setLastProjectFolder( (projectFolder == null) ? null : new File( projectFolder ) );
+
+        String hideOpenProjectDialog = settingsProps.getProperty( HIDE_PROJECT_OPEN_DIALOG );
+        setHideOpenProjectDialog( Boolean.valueOf( hideOpenProjectDialog ) );
 
         // setRepeatCount( rptCount );
         // setLastModelFile( (modelFile == null) ? null : new File( modelFile ) );
-        setLastProjectFolder( (projectFolder == null) ? null : new File( projectFolder ) );
         super.load( settingsProps );
     }
 
@@ -185,6 +191,10 @@ public class UserSettings extends AbstractUserSettings {
         return lastProjectFile;
     }
 
+    public boolean getHideOpenProjectDialog() {
+        return hideProjectOpenDialog;
+    }
+
     /**
      * Assigns the folder location where the last EXAMPLE file was saved.
      *
@@ -192,6 +202,10 @@ public class UserSettings extends AbstractUserSettings {
      */
     public void setLastProjectFolder(File lastProjectFolder) {
         this.lastProjectFile = lastProjectFolder;
+    }
+
+    public void setHideOpenProjectDialog(boolean value) {
+        this.hideProjectOpenDialog = value;
     }
 
 }

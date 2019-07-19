@@ -332,12 +332,13 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
      */
     @Override
     public void post(OtmModelManager modelMgr) {
+        ignoreEvents = true;
         if (modelMgr != null && memberTree != null) {
             currentModelMgr = modelMgr;
-            // if (getFilter() != null)
-            // getFilter().clear();
-            // create cells for members
+            memberTree.getSelectionModel().clearSelection();
             memberTree.getRoot().getChildren().clear();
+
+            // create cells for members
             currentModelMgr.getMembers().forEach( m -> createTreeItem( m, root ) );
             try {
                 memberTree.sort();
@@ -346,12 +347,12 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
                 log.warn( "Exception sorting: " + e.getLocalizedMessage() );
             }
         }
+        ignoreEvents = false;
     }
 
     @Override
     public void refresh() {
         post( currentModelMgr );
-        ignoreEvents = false;
     }
 
     public void select(OtmLibraryMember otm) {

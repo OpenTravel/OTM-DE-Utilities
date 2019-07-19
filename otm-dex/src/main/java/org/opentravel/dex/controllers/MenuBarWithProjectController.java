@@ -131,6 +131,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     private DialogBoxContoller getDialogBox() {
         dialogBox = DialogBoxContoller.init();
+        dialogBox.setUserSettings( userSettings );
         return dialogBox;
     }
 
@@ -219,12 +220,13 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     public void openFile(File selectedFile) {
         if (selectedFile != null) {
             if (selectedFile.getName().endsWith( ".otm" )) {
-                getDialogBox().show( "Opening Library", "Please wait." );
+                if (userSettings.getHideOpenProjectDialog())
+                    getDialogBox().show( "Opening Library", "Please wait." );
                 new OpenLibraryFileTask( selectedFile, modelMgr, this::handleTaskComplete,
                     mainController.getStatusController() ).go();
             } else {
-                // TODO - if project this else if library new OpenLibraryFileTask().go()
-                getDialogBox().show( "Opening Project", "Please wait." );
+                if (userSettings.getHideOpenProjectDialog())
+                    getDialogBox().show( "Opening Project", "Please wait." );
                 new OpenProjectFileTask( selectedFile, modelMgr, this::handleTaskComplete,
                     mainController.getStatusController() ).go();
             }
@@ -251,11 +253,6 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
             openFile( projectMap.get( ((ComboBox<?>) e.getTarget()).getValue() ) );
     }
 
-    // @Override
-    // public void clear() {
-    // // projectCombo.getSelectionModel().clearSelection();
-    // }
-
     public void handleCloseMenu(ActionEvent event) {
         log.debug( "Handle close action event." );
 
@@ -267,6 +264,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
                 fireEvent( new DexModelChangeEvent( modelMgr ) );
                 projectCombo.getSelectionModel().clearSelection();
             }
+            // FIXME - clear actionQueue
         }
     }
 

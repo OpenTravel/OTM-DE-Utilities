@@ -40,7 +40,6 @@ import javafx.stage.Stage;
 /**
  * Controller for selecting a project dialog box pop-up menu.
  * <p>
- * This MUST be constructed by passing an FXMLLoader instance which needs access to default constructor.
  * 
  * @author dmh
  *

@@ -18,10 +18,18 @@ package org.opentravel.dex.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.DexProjectHandler;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.popup.UnlockLibraryDialogContoller;
+import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.tasks.repository.UnlockItemTask;
+import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmContainers.OtmProject;
+import org.opentravel.schemacompiler.loader.LibraryLoaderException;
+import org.opentravel.schemacompiler.repository.ProjectItem;
+import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
+import org.opentravel.schemacompiler.repository.RepositoryManager;
 
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
@@ -54,6 +62,7 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
     // MenuItem lockLibrary;
     MenuItem unlockLibrary;
     MenuItem promoteLibrary;
+    MenuItem addToProject;
 
     private DexMainController mainController;
 
@@ -65,25 +74,41 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
         // lockLibrary = new MenuItem("Lock");
         unlockLibrary = new MenuItem( "Unlock" );
         promoteLibrary = new MenuItem( "Promote (Future)" );
-        contextMenu.getItems().addAll( unlockLibrary, promoteLibrary );
+        addToProject = new MenuItem( "Add To Project" );
+        contextMenu.getItems().addAll( unlockLibrary, promoteLibrary, addToProject );
         // contextMenu.getItems().addAll(lockLibrary, unlockLibrary, promoteLibrary);
         setContextMenu( contextMenu );
-
-        // The item behind this row - NOT Available!
-        // TreeItem<PropertiesDAO> x = this.getTreeItem();
-        // PropertiesDAO y = getItem();
-        // OtmModelElement<?> otm = getItem().getValue();
-        // this.setUserData(otm);
 
         // Create action for events
         // lockLibrary.setOnAction((e) -> lockLibraryEventHandler());
         unlockLibrary.setOnAction( (e) -> unlockLibraryEventHandler() );
         promoteLibrary.setOnAction( this::promoteLibraryEventHandler );
+        addToProject.setOnAction( this::addToProject );
 
         // // Set editable style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
+    }
 
-        // log.debug("");
+    private void addToProject(ActionEvent e) {
+        log.debug( "Add to project in Row Factory. " );
+        RepositoryManager rm = mainController.getRepositoryManager();
+        OtmModelManager mm = mainController.getModelManager();
+
+        RepositoryItem repoItem = null;
+        if (controller != null && controller.getSelectedItem() != null)
+            repoItem = controller.getSelectedItem().getValue();
+        if (repoItem == null)
+            return;
+
+        OtmProject oProject = new DexProjectHandler().selectOneProject( mm.getUserProjects() );
+
+        try {
+            ProjectItem pi = mm.getProjectManager().addManagedProjectItem( repoItem, oProject.getTL() );
+            mm.add( pi.getContent() );
+            controller.fireEvent( new DexModelChangeEvent( mm ) );
+        } catch (LibraryLoaderException | RepositoryException e1) {
+            log.error( "Error opening repo item. " + e1.getLocalizedMessage() );
+        }
     }
 
     // /**

@@ -18,13 +18,16 @@ package org.opentravel.dex.controllers.popup;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.objecteditor.UserSettings;
 
 import java.io.IOException;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
@@ -61,6 +64,10 @@ public class DialogBoxContoller extends DexPopupControllerBase {
     Button dialogButtonOK;
     @FXML
     Label dialogTitleLabel;
+    @FXML
+    CheckBox hideDialog;
+
+    private UserSettings userSettings;
 
     private static Stage dialogStage;
 
@@ -141,6 +148,10 @@ public class DialogBoxContoller extends DexPopupControllerBase {
         super.show( message );
 
         dialogButtonClose.setOnAction( e -> close() );
+        if (userSettings != null) {
+            hideDialog.setOnAction( this::setHideDialog );
+            hideDialog.setSelected( userSettings.getHideOpenProjectDialog() );
+        }
 
         // TODO - how to know if/when to show OK or not?
         if (dialogButtonOK != null)
@@ -162,6 +173,11 @@ public class DialogBoxContoller extends DexPopupControllerBase {
             dialogText.setText( message );
     }
 
+    public void setHideDialog(ActionEvent e) {
+        if (userSettings != null)
+            userSettings.setHideOpenProjectDialog( hideDialog.isSelected() );
+    }
+
     public void close() {
         clear();
         dialogStage.close();
@@ -170,6 +186,13 @@ public class DialogBoxContoller extends DexPopupControllerBase {
     @Override
     public void clear() {
         dialogTitle.getChildren().clear();
+    }
+
+    /**
+     * @param userSettings
+     */
+    public void setUserSettings(UserSettings userSettings) {
+        this.userSettings = userSettings;
     }
 
 }

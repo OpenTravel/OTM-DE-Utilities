@@ -141,9 +141,12 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
 
     @Override
     public void refresh() {
-        log.debug( "Refreshing library tree table." );
-        // create cells for libraries in a namespace. Latest at top, older ones under it.
+        log.debug( "Refreshing library tree table. Ready to post " + modelMgr.getBaseNamespaces().size()
+            + " base namespaces." );
+        librariesTreeTable.getSelectionModel().clearSelection();
         librariesTreeTable.getRoot().getChildren().clear();
+
+        // create cells for libraries in a namespace. Latest at top, older ones under it.
         for (String baseNS : modelMgr.getBaseNamespaces()) {
             TreeItem<LibraryDAO> latestItem = null;
             OtmLibrary latest = null;
@@ -166,24 +169,27 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     @Override
     public void handleEvent(Event event) {
         if (event instanceof DexLibrarySelectionEvent)
-            eventHandler( ((DexLibrarySelectionEvent) event) );
+            handleLibrarySelection( ((DexLibrarySelectionEvent) event) );
         if (event instanceof DexModelChangeEvent)
             post( ((DexModelChangeEvent) event).getModelManager() );
     }
 
-    public void eventHandler(DexLibrarySelectionEvent event) {
-        OtmLibrary selectedLib = event.getLibrary();
-        if (selectedLib != null) {
-            // log.debug("Library selection Listener: " + selectedLib.getName());
-            for (TreeItem<LibraryDAO> item : librariesTreeTable.getRoot().getChildren())
-                if (item.getValue().getValue() == selectedLib) {
-                    ignore = true;
-                    librariesTreeTable.getSelectionModel().select( item );
-                    ignore = false;
-                }
-        } else {
-            librariesTreeTable.getSelectionModel().clearSelection();
-        }
+    public void handleLibrarySelection(DexLibrarySelectionEvent event) {
+        // Do NOT respond to filter or other library selection.
+        // If this is enabled, guard against indexOutOfBounds exceptions
+        //
+        // OtmLibrary selectedLib = event.getLibrary();
+        // if (selectedLib != null) {
+        // // log.debug("Library selection Listener: " + selectedLib.getName());
+        // for (TreeItem<LibraryDAO> item : librariesTreeTable.getRoot().getChildren())
+        // if (item.getValue().getValue() == selectedLib) {
+        // ignore = true;
+        // librariesTreeTable.getSelectionModel().select( item );
+        // ignore = false;
+        // }
+        // } else {
+        // librariesTreeTable.getSelectionModel().clearSelection();
+        // }
     }
 
     /**

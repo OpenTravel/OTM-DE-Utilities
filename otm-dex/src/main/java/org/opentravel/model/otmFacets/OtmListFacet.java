@@ -18,7 +18,8 @@ package org.opentravel.model.otmFacets;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
+import org.opentravel.dex.actions.DexActionManager;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.schemacompiler.model.TLListFacet;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -27,13 +28,27 @@ import org.opentravel.schemacompiler.model.TLModelElement;
  * @author Dave Hollander
  * 
  */
-public class OtmListFacet extends OtmAbstractFacet<TLListFacet> {
+public class OtmListFacet<T extends TLListFacet> extends OtmAbstractFacet<TLListFacet> {
     private static Log log = LogFactory.getLog( OtmListFacet.class );
 
-    /**
-     */
-    public OtmListFacet(TLListFacet tl, OtmComplexObjects<?> parent) {
-        super( tl, parent );
+    private OtmLibraryMember parent;
+
+    public OtmListFacet(T tl, OtmLibraryMember parent) {
+        super( tl );
+        this.parent = parent;
+    }
+
+    public DexActionManager getActionManger() {
+        return parent.getActionManager();
+    }
+
+    public OtmLibraryMember getParent() {
+        return parent;
+    }
+
+    @Override
+    public OtmLibraryMember getOwningMember() {
+        return getParent();
     }
 
     /**

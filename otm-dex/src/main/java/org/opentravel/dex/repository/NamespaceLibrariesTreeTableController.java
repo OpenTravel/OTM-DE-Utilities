@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.DexRepositoryItemReplacedEvent;
 import org.opentravel.dex.events.DexRepositoryItemSelectionEvent;
 import org.opentravel.dex.events.DexRepositoryNamespaceSelectionEvent;
@@ -49,7 +50,7 @@ public class NamespaceLibrariesTreeTableController extends DexIncludedController
     private static Log log = LogFactory.getLog( NamespaceLibrariesTreeTableController.class );
 
     private static final EventType[] publishedEvents = {DexRepositoryItemSelectionEvent.REPOSITORY_ITEM_SELECTED,
-        DexRepositoryItemReplacedEvent.REPOSITORY_ITEM_REPLACED};
+        DexRepositoryItemReplacedEvent.REPOSITORY_ITEM_REPLACED, DexModelChangeEvent.MODEL_CHANGED};
     private static final EventType[] subscribedEvents = {DexRepositoryNamespaceSelectionEvent.REPOSITORY_NS_SELECTED,
         DexRepositoryItemReplacedEvent.REPOSITORY_ITEM_REPLACED};
 

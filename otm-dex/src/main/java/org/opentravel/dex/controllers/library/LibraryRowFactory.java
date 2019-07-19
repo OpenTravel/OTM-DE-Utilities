@@ -18,18 +18,14 @@ package org.opentravel.dex.controllers.library;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.DexProjectHandler;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.popup.SelectProjectDialogController;
 import org.opentravel.dex.controllers.popup.UnlockLibraryDialogContoller;
 import org.opentravel.dex.repository.RepositoryResultHandler;
 import org.opentravel.dex.tasks.repository.LockLibraryTask;
 import org.opentravel.dex.tasks.repository.UnlockLibraryTask;
 import org.opentravel.model.otmContainers.OtmLibrary;
-import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.schemacompiler.repository.RepositoryItemState;
-
-import java.util.Collection;
-import java.util.List;
 
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
@@ -94,24 +90,26 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         if (library == null)
             return;
 
-        // Select one project
-        List<OtmProject> projects = library.getProjects();
-        OtmProject project = null;
-        if (projects.isEmpty())
-            return;
-        if (projects.size() <= 1)
-            project = projects.get( 0 );
-        else {
-            // post selection dialog
-            SelectProjectDialogController spdc = SelectProjectDialogController.init();
-            spdc.setProjectList( projects );
-            spdc.showAndWait( "" );
-            project = spdc.getSelection();
+        new DexProjectHandler().removeLibrary( library );
 
-        }
-        // Remove the library from selected project
-        if (project != null)
-            project.remove( library );
+        // // Select one project
+        // List<OtmProject> projects = library.getProjects();
+        // OtmProject project = null;
+        // if (projects.isEmpty())
+        // return;
+        // if (projects.size() <= 1)
+        // project = projects.get( 0 );
+        // else {
+        // // post selection dialog
+        // SelectProjectDialogController spdc = SelectProjectDialogController.init();
+        // spdc.setProjectList( projects );
+        // spdc.showAndWait( "" );
+        // project = spdc.getSelection();
+        //
+        // }
+        // // Remove the library from selected project
+        // if (project != null)
+        // project.remove( library );
 
         controller.refresh();
     }
@@ -123,24 +121,26 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         if (library == null)
             return;
 
-        Collection<OtmProject> projects = library.getModelManager().getUserProjects();
-        OtmProject project = null;
+        new DexProjectHandler().addToProject( library );
 
-        // Select one project
-        if (projects.size() <= 1)
-            for (OtmProject p : projects)
-                project = p;
-        else {
-            // post a dialog to select the project
-            SelectProjectDialogController spdc = SelectProjectDialogController.init();
-            spdc.setManager( library.getModelManager() );
-            spdc.showAndWait( "" );
-            if (spdc.getSelection() != null)
-                project = spdc.getSelection();
-        }
-        // Add the library to the selected project
-        if (project != null)
-            project.add( library );
+        // Collection<OtmProject> projects = library.getModelManager().getUserProjects();
+        // OtmProject project = null;
+        //
+        // // Select one project
+        // if (projects.size() <= 1)
+        // for (OtmProject p : projects)
+        // project = p;
+        // else {
+        // // post a dialog to select the project
+        // SelectProjectDialogController spdc = SelectProjectDialogController.init();
+        // spdc.setManager( library.getModelManager() );
+        // spdc.showAndWait( "" );
+        // if (spdc.getSelection() != null)
+        // project = spdc.getSelection();
+        // }
+        // // Add the library to the selected project
+        // if (project != null)
+        // project.add( library );
 
         controller.refresh();
     }

@@ -154,6 +154,8 @@ public class OtmModelManager implements TaskResultHandlerI {
         getTlModel().getUserDefinedLibraries().forEach( tlLib -> add( tlLib ) );
     }
 
+    // Fixme - should be ok. fixed OtmLibrary to return baseNamespace without PI.
+    // Todo - refactor add(*) to simplify
     protected OtmLibrary add(AbstractLibrary absLibrary, VersionChainFactory versionChainFactory) {
         if (absLibrary == null)
             return null;
@@ -163,10 +165,44 @@ public class OtmModelManager implements TaskResultHandlerI {
         libraries.put( absLibrary, otmLibrary );
         // Map of base namespaces with all libraries in that namespace
         if (absLibrary instanceof TLLibrary)
-            if (versionChainFactory != null)
+            if (versionChainFactory != null) {
                 baseNSManaged.put( otmLibrary.getNameWithBasenamespace(),
                     versionChainFactory.getVersionChain( (TLLibrary) absLibrary ) );
-            else {
+                log.debug( "Added chain for manged base namespace: " + otmLibrary.getNameWithBasenamespace() );
+            } else {
+                baseNSUnmanaged.put( otmLibrary.getNameWithBasenamespace(), otmLibrary );
+                log.debug( "Added unmanged base namespace: " + otmLibrary.getNameWithBasenamespace() );
+            }
+
+        // For each named member use the factory to create and add OtmObject
+        absLibrary.getNamedMembers().forEach( nm -> OtmLibraryMemberFactory.create( nm, this ) );
+
+        return otmLibrary;
+    }
+
+    protected OtmLibrary add(ProjectItem pi, VersionChainFactory versionChainFactory) {
+        if (pi == null)
+            return null;
+
+        AbstractLibrary absLibrary = pi.getContent();
+        if (absLibrary == null)
+            return null;
+        if (contains( absLibrary ))
+            return libraries.get( absLibrary );
+
+        // Create new library
+        OtmLibrary otmLibrary = new OtmLibrary( absLibrary, this );
+        otmLibrary.add( pi ); // Needed to know base namespace
+
+        // Add new library to the maps
+        libraries.put( absLibrary, otmLibrary );
+        // Map of base namespaces with all libraries in that namespace
+        if (absLibrary instanceof TLLibrary)
+            if (versionChainFactory != null) {
+                baseNSManaged.put( otmLibrary.getNameWithBasenamespace(),
+                    versionChainFactory.getVersionChain( (TLLibrary) absLibrary ) );
+                log.debug( "Added chain for manged base namespace: " + otmLibrary.getNameWithBasenamespace() );
+            } else {
                 baseNSUnmanaged.put( otmLibrary.getNameWithBasenamespace(), otmLibrary );
                 log.debug( "Added unmanged base namespace: " + otmLibrary.getNameWithBasenamespace() );
             }
@@ -300,9 +336,8 @@ public class OtmModelManager implements TaskResultHandlerI {
             // let the library track project as needed to know if the library is editable
             libraries.get( absLibrary ).add( pi );
         } else {
-            // Add newly discovered library to the libraries and baseNS maps
-            OtmLibrary lib = add( absLibrary );
-            lib.add( pi );
+            // Model and Add newly discovered library to the libraries and baseNS maps
+            add( pi, getVersionChainFactory() );
         }
     }
 
@@ -311,9 +346,10 @@ public class OtmModelManager implements TaskResultHandlerI {
      */
     public void clear() {
         projects.clear();
+        baseNSManaged.clear();
+        baseNSUnmanaged.clear();
         libraries.clear();
         members.clear();
-        baseNSManaged.clear();
         tlModel.clearModel();
         log.debug( "Cleared model. " + tlModel.getAllLibraries().size() );
     }
@@ -501,9 +537,12 @@ public class OtmModelManager implements TaskResultHandlerI {
     public boolean isLatest(OtmLibrary lib) {
         if (lib == null || lib.getTL() == null)
             return false;
+        // String key = lib.getNameWithBasenamespace();
         VersionChain<TLLibrary> chain = baseNSManaged.get( lib.getNameWithBasenamespace() );
-        if (chain != null && lib.getTL() instanceof TLLibrary)
+        if (chain != null && lib.getTL() instanceof TLLibrary) {
+            // List<TLLibrary> versions = chain.getVersions();
             return (chain.getNextVersion( (TLLibrary) lib.getTL() )) == null;
+        }
         return true;
     }
 
