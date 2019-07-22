@@ -21,11 +21,14 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmProperties.OtmEnumerationValue;
 import org.opentravel.schemacompiler.model.TLAbstractEnumeration;
 import org.opentravel.schemacompiler.model.TLEnumValue;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * OTM Object open and closed enumerations.
@@ -66,6 +69,11 @@ public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
     @Override
     public OtmEnumeration<?> getBaseType() {
         return (OtmEnumeration<?>) super.getBaseType();
+    }
+
+    @Override
+    public List<OtmTypeProvider> getUsedTypes() {
+        return Collections.emptyList();
     }
 
     @Override

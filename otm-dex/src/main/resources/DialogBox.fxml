@@ -34,7 +34,7 @@
             <Insets bottom="5.0" left="10.0" right="20.0" top="5.0" />
          </BorderPane.margin>
          <children>
-            <CheckBox fx:id="hideDialog" mnemonicParsing="false" prefHeight="33.0" prefWidth="178.0" text="Do not show this menu again" />
+            <CheckBox fx:id="hideDialog" mnemonicParsing="false" prefHeight="33.0" text="Do not show this menu again" />
             <ButtonBar HBox.hgrow="ALWAYS">
                <buttons>
                 <Button fx:id="dialogButtonOK" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-blue" stylesheets="@DavesViper.css" text="OK" textAlignment="CENTER">

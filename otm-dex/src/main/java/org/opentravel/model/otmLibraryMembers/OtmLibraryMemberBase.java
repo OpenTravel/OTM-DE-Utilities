@@ -109,6 +109,11 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return mgr.getActionManager();
     }
 
+    @Override
+    public OtmModelManager getModelManager() {
+        return mgr;
+    }
+
     /**
      */
     @Override
@@ -302,8 +307,14 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             } );
             // log.debug("Creating Where Used List " + whereUsed.size() + " for : " + this.getNameWithPrefix());
         }
-        // FIXME - clear list when changing assigned type
+        // FIXME - get resources when they expose this library member
         return whereUsed;
+    }
+
+    @Override
+    public void addWhereUsed(OtmLibraryMember oldUser, OtmLibraryMember newUser) {
+        whereUsed.remove( oldUser );
+        whereUsed.add( newUser );
     }
 
     private void addProvider(OtmTypeUser user, List<OtmTypeProvider> list) {

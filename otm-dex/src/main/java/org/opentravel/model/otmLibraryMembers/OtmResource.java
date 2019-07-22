@@ -199,8 +199,13 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      */
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
+        OtmLibraryMember oldUser = getAssignedType().getOwningMember();
         if (setAssignedTLType( (NamedEntity) type.getTL() ) != null)
             return type;
+
+        // add to type's typeUsers
+        type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
+
         return null;
     }
 

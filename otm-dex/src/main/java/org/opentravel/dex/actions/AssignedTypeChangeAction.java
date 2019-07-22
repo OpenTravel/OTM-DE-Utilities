@@ -111,9 +111,13 @@ public class AssignedTypeChangeAction implements DexAction<OtmTypeProvider> {
         if (user == null || otm == null)
             return null;
 
+        // Is action manager needed any more? For undo?
         if (otm.getActionManager() == null)
             return null;
-        OtmModelManager modelMgr = otm.getActionManager().getModelManager();
+
+        if (otm.getOwningMember() == null)
+            return null;
+        OtmModelManager modelMgr = otm.getOwningMember().getModelManager();
         if (modelMgr == null)
             return null;
 

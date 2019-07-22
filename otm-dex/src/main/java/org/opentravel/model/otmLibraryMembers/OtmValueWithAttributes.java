@@ -168,8 +168,17 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
      */
     @Override
     public TLPropertyType getAssignedTLType() {
-        return getTL().getParentType() instanceof TLValueWithAttributes ? getBaseType().getAssignedTLType()
-            : getTL().getParentType();
+        if (getTL().getParentType() instanceof TLValueWithAttributes) {
+            if (getBaseType() != null)
+                return getBaseType().getAssignedTLType();
+            else
+                return null;
+        } else {
+            return getTL().getParentType();
+        }
+        // return getTL().getParentType() instanceof TLValueWithAttributes ?
+        // getBaseType().getAssignedTLType()
+        // : getTL().getParentType();
     }
 
     /**
@@ -235,8 +244,13 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
 
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
+        OtmLibraryMember oldUser = getAssignedType().getOwningMember();
         if (type != null && type.getTL() instanceof TLAttributeType)
             setAssignedTLType( (TLAttributeType) type.getTL() );
+
+        // add to type's typeUsers
+        type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
+
         return getAssignedType();
     }
 

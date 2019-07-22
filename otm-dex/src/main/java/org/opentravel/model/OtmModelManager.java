@@ -270,9 +270,9 @@ public class OtmModelManager implements TaskResultHandlerI {
         // Get the built in libraries, will do nothing if already added
         addBuiltInLibraries( getTlModel() );
 
-        // Get VersionChainFactory that provides a versionChain for each project item that lists the base namespace,
-        // name and sorted set of version libraries
-        VersionChainFactory versionChainFactory = getVersionChainFactory();
+        // // Get VersionChainFactory that provides a versionChain for each project item that lists the base namespace,
+        // // name and sorted set of version libraries
+        // VersionChainFactory versionChainFactory = getVersionChainFactory();
 
         // Get Libraries - Libraries can belong to multiple projects.
         // Map will de-dup the entries based on baseNS and name.
@@ -605,6 +605,13 @@ public class OtmModelManager implements TaskResultHandlerI {
      * @return
      */
     public ProjectManager getProjectManager() {
+        // ReentrantLock bankLock = new ReentrantLock();
+        // // FIXME - if in background thread, wait for other threads to be complete
+        // if (!Platform.isFxApplicationThread())
+        // if (statusController.getQueueSize() > 1)
+        // Thread.holdsLock( projectManager )
+        // Platform.runLater( this::getProjectManager );
+
         return projectManager;
     }
 

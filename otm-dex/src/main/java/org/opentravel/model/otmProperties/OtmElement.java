@@ -25,6 +25,7 @@ import org.opentravel.dex.controllers.member.properties.MemberPropertiesTreeTabl
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLProperty;
 import org.opentravel.schemacompiler.model.TLPropertyType;
@@ -122,12 +123,16 @@ public class OtmElement<T extends TLProperty> extends OtmProperty<TLProperty> im
 
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
+        OtmLibraryMember oldUser = getAssignedType().getOwningMember();
         if (type == null)
-            return null; // May not be a modeled type on ondo
+            return null; // May not be a modeled type on undo
         if (type.getTL() instanceof TLPropertyType)
             setAssignedTLType( (TLPropertyType) type.getTL() );
         if (type.isNameControlled())
             setName( type.getName() );
+
+        // add to type's typeUsers
+        type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
         return getAssignedType();
     }
 

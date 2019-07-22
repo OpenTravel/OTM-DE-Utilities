@@ -24,6 +24,7 @@ import org.opentravel.common.OtmTypeUserUtils;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeType;
@@ -125,8 +126,13 @@ public class OtmAttribute<T extends TLAttribute> extends OtmProperty<TLAttribute
 
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
+        OtmLibraryMember oldUser = getAssignedType().getOwningMember();
         if (type != null && type.getTL() instanceof TLAttributeType)
             setAssignedTLType( (TLAttributeType) type.getTL() );
+
+        // add to type's typeUsers
+        type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
+
         return getAssignedType();
     }
 

@@ -134,6 +134,7 @@ public class TypeSelectionContoller extends DexPopupControllerBase {
 
         memberTreeTableController.configure( modelManager, false );
         memberFilterController.configure( modelManager, this );
+        memberFilterController.setBuiltIns( true ); // always start with built-ins showing
         memberTreeTableController.setFilter( memberFilterController );
 
         memberTreeTableController.post( modelManager );

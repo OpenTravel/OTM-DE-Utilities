@@ -336,6 +336,17 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         fireFilterChangeEvent();
     }
 
+    /**
+     * Set the built-in button
+     * 
+     * @param show
+     */
+    public void setBuiltIns(boolean show) {
+        builtInsButton.setSelected( show );
+        builtIns = builtInsButton.isSelected();
+        fireFilterChangeEvent();
+    }
+
     private void setEditableOnly() {
         // log.debug("Editable set to: " + editableButton.isSelected());
         editableOnly = editableButton.isSelected();

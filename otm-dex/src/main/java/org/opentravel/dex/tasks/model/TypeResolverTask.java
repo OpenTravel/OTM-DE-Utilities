@@ -53,12 +53,13 @@ public class TypeResolverTask extends DexTaskBase<OtmModelManager> {
 
         // Replace start message from super-type.
         msgBuilder = new StringBuilder( "Resolving assigned types in the model." );
-        // msgBuilder.append(taskData.getName());
-        // updateMessage(msgBuilder.toString());
+        updateMessage( msgBuilder.toString() );
     }
 
+    // Make sure only one thread is resolving types at a time
+    // To Do - create dispatcher that eliminates multiple simultaneous requests
     @Override
-    public void doIT() throws RepositoryException {
+    public synchronized void doIT() throws RepositoryException {
         // Create local copy because other tasks may update
         Collection<OtmLibraryMember> members = new ArrayList<>( taskData.getMembers() );
         // For each member in the model, force a computation of where used.

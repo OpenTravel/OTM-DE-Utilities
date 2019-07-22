@@ -120,8 +120,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         userSettings = mainController.getUserSettings();
 
         stage = mainController.getStage();
-        // handle window and other close request events
-        // stage.setOnCloseRequest( this::appExit );
+
         // For debugging, intercept and log DexEvents
         stage.setEventDispatcher( new DexEventDispatcher( stage.getEventDispatcher() ) );
 
@@ -129,8 +128,6 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         setFileOpenHandler( this::handleOpenMenu );
         setdoCloseHandler( this::handleCloseMenu );
         setUndoAction( e -> undoAction() );
-
-        // dialogBox = DialogBoxContoller.init();
     }
 
     private DialogBoxContoller getDialogBox() {

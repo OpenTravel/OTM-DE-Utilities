@@ -17,6 +17,7 @@
 package org.opentravel.model.otmLibraryMembers;
 
 import org.opentravel.model.OtmChildrenOwner;
+import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.schemacompiler.model.LibraryMember;
@@ -100,5 +101,18 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public StringProperty prefixProperty();
 
     public StringProperty versionProperty();
+
+    /**
+     * @return the model manager for this object
+     */
+    OtmModelManager getModelManager();
+
+    /**
+     * Add the user library member to the where used list
+     * 
+     * @param oldUser to remove from where used list
+     * @param newUser to add to the where used list
+     */
+    void addWhereUsed(OtmLibraryMember oldUser, OtmLibraryMember newUser);
 
 }

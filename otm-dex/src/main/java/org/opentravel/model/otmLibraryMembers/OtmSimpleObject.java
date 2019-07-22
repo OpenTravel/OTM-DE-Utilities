@@ -110,8 +110,13 @@ public class OtmSimpleObject extends OtmSimpleObjects<TLSimple> implements OtmTy
 
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
+        OtmLibraryMember oldUser = getAssignedType().getOwningMember();
         if (type != null && type.getTL() instanceof TLAttributeType)
             setAssignedTLType( (TLAttributeType) type.getTL() );
+
+        // add to type's typeUsers
+        type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
+
         return getAssignedType();
     }
 

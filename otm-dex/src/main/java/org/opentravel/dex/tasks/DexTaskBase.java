@@ -61,7 +61,7 @@ public abstract class DexTaskBase<T> extends Task<String> {
      */
     public DexTaskBase(T taskData, TaskResultHandlerI handler, DoubleProperty progressProperty,
         StringProperty statusProperty, DexStatusController statusController) {
-        this( taskData );
+        this( taskData, handler, statusController );
 
         // Bind the passed progress bar/indicator and status properties to this task's properties.
         if (progressProperty != null)
@@ -69,14 +69,14 @@ public abstract class DexTaskBase<T> extends Task<String> {
         if (statusProperty != null)
             statusProperty.bind( this.messageProperty() );
 
-        // Set the result handler
-        if (handler != null) {
-            setOnSucceeded( handler::handleTaskComplete );
-            setOnFailed( handler::handleTaskComplete );
-        }
-
-        // Track how many tasks are running
-        this.statusController = statusController;
+        // // Set the result handler
+        // if (handler != null) {
+        // setOnSucceeded( handler::handleTaskComplete );
+        // setOnFailed( handler::handleTaskComplete );
+        // }
+        //
+        // // Track how many tasks are running
+        // this.statusController = statusController;
     }
 
     /**
