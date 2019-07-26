@@ -76,7 +76,7 @@ public class RepositoryItemCommitHistoriesController extends DexIncludedControll
         remarksCol.setCellValueFactory( new PropertyValueFactory<RepoItemCommitDAO,String>( "remarks" ) );
         setColumnProps( remarksCol, true, false, true, 0 );
 
-        table.getColumns().setAll( numCol, dateCol, userCol, remarksCol );
+        table.getColumns().setAll( remarksCol, userCol, dateCol, numCol );
     }
 
     @Override

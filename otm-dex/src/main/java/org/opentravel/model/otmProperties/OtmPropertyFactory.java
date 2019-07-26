@@ -79,4 +79,17 @@ public class OtmPropertyFactory {
             + p.isInherited() );
         return p;
     }
+
+    public static String getObjectName(OtmProperty property) {
+        if (property instanceof OtmElement)
+            return "Element";
+        if (property instanceof OtmElementReference)
+            return "Element Reference";
+        if (property instanceof OtmAttribute)
+            return "Attribute";
+        if (property instanceof OtmIndicator)
+            return "Indicator";
+
+        return property.getClass().getSimpleName();
+    }
 }

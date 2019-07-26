@@ -23,12 +23,17 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLActionResponse;
+import org.opentravel.schemacompiler.model.TLHttpMethod;
+import org.opentravel.schemacompiler.model.TLResource;
+
+import java.util.List;
 
 /**
  * Test class for Action Facet resource descendants.
@@ -50,6 +55,7 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
     @Test
     public void testChildren() {
         OtmAction a = buildOtm( testResource );
+        List<OtmObject> kids = a.getChildren();
         assertTrue( a.getChildren().size() >= 2 );
 
         // Then - make sure there are request and responses in the children
@@ -58,15 +64,30 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
             assertTrue( a.getChildren().contains( r ) );
     }
 
-    public static OtmAction buildOtm(OtmResource testResource) {
-        OtmAction af = new OtmAction( buildTL(), testResource );
-        return af;
+    /**
+     * Build an action with one request and response.
+     * 
+     * @param resource
+     * @return
+     */
+    public static OtmAction buildOtm(OtmResource resource) {
+        OtmAction action = new OtmAction( buildTL( resource.getTL() ), resource );
+
+        assertTrue( action.getRequest() != null );
+        assertTrue( action.getTL().getRequest() != null );
+        assertTrue( resource.getChildren().contains( action ) );
+        assertTrue( resource.getTL().getActions().contains( action.getTL() ) );
+
+        return action;
     }
 
-    public static TLAction buildTL() {
+    public static TLAction buildTL(TLResource tlResource) {
         TLAction tla = new TLAction();
+        tla.setActionId( "Create" );
         tla.addResponse( new TLActionResponse() );
         tla.setRequest( new TLActionRequest() );
+        tla.getRequest().setHttpMethod( TLHttpMethod.POST );
+        tlResource.addAction( tla );
         return tla;
     }
 }

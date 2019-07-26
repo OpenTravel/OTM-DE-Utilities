@@ -25,6 +25,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.resource.OtmAction;
+import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.TestAction;
 import org.opentravel.model.resource.TestActionFacet;
 import org.opentravel.model.resource.TestParamGroup;
@@ -33,6 +35,8 @@ import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLActionFacet;
 import org.opentravel.schemacompiler.model.TLParamGroup;
 import org.opentravel.schemacompiler.model.TLResource;
+
+import java.util.List;
 
 /**
  * Verifies the functions of the <code>OtmResource</code> class.
@@ -89,7 +93,25 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         assertTrue( kidCount + 4 == testResource.getChildren().size() );
     }
 
+    @Test
+    public void testActionRequests() {
+        OtmResource testResource = buildOtm( staticModelManager );
 
+        // Then - no requests have been created
+        List<OtmActionRequest> requests = testResource.getActionRequests();
+        assertTrue( requests.isEmpty() );
+
+        // When two actions are added with two responses
+        OtmAction action1 = TestAction.buildOtm( testResource );
+        // assertTrue( action1.getRequest() != null );
+        // assertTrue( action1.getTL().getRequest() != null );
+        // assertTrue( testResource.getChildren().contains( action1 ) );
+        // assertTrue( testResource.getTL().getActions().contains( action1.getTL() ) );
+
+        OtmAction action2 = TestAction.buildOtm( testResource );
+        requests = testResource.getActionRequests();
+        assertTrue( requests.size() == 2 );
+    }
 
     /** ****************************************************** **/
 

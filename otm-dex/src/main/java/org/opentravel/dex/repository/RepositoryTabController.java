@@ -43,6 +43,8 @@ public class RepositoryTabController implements DexTabController {
     private RepositoryItemCommitHistoriesController repositoryItemCommitHistoriesController;
     @FXML
     private RepositorySelectionController repositorySelectionController;
+    @FXML
+    private RepositoryItemWebViewController repositoryItemWebViewController;
 
     public RepositoryTabController() {
         log.debug( "Repository Tab Controller constructed." );
@@ -71,6 +73,8 @@ public class RepositoryTabController implements DexTabController {
 
         // No set up needed, but add to list
         parent.addIncludedController( repositoryItemCommitHistoriesController );
+
+        parent.addIncludedController( repositoryItemWebViewController );
 
         log.debug( "Repository Tab Stage set." );
     }

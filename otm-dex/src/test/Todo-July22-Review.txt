@@ -1,0 +1,35 @@
+
+1. Add tests for assigning types - make sure where used and uses arrays are correct after change.
+2. built-ins in filter not working
+
+3. ^Z = undo
+4. forward/back button
+5. Inheritance - show library and object where properties and facets are inherited from in Properties pane
+6. Libraries (or namespaces) where used/contains/uses
+"Namespace Entanglement"
+DND - move/copy object to a different library from library tab
+9. Used Types = menu to update to latest
+10. Remember column setup
+
+11. Drilling from Resource to object - how to start with a resource and understand more about the BO
+	a. Putting in Members and TypeProviders view would require either making action facet a type provider or overrideing getChildrenTypeProvider() in OtmResource 
+	b. Putting properties under actionFacet and parameter would require them to become children owners
+	
+11.a - give action facets children -- the actual data they contain since they are 1st class objects to the developers
+
+12. give parameter a child which is the property it references
+
+13. IGNORE - library view - do you need full namespace
+14. Reset to default (or other resore thingy)
+15. remember changes to column order and visability
+
+16. Repository - filter by sub-section of a namespace (all "hospitality")
+17. Low-risk way to know what is in the library (browswer pop-up?) (peek)
+	DONE - both embedded and pop-up browser
+	TODO - authorization credentials
+	
+18. Locked-only button repository filter
+19. Last 10 Projects (not directory) + open option in drop down
+20. Username and password - from launcher
+21. How to compare 2 object
+22. Graphical view

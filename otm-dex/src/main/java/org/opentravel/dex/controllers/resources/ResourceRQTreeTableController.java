@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.member;
+package org.opentravel.dex.controllers.resources;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,6 +22,9 @@ import org.opentravel.common.cellfactories.ValidationMemberTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
+import org.opentravel.dex.controllers.member.MemberFilterController;
+import org.opentravel.dex.controllers.member.MemberRowFactory;
 import org.opentravel.dex.events.DexFilterChangeEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
@@ -54,8 +57,8 @@ import javafx.scene.layout.VBox;
  * @author dmh
  *
  */
-public class MemberTreeTableController extends DexIncludedControllerBase<OtmModelManager> implements DexController {
-    private static Log log = LogFactory.getLog( MemberTreeTableController.class );
+public class ResourceRQTreeTableController extends DexIncludedControllerBase<OtmModelManager> implements DexController {
+    private static Log log = LogFactory.getLog( ResourceRQTreeTableController.class );
 
     // Column labels
     // TODO - externalize strings
@@ -70,9 +73,9 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
      * FXML injected
      */
     @FXML
-    TreeTableView<MemberAndProvidersDAO> memberTree;
+    TreeTableView<MemberAndProvidersDAO> resourceRQTreeTable;
     @FXML
-    private VBox memberTreeController;
+    private VBox resourceRQTreeTableView;
 
     //
     TreeItem<MemberAndProvidersDAO> root; // Root of the navigation tree. Is displayed.
@@ -94,7 +97,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     /**
      * Construct a member tree table controller that can publish and receive events.
      */
-    public MemberTreeTableController() {
+    public ResourceRQTreeTableController() {
         super( subscribedEvents, publishedEvents );
     }
 
@@ -129,14 +132,15 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         setColumnProps( valColumn, true, false, false, 25 );
 
         // Add columns to table
-        memberTree.getColumns().addAll( nameColumn, valColumn, libColumn, versionColumn, prefixColumn, usedTypesCol );
-        memberTree.getSortOrder().add( nameColumn );
+        resourceRQTreeTable.getColumns().addAll( nameColumn, valColumn, libColumn, versionColumn, prefixColumn,
+            usedTypesCol );
+        resourceRQTreeTable.getSortOrder().add( nameColumn );
     }
 
     @Override
     public void checkNodes() {
-        if (memberTree == null)
-            throw new IllegalStateException( "Tree table view is null." );
+        if (resourceRQTreeTable == null)
+            throw new IllegalStateException( "Resource RQ tree table is null." );
     }
 
     /**
@@ -144,7 +148,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
      */
     @Override
     public void clear() {
-        memberTree.getRoot().getChildren().clear();
+        resourceRQTreeTable.getRoot().getChildren().clear();
     }
 
     /**
@@ -154,7 +158,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     public void configure(DexMainController parent) {
         super.configure( parent );
         // log.debug("Configuring Member Tree Table.");
-        eventPublisherNode = memberTreeController;
+        eventPublisherNode = resourceRQTreeTableView;
         configure( parent.getModelManager(), treeEditingEnabled );
     }
 
@@ -177,20 +181,20 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         root.setExpanded( true ); // Startout fully expanded
 
         // Set up the TreeTable
-        memberTree.setRoot( getRoot() );
-        memberTree.setShowRoot( false );
-        memberTree.setEditable( true );
-        memberTree.getSelectionModel().setCellSelectionEnabled( true ); // allow individual cells to be edited
-        memberTree.setTableMenuButtonVisible( true ); // allow users to select columns
+        resourceRQTreeTable.setRoot( getRoot() );
+        resourceRQTreeTable.setShowRoot( false );
+        resourceRQTreeTable.setEditable( true );
+        resourceRQTreeTable.getSelectionModel().setCellSelectionEnabled( true ); // allow individual cells to be edited
+        resourceRQTreeTable.setTableMenuButtonVisible( true ); // allow users to select columns
         // Enable context menus at the row level and add change listener for for applying style
-        memberTree.setRowFactory( (TreeTableView<MemberAndProvidersDAO> p) -> new MemberRowFactory( this ) );
+        resourceRQTreeTable.setRowFactory( (TreeTableView<MemberAndProvidersDAO> p) -> new MemberRowFactory( this ) );
         buildColumns();
 
         // Add listeners and event handlers
-        memberTree.getSelectionModel().select( 0 );
-        memberTree.setOnKeyReleased( this::keyReleased );
+        resourceRQTreeTable.getSelectionModel().select( 0 );
+        resourceRQTreeTable.setOnKeyReleased( this::keyReleased );
         // memberTree.setOnMouseClicked(this::mouseClick);
-        memberTree.getSelectionModel().selectedItemProperty()
+        resourceRQTreeTable.getSelectionModel().selectedItemProperty()
             .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
         refresh();
@@ -249,8 +253,8 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     }
 
     public MemberAndProvidersDAO getSelected() {
-        return memberTree.getSelectionModel().getSelectedItem() != null
-            ? memberTree.getSelectionModel().getSelectedItem().getValue() : null;
+        return resourceRQTreeTable.getSelectionModel().getSelectedItem() != null
+            ? resourceRQTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
     }
 
     private void handleEvent(DexFilterChangeEvent event) {
@@ -279,23 +283,20 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     }
 
     public void keyReleased(KeyEvent event) {
-        TreeItem<MemberAndProvidersDAO> item = memberTree.getSelectionModel().getSelectedItem();
-        int row = memberTree.getSelectionModel().getSelectedIndex();
-        if (item == null)
-            return;
-
+        TreeItem<MemberAndProvidersDAO> item = resourceRQTreeTable.getSelectionModel().getSelectedItem();
+        int row = resourceRQTreeTable.getSelectionModel().getSelectedIndex();
         // log.debug("Selection row = " + row);
         if (event.getCode() == KeyCode.RIGHT) {
             event.consume();
             item.setExpanded( true );
-            memberTree.getSelectionModel().clearAndSelect( row + 1, nameColumn );
+            resourceRQTreeTable.getSelectionModel().clearAndSelect( row + 1, nameColumn );
         } else if (event.getCode() == KeyCode.LEFT) {
             TreeItem<MemberAndProvidersDAO> parent = item.getParent();
             if (parent != null && parent != item && parent != root) {
-                memberTree.getSelectionModel().select( parent );
+                resourceRQTreeTable.getSelectionModel().select( parent );
                 parent.setExpanded( false );
-                row = memberTree.getSelectionModel().getSelectedIndex();
-                memberTree.getSelectionModel().clearAndSelect( row, nameColumn );
+                row = resourceRQTreeTable.getSelectionModel().getSelectedIndex();
+                resourceRQTreeTable.getSelectionModel().clearAndSelect( row, nameColumn );
                 event.consume();
             }
         }
@@ -336,15 +337,15 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     @Override
     public void post(OtmModelManager modelMgr) {
         ignoreEvents = true;
-        if (modelMgr != null && memberTree != null) {
+        if (modelMgr != null && resourceRQTreeTable != null) {
             currentModelMgr = modelMgr;
-            memberTree.getSelectionModel().clearSelection();
-            memberTree.getRoot().getChildren().clear();
+            resourceRQTreeTable.getSelectionModel().clearSelection();
+            resourceRQTreeTable.getRoot().getChildren().clear();
 
             // create cells for members
             currentModelMgr.getMembers().forEach( m -> createTreeItem( m, root ) );
             try {
-                memberTree.sort();
+                resourceRQTreeTable.sort();
             } catch (Exception e) {
                 // why does first sort always throw exception?
                 log.warn( "Exception sorting: " + e.getLocalizedMessage() );
@@ -360,16 +361,16 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
 
     public void select(OtmLibraryMember otm) {
         if (otm != null) {
-            for (TreeItem<MemberAndProvidersDAO> item : memberTree.getRoot().getChildren()) {
+            for (TreeItem<MemberAndProvidersDAO> item : resourceRQTreeTable.getRoot().getChildren()) {
                 if (item.getValue().getValue() == otm) {
-                    int row = memberTree.getRow( item );
+                    int row = resourceRQTreeTable.getRow( item );
                     // This may not highlight the row if the event comes from or goes to a different controller.
                     Platform.runLater( () -> {
                         // ignoreEvents = true;
-                        memberTree.requestFocus();
-                        memberTree.getSelectionModel().clearAndSelect( row );
-                        memberTree.scrollTo( row );
-                        memberTree.getFocusModel().focus( row );
+                        resourceRQTreeTable.requestFocus();
+                        resourceRQTreeTable.getSelectionModel().clearAndSelect( row );
+                        resourceRQTreeTable.scrollTo( row );
+                        resourceRQTreeTable.getFocusModel().focus( row );
                         // ignoreEvents = false;
                     } );
                     // log.debug("Selected " + otm.getName() + " in member tree.");
@@ -385,6 +386,6 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     }
 
     public void setOnMouseClicked(EventHandler<? super MouseEvent> handler) {
-        memberTree.setOnMouseClicked( handler );
+        resourceRQTreeTable.setOnMouseClicked( handler );
     }
 }

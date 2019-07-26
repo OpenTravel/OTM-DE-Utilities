@@ -70,6 +70,7 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
     }
 
     private void addRepository() {
+
         if (loginDialogController.showAndWait( "" ) == Results.OK) {
             repositorySelectionChanged(); // update user field
             // repositoryChoice.getSelectionModel().select(loginDialogController.getLoginRepoID());

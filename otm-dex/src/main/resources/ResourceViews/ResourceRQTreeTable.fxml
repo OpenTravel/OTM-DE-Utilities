@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="resourceRQTreeTableView" prefHeight="100.0"  stylesheets="@../DavesViper.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.resources.ResourceRQTreeTableController">
+   <children>
+     <TitledPane fx:id="rqTitledPane" text="Requests">
+       <content>
+         <TreeTableView fx:id="resourceRQTreeTable"  />
+       </content>
+     </TitledPane>
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</VBox>

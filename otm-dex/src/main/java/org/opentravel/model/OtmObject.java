@@ -25,6 +25,7 @@ import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -54,6 +55,8 @@ public interface OtmObject {
     public Image getIcon();
 
     public ImageManager.Icons getIconType();
+
+    public Tooltip getTooltip();
 
     /**
      * @return this, member's, or owning object's library or null

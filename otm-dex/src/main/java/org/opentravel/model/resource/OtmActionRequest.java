@@ -18,11 +18,18 @@ package org.opentravel.model.resource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.schemacompiler.model.TLActionFacet;
 import org.opentravel.schemacompiler.model.TLActionRequest;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javafx.scene.control.CheckBox;
 
 /**
  * OTM Object for Resource objects.
@@ -52,12 +59,19 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      */
     @Override
     public String getName() {
-        if (getTL().getPayloadType() != null)
-            return getTL().getHttpMethod().toString() + " <" + getTL().getPayloadType().getName() + ">";
-        if (getTL().getParamGroup() != null)
-            return getTL().getHttpMethod().toString() + " ?" + getTL().getParamGroup().getName();
-        else
-            return getTL().getHttpMethod().toString();
+        // Get the name of the parent then add method
+        return getOwner() != null ? getOwner().getName() : "";
+        // if (getTL().getPayloadType() != null)
+        // return getTL().getHttpMethod().toString() + " <" + getTL().getPayloadType().getName() + ">";
+        // if (getTL().getParamGroup() != null)
+        // return getTL().getHttpMethod().toString() + " ?" + getTL().getParamGroup().getName();
+        // else
+        // return getTL().getHttpMethod().toString();
+    }
+
+    public OtmAction getOwner() {
+        return OtmModelElement.get( getTL().getOwner() ) instanceof OtmAction
+            ? ((OtmAction) OtmModelElement.get( getTL().getOwner() )) : null;
     }
 
     @Override
@@ -92,4 +106,11 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     // return ch;
     // }
     //
+    @Override
+    public List<DexEditField> getFields() {
+        List<DexEditField> fields = new ArrayList<>();
+        fields.add( new DexEditField( "Common", new CheckBox(), 1 ) );
+        return fields;
+    }
+
 }

@@ -16,7 +16,10 @@
 
 package org.opentravel.model;
 
+import org.opentravel.common.DexEditField;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+
+import java.util.List;
 
 /**
  * All children of resources (Actions, ActionFacets...) must implement this interface.
@@ -33,5 +36,10 @@ public interface OtmResourceChild extends OtmObject {
      */
     @Override
     public OtmResource getOwningMember();
+
+    /**
+     * @return
+     */
+    public abstract List<DexEditField> getFields();
 
 }

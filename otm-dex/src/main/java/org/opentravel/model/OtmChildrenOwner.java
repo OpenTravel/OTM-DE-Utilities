@@ -60,6 +60,8 @@ public interface OtmChildrenOwner extends OtmObject {
      * and the ID facet will include the summary facet in this list.
      * <p>
      * To allow lazy evaluation, implementations are expected to attempt to model the children if the list is empty.
+     * <p>
+     * Used in views such as Properties tab's view to give modeler a clearer understanding of target object structures.
      * 
      * @return list of children or empty list.
      */

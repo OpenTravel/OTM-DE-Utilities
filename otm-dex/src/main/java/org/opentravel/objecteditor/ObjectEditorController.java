@@ -26,6 +26,7 @@ import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.controllers.member.MemberTreeTableController;
 import org.opentravel.dex.controllers.member.properties.MemberPropertiesTabController;
 import org.opentravel.dex.controllers.member.usage.WhereUsedTabController;
+import org.opentravel.dex.controllers.resources.ResourcesTabController;
 import org.opentravel.dex.repository.RepositoryTabController;
 
 import java.awt.Dimension;
@@ -59,11 +60,15 @@ public class ObjectEditorController extends DexMainControllerBase {
     private WhereUsedTabController whereUsedTabController;
     @FXML
     private RepositoryTabController repositoryTabController;
+    @FXML
+    private ResourcesTabController resourcesTabController;
 
     @Override
     public void checkNodes() {
         if (!(repositoryTabController instanceof RepositoryTabController))
             throw new IllegalStateException( "Repository tab not injected by FXML." );
+        if (!(resourcesTabController instanceof ResourcesTabController))
+            throw new IllegalStateException( "Resource tab not injected by FXML." );
         if (!(memberPropertiesTabController instanceof MemberPropertiesTabController))
             throw new IllegalStateException( "Member properties tab not injected by FXML." );
         if (!(librariesTabController instanceof LibrariesTabController))
@@ -115,6 +120,7 @@ public class ObjectEditorController extends DexMainControllerBase {
         statusController = dexStatusController; // Make available to base class
 
         repositoryTabController.configure( this ); // TODO - this is slow!
+        resourcesTabController.configure( this );
         librariesTabController.configure( this );
         whereUsedTabController.configure( this );
 

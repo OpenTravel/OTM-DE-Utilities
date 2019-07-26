@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="resourcePathsTreeView" prefHeight="150.0" stylesheets="@../DavesViper.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.resources.ResourcePathsTreeController">
+   <children>
+      <TitledPane fx:id="pathsTitlePane" text="Paths">
+         <content>
+            <TreeTableView fx:id="resourcePathsTree"  />
+         </content>
+      </TitledPane>
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</VBox>

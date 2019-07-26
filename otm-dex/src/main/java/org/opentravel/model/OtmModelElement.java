@@ -43,6 +43,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -233,6 +234,13 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     @Override
     public T getTL() {
         return tlObject;
+    }
+
+    // All objects should override with their own TOOLTIP
+    // When done, make this abstract or delete it
+    @Override
+    public Tooltip getTooltip() {
+        return new Tooltip( "" );
     }
 
     @Override

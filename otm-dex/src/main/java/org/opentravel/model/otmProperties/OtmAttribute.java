@@ -126,13 +126,13 @@ public class OtmAttribute<T extends TLAttribute> extends OtmProperty<TLAttribute
 
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
-        OtmLibraryMember oldUser = getAssignedType().getOwningMember();
-        if (type != null && type.getTL() instanceof TLAttributeType)
+        OtmLibraryMember oldUser = getAssignedType() == null ? null : getAssignedType().getOwningMember();
+        if (type != null && type.getTL() instanceof TLAttributeType) {
             setAssignedTLType( (TLAttributeType) type.getTL() );
 
-        // add to type's typeUsers
-        type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
-
+            // add to type's typeUsers
+            type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
+        }
         return getAssignedType();
     }
 

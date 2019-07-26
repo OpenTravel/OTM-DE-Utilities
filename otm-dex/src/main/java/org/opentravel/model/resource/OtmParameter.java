@@ -18,10 +18,16 @@ package org.opentravel.model.resource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.schemacompiler.model.TLParameter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javafx.scene.control.ComboBox;
 
 /**
  * OTM Object for Resource Action objects.
@@ -52,4 +58,12 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
     public String getName() {
         return getTL().getFieldRefName();
     }
+
+    @Override
+    public List<DexEditField> getFields() {
+        List<DexEditField> fields = new ArrayList<>();
+        fields.add( new DexEditField( "Location", new ComboBox<String>(), 1 ) );
+        return fields;
+    }
+
 }

@@ -18,6 +18,7 @@ package org.opentravel.model.resource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmChildrenOwner;
@@ -33,6 +34,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 
 /**
  * OTM Object for Resource Action objects.
@@ -140,6 +144,14 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
     public boolean isExpanded() {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    @Override
+    public List<DexEditField> getFields() {
+        List<DexEditField> fields = new ArrayList<>();
+        fields.add( new DexEditField( "Facet Name", new ComboBox(), 1 ) );
+        fields.add( new DexEditField( "ID Group", new CheckBox(), 1 ) );
+        return fields;
     }
 
 }

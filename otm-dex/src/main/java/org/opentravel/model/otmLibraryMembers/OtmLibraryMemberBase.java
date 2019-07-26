@@ -313,8 +313,12 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public void addWhereUsed(OtmLibraryMember oldUser, OtmLibraryMember newUser) {
-        whereUsed.remove( oldUser );
-        whereUsed.add( newUser );
+        if (whereUsed != null) {
+            if (oldUser != null)
+                whereUsed.remove( oldUser );
+            if (newUser != null)
+                whereUsed.add( newUser );
+        }
     }
 
     private void addProvider(OtmTypeUser user, List<OtmTypeProvider> list) {

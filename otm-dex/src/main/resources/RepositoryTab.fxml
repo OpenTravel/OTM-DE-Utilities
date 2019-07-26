@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-	<Tab fx:id="repoTab" text="Repository" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.repository.RepositoryTabController">
+<Tab fx:id="repoTab" text="Repository" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.repository.RepositoryTabController">
             <BorderPane VBox.vgrow="ALWAYS">
                <center>
                   <SplitPane dividerPositions="0.3" VBox.vgrow="ALWAYS">
@@ -16,10 +17,15 @@
 							<fx:include fx:id="repositoryNamespacesTree" source="RepositoryNamespacesTree.fxml" VBox.vgrow="ALWAYS" />
 						   </children>
 						</VBox>
-                        <SplitPane dividerPositions="0.7" orientation="VERTICAL">
+                        <SplitPane dividerPositions="0.7, 0.5" orientation="VERTICAL">
                                 <items>
                                     <fx:include fx:id="namespaceLibrariesTreeTable" source="NamespaceLibrariesTreeTable.fxml" />
-                                    <fx:include fx:id="repositoryItemCommitHistories" source="RepositoryItemCommitHistories.fxml" />
+                     <SplitPane dividerPositions="0.29797979797979796" prefHeight="160.0" prefWidth="200.0">
+                       <items>
+                         <fx:include fx:id="repositoryItemCommitHistories" source="RepositoryItemCommitHistories.fxml" />
+                         <fx:include fx:id="repositoryItemWebView" source="RepositoryItemWebView.fxml" />
+                       </items>
+                     </SplitPane>
                                 </items>
                         </SplitPane>
                      </items>

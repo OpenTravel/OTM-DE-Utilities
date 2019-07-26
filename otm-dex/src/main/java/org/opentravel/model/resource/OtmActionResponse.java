@@ -18,10 +18,16 @@ package org.opentravel.model.resource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.schemacompiler.model.TLActionResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javafx.scene.control.CheckBox;
 
 /**
  * OTM Object for Resource objects.
@@ -80,4 +86,11 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
     // return ch;
     // }
     //
+    @Override
+    public List<DexEditField> getFields() {
+        List<DexEditField> fields = new ArrayList<>();
+        fields.add( new DexEditField( "Common", new CheckBox(), 1, 1 ) );
+        return fields;
+    }
+
 }

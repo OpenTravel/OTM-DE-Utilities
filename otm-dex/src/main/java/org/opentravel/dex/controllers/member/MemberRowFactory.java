@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.member;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.controllers.DexIncludedController;
 
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
@@ -36,9 +37,9 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
 
     private final ContextMenu addMenu = new ContextMenu();
     private static final PseudoClass EDITABLE = PseudoClass.getPseudoClass( "editable" );
-    private MemberTreeTableController controller;
+    private DexIncludedController<?> controller;
 
-    public MemberRowFactory(MemberTreeTableController controller) {
+    public MemberRowFactory(DexIncludedController<?> controller) {
         this.controller = controller;
 
         // Create Context menu

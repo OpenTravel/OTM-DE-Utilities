@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<Tab fx:id="resourcesTab" text="Resources" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.resources.ResourcesTabController">
+            <BorderPane VBox.vgrow="ALWAYS">
+               <!-- top>
+			      <fx:include fx:id="resourceDetails" source="ResourceDetails.fxml" />
+               </top -->               
+			   <center>
+                  <SplitPane dividerPositions="0.3" VBox.vgrow="ALWAYS">
+                     <items>
+					    <VBox>
+						   <children>
+							<!-- fx:include fx:id="repositorySearch" source="RepositorySearch.fxml" / -->
+							<fx:include fx:id="resourcesTreeTable" source="ResourcesTreeTable.fxml" VBox.vgrow="ALWAYS" />
+						   </children>
+						</VBox>
+                        <SplitPane dividerPositions="0.7, 0.5" orientation="VERTICAL">
+                           <items>
+					    <!-- VBox>
+						   <children -->
+			                     <!-- fx:include fx:id="resourceDetails" source="ResourceDetails.fxml" /-->
+                                 <fx:include fx:id="resourceChildDetails" source="ResourceChildDetails.fxml" />
+                                 <fx:include fx:id="resourcePathsTree" source="ResourcePathsTree.fxml" />
+                                 <fx:include fx:id="resourceRQTreeTable" source="ResourceRQTreeTable.fxml" />
+                                 <fx:include fx:id="resourceRSTreeTable" source="ResourceRSTreeTable.fxml" />
+                                 <fx:include fx:id="resourceErrorsTreeTable" source="ResourceErrorsTreeTable.fxml" />
+						   <!-- /children>
+						</VBox -->
+                         </items>
+                       </SplitPane>
+                     </items>
+                </SplitPane>
+               </center>
+            </BorderPane>
+	</Tab>

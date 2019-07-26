@@ -18,11 +18,19 @@ package org.opentravel.model.resource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.model.TLResourceParentRef;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Spinner;
 
 /**
  * OTM Object for Resource Action objects.
@@ -73,4 +81,14 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
     // return ch;
     // }
     //
+    @Override
+    public List<DexEditField> getFields() {
+        List<DexEditField> fields = new ArrayList<>();
+        fields.add( new DexEditField( "Base Payload", new Button(), 1 ) );
+        fields.add( new DexEditField( "Reference Type", new ComboBox<String>(), 1 ) );
+        fields.add( new DexEditField( "Reference Facet", new ComboBox<String>(), 1 ) );
+        fields.add( new DexEditField( "Repeat Count", new Spinner(), 1 ) );
+        return fields;
+    }
+
 }

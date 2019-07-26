@@ -29,6 +29,7 @@ import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberFactory;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.ic.ModelIntegrityChecker;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.BuiltInLibrary;
@@ -613,6 +614,19 @@ public class OtmModelManager implements TaskResultHandlerI {
         // Platform.runLater( this::getProjectManager );
 
         return projectManager;
+    }
+
+
+    /**
+     * @return new list of members that are resources
+     */
+    public List<OtmResource> getResources() {
+        List<OtmResource> resources = new ArrayList<>();
+        members.values().forEach( m -> {
+            if (m instanceof OtmResource)
+                resources.add( (OtmResource) m );
+        } );
+        return resources;
     }
 
 

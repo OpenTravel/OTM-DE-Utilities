@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexProjectHandler;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.popup.UnlockLibraryDialogContoller;
+import org.opentravel.dex.controllers.popup.WebViewDialogController;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.tasks.repository.UnlockItemTask;
 import org.opentravel.model.OtmModelManager;
@@ -63,6 +64,7 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
     MenuItem unlockLibrary;
     MenuItem promoteLibrary;
     MenuItem addToProject;
+    MenuItem browser;
 
     private DexMainController mainController;
 
@@ -75,7 +77,8 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
         unlockLibrary = new MenuItem( "Unlock" );
         promoteLibrary = new MenuItem( "Promote (Future)" );
         addToProject = new MenuItem( "Add To Project" );
-        contextMenu.getItems().addAll( unlockLibrary, promoteLibrary, addToProject );
+        browser = new MenuItem( "Preview in Browser" );
+        contextMenu.getItems().addAll( unlockLibrary, promoteLibrary, addToProject, browser );
         // contextMenu.getItems().addAll(lockLibrary, unlockLibrary, promoteLibrary);
         setContextMenu( contextMenu );
 
@@ -84,9 +87,17 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
         unlockLibrary.setOnAction( (e) -> unlockLibraryEventHandler() );
         promoteLibrary.setOnAction( this::promoteLibraryEventHandler );
         addToProject.setOnAction( this::addToProject );
+        browser.setOnAction( this::previewInBrowser );
 
         // // Set editable style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
+    }
+
+    private void previewInBrowser(ActionEvent e) {
+        if (controller != null && controller.getSelectedItem() != null) {
+            WebViewDialogController wvdc = WebViewDialogController.init();
+            wvdc.show( controller.getSelectedItem().getRepositoryURL() );
+        }
     }
 
     private void addToProject(ActionEvent e) {

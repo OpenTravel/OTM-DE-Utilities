@@ -18,6 +18,7 @@ package org.opentravel.model.otmLibraryMembers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelElement;
@@ -28,17 +29,25 @@ import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionFacet;
+import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmParameterGroup;
 import org.opentravel.model.resource.OtmParentRef;
 import org.opentravel.schemacompiler.model.NamedEntity;
+import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLResource;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 
 /**
  * OTM Object for Resource objects.
@@ -73,6 +82,10 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     @Override
     public Icons getIconType() {
         return ImageManager.Icons.RESOURCE;
+    }
+
+    public Tooltip getTooltip() {
+        return new Tooltip( TOOLTIP );
     }
 
     @Override
@@ -174,6 +187,10 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return (OtmBusinessObject) OtmModelElement.get( (TLModelElement) getAssignedTLType() );
     }
 
+    public OtmBusinessObject getBusinessObject() {
+        return getAssignedType();
+    }
+
     /**
      * @see org.opentravel.model.OtmTypeUser#getTlAssignedTypeName()
      */
@@ -199,14 +216,12 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      */
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
-        OtmLibraryMember oldUser = getAssignedType().getOwningMember();
+        OtmLibraryMember oldUser = getAssignedType() == null ? null : getAssignedType().getOwningMember();
         if (setAssignedTLType( (NamedEntity) type.getTL() ) != null)
-            return type;
+            // add to type's typeUsers
+            type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
 
-        // add to type's typeUsers
-        type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
-
-        return null;
+        return getAssignedType();
     }
 
     /**
@@ -216,4 +231,71 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     public void setTLTypeName(String name) {
         // no-op
     }
+
+    /**
+     * Get all the actions in the resource
+     * 
+     * @return new list of OtmAction
+     */
+    public List<OtmActionRequest> getActionRequests() {
+        List<OtmActionRequest> requests = new ArrayList<>();
+        // List<TLAction> tlas = getTL().getActions();
+        for (TLAction ta : getTL().getActions()) {
+            if (OtmModelElement.get( ta ) instanceof OtmAction
+                && ((OtmAction) OtmModelElement.get( ta )).getRequest() != null)
+                requests.add( ((OtmAction) OtmModelElement.get( ta )).getRequest() );
+        }
+        return requests;
+    }
+
+    public List<DexEditField> getFields() {
+        List<DexEditField> fields = new ArrayList<>();
+        fields.add( new DexEditField( 1, 0, extension_LABEL, extension_TOOLTIP, new ComboBox<String>() ) );
+        fields.add( new DexEditField( 2, 0, businessObject_LABEL, businessObject_TOOLTIP,
+            new Button( getBusinessObject().getName() ) ) );
+        fields.add( new DexEditField( 3, 0, basePath_LABEL, basePath_TOOLTIP, new TextField() ) );
+        fields.add( new DexEditField( 4, 0, abstract_LABEL, abstract_TOOLTIP, new CheckBox() ) );
+        fields.add( new DexEditField( 4, 3, firstClass_LABEL, firstClass_TOOLTIP, new CheckBox() ) );
+
+        // fields.add( new DexEditField( 1, 0, name_LABEL, name_TOOLTIP, new Button() ) );
+        // fields.add( new DexEditField( 1, 0, parentRef_LABEL, parentRef_TOOLTIP, new Button() ) );
+        // fields.add( new DexEditField( 1, 0, parent_LABEL, parent_TOOLTIP, new Button() ) );
+        return fields;
+    }
+
+    private static final String TOOLTIP =
+        "Encapsulates all aspects of a RESTful resource used to expose and manage a particular business object.";
+
+    private static final String name_LABEL = "Resource Name";
+    private static final String name_TOOLTIP =
+        "The name of the resource.  This name is used to uniquely identify the resource within the OTM model, but will not conflict with any naming conventions used in generated XSD documents.";
+
+    private static final String businessObject_LABEL = "Business Object";
+    private static final String businessObject_TOOLTIP =
+        "The name of the business object with which this resource is associated. ";
+
+    private static final String abstract_LABEL = "Abstract";
+    private static final String abstract_TOOLTIP = "Indicates whether this is an abstract resource.";
+
+    private static final String firstClass_LABEL = "First Class";
+    private static final String firstClass_TOOLTIP =
+        "Indicates whether this is a first-class resource. If checked the generated SWAGGER will have paths with and without the parent resource. First class resources may exist independently of a parent resource.";
+
+    private static final String basePath_LABEL = "Base Path";
+    private static final String basePath_TOOLTIP =
+        "Specifies the base path for this resource.  In usage, do not enter the name of the object because parameters are not allowed within a resource's base path. ";
+
+    private static final String parentRef_LABEL = "Parent";
+    private static final String parentRef_TOOLTIP = " The list of parent references for the resource. ";
+
+    private static final String extension_LABEL = "Extends";
+    private static final String extension_TOOLTIP =
+        "Reference to the resource from which the child resource will inherit.";
+
+    private static final String parent_LABEL = "Parent";
+    private static final String parent_TOOLTIP = "Reference to the parent resource for this sub-resource.";
+
+    private static final String baseResponseWizard_LABEL = "Base Response Wizard";
+    private static final String baseResponseWizard_TOOLTIP =
+        "Set base response on all Action Facets used for responses.";
 }

@@ -23,9 +23,15 @@ import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.repository.GetRepositoryItemHistoryTask;
+import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryItemHistory;
+import org.opentravel.schemacompiler.repository.impl.RemoteRepositoryClient;
+
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+import java.net.URI;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -139,4 +145,44 @@ public class RepoItemDAO implements DexDAO<RepositoryItem>, TaskResultHandlerI {
         repoItem = item;
     }
 
+    public String getRepositoryURL() {
+        // get the actual repository client
+        Repository r = repoItem.getRepository();
+        RemoteRepositoryClient repoClient = null;
+        if (r instanceof RemoteRepositoryClient)
+            repoClient = (RemoteRepositoryClient) r;
+
+        if (repoClient == null)
+            return "";
+
+        // Get the full URL
+        // http://opentravelmodel.net/console/libraryDictionary.html?baseNamespace=http%3a%2f%2fwww.opentravel.org%2fSandbox%2fdemo&filename=SteveTest_0_0_0.otm&version=0.0.0
+        String rn = ((RemoteRepositoryClient) r).getEndpointUrl();
+        String path = "/console/libraryDictionary.html?";
+        String bns = repoItem.getBaseNamespace();
+        String fn = repoItem.getFilename();
+        String vn = repoItem.getVersion();
+        String url = rn + path + "baseNamespace=" + bns + "&filename=" + fn + "&version=" + vn;
+
+
+        final String password = repoClient.getEncryptedPassword();
+        final String username = repoClient.getUserId();
+
+        // Create authenticator
+        URI baseUri = URI.create( rn );
+        log.debug( "Creating authenticator for " + baseUri.toString() );
+        Authenticator.setDefault( new Authenticator() {
+
+            @Override
+            public PasswordAuthentication getPasswordAuthentication() {
+                // only return our credentials for our URI
+                if (baseUri.getHost().equals( getRequestingHost() )) {
+                    return new PasswordAuthentication( username, password.toCharArray() );
+                }
+                return null;
+            }
+        } );
+
+        return url;
+    }
 }
