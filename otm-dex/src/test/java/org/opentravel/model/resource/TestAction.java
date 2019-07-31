@@ -64,6 +64,11 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
             assertTrue( a.getChildren().contains( r ) );
     }
 
+    @Test
+    public void testRequestPayload() {
+        // TODO
+    }
+
     /**
      * Build an action with one request and response.
      * 

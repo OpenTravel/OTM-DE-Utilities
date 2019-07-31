@@ -39,6 +39,7 @@ public class DexEditField {
     public int row;
     public int column;
 
+    @Deprecated
     public DexEditField(String label, Node fxNode, int row) {
         this.label = label;
         this.fxNode = fxNode;
@@ -46,13 +47,15 @@ public class DexEditField {
         this.column = 1;
     }
 
-    public DexEditField(String label, Node fxNode, int row, int column) {
-        this.label = label;
-        this.fxNode = fxNode;
-        this.row = row;
-        this.column = column;
-    }
 
+    /**
+     * 
+     * @param row integer 0 to n. 0 is placed right after description row
+     * @param column integer 0 to n. Fields with label will require 2 columns.
+     * @param label string for first column or if null no label column is used
+     * @param tooltip added to label and fxNode
+     * @param fxNode actual Java FX control node or if null no node column is used
+     */
     public DexEditField(int row, int column, String label, String tooltip, Node fxNode) {
         this.label = label;
         this.fxNode = fxNode;

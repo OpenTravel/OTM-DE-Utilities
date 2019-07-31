@@ -28,9 +28,9 @@ import org.opentravel.schemacompiler.model.TLResourceParentRef;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 
 /**
  * OTM Object for Resource Action objects.
@@ -84,11 +84,26 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
     @Override
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( "Base Payload", new Button(), 1 ) );
-        fields.add( new DexEditField( "Reference Type", new ComboBox<String>(), 1 ) );
-        fields.add( new DexEditField( "Reference Facet", new ComboBox<String>(), 1 ) );
-        fields.add( new DexEditField( "Repeat Count", new Spinner(), 1 ) );
+        fields.add( new DexEditField( 0, 0, PARENT_LABEL, PARENT_TOOLTIP, new ComboBox<String>() ) );
+        fields.add( new DexEditField( 1, 0, PARAM_GROUP_LABEL, PARAM_GROUP_TOOLTIP, new ComboBox<String>() ) );
+        fields.add( new DexEditField( 2, 0, PATH_LABEL, PATH_LABEL, new TextField() ) );
         return fields;
     }
+
+    public Tooltip getTooltip() {
+        return new Tooltip( TOOLTIP );
+    }
+
+    private static final String TOOLTIP = "Specifies a parent reference for a REST resource.";
+
+    private static final String PARAM_GROUP_LABEL = "Parameter Group";
+    private static final String PARAM_GROUP_TOOLTIP =
+        "The name of the parameter group on the the parent resource with which this parent reference is associated.  The referenced group must be an ID parameter group.";
+    private static final String PATH_LABEL = "Path Template";
+    private static final String PATH_TOOLTIP =
+        "Specifies the path template for the parent resource. This path will be pre-pended to all action path templates when the child resource is treated as a sub-resource (non-first class).";
+    private static final String PARENT_LABEL = "Parent";
+    private static final String PARENT_TOOLTIP = "Specifies a parent reference for a REST resource.";
+
 
 }

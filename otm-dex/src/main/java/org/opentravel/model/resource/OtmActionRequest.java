@@ -29,7 +29,12 @@ import org.opentravel.schemacompiler.model.TLActionRequest;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.control.CheckBox;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.StringProperty;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 
 /**
  * OTM Object for Resource objects.
@@ -46,8 +51,18 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         tla.getHttpMethod();
         TLActionFacet tlf = tla.getPayloadType();
         tla.getParamGroupName();
+
     }
 
+    public String getPathTemplate() {
+        return getTL().getPathTemplate();
+    }
+
+    public OtmParameterGroup getParamGroup() {
+        if (OtmModelElement.get( getTL().getParamGroup() ) instanceof OtmParameterGroup)
+            return (OtmParameterGroup) OtmModelElement.get( getTL().getParamGroup() );
+        return null;
+    }
     //
     // public OtmActionFacet(String name, OtmResource parent) {
     // super( new TLActionRequest(), parent );
@@ -109,8 +124,82 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     @Override
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( "Common", new CheckBox(), 1 ) );
+        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, new ComboBox<String>() ) );
+        fields.add( new DexEditField( 0, 2, PARAMETERS_LABEL, PARAMETERS_TOOLTIP, new ComboBox<String>() ) );
+        fields.add( new DexEditField( 1, 0, MIME_LABEL, MIME_TOOLTIP, new ChoiceBox<String>() ) );
+        fields.add( new DexEditField( 1, 2, METHOD_LABEL, METHOD_TOOLTIP, new ChoiceBox<String>() ) );
+        fields.add( new DexEditField( 2, 0, PATH_LABEL, PATH_TOOLTIP, new TextField() ) );
+
         return fields;
     }
+
+    public Tooltip getTooltip() {
+        return new Tooltip( TOOLTIP );
+    }
+
+    private static final String TOOLTIP = "Specifies the characteristics and payload for a REST Action request.";
+
+    private static final String MIME_LABEL = "Mime Types";
+    private static final String MIME_TOOLTIP =
+        "Specifies the message MIME type for a REST request. Only XML and JSON types are supported by the OTM model.";
+    private static final String PAYLOAD_LABEL = "Payload Type";
+    private static final String PAYLOAD_TOOLTIP =
+        "Name of the action facet that specifies the payload (if any) for the request.";
+    private static final String PATH_LABEL = "Path Template";
+    private static final String PATH_TOOLTIP =
+        "Specifies the path for this action relative to the base path of the owning resource.  The path template must contain a reference to all path parameters specified in the request's parameter group.";
+    private static final String METHOD_LABEL = "HTTP Method";
+    private static final String METHOD_TOOLTIP = "Specify the HTTP method for a REST action request.";
+    private static final String PARAMETERS_LABEL = "Parameters";
+    private static final String PARAMETERS_TOOLTIP =
+        "Name of the parameter group that provides the URL and header parameters (if any) for the request.";
+
+    /**
+     * 
+     */
+    public StringProperty methodProperty() {
+        return new ReadOnlyStringWrapper( getTL().getHttpMethod().toString() );
+    }
+
+    public StringProperty urlProperty() {
+        if (getOwningMember() != null)
+            return new ReadOnlyStringWrapper( getOwningMember().getURL( getOwner() ) );
+        return new ReadOnlyStringWrapper( "http://www.travelport.com/Members/{memberID}" );
+    }
+
+    /**
+     * @param group can be null
+     */
+    public void setParamGroup(OtmParameterGroup group) {
+        getTL().setParamGroup( group.getTL() );
+    }
+
+    /**
+     * @param actionFacet
+     */
+    public void setPayloadType(OtmActionFacet actionFacet) {
+        getTL().setPayloadType( actionFacet.getTL() );
+    }
+
+    /**
+     * @param actionFacet
+     */
+    public OtmActionFacet getPayloadType() {
+        if (OtmModelElement.get( getTL().getPayloadType() ) instanceof OtmActionFacet)
+            return (OtmActionFacet) OtmModelElement.get( getTL().getPayloadType() );
+        return null;
+    }
+
+    /**
+     * Try to return the name of the payload action facet. If null, try the TL's payload type name.
+     * 
+     * @return
+     */
+    public String getPayloadTypeName() {
+        if (getPayloadType() != null)
+            return getPayloadType().getName();
+        return getTL().getPayloadTypeName() != null ? getTL().getPayloadTypeName() : "";
+    }
+
 
 }

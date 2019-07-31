@@ -16,17 +16,24 @@
 
 package org.opentravel.model.resource;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmFacets.OtmIdFacet;
+import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestResource;
+import org.opentravel.schemacompiler.model.TLFacet;
+import org.opentravel.schemacompiler.model.TLMemberField;
 import org.opentravel.schemacompiler.model.TLParamGroup;
+import org.opentravel.schemacompiler.model.TLParamLocation;
 import org.opentravel.schemacompiler.model.TLParameter;
 
 /**
@@ -57,6 +64,28 @@ public class TestParamGroup extends TestOtmResourceBase<OtmParameterGroup> {
             assertTrue( p.getChildren().contains( r ) );
     }
 
+    @Test
+    public void testParameters() {
+        OtmParameterGroup p = buildOtm( testResource );
+        assertTrue( p.getParameters().size() >= 2 );
+
+        for (OtmParameter param : p.getParameters()) {
+            assertNotNull( "Parameter must be non-null.", param );
+            assertTrue( "Parameter must have identity listner.", param == OtmModelElement.get( param.getTL() ) );
+            String pathContribution = param.getPathContribution();
+            assertNotNull( pathContribution );
+            if (param.isPathParam())
+                assertTrue( !param.getPathContribution().isEmpty() );
+
+            String queryContribution = param.getQueryContribution( "?" );
+            assertNotNull( queryContribution );
+            if (param.isQueryParam())
+                assertTrue( !param.getQueryContribution( "?" ).isEmpty() );
+
+            log.debug( pathContribution + " " + queryContribution );
+        }
+    }
+
     public static OtmParameterGroup buildOtm(OtmResource testResource) {
         OtmParameterGroup af = new OtmParameterGroup( buildTL(), testResource );
         return af;
@@ -67,10 +96,26 @@ public class TestParamGroup extends TestOtmResourceBase<OtmParameterGroup> {
         tlpg.setName( "tlpg1" );
 
         TLParameter tlp = new TLParameter();
+        tlp.setLocation( TLParamLocation.PATH );
+        tlp.setFieldRef( getMemberField() );
         tlpg.addParameter( tlp );
         tlp = new TLParameter();
+        tlp.setLocation( TLParamLocation.QUERY );
+        tlp.setFieldRef( getMemberField() );
         tlpg.addParameter( tlp );
 
         return tlpg;
+    }
+
+    private static TLMemberField<TLFacet> getMemberField() {
+        TLMemberField<TLFacet> mf = null;
+        if (baseObject != null) {
+            OtmIdFacet id = ((OtmBusinessObject) baseObject).getIdFacet();
+            if (!id.getChildren().isEmpty()) {
+                if (id.getChildren().get( 0 ).getTL() instanceof TLMemberField)
+                    mf = (TLMemberField<TLFacet>) id.getChildren().get( 0 ).getTL();
+            }
+        }
+        return mf;
     }
 }

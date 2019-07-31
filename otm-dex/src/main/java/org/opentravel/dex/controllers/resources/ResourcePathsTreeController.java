@@ -23,7 +23,6 @@ import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 
 import javafx.event.Event;
@@ -35,9 +34,6 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.SortType;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 /**
@@ -50,13 +46,9 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
     private static Log log = LogFactory.getLog( ResourcePathsTreeController.class );
 
     // Column labels
-    // TODO - externalize strings
-    public static final String METHODCOLUMNLABEL = "Prefix";
-    private static final String NAMECOLUMNLABEL = "Member";
-    private static final String URLCOLUMNLABEL = "Version";
-    // private static final String LIBRARYLABEL = "Library";
-    // // private static final String ERRORLABEL = "Errors";
-    // private static final String WHEREUSEDLABEL = "Types Used";
+    public static final String METHODCOLUMNLABEL = "Method";
+    private static final String NAMECOLUMNLABEL = "Name";
+    private static final String URLCOLUMNLABEL = "URL";
 
     /*
      * FXML injected
@@ -101,30 +93,20 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
 
         TreeTableColumn<ResourcePathsDAO,String> nameColumn = new TreeTableColumn<>( NAMECOLUMNLABEL );
         nameColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ResourcePathsDAO,String>( "name" ) );
-        setColumnProps( nameColumn, true, true, true, 50 );
+        setColumnProps( nameColumn, true, true, true, 100 );
         nameColumn.setSortType( SortType.ASCENDING );
 
-        TreeTableColumn<ResourcePathsDAO,String> prefixColumn = new TreeTableColumn<>( METHODCOLUMNLABEL );
-        prefixColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ResourcePathsDAO,String>( "method" ) );
-        setColumnProps( prefixColumn, true, false, true, 50 );
-        prefixColumn.setStyle( "-fx-alignment: CENTER-RIGHT;" );
+        TreeTableColumn<ResourcePathsDAO,String> methodColumn = new TreeTableColumn<>( METHODCOLUMNLABEL );
+        methodColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ResourcePathsDAO,String>( "method" ) );
+        setColumnProps( methodColumn, true, false, true, 75 );
+        methodColumn.setStyle( "-fx-alignment: CENTER-RIGHT;" );
 
-        TreeTableColumn<ResourcePathsDAO,String> versionColumn = new TreeTableColumn<>( URLCOLUMNLABEL );
-        versionColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ResourcePathsDAO,String>( "url" ) );
-        setColumnProps( versionColumn, true, true, true, 300 );
-
-        // TreeTableColumn<ResourcePathsDAO,String> libColumn = new TreeTableColumn<>( LIBRARYLABEL );
-        // libColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ResourcePathsDAO,String>( "library" ) );
-        //
-        // TreeTableColumn<ResourcePathsDAO,String> usedTypesCol = new TreeTableColumn<>( WHEREUSEDLABEL );
-        // usedTypesCol.setCellValueFactory( new TreeItemPropertyValueFactory<ResourcePathsDAO,String>( "usedTypes" ) );
-        //
-        // TreeTableColumn<ResourcePathsDAO,ImageView> valColumn = new TreeTableColumn<>( "" );
-        // valColumn.setCellFactory( c -> new ValidationMemberTreeTableCellFactory() );
-        // setColumnProps( valColumn, true, false, false, 25 );
+        TreeTableColumn<ResourcePathsDAO,String> urlColumn = new TreeTableColumn<>( URLCOLUMNLABEL );
+        urlColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ResourcePathsDAO,String>( "url" ) );
+        setColumnProps( urlColumn, true, true, true, 600 );
 
         // Add columns to table
-        resourcePathsTree.getColumns().addAll( nameColumn, versionColumn, prefixColumn );
+        resourcePathsTree.getColumns().addAll( nameColumn, methodColumn, urlColumn );
         resourcePathsTree.getSortOrder().add( nameColumn );
     }
 
@@ -144,24 +126,7 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
     @Override
     public void configure(DexMainController parent) {
         super.configure( parent );
-        // log.debug("Configuring Member Tree Table.");
         eventPublisherNode = resourcePathsTreeView;
-        // configure( parent.getModelManager(), treeEditingEnabled );
-        // }
-        //
-        // /**
-        // * Configure controller for use by non-main controllers.
-        // *
-        // * @param modelMgr must not be null
-        // * @param editable sets tree editing enables
-        // */
-        // public void configure(OtmModelManager modelMgr, boolean editable) {
-        // if (modelMgr == null)
-        // throw new IllegalArgumentException(
-        // "Model manager is null. Must configure member tree with model manager." );
-        //
-        // this.currentModelMgr = parent.getModelManager();
-        // this.treeEditingEnabled = editable;
 
         // Set the hidden root item
         root = new TreeItem<>();
@@ -171,17 +136,9 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
         resourcePathsTree.setRoot( getRoot() );
         resourcePathsTree.setShowRoot( false );
         resourcePathsTree.setEditable( false );
-        // resourcesTree.getSelectionModel().setCellSelectionEnabled( true ); // allow individual cells to be edited
-        // resourcesTree.setTableMenuButtonVisible( true ); // allow users to select columns
-
-        // Enable context menus at the row level and add change listener for for applying style
-        // resourcePathsTree.setRowFactory( (TreeTableView<ResourcePathsDAO> p) -> new MemberRowFactory( this ) );
         buildColumns();
 
         // Add listeners and event handlers
-        // resourcePathsTree.getSelectionModel().select( 0 );
-        // resourcePathsTree.setOnKeyReleased( this::keyReleased );
-        // // resourcesTree.setOnMouseClicked(this::mouseClick);
         // resourcePathsTree.getSelectionModel().selectedItemProperty()
         // .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
@@ -246,11 +203,6 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
     // ? resourcePathsTree.getSelectionModel().getSelectedItem().getValue() : null;
     // }
 
-    // private void handleEvent(DexFilterChangeEvent event) {
-    // if (!ignoreEvents)
-    // refresh();
-    // }
-
     private void handleEvent(DexMemberSelectionEvent event) {
         if (!ignoreEvents)
             if (event.getMember() instanceof OtmResource)
@@ -272,25 +224,25 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
         }
     }
 
-    public void keyReleased(KeyEvent event) {
-        TreeItem<ResourcePathsDAO> item = resourcePathsTree.getSelectionModel().getSelectedItem();
-        int row = resourcePathsTree.getSelectionModel().getSelectedIndex();
-        // log.debug("Selection row = " + row);
-        // if (event.getCode() == KeyCode.RIGHT) {
-        // event.consume();
-        // item.setExpanded( true );
-        // resourcesTree.getSelectionModel().clearAndSelect( row + 1, nameColumn );
-        // } else if (event.getCode() == KeyCode.LEFT) {
-        // TreeItem<ResourcePathsDAO> parent = item.getParent();
-        // if (parent != null && parent != item && parent != root) {
-        // resourcesTree.getSelectionModel().select( parent );
-        // parent.setExpanded( false );
-        // row = resourcesTree.getSelectionModel().getSelectedIndex();
-        // resourcesTree.getSelectionModel().clearAndSelect( row, nameColumn );
-        // event.consume();
-        // }
-        // }
-    }
+    // public void keyReleased(KeyEvent event) {
+    // TreeItem<ResourcePathsDAO> item = resourcePathsTree.getSelectionModel().getSelectedItem();
+    // int row = resourcePathsTree.getSelectionModel().getSelectedIndex();
+    // // log.debug("Selection row = " + row);
+    // // if (event.getCode() == KeyCode.RIGHT) {
+    // // event.consume();
+    // // item.setExpanded( true );
+    // // resourcesTree.getSelectionModel().clearAndSelect( row + 1, nameColumn );
+    // // } else if (event.getCode() == KeyCode.LEFT) {
+    // // TreeItem<ResourcePathsDAO> parent = item.getParent();
+    // // if (parent != null && parent != item && parent != root) {
+    // // resourcesTree.getSelectionModel().select( parent );
+    // // parent.setExpanded( false );
+    // // row = resourcesTree.getSelectionModel().getSelectedIndex();
+    // // resourcesTree.getSelectionModel().clearAndSelect( row, nameColumn );
+    // // event.consume();
+    // // }
+    // // }
+    // }
 
     /**
      * Listener for selected library members in the tree table.
@@ -314,12 +266,12 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
         ignoreEvents = false;
     }
 
-    public void mouseClick(MouseEvent event) {
-        // this fires after the member selection listener
-        if (event.getButton().equals( MouseButton.PRIMARY ) && event.getClickCount() == 2)
-            log.debug( "Double click selection: " );
-        // + resourcesTree.getSelectionModel().getSelectedItem().getValue().nameProperty().toString());
-    }
+    // public void mouseClick(MouseEvent event) {
+    // // this fires after the member selection listener
+    // if (event.getButton().equals( MouseButton.PRIMARY ) && event.getClickCount() == 2)
+    // log.debug( "Double click selection: " );
+    // // + resourcesTree.getSelectionModel().getSelectedItem().getValue().nameProperty().toString());
+    // }
 
     /**
      * Get the library members from the model manager and put them into a cleared tree.
@@ -337,14 +289,6 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
                 new ResourcePathsDAO( a ).createTreeItem( getRoot() );
             } );
 
-            // create cells for members
-            // currentModelMgr.getMembers().forEach( m -> createTreeItem( m, root ) );
-            // try {
-            // resourcesTree.sort();
-            // } catch (Exception e) {
-            // // why does first sort always throw exception?
-            // log.warn( "Exception sorting: " + e.getLocalizedMessage() );
-            // }
         }
         ignoreEvents = false;
     }
@@ -354,27 +298,27 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
         post( currentResource );
     }
 
-    public void select(OtmLibraryMember otm) {
-        // if (otm != null) {
-        // for (TreeItem<ResourcePathsDAO> item : resourcePathsTree.getRoot().getChildren()) {
-        // if (item.getValue().getValue() == otm) {
-        // int row = resourcePathsTree.getRow( item );
-        // // This may not highlight the row if the event comes from or goes to a different controller.
-        // Platform.runLater( () -> {
-        // // ignoreEvents = true;
-        // resourcePathsTree.requestFocus();
-        // resourcePathsTree.getSelectionModel().clearAndSelect( row );
-        // resourcePathsTree.scrollTo( row );
-        // resourcePathsTree.getFocusModel().focus( row );
-        // // ignoreEvents = false;
-        // } );
-        // // log.debug("Selected " + otm.getName() + " in member tree.");
-        // return;
-        // }
-        // }
-        // log.warn( otm.getName() + " not found in member tree." );
-        // }
-    }
+    // public void select(OtmLibraryMember otm) {
+    // // if (otm != null) {
+    // // for (TreeItem<ResourcePathsDAO> item : resourcePathsTree.getRoot().getChildren()) {
+    // // if (item.getValue().getValue() == otm) {
+    // // int row = resourcePathsTree.getRow( item );
+    // // // This may not highlight the row if the event comes from or goes to a different controller.
+    // // Platform.runLater( () -> {
+    // // // ignoreEvents = true;
+    // // resourcePathsTree.requestFocus();
+    // // resourcePathsTree.getSelectionModel().clearAndSelect( row );
+    // // resourcePathsTree.scrollTo( row );
+    // // resourcePathsTree.getFocusModel().focus( row );
+    // // // ignoreEvents = false;
+    // // } );
+    // // // log.debug("Selected " + otm.getName() + " in member tree.");
+    // // return;
+    // // }
+    // // }
+    // // log.warn( otm.getName() + " not found in member tree." );
+    // // }
+    // }
 
     // public void setFilter(MemberFilterController filter) {
     // this.filter = filter;

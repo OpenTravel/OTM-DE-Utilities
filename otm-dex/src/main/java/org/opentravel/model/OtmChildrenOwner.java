@@ -31,6 +31,8 @@ public interface OtmChildrenOwner extends OtmObject {
      * Safely add the OtmObject to the owner if can be owned by the owner. Make sure the owner does not already contain
      * it. If the child reports it is inherited (isInherited() = true) then it is added to inherited children.
      * <p>
+     * Does <b>not</b> change the underlying TL object. Does <b>not</b> change the added object.
+     * <p>
      * Typically, the child will add itself when constructed unless parent is null.
      * 
      * @param child

@@ -16,6 +16,7 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -27,6 +28,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionRequest;
+import org.opentravel.model.resource.OtmParameterGroup;
 import org.opentravel.model.resource.TestAction;
 import org.opentravel.model.resource.TestActionFacet;
 import org.opentravel.model.resource.TestParamGroup;
@@ -91,6 +93,52 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         TestParentRef.buildOtm( testResource );
 
         assertTrue( kidCount + 4 == testResource.getChildren().size() );
+    }
+
+    @Test
+    public void testActions() {
+        OtmResource r = buildOtm( staticModelManager );
+        assertTrue( r.getActions().size() >= 1 );
+    }
+
+    @Test
+    public void testParameterGroups() {
+        // Given a new resource with one parameter group
+        OtmResource r = buildOtm( staticModelManager );
+        assertTrue( r.getParameterGroups().size() >= 1 );
+        int groupCount = r.getParameterGroups().size();
+
+        // Given - two parameter groups
+        OtmParameterGroup group1 = new OtmParameterGroup( new TLParamGroup(), null );
+        OtmParameterGroup group2 = new OtmParameterGroup( new TLParamGroup(), null );
+
+        // When - one group is added
+        r.addParameterGroup( group1 );
+        assertTrue( r.getParameterGroups().size() == groupCount + 1 );
+        assertTrue( r.getParameterGroups().contains( group1 ) );
+        assertTrue( group1.getOwningMember() == r );
+        groupCount++;
+
+        // When - one group is added
+        r.addParameterGroup( group2 );
+        assertTrue( r.getParameterGroups().size() == groupCount + 1 );
+        groupCount++;
+    }
+
+    @Test
+    public void testSubject() {
+        OtmResource resource = buildOtm( staticModelManager );
+        OtmBusinessObject testBO = TestBusiness.buildOtm( staticModelManager );
+
+        // Initially, no subject is set
+        assertTrue( resource.getSubject() == null );
+        assertTrue( resource.getSubjectName().isEmpty() );
+
+        // When set
+        resource.setAssignedType( testBO );
+        assertTrue( resource.getAssignedType() == testBO );
+        assertTrue( resource.getSubject() == testBO );
+        assertFalse( resource.getSubjectName().isEmpty() );
     }
 
     @Test

@@ -53,6 +53,12 @@ public interface OtmTypeUser extends OtmObject {
 
     public NamedEntity setAssignedTLType(NamedEntity type);
 
+    /**
+     * Set the type assigned to this type user.
+     * 
+     * @param type
+     * @return the type
+     */
     public OtmTypeProvider setAssignedType(OtmTypeProvider type);
 
     /**

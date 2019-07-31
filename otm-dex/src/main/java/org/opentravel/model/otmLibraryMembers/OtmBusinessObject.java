@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmAlias;
@@ -45,6 +46,13 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
     public OtmBusinessObject(String name, OtmModelManager mgr) {
         super( new TLBusinessObject(), mgr );
         setName( name );
+    }
+
+    public OtmIdFacet getIdFacet() {
+        getChildren(); // Make sure it has been modeled.
+        if (OtmModelElement.get( getTL().getIdFacet() ) instanceof OtmIdFacet)
+            return (OtmIdFacet) (OtmModelElement.get( getTL().getIdFacet() ));
+        return null;
     }
 
     @Override

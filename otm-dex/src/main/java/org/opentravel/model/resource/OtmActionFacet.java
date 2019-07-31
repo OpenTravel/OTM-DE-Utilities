@@ -35,6 +35,7 @@ import java.util.List;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.Tooltip;
 
 /**
  * OTM Object for Resource objects.
@@ -87,11 +88,32 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     @Override
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( "Base Payload", new Button(), 1 ) );
-        fields.add( new DexEditField( "Reference Type", new ComboBox<String>(), 1 ) );
-        fields.add( new DexEditField( "Reference Facet", new ComboBox<String>(), 1 ) );
-        fields.add( new DexEditField( "Repeat Count", new Spinner<Integer>( 0, 10000, 0 ), 1 ) );
+        fields.add( new DexEditField( 0, 0, BASE_PAYLOAD_LABEL, BASE_PAYLOAD_TOOLTIP, new ComboBox<String>() ) );
+        fields.add( new DexEditField( 0, 2, null, "Remove base payload.", new Button( "-Remove-" ) ) );
+        fields.add( new DexEditField( 1, 0, REFERENCE_TYPE_LABEL, REFERENCE_TYPE_TOOLTIP, new ComboBox<String>() ) );
+        fields.add( new DexEditField( 2, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, new ComboBox<String>() ) );
+        fields.add(
+            new DexEditField( 3, 0, REPEAT_COUNT_LABEL, REPEAT_COUNT_TOOLTIP, new Spinner<Integer>( 0, 10000, 0 ) ) );
         return fields;
     }
+
+    public Tooltip getTooltip() {
+        return new Tooltip( TOOLTIP );
+    }
+
+    private static final String TOOLTIP =
+        "            Action facets describe the message payload for RESTful action requests and responses.  In addition to their own payload, they provide basic information about how the resource's business object should be referenced in the message.";
+
+    private static final String REFERENCE_FACET_LABEL = "Reference Facet";
+    private static final String REFERENCE_FACET_TOOLTIP =
+        "Specifies the name of the business object facet to be referenced in the message.  If the Reference Type value is None this value will be ignored. ";
+    private static final String REPEAT_COUNT_LABEL = "Repeat Count";
+    private static final String REPEAT_COUNT_TOOLTIP =
+        "Specifies the maximum number of times that the business object reference should repeat in the message. Best practices state that this string value should contain a positive number that is greater than or equal to 1. ";
+    private static final String REFERENCE_TYPE_LABEL = "Reference Type";
+    private static final String REFERENCE_TYPE_TOOLTIP = "Reference type";
+    private static final String BASE_PAYLOAD_LABEL = "Base Payload";
+    private static final String BASE_PAYLOAD_TOOLTIP =
+        " Optional reference to a core or choice object that indicates the basic structure of the message payload. If the 'referenceType' value is NONE, this will indicate the entirity of the message structure.  For reference type values other than NONE, the message structure will include all elements of the base payload, plus reference(s) to the owning resource's business ";
 
 }

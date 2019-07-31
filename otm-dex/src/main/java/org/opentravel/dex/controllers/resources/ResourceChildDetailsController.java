@@ -160,21 +160,25 @@ public class ResourceChildDetailsController extends DexIncludedControllerBase<Vo
     }
 
     private void postField(DexEditField field, OtmObject obj) {
-        Label label = new Label( field.label );
-        label.setTooltip( field.tooltip );
-        propertyGrid.add( label, field.column, field.row + rowIndex );
-
-        if (field.fxNode instanceof Control)
-            ((Control) field.fxNode).setTooltip( field.tooltip );
-        if (obj.isEditable())
-            propertyGrid.add( field.fxNode, field.column + 1, field.row + rowIndex );
-        else {
-            TextField txt = new TextField( "some value" );
-            txt.setEditable( false );
-            txt.setDisable( true );
-            propertyGrid.add( txt, field.column + 1, field.row + rowIndex );
+        int column = field.column;
+        if (field.label != null) {
+            Label label = new Label( field.label );
+            label.setTooltip( field.tooltip );
+            propertyGrid.add( label, field.column, field.row + rowIndex );
+            column += 1;
         }
-        // TODO - update row index
+        if (field.fxNode != null) {
+            if (field.fxNode instanceof Control)
+                ((Control) field.fxNode).setTooltip( field.tooltip );
+            if (obj.isEditable())
+                propertyGrid.add( field.fxNode, column, field.row + rowIndex );
+            else {
+                TextField txt = new TextField( "some value" );
+                txt.setEditable( false );
+                txt.setDisable( true );
+                propertyGrid.add( txt, column, field.row + rowIndex );
+            }
+        }
     }
 
     private void postTitle(OtmObject obj) {

@@ -46,6 +46,7 @@ import javafx.scene.layout.VBox;
  * @author dmh
  *
  */
+@Deprecated
 public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     private static Log log = LogFactory.getLog( ResourceDetailsController.class );
 

@@ -27,6 +27,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.resource.DexResourcePathHandler;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.model.resource.OtmActionRequest;
@@ -58,13 +59,33 @@ import javafx.scene.control.Tooltip;
 public class OtmResource extends OtmLibraryMemberBase<TLResource> implements OtmTypeUser {
     private static Log log = LogFactory.getLog( OtmResource.class );
 
+    private DexResourcePathHandler pathHandler;
+
     public OtmResource(TLResource tlo, OtmModelManager mgr) {
         super( tlo, mgr );
+        modelChildren();
+        pathHandler = new DexResourcePathHandler( this );
+    }
+
+    public String getURL(OtmAction action) {
+        return pathHandler.get( action );
     }
 
     public OtmResource(String name, OtmModelManager mgr) {
         super( new TLResource(), mgr );
         setName( name );
+    }
+
+    public void setBasePath(String basePath) {
+        getTL().setBasePath( basePath );
+    }
+
+    public String getBasePath() {
+        return getTL().getBasePath();
+    }
+
+    public StringProperty basePathProperty() {
+        return new ReadOnlyStringWrapper( getBasePath() );
     }
 
     @Override
@@ -192,11 +213,13 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     /**
+     * {@inheritDoc} Returns the TL business object reference name not getName() of the assigned type
+     * 
      * @see org.opentravel.model.OtmTypeUser#getTlAssignedTypeName()
      */
     @Override
     public String getTlAssignedTypeName() {
-        return getTL().getBusinessObjectRefName();
+        return getTL().getBusinessObjectRefName() != null ? getTL().getBusinessObjectRefName() : "";
     }
 
     /**
@@ -212,6 +235,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     /**
+     * {@inheritDoc} For resources, <b>must</b> be a business object.
+     * 
      * @see org.opentravel.model.OtmTypeUser#setAssignedType(org.opentravel.model.OtmTypeProvider)
      */
     @Override
@@ -222,6 +247,38 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
             type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
 
         return getAssignedType();
+    }
+
+    /**
+     * Get the name of the business object. First trys the business object and if that is missing, trys the business
+     * object reference name field.
+     * 
+     * @return name of the business object assigned or empty string
+     */
+    public String getSubjectName() {
+        if (getAssignedType() == null)
+            return getTlAssignedTypeName();
+        return getAssignedType().getName();
+    }
+
+    /**
+     * Convenience method for {@link #getAssignedType()}
+     * 
+     * @return business object assigned
+     */
+    public OtmBusinessObject getSubject() {
+        return getAssignedType();
+        // OtmObject subject = OtmModelElement.get( getTL().getBusinessObjectRef() );
+        // return subject instanceof OtmBusinessObject ? (OtmBusinessObject) subject : null;
+    }
+
+    /**
+     * Convenience method for {@link #setAssignedType(OtmTypeProvider)}
+     * 
+     * @param subject
+     */
+    public OtmBusinessObject setSubject(OtmBusinessObject subject) {
+        return (OtmBusinessObject) setAssignedType( subject );
     }
 
     /**
@@ -250,12 +307,12 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 1, 0, extension_LABEL, extension_TOOLTIP, new ComboBox<String>() ) );
-        fields.add( new DexEditField( 2, 0, businessObject_LABEL, businessObject_TOOLTIP,
+        fields.add( new DexEditField( 0, 0, extension_LABEL, extension_TOOLTIP, new ComboBox<String>() ) );
+        fields.add( new DexEditField( 1, 0, businessObject_LABEL, businessObject_TOOLTIP,
             new Button( getBusinessObject().getName() ) ) );
-        fields.add( new DexEditField( 3, 0, basePath_LABEL, basePath_TOOLTIP, new TextField() ) );
-        fields.add( new DexEditField( 4, 0, abstract_LABEL, abstract_TOOLTIP, new CheckBox() ) );
-        fields.add( new DexEditField( 4, 3, firstClass_LABEL, firstClass_TOOLTIP, new CheckBox() ) );
+        fields.add( new DexEditField( 2, 0, basePath_LABEL, basePath_TOOLTIP, new TextField() ) );
+        fields.add( new DexEditField( 3, 0, null, abstract_TOOLTIP, new CheckBox( abstract_LABEL ) ) );
+        fields.add( new DexEditField( 3, 1, null, firstClass_TOOLTIP, new CheckBox( firstClass_LABEL ) ) );
 
         // fields.add( new DexEditField( 1, 0, name_LABEL, name_TOOLTIP, new Button() ) );
         // fields.add( new DexEditField( 1, 0, parentRef_LABEL, parentRef_TOOLTIP, new Button() ) );
@@ -298,4 +355,44 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     private static final String baseResponseWizard_LABEL = "Base Response Wizard";
     private static final String baseResponseWizard_TOOLTIP =
         "Set base response on all Action Facets used for responses.";
+
+    /**
+     * @return
+     */
+    public Object getParentRef() {
+        List<OtmParentRef> parents = new ArrayList<>();
+        getTL().getParentRefs().forEach( pr -> {
+            if (OtmModelElement.get( pr ) instanceof OtmParentRef)
+                parents.add( (OtmParentRef) OtmModelElement.get( pr ) );
+        } );
+        return parents;
+    }
+
+    public void addParameterGroup(OtmParameterGroup group) {
+        if (group != null)
+            getTL().addParamGroup( group.getTL() );
+        add( group ); // Add to children list
+        group.setParent( this );
+    }
+
+    public List<OtmParameterGroup> getParameterGroups() {
+        List<OtmParameterGroup> groups = new ArrayList<>();
+        getTL().getParamGroups().forEach( pg -> {
+            if (OtmModelElement.get( pg ) instanceof OtmParameterGroup)
+                groups.add( (OtmParameterGroup) OtmModelElement.get( pg ) );
+        } );
+        return groups;
+    }
+
+    /**
+     * @return
+     */
+    public List<OtmAction> getActions() {
+        List<OtmAction> actions = new ArrayList<>();
+        getTL().getActions().forEach( ta -> {
+            if (OtmModelElement.get( ta ) instanceof OtmAction)
+                actions.add( (OtmAction) OtmModelElement.get( ta ) );
+        } );
+        return actions;
+    }
 }

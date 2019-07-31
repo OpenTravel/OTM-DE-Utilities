@@ -37,6 +37,7 @@ import java.util.List;
 
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Tooltip;
 
 /**
  * OTM Object for Resource Action objects.
@@ -50,6 +51,8 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
 
     public OtmParameterGroup(TLParamGroup tla, OtmResource parent) {
         super( tla, parent );
+        // Model the children to set their identity listeners
+        modelChildren();
     }
 
     @Override
@@ -64,8 +67,10 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
 
     public List<OtmParameter> getParameters() {
         List<OtmParameter> list = new ArrayList<>();
-        getTL().getParameters().forEach( t -> list.add( (OtmParameter) OtmModelElement.get( t ) ) );
-        // getChildren().forEach( c -> list.add( (OtmParameter) c ) );
+        getTL().getParameters().forEach( t -> {
+            if (OtmModelElement.get( t ) instanceof OtmParameter)
+                list.add( (OtmParameter) OtmModelElement.get( t ) );
+        } );
         return list;
     }
 
@@ -149,9 +154,29 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
     @Override
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( "Facet Name", new ComboBox(), 1 ) );
-        fields.add( new DexEditField( "ID Group", new CheckBox(), 1 ) );
+        fields.add( new DexEditField( 0, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, new ComboBox<String>() ) );
+        fields.add( new DexEditField( 1, 0, null, IDGROUP_TOOLTIP, new CheckBox( IDGROUP_LABEL ) ) );
         return fields;
     }
 
+    public Tooltip getTooltip() {
+        return new Tooltip( TOOLTIP );
+    }
+
+    private static final String TOOLTIP =
+        "Provides a collection of field references to the resource's business object that will be used as parameters on a REST request.";
+    private static final String IDGROUP_LABEL = "ID Group";
+    private static final String IDGROUP_TOOLTIP =
+        "Indicates whether this group is intended to be used as an identity group for the owning resource.";
+    private static final String REFERENCE_FACET_LABEL = "Facet Name";
+    private static final String REFERENCE_FACET_TOOLTIP =
+        "Name of the business object facet from which all parameters in this group will be referenced. Possible parameters will include any indicators and simple type attributes and elements that are not contained within repeating elements of the given facet or its children.";
+
+    /**
+     * @param otmResource
+     */
+    public void setParent(OtmResource otmResource) {
+        owner = otmResource;
+        parent = null;
+    }
 }

@@ -24,7 +24,6 @@ import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.resource.OtmActionRequest;
 
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
@@ -44,17 +43,10 @@ public class ResourcePathsDAO implements DexDAO<OtmActionRequest> {
     protected OtmResource otmResource;
     protected OtmActionRequest otmRequest;
 
-    // public ResourcePathsDAO(OtmResource resource) {
-    // this.otmResource = resource;
-    // }
     public ResourcePathsDAO(OtmActionRequest request) {
         this.otmRequest = request;
         otmResource = request.getOwningMember();
     }
-
-    // public ResourcePathsDAO(OtmTypeProvider provider) {
-    // this.otmResource = provider;
-    // }
 
     @Override
     public ImageView getIcon(ImageManager imageMgr) {
@@ -70,35 +62,13 @@ public class ResourcePathsDAO implements DexDAO<OtmActionRequest> {
         return otmResource.isEditable();
     }
 
-    // public StringProperty usedTypesProperty() {
-    // String usedTypeCount = "";
-    // if (otmResource instanceof OtmLibraryMember) {
-    // List<OtmTypeProvider> u = ((OtmLibraryMember) otmResource).getUsedTypes();
-    // if (u != null)
-    // usedTypeCount = Integer.toString( u.size() );
-    // }
-    // return new ReadOnlyStringWrapper( usedTypeCount );
-    // }
-
-    // public StringProperty errorProperty() {
-    // return otmResource.validationProperty();
-    // }
 
     public ObjectProperty<ImageView> errorImageProperty() {
         return otmResource.validationImageProperty();
     }
 
-    // public StringProperty libraryProperty() {
-    // if (otmResource instanceof OtmLibraryMember)
-    // return ((OtmLibraryMember) otmResource).libraryProperty();
-    // return new ReadOnlyStringWrapper( otmResource.getLibrary().getName() );
-    // }
-
     public StringProperty methodProperty() {
-        // otmRequest.getMethod();
-        // if (otmResource instanceof OtmLibraryMember)
-        // return ((OtmLibraryMember) otmResource).prefixProperty();
-        return new ReadOnlyStringWrapper( "METHOD" );
+        return otmRequest.methodProperty();
     }
 
     public StringProperty nameProperty() {
@@ -106,25 +76,13 @@ public class ResourcePathsDAO implements DexDAO<OtmActionRequest> {
     }
 
     public StringProperty urlProperty() {
-        // if (otmResource instanceof OtmLibraryMember)
-        // return ((OtmLibraryMember) otmResource).prefixProperty();
-        return new ReadOnlyStringWrapper( "http://www.travelport.com/someCollection/{collectionID}" );
+        return otmRequest.urlProperty();
     }
-
-    // public void setName(String name) {
-    // otmResource.setName( name );
-    // }
 
     @Override
     public String toString() {
         return otmResource != null ? otmResource.getPrefix() + ":" + otmResource.toString() : "";
     }
-
-    // public StringProperty versionProperty() {
-    // if (otmResource instanceof OtmLibraryMember)
-    // return ((OtmLibraryMember) otmResource).versionProperty();
-    // return new ReadOnlyStringWrapper( "" );
-    // }
 
     /**
      * Create and add to tree with no conditional logic.

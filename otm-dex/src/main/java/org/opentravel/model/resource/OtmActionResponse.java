@@ -27,7 +27,9 @@ import org.opentravel.schemacompiler.model.TLActionResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Tooltip;
 
 /**
  * OTM Object for Resource objects.
@@ -89,8 +91,23 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
     @Override
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( "Common", new CheckBox(), 1, 1 ) );
+        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, new ComboBox<String>() ) );
+        fields.add( new DexEditField( 1, 0, MIME_TYPE_LABEL, MIME_TYPE_TOOLTIP, new ChoiceBox<String>() ) );
+        fields.add( new DexEditField( 2, 0, STATUS_CODES_LABEL, STATUS_CODES_TOOLTIP, new ChoiceBox<String>() ) );
         return fields;
     }
+
+    public Tooltip getTooltip() {
+        return new Tooltip( TOOLTIP );
+    }
+
+    private static final String TOOLTIP = "Specifies the characteristics and payload for a REST Action response.";
+    private static final String PAYLOAD_LABEL = "Payload Type";
+    private static final String PAYLOAD_TOOLTIP =
+        "Name of the action facet or core object that specifies the payload (if any) for the response.";
+    private static final String MIME_TYPE_LABEL = "MIME Types";
+    private static final String MIME_TYPE_TOOLTIP = "List of supported MIME types.";
+    private static final String STATUS_CODES_LABEL = " HTTP Status Codes";
+    private static final String STATUS_CODES_TOOLTIP = "Specifies the acceptable HTTP response codes.";
 
 }

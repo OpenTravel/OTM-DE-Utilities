@@ -24,9 +24,10 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
+import org.opentravel.schemacompiler.model.TLExample;
+import org.opentravel.schemacompiler.model.TLExampleOwner;
 import org.opentravel.schemacompiler.model.TLProperty;
 
 /**
@@ -60,8 +61,6 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
     public static OtmBusinessObject buildOtm(OtmModelManager mgr) {
         OtmBusinessObject bo = new OtmBusinessObject( buildTL(), mgr );
         assertNotNull( bo );
-        bo.getTL().getSummaryFacet().addAttribute( new TLAttribute() );
-        bo.getTL().getSummaryFacet().addElement( new TLProperty() );
 
         // TestCustomFacet.buildOtm( staticModelManager );
         assertTrue( bo.getChildren().size() > 2 );
@@ -72,6 +71,29 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
     public static TLBusinessObject buildTL() {
         TLBusinessObject tlbo = new TLBusinessObject();
         tlbo.setName( BO_NAME );
+        TLAttribute tla = new TLAttribute();
+        tla.setName( "idAttr_" + BO_NAME );
+        buildExample( tla );
+        tlbo.getIdFacet().addAttribute( tla );
+
+        TLProperty tlp = new TLProperty();
+        tlp.setName( "idProp_" + BO_NAME );
+        buildExample( tlp );
+        tlbo.getIdFacet().addElement( tlp );
+
+        tla = new TLAttribute();
+        tla.setName( "sumAttr_" + BO_NAME );
+        tlbo.getSummaryFacet().addAttribute( tla );
+        tlp = new TLProperty();
+        tlp.setName( "sumProp_" + BO_NAME );
+        tlbo.getSummaryFacet().addElement( tlp );
         return tlbo;
+    }
+
+    public static void buildExample(TLExampleOwner tleo) {
+        TLExample tle = new TLExample();
+        tle.setValue( "ExampleValue123" );
+        tleo.addExample( tle );
+        assertTrue( tleo.getExamples().size() >= 1 );
     }
 }

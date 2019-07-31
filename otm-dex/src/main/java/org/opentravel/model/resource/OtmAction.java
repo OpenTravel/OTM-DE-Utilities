@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Tooltip;
 
 /**
  * OTM Object for Resource Action objects.
@@ -162,7 +163,15 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
     @Override
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( "Common", new CheckBox(), 1, 1 ) );
+        fields.add( new DexEditField( 0, 0, null, COMMON_TOOLTIP, new CheckBox( "Common" ) ) );
         return fields;
     }
+
+    public Tooltip getTooltip() {
+        return new Tooltip( TOOLTIP );
+    }
+
+    private static final String TOOLTIP = "Specify an action request and possible responses.";
+    private static final String COMMON_TOOLTIP =
+        "Indicates that the action is a common or shared action, meaning that all other actions defined for the resource will inherit the characteristics (typically responses) defined for it.";
 }
