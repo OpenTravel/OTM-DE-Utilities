@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.dex.controllers.DexMainController;
@@ -42,6 +43,7 @@ import javafx.scene.input.KeyCode;
  * Verifies the functions of the <code>ObjectEditorApp</code> application when working with unmanaged OTM libraries and
  * projects.
  */
+@Ignore
 public class TestDExUnmanaged extends AbstractFxTest {
     private static Log log = LogFactory.getLog( TestDExUnmanaged.class );
 

@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
@@ -65,6 +66,7 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
         // TestCustomFacet.buildOtm( staticModelManager );
         assertTrue( bo.getChildren().size() > 2 );
         assertTrue( bo.getSummary().getChildren().size() == 2 );
+        assertTrue( "Must have identity listener.", OtmModelElement.get( bo.getTL() ) == bo );
         return bo;
     }
 

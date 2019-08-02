@@ -52,6 +52,6 @@ public class DexEventDispatcher implements EventDispatcher {
             // some event filter and business logic ...
             // return event;
         }
-        return originalDispatcher.dispatchEvent( event, tail );
+        return originalDispatcher != null ? originalDispatcher.dispatchEvent( event, tail ) : event;
     }
 }

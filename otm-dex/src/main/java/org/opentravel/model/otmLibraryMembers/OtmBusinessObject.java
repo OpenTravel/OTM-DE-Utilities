@@ -24,7 +24,11 @@ import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmAlias;
+import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmFacets.OtmIdFacet;
+import org.opentravel.model.otmFacets.OtmQueryFacet;
+import org.opentravel.model.otmFacets.OtmUpdateFacet;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
 
 import java.util.ArrayList;
@@ -46,6 +50,30 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
     public OtmBusinessObject(String name, OtmModelManager mgr) {
         super( new TLBusinessObject(), mgr );
         setName( name );
+    }
+
+
+    /**
+     * Add the contextual facet library member to this business object. A contributed facet is created and added to the
+     * children.
+     * 
+     * @param cf contextual facet that is a library member
+     * @return new contributed facet
+     */
+    public OtmContributedFacet add(OtmContextualFacet cf) {
+        if (cf instanceof OtmCustomFacet)
+            getTL().addCustomFacet( cf.getTL() );
+        else if (cf instanceof OtmQueryFacet)
+            getTL().addQueryFacet( cf.getTL() );
+        else if (cf instanceof OtmUpdateFacet)
+            getTL().addUpdateFacet( cf.getTL() );
+        else
+            return null;
+
+        // Creating the contributed facet will link the contributed and contributor via the TL facet.
+        OtmContributedFacet contrib = new OtmContributedFacet( cf.getTL(), this );
+        super.add( contrib );
+        return contrib;
     }
 
     public OtmIdFacet getIdFacet() {

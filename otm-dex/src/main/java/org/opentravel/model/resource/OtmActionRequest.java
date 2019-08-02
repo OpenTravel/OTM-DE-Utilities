@@ -90,6 +90,11 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     @Override
+    public OtmAction getParent() {
+        return (OtmAction) parent;
+    }
+
+    @Override
     public TLActionRequest getTL() {
         return (TLActionRequest) tlObject;
     }
@@ -178,7 +183,13 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      * @param actionFacet
      */
     public void setPayloadType(OtmActionFacet actionFacet) {
-        getTL().setPayloadType( actionFacet.getTL() );
+        if (actionFacet == null) {
+            getTL().setPayloadType( null );
+            getTL().setPayloadTypeName( null );
+            getTL().setMimeTypes( null ); // validation error if set and no payload
+        } else {
+            getTL().setPayloadType( actionFacet.getTL() );
+        }
     }
 
     /**
@@ -200,6 +211,5 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
             return getPayloadType().getName();
         return getTL().getPayloadTypeName() != null ? getTL().getPayloadTypeName() : "";
     }
-
 
 }

@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
-import org.opentravel.model.otmFacets.OtmCustomFacet;
+import org.opentravel.model.otmFacets.OtmQueryFacet;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
@@ -35,9 +35,9 @@ import org.opentravel.schemacompiler.model.TLProperty;
  * Verifies the functions of the <code>OtmCustomFacet</code> class. Very minimal testing without contributed facets or
  * owning object.
  */
-public class TestCustomFacet extends TestOtmLibraryMemberBase<OtmContextualFacet> {
+public class TestQueryFacet extends TestOtmLibraryMemberBase<OtmContextualFacet> {
     // private static Log log = LogFactory.getLog( TestContextualFacet.class );
-    private static final String CF_NAME = "TestCF";
+    private static final String CF_NAME = "TestCQF";
 
 
     @BeforeClass
@@ -83,26 +83,24 @@ public class TestCustomFacet extends TestOtmLibraryMemberBase<OtmContextualFacet
      * @param mgr
      * @return
      */
-    public static OtmCustomFacet buildOtm(OtmModelManager mgr) {
-        OtmCustomFacet custom = new OtmCustomFacet( buildTL(), mgr );
-        assertNotNull( custom );
-        // custom.getTL().addAttribute( new TLAttribute() );
-        // custom.getTL().addElement( new TLProperty() );
+    public static OtmQueryFacet buildOtm(OtmModelManager mgr) {
+        OtmQueryFacet query = new OtmQueryFacet( buildTL(), mgr );
+        assertNotNull( query );
 
         // Will only have children when contributed is modeled.
-        return custom;
+        return query;
     }
 
     public static TLContextualFacet buildTL() {
         TLContextualFacet tlcf = new TLContextualFacet();
         tlcf.setName( CF_NAME );
-        tlcf.setFacetType( TLFacetType.CUSTOM );
+        tlcf.setFacetType( TLFacetType.QUERY );
         tlcf.addAttribute( new TLAttribute() );
         tlcf.addElement( new TLProperty() );
 
         TLBusinessObject tlbo = TestBusiness.buildTL();
         // does NOT tell BO that it has custom facet - tlcf.setOwningEntity( tlbo );
-        tlbo.addCustomFacet( tlcf );
+        tlbo.addQueryFacet( tlcf );
         return tlcf;
     }
 }

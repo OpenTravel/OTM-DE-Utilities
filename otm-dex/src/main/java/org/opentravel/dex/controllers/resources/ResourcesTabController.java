@@ -37,10 +37,8 @@ public class ResourcesTabController implements DexTabController {
      */
     @FXML
     private ResourcesTreeTableController resourcesTreeTableController;
-    // @FXML
-    // private ResourceDetailsController resourceDetailsController;
     @FXML
-    private ResourceChildDetailsController resourceChildDetailsController;
+    private ResourceDetailsController resourceDetailsController;
     @FXML
     private ResourcePathsTreeController resourcePathsTreeController;
     @FXML
@@ -58,10 +56,7 @@ public class ResourcesTabController implements DexTabController {
         if (!(resourcesTreeTableController instanceof ResourcesTreeTableController))
             throw new IllegalStateException( "Resource tree table controller not injected by FXML." );
 
-        // if (!(resourceDetailsController instanceof ResourceDetailsController))
-        // throw new IllegalStateException( "Resource details controller not injected by FXML." );
-        //
-        if (!(resourceChildDetailsController instanceof ResourceChildDetailsController))
+        if (!(resourceDetailsController instanceof ResourceDetailsController))
             throw new IllegalStateException( "Resource child details controller not injected by FXML." );
 
         if (!(resourcePathsTreeController instanceof ResourcePathsTreeController))
@@ -90,10 +85,8 @@ public class ResourcesTabController implements DexTabController {
      */
     @Override
     public void configure(DexMainController parent) {
-
         parent.addIncludedController( resourcesTreeTableController );
-        // parent.addIncludedController( resourceDetailsController );
-        parent.addIncludedController( resourceChildDetailsController );
+        parent.addIncludedController( resourceDetailsController );
         parent.addIncludedController( resourcePathsTreeController );
         parent.addIncludedController( resourceRQTreeTableController );
         parent.addIncludedController( resourceRSTreeTableController );

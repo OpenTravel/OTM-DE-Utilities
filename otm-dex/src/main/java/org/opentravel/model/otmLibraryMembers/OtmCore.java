@@ -169,7 +169,9 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
 
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
-        OtmLibraryMember oldUser = getAssignedType().getOwningMember();
+        OtmLibraryMember oldUser = null;
+        if (getAssignedType() != null)
+            oldUser = getAssignedType().getOwningMember();
         if (type != null && type.getTL() instanceof NamedEntity)
             setAssignedTLType( (NamedEntity) type.getTL() );
 

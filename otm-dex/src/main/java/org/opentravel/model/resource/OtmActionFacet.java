@@ -24,9 +24,17 @@ import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
+import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmFacets.OtmFacet;
+import org.opentravel.model.otmFacets.OtmQueryFacet;
+import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLActionFacet;
+import org.opentravel.schemacompiler.model.TLFacetType;
 import org.opentravel.schemacompiler.model.TLModelElement;
+import org.opentravel.schemacompiler.model.TLReferenceType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -85,6 +93,83 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         return ch;
     }
 
+    public static final String SUBGRP = "Substitution Group";
+
+    public String getReferenceFacetName() {
+        return getTL().getReferenceFacetName() != null ? getTL().getReferenceFacetName() : "";
+    }
+
+    /**
+     * If set to null, then the object is used instead of facet (substitution group)
+     * 
+     * @param facet
+     */
+    public void setReferenceFacet(OtmFacet<?> facet) {
+        if (facet == null)
+            getTL().setReferenceFacetName( SUBGRP );
+        else {
+            TLFacetType type = facet.getTL().getFacetType();
+            getTL().setReferenceFacetName( type.getIdentityName() );
+        }
+
+        // getTL().setReferenceFacetName( facet.getName() );
+    }
+
+    public TLReferenceType getReferenceType() {
+        return getTL().getReferenceType() != null ? getTL().getReferenceType() : TLReferenceType.NONE;
+    }
+
+    public void setReferenceType(TLReferenceType type) {
+        if (type == null)
+            type = TLReferenceType.NONE;
+        getTL().setReferenceType( type );
+    }
+
+    public OtmObject getRequestPayload() {
+        // For a request, the "payloadType" indicates which action facet.
+        // This action facet defines the root element.
+        OtmObject rqPayload = null;
+        String rfName = getReferenceFacetName();
+        OtmBusinessObject subject = getOwningMember().getSubject();
+        OtmLibraryMember base = getBasePayload(); // creates wrapper object
+
+        // Early Exit Conditions
+        if (subject == null)
+            return rqPayload; // Error, resource is not complete
+        if (rfName.equals( SUBGRP ))
+            return subject; // The whole object is the substitution group
+        if (getReferenceType() == TLReferenceType.NONE)
+            return null; // User set to have No request payload
+
+        // FIXME - support base payloads
+
+        if (getReferenceType() != TLReferenceType.NONE) {
+            rqPayload = subject;
+            // Try to find the matching facet
+            for (OtmObject c : subject.getChildren()) {
+                if (c instanceof OtmContributedFacet) {
+                    // TODO - use a better way to find the query facet name?
+                    String cfName = ((OtmContributedFacet) c).getTL().getName();
+                    if (((OtmContributedFacet) c).getContributor() instanceof OtmQueryFacet)
+                        cfName = "Query_" + cfName;
+                    if (cfName.equals( rfName )) {
+                        rqPayload = c;
+                        break;
+                    }
+                }
+                String type = ((OtmFacet<?>) c).getTL().getFacetType().getIdentityName();
+                if (type.equals( rfName )) {
+                    rqPayload = c;
+                    break;
+                }
+            }
+        }
+        // if ((getTL().getReferenceType() != TLReferenceType.NONE) && !facetSelection.getFacetNames().isEmpty()) {
+        // TLBusinessObject boRef = getTL().getOwningResource().getBusinessObjectRef();
+        // }
+        return rqPayload;
+    }
+
     @Override
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
@@ -95,6 +180,13 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         fields.add(
             new DexEditField( 3, 0, REPEAT_COUNT_LABEL, REPEAT_COUNT_TOOLTIP, new Spinner<Integer>( 0, 10000, 0 ) ) );
         return fields;
+    }
+
+    public OtmLibraryMember getBasePayload() {
+        NamedEntity pl = getTL().getBasePayload();
+        // Could be Choice or Core
+        // FIXME
+        return null;
     }
 
     public Tooltip getTooltip() {

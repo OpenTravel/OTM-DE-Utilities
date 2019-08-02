@@ -23,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestResource;
@@ -32,8 +31,6 @@ import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLActionResponse;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
 import org.opentravel.schemacompiler.model.TLResource;
-
-import java.util.List;
 
 /**
  * Test class for Action Facet resource descendants.
@@ -55,7 +52,8 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
     @Test
     public void testChildren() {
         OtmAction a = buildOtm( testResource );
-        List<OtmObject> kids = a.getChildren();
+        // List<OtmObject> kids = a.getChildren();
+        // OtmActionRequest rq = a.getRequest();
         assertTrue( a.getChildren().size() >= 2 );
 
         // Then - make sure there are request and responses in the children
@@ -67,6 +65,14 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
     @Test
     public void testRequestPayload() {
         // TODO
+    }
+
+    @Test
+    public void testRequestContent() {
+        // Get the content model of the request
+        // NONE
+        // Just reference facet
+        // Reference facet + base payload properties
     }
 
     /**

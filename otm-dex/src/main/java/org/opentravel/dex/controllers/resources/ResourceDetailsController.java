@@ -18,35 +18,34 @@ package org.opentravel.dex.controllers.resources;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
-import org.opentravel.dex.actions.DexActionManager.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.DexResourceChildSelectionEvent;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
-import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
 /**
- * Controller for resource details controller.
+ * Controller for resource details.
  * 
  * @author dmh
  *
  */
-@Deprecated
 public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     private static Log log = LogFactory.getLog( ResourceDetailsController.class );
 
@@ -54,33 +53,23 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
      * FXML Java FX Nodes this controller is dependent upon
      */
     @FXML
-    private VBox resourceDetailsView;
+    private VBox resourceDetails;
+    @FXML
+    private TitledPane childObjectType;
+    @FXML
+    private GridPane propertyGrid;
     @FXML
     private TextField memberName;
     @FXML
-    private TitledPane resourceTitle;
-    @FXML
-    private Label objectLabel;
+    private Label memberNameLabel;
     @FXML
     private ImageView objectImageView;
-    @FXML
-    private TextField libraryName;
-    @FXML
-    private Button changeLibraryButton;
-    @FXML
-    private Label typeLabel;
-    @FXML
-    private TextField baseTypeName;
-    @FXML
-    private Button changeBaseButton;
-    @FXML
-    private TextField assignedTypeName;
-    @FXML
-    private Button changeTypeButton;
+
     @FXML
     private TextField memberDescription;
 
-    private OtmResource selectedResource;
+    private OtmResourceChild selectedChild;
+    private int rowIndex = 0; // last row populated with data
 
     private boolean ignoreClear = false;
 
@@ -88,8 +77,8 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     private static final EventType[] publishedEvents = {};
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents =
-        {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] subscribedEvents = {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED,
+        DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
 
     public ResourceDetailsController() {
         super( subscribedEvents, publishedEvents );
@@ -98,20 +87,12 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
 
     @Override
     public void checkNodes() {
-        if (!(resourceDetailsView instanceof VBox))
+        if (!(resourceDetails instanceof VBox))
             throw new IllegalStateException( "Member Details not injected by FXML." );
-        if (objectLabel == null)
-            throw new IllegalStateException( "Object label not injected by FXML." );
-        if (!(libraryName instanceof TextField))
-            throw new IllegalStateException( "Library  not injected by FXML." );
         if (!(memberName instanceof TextField))
             throw new IllegalStateException( "memberName not injected by FXML." );
-        if (!(typeLabel instanceof Label))
-            throw new IllegalStateException( "label not injected by FXML." );
         if (!(memberDescription instanceof TextField))
             throw new IllegalStateException( "member description not injected by FXML." );
-        if (!(assignedTypeName instanceof TextField))
-            throw new IllegalStateException( "member type name not injected by FXML." );
     }
 
     @Override
@@ -124,140 +105,136 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     @Override
     public void configure(DexMainController mainController) {
         super.configure( mainController );
-        eventPublisherNode = resourceDetailsView;
-
-        changeBaseButton.setOnAction( e -> postNotImplemented() );
-        changeTypeButton.setOnAction( e -> postNotImplemented() );
+        eventPublisherNode = resourceDetails;
     }
 
     @Override
     public void handleEvent(Event event) {
         if (event instanceof DexMemberSelectionEvent)
-            memberSelectionHandler( (DexMemberSelectionEvent) event );
-        if (event instanceof DexModelChangeEvent)
-            modelChangeEvent( (DexModelChangeEvent) event );
+            handleEvent( (DexMemberSelectionEvent) event );
+        else if (event instanceof DexResourceChildSelectionEvent)
+            handleEvent( (DexResourceChildSelectionEvent) event );
+        else if (event instanceof DexModelChangeEvent)
+            handleEvent( (DexModelChangeEvent) event );
     }
 
-    public void modelChangeEvent(DexModelChangeEvent event) {
+    public void handleEvent(DexResourceChildSelectionEvent event) {
+        post( event.get() );
+    }
+
+    public void handleEvent(DexMemberSelectionEvent event) {
+        if (event.getMember() instanceof OtmResource)
+            post( (OtmResource) event.getMember() );
+    }
+
+    public void handleEvent(DexModelChangeEvent event) {
         clear();
     }
 
     public void memberSelectionHandler(DexMemberSelectionEvent event) {
-        if (event != null && event.getMember() != null) {
-            if (event.getMember() instanceof OtmResource)
-                post( (OtmResource) event.getMember() );
-            else if (event.getMember() instanceof OtmResourceChild)
-                post( ((OtmResourceChild) event.getMember()).getOwningMember() );
+        if (event != null && event.getMember() instanceof OtmResourceChild) {
+            post( (OtmResourceChild) event.getMember() );
         }
     }
 
-    private void postNotImplemented() {
-        DialogBoxContoller.init().show( "Not Implemented", "Work in progress." );
-    }
+    // private void postNotImplemented() {
+    // DialogBoxContoller.init().show( "Not Implemented", "Work in progress." );
+    // }
 
     public void post(OtmResource resource) {
         if (resource == null) {
             clear();
             return;
         }
-        selectedResource = resource;
-        // Collection<OtmTypeUser> u = member.getDescendantsTypeUsers();
-        // Collection<OtmTypeProvider> p = member.getDescendantsTypeProviders();
-        // Collection<OtmTypeProvider> c = member.getChildrenTypeProviders();
+        propertyGrid.getChildren().clear();
 
-        objectLabel.setTooltip( new Tooltip( resource.getObjectTypeName() ) );
-        // if (imageMgr != null)
-        // objectImageView.setImage( imageMgr.get_OLD( member.getIconType() ) );
-        objectImageView.setImage( ImageManager.getImage( resource.getIconType() ) );
-        resourceTitle.setText( resource.getObjectTypeName() + " - " + resource.getName() );
+        postTitle( resource );
+        postName( resource );
+        postDescription( resource );
+        resource.getFields().forEach( f -> postField( f, resource ) );
+    }
 
-        memberName.setEditable( resource.isEditable() );
-        memberName.setText( resource.nameProperty().get() );
-        memberName.setOnAction( e -> resource.nameProperty().set( memberName.getText() ) );
-
-        // Set library
-        libraryName.setEditable( false );
-        libraryName.setText( resource.libraryProperty().get() );
-        changeLibraryButton.setDisable( !resource.isEditable() );
-        changeLibraryButton.setDisable( true ); // TEMP
-
-        // Description
-        memberDescription.setEditable( resource.isEditable() );
-        memberDescription.setText( resource.descriptionProperty().get() );
-        memberDescription.setOnAction( e -> resource.descriptionProperty().set( memberDescription.getText() ) );
-
-        // Base type
-        changeBaseButton.setDisable( true ); // TEMP
-        baseTypeName.setText( resource.baseTypeProperty().get() );
-
-        // Assigned type
-        final String TYPELABELRESOURCE = "Exposed Object";
-        typeLabel.setDisable( !(resource instanceof OtmTypeUser) );
-        typeLabel.setText( TYPELABELRESOURCE );
-
-        // icon?
-        if (resource.getActionManager().isEnabled( DexActions.TYPECHANGE, resource )) {
-            changeTypeButton.setDisable( false );
-            changeTypeButton.setOnAction( e -> setAssignedType() );
-        } else {
-            changeTypeButton.setDisable( true );
-            changeTypeButton.setOnAction( null );
+    private void postField(DexEditField field, OtmObject obj) {
+        int column = field.column;
+        if (field.label != null) {
+            Label label = new Label( field.label );
+            label.setTooltip( field.tooltip );
+            propertyGrid.add( label, field.column, field.row + rowIndex );
+            column += 1;
         }
-        assignedTypeName.setDisable( (!(resource instanceof OtmTypeUser)) );
-        assignedTypeName.setEditable( false );
-        if (resource instanceof OtmTypeUser && (resource).getAssignedType() != null) {
-            assignedTypeName.setTooltip( new Tooltip( (resource).getAssignedType().getDescription() ) );
-            assignedTypeName.setText( (resource).assignedTypeProperty().get() );
-        } else {
-            assignedTypeName.setTooltip( null );
-            assignedTypeName.setText( "" );
+        if (field.fxNode != null) {
+            if (field.fxNode instanceof Control)
+                ((Control) field.fxNode).setTooltip( field.tooltip );
+            if (obj.isEditable())
+                propertyGrid.add( field.fxNode, column, field.row + rowIndex );
+            else {
+                TextField txt = new TextField( "some value" );
+                txt.setEditable( false );
+                txt.setDisable( true );
+                propertyGrid.add( txt, column, field.row + rowIndex );
+            }
         }
     }
 
-    // Called when button is pressed
-    private void setAssignedType() {
-        log.debug( "Set assigned type event." );
-        if (selectedResource instanceof OtmTypeUser)
-            selectedResource.getActionManager().run( DexActions.TYPECHANGE, selectedResource, null );
-        refresh();
+    private void postTitle(OtmObject obj) {
+        objectImageView.setImage( ImageManager.getImage( obj.getIconType() ) );
+        if (obj instanceof OtmResource)
+            childObjectType.setText( obj.getOwningMember().getName() );
+        else
+            childObjectType.setText( obj.getObjectTypeName() + "   in " + obj.getOwningMember().getName() );
     }
 
-    // /**
-    // * Make and fire a filter event. Set ignore clear in case event handler tries to clear() this controller.
-    // */
-    // private void fireFilterChangeEvent() {
-    // if (eventPublisherNode != null) {
-    // ignoreClear = true; // Set just in case event handler does a clear
-    // log.debug("Ready to fire controller level Filter Change event.");
-    // eventPublisherNode.fireEvent(new DexFilterChangeEvent(this, memberDetails));
-    // ignoreClear = false;
-    // } else if (popupController != null) {
-    // popupController.refresh();
-    // }
-    // }
+    private void postName(OtmObject obj) {
+        rowIndex = 0;
+        Label label = new Label( "Name" );
+        label.setTooltip( obj.getTooltip() );
+        propertyGrid.add( label, 0, rowIndex );
+
+        memberName.setEditable( obj.isEditable() );
+        memberName.setText( obj.nameProperty().get() );
+        memberName.setOnAction( e -> obj.nameProperty().set( memberName.getText() ) );
+        propertyGrid.add( memberName, 1, rowIndex++ );
+    }
+
+    private void postDescription(OtmObject obj) {
+        memberDescription.setEditable( obj.isEditable() );
+        memberDescription.setText( obj.descriptionProperty().get() );
+        memberDescription.setOnAction( e -> obj.descriptionProperty().set( memberDescription.getText() ) );
+        propertyGrid.add( new Label( "Description" ), 0, rowIndex );
+        propertyGrid.add( memberDescription, 1, rowIndex++ );
+    }
+
+    public void post(OtmResourceChild resourceChild) {
+        clear();
+        if (resourceChild == null)
+            return;
+
+        selectedChild = resourceChild;
+
+        postTitle( resourceChild );
+        postName( resourceChild );
+        postDescription( resourceChild );
+
+        resourceChild.getFields().forEach( f -> postField( f, resourceChild ) );
+    }
+
 
     @Override
     public void clear() {
         // When posting updated filter results, do not clear the filters.
         if (!ignoreClear) {
-            // if (mainController != null)
-            // modelMgr = mainController.getModelManager();
-            selectedResource = null;
-            assignedTypeName.setText( "" );
+            selectedChild = null;
             memberName.setText( "" );
-            libraryName.setText( "" );
-            baseTypeName.setText( "" );
             memberDescription.setText( "" );
             objectImageView.setImage( null );
+            childObjectType.setText( "" );
+            propertyGrid.getChildren().clear();
         }
     }
 
     @Override
     public void refresh() {
-        if (selectedResource instanceof OtmResource)
-            post( (OtmResource) selectedResource );
-        else if (selectedResource instanceof OtmResourceChild)
-            post( ((OtmResourceChild) selectedResource).getOwningMember() );
+        post( selectedChild );
     }
 
 }

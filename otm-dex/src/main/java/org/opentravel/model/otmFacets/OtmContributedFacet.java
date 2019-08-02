@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Abstract OTM Node for Custom Facets with a parent (not library member).
+ * Abstract OTM Node for Custom Facets (not library members) with a parent.
  * 
  * @author Dave Hollander
  * 
