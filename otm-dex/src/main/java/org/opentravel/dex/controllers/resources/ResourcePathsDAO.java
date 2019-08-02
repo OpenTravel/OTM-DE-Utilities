@@ -24,6 +24,7 @@ import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.resource.OtmActionRequest;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
@@ -72,7 +73,14 @@ public class ResourcePathsDAO implements DexDAO<OtmActionRequest> {
     }
 
     public StringProperty nameProperty() {
-        return (otmRequest.nameProperty());
+        return otmRequest.nameProperty();
+    }
+
+    public StringProperty payloadProperty() {
+        String pName = "NONE";
+        if (otmRequest.getPayload() != null)
+            pName = "<" + otmRequest.getPayload().getName() + "> ... <" + otmRequest.getPayload().getName() + ">";
+        return new ReadOnlyStringWrapper( pName );
     }
 
     public StringProperty urlProperty() {
@@ -86,7 +94,7 @@ public class ResourcePathsDAO implements DexDAO<OtmActionRequest> {
 
     /**
      * Create and add to tree with no conditional logic.
-     * 
+     *
      * @return new tree item added to tree at the parent
      */
     public TreeItem<ResourcePathsDAO> createTreeItem(TreeItem<ResourcePathsDAO> parent) {

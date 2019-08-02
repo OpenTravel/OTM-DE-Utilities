@@ -39,12 +39,14 @@ public class ResourcesTabController implements DexTabController {
     private ResourcesTreeTableController resourcesTreeTableController;
     @FXML
     private ResourceDetailsController resourceDetailsController;
+    // @FXML
+    // private ResourcePathsTreeController resourcePathsTreeController;
     @FXML
-    private ResourcePathsTreeController resourcePathsTreeController;
-    @FXML
-    private ResourceRQTreeTableController resourceRQTreeTableController;
-    @FXML
-    private ResourceRSTreeTableController resourceRSTreeTableController;
+    private ResourceActionsTreeTableController resourceActionsTreeTableController;
+    // @FXML
+    // private ResourceRQTreeTableController resourceRQTreeTableController;
+    // @FXML
+    // private ResourceRSTreeTableController resourceRSTreeTableController;
     @FXML
     private ResourceErrorsTreeTableController resourceErrorsTreeTableController;
 
@@ -59,14 +61,14 @@ public class ResourcesTabController implements DexTabController {
         if (!(resourceDetailsController instanceof ResourceDetailsController))
             throw new IllegalStateException( "Resource child details controller not injected by FXML." );
 
-        if (!(resourcePathsTreeController instanceof ResourcePathsTreeController))
-            throw new IllegalStateException( "Resource path controller not injected by FXML." );
+        // if (!(resourcePathsTreeController instanceof ResourcePathsTreeController))
+        // throw new IllegalStateException( "Resource path controller not injected by FXML." );
 
-        if (!(resourceRQTreeTableController instanceof ResourceRQTreeTableController))
-            throw new IllegalStateException( "Resource RQ controller not injected by FXML." );
+        if (!(resourceActionsTreeTableController instanceof ResourceActionsTreeTableController))
+            throw new IllegalStateException( "Resource Actions controller not injected by FXML." );
 
-        if (!(resourceRSTreeTableController instanceof ResourceRSTreeTableController))
-            throw new IllegalStateException( "Resource RS controller not injected by FXML." );
+        // if (!(resourceRSTreeTableController instanceof ResourceRSTreeTableController))
+        // throw new IllegalStateException( "Resource RS controller not injected by FXML." );
 
         if (!(resourceErrorsTreeTableController instanceof ResourceErrorsTreeTableController))
             throw new IllegalStateException( "Resource Errors controller not injected by FXML." );
@@ -87,9 +89,9 @@ public class ResourcesTabController implements DexTabController {
     public void configure(DexMainController parent) {
         parent.addIncludedController( resourcesTreeTableController );
         parent.addIncludedController( resourceDetailsController );
-        parent.addIncludedController( resourcePathsTreeController );
-        parent.addIncludedController( resourceRQTreeTableController );
-        parent.addIncludedController( resourceRSTreeTableController );
+        // parent.addIncludedController( resourcePathsTreeController );
+        parent.addIncludedController( resourceActionsTreeTableController );
+        // parent.addIncludedController( resourceRSTreeTableController );
         parent.addIncludedController( resourceErrorsTreeTableController );
         log.debug( "Repository Tab configured." );
     }

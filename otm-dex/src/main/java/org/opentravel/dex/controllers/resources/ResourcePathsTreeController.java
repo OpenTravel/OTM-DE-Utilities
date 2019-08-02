@@ -23,6 +23,8 @@ import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.DexResourceChildSelectionEvent;
+import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 
 import javafx.event.Event;
@@ -49,6 +51,7 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
     public static final String METHODCOLUMNLABEL = "Method";
     private static final String NAMECOLUMNLABEL = "Name";
     private static final String URLCOLUMNLABEL = "URL";
+    private static final String CONTENTCOLUMNLABEL = "Content";
 
     /*
      * FXML injected
@@ -61,22 +64,13 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
     private TitledPane pathsTitlePane;
 
 
-    //
-    TreeItem<ResourcePathsDAO> root; // Root of the navigation tree. Is displayed.
-
-    // OtmModelManager currentModelMgr; // this is postedData
-
-    // MemberFilterController filter = null;
-
+    private TreeItem<ResourcePathsDAO> root; // Root of the navigation tree. Is displayed.
     private boolean ignoreEvents = false;
-    // By default, the tree is editable. Setting this to false will prevent edits.
-    // private boolean treeEditingEnabled = true;
-
     private OtmResource currentResource;
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents =
-        {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] subscribedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED,
+        DexModelChangeEvent.MODEL_CHANGED, DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED};
     private static final EventType[] publishedEvents = {};
 
     /**
@@ -105,8 +99,12 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
         urlColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ResourcePathsDAO,String>( "url" ) );
         setColumnProps( urlColumn, true, true, true, 600 );
 
+        TreeTableColumn<ResourcePathsDAO,String> contentColumn = new TreeTableColumn<>( CONTENTCOLUMNLABEL );
+        contentColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ResourcePathsDAO,String>( "payload" ) );
+        setColumnProps( contentColumn, true, true, true, 100 );
+
         // Add columns to table
-        resourcePathsTree.getColumns().addAll( nameColumn, methodColumn, urlColumn );
+        resourcePathsTree.getColumns().addAll( nameColumn, methodColumn, urlColumn, contentColumn );
         resourcePathsTree.getSortOrder().add( nameColumn );
     }
 
@@ -139,74 +137,23 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
         buildColumns();
 
         // Add listeners and event handlers
-        // resourcePathsTree.getSelectionModel().selectedItemProperty()
-        // .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
         refresh();
     }
 
-    // /**
-    // * Note: TreeItem class does not extend the Node class. Therefore, you cannot apply any visual effects or add
-    // menus
-    // * to the tree items. Use the cell factory mechanism to overcome this obstacle and define as much custom behavior
-    // * for the tree items as your application requires.
-    // *
-    // * @param member the Otm Library Member to add to the tree
-    // * @param parent the tree root or parent member
-    // * @return
-    // */
-    // public void createTreeItem(OtmResource member, TreeItem<ResourcePathsDAO> parent) {
-    // // log.debug("Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName());
-    //
-    // // // Apply Filter
-    // // if (filter != null && !filter.isSelected( member ))
-    // // return;
-    // // Skip over contextual facets that have been injected into an object. Their contributed facets will be modeled.
-    // // if ((member instanceof OtmContextualFacet && ((OtmContextualFacet) member).getWhereContributed() != null))
-    // // return;
-    //
-    // // Create item for the library member
-    // TreeItem<ResourcePathsDAO> item = new ResourcePathsDAO( member ).createTreeItem( parent );
-    //
-    // // Create and add items for children
-    // if (member instanceof OtmChildrenOwner)
-    // createChildrenItems( member, item );
-    // }
-
-    // /**
-    // * Create tree items for the type provider children of this child owning member
-    // */
-    // private void createChildrenItems(OtmChildrenOwner member, TreeItem<ResourcePathsDAO> parentItem) {
-    // member.getChildrenTypeProviders().forEach( p -> {
-    // TreeItem<ResourcePathsDAO> cfItem = new ResourcePathsDAO( p ).createTreeItem( parentItem );
-    //
-    // // Only use contextual facet for recursing
-    // if (p instanceof OtmContributedFacet && ((OtmContributedFacet) p).getContributor() != null)
-    // p = ((OtmContributedFacet) p).getContributor();
-    //
-    // // Recurse
-    // if (p instanceof OtmChildrenOwner)
-    // createChildrenItems( (OtmChildrenOwner) p, cfItem );
-    // } );
-    // }
-
-    // public MemberFilterController getFilter() {
-    // return filter;
-    // }
 
     public TreeItem<ResourcePathsDAO> getRoot() {
         return root;
     }
 
-    // public ResourcePathsDAO getSelected() {
-    // return resourcePathsTree.getSelectionModel().getSelectedItem() != null
-    // ? resourcePathsTree.getSelectionModel().getSelectedItem().getValue() : null;
-    // }
-
     private void handleEvent(DexMemberSelectionEvent event) {
-        if (!ignoreEvents)
-            if (event.getMember() instanceof OtmResource)
-                post( (OtmResource) event.getMember() );
+        if (!ignoreEvents && event.getMember() instanceof OtmResource)
+            post( (OtmResource) event.getMember() );
+    }
+
+    private void handleEvent(DexResourceChildSelectionEvent event) {
+        if (!ignoreEvents && event.get() instanceof OtmResourceChild)
+            post( event.get().getOwningMember() );
     }
 
     @Override
@@ -215,34 +162,14 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
-            // if (event instanceof DexFilterChangeEvent)
-            // handleEvent( (DexFilterChangeEvent) event );
+            if (event instanceof DexResourceChildSelectionEvent)
+                handleEvent( (DexResourceChildSelectionEvent) event );
             if (event instanceof DexModelChangeEvent)
                 clear();
             else
                 refresh();
         }
     }
-
-    // public void keyReleased(KeyEvent event) {
-    // TreeItem<ResourcePathsDAO> item = resourcePathsTree.getSelectionModel().getSelectedItem();
-    // int row = resourcePathsTree.getSelectionModel().getSelectedIndex();
-    // // log.debug("Selection row = " + row);
-    // // if (event.getCode() == KeyCode.RIGHT) {
-    // // event.consume();
-    // // item.setExpanded( true );
-    // // resourcesTree.getSelectionModel().clearAndSelect( row + 1, nameColumn );
-    // // } else if (event.getCode() == KeyCode.LEFT) {
-    // // TreeItem<ResourcePathsDAO> parent = item.getParent();
-    // // if (parent != null && parent != item && parent != root) {
-    // // resourcesTree.getSelectionModel().select( parent );
-    // // parent.setExpanded( false );
-    // // row = resourcesTree.getSelectionModel().getSelectedIndex();
-    // // resourcesTree.getSelectionModel().clearAndSelect( row, nameColumn );
-    // // event.consume();
-    // // }
-    // // }
-    // }
 
     /**
      * Listener for selected library members in the tree table.
@@ -265,13 +192,6 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
         // eventPublisherNode.fireEvent( new DexMemberSelectionEvent( this, item ) );
         ignoreEvents = false;
     }
-
-    // public void mouseClick(MouseEvent event) {
-    // // this fires after the member selection listener
-    // if (event.getButton().equals( MouseButton.PRIMARY ) && event.getClickCount() == 2)
-    // log.debug( "Double click selection: " );
-    // // + resourcesTree.getSelectionModel().getSelectedItem().getValue().nameProperty().toString());
-    // }
 
     /**
      * Get the library members from the model manager and put them into a cleared tree.
@@ -298,33 +218,4 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
         post( currentResource );
     }
 
-    // public void select(OtmLibraryMember otm) {
-    // // if (otm != null) {
-    // // for (TreeItem<ResourcePathsDAO> item : resourcePathsTree.getRoot().getChildren()) {
-    // // if (item.getValue().getValue() == otm) {
-    // // int row = resourcePathsTree.getRow( item );
-    // // // This may not highlight the row if the event comes from or goes to a different controller.
-    // // Platform.runLater( () -> {
-    // // // ignoreEvents = true;
-    // // resourcePathsTree.requestFocus();
-    // // resourcePathsTree.getSelectionModel().clearAndSelect( row );
-    // // resourcePathsTree.scrollTo( row );
-    // // resourcePathsTree.getFocusModel().focus( row );
-    // // // ignoreEvents = false;
-    // // } );
-    // // // log.debug("Selected " + otm.getName() + " in member tree.");
-    // // return;
-    // // }
-    // // }
-    // // log.warn( otm.getName() + " not found in member tree." );
-    // // }
-    // }
-
-    // public void setFilter(MemberFilterController filter) {
-    // this.filter = filter;
-    // }
-
-    // public void setOnMouseClicked(EventHandler<? super MouseEvent> handler) {
-    // resourcePathsTree.setOnMouseClicked( handler );
-    // }
 }

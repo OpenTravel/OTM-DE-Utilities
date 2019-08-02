@@ -21,17 +21,23 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.model.OtmModelElement;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.schemacompiler.model.TLExample;
 import org.opentravel.schemacompiler.model.TLExampleOwner;
 import org.opentravel.schemacompiler.model.TLMemberField;
 import org.opentravel.schemacompiler.model.TLMemberFieldOwner;
+import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLParamLocation;
 import org.opentravel.schemacompiler.model.TLParameter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tooltip;
 
@@ -136,6 +142,31 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
     // private static final String FIELD_TOOLTIP = "Name of the field to be used as a REST request parameter. ";
     private static final String LOCATION_LABEL = "Location";
     private static final String LOCATION_TOOLTIP = "Specifies the location of the parameter in the REST request. ";
+
+    public TLParamLocation getLocation() {
+        return getTL().getLocation();
+    }
+
+    /**
+     * @return
+     */
+    public StringProperty locationProperty() {
+        String location = "";
+        if (getLocation() != null)
+            location = getLocation().toString();
+        return new ReadOnlyStringWrapper( location );
+    }
+
+    /**
+     * @return the object this parameter references
+     */
+    public StringProperty typeProperty() {
+        OtmObject ref = OtmModelElement.get( (TLModelElement) getTL().getFieldRef() );
+        String type = "";
+        if (ref instanceof OtmTypeUser)
+            type = ((OtmTypeUser) ref).getTlAssignedTypeName();
+        return new ReadOnlyStringWrapper( type );
+    }
 
 
 }

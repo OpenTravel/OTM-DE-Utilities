@@ -18,13 +18,11 @@ package org.opentravel.dex.controllers.resources;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.common.cellfactories.ValidationMemberTreeTableCellFactory;
+import org.opentravel.common.cellfactories.ValidationActionTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.dex.controllers.member.MemberFilterController;
-import org.opentravel.dex.controllers.member.MemberRowFactory;
 import org.opentravel.dex.events.DexFilterChangeEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
@@ -33,14 +31,17 @@ import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
-import org.opentravel.model.resource.OtmActionRequest;
+import org.opentravel.model.resource.OtmAction;
+import org.opentravel.model.resource.OtmActionResponse;
 
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.SortType;
@@ -55,30 +56,28 @@ import javafx.scene.layout.VBox;
  * @author dmh
  *
  */
-@Deprecated
-public class ResourceRQTreeTableController extends DexIncludedControllerBase<OtmResource> implements DexController {
-    private static Log log = LogFactory.getLog( ResourceRQTreeTableController.class );
+public class ResourceActionsTreeTableController extends DexIncludedControllerBase<OtmResource>
+    implements DexController {
+    private static Log log = LogFactory.getLog( ResourceActionsTreeTableController.class );
 
     // Column labels
-    // TODO - externalize strings
-    public static final String PREFIXCOLUMNLABEL = "Prefix";
     private static final String NAMECOLUMNLABEL = "Member";
-    private static final String VERSIONCOLUMNLABEL = "Version";
-    private static final String LIBRARYLABEL = "Library";
-    // private static final String ERRORLABEL = "Errors";
-    private static final String WHEREUSEDLABEL = "Types Used";
+    private static final String AFLABEL = "";
+    private static final String CONTENTlABEL = "";
 
     /*
      * FXML injected
      */
     @FXML
-    TreeTableView<MemberAndProvidersDAO> resourceRQTreeTable;
+    TreeTableView<ActionsDAO> resourceActionsTreeTable;
     @FXML
-    private VBox resourceRQTreeTableView;
+    private TitledPane resourceActionsTreeTablePane;
+    @FXML
+    private VBox resourceActionsTreeTableView;
 
     //
-    TreeItem<MemberAndProvidersDAO> root; // Root of the navigation tree. Is displayed.
-    TreeTableColumn<MemberAndProvidersDAO,String> nameColumn; // an editable column
+    TreeItem<ActionsDAO> root; // Root of the navigation tree. Is displayed.
+    TreeTableColumn<ActionsDAO,String> nameColumn; // an editable column
 
     // OtmModelManager currentModelMgr; // this is postedData
 
@@ -91,12 +90,12 @@ public class ResourceRQTreeTableController extends DexIncludedControllerBase<Otm
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents = {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED,
         DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
-    private static final EventType[] publishedEvents = {};
+    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
 
     /**
      * Construct a member tree table controller that can publish and receive events.
      */
-    public ResourceRQTreeTableController() {
+    public ResourceActionsTreeTableController() {
         super( subscribedEvents, publishedEvents );
     }
 
@@ -105,40 +104,31 @@ public class ResourceRQTreeTableController extends DexIncludedControllerBase<Otm
      */
     private void buildColumns() {
 
-        TreeTableColumn<MemberAndProvidersDAO,String> prefixColumn = new TreeTableColumn<>( PREFIXCOLUMNLABEL );
-        prefixColumn.setCellValueFactory( new TreeItemPropertyValueFactory<MemberAndProvidersDAO,String>( "prefix" ) );
-        setColumnProps( prefixColumn, true, false, true, 100 );
-        prefixColumn.setStyle( "-fx-alignment: CENTER-RIGHT;" );
-
         nameColumn = new TreeTableColumn<>( NAMECOLUMNLABEL );
-        nameColumn.setCellValueFactory( new TreeItemPropertyValueFactory<MemberAndProvidersDAO,String>( "name" ) );
+        nameColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ActionsDAO,String>( "name" ) );
         setColumnProps( nameColumn, true, true, true, 200 );
         nameColumn.setSortType( SortType.ASCENDING );
 
-        TreeTableColumn<MemberAndProvidersDAO,String> versionColumn = new TreeTableColumn<>( VERSIONCOLUMNLABEL );
-        versionColumn
-            .setCellValueFactory( new TreeItemPropertyValueFactory<MemberAndProvidersDAO,String>( "version" ) );
+        TreeTableColumn<ActionsDAO,String> afColumn = new TreeTableColumn<>( AFLABEL );
+        afColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ActionsDAO,String>( "actionFacet" ) );
+        setColumnProps( afColumn, true, true, true, 300 );
 
-        TreeTableColumn<MemberAndProvidersDAO,String> libColumn = new TreeTableColumn<>( LIBRARYLABEL );
-        libColumn.setCellValueFactory( new TreeItemPropertyValueFactory<MemberAndProvidersDAO,String>( "library" ) );
+        TreeTableColumn<ActionsDAO,String> contentColumn = new TreeTableColumn<>( CONTENTlABEL );
+        contentColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ActionsDAO,String>( "content" ) );
+        setColumnProps( contentColumn, true, true, true, 300 );
 
-        TreeTableColumn<MemberAndProvidersDAO,String> usedTypesCol = new TreeTableColumn<>( WHEREUSEDLABEL );
-        usedTypesCol
-            .setCellValueFactory( new TreeItemPropertyValueFactory<MemberAndProvidersDAO,String>( "usedTypes" ) );
-
-        TreeTableColumn<MemberAndProvidersDAO,ImageView> valColumn = new TreeTableColumn<>( "" );
-        valColumn.setCellFactory( c -> new ValidationMemberTreeTableCellFactory() );
+        TreeTableColumn<ActionsDAO,ImageView> valColumn = new TreeTableColumn<>( "" );
+        valColumn.setCellFactory( c -> new ValidationActionTreeTableCellFactory() );
         setColumnProps( valColumn, true, false, false, 25 );
 
         // Add columns to table
-        resourceRQTreeTable.getColumns().addAll( nameColumn, valColumn, libColumn, versionColumn, prefixColumn,
-            usedTypesCol );
-        resourceRQTreeTable.getSortOrder().add( nameColumn );
+        resourceActionsTreeTable.getColumns().addAll( nameColumn, afColumn, contentColumn, valColumn );
+        resourceActionsTreeTable.getSortOrder().add( nameColumn );
     }
 
     @Override
     public void checkNodes() {
-        if (resourceRQTreeTable == null)
+        if (resourceActionsTreeTable == null)
             throw new IllegalStateException( "Resource RQ tree table is null." );
     }
 
@@ -147,8 +137,8 @@ public class ResourceRQTreeTableController extends DexIncludedControllerBase<Otm
      */
     @Override
     public void clear() {
-        resourceRQTreeTable.getSelectionModel().clearSelection();
-        resourceRQTreeTable.getRoot().getChildren().clear();
+        resourceActionsTreeTable.getSelectionModel().clearSelection();
+        resourceActionsTreeTable.getRoot().getChildren().clear();
     }
 
     /**
@@ -158,7 +148,7 @@ public class ResourceRQTreeTableController extends DexIncludedControllerBase<Otm
     public void configure(DexMainController parent) {
         super.configure( parent );
         // log.debug("Configuring Member Tree Table.");
-        eventPublisherNode = resourceRQTreeTableView;
+        eventPublisherNode = resourceActionsTreeTableView;
         configure( parent.getModelManager(), treeEditingEnabled );
     }
 
@@ -180,21 +170,22 @@ public class ResourceRQTreeTableController extends DexIncludedControllerBase<Otm
         root.setExpanded( true ); // Startout fully expanded
 
         // Set up the TreeTable
-        resourceRQTreeTable.setRoot( getRoot() );
-        resourceRQTreeTable.setShowRoot( false );
-        resourceRQTreeTable.setEditable( true );
-        resourceRQTreeTable.getSelectionModel().setCellSelectionEnabled( true ); // allow individual cells to be edited
-        resourceRQTreeTable.setTableMenuButtonVisible( true ); // allow users to select columns
+        resourceActionsTreeTable.setRoot( getRoot() );
+        resourceActionsTreeTable.setShowRoot( false );
+        resourceActionsTreeTable.setEditable( true );
+        resourceActionsTreeTable.getSelectionModel().setCellSelectionEnabled( true ); // allow individual cells to be
+                                                                                      // edited
+        resourceActionsTreeTable.setTableMenuButtonVisible( true ); // allow users to select columns
         // Enable context menus at the row level and add change listener for for applying style
-        resourceRQTreeTable.setRowFactory( (TreeTableView<MemberAndProvidersDAO> p) -> new MemberRowFactory( this ) );
+        resourceActionsTreeTable.setRowFactory( (TreeTableView<ActionsDAO> p) -> new ActionRowFactory( this ) );
         buildColumns();
 
         // Add listeners and event handlers
-        // resourceRQTreeTable.getSelectionModel().select( 0 );
-        // resourceRQTreeTable.setOnKeyReleased( this::keyReleased );
+        // resourceActionsTreeTable.getSelectionModel().select( 0 );
+        // resourceActionsTreeTable.setOnKeyReleased( this::keyReleased );
         // // memberTree.setOnMouseClicked(this::mouseClick);
-        // resourceRQTreeTable.getSelectionModel().selectedItemProperty()
-        // .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
+        resourceActionsTreeTable.getSelectionModel().selectedItemProperty()
+            .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
         refresh();
     }
@@ -202,9 +193,9 @@ public class ResourceRQTreeTableController extends DexIncludedControllerBase<Otm
     /**
      * Create tree items for the type provider children of this child owning member
      */
-    private void createChildrenItems(OtmChildrenOwner childrenOwner, TreeItem<MemberAndProvidersDAO> parentItem) {
+    private void createChildrenItems(OtmChildrenOwner childrenOwner, TreeItem<ActionsDAO> parentItem) {
         for (OtmObject child : childrenOwner.getChildren()) {
-            TreeItem<MemberAndProvidersDAO> cfItem = new MemberAndProvidersDAO( child ).createTreeItem( parentItem );
+            TreeItem<ActionsDAO> cfItem = new ActionsDAO( child ).createTreeItem( parentItem );
 
             // Only use contextual facet for recursing
             if (child instanceof OtmContributedFacet && ((OtmContributedFacet) child).getContributor() != null)
@@ -220,13 +211,13 @@ public class ResourceRQTreeTableController extends DexIncludedControllerBase<Otm
     // return filter;
     // }
 
-    public TreeItem<MemberAndProvidersDAO> getRoot() {
+    public TreeItem<ActionsDAO> getRoot() {
         return root;
     }
 
-    public MemberAndProvidersDAO getSelected() {
-        return resourceRQTreeTable.getSelectionModel().getSelectedItem() != null
-            ? resourceRQTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
+    public ActionsDAO getSelected() {
+        return resourceActionsTreeTable.getSelectionModel().getSelectedItem() != null
+            ? resourceActionsTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
     }
 
     // private void handleEvent(DexFilterChangeEvent event) {
@@ -262,44 +253,48 @@ public class ResourceRQTreeTableController extends DexIncludedControllerBase<Otm
     }
 
     // public void keyReleased(KeyEvent event) {
-    // TreeItem<MemberAndProvidersDAO> item = resourceRQTreeTable.getSelectionModel().getSelectedItem();
-    // int row = resourceRQTreeTable.getSelectionModel().getSelectedIndex();
+    // TreeItem<ActionsDAO> item = resourceActionsTreeTable.getSelectionModel().getSelectedItem();
+    // int row = resourceActionsTreeTable.getSelectionModel().getSelectedIndex();
     // // log.debug("Selection row = " + row);
     // if (event.getCode() == KeyCode.RIGHT) {
     // event.consume();
     // item.setExpanded( true );
-    // resourceRQTreeTable.getSelectionModel().clearAndSelect( row + 1, nameColumn );
+    // resourceActionsTreeTable.getSelectionModel().clearAndSelect( row + 1, nameColumn );
     // } else if (event.getCode() == KeyCode.LEFT) {
-    // TreeItem<MemberAndProvidersDAO> parent = item.getParent();
+    // TreeItem<ActionsDAO> parent = item.getParent();
     // if (parent != null && parent != item && parent != root) {
-    // resourceRQTreeTable.getSelectionModel().select( parent );
+    // resourceActionsTreeTable.getSelectionModel().select( parent );
     // parent.setExpanded( false );
-    // row = resourceRQTreeTable.getSelectionModel().getSelectedIndex();
-    // resourceRQTreeTable.getSelectionModel().clearAndSelect( row, nameColumn );
+    // row = resourceActionsTreeTable.getSelectionModel().getSelectedIndex();
+    // resourceActionsTreeTable.getSelectionModel().clearAndSelect( row, nameColumn );
     // event.consume();
     // }
     // }
     // }
 
-    // /**
-    // * Listener for selected library members in the tree table.
-    // *
-    // * @param item
-    // */
-    // private void memberSelectionListener(TreeItem<MemberAndProvidersDAO> item) {
-    // if (item == null)
-    // return;
-    // log.debug( "Selection Listener: " + item.getValue() );
-    // // assert item != null;
-    // // boolean editable = false;
-    // // if (treeEditingEnabled && item.getValue() != null)
-    // // editable = item.getValue().isEditable();
-    // // nameColumn.setEditable( editable ); // TODO - is this still useful?
-    // ignoreEvents = true;
-    // // if (eventPublisherNode != null)
-    // // eventPublisherNode.fireEvent( new DexMemberSelectionEvent( this, item ) );
-    // ignoreEvents = false;
-    // }
+    /**
+     * Listener for selected library members in the tree table.
+     *
+     * @param item
+     */
+    private void memberSelectionListener(TreeItem<ActionsDAO> item) {
+        if (item == null)
+            return;
+        if (item.getValue() != null && item.getValue().getValue() != null) {
+            log.debug( "Selection Listener: " + item.getValue() );
+            OtmObject obj = item.getValue().getValue();
+            OtmLibraryMember member = null;
+            if (obj instanceof OtmLibraryMember)
+                member = (OtmLibraryMember) obj;
+            else if (obj instanceof OtmTypeUser && ((OtmTypeUser) obj).getAssignedType() != null)
+                member = ((OtmTypeUser) obj).getAssignedType().getOwningMember();
+            else
+                member = obj.getOwningMember();
+            ignoreEvents = true;
+            eventPublisherNode.fireEvent( new DexMemberSelectionEvent( member ) );
+            ignoreEvents = false;
+        }
+    }
 
     // public void mouseClick(MouseEvent event) {
     // // this fires after the member selection listener
@@ -326,21 +321,43 @@ public class ResourceRQTreeTableController extends DexIncludedControllerBase<Otm
         clear();
 
         if (resource != null)
-            resource.getActionRequests().forEach( a -> createTreeItem( a, root ) );
+            resource.getActions().forEach( a -> createTreeItem( a, root ) );
     }
 
-    public void createTreeItem(OtmActionRequest request, TreeItem<MemberAndProvidersDAO> parent) {
+    public void createTreeItem(OtmAction action, TreeItem<ActionsDAO> parent) {
         // Create item for the request
-        TreeItem<MemberAndProvidersDAO> rqItem = new MemberAndProvidersDAO( request ).createTreeItem( parent );
+        TreeItem<ActionsDAO> actionItem = new ActionsDAO( action ).createTreeItem( parent );
+        actionItem.setExpanded( true );
 
-        // Model the pay load if any
-        OtmObject payload = request.getPayload();
+        // Create request item
+        if (action.getRequest() != null) {
+            TreeItem<ActionsDAO> requestItem = new ActionsDAO( action.getRequest() ).createTreeItem( actionItem );
+            // Show the parameters
+            if (action.getRequest().getParamGroup() != null)
+                action.getRequest().getParamGroup().getChildren()
+                    .forEach( p -> new ActionsDAO( p ).createTreeItem( requestItem ) );
+            // TODO - add inherited parameters
+            createPayloadItems( action.getRequest().getPayload(), requestItem );
+        }
+
+        // Create response items
+        for (OtmActionResponse response : action.getResponses()) {
+            TreeItem<ActionsDAO> responseItem = new ActionsDAO( response ).createTreeItem( actionItem );
+            // responseItem.setExpanded( true );
+            createPayloadItems( response.getPayload(), responseItem );
+        }
+
+    }
+
+    // Model the pay load if any
+    private void createPayloadItems(OtmObject payload, TreeItem<ActionsDAO> ownerItem) {
+        log.debug( "Posting payload of: " + payload );
         if (payload != null) {
-            log.debug( "Posting payload of: " + payload );
-            TreeItem<MemberAndProvidersDAO> payloadItem = new MemberAndProvidersDAO( payload ).createTreeItem( rqItem );
+            TreeItem<ActionsDAO> payloadItem = new ActionsDAO( payload ).createTreeItem( ownerItem );
             if (payload instanceof OtmChildrenOwner)
                 createChildrenItems( (OtmChildrenOwner) payload, payloadItem );
         }
+
     }
 
     @Override
@@ -350,16 +367,16 @@ public class ResourceRQTreeTableController extends DexIncludedControllerBase<Otm
 
     public void select(OtmLibraryMember otm) {
         // if (otm != null) {
-        // for (TreeItem<MemberAndProvidersDAO> item : resourceRQTreeTable.getRoot().getChildren()) {
+        // for (TreeItem<ActionsDAO> item : resourceActionsTreeTable.getRoot().getChildren()) {
         // if (item.getValue().getValue() == otm) {
-        // int row = resourceRQTreeTable.getRow( item );
+        // int row = resourceActionsTreeTable.getRow( item );
         // // This may not highlight the row if the event comes from or goes to a different controller.
         // Platform.runLater( () -> {
         // // ignoreEvents = true;
-        // resourceRQTreeTable.requestFocus();
-        // resourceRQTreeTable.getSelectionModel().clearAndSelect( row );
-        // resourceRQTreeTable.scrollTo( row );
-        // resourceRQTreeTable.getFocusModel().focus( row );
+        // resourceActionsTreeTable.requestFocus();
+        // resourceActionsTreeTable.getSelectionModel().clearAndSelect( row );
+        // resourceActionsTreeTable.scrollTo( row );
+        // resourceActionsTreeTable.getFocusModel().focus( row );
         // // ignoreEvents = false;
         // } );
         // // log.debug("Selected " + otm.getName() + " in member tree.");
@@ -375,6 +392,6 @@ public class ResourceRQTreeTableController extends DexIncludedControllerBase<Otm
     // }
 
     // public void setOnMouseClicked(EventHandler<? super MouseEvent> handler) {
-    // resourceRQTreeTable.setOnMouseClicked( handler );
+    // resourceActionsTreeTable.setOnMouseClicked( handler );
     // }
 }

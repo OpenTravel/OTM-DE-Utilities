@@ -28,40 +28,39 @@ import org.opentravel.dex.controllers.member.MemberRowFactory;
 import org.opentravel.dex.events.DexFilterChangeEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.DexResourceChildSelectionEvent;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
-import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.model.resource.OtmAction;
+import org.opentravel.model.resource.OtmActionResponse;
 
-import javafx.application.Platform;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.SortType;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 /**
- * Manage the library member navigation tree.
+ * Manage the Resource Response tree.
  * 
  * @author dmh
  *
  */
-public class ResourceRSTreeTableController extends DexIncludedControllerBase<OtmModelManager> implements DexController {
+@Deprecated
+public class ResourceRSTreeTableController extends DexIncludedControllerBase<OtmResource> implements DexController {
     private static Log log = LogFactory.getLog( ResourceRSTreeTableController.class );
 
     // Column labels
-    // TODO - externalize strings
     public static final String PREFIXCOLUMNLABEL = "Prefix";
     private static final String NAMECOLUMNLABEL = "Member";
     private static final String VERSIONCOLUMNLABEL = "Version";
@@ -76,6 +75,8 @@ public class ResourceRSTreeTableController extends DexIncludedControllerBase<Otm
     TreeTableView<MemberAndProvidersDAO> resourceRSTreeTable;
     @FXML
     private VBox resourceRSTreeTableView;
+    @FXML
+    private TitledPane rsTitledPane;
 
     //
     TreeItem<MemberAndProvidersDAO> root; // Root of the navigation tree. Is displayed.
@@ -90,9 +91,10 @@ public class ResourceRSTreeTableController extends DexIncludedControllerBase<Otm
     private boolean treeEditingEnabled = true;
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents = {DexFilterChangeEvent.FILTER_CHANGED,
-        DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
-    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
+    private static final EventType[] subscribedEvents =
+        {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED, DexFilterChangeEvent.FILTER_CHANGED,
+            DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] publishedEvents = {};
 
     /**
      * Construct a member tree table controller that can publish and receive events.
@@ -157,7 +159,6 @@ public class ResourceRSTreeTableController extends DexIncludedControllerBase<Otm
     @Override
     public void configure(DexMainController parent) {
         super.configure( parent );
-        // log.debug("Configuring Member Tree Table.");
         eventPublisherNode = resourceRSTreeTableView;
         configure( parent.getModelManager(), treeEditingEnabled );
     }
@@ -191,62 +192,63 @@ public class ResourceRSTreeTableController extends DexIncludedControllerBase<Otm
         buildColumns();
 
         // Add listeners and event handlers
-        resourceRSTreeTable.getSelectionModel().select( 0 );
-        resourceRSTreeTable.setOnKeyReleased( this::keyReleased );
-        // memberTree.setOnMouseClicked(this::mouseClick);
-        resourceRSTreeTable.getSelectionModel().selectedItemProperty()
-            .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
+        // resourceRSTreeTable.getSelectionModel().select( 0 );
+        // resourceRSTreeTable.setOnKeyReleased( this::keyReleased );
+        // // memberTree.setOnMouseClicked(this::mouseClick);
+        // resourceRSTreeTable.getSelectionModel().selectedItemProperty()
+        // .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
         refresh();
     }
 
-    /**
-     * Note: TreeItem class does not extend the Node class. Therefore, you cannot apply any visual effects or add menus
-     * to the tree items. Use the cell factory mechanism to overcome this obstacle and define as much custom behavior
-     * for the tree items as your application requires.
-     * 
-     * @param member the Otm Library Member to add to the tree
-     * @param parent the tree root or parent member
-     * @return
-     */
-    public void createTreeItem(OtmLibraryMember member, TreeItem<MemberAndProvidersDAO> parent) {
-        // log.debug("Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName());
-
-        // Apply Filter
-        if (filter != null && !filter.isSelected( member ))
-            return;
-        // Skip over contextual facets that have been injected into an object. Their contributed facets will be modeled.
-        if ((member instanceof OtmContextualFacet && ((OtmContextualFacet) member).getWhereContributed() != null))
-            return;
-
-        // Create item for the library member
-        TreeItem<MemberAndProvidersDAO> item = new MemberAndProvidersDAO( member ).createTreeItem( parent );
-
-        // Create and add items for children
-        if (member instanceof OtmChildrenOwner)
-            createChildrenItems( member, item );
-    }
+    // /**
+    // * Note: TreeItem class does not extend the Node class. Therefore, you cannot apply any visual effects or add
+    // menus
+    // * to the tree items. Use the cell factory mechanism to overcome this obstacle and define as much custom behavior
+    // * for the tree items as your application requires.
+    // *
+    // * @param member the Otm Library Member to add to the tree
+    // * @param parent the tree root or parent member
+    // * @return
+    // */
+    // public void createTreeItem(OtmLibraryMember member, TreeItem<MemberAndProvidersDAO> parent) {
+    // // log.debug("Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName());
+    //
+    // // Apply Filter
+    // if (filter != null && !filter.isSelected( member ))
+    // return;
+    // // Skip over contextual facets that have been injected into an object. Their contributed facets will be modeled.
+    // if ((member instanceof OtmContextualFacet && ((OtmContextualFacet) member).getWhereContributed() != null))
+    // return;
+    //
+    // // Create item for the library member
+    // TreeItem<MemberAndProvidersDAO> item = new MemberAndProvidersDAO( member ).createTreeItem( parent );
+    //
+    // // Create and add items for children
+    // if (member instanceof OtmChildrenOwner)
+    // createChildrenItems( member, item );
+    // }
 
     /**
      * Create tree items for the type provider children of this child owning member
      */
-    private void createChildrenItems(OtmChildrenOwner member, TreeItem<MemberAndProvidersDAO> parentItem) {
-        member.getChildrenTypeProviders().forEach( p -> {
-            TreeItem<MemberAndProvidersDAO> cfItem = new MemberAndProvidersDAO( p ).createTreeItem( parentItem );
+    private void createChildrenItems(OtmChildrenOwner childOwner, TreeItem<MemberAndProvidersDAO> parentItem) {
+        childOwner.getChildren().forEach( child -> {
+            TreeItem<MemberAndProvidersDAO> cfItem = new MemberAndProvidersDAO( child ).createTreeItem( parentItem );
 
             // Only use contextual facet for recursing
-            if (p instanceof OtmContributedFacet && ((OtmContributedFacet) p).getContributor() != null)
-                p = ((OtmContributedFacet) p).getContributor();
+            if (child instanceof OtmContributedFacet && ((OtmContributedFacet) child).getContributor() != null)
+                child = ((OtmContributedFacet) child).getContributor();
 
             // Recurse
-            if (p instanceof OtmChildrenOwner)
-                createChildrenItems( (OtmChildrenOwner) p, cfItem );
+            if (child instanceof OtmChildrenOwner)
+                createChildrenItems( (OtmChildrenOwner) child, cfItem );
         } );
     }
 
-    public MemberFilterController getFilter() {
-        return filter;
-    }
+    // public MemberFilterController getFilter() {
+    // return filter;
+    // }
 
     public TreeItem<MemberAndProvidersDAO> getRoot() {
         return root;
@@ -257,14 +259,20 @@ public class ResourceRSTreeTableController extends DexIncludedControllerBase<Otm
             ? resourceRSTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
     }
 
-    private void handleEvent(DexFilterChangeEvent event) {
-        if (!ignoreEvents)
-            refresh();
-    }
+    // private void handleEvent(DexFilterChangeEvent event) {
+    // if (!ignoreEvents)
+    // refresh();
+    // }
+
 
     private void handleEvent(DexMemberSelectionEvent event) {
-        if (!ignoreEvents)
-            select( event.getMember() );
+        if (!ignoreEvents && event.getMember() instanceof OtmResource)
+            post( (OtmResource) event.getMember() );
+    }
+
+    private void handleEvent(DexResourceChildSelectionEvent event) {
+        if (!ignoreEvents && event.get() instanceof OtmResourceChild)
+            post( event.get().getOwningMember() );
     }
 
     @Override
@@ -273,119 +281,135 @@ public class ResourceRSTreeTableController extends DexIncludedControllerBase<Otm
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
-            if (event instanceof DexFilterChangeEvent)
-                handleEvent( (DexFilterChangeEvent) event );
+            if (event instanceof DexResourceChildSelectionEvent)
+                handleEvent( (DexResourceChildSelectionEvent) event );
             if (event instanceof DexModelChangeEvent)
-                post( ((DexModelChangeEvent) event).getModelManager() );
+                clear();
             else
                 refresh();
         }
     }
 
-    public void keyReleased(KeyEvent event) {
-        TreeItem<MemberAndProvidersDAO> item = resourceRSTreeTable.getSelectionModel().getSelectedItem();
-        int row = resourceRSTreeTable.getSelectionModel().getSelectedIndex();
-        // log.debug("Selection row = " + row);
-        if (event.getCode() == KeyCode.RIGHT) {
-            event.consume();
-            item.setExpanded( true );
-            resourceRSTreeTable.getSelectionModel().clearAndSelect( row + 1, nameColumn );
-        } else if (event.getCode() == KeyCode.LEFT) {
-            TreeItem<MemberAndProvidersDAO> parent = item.getParent();
-            if (parent != null && parent != item && parent != root) {
-                resourceRSTreeTable.getSelectionModel().select( parent );
-                parent.setExpanded( false );
-                row = resourceRSTreeTable.getSelectionModel().getSelectedIndex();
-                resourceRSTreeTable.getSelectionModel().clearAndSelect( row, nameColumn );
-                event.consume();
-            }
-        }
-    }
 
-    /**
-     * Listener for selected library members in the tree table.
-     * 
-     * @param item
-     */
-    private void memberSelectionListener(TreeItem<MemberAndProvidersDAO> item) {
-        if (item == null)
-            return;
-        // log.debug("Selection Listener: " + item.getValue());
-        assert item != null;
-        boolean editable = false;
-        if (treeEditingEnabled && item.getValue() != null)
-            editable = item.getValue().isEditable();
-        nameColumn.setEditable( editable ); // TODO - is this still useful?
-        ignoreEvents = true;
-        if (eventPublisherNode != null)
-            eventPublisherNode.fireEvent( new DexMemberSelectionEvent( this, item ) );
-        ignoreEvents = false;
-    }
+    // /**
+    // * Listener for selected library members in the tree table.
+    // *
+    // * @param item
+    // */
+    // private void memberSelectionListener(TreeItem<MemberAndProvidersDAO> item) {
+    // if (item == null)
+    // return;
+    // // log.debug("Selection Listener: " + item.getValue());
+    // assert item != null;
+    // boolean editable = false;
+    // if (treeEditingEnabled && item.getValue() != null)
+    // editable = item.getValue().isEditable();
+    // nameColumn.setEditable( editable ); // TODO - is this still useful?
+    // ignoreEvents = true;
+    // if (eventPublisherNode != null)
+    // eventPublisherNode.fireEvent( new DexMemberSelectionEvent( this, item ) );
+    // ignoreEvents = false;
+    // }
 
-    public void mouseClick(MouseEvent event) {
-        // this fires after the member selection listener
-        if (event.getButton().equals( MouseButton.PRIMARY ) && event.getClickCount() == 2)
-            log.debug( "Double click selection: " );
-        // + memberTree.getSelectionModel().getSelectedItem().getValue().nameProperty().toString());
-    }
-
-    /**
-     * Get the library members from the model manager and put them into a cleared tree.
-     * 
-     * @param modelMgr
-     */
     @Override
-    public void post(OtmModelManager modelMgr) {
-        ignoreEvents = true;
-        if (modelMgr != null && resourceRSTreeTable != null) {
-            currentModelMgr = modelMgr;
-            resourceRSTreeTable.getSelectionModel().clearSelection();
-            resourceRSTreeTable.getRoot().getChildren().clear();
+    public void post(OtmResource resource) {
+        postedData = resource;
+        clear();
 
-            // create cells for members
-            currentModelMgr.getMembers().forEach( m -> createTreeItem( m, root ) );
-            try {
-                resourceRSTreeTable.sort();
-            } catch (Exception e) {
-                // why does first sort always throw exception?
-                log.warn( "Exception sorting: " + e.getLocalizedMessage() );
-            }
-        }
-        ignoreEvents = false;
+        if (resource != null)
+            resource.getActions().forEach( a -> createTreeItem( a, root ) );
+
     }
+
+    public void createTreeItem(OtmAction action, TreeItem<MemberAndProvidersDAO> parent) {
+        // Create item for the request
+        TreeItem<MemberAndProvidersDAO> actionItem = new MemberAndProvidersDAO( action ).createTreeItem( parent );
+
+        // Create request item
+        if (action.getRequest() != null) {
+            TreeItem<MemberAndProvidersDAO> requestItem =
+                new MemberAndProvidersDAO( action.getRequest() ).createTreeItem( actionItem );
+            createPayloadItems( action.getRequest().getPayload(), requestItem );
+        }
+
+        // Create response items
+        for (OtmActionResponse response : action.getResponses()) {
+            TreeItem<MemberAndProvidersDAO> responseItem =
+                new MemberAndProvidersDAO( response ).createTreeItem( actionItem );
+            createPayloadItems( response.getPayload(), responseItem );
+        }
+
+    }
+
+    // Model the pay load if any
+    private void createPayloadItems(OtmObject payload, TreeItem<MemberAndProvidersDAO> ownerItem) {
+        log.debug( "Posting payload of: " + payload );
+        if (payload != null) {
+            TreeItem<MemberAndProvidersDAO> payloadItem =
+                new MemberAndProvidersDAO( payload ).createTreeItem( ownerItem );
+            if (payload instanceof OtmChildrenOwner)
+                createChildrenItems( (OtmChildrenOwner) payload, payloadItem );
+        }
+
+    }
+
+    // /**
+    // * Get the library members from the model manager and put them into a cleared tree.
+    // *
+    // * @param modelMgr
+    // */
+    // @Override
+    // public void post(OtmModelManager modelMgr) {
+    // ignoreEvents = true;
+    // if (modelMgr != null && resourceRSTreeTable != null) {
+    // currentModelMgr = modelMgr;
+    // resourceRSTreeTable.getSelectionModel().clearSelection();
+    // resourceRSTreeTable.getRoot().getChildren().clear();
+    //
+    // // create cells for members
+    // currentModelMgr.getMembers().forEach( m -> createTreeItem( m, root ) );
+    // try {
+    // resourceRSTreeTable.sort();
+    // } catch (Exception e) {
+    // // why does first sort always throw exception?
+    // log.warn( "Exception sorting: " + e.getLocalizedMessage() );
+    // }
+    // }
+    // ignoreEvents = false;
+    // }
 
     @Override
     public void refresh() {
-        post( currentModelMgr );
+        post( postedData );
     }
 
-    public void select(OtmLibraryMember otm) {
-        if (otm != null) {
-            for (TreeItem<MemberAndProvidersDAO> item : resourceRSTreeTable.getRoot().getChildren()) {
-                if (item.getValue().getValue() == otm) {
-                    int row = resourceRSTreeTable.getRow( item );
-                    // This may not highlight the row if the event comes from or goes to a different controller.
-                    Platform.runLater( () -> {
-                        // ignoreEvents = true;
-                        resourceRSTreeTable.requestFocus();
-                        resourceRSTreeTable.getSelectionModel().clearAndSelect( row );
-                        resourceRSTreeTable.scrollTo( row );
-                        resourceRSTreeTable.getFocusModel().focus( row );
-                        // ignoreEvents = false;
-                    } );
-                    // log.debug("Selected " + otm.getName() + " in member tree.");
-                    return;
-                }
-            }
-            log.warn( otm.getName() + " not found in member tree." );
-        }
-    }
+    // public void select(OtmLibraryMember otm) {
+    // if (otm != null) {
+    // for (TreeItem<MemberAndProvidersDAO> item : resourceRSTreeTable.getRoot().getChildren()) {
+    // if (item.getValue().getValue() == otm) {
+    // int row = resourceRSTreeTable.getRow( item );
+    // // This may not highlight the row if the event comes from or goes to a different controller.
+    // Platform.runLater( () -> {
+    // // ignoreEvents = true;
+    // resourceRSTreeTable.requestFocus();
+    // resourceRSTreeTable.getSelectionModel().clearAndSelect( row );
+    // resourceRSTreeTable.scrollTo( row );
+    // resourceRSTreeTable.getFocusModel().focus( row );
+    // // ignoreEvents = false;
+    // } );
+    // // log.debug("Selected " + otm.getName() + " in member tree.");
+    // return;
+    // }
+    // }
+    // log.warn( otm.getName() + " not found in member tree." );
+    // }
+    // }
 
-    public void setFilter(MemberFilterController filter) {
-        this.filter = filter;
-    }
-
-    public void setOnMouseClicked(EventHandler<? super MouseEvent> handler) {
-        resourceRSTreeTable.setOnMouseClicked( handler );
-    }
+    // public void setFilter(MemberFilterController filter) {
+    // this.filter = filter;
+    // }
+    //
+    // public void setOnMouseClicked(EventHandler<? super MouseEvent> handler) {
+    // resourceRSTreeTable.setOnMouseClicked( handler );
+    // }
 }

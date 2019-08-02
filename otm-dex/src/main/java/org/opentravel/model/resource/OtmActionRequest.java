@@ -22,6 +22,7 @@ import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelElement;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.schemacompiler.model.TLActionFacet;
 import org.opentravel.schemacompiler.model.TLActionRequest;
@@ -166,10 +167,21 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         return new ReadOnlyStringWrapper( getTL().getHttpMethod().toString() );
     }
 
+    /**
+     * Get the example pay load from the resources URL helper in a string property
+     * 
+     * @return
+     */
+    public StringProperty examplePayloadProperty() {
+        if (getOwningMember() != null)
+            return new ReadOnlyStringWrapper( getOwningMember().getPayloadExample( this ) );
+        return new ReadOnlyStringWrapper( "" );
+    }
+
     public StringProperty urlProperty() {
         if (getOwningMember() != null)
             return new ReadOnlyStringWrapper( getOwningMember().getURL( getOwner() ) );
-        return new ReadOnlyStringWrapper( "http://www.travelport.com/Members/{memberID}" );
+        return new ReadOnlyStringWrapper( "http://www.example.com/Members/{memberID}" );
     }
 
     /**
@@ -202,6 +214,14 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     /**
+     * 
+     * @return the Otm object used as the payload or null
+     */
+    public OtmObject getPayload() {
+        return getPayloadType() != null ? getPayloadType().getRequestPayload() : null;
+    }
+
+    /**
      * Try to return the name of the payload action facet. If null, try the TL's payload type name.
      * 
      * @return
@@ -212,4 +232,10 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         return getTL().getPayloadTypeName() != null ? getTL().getPayloadTypeName() : "";
     }
 
+    /**
+     * Java model:
+     * <P>
+     * Action Request Info [] - each path parameter
+     * 
+     */
 }

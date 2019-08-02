@@ -25,9 +25,10 @@
 					    <!-- VBox>
 						   <children -->
                                  <fx:include fx:id="resourceDetails" source="ResourceDetails.fxml" />
-                                 <fx:include fx:id="resourcePathsTree" source="ResourcePathsTree.fxml" />
+                                 <!-- fx:include fx:id="resourcePathsTree" source="ResourcePathsTree.fxml" />
                                  <fx:include fx:id="resourceRQTreeTable" source="ResourceRQTreeTable.fxml" />
-                                 <fx:include fx:id="resourceRSTreeTable" source="ResourceRSTreeTable.fxml" />
+                                 <fx:include fx:id="resourceRSTreeTable" source="ResourceRSTreeTable.fxml" / -->
+                                 <fx:include fx:id="resourceActionsTreeTable" source="ResourceActionsTreeTable.fxml" />
                                  <fx:include fx:id="resourceErrorsTreeTable" source="ResourceErrorsTreeTable.fxml" />
 						   <!-- /children>
 						</VBox -->

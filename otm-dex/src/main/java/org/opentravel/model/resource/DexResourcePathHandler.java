@@ -52,9 +52,9 @@ public class DexResourcePathHandler {
         builder.append( getCollectionContribution( action.getRequest() ) );
         builder.append( getPathParameterContributions( action.getRequest() ) );
         builder.append( getQueryParameterContributions( action.getRequest() ) );
-        builder.append( "  " + getPayloadExample( action.getRequest() ) );
         return builder.toString();
     }
+
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -115,11 +115,19 @@ public class DexResourcePathHandler {
         return value;
     }
 
-    protected String getPayloadExample(OtmActionRequest request) {
+    public String getPayloadExample(OtmActionRequest request) {
         String payload = "";
         if (request != null && request.getTL().getPayloadType() != null)
             payload = request.getPayloadTypeName();
-        return !payload.isEmpty() ? " <" + payload + ">...</" + payload + ">" : "";
+        return !payload.isEmpty() ? " <" + payload + ">...</" + payload + ">" : "NONE";
+    }
+
+    public String getPayloadExample(OtmActionResponse response) {
+        // FIXME
+        String payload = "";
+        if (response != null && response.getTL().getPayloadType() != null)
+            payload = response.getPayloadTypeName();
+        return !payload.isEmpty() ? " <" + payload + ">...</" + payload + ">" : "NONE";
     }
 
     private String getResourceBaseURL() {

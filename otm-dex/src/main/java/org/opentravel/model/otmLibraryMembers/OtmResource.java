@@ -31,6 +31,7 @@ import org.opentravel.model.resource.DexResourcePathHandler;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.model.resource.OtmActionRequest;
+import org.opentravel.model.resource.OtmActionResponse;
 import org.opentravel.model.resource.OtmParameterGroup;
 import org.opentravel.model.resource.OtmParentRef;
 import org.opentravel.schemacompiler.model.NamedEntity;
@@ -67,8 +68,17 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         pathHandler = new DexResourcePathHandler( this );
     }
 
+
     public String getURL(OtmAction action) {
         return pathHandler.get( action );
+    }
+
+    public String getPayloadExample(OtmActionRequest request) {
+        return pathHandler.getPayloadExample( request );
+    }
+
+    public String getPayloadExample(OtmActionResponse response) {
+        return pathHandler.getPayloadExample( response );
     }
 
     public OtmResource(String name, OtmModelManager mgr) {
@@ -305,6 +315,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return requests;
     }
 
+    // FIXME
+    // Add namespace to fields.
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
         fields.add( new DexEditField( 0, 0, extension_LABEL, extension_TOOLTIP, new ComboBox<String>() ) );
