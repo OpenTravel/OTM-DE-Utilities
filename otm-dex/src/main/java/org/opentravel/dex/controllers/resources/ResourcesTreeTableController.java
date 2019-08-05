@@ -315,7 +315,7 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
                 event = new DexResourceChildSelectionEvent( (OtmResourceChild) item.getValue().getValue() );
 
             ignoreEvents = true;
-            if (event != null)
+            if (eventPublisherNode != null && event != null)
                 eventPublisherNode.fireEvent( event );
             ignoreEvents = false;
         }

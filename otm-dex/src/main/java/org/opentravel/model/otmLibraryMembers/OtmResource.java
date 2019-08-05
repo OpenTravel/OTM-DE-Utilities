@@ -222,6 +222,10 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return getAssignedType();
     }
 
+    public String getBusinessObjectName() {
+        return getAssignedType() != null ? getAssignedType().getName() : "";
+    }
+
     /**
      * {@inheritDoc} Returns the TL business object reference name not getName() of the assigned type
      * 
@@ -321,7 +325,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         List<DexEditField> fields = new ArrayList<>();
         fields.add( new DexEditField( 0, 0, extension_LABEL, extension_TOOLTIP, new ComboBox<String>() ) );
         fields.add( new DexEditField( 1, 0, businessObject_LABEL, businessObject_TOOLTIP,
-            new Button( getBusinessObject().getName() ) ) );
+            new Button( getBusinessObjectName() ) ) );
         fields.add( new DexEditField( 2, 0, basePath_LABEL, basePath_TOOLTIP, new TextField() ) );
         fields.add( new DexEditField( 3, 0, null, abstract_TOOLTIP, new CheckBox( abstract_LABEL ) ) );
         fields.add( new DexEditField( 3, 1, null, firstClass_TOOLTIP, new CheckBox( firstClass_LABEL ) ) );
