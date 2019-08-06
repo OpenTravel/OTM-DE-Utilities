@@ -20,18 +20,60 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.DexTabController;
+import org.opentravel.dex.controllers.popup.DexPopupControllerBase;
+
+import java.io.IOException;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 /**
- * Manage the resource tab.
+ * Manage the stand-alone resource window.
  * 
  * @author dmh
  *
  */
-public class ResourcesTabController implements DexTabController {
-    private static Log log = LogFactory.getLog( ResourcesTabController.class );
+public class ResourcesWindowController extends DexPopupControllerBase {
+    private static Log log = LogFactory.getLog( ResourcesWindowController.class );
+
+    public static final String LAYOUT_FILE = "/ResourceViews/ResourcesWindow.fxml";
+
+    private static String dialogTitle = "Resources";
+
+    protected static Stage dialogStage;
+
+    /**
+     * Initialize this controller using the passed FXML loader.
+     * <p>
+     * Note: This approach using a static stage and main controller hides the complexity from calling controller.
+     * Otherwise, this code must migrate into the calling controller.
+     * 
+     */
+    public static ResourcesWindowController init() {
+        FXMLLoader loader = new FXMLLoader( ResourcesWindowController.class.getResource( LAYOUT_FILE ) );
+        ResourcesWindowController controller = null;
+        try {
+            // Load the fxml file initialize controller it declares.
+            Pane pane = loader.load();
+            // Create scene and stage
+            dialogStage = new Stage();
+            dialogStage.setScene( new Scene( pane ) );
+            dialogStage.initModality( Modality.NONE );
+
+            // get the controller from loader.
+            controller = loader.getController();
+            if (!(controller instanceof ResourcesWindowController))
+                throw new IllegalStateException( "Error creating resources window controller." );
+        } catch (IOException e1) {
+            throw new IllegalStateException(
+                "Error loading resources window. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
+        }
+        return controller;
+    }
 
     /**
      * FXML Java FX Nodes this controller is dependent upon
@@ -40,18 +82,12 @@ public class ResourcesTabController implements DexTabController {
     private ResourcesTreeTableController resourcesTreeTableController;
     @FXML
     private ResourceDetailsController resourceDetailsController;
-    // @FXML
-    // private ResourcePathsTreeController resourcePathsTreeController;
     @FXML
     private ResourceActionsTreeTableController resourceActionsTreeTableController;
-    // @FXML
-    // private ResourceRQTreeTableController resourceRQTreeTableController;
-    // @FXML
-    // private ResourceRSTreeTableController resourceRSTreeTableController;
     @FXML
     private ResourceErrorsTreeTableController resourceErrorsTreeTableController;
 
-    public ResourcesTabController() {
+    public ResourcesWindowController() {
         log.debug( "Resource Tab Controller constructed." );
     }
 
@@ -62,14 +98,8 @@ public class ResourcesTabController implements DexTabController {
         if (!(resourceDetailsController instanceof ResourceDetailsController))
             throw new IllegalStateException( "Resource child details controller not injected by FXML." );
 
-        // if (!(resourcePathsTreeController instanceof ResourcePathsTreeController))
-        // throw new IllegalStateException( "Resource path controller not injected by FXML." );
-
         if (!(resourceActionsTreeTableController instanceof ResourceActionsTreeTableController))
             throw new IllegalStateException( "Resource Actions controller not injected by FXML." );
-
-        // if (!(resourceRSTreeTableController instanceof ResourceRSTreeTableController))
-        // throw new IllegalStateException( "Resource RS controller not injected by FXML." );
 
         if (!(resourceErrorsTreeTableController instanceof ResourceErrorsTreeTableController))
             throw new IllegalStateException( "Resource Errors controller not injected by FXML." );
@@ -86,15 +116,29 @@ public class ResourcesTabController implements DexTabController {
     /**
      * @param primaryStage
      */
-    @Override
+    // @Override
     public void configure(DexMainController parent) {
+        if (parent == null) {
+            log.debug( "Null main controller when configuring resources window" );
+            return;
+        }
+
         OtmEventSubscriptionManager eventManager = parent.getEventSubscriptionManager();
         parent.addIncludedController( resourcesTreeTableController, eventManager );
         parent.addIncludedController( resourceDetailsController, eventManager );
-        // parent.addIncludedController( resourcePathsTreeController );
         parent.addIncludedController( resourceActionsTreeTableController, eventManager );
-        // parent.addIncludedController( resourceRSTreeTableController );
         parent.addIncludedController( resourceErrorsTreeTableController, eventManager );
-        log.debug( "Repository Tab configured." );
+
+        eventManager.configureEventHandlers();
+        log.debug( "Repository window configured." );
+    }
+
+    /**
+     * @see org.opentravel.dex.controllers.popup.DexPopupControllerBase#setup(java.lang.String)
+     */
+    @Override
+    public void setup(String message) {
+        super.setStage( dialogTitle, dialogStage );
+        // log.debug( "MUST configure with DexMainController" );
     }
 }

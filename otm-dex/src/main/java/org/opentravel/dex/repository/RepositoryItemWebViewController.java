@@ -18,12 +18,12 @@ package org.opentravel.dex.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.events.DexRepositoryItemSelectionEvent;
 import org.opentravel.dex.events.DexRepositoryNamespaceSelectionEvent;
 import org.opentravel.dex.events.DexRepositorySelectionEvent;
 
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -75,7 +75,7 @@ public class RepositoryItemWebViewController extends DexIncludedControllerBase<R
     }
 
     @Override
-    public void handleEvent(Event e) {
+    public void handleEvent(AbstractOtmEvent e) {
         if (e instanceof DexRepositoryItemSelectionEvent)
             handleEvent( (DexRepositoryItemSelectionEvent) e );
         else if (e instanceof DexRepositoryNamespaceSelectionEvent)

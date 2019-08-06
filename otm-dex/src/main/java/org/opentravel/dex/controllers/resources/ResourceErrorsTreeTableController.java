@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.resources;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.common.cellfactories.ValidationErrorsAndWarningsTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexController;
@@ -33,7 +34,6 @@ import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.validate.ValidationFinding;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
@@ -76,8 +76,8 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
     private boolean treeEditingEnabled = true;
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents =
-        {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] subscribedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED,
+        DexMemberSelectionEvent.RESOURCE_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
 
     /**
@@ -199,7 +199,7 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
     }
 
     @Override
-    public void handleEvent(Event event) {
+    public void handleEvent(AbstractOtmEvent event) {
         // log.debug(event.getEventType() + " event received. Ignore? " + ignoreEvents);
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)

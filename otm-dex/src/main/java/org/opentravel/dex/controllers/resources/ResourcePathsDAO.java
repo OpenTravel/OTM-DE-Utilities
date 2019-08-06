@@ -38,6 +38,7 @@ import javafx.scene.image.ImageView;
  * @param <T>
  *
  */
+@Deprecated
 public class ResourcePathsDAO implements DexDAO<OtmActionRequest> {
     private static Log log = LogFactory.getLog( ResourcePathsDAO.class );
 

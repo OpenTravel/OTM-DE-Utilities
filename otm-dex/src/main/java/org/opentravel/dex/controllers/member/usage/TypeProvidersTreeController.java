@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.member.usage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
@@ -32,7 +33,6 @@ import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Tooltip;
@@ -201,7 +201,7 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
     }
 
     @Override
-    public void handleEvent(Event event) {
+    public void handleEvent(AbstractOtmEvent event) {
         log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)

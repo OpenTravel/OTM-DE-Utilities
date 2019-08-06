@@ -18,13 +18,14 @@ package org.opentravel.dex.controllers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.OtmEventUser;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.events.DexEvent;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
@@ -42,14 +43,15 @@ import javafx.scene.control.TreeTableColumn;
  * @author dmh
  *
  */
-public abstract class DexIncludedControllerBase<C> implements DexIncludedController<C> {
+public abstract class DexIncludedControllerBase<C> implements DexIncludedController<C>, OtmEventUser {
     private static Log log = LogFactory.getLog( DexIncludedControllerBase.class );
 
     protected DexMainController mainController;
     protected C postedData;
 
-    protected List<EventType> publishedEventTypes = null;
-    protected List<EventType> subscribedEventTypes = null;
+    // Lists to copy static arrays declared in the sub-types
+    protected List<EventType<? extends AbstractOtmEvent>> publishedEventTypes = null;
+    protected List<EventType<? extends AbstractOtmEvent>> subscribedEventTypes = null;
     // source FX Node for events fired from this controller. None fired if null.
     protected Node eventPublisherNode = null;
 
@@ -83,23 +85,25 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
 
     @Override
     // @SuppressWarnings("rawtypes")
-    public List<EventType> getPublishedEventTypes() {
+    public List<EventType<? extends AbstractOtmEvent>> getPublishedEventTypes() {
         return publishedEventTypes != null ? publishedEventTypes : Collections.emptyList();
     }
 
     @Override
     // @SuppressWarnings("rawtypes")
-    public List<EventType> getSubscribedEventTypes() {
+    public List<EventType<? extends AbstractOtmEvent>> getSubscribedEventTypes() {
         return subscribedEventTypes != null ? subscribedEventTypes : Collections.emptyList();
     }
 
     @Override
-    public void handleEvent(Event e) {
+    public void handleEvent(AbstractOtmEvent e) {
         // override
     }
 
     @Override
-    public void setEventHandler(EventType<? extends DexEvent> type, EventHandler<DexEvent> handler) {
+    public void setEventHandler(EventType<? extends AbstractOtmEvent> type, EventHandler<AbstractOtmEvent> handler) {
+        if (type == null || handler == null)
+            return; // Error
         if (eventPublisherNode != null && publishedEventTypes.contains( type )) {
             eventPublisherNode.addEventHandler( type, handler );
             log.debug( "Event handler set: " + type.getName() + " " + handler.getClass().getName() );
@@ -181,6 +185,7 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
         if (width > 0)
             c.setPrefWidth( width );
     }
+
 
     /**
      * TODO

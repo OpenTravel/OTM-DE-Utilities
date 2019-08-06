@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.member;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.actions.DexActionManager.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
@@ -31,7 +32,6 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -139,7 +139,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     }
 
     @Override
-    public void handleEvent(Event event) {
+    public void handleEvent(AbstractOtmEvent event) {
         if (event instanceof DexMemberSelectionEvent)
             memberSelectionHandler( (DexMemberSelectionEvent) event );
         if (event instanceof DexModelChangeEvent)

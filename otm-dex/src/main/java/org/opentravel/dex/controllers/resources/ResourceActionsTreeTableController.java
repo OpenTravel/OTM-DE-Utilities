@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.resources;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.cellfactories.ValidationActionTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
@@ -37,8 +38,8 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionResponse;
+import org.opentravel.model.resource.OtmParameter;
 
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.TitledPane;
@@ -88,8 +89,9 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
     private boolean treeEditingEnabled = true;
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents = {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED,
-        DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] subscribedEvents =
+        {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED, DexMemberSelectionEvent.RESOURCE_SELECTED,
+            DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
 
     /**
@@ -181,9 +183,6 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         buildColumns();
 
         // Add listeners and event handlers
-        // resourceActionsTreeTable.getSelectionModel().select( 0 );
-        // resourceActionsTreeTable.setOnKeyReleased( this::keyReleased );
-        // // memberTree.setOnMouseClicked(this::mouseClick);
         resourceActionsTreeTable.getSelectionModel().selectedItemProperty()
             .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
@@ -207,10 +206,6 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         }
     }
 
-    // public MemberFilterController getFilter() {
-    // return filter;
-    // }
-
     public TreeItem<ActionsDAO> getRoot() {
         return root;
     }
@@ -219,11 +214,6 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         return resourceActionsTreeTable.getSelectionModel().getSelectedItem() != null
             ? resourceActionsTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
     }
-
-    // private void handleEvent(DexFilterChangeEvent event) {
-    // if (!ignoreEvents)
-    // refresh();
-    // }
 
     private void handleEvent(DexMemberSelectionEvent event) {
         if (!ignoreEvents && event.getMember() instanceof OtmResource)
@@ -236,7 +226,7 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
     }
 
     @Override
-    public void handleEvent(Event event) {
+    public void handleEvent(AbstractOtmEvent event) {
         // log.debug(event.getEventType() + " event received. Ignore? " + ignoreEvents);
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
@@ -252,26 +242,6 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         }
     }
 
-    // public void keyReleased(KeyEvent event) {
-    // TreeItem<ActionsDAO> item = resourceActionsTreeTable.getSelectionModel().getSelectedItem();
-    // int row = resourceActionsTreeTable.getSelectionModel().getSelectedIndex();
-    // // log.debug("Selection row = " + row);
-    // if (event.getCode() == KeyCode.RIGHT) {
-    // event.consume();
-    // item.setExpanded( true );
-    // resourceActionsTreeTable.getSelectionModel().clearAndSelect( row + 1, nameColumn );
-    // } else if (event.getCode() == KeyCode.LEFT) {
-    // TreeItem<ActionsDAO> parent = item.getParent();
-    // if (parent != null && parent != item && parent != root) {
-    // resourceActionsTreeTable.getSelectionModel().select( parent );
-    // parent.setExpanded( false );
-    // row = resourceActionsTreeTable.getSelectionModel().getSelectedIndex();
-    // resourceActionsTreeTable.getSelectionModel().clearAndSelect( row, nameColumn );
-    // event.consume();
-    // }
-    // }
-    // }
-
     /**
      * Listener for selected library members in the tree table.
      *
@@ -286,22 +256,18 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
             OtmLibraryMember member = null;
             if (obj instanceof OtmLibraryMember)
                 member = (OtmLibraryMember) obj;
+            else if (obj instanceof OtmParameter)
+                member = ((OtmParameter) obj).getFieldOwner();
             else if (obj instanceof OtmTypeUser && ((OtmTypeUser) obj).getAssignedType() != null)
                 member = ((OtmTypeUser) obj).getAssignedType().getOwningMember();
-            else
-                member = obj.getOwningMember();
+            // else
+            // member = obj.getOwningMember();
             ignoreEvents = true;
-            eventPublisherNode.fireEvent( new DexMemberSelectionEvent( member ) );
+            if (member != null)
+                eventPublisherNode.fireEvent( new DexMemberSelectionEvent( member ) );
             ignoreEvents = false;
         }
     }
-
-    // public void mouseClick(MouseEvent event) {
-    // // this fires after the member selection listener
-    // if (event.getButton().equals( MouseButton.PRIMARY ) && event.getClickCount() == 2)
-    // log.debug( "Double click selection: " );
-    // // + memberTree.getSelectionModel().getSelectedItem().getValue().nameProperty().toString());
-    // }
 
     /**
      * 
@@ -365,33 +331,4 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         post( postedData );
     }
 
-    public void select(OtmLibraryMember otm) {
-        // if (otm != null) {
-        // for (TreeItem<ActionsDAO> item : resourceActionsTreeTable.getRoot().getChildren()) {
-        // if (item.getValue().getValue() == otm) {
-        // int row = resourceActionsTreeTable.getRow( item );
-        // // This may not highlight the row if the event comes from or goes to a different controller.
-        // Platform.runLater( () -> {
-        // // ignoreEvents = true;
-        // resourceActionsTreeTable.requestFocus();
-        // resourceActionsTreeTable.getSelectionModel().clearAndSelect( row );
-        // resourceActionsTreeTable.scrollTo( row );
-        // resourceActionsTreeTable.getFocusModel().focus( row );
-        // // ignoreEvents = false;
-        // } );
-        // // log.debug("Selected " + otm.getName() + " in member tree.");
-        // return;
-        // }
-        // }
-        // log.warn( otm.getName() + " not found in member tree." );
-        // }
-    }
-
-    // public void setFilter(MemberFilterController filter) {
-    // this.filter = filter;
-    // }
-
-    // public void setOnMouseClicked(EventHandler<? super MouseEvent> handler) {
-    // resourceActionsTreeTable.setOnMouseClicked( handler );
-    // }
 }

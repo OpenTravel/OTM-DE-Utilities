@@ -18,6 +18,7 @@ package org.opentravel.dex.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexModelChangeEvent;
@@ -28,7 +29,6 @@ import org.opentravel.schemacompiler.repository.RepositoryItem;
 
 import java.util.HashMap;
 
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -129,7 +129,7 @@ public class NamespaceLibrariesTreeTableController extends DexIncludedController
     }
 
     @Override
-    public void handleEvent(Event event) {
+    public void handleEvent(AbstractOtmEvent event) {
         // log.debug("Received event: " + event.getClass().getSimpleName());
         if (event instanceof DexRepositoryNamespaceSelectionEvent)
             handleEvent( (DexRepositoryNamespaceSelectionEvent) event );

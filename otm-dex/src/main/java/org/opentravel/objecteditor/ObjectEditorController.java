@@ -31,7 +31,6 @@ import org.opentravel.dex.repository.RepositoryTabController;
 
 import java.awt.Dimension;
 
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 
@@ -111,12 +110,12 @@ public class ObjectEditorController extends DexMainControllerBase {
         // Point position = userSettings.getWindowPosition();
 
         // Set up menu bar and show the project combo
-        addIncludedController( menuBarWithProjectController );
+        addIncludedController( menuBarWithProjectController, eventManager );
         menuBarWithProjectController.showCombo( true );
         menuBarController = menuBarWithProjectController; // Make available to base class
 
         // Setup status controller
-        addIncludedController( dexStatusController );
+        addIncludedController( dexStatusController, eventManager );
         statusController = dexStatusController; // Make available to base class
 
         repositoryTabController.configure( this ); // TODO - this is slow!
@@ -125,14 +124,15 @@ public class ObjectEditorController extends DexMainControllerBase {
         whereUsedTabController.configure( this );
 
         // Include controllers that are not in tabs
-        addIncludedController( memberFilterController );
-        addIncludedController( memberTreeTableController );
+        addIncludedController( memberFilterController, eventManager );
+        addIncludedController( memberTreeTableController, eventManager );
         memberTreeTableController.setFilter( memberFilterController );
 
         memberPropertiesTabController.configure( this );
 
         // Now that all controller's event requirements are known
-        configureEventHandlers();
+        eventManager.configureEventHandlers();
+
         setMainController( this );
     }
 
@@ -142,14 +142,36 @@ public class ObjectEditorController extends DexMainControllerBase {
         checkNodes();
     }
 
-    // Fires whenever a tab is selected. Fires on closed tab and opened tab.
-    @FXML
-    public void whereUsedTabSelection(Event e) {
-        log.debug( "Where used tab selection event" );
-    }
+    // @Override
+    // public List<EventType<? extends AbstractOtmEvent>> getPublishedEventTypes() {
+    // // NO-OP - does not publish any events
+    // return null;
+    // }
+    //
+    // @Override
+    // public List<EventType<? extends AbstractOtmEvent>> getSubscribedEventTypes() {
+    // // NO-OP - does not subscribe to any events
+    // return null;
+    // }
+    //
+    // @Override
+    // public void handleEvent(AbstractOtmEvent event) {
+    // // NO-OP - does not handle any events
+    // }
+    //
+    // @Override
+    // public void setEventHandler(EventType<? extends AbstractOtmEvent> type, EventHandler<AbstractOtmEvent> handler) {
+    // // NO-OP - does not publish any events
+    // }
 
-    @FXML
-    public void memberTabSelection(Event e) {
-        log.debug( "memberTab selection event" );
-    }
+    // // Fires whenever a tab is selected. Fires on closed tab and opened tab.
+    // @FXML
+    // public void whereUsedTabSelection(Event e) {
+    // log.debug( "Where used tab selection event" );
+    // }
+
+    // @FXML
+    // public void memberTabSelection(Event e) {
+    // log.debug( "memberTab selection event" );
+    // }
 }

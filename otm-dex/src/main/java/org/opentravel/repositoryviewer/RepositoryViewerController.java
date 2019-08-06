@@ -54,6 +54,7 @@ public class RepositoryViewerController extends DexMainControllerBase implements
     @FXML
     private MenuBarWithProjectController menuBarWithProjectController;
 
+
     @Override
     public void checkNodes() {
         if (!(repositoryItemCommitHistoriesController instanceof RepositoryItemCommitHistoriesController))
@@ -96,21 +97,21 @@ public class RepositoryViewerController extends DexMainControllerBase implements
         checkNodes();
 
         // Hide the project combo
-        addIncludedController( menuBarWithProjectController );
+        addIncludedController( menuBarWithProjectController, eventManager );
         menuBarWithProjectController.showCombo( false );
         menuBarController = menuBarWithProjectController; // Make available to base class
 
-        addIncludedController( dexStatusController );
+        addIncludedController( dexStatusController, eventManager );
         statusController = dexStatusController; // make available to base class
 
         // Set up the repository selection
-        addIncludedController( repositorySelectionController );
-        addIncludedController( repositoryNamespacesTreeController );
-        addIncludedController( namespaceLibrariesTreeTableController );
+        addIncludedController( repositorySelectionController, eventManager );
+        addIncludedController( repositoryNamespacesTreeController, eventManager );
+        addIncludedController( namespaceLibrariesTreeTableController, eventManager );
         // No set up needed, but add to list
-        addIncludedController( repositoryItemCommitHistoriesController );
+        addIncludedController( repositoryItemCommitHistoriesController, eventManager );
 
-        configureEventHandlers();
+        eventManager.configureEventHandlers();
         setMainController( this );
 
         log.debug( "Stage set." );

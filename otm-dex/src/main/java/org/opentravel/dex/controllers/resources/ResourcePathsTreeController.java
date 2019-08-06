@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.resources;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -27,7 +28,6 @@ import org.opentravel.dex.events.DexResourceChildSelectionEvent;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.TitledPane;
@@ -157,7 +157,7 @@ public class ResourcePathsTreeController extends DexIncludedControllerBase<OtmRe
     }
 
     @Override
-    public void handleEvent(Event event) {
+    public void handleEvent(AbstractOtmEvent event) {
         // log.debug(event.getEventType() + " event received. Ignore? " + ignoreEvents);
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)

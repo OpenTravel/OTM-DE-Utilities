@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.resources;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.cellfactories.ValidationResourceTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
@@ -33,9 +34,9 @@ import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 
 import javafx.application.Platform;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
@@ -45,8 +46,6 @@ import javafx.scene.control.TreeTableColumn.SortType;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
@@ -60,12 +59,10 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
     private static Log log = LogFactory.getLog( ResourcesTreeTableController.class );
 
     // Column labels
-    // TODO - externalize strings
     public static final String PREFIXCOLUMNLABEL = "Prefix";
     private static final String NAMECOLUMNLABEL = "Member";
     private static final String VERSIONCOLUMNLABEL = "Version";
     private static final String LIBRARYLABEL = "Library";
-    // private static final String ERRORLABEL = "Errors";
     private static final String WHEREUSEDLABEL = "Types Used";
 
     /*
@@ -76,14 +73,12 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
     @FXML
     private TreeTableView<ResourcesDAO> resourcesTreeTable;
 
-
     //
     TreeItem<ResourcesDAO> root; // Root of the navigation tree. Is displayed.
     TreeTableColumn<ResourcesDAO,String> nameColumn; // an editable column
 
     OtmModelManager currentModelMgr; // this is postedData
 
-    // MemberFilterController filter = null;
 
     private boolean ignoreEvents = false;
     // By default, the tree is editable. Setting this to false will prevent edits.
@@ -92,8 +87,8 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
         {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
-    private static final EventType[] publishedEvents =
-        {DexMemberSelectionEvent.MEMBER_SELECTED, DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED};
+    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED,
+        DexMemberSelectionEvent.RESOURCE_SELECTED, DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED};
 
     /**
      * Construct a member tree table controller that can publish and receive events.
@@ -152,22 +147,7 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
         super.configure( parent );
         // log.debug("Configuring Member Tree Table.");
         eventPublisherNode = resourcesTreeTableView;
-        // configure( parent.getModelManager(), treeEditingEnabled );
-        // }
-        //
-        // /**
-        // * Configure controller for use by non-main controllers.
-        // *
-        // * @param modelMgr must not be null
-        // * @param editable sets tree editing enables
-        // */
-        // public void configure(OtmModelManager modelMgr, boolean editable) {
-        // if (modelMgr == null)
-        // throw new IllegalArgumentException(
-        // "Model manager is null. Must configure member tree with model manager." );
-        //
         this.currentModelMgr = parent.getModelManager();
-        // this.treeEditingEnabled = editable;
 
         // Set the hidden root item
         root = new TreeItem<>();
@@ -176,17 +156,11 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
         // Set up the TreeTable
         resourcesTreeTable.setRoot( getRoot() );
         resourcesTreeTable.setShowRoot( false );
-        resourcesTreeTable.setEditable( true );
-        // resourcesTree.getSelectionModel().setCellSelectionEnabled( true ); // allow individual cells to be edited
-        // resourcesTree.setTableMenuButtonVisible( true ); // allow users to select columns
-        // Enable context menus at the row level and add change listener for for applying style
-        // resourcesTree.setRowFactory( (TreeTableView<ResourcesDAO> p) -> new MemberRowFactory( this ) );
+        resourcesTreeTable.setEditable( false );
         buildColumns();
 
         // Add listeners and event handlers
         resourcesTreeTable.getSelectionModel().select( 0 );
-        resourcesTreeTable.setOnKeyReleased( this::keyReleased );
-        // resourcesTree.setOnMouseClicked(this::mouseClick);
         resourcesTreeTable.getSelectionModel().selectedItemProperty()
             .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
@@ -205,9 +179,6 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
     public void createTreeItem(OtmLibraryMember member, TreeItem<ResourcesDAO> parent) {
         // log.debug("Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName());
 
-        // // Apply Filter
-        // if (filter != null && !filter.isSelected( member ))
-        // return;
         // Skip over contextual facets that have been injected into an object. Their contributed facets will be modeled.
         if ((member instanceof OtmContextualFacet && ((OtmContextualFacet) member).getWhereContributed() != null))
             return;
@@ -238,10 +209,6 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
         } );
     }
 
-    // public MemberFilterController getFilter() {
-    // return filter;
-    // }
-
     public TreeItem<ResourcesDAO> getRoot() {
         return root;
     }
@@ -262,7 +229,7 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
     }
 
     @Override
-    public void handleEvent(Event event) {
+    public void handleEvent(AbstractOtmEvent event) {
         // log.debug(event.getEventType() + " event received. Ignore? " + ignoreEvents);
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
@@ -276,25 +243,6 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
         }
     }
 
-    public void keyReleased(KeyEvent event) {
-        TreeItem<ResourcesDAO> item = resourcesTreeTable.getSelectionModel().getSelectedItem();
-        int row = resourcesTreeTable.getSelectionModel().getSelectedIndex();
-        // log.debug("Selection row = " + row);
-        // if (event.getCode() == KeyCode.RIGHT) {
-        // event.consume();
-        // item.setExpanded( true );
-        // resourcesTree.getSelectionModel().clearAndSelect( row + 1, nameColumn );
-        // } else if (event.getCode() == KeyCode.LEFT) {
-        // TreeItem<ResourcesDAO> parent = item.getParent();
-        // if (parent != null && parent != item && parent != root) {
-        // resourcesTree.getSelectionModel().select( parent );
-        // parent.setExpanded( false );
-        // row = resourcesTree.getSelectionModel().getSelectedIndex();
-        // resourcesTree.getSelectionModel().clearAndSelect( row, nameColumn );
-        // event.consume();
-        // }
-        // }
-    }
 
     /**
      * Listener for selected library members in the tree table.
@@ -309,7 +257,9 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
         // Fire event for selecting resources
         if (eventPublisherNode != null) {
             DexEvent event = null;
-            if (item.getValue().getValue() instanceof OtmLibraryMember)
+            if (item.getValue().getValue() instanceof OtmResource)
+                event = new DexMemberSelectionEvent( (OtmResource) item.getValue().getValue() );
+            else if (item.getValue().getValue() instanceof OtmLibraryMember)
                 event = new DexMemberSelectionEvent( (OtmLibraryMember) item.getValue().getValue() );
             else if (item.getValue().getValue() instanceof OtmResourceChild)
                 event = new DexResourceChildSelectionEvent( (OtmResourceChild) item.getValue().getValue() );
@@ -319,13 +269,6 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
                 eventPublisherNode.fireEvent( event );
             ignoreEvents = false;
         }
-    }
-
-    public void mouseClick(MouseEvent event) {
-        // this fires after the member selection listener
-        if (event.getButton().equals( MouseButton.PRIMARY ) && event.getClickCount() == 2)
-            log.debug( "Double click selection: " );
-        // + resourcesTree.getSelectionModel().getSelectedItem().getValue().nameProperty().toString());
     }
 
     /**
@@ -378,10 +321,6 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
             log.warn( otm.getName() + " not found in member tree." );
         }
     }
-
-    // public void setFilter(MemberFilterController filter) {
-    // this.filter = filter;
-    // }
 
     public void setOnMouseClicked(EventHandler<? super MouseEvent> handler) {
         resourcesTreeTable.setOnMouseClicked( handler );

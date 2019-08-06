@@ -22,6 +22,7 @@ import org.opentravel.common.DexFileHandler;
 import org.opentravel.common.DialogBox;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.controllers.popup.NewProjectDialogController;
+import org.opentravel.dex.controllers.resources.ResourcesWindowController;
 import org.opentravel.dex.events.DexEventDispatcher;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
@@ -45,6 +46,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.stage.Stage;
 
@@ -81,6 +83,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     private OtmModelManager modelMgr;
 
     private DialogBoxContoller dialogBox;
+    private ResourcesWindowController rwc;
 
     private UserSettings userSettings;
 
@@ -128,6 +131,11 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         setFileOpenHandler( this::handleOpenMenu );
         setdoCloseHandler( this::handleCloseMenu );
         setUndoAction( e -> undoAction() );
+
+        rwc = ResourcesWindowController.init();
+        rwc.setup( "" );
+        rwc.configure( mainController );
+
     }
 
     private DialogBoxContoller getDialogBox() {
@@ -277,6 +285,17 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
             fireEvent( new DexModelChangeEvent( modelMgr ) );
             mainController.refresh();
         }
+    }
+
+    @FXML
+    private ToggleButton launchResourceWindow;
+
+    @FXML
+    private void launchResourceWindow() {
+        if (launchResourceWindow.isSelected())
+            rwc.show( "" );
+        else
+            rwc.hide();
     }
 
     public void setComboLabel(String text) {

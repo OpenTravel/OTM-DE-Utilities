@@ -182,6 +182,10 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         popupStage.show();
     }
 
+    public void hide() {
+        popupStage.hide();
+    }
+
     @Override
     public Results showAndWait(String message) {
         setup( message );

@@ -18,6 +18,7 @@ package org.opentravel.dex.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabController;
 
@@ -61,20 +62,21 @@ public class RepositoryTabController implements DexTabController {
      */
     @Override
     public void configure(DexMainController parent) {
+        OtmEventSubscriptionManager eventManager = parent.getEventSubscriptionManager();
 
         // Set up the repository selection
-        parent.addIncludedController( repositorySelectionController );
+        parent.addIncludedController( repositorySelectionController, eventManager );
 
         // Set up repository namespaces tree
-        parent.addIncludedController( repositoryNamespacesTreeController );
+        parent.addIncludedController( repositoryNamespacesTreeController, eventManager );
 
         // Set up the libraries in a namespace table
-        parent.addIncludedController( namespaceLibrariesTreeTableController );
+        parent.addIncludedController( namespaceLibrariesTreeTableController, eventManager );
 
         // No set up needed, but add to list
-        parent.addIncludedController( repositoryItemCommitHistoriesController );
+        parent.addIncludedController( repositoryItemCommitHistoriesController, eventManager );
 
-        parent.addIncludedController( repositoryItemWebViewController );
+        parent.addIncludedController( repositoryItemWebViewController, eventManager );
 
         log.debug( "Repository Tab Stage set." );
     }

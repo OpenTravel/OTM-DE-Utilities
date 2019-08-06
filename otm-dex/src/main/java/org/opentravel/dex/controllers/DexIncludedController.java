@@ -16,12 +16,11 @@
 
 package org.opentravel.dex.controllers;
 
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.events.DexEvent;
 
 import java.util.List;
 
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.event.EventType;
 
 /**
@@ -58,12 +57,12 @@ public interface DexIncludedController<T> extends DexController {
     /**
      * @return
      */
-    public List<EventType> getPublishedEventTypes();
+    public List<EventType<? extends AbstractOtmEvent>> getPublishedEventTypes();
 
     /**
      * @return
      */
-    public List<EventType> getSubscribedEventTypes();
+    public List<EventType<? extends AbstractOtmEvent>> getSubscribedEventTypes();
 
     /**
      * Get the parent main controller.
@@ -85,10 +84,8 @@ public interface DexIncludedController<T> extends DexController {
      * 
      * @param event
      */
-    public void handleEvent(Event event);
+    public void handleEvent(AbstractOtmEvent event);
 
-    // May do nothing if this controller does not publish the event type
-    public void setEventHandler(EventType<? extends DexEvent> type, EventHandler<DexEvent> handler);
 
     /**
      * Initialize is called by the FXML loader when the FXML file is loaded. These methods must make the controller

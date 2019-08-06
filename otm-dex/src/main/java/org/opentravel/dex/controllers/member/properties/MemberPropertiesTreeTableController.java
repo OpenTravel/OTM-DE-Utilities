@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.member.properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.DexRepeatMaxConverter;
 import org.opentravel.common.cellfactories.AssignedTypePropertiesTreeTableCellFactory;
 import org.opentravel.common.cellfactories.ValidationPropertiesTreeTableCellFactory;
@@ -28,7 +29,6 @@ import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
@@ -175,7 +175,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     }
 
     @Override
-    public void handleEvent(Event e) {
+    public void handleEvent(AbstractOtmEvent e) {
         // log.debug("event handler.");
         if (e instanceof DexMemberSelectionEvent)
             handleMemberSelection( (DexMemberSelectionEvent) e );

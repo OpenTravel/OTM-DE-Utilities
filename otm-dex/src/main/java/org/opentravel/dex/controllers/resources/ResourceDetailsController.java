@@ -18,6 +18,8 @@ package org.opentravel.dex.controllers.resources;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
+import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
@@ -29,7 +31,6 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Control;
@@ -73,12 +74,15 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
 
     private boolean ignoreClear = false;
 
+    private OtmEventSubscriptionManager eventManager;
+
     // All event types fired by this controller.
     private static final EventType[] publishedEvents = {};
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents = {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED,
-        DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] subscribedEvents =
+        {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED, DexMemberSelectionEvent.MEMBER_SELECTED,
+            DexMemberSelectionEvent.RESOURCE_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
 
     public ResourceDetailsController() {
         super( subscribedEvents, publishedEvents );
@@ -106,10 +110,11 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     public void configure(DexMainController mainController) {
         super.configure( mainController );
         eventPublisherNode = resourceDetails;
+        eventManager = mainController.getEventSubscriptionManager();
     }
 
     @Override
-    public void handleEvent(Event event) {
+    public void handleEvent(AbstractOtmEvent event) {
         if (event instanceof DexMemberSelectionEvent)
             handleEvent( (DexMemberSelectionEvent) event );
         else if (event instanceof DexResourceChildSelectionEvent)
@@ -137,10 +142,6 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
         }
     }
 
-    // private void postNotImplemented() {
-    // DialogBoxContoller.init().show( "Not Implemented", "Work in progress." );
-    // }
-
     public void post(OtmResource resource) {
         if (resource == null) {
             clear();
@@ -148,11 +149,13 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
         }
         propertyGrid.getChildren().clear();
 
+
         postTitle( resource );
         postName( resource );
         postDescription( resource );
         resource.getFields().forEach( f -> postField( f, resource ) );
     }
+
 
     private void postField(DexEditField field, OtmObject obj) {
         int column = field.column;

@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.events;
+package org.opentravel.application.common.events;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.opentravel.application.common.events.AbstractOtmEvent;
-import org.opentravel.dex.actions.DexAction;
-import org.opentravel.dex.controllers.member.MemberFilterController;
-
+import javafx.event.Event;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
 
 /**
- * DEX Event extends Abstract OTM event.
+ * Abstract OTM event.
  * <p>
- * DexEvents leverage and extend JavaFX event architecture to provide the ability to loosely couple the interaction
+ * OtmEvents leverage and extend JavaFX event architecture to provide the ability to loosely couple the interaction
  * between two or more controllers. Controllers can declare on initialization the events they throw and listen to.
  * Controllers then throw events to indicate they have changed the application state. <b>No</b> controller should ever
  * directly call other controllers--they use events to pass control and data.
@@ -38,7 +33,7 @@ import javafx.event.EventType;
  * <p>
  * Implementation steps (event publisher):
  * <ol>
- * <li>Create sub-type of DexEvent (if needed)
+ * <li>Create sub-type of OtmEvent (if needed)
  * <li>Add event type to published event list
  * <li>Ensure <i>eventPublisherNode</i> in base controller is set to the fx:node used to broadcast events.
  * <li>Add <i>eventPublisherNode.fireEvent(new event)</i> in event provider controllers where needed.
@@ -56,40 +51,36 @@ import javafx.event.EventType;
  * @author dmh
  *
  */
-public abstract class DexEvent extends AbstractOtmEvent {
-    private static Log log = LogFactory.getLog( DexEvent.class );
-    private static final long serialVersionUID = 20190406L;
-    public static final EventType<DexEvent> DEX_ALL = new EventType<>( "DEX_ALL" );
+public abstract class AbstractOtmEvent extends Event {
+    // private static Log log = LogFactory.getLog( AbstractOtmEvent.class );
+    private static final long serialVersionUID = 20190805L;
+    public static final EventType<AbstractOtmEvent> OTM_ALL = new EventType<>( "OTM_ALL" );
 
     @SuppressWarnings("unchecked")
     @Override
-    public EventType<? extends DexEvent> getEventType() {
-        return (EventType<? extends DexEvent>) super.getEventType();
+    public EventType<? extends AbstractOtmEvent> getEventType() {
+        return (EventType<? extends AbstractOtmEvent>) super.getEventType();
     }
 
     /**
      * Filter change event with no subject.
      */
-    public DexEvent() {
-        super( DEX_ALL );
+    public AbstractOtmEvent() {
+        super( OTM_ALL );
     }
 
     /**
      * @param eventType
      */
-    public DexEvent(EventType<? extends DexEvent> eventType) {
+    public AbstractOtmEvent(EventType<? extends AbstractOtmEvent> eventType) {
         super( eventType );
     }
 
-    public DexEvent(Object source, EventTarget target, EventType<? extends DexEvent> eventType) {
+    public AbstractOtmEvent(Object source, EventTarget target, EventType<? extends AbstractOtmEvent> eventType) {
         super( source, target, eventType );
-        // log.debug("DexEvent source/target/type constructor ran for " + getClass().getSimpleName());
-        // If there is data, extract it from source or target here
     }
 
-    public DexEvent(Object source, EventTarget target) {
-        super( source, target, DEX_ALL );
-        // log.debug("DexEvent source/target/type constructor ran for " + getClass().getSimpleName());
-        // If there is data, extract it from source or target here
+    public AbstractOtmEvent(Object source, EventTarget target) {
+        super( source, target, OTM_ALL );
     }
 }

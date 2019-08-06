@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.member.properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabController;
 import org.opentravel.dex.controllers.member.MemberDetailsController;
@@ -53,8 +54,10 @@ public class MemberPropertiesTabController implements DexTabController {
 
     @Override
     public void configure(DexMainController parent) {
-        parent.addIncludedController( memberPropertiesTreeTableController );
-        parent.addIncludedController( memberDetailsController );
+        OtmEventSubscriptionManager eventManager = parent.getEventSubscriptionManager();
+
+        parent.addIncludedController( memberPropertiesTreeTableController, eventManager );
+        parent.addIncludedController( memberDetailsController, eventManager );
     }
 
 }

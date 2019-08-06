@@ -16,6 +16,7 @@
 
 package org.opentravel.dex.controllers;
 
+import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
@@ -44,12 +45,7 @@ public interface DexMainController extends DexController {
      * 
      * @param controller
      */
-    void addIncludedController(DexIncludedController<?> controller);
-
-    // /**
-    // * @return the image manager used by this controller
-    // */
-    // public ImageManager getImageManager();
+    void addIncludedController(DexIncludedController<?> controller, OtmEventSubscriptionManager eventManager);
 
     /**
      * @return the model manager used by this controller or null
@@ -102,5 +98,10 @@ public interface DexMainController extends DexController {
      * @return
      */
     UserSettings getUserSettings();
+
+    /**
+     * @return
+     */
+    OtmEventSubscriptionManager getEventSubscriptionManager();
 
 }

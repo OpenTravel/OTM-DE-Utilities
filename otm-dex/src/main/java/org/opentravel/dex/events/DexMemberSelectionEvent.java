@@ -22,6 +22,7 @@ import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 
 import javafx.event.EventType;
 import javafx.scene.control.TreeItem;
@@ -38,6 +39,8 @@ public class DexMemberSelectionEvent extends DexEvent {
 
     public static final EventType<DexMemberSelectionEvent> MEMBER_SELECTED =
         new EventType<>( DEX_ALL, "MEMBER_SELECTED" );
+    public static final EventType<DexMemberSelectionEvent> RESOURCE_SELECTED =
+        new EventType<>( DEX_ALL, "RESOURCE_SELECTED" );
 
     private final OtmLibraryMember member;
 
@@ -79,6 +82,11 @@ public class DexMemberSelectionEvent extends DexEvent {
         super( MEMBER_SELECTED );
         if (otm instanceof OtmContributedFacet)
             otm = ((OtmContributedFacet) otm).getContributor();
+        member = otm;
+    }
+
+    public DexMemberSelectionEvent(OtmResource otm) {
+        super( RESOURCE_SELECTED );
         member = otm;
     }
 

@@ -19,20 +19,18 @@ package org.opentravel.dex.controllers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.AbstractMainWindowController;
+import org.opentravel.application.common.OtmEventUser;
 import org.opentravel.application.common.StatusType;
+import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.actions.DexFullActionManager;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
-import org.opentravel.dex.events.DexEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 
@@ -53,12 +51,12 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     protected UserSettings userSettings;
 
     protected List<DexIncludedController<?>> includedControllers = new ArrayList<>();
-    private Map<EventType<?>,List<DexIncludedController<?>>> eventPublishers = new HashMap<>();
-    private Map<EventType<?>,List<DexIncludedController<?>>> eventSubscribers = new HashMap<>();
 
     protected DexStatusController statusController;
     protected MenuBarWithProjectController menuBarController;
     protected DialogBoxContoller dialogBoxController;
+
+    protected OtmEventSubscriptionManager eventManager = new OtmEventSubscriptionManager();
 
     protected Stage stage;
 
@@ -67,7 +65,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     }
 
     @Override
-    public void addIncludedController(DexIncludedController<?> controller) {
+    public void addIncludedController(DexIncludedController<?> controller, OtmEventSubscriptionManager eventManager) {
         if (controller == null)
             throw new IllegalStateException( "Tried to add null Included controller" );
 
@@ -75,24 +73,10 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         includedControllers.add( controller );
         controller.configure( this );
 
-        // Register any published event types
-        for (EventType<?> et : controller.getPublishedEventTypes())
-            if (eventPublishers.containsKey( et )) {
-                eventPublishers.get( et ).add( controller );
-            } else {
-                ArrayList<DexIncludedController<?>> list = new ArrayList<>();
-                list.add( controller );
-                eventPublishers.put( et, list );
-            }
-        // Register any subscribed event types
-        for (EventType<?> et : controller.getSubscribedEventTypes())
-            if (eventSubscribers.containsKey( et )) {
-                eventSubscribers.get( et ).add( controller );
-            } else {
-                ArrayList<DexIncludedController<?>> list = new ArrayList<>();
-                list.add( controller );
-                eventSubscribers.put( et, list );
-            }
+        // // Register any published event types
+        if (controller instanceof OtmEventUser)
+            eventManager.register( (OtmEventUser) controller );
+        this.eventManager = eventManager;
     }
 
     @Override
@@ -100,20 +84,11 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         includedControllers.forEach( DexIncludedController::clear );
     }
 
-
-    @SuppressWarnings("unchecked")
-    protected void configureEventHandlers() {
-        for (DexIncludedController<?> c : includedControllers) {
-            List<EventType> subscriptions = c.getSubscribedEventTypes();
-            if (subscriptions != null && !subscriptions.isEmpty())
-                for (EventType et : subscriptions)
-                    if (eventPublishers.containsKey( et )) {
-                        List<DexIncludedController<?>> publishers = eventPublishers.get( et );
-                        EventType<? extends DexEvent> dexET = et;
-                        for (DexIncludedController<?> publisher : publishers)
-                            publisher.setEventHandler( dexET, c::handleEvent );
-                    }
-        }
+    /**
+     */
+    @Override
+    public OtmEventSubscriptionManager getEventSubscriptionManager() {
+        return eventManager;
     }
 
     public DialogBoxContoller getDialogBoxController() {
@@ -128,11 +103,6 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
             return modelMgr;
         return mainController != null ? mainController.getModelManager() : null;
     }
-
-    // @Override
-    // public RepositoryManager getRepositoryManager() {
-    // return super.getRepositoryManager();
-    // }
 
     @Override
     public Stage getStage() {

@@ -18,6 +18,7 @@ package org.opentravel.dex.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.events.DexRepositoryItemSelectionEvent;
 import org.opentravel.dex.events.DexRepositoryNamespaceSelectionEvent;
@@ -27,7 +28,6 @@ import org.opentravel.schemacompiler.repository.RepositoryItemHistory;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
@@ -99,7 +99,7 @@ public class RepositoryItemCommitHistoriesController extends DexIncludedControll
     }
 
     @Override
-    public void handleEvent(Event e) {
+    public void handleEvent(AbstractOtmEvent e) {
         if (e instanceof DexRepositoryItemSelectionEvent)
             eventHandler( (DexRepositoryItemSelectionEvent) e );
         else if (e instanceof DexRepositoryNamespaceSelectionEvent)

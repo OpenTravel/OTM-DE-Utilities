@@ -25,6 +25,7 @@ import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.TLExample;
 import org.opentravel.schemacompiler.model.TLExampleOwner;
 import org.opentravel.schemacompiler.model.TLMemberField;
@@ -54,6 +55,11 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
         super( tla, parent );
 
         // tla.getFieldRefName();
+    }
+
+    public OtmLibraryMember getFieldOwner() {
+        OtmObject field = OtmModelElement.get( (TLModelElement) getTL().getFieldRef() );
+        return field != null ? field.getOwningMember() : null;
     }
 
     @Override

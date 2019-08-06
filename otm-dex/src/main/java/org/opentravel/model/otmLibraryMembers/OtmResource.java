@@ -34,6 +34,7 @@ import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmActionResponse;
 import org.opentravel.model.resource.OtmParameterGroup;
 import org.opentravel.model.resource.OtmParentRef;
+import org.opentravel.schemacompiler.codegen.util.ResourceCodegenUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
@@ -61,6 +62,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     private static Log log = LogFactory.getLog( OtmResource.class );
 
     private DexResourcePathHandler pathHandler;
+    private ResourceCodegenUtils codegenUtils;
 
     public OtmResource(TLResource tlo, OtmModelManager mgr) {
         super( tlo, mgr );

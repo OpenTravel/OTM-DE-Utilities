@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.library;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexLibrarySelectionEvent;
@@ -28,7 +29,6 @@ import org.opentravel.model.otmContainers.OtmLibrary;
 import java.util.Set;
 
 import javafx.beans.value.ChangeListener;
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
@@ -167,7 +167,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     private boolean ignore = false;
 
     @Override
-    public void handleEvent(Event event) {
+    public void handleEvent(AbstractOtmEvent event) {
         if (event instanceof DexLibrarySelectionEvent)
             handleLibrarySelection( ((DexLibrarySelectionEvent) event) );
         if (event instanceof DexModelChangeEvent)

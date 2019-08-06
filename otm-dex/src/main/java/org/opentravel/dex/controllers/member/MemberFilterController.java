@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.member;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.popup.DexPopupController;
@@ -42,7 +43,6 @@ import java.util.HashMap;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
@@ -235,7 +235,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     }
 
     @Override
-    public void handleEvent(Event event) {
+    public void handleEvent(AbstractOtmEvent event) {
         if (event instanceof DexLibrarySelectionEvent)
             librarySelectionHandler( (DexLibrarySelectionEvent) event );
         else if (event instanceof DexModelChangeEvent)
