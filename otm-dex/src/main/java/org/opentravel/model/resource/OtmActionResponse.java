@@ -25,15 +25,21 @@ import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.schemacompiler.model.TLActionResponse;
+import org.opentravel.schemacompiler.model.TLMimeType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
-import javafx.scene.control.ChoiceBox;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 
 /**
  * OTM Object for Resource objects.
@@ -81,6 +87,7 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
     }
 
     /**
+     * Same as {@link #getPayloadType()}
      * 
      * @return the Otm object used as the payload or null
      */
@@ -100,33 +107,49 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
         return getTL().getPayloadTypeName() != null ? getTL().getPayloadTypeName() : "";
     }
 
-    // @Override
-    // public String setName(String name) {
-    // getTL().setName( name );
-    // isValid( true );
-    // return getName();
-    // }
-    //
-    //
-    //
-    // @Override
-    // public Collection<OtmObject> getChildrenHierarchy() {
-    // Collection<OtmObject> ch = new ArrayList<>();
-    // // children.forEach(c -> {
-    // // if (c instanceof OtmIdFacet)
-    // // ch.add(c);
-    // // if (c instanceof OtmAlias)
-    // // ch.add(c);
-    // // });
-    // return ch;
-    // }
-    //
+    private Node getPayloadNode() {
+        ObservableList<String> actionFacets = FXCollections.observableArrayList();
+        getOwningMember().getActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
+        ComboBox<String> box = DexEditField.makeComboBox( actionFacets, getPayloadTypeName(), this );
+        return box;
+    }
+
+    private Node getMimeNode() {
+        SortedMap<String,Boolean> values = new TreeMap<>();
+        for (TLMimeType t : TLMimeType.values())
+            values.put( t.toString(), getTL().getMimeTypes().contains( t ) );
+        HBox hbox = DexEditField.makeCheckBoxRow( values, this );
+        return hbox;
+    }
+
+    private Node getStatus1Node() {
+        SortedMap<String,Boolean> values = new TreeMap<>();
+        int cnt = 0;
+        for (RestStatusCodes t : RestStatusCodes.values()) {
+            if (cnt++ < 4)
+                values.put( t.toString(), getTL().getStatusCodes().contains( t.value() ) );
+        }
+        HBox hbox = DexEditField.makeCheckBoxRow( values, this );
+        return hbox;
+    }
+
+    private Node getStatus2Node() {
+        SortedMap<String,Boolean> values = new TreeMap<>();
+        int cnt = 0;
+        for (RestStatusCodes t : RestStatusCodes.values())
+            if (cnt++ >= 4)
+                values.put( t.toString(), getTL().getStatusCodes().contains( t.value() ) );
+        HBox hbox = DexEditField.makeCheckBoxRow( values, this );
+        return hbox;
+    }
+
     @Override
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, new ComboBox<String>() ) );
-        fields.add( new DexEditField( 1, 0, MIME_TYPE_LABEL, MIME_TYPE_TOOLTIP, new ChoiceBox<String>() ) );
-        fields.add( new DexEditField( 2, 0, STATUS_CODES_LABEL, STATUS_CODES_TOOLTIP, new ChoiceBox<String>() ) );
+        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, getPayloadNode() ) );
+        fields.add( new DexEditField( 1, 0, MIME_TYPE_LABEL, MIME_TYPE_TOOLTIP, getMimeNode() ) );
+        fields.add( new DexEditField( 2, 0, STATUS_CODES_LABEL, STATUS_CODES_TOOLTIP, getStatus1Node() ) );
+        fields.add( new DexEditField( 3, 0, STATUS_CODES_LABEL, STATUS_CODES_TOOLTIP, getStatus2Node() ) );
         return fields;
     }
 

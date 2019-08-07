@@ -164,18 +164,12 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
             label.setTooltip( field.tooltip );
             propertyGrid.add( label, field.column, field.row + rowIndex );
             column += 1;
+            label.setDisable( !obj.isEditable() );
         }
         if (field.fxNode != null) {
             if (field.fxNode instanceof Control)
                 ((Control) field.fxNode).setTooltip( field.tooltip );
-            if (obj.isEditable())
-                propertyGrid.add( field.fxNode, column, field.row + rowIndex );
-            else {
-                TextField txt = new TextField( "some value" );
-                txt.setEditable( false );
-                txt.setDisable( true );
-                propertyGrid.add( txt, column, field.row + rowIndex );
-            }
+            propertyGrid.add( field.fxNode, column, field.row + rowIndex );
         }
     }
 

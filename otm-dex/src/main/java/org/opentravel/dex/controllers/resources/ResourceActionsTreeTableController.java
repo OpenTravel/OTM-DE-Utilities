@@ -254,10 +254,12 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
             log.debug( "Selection Listener: " + item.getValue() );
             OtmObject obj = item.getValue().getValue();
             OtmLibraryMember member = null;
+            if (obj instanceof OtmContributedFacet)
+                obj = ((OtmContributedFacet) obj).getContributor();
             if (obj instanceof OtmLibraryMember)
                 member = (OtmLibraryMember) obj;
-            else if (obj instanceof OtmParameter)
-                member = ((OtmParameter) obj).getFieldOwner();
+            else if (obj instanceof OtmParameter && ((OtmParameter) obj).getFieldAssignedType() != null)
+                member = ((OtmParameter) obj).getFieldAssignedType().getOwningMember();
             else if (obj instanceof OtmTypeUser && ((OtmTypeUser) obj).getAssignedType() != null)
                 member = ((OtmTypeUser) obj).getAssignedType().getOwningMember();
             // else

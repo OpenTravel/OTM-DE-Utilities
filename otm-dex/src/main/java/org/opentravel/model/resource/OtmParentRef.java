@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.model.TLResourceParentRef;
@@ -28,6 +29,9 @@ import org.opentravel.schemacompiler.model.TLResourceParentRef;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -46,47 +50,58 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
     }
 
     @Override
+    public String getName() {
+        return "Parent: " + getParentResource().getNameWithPrefix();
+    }
+
+    @Override
+    public TLResourceParentRef getTL() {
+        return (TLResourceParentRef) tlObject;
+    }
+
+    @Override
     public Icons getIconType() {
         return ImageManager.Icons.RESOURCE_PARENTREF;
     }
 
-    //
-    // public OtmActionFacet(String name, OtmModelManager mgr) {
-    // super( new TLResource(), mgr );
-    // setName( name );
-    // }
+    private ObservableList<String> getParentCandidates() {
+        ObservableList<String> candidates = FXCollections.observableArrayList();
+        getOwningMember().getModelManager().getResources().forEach( r -> candidates.add( r.getNameWithPrefix() ) );
+        candidates.remove( getOwningMember().getNameWithPrefix() );
+        return candidates;
+    }
 
-    // @Override
-    // public String setName(String name) {
-    // getTL().setName( name );
-    // isValid( true );
-    // return getName();
-    // }
-    //
-    // @Override
-    // public TLResource getTL() {
-    // return (TLResource) tlObject;
-    // }
-    //
-    //
-    // @Override
-    // public Collection<OtmObject> getChildrenHierarchy() {
-    // Collection<OtmObject> ch = new ArrayList<>();
-    // // children.forEach(c -> {
-    // // if (c instanceof OtmIdFacet)
-    // // ch.add(c);
-    // // if (c instanceof OtmAlias)
-    // // ch.add(c);
-    // // });
-    // return ch;
-    // }
-    //
+    public OtmResource getParentResource() {
+        return (OtmResource) OtmModelElement.get( getTL().getParentResource() );
+    }
+
+    private Node getParentNode() {
+        String selection = "";
+        if (getParentResource() != null)
+            selection = getParentResource().getNameWithPrefix();
+        ComboBox<String> box = DexEditField.makeComboBox( getParentCandidates(), selection, this );
+        return box;
+    }
+
+    private Node getParameterGroupNode() {
+        ObservableList<String> groups = FXCollections.observableArrayList();
+        if (getParentResource() != null)
+            getParentResource().getParameterGroups().forEach( pg -> groups.add( pg.getName() ) );
+        ComboBox<String> box = DexEditField.makeComboBox( groups, getTL().getParentParamGroupName(), this );
+        return box;
+    }
+
+    private Node getPathNode() {
+        TextField field = DexEditField.makeTextField( getTL().getPathTemplate(), this );
+        return field;
+    }
+
     @Override
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, PARENT_LABEL, PARENT_TOOLTIP, new ComboBox<String>() ) );
-        fields.add( new DexEditField( 1, 0, PARAM_GROUP_LABEL, PARAM_GROUP_TOOLTIP, new ComboBox<String>() ) );
-        fields.add( new DexEditField( 2, 0, PATH_LABEL, PATH_LABEL, new TextField() ) );
+        fields.add( new DexEditField( 0, 0, PARENT_LABEL, PARENT_TOOLTIP, getParentNode() ) );
+        fields.add( new DexEditField( 1, 0, PARAM_GROUP_LABEL, PARAM_GROUP_TOOLTIP, getParameterGroupNode() ) );
+        fields.add( new DexEditField( 2, 0, PATH_LABEL, PATH_LABEL, getPathNode() ) );
         return fields;
     }
 

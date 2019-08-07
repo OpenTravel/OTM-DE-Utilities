@@ -24,8 +24,8 @@ import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.TLExample;
 import org.opentravel.schemacompiler.model.TLExampleOwner;
 import org.opentravel.schemacompiler.model.TLMemberField;
@@ -39,6 +39,9 @@ import java.util.List;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tooltip;
 
@@ -57,10 +60,25 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
         // tla.getFieldRefName();
     }
 
-    public OtmLibraryMember getFieldOwner() {
-        OtmObject field = OtmModelElement.get( (TLModelElement) getTL().getFieldRef() );
-        return field != null ? field.getOwningMember() : null;
+    public OtmObject getFieldRef() {
+        return OtmModelElement.get( (TLModelElement) getTL().getFieldRef() );
     }
+
+    /**
+     * 
+     * @return the type assigned to the field reference or null
+     */
+    public OtmTypeProvider getFieldAssignedType() {
+        return getFieldRef() instanceof OtmTypeUser ? ((OtmTypeUser) getFieldRef()).getAssignedType() : null;
+    }
+    // /**
+    // *
+    // * @return the Otm library member that owns the TLFieldRef()
+    // */
+    // public OtmLibraryMember getFieldOwner() {
+    // OtmObject field = OtmModelElement.get( (TLModelElement) getTL().getFieldRef() );
+    // return field != null ? field.getOwningMember() : null;
+    // }
 
     @Override
     public Icons getIconType() {
@@ -81,7 +99,7 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
         // fields.add( new DexEditField( 0, 0, FIELD_LABEL, FIELD_TOOLTIP, new ComboBox<String>() ) );
-        fields.add( new DexEditField( 0, 0, LOCATION_LABEL, LOCATION_TOOLTIP, new ComboBox<String>() ) );
+        fields.add( new DexEditField( 0, 0, LOCATION_LABEL, LOCATION_TOOLTIP, getLocationsNode() ) );
         return fields;
     }
 
@@ -137,6 +155,20 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
         return contribution.toString();
     }
 
+
+    private ObservableList<String> getLocations() {
+        ObservableList<String> locations = FXCollections.observableArrayList();
+        for (TLParamLocation l : TLParamLocation.values())
+            locations.add( l.toString() );
+        return locations;
+    }
+
+    private Node getLocationsNode() {
+        ComboBox<String> box = new ComboBox<>( getLocations() );
+        box.getSelectionModel().select( getTL().getLocation().toString() );
+        box.setEditable( getOwningMember().isEditable() );
+        return box;
+    }
 
     public Tooltip getTooltip() {
         return new Tooltip( TOOLTIP );

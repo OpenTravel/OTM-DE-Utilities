@@ -26,16 +26,25 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.schemacompiler.model.TLActionFacet;
 import org.opentravel.schemacompiler.model.TLActionRequest;
+import org.opentravel.schemacompiler.model.TLHttpMethod;
+import org.opentravel.schemacompiler.model.TLMimeType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
-import javafx.scene.control.ChoiceBox;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 
 /**
  * OTM Object for Resource objects.
@@ -57,6 +66,11 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
 
     public String getPathTemplate() {
         return getTL().getPathTemplate();
+    }
+
+    public String getParamGroupName() {
+        return getParamGroup() != null ? getParamGroup().getName() : "";
+
     }
 
     public OtmParameterGroup getParamGroup() {
@@ -105,36 +119,55 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         return ImageManager.Icons.RESOURCE_REQUEST;
     }
 
+    private Node getPayloadNode() {
+        ObservableList<String> actionFacets = FXCollections.observableArrayList();
+        getOwningMember().getActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
+        ComboBox<String> box = DexEditField.makeComboBox( actionFacets, getPayloadTypeName(), this );
+        return box;
+    }
 
-    // @Override
-    // public String setName(String name) {
-    // getTL().setName( name );
-    // isValid( true );
-    // return getName();
-    // }
-    //
-    //
-    //
-    // @Override
-    // public Collection<OtmObject> getChildrenHierarchy() {
-    // Collection<OtmObject> ch = new ArrayList<>();
-    // // children.forEach(c -> {
-    // // if (c instanceof OtmIdFacet)
-    // // ch.add(c);
-    // // if (c instanceof OtmAlias)
-    // // ch.add(c);
-    // // });
-    // return ch;
-    // }
-    //
+    private Node getParametersNode() {
+        ObservableList<String> groups = FXCollections.observableArrayList();
+        getOwningMember().getParameterGroups().forEach( pg -> groups.add( pg.getName() ) );
+        ComboBox<String> box = DexEditField.makeComboBox( groups, getParamGroupName(), this );
+        return box;
+    }
+
+    private Node getMimeNode() {
+        SortedMap<String,Boolean> values = new TreeMap<>();
+        for (TLMimeType t : TLMimeType.values())
+            values.put( t.toString(), getTL().getMimeTypes().contains( t ) );
+        HBox hbox = DexEditField.makeCheckBoxRow( values, this );
+        return hbox;
+    }
+
+    public static MenuButton makeMenuButton(List<String> values, OtmObject object) {
+        MenuButton mb = new MenuButton();
+        values.forEach( v -> mb.getItems().add( new CheckMenuItem( v ) ) );
+        return mb;
+    }
+
+    private Node getMethodNode() {
+        ObservableList<String> candidates = FXCollections.observableArrayList();
+        for (TLHttpMethod m : TLHttpMethod.values())
+            candidates.add( m.toString() );
+        ComboBox<String> box = DexEditField.makeComboBox( candidates, getTL().getHttpMethod().toString(), this );
+        return box;
+    }
+
+    private Node getPathNode() {
+        TextField field = DexEditField.makeTextField( getPathTemplate(), this );
+        return field;
+    }
+
     @Override
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, new ComboBox<String>() ) );
-        fields.add( new DexEditField( 0, 2, PARAMETERS_LABEL, PARAMETERS_TOOLTIP, new ComboBox<String>() ) );
-        fields.add( new DexEditField( 1, 0, MIME_LABEL, MIME_TOOLTIP, new ChoiceBox<String>() ) );
-        fields.add( new DexEditField( 1, 2, METHOD_LABEL, METHOD_TOOLTIP, new ChoiceBox<String>() ) );
-        fields.add( new DexEditField( 2, 0, PATH_LABEL, PATH_TOOLTIP, new TextField() ) );
+        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, getPayloadNode() ) );
+        fields.add( new DexEditField( 1, 0, PARAMETERS_LABEL, PARAMETERS_TOOLTIP, getParametersNode() ) );
+        fields.add( new DexEditField( 2, 0, METHOD_LABEL, METHOD_TOOLTIP, getMethodNode() ) );
+        fields.add( new DexEditField( 3, 0, MIME_LABEL, MIME_TOOLTIP, getMimeNode() ) );
+        fields.add( new DexEditField( 4, 0, PATH_LABEL, PATH_TOOLTIP, getPathNode() ) );
 
         return fields;
     }
@@ -214,6 +247,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     /**
+     * Same as {@link #getPayloadType()}
      * 
      * @return the Otm object used as the payload or null
      */

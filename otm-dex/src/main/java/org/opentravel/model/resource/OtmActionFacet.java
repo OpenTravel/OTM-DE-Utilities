@@ -40,6 +40,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Spinner;
@@ -93,7 +96,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         return ch;
     }
 
-    public static final String SUBGRP = "Substitution Group";
+    // public static final String SUBGRP = "Substitution Group";
 
     public String getReferenceFacetName() {
         return getTL().getReferenceFacetName() != null ? getTL().getReferenceFacetName() : "";
@@ -106,7 +109,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
      */
     public void setReferenceFacet(OtmFacet<?> facet) {
         if (facet == null)
-            getTL().setReferenceFacetName( SUBGRP );
+            getTL().setReferenceFacetName( OtmResource.SUBGROUP );
         else {
             TLFacetType type = facet.getTL().getFacetType();
             getTL().setReferenceFacetName( type.getIdentityName() );
@@ -136,7 +139,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         // Early Exit Conditions
         if (subject == null)
             return rqPayload; // Error, resource is not complete
-        if (rfName.equals( SUBGRP ))
+        if (rfName.equals( OtmResource.SUBGROUP ))
             return subject; // The whole object is the substitution group
         if (getReferenceType() == TLReferenceType.NONE)
             return null; // User set to have No request payload
@@ -170,15 +173,76 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         return rqPayload;
     }
 
+    /**
+     * @return all TL Modeled strings or for abstract resources just the first string (none)
+     */
+    private ObservableList<String> getReferenceTypeCandidates() {
+        ObservableList<String> candidates = FXCollections.observableArrayList();
+        if (getOwningMember().isAbstract())
+            candidates.add( TLReferenceType.values()[0].toString() );
+        else
+            for (TLReferenceType value : TLReferenceType.values())
+                candidates.add( value.toString() );
+        return candidates;
+    }
+
+    private Node getReferenceTypeNode() {
+        String selection = TLReferenceType.values()[0].toString();
+        if (getReferenceType() != null)
+            selection = getReferenceType().toString();
+        ComboBox<String> box = DexEditField.makeComboBox( getReferenceTypeCandidates(), selection, this );
+        box.setOnAction( a -> log.debug( "Type Selected" ) );
+        return box;
+    }
+
+    /**
+     * List of facet names on subject and entry for the substitution group
+     * 
+     * @return list of facets on the subject business object
+     */
+    private ObservableList<String> getReferenceFacetCandidates() {
+        ObservableList<String> candidates = FXCollections.observableArrayList();
+        if (getOwningMember() != null)
+            getOwningMember().getSubjectFacets().forEach( f -> candidates.add( f.getName() ) );
+        candidates.add( OtmResource.SUBGROUP );
+        return candidates;
+    }
+
+    private Node getReferenceFacetNode() {
+        String selection = OtmResource.SUBGROUP;
+        if (!getReferenceFacetName().isEmpty())
+            selection = getReferenceFacetName();
+        ComboBox<String> box = DexEditField.makeComboBox( getReferenceFacetCandidates(), selection, this );
+        box.setOnAction( a -> log.debug( "Reference Facet Selected" ) );
+        return box;
+    }
+
+
+    private Node getBasePayloadNode() {
+        String name = OtmResource.NONE;
+        if (getBasePayload() != null)
+            name = getBasePayload().getNameWithPrefix();
+        Button button = new Button( name );
+        button.setDisable( !isEditable() );
+        button.setOnAction( a -> log.debug( "Base Payload Button selected" ) );
+        return button;
+    }
+
+    private Node getRepeatCountNode() {
+        Spinner<Integer> spinner = new Spinner<>( 0, 10000, 0 );
+        spinner.setDisable( !isEditable() );
+        spinner.setOnRotate( a -> log.debug( "Spinner selected" ) );
+        return spinner;
+    }
+
     @Override
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, BASE_PAYLOAD_LABEL, BASE_PAYLOAD_TOOLTIP, new ComboBox<String>() ) );
+        fields.add( new DexEditField( 0, 0, BASE_PAYLOAD_LABEL, BASE_PAYLOAD_TOOLTIP, getBasePayloadNode() ) );
         fields.add( new DexEditField( 0, 2, null, "Remove base payload.", new Button( "-Remove-" ) ) );
-        fields.add( new DexEditField( 1, 0, REFERENCE_TYPE_LABEL, REFERENCE_TYPE_TOOLTIP, new ComboBox<String>() ) );
-        fields.add( new DexEditField( 2, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, new ComboBox<String>() ) );
-        fields.add(
-            new DexEditField( 3, 0, REPEAT_COUNT_LABEL, REPEAT_COUNT_TOOLTIP, new Spinner<Integer>( 0, 10000, 0 ) ) );
+        fields.add( new DexEditField( 1, 0, REFERENCE_TYPE_LABEL, REFERENCE_TYPE_TOOLTIP, getReferenceTypeNode() ) );
+        fields.add( new DexEditField( 2, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, getReferenceFacetNode() ) );
+        fields.add( new DexEditField( 3, 0, REPEAT_COUNT_LABEL, REPEAT_COUNT_TOOLTIP, getRepeatCountNode() ) );
         return fields;
     }
 

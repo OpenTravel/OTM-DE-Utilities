@@ -27,6 +27,8 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.resource.DexResourcePathHandler;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionFacet;
@@ -42,10 +44,14 @@ import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLResource;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -63,6 +69,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     private DexResourcePathHandler pathHandler;
     private ResourceCodegenUtils codegenUtils;
+    public static final String NONE = "None";
+    public static final String SUBGROUP = "Substitution Group";
 
     public OtmResource(TLResource tlo, OtmModelManager mgr) {
         super( tlo, mgr );
@@ -266,6 +274,27 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     /**
+     * Get facets from subject business object. Replace contributed facets with their contributor.
+     * 
+     * @return a non-null list of subject facets and contextual facets.
+     */
+    public List<OtmObject> getSubjectFacets() {
+        List<OtmObject> facets = null;
+        if (getSubject() != null) {
+            facets = new ArrayList<>();
+            for (OtmObject object : getSubject().getChildren()) {
+                if (object instanceof OtmFacet) {
+                    if (object instanceof OtmContributedFacet)
+                        object = ((OtmContributedFacet) object).getContributor();
+                    if (object != null)
+                        facets.add( object );
+                }
+            }
+        }
+        return facets != null ? facets : Collections.emptyList();
+    }
+
+    /**
      * Get the name of the business object. First trys the business object and if that is missing, trys the business
      * object reference name field.
      * 
@@ -321,16 +350,93 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return requests;
     }
 
+    public OtmResource getExtendedResource() {
+        OtmResource extended = null;
+        if (getTL().getExtension() != null) {
+            OtmObject r = OtmModelElement.get( (TLModelElement) getTL().getExtension().getExtendsEntity() );
+            if (r instanceof OtmResource)
+                extended = (OtmResource) r;
+        }
+        return extended;
+    }
+
+    /**
+     * 
+     * If this is a minor version, returns ONLY the name of the extension object
+     * 
+     * @return an array of other resources including NONE
+     */
+    public ObservableList<String> getExtensionCandidates() {
+        ObservableList<String> candidates = FXCollections.observableArrayList();
+        // TODO - handle minor version case
+        candidates.add( NONE );
+        getModelManager().getResources().forEach( r -> candidates.add( r.getNameWithPrefix() ) );
+        candidates.remove( getNameWithPrefix() );
+        return candidates;
+    }
+
+    private Node getExtensionNode() {
+        ComboBox<String> box = new ComboBox<>( getExtensionCandidates() );
+        // box.setEditable( isEditable() ); -- do not use. editable allows typing into the combo box
+        if (getExtendedResource() != null)
+            box.getSelectionModel().select( getExtendedResource().getNameWithPrefix() );
+        else
+            box.getSelectionModel().select( NONE );
+        // TO DO - create a cell factory to make them more visable.
+        box.setDisable( !isEditable() );
+        box.setOnAction( a -> log.debug( "Extension Selected" ) );
+        // TO DO - how to set the selected value in the lamda?
+        return box;
+    }
+
+    private Node getSubectNode() {
+        Button button = new Button( getSubjectName() );
+        button.setDisable( !isEditable() );
+        button.setOnAction( a -> log.debug( "Button selected" ) );
+        return button;
+    }
+
+    private Node getBasePathNode() {
+        TextField field = DexEditField.makeTextField( getBasePath(), this );
+        return field;
+    }
+
+
+    public boolean isAbstract() {
+        return getTL().isAbstract();
+    }
+
+    private Node getIsAbstractNode() {
+        CheckBox box = DexEditField.makeCheckBox( isAbstract(), abstract_LABEL, this );
+        box.setOnAction( a -> log.debug( "Abstract check box selected." ) );
+        return box;
+    }
+
+    public boolean isFirstClass() {
+        return getTL().isFirstClass();
+    }
+
+    private Node getIsFirstClassNode() {
+        CheckBox box = DexEditField.makeCheckBox( isFirstClass(), firstClass_LABEL, this );
+        box.setOnAction( a -> log.debug( "First class check box selected." ) );
+        return box;
+    }
+
+    // FIXME - testing only
+    @Override
+    public boolean isEditable() {
+        return getName().startsWith( "S" );
+    }
+
     // FIXME
     // Add namespace to fields.
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, extension_LABEL, extension_TOOLTIP, new ComboBox<String>() ) );
-        fields.add( new DexEditField( 1, 0, businessObject_LABEL, businessObject_TOOLTIP,
-            new Button( getBusinessObjectName() ) ) );
-        fields.add( new DexEditField( 2, 0, basePath_LABEL, basePath_TOOLTIP, new TextField() ) );
-        fields.add( new DexEditField( 3, 0, null, abstract_TOOLTIP, new CheckBox( abstract_LABEL ) ) );
-        fields.add( new DexEditField( 3, 1, null, firstClass_TOOLTIP, new CheckBox( firstClass_LABEL ) ) );
+        fields.add( new DexEditField( 0, 0, extension_LABEL, extension_TOOLTIP, getExtensionNode() ) );
+        fields.add( new DexEditField( 1, 0, businessObject_LABEL, businessObject_TOOLTIP, getSubectNode() ) );
+        fields.add( new DexEditField( 2, 0, basePath_LABEL, basePath_TOOLTIP, getBasePathNode() ) );
+        fields.add( new DexEditField( 3, 0, null, abstract_TOOLTIP, getIsAbstractNode() ) );
+        fields.add( new DexEditField( 3, 1, null, firstClass_TOOLTIP, getIsFirstClassNode() ) );
 
         // fields.add( new DexEditField( 1, 0, name_LABEL, name_TOOLTIP, new Button() ) );
         // fields.add( new DexEditField( 1, 0, parentRef_LABEL, parentRef_TOOLTIP, new Button() ) );
@@ -375,9 +481,9 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         "Set base response on all Action Facets used for responses.";
 
     /**
-     * @return
+     * @return non-null list of parent refs
      */
-    public Object getParentRef() {
+    public List<OtmParentRef> getParentRefs() {
         List<OtmParentRef> parents = new ArrayList<>();
         getTL().getParentRefs().forEach( pr -> {
             if (OtmModelElement.get( pr ) instanceof OtmParentRef)
@@ -402,6 +508,15 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return groups;
     }
 
+    public List<OtmActionFacet> getActionFacets() {
+        List<OtmActionFacet> actionFacets = new ArrayList<>();
+        getTL().getActionFacets().forEach( af -> {
+            if (OtmModelElement.get( af ) instanceof OtmActionFacet)
+                actionFacets.add( (OtmActionFacet) OtmModelElement.get( af ) );
+        } );
+        return actionFacets;
+    }
+
     /**
      * @return
      */
@@ -413,4 +528,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         } );
         return actions;
     }
+
+
 }

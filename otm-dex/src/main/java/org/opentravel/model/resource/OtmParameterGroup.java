@@ -27,6 +27,9 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmFacets.OtmFacet;
+import org.opentravel.model.otmFacets.OtmQueryFacet;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.model.TLParamGroup;
 
@@ -35,6 +38,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tooltip;
@@ -151,11 +157,50 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         return false;
     }
 
+    public boolean isIdGroup() {
+        return getTL().isIdGroup();
+    }
+
+    public Node getIdGroupNode() {
+        CheckBox box = new CheckBox( IDGROUP_LABEL );
+        box.setSelected( isIdGroup() );
+        box.setDisable( !getOwningMember().isEditable() );
+        return box;
+    }
+
+    /**
+     * Get facet names from subject business object. Omit query facets if this is an ID Parameter Group.
+     * 
+     * @return a string array of subject facet names.
+     */
+    protected ObservableList<String> getSubjectFacets() {
+        ObservableList<String> facets = FXCollections.observableArrayList();
+        if (getOwningMember() != null) {
+            getOwningMember().getSubjectFacets().forEach( f -> {
+                if (f instanceof OtmFacet)
+                    facets.add( f.getName() );
+                else if (f instanceof OtmQueryFacet) {
+                    if (!isIdGroup())
+                        facets.add( f.getName() );
+                } else if (f instanceof OtmContextualFacet)
+                    facets.add( f.getName() );
+            } );
+        }
+        return facets;
+    }
+
+    public Node getReferenceFacetNode() {
+        ComboBox<String> box = new ComboBox<>( getSubjectFacets() );
+        box.setEditable( getOwningMember().isEditable() );
+        box.getSelectionModel().select( getTL().getFacetRefName() );
+        return box;
+    }
+
     @Override
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, new ComboBox<String>() ) );
-        fields.add( new DexEditField( 1, 0, null, IDGROUP_TOOLTIP, new CheckBox( IDGROUP_LABEL ) ) );
+        fields.add( new DexEditField( 0, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, getReferenceFacetNode() ) );
+        fields.add( new DexEditField( 1, 0, null, IDGROUP_TOOLTIP, getIdGroupNode() ) );
         return fields;
     }
 

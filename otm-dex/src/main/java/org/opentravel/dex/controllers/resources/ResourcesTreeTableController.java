@@ -32,9 +32,10 @@ import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
-import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+
+import java.util.List;
 
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -167,28 +168,52 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
         refresh();
     }
 
-    /**
-     * Note: TreeItem class does not extend the Node class. Therefore, you cannot apply any visual effects or add menus
-     * to the tree items. Use the cell factory mechanism to overcome this obstacle and define as much custom behavior
-     * for the tree items as your application requires.
-     * 
-     * @param member the Otm Library Member to add to the tree
-     * @param parent the tree root or parent member
-     * @return
-     */
-    public void createTreeItem(OtmLibraryMember member, TreeItem<ResourcesDAO> parent) {
-        // log.debug("Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName());
+    // /**
+    // * Note: TreeItem class does not extend the Node class. Therefore, you cannot apply any visual effects or add
+    // menus
+    // * to the tree items. Use the cell factory mechanism to overcome this obstacle and define as much custom behavior
+    // * for the tree items as your application requires.
+    // *
+    // * @param member the Otm Library Member to add to the tree
+    // * @param parent the tree root or parent member
+    // * @return
+    // */
+    // public void createTreeItem(OtmLibraryMember member, TreeItem<ResourcesDAO> parent) {
+    // // log.debug("Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName());
+    //
+    // // Skip over contextual facets that have been injected into an object. Their contributed facets will be modeled.
+    // if ((member instanceof OtmContextualFacet && ((OtmContextualFacet) member).getWhereContributed() != null))
+    // return;
+    //
+    // // Create item for the library member
+    // TreeItem<ResourcesDAO> item = new ResourcesDAO( member ).createTreeItem( parent );
+    //
+    // // Create and add items for children
+    // if (member instanceof OtmChildrenOwner)
+    // createChildrenItems( member, item );
+    // }
 
-        // Skip over contextual facets that have been injected into an object. Their contributed facets will be modeled.
-        if ((member instanceof OtmContextualFacet && ((OtmContextualFacet) member).getWhereContributed() != null))
-            return;
+    public void createTreeItem(OtmResource resource, TreeItem<ResourcesDAO> parent) {
+        // The resource
+        TreeItem<ResourcesDAO> rItem = new ResourcesDAO( resource ).createTreeItem( parent );
 
-        // Create item for the library member
-        TreeItem<ResourcesDAO> item = new ResourcesDAO( member ).createTreeItem( parent );
+        // Parent Refs
+        resource.getParentRefs().forEach( pr -> new ResourcesDAO( pr ).createTreeItem( rItem ) );
 
-        // Create and add items for children
-        if (member instanceof OtmChildrenOwner)
-            createChildrenItems( member, item );
+        // Parameter Groups
+        resource.getParameterGroups().forEach( pg -> {
+            TreeItem<ResourcesDAO> child = new ResourcesDAO( pg ).createTreeItem( rItem );
+            createChildrenItems( pg, child );
+        } );
+
+        // Action facets
+        resource.getActionFacets().forEach( af -> new ResourcesDAO( af ).createTreeItem( rItem ) );
+
+        // Actions
+        resource.getActions().forEach( a -> {
+            TreeItem<ResourcesDAO> child = new ResourcesDAO( a ).createTreeItem( rItem );
+            createChildrenItems( a, child );
+        } );
     }
 
     /**
@@ -285,12 +310,14 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
             resourcesTreeTable.getRoot().getChildren().clear();
 
             // create cells for resources
-            currentModelMgr.getResources().forEach( r -> createTreeItem( r, root ) );
-            try {
-                resourcesTreeTable.sort();
-            } catch (Exception e) {
-                log.warn( "Exception sorting: " + e.getLocalizedMessage() );
-            }
+            List<OtmResource> resources = currentModelMgr.getResources();
+            resources.sort( (one, other) -> one.getName().compareTo( other.getName() ) );
+            // resource.sort( new Comparator<OtmResource>() {
+            // public int compare(OtmResource one, OtmResource other) {
+            // return one.getName().compareTo( other.getName() );
+            // }
+            // } );
+            resources.forEach( r -> createTreeItem( r, root ) );
         }
         ignoreEvents = false;
     }
