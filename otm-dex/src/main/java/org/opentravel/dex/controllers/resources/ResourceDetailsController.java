@@ -39,7 +39,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 
 /**
  * Controller for resource details.
@@ -53,10 +52,10 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     /**
      * FXML Java FX Nodes this controller is dependent upon
      */
+    // @FXML
+    // private VBox resourceDetails;
     @FXML
-    private VBox resourceDetails;
-    @FXML
-    private TitledPane childObjectType;
+    private TitledPane resourceDetailsPane;
     @FXML
     private GridPane propertyGrid;
     @FXML
@@ -91,7 +90,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
 
     @Override
     public void checkNodes() {
-        if (!(resourceDetails instanceof VBox))
+        if (!(resourceDetailsPane instanceof TitledPane))
             throw new IllegalStateException( "Member Details not injected by FXML." );
         if (!(memberName instanceof TextField))
             throw new IllegalStateException( "memberName not injected by FXML." );
@@ -109,7 +108,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     @Override
     public void configure(DexMainController mainController) {
         super.configure( mainController );
-        eventPublisherNode = resourceDetails;
+        eventPublisherNode = resourceDetailsPane;
         eventManager = mainController.getEventSubscriptionManager();
     }
 
@@ -176,9 +175,9 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     private void postTitle(OtmObject obj) {
         objectImageView.setImage( ImageManager.getImage( obj.getIconType() ) );
         if (obj instanceof OtmResource)
-            childObjectType.setText( obj.getOwningMember().getName() );
+            resourceDetailsPane.setText( obj.getOwningMember().getName() );
         else
-            childObjectType.setText( obj.getObjectTypeName() + "   in " + obj.getOwningMember().getName() );
+            resourceDetailsPane.setText( obj.getObjectTypeName() + "   in " + obj.getOwningMember().getName() );
     }
 
     private void postName(OtmObject obj) {
@@ -224,7 +223,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
             memberName.setText( "" );
             memberDescription.setText( "" );
             objectImageView.setImage( null );
-            childObjectType.setText( "" );
+            resourceDetailsPane.setText( "" );
             propertyGrid.getChildren().clear();
         }
     }

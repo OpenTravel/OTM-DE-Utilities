@@ -36,13 +36,13 @@ import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.SortType;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 
 /**
  * Manage the library member navigation tree.
@@ -64,7 +64,9 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
     @FXML
     TreeTableView<ErrorsAndWarningsDAO> resourceErrors;
     @FXML
-    private VBox resourceErrorsView;
+    private TitledPane resourceErrorsPane;
+    @FXML
+    private ImageView objectImageView;
 
     //
     TreeItem<ErrorsAndWarningsDAO> root; // Root of the navigation tree. Is displayed.
@@ -105,7 +107,7 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
         TreeTableColumn<ErrorsAndWarningsDAO,String> descColumn = new TreeTableColumn<>( DESCRIPTIONLABEL );
         descColumn
             .setCellValueFactory( new TreeItemPropertyValueFactory<ErrorsAndWarningsDAO,String>( "description" ) );
-        setColumnProps( nameColumn, true, true, true, 500 );
+        setColumnProps( descColumn, true, true, true, 500 );
 
 
         TreeTableColumn<ErrorsAndWarningsDAO,ImageView> valColumn = new TreeTableColumn<>( "" );
@@ -140,7 +142,7 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
     public void configure(DexMainController parent) {
         super.configure( parent );
         // log.debug("Configuring Member Tree Table.");
-        eventPublisherNode = resourceErrorsView;
+        eventPublisherNode = resourceErrorsPane;
         configure( parent.getModelManager(), treeEditingEnabled );
     }
 
@@ -245,6 +247,9 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
         if (resource != null && resourceErrors != null) {
             clear();
             postedData = resource;
+
+            // Put OK/Warn/Error icon in title
+            objectImageView.setImage( resource.validationImage().getImage() );
 
             ValidationFindings findings = resource.getFindings();
             String f = ValidationUtils.getMessagesAsString( findings );

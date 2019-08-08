@@ -7,33 +7,24 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane fx:id="resourcesWindow" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.resources.ResourcesWindowController">
-               <!-- top>
-			      <fx:include fx:id="resourceDetails" source="ResourceDetails.fxml" />
-               </top -->               
 			   <center>
                   <SplitPane dividerPositions="0.3" VBox.vgrow="ALWAYS">
                      <items>
 					    <VBox>
 						   <children>
-							<!-- fx:include fx:id="repositorySearch" source="RepositorySearch.fxml" / -->
-							<fx:include fx:id="resourcesTreeTable" source="ResourcesTreeTable.fxml" VBox.vgrow="ALWAYS" />
+							  <fx:include fx:id="resourcesTreeTable" source="ResourcesTreeTable.fxml" VBox.vgrow="ALWAYS" />
 						   </children>
 						</VBox>
-                        <SplitPane dividerPositions="0.7, 0.5" orientation="VERTICAL">
+                        <SplitPane  orientation="VERTICAL">
                            <items>
-					    <!-- VBox>
-						   <children -->
-                                 <fx:include fx:id="resourceDetails" source="ResourceDetails.fxml" />
-                                 <!-- fx:include fx:id="resourcePathsTree" source="ResourcePathsTree.fxml" />
-                                 <fx:include fx:id="resourceRQTreeTable" source="ResourceRQTreeTable.fxml" />
-                                 <fx:include fx:id="resourceRSTreeTable" source="ResourceRSTreeTable.fxml" / -->
-                                 <fx:include fx:id="resourceActionsTreeTable" source="ResourceActionsTreeTable.fxml" />
-                                 <fx:include fx:id="resourceErrorsTreeTable" source="ResourceErrorsTreeTable.fxml" />
-						   <!-- /children>
-						</VBox -->
-                         </items>
+                               <fx:include fx:id="resourceDetails" source="ResourceDetails.fxml" />
+                               <fx:include fx:id="resourceActionsTreeTable" source="ResourceActionsTreeTable.fxml" />
+                           </items>
                        </SplitPane>
                      </items>
                 </SplitPane>
                </center>
+			   <bottom>
+                  <fx:include fx:id="resourceErrorsTreeTable" source="ResourceErrorsTreeTable.fxml" />
+			   </bottom>
 </BorderPane>

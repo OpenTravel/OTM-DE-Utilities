@@ -49,7 +49,6 @@ import javafx.scene.control.TreeTableColumn.SortType;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 
 /**
  * Manage the library member navigation tree.
@@ -62,7 +61,7 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
     private static Log log = LogFactory.getLog( ResourceActionsTreeTableController.class );
 
     // Column labels
-    private static final String NAMECOLUMNLABEL = "Member";
+    private static final String NAMECOLUMNLABEL = "";
     private static final String AFLABEL = "";
     private static final String CONTENTlABEL = "";
 
@@ -73,8 +72,8 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
     TreeTableView<ActionsDAO> resourceActionsTreeTable;
     @FXML
     private TitledPane resourceActionsTreeTablePane;
-    @FXML
-    private VBox resourceActionsTreeTableView;
+    // @FXML
+    // private VBox resourceActionsTreeTableView;
 
     //
     TreeItem<ActionsDAO> root; // Root of the navigation tree. Is displayed.
@@ -150,7 +149,7 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
     public void configure(DexMainController parent) {
         super.configure( parent );
         // log.debug("Configuring Member Tree Table.");
-        eventPublisherNode = resourceActionsTreeTableView;
+        eventPublisherNode = resourceActionsTreeTablePane;
         configure( parent.getModelManager(), treeEditingEnabled );
     }
 
@@ -175,8 +174,13 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         resourceActionsTreeTable.setRoot( getRoot() );
         resourceActionsTreeTable.setShowRoot( false );
         resourceActionsTreeTable.setEditable( true );
-        resourceActionsTreeTable.getSelectionModel().setCellSelectionEnabled( true ); // allow individual cells to be
-                                                                                      // edited
+        resourceActionsTreeTable.getSelectionModel().setCellSelectionEnabled( true );
+
+        resourceActionsTreeTablePane.setPrefHeight( 1000 );
+        resourceActionsTreeTable.minHeight( 1000 );
+        resourceActionsTreeTable.prefHeightProperty().bind( resourceActionsTreeTablePane.heightProperty() );
+        // resourceActionsTreeTablePane.prefHeightProperty().bind( resourceActionsTreeTable.heightProperty() );
+
         resourceActionsTreeTable.setTableMenuButtonVisible( true ); // allow users to select columns
         // Enable context menus at the row level and add change listener for for applying style
         resourceActionsTreeTable.setRowFactory( (TreeTableView<ActionsDAO> p) -> new ActionRowFactory( this ) );

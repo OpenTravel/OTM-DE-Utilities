@@ -71,7 +71,8 @@
     -fx-text-fill: #603030;
 }
 .tree-table-cell:inherited {
-    -fx-font-weight: italic ;
+    -fx-font-weight: normal ;
+	-fx-font-style: italic ;
     -fx-text-fill: #603030;
 }
 .split-pane {
