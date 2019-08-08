@@ -64,7 +64,7 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
         return mainController;
     }
 
-    public DexIncludedControllerBase(EventType[] subscribed) {
+    public DexIncludedControllerBase(EventType<? extends AbstractOtmEvent>[] subscribed) {
         log.debug( "Constructing included controller with subscribed event types." );
         if (subscribed != null && subscribed.length > 0)
             subscribedEventTypes = Collections.unmodifiableList( Arrays.asList( subscribed ) );
@@ -76,7 +76,8 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
      * @param subscribed event types handled by this controller. Used by main controller to register handlers.
      * @param published event types fired by this controller. Used by main controller to register handlers.
      */
-    public DexIncludedControllerBase(EventType[] subscribed, EventType[] published) {
+    public DexIncludedControllerBase(EventType<? extends AbstractOtmEvent>[] subscribed,
+        EventType<? extends AbstractOtmEvent>[] published) {
         this( subscribed );
         log.debug( "Constructing included controller with subscribed and published event types." );
         if (published != null && published.length > 0)
