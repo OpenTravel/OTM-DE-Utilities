@@ -66,7 +66,8 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
 
     private ObservableList<String> getParentCandidates() {
         ObservableList<String> candidates = FXCollections.observableArrayList();
-        getOwningMember().getModelManager().getResources().forEach( r -> candidates.add( r.getNameWithPrefix() ) );
+        getOwningMember().getModelManager().getResources( true )
+            .forEach( r -> candidates.add( r.getNameWithPrefix() ) );
         candidates.remove( getOwningMember().getNameWithPrefix() );
         return candidates;
     }

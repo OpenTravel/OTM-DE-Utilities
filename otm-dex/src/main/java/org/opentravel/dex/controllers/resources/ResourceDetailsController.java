@@ -52,8 +52,6 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     /**
      * FXML Java FX Nodes this controller is dependent upon
      */
-    // @FXML
-    // private VBox resourceDetails;
     @FXML
     private TitledPane resourceDetailsPane;
     @FXML

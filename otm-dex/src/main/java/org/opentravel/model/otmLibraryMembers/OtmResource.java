@@ -370,7 +370,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         ObservableList<String> candidates = FXCollections.observableArrayList();
         // TODO - handle minor version case
         candidates.add( NONE );
-        getModelManager().getResources().forEach( r -> candidates.add( r.getNameWithPrefix() ) );
+        getModelManager().getResources( true ).forEach( r -> candidates.add( r.getNameWithPrefix() ) );
         candidates.remove( getNameWithPrefix() );
         return candidates;
     }

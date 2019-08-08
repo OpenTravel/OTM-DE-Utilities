@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.resources;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.model.OtmModelElement;
@@ -43,7 +41,7 @@ import javafx.scene.image.ImageView;
  *
  */
 public class ErrorsAndWarningsDAO implements DexDAO<OtmObject> {
-    private static Log log = LogFactory.getLog( ErrorsAndWarningsDAO.class );
+    // private static Log log = LogFactory.getLog( ErrorsAndWarningsDAO.class );
 
     protected OtmObject otmObject;
     protected ValidationFinding finding;
@@ -52,9 +50,6 @@ public class ErrorsAndWarningsDAO implements DexDAO<OtmObject> {
         this.finding = finding;
         this.otmObject = OtmModelElement.get( (TLModelElement) finding.getSource() );
     }
-    // public ErrorsAndWarningsDAO(OtmObject object) {
-    // this.otmObject = member;
-    // }
 
     @Override
     public ImageView getIcon(ImageManager imageMgr) {

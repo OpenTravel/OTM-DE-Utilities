@@ -23,7 +23,6 @@ import org.opentravel.common.cellfactories.ValidationActionTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.events.DexFilterChangeEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
@@ -72,20 +71,14 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
     TreeTableView<ActionsDAO> resourceActionsTreeTable;
     @FXML
     private TitledPane resourceActionsTreeTablePane;
-    // @FXML
-    // private VBox resourceActionsTreeTableView;
 
     //
     TreeItem<ActionsDAO> root; // Root of the navigation tree. Is displayed.
     TreeTableColumn<ActionsDAO,String> nameColumn; // an editable column
 
-    // OtmModelManager currentModelMgr; // this is postedData
-
-    MemberFilterController filter = null;
-
     private boolean ignoreEvents = false;
     // By default, the tree is editable. Setting this to false will prevent edits.
-    private boolean treeEditingEnabled = true;
+    private boolean treeEditingEnabled = false;
 
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
@@ -176,8 +169,9 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         resourceActionsTreeTable.setEditable( true );
         resourceActionsTreeTable.getSelectionModel().setCellSelectionEnabled( true );
 
-        resourceActionsTreeTablePane.setPrefHeight( 1000 );
-        resourceActionsTreeTable.minHeight( 1000 );
+        // Force the tree to take up the rest of the horizontal space
+        resourceActionsTreeTablePane.setPrefHeight( 2000 );
+        resourceActionsTreeTable.minHeight( 2000 );
         resourceActionsTreeTable.prefHeightProperty().bind( resourceActionsTreeTablePane.heightProperty() );
         // resourceActionsTreeTablePane.prefHeightProperty().bind( resourceActionsTreeTable.heightProperty() );
 

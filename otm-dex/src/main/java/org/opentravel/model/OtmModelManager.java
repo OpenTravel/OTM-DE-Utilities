@@ -618,14 +618,17 @@ public class OtmModelManager implements TaskResultHandlerI {
 
 
     /**
+     * @param sort if true, sort the list by member name
      * @return new list of members that are resources
      */
-    public List<OtmResource> getResources() {
+    public List<OtmResource> getResources(boolean sort) {
         List<OtmResource> resources = new ArrayList<>();
         members.values().forEach( m -> {
             if (m instanceof OtmResource)
                 resources.add( (OtmResource) m );
         } );
+        if (sort)
+            resources.sort( (one, other) -> one.getName().compareTo( other.getName() ) );
         return resources;
     }
 

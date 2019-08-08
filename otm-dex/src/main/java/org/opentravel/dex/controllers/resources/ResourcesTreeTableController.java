@@ -309,14 +309,8 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
             resourcesTreeTable.getSelectionModel().clearSelection();
             resourcesTreeTable.getRoot().getChildren().clear();
 
-            // create cells for resources
-            List<OtmResource> resources = currentModelMgr.getResources();
-            resources.sort( (one, other) -> one.getName().compareTo( other.getName() ) );
-            // resource.sort( new Comparator<OtmResource>() {
-            // public int compare(OtmResource one, OtmResource other) {
-            // return one.getName().compareTo( other.getName() );
-            // }
-            // } );
+            // create cells for sorted list of resources
+            List<OtmResource> resources = currentModelMgr.getResources( true );
             resources.forEach( r -> createTreeItem( r, root ) );
         }
         ignoreEvents = false;
