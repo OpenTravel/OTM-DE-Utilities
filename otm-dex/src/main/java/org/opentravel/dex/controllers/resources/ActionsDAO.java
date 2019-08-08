@@ -115,15 +115,16 @@ public class ActionsDAO implements DexDAO<OtmObject> {
     public StringProperty actionFacetProperty() {
         StringProperty wrapper = new ReadOnlyStringWrapper( "" );
         if (otmObject instanceof OtmAction)
-            wrapper.set( "" );
+            // The path is the endpoint path
+            wrapper = ((OtmAction) otmObject).getRequest().urlProperty();
         else if (otmObject instanceof OtmActionRequest)
-            wrapper = ((OtmActionRequest) otmObject).urlProperty();
+            wrapper = ((OtmActionRequest) otmObject).examplePayloadProperty();
         else if (otmObject instanceof OtmActionResponse)
             wrapper = ((OtmActionResponse) otmObject).examplePayloadProperty();
         else if (otmObject instanceof OtmTypeUser)
             wrapper.set( ((OtmTypeUser) otmObject).getTlAssignedTypeName() );
         else if (otmObject instanceof OtmParameter)
-            wrapper = ((OtmParameter) otmObject).locationProperty();
+            wrapper = ((OtmParameter) otmObject).typeProperty();
         return wrapper;
     }
 
@@ -132,7 +133,7 @@ public class ActionsDAO implements DexDAO<OtmObject> {
         if (otmObject instanceof OtmActionRequest)
             wrapper = ((OtmActionRequest) otmObject).examplePayloadProperty();
         else if (otmObject instanceof OtmParameter)
-            wrapper = ((OtmParameter) otmObject).typeProperty();
+            wrapper = ((OtmParameter) otmObject).locationProperty();
         return wrapper;
     }
 

@@ -85,13 +85,11 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
     }
 
     @Override
-    // @SuppressWarnings("rawtypes")
     public List<EventType<? extends AbstractOtmEvent>> getPublishedEventTypes() {
         return publishedEventTypes != null ? publishedEventTypes : Collections.emptyList();
     }
 
     @Override
-    // @SuppressWarnings("rawtypes")
     public List<EventType<? extends AbstractOtmEvent>> getSubscribedEventTypes() {
         return subscribedEventTypes != null ? subscribedEventTypes : Collections.emptyList();
     }
