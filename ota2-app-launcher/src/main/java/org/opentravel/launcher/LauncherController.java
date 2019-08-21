@@ -192,7 +192,7 @@ public class LauncherController extends AbstractMainWindowController {
             cmds.add( appClass.getCanonicalName() );
             builder = new ProcessBuilder( cmds );
             builder.redirectErrorStream( true );
-            builder.redirectOutput( Redirect.to( getLogFile( appClass ) ) );
+            builder.redirectOutput( Redirect.appendTo( getLogFile( appClass ) ) );
             newProcess = builder.start();
             sourceButton.getProperties().put( APP_PROCESS_KEY, newProcess );
 
