@@ -26,6 +26,7 @@ import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmActionResponse;
 import org.opentravel.model.resource.OtmParameter;
+import org.opentravel.model.resource.OtmParentRef;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -47,14 +48,22 @@ public class ActionsDAO implements DexDAO<OtmObject> {
     private static Log log = LogFactory.getLog( ActionsDAO.class );
 
     protected OtmObject otmObject;
+    protected OtmAction action = null;
 
     public ActionsDAO(OtmObject member) {
         this.otmObject = member;
     }
 
-    // public ActionsDAO(OtmTypeProvider provider) {
-    // this.otmObject = provider;
-    // }
+    /**
+     * To get full path from the parentRef, it needs to have the endpoints map from the action.
+     * 
+     * @param parentRef
+     * @param action
+     */
+    public ActionsDAO(OtmParentRef parentRef, OtmAction action) {
+        this.otmObject = parentRef;
+        this.action = action;
+    }
 
     @Override
     public ImageView getIcon(ImageManager imageMgr) {
@@ -70,16 +79,6 @@ public class ActionsDAO implements DexDAO<OtmObject> {
         return otmObject.isEditable();
     }
 
-    // public StringProperty usedTypesProperty() {
-    // String usedTypeCount = "";
-    // if (otmObject instanceof OtmLibraryMember) {
-    // List<OtmTypeProvider> u = ((OtmLibraryMember) otmObject).getUsedTypes();
-    // if (u != null)
-    // usedTypeCount = Integer.toString( u.size() );
-    // }
-    // return new ReadOnlyStringWrapper( usedTypeCount );
-    // }
-
     public StringProperty errorProperty() {
         return otmObject.validationProperty();
     }
@@ -88,35 +87,23 @@ public class ActionsDAO implements DexDAO<OtmObject> {
         return otmObject.validationImageProperty();
     }
 
-    // public StringProperty libraryProperty() {
-    // if (otmObject instanceof OtmLibraryMember)
-    // return ((OtmLibraryMember) otmObject).libraryProperty();
-    // return new ReadOnlyStringWrapper( otmObject.getLibrary().getName() );
-    // }
-
-    // public StringProperty prefixProperty() {
-    // if (otmObject instanceof OtmLibraryMember)
-    // return ((OtmLibraryMember) otmObject).prefixProperty();
-    // return new ReadOnlyStringWrapper( otmObject.getPrefix() );
-    // }
-
     public StringProperty nameProperty() {
         StringProperty wrapper = otmObject.nameProperty();
         if (otmObject instanceof OtmActionRequest)
             wrapper = ((OtmActionRequest) otmObject).methodProperty();
         if (otmObject instanceof OtmActionResponse)
             wrapper = ((OtmActionResponse) otmObject).statusCodeProperty();
-        // else if (otmObject instanceof OtmParameter)
-        // wrapper = ((OtmParameter)otmObject).g);
         return wrapper;
     }
 
-    // TODO - add repeat count ??
-    public StringProperty actionFacetProperty() {
+    // add repeat count ??
+    public StringProperty dataColumnProperty() {
         StringProperty wrapper = new ReadOnlyStringWrapper( "" );
-        if (otmObject instanceof OtmAction)
-            // The path is the endpoint path
-            wrapper = ((OtmAction) otmObject).getRequest().urlProperty();
+        if (otmObject instanceof OtmParentRef && action != null)
+            // Without action and its endpoints, there is no context to present a path
+            wrapper = new ReadOnlyStringWrapper( action.getEndpointURL( ((OtmParentRef) otmObject) ) );
+        else if (otmObject instanceof OtmAction)
+            wrapper = new ReadOnlyStringWrapper( ((OtmAction) otmObject).getEndpointURL() );
         else if (otmObject instanceof OtmActionRequest)
             wrapper = ((OtmActionRequest) otmObject).examplePayloadProperty();
         else if (otmObject instanceof OtmActionResponse)
@@ -137,20 +124,10 @@ public class ActionsDAO implements DexDAO<OtmObject> {
         return wrapper;
     }
 
-    // public void setName(String name) {
-    // otmObject.setName( name );
-    // }
-
     @Override
     public String toString() {
         return otmObject != null ? otmObject.getPrefix() + ":" + otmObject.toString() : "";
     }
-
-    // public StringProperty versionProperty() {
-    // if (otmObject instanceof OtmLibraryMember)
-    // return ((OtmLibraryMember) otmObject).versionProperty();
-    // return new ReadOnlyStringWrapper( "" );
-    // }
 
     /**
      * Create and add to tree with no conditional logic.

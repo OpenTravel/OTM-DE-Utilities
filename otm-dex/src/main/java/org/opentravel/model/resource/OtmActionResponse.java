@@ -54,6 +54,14 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
         super( tla, parent );
     }
 
+    public boolean isInherited() {
+        return getParent().getResponses().contains( this );
+    }
+
+    @Override
+    public OtmAction getParent() {
+        return (OtmAction) parent;
+    }
     // public OtmActionResponse(String name, OtmAction parent) {
     // super( new TLActionResponse(), parent );
     // setName( name );

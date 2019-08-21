@@ -35,7 +35,7 @@ import org.opentravel.schemacompiler.model.TLProperty;
  * Verifies the functions of the <code>OtmBusinessObject</code> class.
  */
 public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
-    private static final String BO_NAME = "Testbo";
+    private static String BoName = "Testbo";
 
     private static Log log = LogFactory.getLog( TestBusiness.class );
 
@@ -58,10 +58,15 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
 
 
     /** ****************************************************** **/
+    public static OtmBusinessObject buildOtm(OtmModelManager mgr, String name) {
+        BoName = name;
+        return buildOtm( mgr );
+    }
 
     public static OtmBusinessObject buildOtm(OtmModelManager mgr) {
         OtmBusinessObject bo = new OtmBusinessObject( buildTL(), mgr );
         assertNotNull( bo );
+        mgr.add( bo );
 
         // TestCustomFacet.buildOtm( staticModelManager );
         assertTrue( bo.getChildren().size() > 2 );
@@ -72,22 +77,22 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
 
     public static TLBusinessObject buildTL() {
         TLBusinessObject tlbo = new TLBusinessObject();
-        tlbo.setName( BO_NAME );
+        tlbo.setName( BoName );
         TLAttribute tla = new TLAttribute();
-        tla.setName( "idAttr_" + BO_NAME );
+        tla.setName( "idAttr_" + BoName );
         buildExample( tla );
         tlbo.getIdFacet().addAttribute( tla );
 
         TLProperty tlp = new TLProperty();
-        tlp.setName( "idProp_" + BO_NAME );
+        tlp.setName( "idProp_" + BoName );
         buildExample( tlp );
         tlbo.getIdFacet().addElement( tlp );
 
         tla = new TLAttribute();
-        tla.setName( "sumAttr_" + BO_NAME );
+        tla.setName( "sumAttr_" + BoName );
         tlbo.getSummaryFacet().addAttribute( tla );
         tlp = new TLProperty();
-        tlp.setName( "sumProp_" + BO_NAME );
+        tlp.setName( "sumProp_" + BoName );
         tlbo.getSummaryFacet().addElement( tlp );
         return tlbo;
     }

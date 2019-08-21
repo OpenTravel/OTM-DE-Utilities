@@ -16,6 +16,7 @@
 
 package org.opentravel.model.resource;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
@@ -52,9 +53,8 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
     @Test
     public void testChildren() {
         OtmAction a = buildOtm( testResource );
-        // List<OtmObject> kids = a.getChildren();
-        // OtmActionRequest rq = a.getRequest();
         assertTrue( a.getChildren().size() >= 2 );
+        assertTrue( a.getRequest() != null );
 
         // Then - make sure there are request and responses in the children
         assertTrue( a.getChildren().contains( a.getRequest() ) );
@@ -66,6 +66,147 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
     public void testRequestPayload() {
         // TODO
     }
+
+    @Test
+    public void testInheritedResponses() {
+        // TODO
+        // Make sure the inherited are not also children
+    }
+
+    public static final String THEPATH = "/MySubjectPath";
+    public static final String SUBJECTNAME = "MySubject";
+    public static final String TEMPLATE = "ThisIsMyTemplate";
+
+    @Test
+    public void testEndpointPathsNotFirstClass() {
+        // Given one 1st class resource with ID group
+        OtmResource resource = TestResource.buildFullOtm( THEPATH, SUBJECTNAME, staticModelManager );
+        TestParamGroup.buildIdGroup( resource );
+        resource.setFirstClass( false );
+        DexParentRefsEndpointMap endpoints = resource.getParentRefEndpointsMap();
+        assertTrue( "Must be empty when no parent references.", endpoints.size() == 0 );
+
+        for (OtmAction a : resource.getActions()) {
+            assertFalse( a.getEndpointURL().isEmpty() );
+            log.debug( "Testing action: " + a + "  Url = " + a.getEndpointURL() );
+            assertTrue( a.getEndpointURL().equals( DexParentRefsEndpointMap.NO_PATH_NOTFIRSTCLASS_AND_NOPARENTREFS ) );
+        }
+    }
+
+    @Test
+    public void testEndpointPathsNotFirstClassParents() {
+        // Given a NOT 1st class resource with ID group
+        OtmResource resource = TestResource.buildFullOtm( THEPATH, SUBJECTNAME, staticModelManager );
+        TestParamGroup.buildIdGroup( resource );
+        resource.setFirstClass( false );
+        // Given - a parent reference to another resource
+        OtmResource parent = TestResource.buildParentResource( resource, "Parent", staticModelManager );
+
+        for (OtmAction a : resource.getActions()) {
+            assertFalse( a.getEndpointURL().isEmpty() );
+            log.debug( "Testing action: " + a + "  Url = " + a.getEndpointURL() );
+            // Then - must have static message
+            assertTrue( a.getEndpointURL().equals( DexParentRefsEndpointMap.NO_PATH ) );
+        }
+    }
+
+    @Test
+    public void testEndpointPathsFirstClassNoParentRefs() {
+        // Given one 1st class resource with ID group
+        OtmResource resource = TestResource.buildFullOtm( THEPATH, SUBJECTNAME, staticModelManager );
+        TestParamGroup.buildIdGroup( resource );
+        DexParentRefsEndpointMap endpoints = resource.getParentRefEndpointsMap();
+        assertTrue( "Must be empty when no parent references.", endpoints.size() == 0 );
+
+        for (OtmAction a : resource.getActions()) {
+            log.debug( "Testing action: " + a + "  Url = " + a.getEndpointURL() );
+            checkURLs( a );
+        }
+    }
+
+    /**
+     * Make sure URL with and with out template on request are correct
+     * 
+     * @param a
+     */
+    public static void checkURLs(OtmAction a) {
+        assertFalse( a.getEndpointURL().isEmpty() );
+        String subjectName = a.getOwningMember().getSubjectName();
+        String initialTemplate = a.getRequest().getPathTemplate();
+        String url = "";
+
+        if (a.getOwningMember().isFirstClass()) {
+            // When - template on request
+            a.getRequest().setPathTemplate( TEMPLATE, true );
+            url = a.getEndpointURL();
+            // Then
+            assertTrue( "Must use template.", url.contains( TEMPLATE ) );
+            assertFalse( "Must not have subject name.", url.contains( subjectName ) );
+
+            // When - template is null
+            a.getRequest().setPathTemplate( null, true );
+            url = a.getEndpointURL();
+            // Then
+            assertFalse( "Must not use template.", url.contains( TEMPLATE ) );
+            assertTrue( "Must have subject name.", url.contains( subjectName ) );
+        } else {
+            // Then - url is fixed
+            assertFalse( a.getEndpointURL().startsWith( DexParentRefsEndpointMap.getResourceBaseURL() ) );
+        }
+
+        a.getRequest().setPathTemplate( initialTemplate, false );
+    }
+
+    @Test
+    public void testEndpointPathsParents() {
+        // Given a NOT 1st class resource with ID group
+        OtmResource resource = TestResource.buildFullOtm( THEPATH, SUBJECTNAME, staticModelManager );
+        TestParamGroup.buildIdGroup( resource );
+        resource.setFirstClass( false );
+        // Given - a parent reference to another resource
+        OtmResource parent = TestResource.buildParentResource( resource, "Parent", staticModelManager );
+
+        // Then - the action's URLs are correct
+        for (OtmAction a : resource.getActions()) {
+            log.debug( "Testing action: " + a + "  Url = " + a.getEndpointURL() );
+            checkURLs( a );
+
+            // Then - there is a url for all parent refs
+            for (OtmParentRef pr : resource.getAllParentRefs( true )) {
+                log.debug( a.getEndpointURL( pr ) );
+                log.debug( DexParentRefsEndpointMap.getResourceBaseURL() );
+                assertTrue( a.getEndpointURL( pr ).startsWith( DexParentRefsEndpointMap.getResourceBaseURL() ) );
+            }
+        }
+    }
+
+    // Actions can have many paths. Their own and those from all the parentRefs and their parent refs.
+    @Test
+    public void testEndpointURLsMultipleParents() {
+        // Given one resource 1st class resource
+        OtmResource resource = TestResource.buildFullOtm( THEPATH, "Subject", staticModelManager );
+        TestParamGroup.buildIdGroup( resource );
+        // Given - a parent resource
+        OtmResource parent = TestResource.buildParentResource( resource, "Parent", staticModelManager );
+        // When - there is a grand parent
+        OtmResource gp = TestResource.buildParentResource( parent, "Grand", staticModelManager );
+        // When - there is a grand parent
+        OtmResource ggp = TestResource.buildParentResource( gp, "Agreat", staticModelManager );
+
+        // Then - get URLs
+        // Then - the action's URLs are correct
+        for (OtmAction a : resource.getActions()) {
+            log.debug( "Testing action: " + a + "  Url = " + a.getEndpointURL() );
+            checkURLs( a );
+
+            // Then - there is a url for all parent refs
+            for (OtmParentRef pr : resource.getAllParentRefs( true )) {
+                log.debug( a.getEndpointURL( pr ) );
+                assertTrue( a.getEndpointURL( pr ).startsWith( DexParentRefsEndpointMap.getResourceBaseURL() ) );
+            }
+        }
+    }
+
 
     @Test
     public void testRequestContent() {
@@ -98,7 +239,25 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
         tla.addResponse( new TLActionResponse() );
         tla.setRequest( new TLActionRequest() );
         tla.getRequest().setHttpMethod( TLHttpMethod.POST );
+        tla.getRequest().setPathTemplate( tlResource.getBasePath() );
         tlResource.addAction( tla );
         return tla;
     }
+
+    /**
+     * Build an action with request that has parameter group added to resource
+     * 
+     * @param resource
+     */
+    public static void buildFullOtm(OtmResource resource) {
+        assertTrue( "Resource must have base path set.", resource.getBasePath() != null );
+        assertTrue( "Resource must have base path set.", !resource.getBasePath().isEmpty() );
+        OtmAction action = TestAction.buildOtm( resource );
+        assertTrue( resource.getActions().contains( action ) );
+        assertTrue( action.getRequest() != null );
+        OtmParameterGroup group1 = TestParamGroup.buildOtm( resource );
+        action.getRequest().setParamGroup( group1 );
+        // To do - assumes group contains a path and query parameter
+    }
+
 }

@@ -24,7 +24,6 @@ import org.opentravel.common.cellfactories.ValidationErrorsAndWarningsTreeTableC
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.events.DexFilterChangeEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.OtmModelManager;
@@ -190,10 +189,10 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
             ? resourceErrors.getSelectionModel().getSelectedItem().getValue() : null;
     }
 
-    private void handleEvent(DexFilterChangeEvent event) {
-        if (!ignoreEvents)
-            refresh();
-    }
+    // private void handleEvent(DexFilterChangeEvent event) {
+    // if (!ignoreEvents)
+    // refresh();
+    // }
 
     private void handleEvent(DexMemberSelectionEvent event) {
         if (!ignoreEvents && event != null && event.getMember() instanceof OtmResource)
@@ -253,7 +252,6 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
 
             ValidationFindings findings = resource.getFindings();
             String f = ValidationUtils.getMessagesAsString( findings );
-            log.debug( f );
 
             for (ValidationFinding finding : findings.getAllFindingsAsList())
                 new ErrorsAndWarningsDAO( finding ).createTreeItem( root );

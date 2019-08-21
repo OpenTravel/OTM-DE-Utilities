@@ -60,7 +60,7 @@ public class ImageManager {
         RESOURCE_ACTION("/icons/ResourceAction.gif"),
         RESOURCE_PARAMETER("/icons/ResourceParameterGroup.gif"),
         RESOURCE_PARAMETERGROUP("/icons/ResourceParameter.gif"),
-        RESOURCE_PARENTREF("/icons/ResourceParentRef.gif"),
+        RESOURCE_PARENTREF("/icons/ResourceParentRef.png"),
         RESOURCE_REQUEST("/icons/ResourceRequest.gif"),
         RESOURCE_RESPONSE("/icons/ResourceResponse.gif"),
         RUN("/icons/run.gif"),

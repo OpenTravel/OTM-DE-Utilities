@@ -29,12 +29,15 @@ import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmParameterGroup;
+import org.opentravel.model.resource.OtmParentRef;
 import org.opentravel.model.resource.TestAction;
 import org.opentravel.model.resource.TestActionFacet;
 import org.opentravel.model.resource.TestParamGroup;
 import org.opentravel.model.resource.TestParentRef;
 import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLActionFacet;
+import org.opentravel.schemacompiler.model.TLActionRequest;
+import org.opentravel.schemacompiler.model.TLHttpMethod;
 import org.opentravel.schemacompiler.model.TLParamGroup;
 import org.opentravel.schemacompiler.model.TLResource;
 
@@ -141,38 +144,126 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         assertFalse( resource.getSubjectName().isEmpty() );
     }
 
+    // Test one parent
+    @Test
+    public void testParentRefs() {
+        // Given - two resources
+        OtmResource resource = buildOtm( staticModelManager );
+        OtmResource parent = buildOtm( staticModelManager );
+        assertTrue( staticModelManager.getResources( false ).contains( resource ) );
+        assertTrue( staticModelManager.getResources( false ).contains( parent ) );
+
+        // When - parent ref is added
+        OtmParentRef parentRef = resource.addParentRef( parent );
+        assertTrue( parent.getAllSubResources().contains( resource ) );
+
+        // Then - the parent ref check is OK
+        TestParentRef.check( parentRef, resource, parent );
+    }
+
+    // Test parent and grandparent
+    @Test
+    public void testParentAndGrandparentRefs() {
+        // Given - 4 resources
+        OtmResource resource = buildOtm( staticModelManager );
+        OtmResource parent1 = buildOtm( staticModelManager );
+        OtmResource parent2 = buildOtm( staticModelManager );
+        OtmResource parent3 = buildOtm( staticModelManager );
+
+        // When - parent ref is added
+        OtmParentRef parentRef3 = parent2.addParentRef( parent3 );
+        OtmParentRef parentRef2 = parent1.addParentRef( parent2 );
+        OtmParentRef parentRef1 = resource.addParentRef( parent1 );
+
+        assertTrue( resource.getParentRefs().size() == 1 );
+        assertTrue( parent1.getParentRefs().size() == 1 );
+        assertTrue( parent2.getParentRefs().size() == 1 );
+
+        // Then - sub-resources can be found
+        assertTrue( parent1.getAllSubResources().contains( resource ) );
+        assertTrue( parent2.getAllSubResources().contains( resource ) );
+
+        // Then - the parent ref check is OK
+        TestParentRef.check( parentRef1, resource, parent1 );
+        TestParentRef.check( parentRef2, parent1, parent2 );
+        TestParentRef.check( parentRef3, parent2, parent3 );
+    }
+
+    // Test multiple parents
+    @Test
+    public void testParentsRefs() {
+        // Given - 4 resources
+        OtmResource resource = buildOtm( staticModelManager );
+        OtmResource parent1 = buildOtm( staticModelManager );
+        OtmResource parent2 = buildOtm( staticModelManager );
+        OtmResource parent3 = buildOtm( staticModelManager );
+
+        // When - parent ref is added
+        OtmParentRef parentRef1 = resource.addParentRef( parent1 );
+        OtmParentRef parentRef2 = resource.addParentRef( parent2 );
+        OtmParentRef parentRef3 = resource.addParentRef( parent3 );
+
+        // Then - 3 parent refs
+        assertTrue( resource.getParentRefs().size() == 3 );
+        // Then - the parent ref check is OK
+        TestParentRef.check( parentRef1, resource, parent1 );
+        TestParentRef.check( parentRef2, resource, parent2 );
+        TestParentRef.check( parentRef3, resource, parent3 );
+    }
+
     @Test
     public void testActionRequests() {
         OtmResource testResource = buildOtm( staticModelManager );
 
-        // Then - no requests have been created
+        // Given - how many requests have been created
         List<OtmActionRequest> requests = testResource.getActionRequests();
-        assertTrue( requests.isEmpty() );
+        int initialRQsize = requests.size();
 
-        // When two actions are added with two responses
+        // When - two actions are added
         OtmAction action1 = TestAction.buildOtm( testResource );
-        // assertTrue( action1.getRequest() != null );
-        // assertTrue( action1.getTL().getRequest() != null );
-        // assertTrue( testResource.getChildren().contains( action1 ) );
-        // assertTrue( testResource.getTL().getActions().contains( action1.getTL() ) );
-
         OtmAction action2 = TestAction.buildOtm( testResource );
+
         requests = testResource.getActionRequests();
-        assertTrue( requests.size() == 2 );
+        // Then there must be 2 more requests
+        assertTrue( requests.size() == initialRQsize + 2 );
     }
+
+    // @Test
+    // public void testSWAGGERTransformer() {
+    // OtmResource r = buildFullOtm( "/thisPath", "Subject", staticModelManager );
+    // OtmResource p = buildParentResource( r, "Parent", staticModelManager );
+    // TLResource source = r.getTL();
+    //
+    // for (QualifiedAction qAction : ResourceCodegenUtils.getQualifiedActions( source )) {
+    // if (qAction.getAction().isCommonAction()) {
+    // continue;
+    // }
+    // OtmAction action = (OtmAction) OtmModelElement.get( qAction.getAction() );
+    // log.debug( r.getName() + " " + qAction.getActionRequest().getHttpMethod() + " action: " + action.getName()
+    // + " on path " + qAction.getPathTemplate() );
+    // TLActionRequest actionRequest = qAction.getActionRequest();
+    // String pathTemplate = qAction.getPathTemplate();
+    // TLHttpMethod httpMethod = actionRequest.getHttpMethod();
+    // }
+    //
+    // }
 
     /** ****************************************************** **/
 
     public static OtmResource buildOtm(OtmModelManager mgr) {
         OtmResource resource = new OtmResource( buildTL(), mgr );
+        mgr.add( resource );
         assertNotNull( resource );
         assertTrue( resource.getChildren().size() == 3 );
         return resource;
     }
 
+    public static final String BASEPATH = "/SomeBasePath";
+
     public static TLResource buildTL() {
         TLResource tlr = new TLResource();
         tlr.setName( R_NAME );
+        tlr.setBasePath( BASEPATH );
 
         TLActionFacet tlaf = new TLActionFacet();
         tlr.addActionFacet( tlaf );
@@ -181,6 +272,11 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         TLAction tla = new TLAction();
         tla.setActionId( R_NAME + "a1" );
         tlr.addAction( tla );
+        // All actions must have a request
+        TLActionRequest tlar = new TLActionRequest();
+        tlar.setHttpMethod( TLHttpMethod.GET );
+        tla.setRequest( tlar );
+        tlar.setPathTemplate( BASEPATH );
 
         TLParamGroup tlpg = new TLParamGroup();
         tlpg.setName( R_NAME + "pg1" );
@@ -188,5 +284,69 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
 
         // No parent Ref
         return tlr;
+    }
+
+    /**
+     * Create 1st class resource with ID parameter group and make it a parent to the passed resource. Set ID Group in
+     * the parent resource reference.
+     * 
+     * @param r
+     * @param name
+     * @param mgr
+     * @return
+     */
+    public static OtmResource buildParentResource(OtmResource r, String name, OtmModelManager mgr) {
+        // Given a subject for the resource
+        OtmBusinessObject parentBO = TestBusiness.buildOtm( mgr, name );
+        // String parentNameString = name + "BO";
+        // parentBO.setName( parentNameString );
+
+        // Create the parent resource with path
+        String parentPathString = "/" + name + "Path";
+        OtmResource parentR = TestResource.buildOtm( mgr );
+        parentR.setName( name );
+        parentR.setAssignedType( parentBO );
+        parentR.setBasePath( parentPathString, true );
+        parentR.getTL().setFirstClass( true );
+        OtmParameterGroup idGroup = TestParamGroup.buildIdGroup( parentR );
+
+        OtmParentRef parentRef = r.addParentRef( parentR );
+        parentRef.getTL().setParentParamGroup( idGroup.getTL() );
+        parentRef.getTL().setPathTemplate( null ); // do NOT use the override
+
+        assertTrue( parentRef.getParentResource() == parentR );
+        assertTrue( parentRef.getParameterGroup() == idGroup );
+        assertTrue( idGroup.getOwningMember() == parentR );
+
+        return parentR;
+    }
+
+    /**
+     * Build a fully structured resource with:
+     * <ul>
+     * <li>subject
+     * <li>base path
+     * <li>First class set to true
+     * <li>actions with payload
+     * <li>an action with request that has parameter group added to resource
+     * <li>an action facet named "af1"
+     * </ul>
+     * 
+     * @param pathString
+     * @return
+     */
+    public static OtmResource buildFullOtm(String pathString, String subjectName, OtmModelManager mgr) {
+        OtmResource resource = TestResource.buildOtm( mgr );
+        resource.setBasePath( pathString, true );
+        resource.getTL().setFirstClass( true );
+
+        OtmBusinessObject testBO = TestBusiness.buildOtm( mgr );
+        testBO.setName( subjectName );
+        resource.setAssignedType( testBO );
+
+        TestAction.buildFullOtm( resource );
+        TestActionFacet.buildOtm( resource );
+
+        return resource;
     }
 }

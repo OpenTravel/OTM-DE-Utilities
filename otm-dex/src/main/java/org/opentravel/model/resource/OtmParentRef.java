@@ -45,13 +45,13 @@ import javafx.scene.control.Tooltip;
 public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> implements OtmResourceChild {
     private static Log log = LogFactory.getLog( OtmParentRef.class );
 
-    public OtmParentRef(TLResourceParentRef tla, OtmResource parent) {
-        super( tla, parent );
+    public OtmParentRef(TLResourceParentRef tla, OtmResource owner) {
+        super( tla, owner );
     }
 
     @Override
     public String getName() {
-        return "Parent: " + getParentResource().getNameWithPrefix();
+        return getParentResource().getName();
     }
 
     @Override
@@ -74,6 +74,21 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
 
     public OtmResource getParentResource() {
         return (OtmResource) OtmModelElement.get( getTL().getParentResource() );
+    }
+
+    /**
+     * @return true if the parent resource exists and is first class
+     */
+    public boolean isParentFirstClass() {
+        return getParentResource() != null && getParentResource().isFirstClass();
+    }
+
+
+    /**
+     * @return the parameter group used by this parent reference.
+     */
+    public OtmParameterGroup getParameterGroup() {
+        return (OtmParameterGroup) OtmModelElement.get( getTL().getParentParamGroup() );
     }
 
     private Node getParentNode() {
@@ -120,6 +135,21 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
         "Specifies the path template for the parent resource. This path will be pre-pended to all action path templates when the child resource is treated as a sub-resource (non-first class).";
     private static final String PARENT_LABEL = "Parent";
     private static final String PARENT_TOOLTIP = "Specifies a parent reference for a REST resource.";
+
+    /**
+     * @param path is the string to set or null
+     * @return
+     */
+    public void setPathTemplate(String path) {
+        getTL().setPathTemplate( path );
+    }
+
+    /**
+     * @return
+     */
+    public String getPathTemplate() {
+        return getTL().getPathTemplate();
+    }
 
 
 }

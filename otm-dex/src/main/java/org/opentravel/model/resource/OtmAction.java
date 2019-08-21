@@ -28,7 +28,9 @@ import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.schemacompiler.codegen.util.ResourceCodegenUtils;
 import org.opentravel.schemacompiler.model.TLAction;
+import org.opentravel.schemacompiler.model.TLActionResponse;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,11 +50,13 @@ import javafx.scene.control.Tooltip;
 public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmResourceChild, OtmChildrenOwner {
     private static Log log = LogFactory.getLog( OtmAction.class );
 
+    private DexParentRefsEndpointMap endpoints = null;
+
     public OtmAction(TLAction tla, OtmResource parent) {
         super( tla, parent );
         // Do it now so the methods that use the TLAction directly will have listeners.
         modelChildren();
-        // tla.getActionId();
+        modelInheritedChildren();
     }
 
     @Override
@@ -72,6 +76,41 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         super( new TLAction(), parent );
         setName( name );
     }
+
+    /**
+     * Get the URL for this action without contributions from parent resources. If it is not a first class resource,
+     * return static strings.
+     * 
+     * @return
+     */
+    public String getEndpointURL() {
+        StringBuilder path = new StringBuilder();
+        if (getOwningMember().isFirstClass()) {
+            path.append( DexParentRefsEndpointMap.getResourceBaseURL() );
+            path.append( DexParentRefsEndpointMap.getActionContribution( this ) );
+        } else {
+            if (getOwningMember().getParentRefs().isEmpty())
+                path.append( DexParentRefsEndpointMap.NO_PATH_NOTFIRSTCLASS_AND_NOPARENTREFS );
+            else
+                path.append( DexParentRefsEndpointMap.NO_PATH );
+        }
+        return path.toString();
+    }
+
+    /**
+     * Get the URL for this action with contributions from ancestor resources.
+     * 
+     * @return
+     */
+    public String getEndpointURL(OtmParentRef parentRef) {
+        StringBuilder path = new StringBuilder();
+        path.append( DexParentRefsEndpointMap.getResourceBaseURL() );
+        path.append( getOwningMember().getParentRefEndpointsMap().get( parentRef ) );
+        path.append( DexParentRefsEndpointMap.getActionContribution( this ) );
+        return path.toString();
+    }
+
+
 
     public OtmActionRequest getRequest() {
         return (OtmActionRequest) OtmModelElement.get( getTL().getRequest() );
@@ -110,7 +149,7 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
 
     @Override
     public List<OtmObject> getInheritedChildren() {
-        return Collections.emptyList();
+        return inheritedChildren != null ? inheritedChildren : Collections.emptyList();
     }
 
     @Override
@@ -149,7 +188,19 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
      */
     @Override
     public void modelInheritedChildren() {
-        // TODO Auto-generated method stub
+        if (inheritedChildren == null)
+            inheritedChildren = new ArrayList<>();
+        else
+            inheritedChildren.clear();
+
+        for (TLActionResponse tlAR : ResourceCodegenUtils.getInheritedResponses( getTL() )) {
+            if (!getTL().getResponses().contains( tlAR )) {
+                if (OtmModelElement.get( tlAR ) == null)
+                    inheritedChildren.add( new OtmActionResponse( tlAR, this ) );
+                else
+                    inheritedChildren.add( OtmModelElement.get( tlAR ) );
+            }
+        }
     }
 
     /**

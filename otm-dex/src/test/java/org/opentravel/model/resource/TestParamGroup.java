@@ -65,6 +65,17 @@ public class TestParamGroup extends TestOtmResourceBase<OtmParameterGroup> {
     }
 
     @Test
+    public void testIdGroup() {
+        OtmResource r = TestResource.buildOtm( staticModelManager );
+        OtmParameterGroup idPg = buildIdGroup( r );
+
+        assertTrue( idPg.getOwningMember() == r );
+        assertTrue( idPg.getTL().isIdGroup() );
+
+        assertTrue( r.getParameterGroups().contains( idPg ) );
+    }
+
+    @Test
     public void testParameters() {
         OtmParameterGroup p = buildOtm( testResource );
         assertTrue( p.getParameters().size() >= 2 );
@@ -107,10 +118,36 @@ public class TestParamGroup extends TestOtmResourceBase<OtmParameterGroup> {
         return tlpg;
     }
 
+    public static OtmParameterGroup buildIdGroup(OtmResource owner) {
+        TLParamGroup tlpg = new TLParamGroup();
+        tlpg.setName( "idGroup" );
+        tlpg.setIdGroup( true );
+
+        TLParameter tlp = new TLParameter();
+        tlp.setLocation( TLParamLocation.PATH );
+        tlp.setFieldRef( getMemberField( owner.getSubject() ) );
+        tlpg.addParameter( tlp );
+        owner.getTL().addParamGroup( tlpg );
+
+        return new OtmParameterGroup( tlpg, owner );
+    }
+
     private static TLMemberField<TLFacet> getMemberField() {
         TLMemberField<TLFacet> mf = null;
         if (baseObject != null) {
             OtmIdFacet id = ((OtmBusinessObject) baseObject).getIdFacet();
+            if (!id.getChildren().isEmpty()) {
+                if (id.getChildren().get( 0 ).getTL() instanceof TLMemberField)
+                    mf = (TLMemberField<TLFacet>) id.getChildren().get( 0 ).getTL();
+            }
+        }
+        return mf;
+    }
+
+    private static TLMemberField<TLFacet> getMemberField(OtmBusinessObject bo) {
+        TLMemberField<TLFacet> mf = null;
+        if (bo != null) {
+            OtmIdFacet id = ((OtmBusinessObject) bo).getIdFacet();
             if (!id.getChildren().isEmpty()) {
                 if (id.getChildren().get( 0 ).getTL() instanceof TLMemberField)
                     mf = (TLMemberField<TLFacet>) id.getChildren().get( 0 ).getTL();

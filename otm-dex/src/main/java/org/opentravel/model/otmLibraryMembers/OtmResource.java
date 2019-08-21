@@ -29,7 +29,7 @@ import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
-import org.opentravel.model.resource.DexResourcePathHandler;
+import org.opentravel.model.resource.DexParentRefsEndpointMap;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.model.resource.OtmActionRequest;
@@ -42,6 +42,7 @@ import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLResource;
+import org.opentravel.schemacompiler.model.TLResourceParentRef;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,7 +68,7 @@ import javafx.scene.control.Tooltip;
 public class OtmResource extends OtmLibraryMemberBase<TLResource> implements OtmTypeUser {
     private static Log log = LogFactory.getLog( OtmResource.class );
 
-    private DexResourcePathHandler pathHandler;
+    private DexParentRefsEndpointMap parentRefsEndpointMap;
     private ResourceCodegenUtils codegenUtils;
     public static final String NONE = "None";
     public static final String SUBGROUP = "Substitution Group";
@@ -75,20 +76,62 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     public OtmResource(TLResource tlo, OtmModelManager mgr) {
         super( tlo, mgr );
         modelChildren();
-        pathHandler = new DexResourcePathHandler( this );
+        // Do not build on construction - all parents may not exist
+        // parentRefsEndpointMap = new DexParentRefsEndpointMap( this );
     }
 
-
-    public String getURL(OtmAction action) {
-        return pathHandler.get( action );
+    public DexParentRefsEndpointMap getParentRefEndpointsMap() {
+        if (parentRefsEndpointMap == null)
+            parentRefsEndpointMap = new DexParentRefsEndpointMap( this );
+        return parentRefsEndpointMap;
     }
 
     public String getPayloadExample(OtmActionRequest request) {
-        return pathHandler.getPayloadExample( request );
+        return DexParentRefsEndpointMap.getPayloadExample( request );
     }
 
     public String getPayloadExample(OtmActionResponse response) {
-        return pathHandler.getPayloadExample( response );
+        return DexParentRefsEndpointMap.getPayloadExample( response );
+    }
+
+    /**
+     * Get the parent refs and all of the ancestors.
+     * 
+     * @param firstClassOnly
+     * @return new list of parent refs that may be empty
+     */
+    public List<OtmParentRef> getAllParentRefs(boolean firstClassOnly) {
+        List<OtmParentRef> refs = new ArrayList<>();
+        getParentRefs().forEach( pr -> {
+            if (!firstClassOnly || pr.isParentFirstClass())
+                refs.add( pr );
+            refs.addAll( pr.getParentResource().getAllParentRefs( firstClassOnly ) );
+        } );
+        return refs;
+    }
+
+    /**
+     * Get a list of all sub-resources of this resource.
+     * <p>
+     * Compute intensive: examines list from model manager and filter out non-sub resources.
+     * 
+     * @return a list of all resources that have this resource in its paths or empty list
+     */
+    public List<OtmResource> getAllSubResources() {
+        List<OtmResource> candidates = new ArrayList<>();
+        List<OtmResource> subResources = new ArrayList<>();
+        // Only resources with parentRefs could be sub-resources
+        for (OtmResource r : getModelManager().getResources( false ))
+            if (!r.getParentRefs().isEmpty())
+                candidates.add( r );
+        // Get first generation and recurse
+        for (OtmResource c : candidates)
+            for (OtmParentRef pr : c.getParentRefs())
+                if (pr.getParentResource() == this) {
+                    subResources.add( c );
+                    subResources.addAll( c.getAllSubResources() ); // recurse
+                }
+        return subResources;
     }
 
     public OtmResource(String name, OtmModelManager mgr) {
@@ -96,8 +139,17 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         setName( name );
     }
 
-    public void setBasePath(String basePath) {
+    /**
+     * Set the base path on this resource. If override is true, do all the action resources also.
+     * 
+     * @param basePath
+     * @param override
+     */
+    public void setBasePath(String basePath, boolean override) {
         getTL().setBasePath( basePath );
+        if (override)
+            getActionRequests().forEach( ar -> ar.getTL().setPathTemplate( basePath ) );
+        refresh( true );
     }
 
     public String getBasePath() {
@@ -313,8 +365,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      */
     public OtmBusinessObject getSubject() {
         return getAssignedType();
-        // OtmObject subject = OtmModelElement.get( getTL().getBusinessObjectRef() );
-        // return subject instanceof OtmBusinessObject ? (OtmBusinessObject) subject : null;
     }
 
     /**
@@ -422,10 +472,10 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return box;
     }
 
-    // FIXME - testing only
     @Override
     public boolean isEditable() {
-        return getName().startsWith( "S" );
+        return getLibrary() != null && getLibrary().isEditable();
+        // return getName().startsWith( "S" ); // testing only
     }
 
     // FIXME
@@ -492,6 +542,44 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return parents;
     }
 
+    public OtmParentRef addParentRef(OtmResource parent) {
+        // Do we need to test if already done?
+        // Create the TL parent ref and set to
+        TLResourceParentRef tlParentRef = new TLResourceParentRef();
+        // Set initial path template
+        tlParentRef.setPathTemplate( parent.getBasePath() );
+
+        tlParentRef.setParentResource( parent.getTL() );
+        OtmParentRef parentRef = new OtmParentRef( tlParentRef, this );
+
+        // parentRef.setOwner( parent.getTL() );
+        getTL().addParentRef( parentRef.getTL() );
+        add( parentRef );
+        refresh( true );
+        return parentRef;
+    }
+
+    /**
+     * Something changed in this resource so refresh it. To refresh all who use this resource as parent
+     * {@link #refresh(boolean)}
+     */
+    public void refresh() {
+        refresh( false );
+    }
+
+    /**
+     * Something changed in this resource so refresh it.
+     * 
+     * @param deep if true, refresh all sub resources too. Sub-resources have this resource in their paths
+     */
+    public void refresh(boolean deep) {
+        log.debug( "Deep refesh of " + this );
+        parentRefsEndpointMap = null; // build on next access
+
+        if (deep)
+            getAllSubResources().forEach( sr -> sr.refresh( true ) );
+    }
+
     public void addParameterGroup(OtmParameterGroup group) {
         if (group != null)
             getTL().addParamGroup( group.getTL() );
@@ -529,5 +617,11 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return actions;
     }
 
-
+    /**
+     * @param b
+     */
+    public void setFirstClass(boolean b) {
+        getTL().setFirstClass( b );
+        refresh( true );
+    }
 }

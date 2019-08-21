@@ -19,7 +19,6 @@ package org.opentravel.dex.controllers.resources;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
-import org.opentravel.common.cellfactories.ValidationActionTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -47,7 +46,6 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.SortType;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
-import javafx.scene.image.ImageView;
 
 /**
  * Manage the library member navigation tree.
@@ -62,7 +60,7 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
     // Column labels
     private static final String NAMECOLUMNLABEL = "";
     private static final String AFLABEL = "";
-    private static final String CONTENTlABEL = "";
+    // private static final String CONTENTlABEL = "";
 
     /*
      * FXML injected
@@ -104,19 +102,20 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         nameColumn.setSortType( SortType.ASCENDING );
 
         TreeTableColumn<ActionsDAO,String> afColumn = new TreeTableColumn<>( AFLABEL );
-        afColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ActionsDAO,String>( "actionFacet" ) );
-        setColumnProps( afColumn, true, true, true, 300 );
+        afColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ActionsDAO,String>( "dataColumn" ) );
+        setColumnProps( afColumn, true, true, true, 500 );
 
-        TreeTableColumn<ActionsDAO,String> contentColumn = new TreeTableColumn<>( CONTENTlABEL );
-        contentColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ActionsDAO,String>( "content" ) );
-        setColumnProps( contentColumn, true, true, true, 300 );
+        // TreeTableColumn<ActionsDAO,String> contentColumn = new TreeTableColumn<>( CONTENTlABEL );
+        // contentColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ActionsDAO,String>( "content" ) );
+        // setColumnProps( contentColumn, true, true, true, 300 );
 
-        TreeTableColumn<ActionsDAO,ImageView> valColumn = new TreeTableColumn<>( "" );
-        valColumn.setCellFactory( c -> new ValidationActionTreeTableCellFactory() );
-        setColumnProps( valColumn, true, false, false, 25 );
+        // TreeTableColumn<ActionsDAO,ImageView> valColumn = new TreeTableColumn<>( "" );
+        // valColumn.setCellFactory( c -> new ValidationActionTreeTableCellFactory() );
+        // setColumnProps( valColumn, true, false, false, 25 );
 
         // Add columns to table
-        resourceActionsTreeTable.getColumns().addAll( nameColumn, afColumn, contentColumn, valColumn );
+        resourceActionsTreeTable.getColumns().addAll( nameColumn, afColumn );
+        // resourceActionsTreeTable.getColumns().addAll( nameColumn, afColumn, contentColumn, valColumn );
         resourceActionsTreeTable.getSortOrder().add( nameColumn );
     }
 
@@ -249,7 +248,7 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         if (item == null)
             return;
         if (item.getValue() != null && item.getValue().getValue() != null) {
-            log.debug( "Selection Listener: " + item.getValue() );
+            // log.debug( "Selection Listener: " + item.getValue() );
             OtmObject obj = item.getValue().getValue();
             OtmLibraryMember member = null;
             if (obj instanceof OtmContributedFacet)
@@ -260,8 +259,6 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
                 member = ((OtmParameter) obj).getFieldAssignedType().getOwningMember();
             else if (obj instanceof OtmTypeUser && ((OtmTypeUser) obj).getAssignedType() != null)
                 member = ((OtmTypeUser) obj).getAssignedType().getOwningMember();
-            // else
-            // member = obj.getOwningMember();
             ignoreEvents = true;
             if (member != null)
                 eventPublisherNode.fireEvent( new DexMemberSelectionEvent( member ) );
@@ -286,14 +283,22 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         postedData = resource;
         clear();
 
-        if (resource != null)
+        if (resource != null) {
+            // create items for each action
             resource.getActions().forEach( a -> createTreeItem( a, root ) );
+        }
     }
 
     public void createTreeItem(OtmAction action, TreeItem<ActionsDAO> parent) {
         // Create item for the request
         TreeItem<ActionsDAO> actionItem = new ActionsDAO( action ).createTreeItem( parent );
         actionItem.setExpanded( true );
+
+        // Create parent reference items (if any)
+        action.getOwningMember().getAllParentRefs( true ).forEach( pr -> {
+            if (pr.isParentFirstClass())
+                new ActionsDAO( pr, action ).createTreeItem( actionItem );
+        } );
 
         // Create request item
         if (action.getRequest() != null) {
@@ -302,8 +307,8 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
             if (action.getRequest().getParamGroup() != null)
                 action.getRequest().getParamGroup().getChildren()
                     .forEach( p -> new ActionsDAO( p ).createTreeItem( requestItem ) );
-            // TODO - add inherited parameters
             createPayloadItems( action.getRequest().getPayload(), requestItem );
+            // TODO - add inherited parameters ??
         }
 
         // Create response items
@@ -313,11 +318,16 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
             createPayloadItems( response.getPayload(), responseItem );
         }
 
+        // Test - inherited responses
+        for (OtmObject inherited : action.getInheritedChildren())
+            // TreeItem<ActionsDAO> responseItem =
+            new ActionsDAO( inherited ).createTreeItem( actionItem );
+
     }
 
-    // Model the pay load if any
+    // Model the pay load if any. Payload model is the Business Object or other objects.
     private void createPayloadItems(OtmObject payload, TreeItem<ActionsDAO> ownerItem) {
-        log.debug( "Posting payload of: " + payload );
+        // log.debug( "Posting payload of: " + payload );
         if (payload != null) {
             TreeItem<ActionsDAO> payloadItem = new ActionsDAO( payload ).createTreeItem( ownerItem );
             if (payload instanceof OtmChildrenOwner)

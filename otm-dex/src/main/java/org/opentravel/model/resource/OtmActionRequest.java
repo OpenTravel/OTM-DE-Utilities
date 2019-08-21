@@ -24,7 +24,6 @@ import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
-import org.opentravel.schemacompiler.model.TLActionFacet;
 import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
 import org.opentravel.schemacompiler.model.TLMimeType;
@@ -57,11 +56,6 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
 
     public OtmActionRequest(TLActionRequest tla, OtmAction parent) {
         super( tla, parent );
-
-        tla.getHttpMethod();
-        TLActionFacet tlf = tla.getPayloadType();
-        tla.getParamGroupName();
-
     }
 
     public String getPathTemplate() {
@@ -78,12 +72,8 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
             return (OtmParameterGroup) OtmModelElement.get( getTL().getParamGroup() );
         return null;
     }
-    //
-    // public OtmActionFacet(String name, OtmResource parent) {
-    // super( new TLActionRequest(), parent );
-    // setName( name );
-    // }
 
+    //
     /**
      * @see org.opentravel.model.OtmModelElement#getName()
      */
@@ -91,12 +81,6 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     public String getName() {
         // Get the name of the parent then add method
         return getOwner() != null ? getOwner().getName() : "";
-        // if (getTL().getPayloadType() != null)
-        // return getTL().getHttpMethod().toString() + " <" + getTL().getPayloadType().getName() + ">";
-        // if (getTL().getParamGroup() != null)
-        // return getTL().getHttpMethod().toString() + " ?" + getTL().getParamGroup().getName();
-        // else
-        // return getTL().getHttpMethod().toString();
     }
 
     public OtmAction getOwner() {
@@ -211,17 +195,37 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         return new ReadOnlyStringWrapper( "" );
     }
 
-    public StringProperty urlProperty() {
-        if (getOwningMember() != null)
-            return new ReadOnlyStringWrapper( getOwningMember().getURL( getOwner() ) );
-        return new ReadOnlyStringWrapper( "http://www.example.com/Members/{memberID}" );
-    }
-
     /**
      * @param group can be null
      */
     public void setParamGroup(OtmParameterGroup group) {
         getTL().setParamGroup( group.getTL() );
+    }
+
+    /**
+     * Set the base path for this action request to the passed path. If addParameters is true and the parameter group is
+     * an ID group, add the parameters in brackets.
+     * 
+     * @param basePath
+     * @param addParameters
+     */
+    public void setPathTemplate(String basePath, boolean addParameters) {
+        if (basePath == null)
+            getTL().setPathTemplate( null );
+        else {
+            StringBuilder path = new StringBuilder( basePath );
+            if (addParameters && getParamGroup() != null && getParamGroup().isIdGroup()) {
+                if (!getParamGroup().getParameters().isEmpty())
+                    path.append( "/" );
+                // Add these parameters
+                for (OtmParameter p : getParamGroup().getParameters()) {
+                    path.append( "{" );
+                    path.append( p.getName() );
+                    path.append( "}" );
+                }
+            }
+            getTL().setPathTemplate( path.toString() );
+        }
     }
 
     /**
@@ -266,10 +270,4 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         return getTL().getPayloadTypeName() != null ? getTL().getPayloadTypeName() : "";
     }
 
-    /**
-     * Java model:
-     * <P>
-     * Action Request Info [] - each path parameter
-     * 
-     */
 }

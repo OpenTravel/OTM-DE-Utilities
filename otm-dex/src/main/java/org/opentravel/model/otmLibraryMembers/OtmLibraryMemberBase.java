@@ -31,7 +31,6 @@ import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmFacets.OtmFacetFactory;
 import org.opentravel.schemacompiler.codegen.util.FacetCodegenUtils;
-import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLAlias;
 import org.opentravel.schemacompiler.model.TLAliasOwner;
@@ -230,8 +229,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public OtmLibrary getLibrary() {
-        AbstractLibrary absLib = getTlLM().getOwningLibrary();
-        return mgr.get( getTlLM().getOwningLibrary() );
+        // AbstractLibrary absLib = getTlLM().getOwningLibrary();
+        return getTlLM() != null ? mgr.get( getTlLM().getOwningLibrary() ) : null;
     }
 
     @Override
