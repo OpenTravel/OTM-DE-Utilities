@@ -190,17 +190,18 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
      * Create tree items for the type provider children of this child owning member
      */
     private void createChildrenItems(OtmChildrenOwner childrenOwner, TreeItem<ActionsDAO> parentItem) {
-        for (OtmObject child : childrenOwner.getChildren()) {
-            TreeItem<ActionsDAO> cfItem = new ActionsDAO( child ).createTreeItem( parentItem );
+        if (childrenOwner.getChildren() != null)
+            for (OtmObject child : childrenOwner.getChildren()) {
+                TreeItem<ActionsDAO> cfItem = new ActionsDAO( child ).createTreeItem( parentItem );
 
-            // Only use contextual facet for recursing
-            if (child instanceof OtmContributedFacet && ((OtmContributedFacet) child).getContributor() != null)
-                child = ((OtmContributedFacet) child).getContributor();
+                // Only use contextual facet for recursing
+                if (child instanceof OtmContributedFacet && ((OtmContributedFacet) child).getContributor() != null)
+                    child = ((OtmContributedFacet) child).getContributor();
 
-            // Recurse
-            if (child instanceof OtmChildrenOwner)
-                createChildrenItems( (OtmChildrenOwner) child, cfItem );
-        }
+                // Recurse
+                if (child instanceof OtmChildrenOwner)
+                    createChildrenItems( (OtmChildrenOwner) child, cfItem );
+            }
     }
 
     public TreeItem<ActionsDAO> getRoot() {

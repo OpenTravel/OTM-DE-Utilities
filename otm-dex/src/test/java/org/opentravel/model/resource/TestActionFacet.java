@@ -53,8 +53,7 @@ public class TestActionFacet<L extends TestOtmResourceBase<OtmActionFacet>>
     }
 
     @Test
-    public void testRequestPayload() {
-        // Given a business object
+    public void testName() {
         OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
         bo.add( TestCustomFacet.buildOtm( staticModelManager ) );
         bo.add( TestQueryFacet.buildOtm( staticModelManager ) );
@@ -63,31 +62,46 @@ public class TestActionFacet<L extends TestOtmResourceBase<OtmActionFacet>>
         resource.setSubject( bo );
         // Given an action facet on that resource
         OtmActionFacet af = buildOtm( resource );
-        af.getTL().setBasePayload( null ); // FIXME
 
-        // When the action facet is set to NONE
-        af.setReferenceType( TLReferenceType.NONE );
-        // Then
-        assertTrue( "Payload must be null.", af.getRequestPayload() == null );
-
-        // When the action facet is set null reference facet
-        af.setReferenceFacet( null );
-        // Then
-        assertTrue( "Payload must be the object.", af.getRequestPayload() == bo );
-
-        // When the action facet is set to the business object facet
-        for (OtmObject facet : bo.getChildren()) {
-            af.setReferenceFacet( (OtmFacet<?>) facet );
-            af.setReferenceType( TLReferenceType.REQUIRED );
-
-            // Then
-            OtmObject rqPayload = af.getRequestPayload();
-            assertTrue( "Must have facet as payload.", rqPayload == facet );
-
-            log.debug( "Payload = " + rqPayload.getName() );
+        String[] names = {"Foo", "Bar", "foo", "bar", "Foo_Bar"};
+        for (String name : names) {
+            af.setName( name );
+            af.getName();
+            assertTrue( af.getName().equals( name ) );
+            log.debug( "Tested name: " + name );
         }
 
-        // TODO - test with basePayload set
+    }
+
+    @Test
+    public void testGetReferenceFacet() {
+        // Given a business object
+        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        bo.add( TestCustomFacet.buildOtm( staticModelManager ) );
+        bo.add( TestQueryFacet.buildOtm( staticModelManager ) );
+        // Given a resource
+        OtmResource resource = TestResource.buildOtm( staticModelManager );
+        resource.setSubject( bo );
+
+        // Given an action facet on that resource
+        OtmActionFacet af = buildOtm( resource );
+        af.setReferenceType( TLReferenceType.REQUIRED );
+        for (OtmObject f : bo.getChildren())
+            if (f instanceof OtmFacet) {
+                // When - set to facet
+                af.setReferenceFacet( (OtmFacet<?>) f );
+                // String rf = af.getTL().getReferenceFacetName();
+                // OtmFacet<?> facet = af.getReferenceFacet();
+                // log.debug( "RF = " + rf + " Referenced Facet is: " + facet );
+                // Then - it must return that facet
+                assertTrue( "Must find reference facet.", af.getReferenceFacet() == f );
+            }
+    }
+
+    public static void print(OtmActionFacet af) {
+        log.debug(
+            af.getName() + " base= " + af.getTL().getBasePayloadName() + " repeats= " + af.getTL().getReferenceRepeat()
+                + " rf= " + af.getTL().getReferenceFacetName() + " type= " + af.getTL().getReferenceType() );
     }
 
     public static OtmActionFacet buildOtm(OtmResource testResource) {

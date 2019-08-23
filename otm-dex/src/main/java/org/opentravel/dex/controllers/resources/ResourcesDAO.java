@@ -23,6 +23,7 @@ import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.resource.OtmActionFacet;
 
 import java.util.List;
 
@@ -49,6 +50,8 @@ public class ResourcesDAO implements DexDAO<OtmObject> {
 
     public ResourcesDAO(OtmObject member) {
         this.otmObject = member;
+        if (member instanceof OtmActionFacet)
+            log.debug( "Action Facet Name: " + member.getName() );
     }
 
     public ResourcesDAO(OtmTypeProvider provider) {

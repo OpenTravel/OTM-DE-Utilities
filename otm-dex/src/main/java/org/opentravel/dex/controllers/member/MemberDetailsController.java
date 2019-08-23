@@ -212,6 +212,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             typeLabel.setText( TYPELABELRESOURCE );
 
         // icon?
+
+        // Assigned Type
         if (member.getActionManager().isEnabled( DexActions.TYPECHANGE, member )) {
             changeTypeButton.setDisable( false );
             changeTypeButton.setOnAction( e -> setAssignedType() );
@@ -228,6 +230,31 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             assignedTypeName.setTooltip( null );
             assignedTypeName.setText( "" );
         }
+
+        // Action Buttons
+        deleteButton.setDisable( true );
+        addButton.setDisable( true );
+        // This approach will work. Need to make sure not to re-add nodes
+        // if (member instanceof OtmEnumeration) {
+        // CheckBox openBox = new CheckBox( "Open" );
+        // CheckBox closeBox = new CheckBox( "Close" );
+        // // addButton.setVisible( false );
+        // // deleteButton.setVisible( false );
+        // Parent parent = deleteButton.getParent();
+        // ((VBox) parent).getChildren().remove( addButton );
+        // ((VBox) parent).getChildren().remove( deleteButton );
+        // ((VBox) parent).getChildren().add( openBox );
+        // openBox.setSelected( member instanceof OtmEnumerationOpen );
+        // ((VBox) parent).getChildren().add( closeBox );
+        // openBox.setSelected( member instanceof OtmEnumerationClosed );
+        // } else {
+        // Parent parent = deleteButton.getParent();
+        // ((VBox) parent).getChildren().add( addButton );
+        // ((VBox) parent).getChildren().add( deleteButton );
+        // // ((VBox) parent).getChildren().add( openBox );
+        // addButton.setVisible( true );
+        // deleteButton.setVisible( true );
+        // }
     }
 
     // Called when button is pressed

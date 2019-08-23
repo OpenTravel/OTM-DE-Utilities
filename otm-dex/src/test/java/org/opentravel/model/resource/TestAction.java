@@ -24,14 +24,22 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
+import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
+import org.opentravel.model.otmLibraryMembers.TestCore;
+import org.opentravel.model.otmLibraryMembers.TestCustomFacet;
+import org.opentravel.model.otmLibraryMembers.TestQueryFacet;
 import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLActionResponse;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
 import org.opentravel.schemacompiler.model.TLResource;
+
+import java.util.List;
 
 /**
  * Test class for Action Facet resource descendants.
@@ -62,9 +70,55 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
             assertTrue( a.getChildren().contains( r ) );
     }
 
+    // @Test
+    // public void testRequestPayload() {
+    // // see TestActionRequest
+    // }
+
     @Test
-    public void testRequestPayload() {
-        // TODO
+    public void testGetResponses() {
+        // Given a business object
+        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        bo.add( TestCustomFacet.buildOtm( staticModelManager ) );
+        bo.add( TestQueryFacet.buildOtm( staticModelManager ) );
+        // Given a core object to use as base payload
+        OtmCore core = TestCore.buildOtm( staticModelManager );
+        // Given a resource
+        OtmResource resource = TestResource.buildFullOtm( "SubjectCollection", "MySubject", staticModelManager );
+        resource.setSubject( bo );
+        // Given an action facet on that resource
+        OtmActionFacet af = TestActionFacet.buildOtm( resource );
+
+        int responseCount = 0;
+        for (OtmAction action : resource.getActions())
+            responseCount += action.getResponses().size();
+
+        // Given a response on the actions
+        resource.getActions().forEach( a -> a.add( TestActionResponse.buildOtm( a ) ) );
+        // Given - core set as base payload
+        af.setBasePayload( core );
+        assertTrue( "Must have core as base payload.", af.getBasePayload() == core );
+
+        int newResponseCount = 0;
+        for (OtmAction action : resource.getActions())
+            newResponseCount += action.getResponses().size();
+        assertTrue( newResponseCount > responseCount );
+
+        // Then
+        for (OtmAction action : resource.getActions()) {
+            List<TLActionResponse> tlResponses = action.getTL().getResponses();
+            List<OtmActionResponse> otmResponses = action.getResponses();
+            assertTrue( tlResponses.size() == otmResponses.size() );
+            int kidCount = 0;
+            // Then - must have children that match
+            for (OtmObject c : action.getChildren()) {
+                if (c instanceof OtmActionResponse)
+                    kidCount++;
+            }
+            assertTrue( kidCount == tlResponses.size() );
+
+            // log.debug( "Found " + otmResponses.size() + " responses." );
+        }
     }
 
     @Test

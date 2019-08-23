@@ -295,18 +295,21 @@ public class DexParentRefsEndpointMap {
         return endpoints.size();
     }
 
+    /**
+     * @param request
+     * @return the name from the ActionFacet (not the name of the AF)
+     */
     public static String getPayloadExample(OtmActionRequest request) {
-        String payload = "";
-        if (request != null && request.getTL().getPayloadType() != null)
-            payload = request.getPayloadTypeName();
-        return !payload.isEmpty() ? " <" + payload + ">...</" + payload + ">" : NO_PAYLOAD;
+        String pn = "";
+        if (request != null)
+            pn = request.getPayloadName();
+        return !pn.isEmpty() ? " <" + pn + ">...</" + pn + ">" : NO_PAYLOAD;
     }
 
     public static String getPayloadExample(OtmActionResponse response) {
-        // FIXME
         String payload = "";
-        if (response != null && response.getTL().getPayloadType() != null)
-            payload = response.getPayloadTypeName();
+        if (response != null)
+            payload = response.getPayloadName();
         return !payload.isEmpty() ? " <" + payload + ">...</" + payload + ">" : NO_PAYLOAD;
     }
 

@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractOTMApplication;
@@ -40,6 +41,7 @@ import java.util.Collection;
 /**
  * Verifies the functions of the <code>Otm Model Manager</code>.
  */
+@Ignore
 public class TestOtmModelManager extends AbstractFxTest {
     private static Log log = LogFactory.getLog( TestOtmModelManager.class );
 

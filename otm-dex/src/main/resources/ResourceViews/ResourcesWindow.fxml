@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="resourcesWindow" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.resources.ResourcesWindowController">
+<BorderPane fx:id="resourcesWindow" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" prefHeight="800.0" prefWidth="1280.0" fx:controller="org.opentravel.dex.controllers.resources.ResourcesWindowController">
 			   <center>
                   <SplitPane dividerPositions="0.3" VBox.vgrow="ALWAYS">
                      <items>

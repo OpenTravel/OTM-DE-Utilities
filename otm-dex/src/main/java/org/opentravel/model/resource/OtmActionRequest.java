@@ -106,7 +106,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     private Node getPayloadNode() {
         ObservableList<String> actionFacets = FXCollections.observableArrayList();
         getOwningMember().getActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
-        ComboBox<String> box = DexEditField.makeComboBox( actionFacets, getPayloadTypeName(), this );
+        ComboBox<String> box = DexEditField.makeComboBox( actionFacets, getPayloadActionFacetName(), this );
         return box;
     }
 
@@ -242,21 +242,31 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     /**
-     * @param actionFacet
+     * Get the payload name from the action facet returned from {@link #getPayloadActionFacet()}
+     * 
+     * @return the Otm object used as the request payload or null
      */
-    public OtmActionFacet getPayloadType() {
-        if (OtmModelElement.get( getTL().getPayloadType() ) instanceof OtmActionFacet)
-            return (OtmActionFacet) OtmModelElement.get( getTL().getPayloadType() );
-        return null;
+    public OtmObject getPayload() {
+        return getPayloadActionFacet() != null ? getPayloadActionFacet().getRequestPayload() : null;
     }
 
     /**
-     * Same as {@link #getPayloadType()}
-     * 
-     * @return the Otm object used as the payload or null
+     * @return the name of the payload from the action facet
      */
-    public OtmObject getPayload() {
-        return getPayloadType() != null ? getPayloadType().getRequestPayload() : null;
+    public String getPayloadName() {
+        String name = "";
+        if (getPayloadActionFacet() != null && getPayloadActionFacet().getRequestPayload() != null)
+            name = getPayloadActionFacet().getRequestPayload().getName();
+        return name;
+    }
+
+    /**
+     * @return the actionFacet from tlObject or null
+     */
+    public OtmActionFacet getPayloadActionFacet() {
+        if (OtmModelElement.get( getTL().getPayloadType() ) instanceof OtmActionFacet)
+            return (OtmActionFacet) OtmModelElement.get( getTL().getPayloadType() );
+        return null;
     }
 
     /**
@@ -264,9 +274,9 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      * 
      * @return
      */
-    public String getPayloadTypeName() {
-        if (getPayloadType() != null)
-            return getPayloadType().getName();
+    public String getPayloadActionFacetName() {
+        if (getPayloadActionFacet() != null)
+            return getPayloadActionFacet().getName();
         return getTL().getPayloadTypeName() != null ? getTL().getPayloadTypeName() : "";
     }
 
