@@ -21,6 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.dex.actions.DexActionManager.DexActions;
+import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -37,7 +39,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
@@ -124,11 +125,16 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
         return getTL().getPayloadTypeName() != null ? getTL().getPayloadTypeName() : "";
     }
 
-    private Node getPayloadNode() {
+    public ObservableList<String> getPayloadCandidates() {
         ObservableList<String> actionFacets = FXCollections.observableArrayList();
         getOwningMember().getActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
-        ComboBox<String> box = DexEditField.makeComboBox( actionFacets, getPayloadActionFacetName(), this );
-        return box;
+        return actionFacets;
+    }
+
+    private Node getPayloadNode(DexIncludedController<?> ec) {
+        StringProperty selection =
+            getActionManager().add( DexActions.SETRESPONSEPAYLOAD, getPayloadActionFacetName(), this );
+        return DexEditField.makeComboBox( getPayloadCandidates(), selection, ec, this );
     }
 
     private Node getMimeNode() {
@@ -161,9 +167,9 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
     }
 
     @Override
-    public List<DexEditField> getFields() {
+    public List<DexEditField> getFields(DexIncludedController<?> ec) {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, getPayloadNode() ) );
+        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, getPayloadNode( ec ) ) );
         fields.add( new DexEditField( 1, 0, MIME_TYPE_LABEL, MIME_TYPE_TOOLTIP, getMimeNode() ) );
         fields.add( new DexEditField( 2, 0, STATUS_CODES_LABEL, STATUS_CODES_TOOLTIP, getStatus1Node() ) );
         fields.add( new DexEditField( 3, 0, STATUS_CODES_LABEL, STATUS_CODES_TOOLTIP, getStatus2Node() ) );
@@ -207,6 +213,10 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
         // if (getOwningMember() != null)
         // return new ReadOnlyStringWrapper( getOwningMember().getPayloadExample( this ) );
         return new ReadOnlyStringWrapper( getPayloadName() );
+    }
+
+    public void setPayloadActionFacetString(String value) {
+        log.error( "FIXME - Set action facet to " + value );
     }
 
     /**

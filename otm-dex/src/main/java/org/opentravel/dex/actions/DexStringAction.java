@@ -18,7 +18,10 @@ package org.opentravel.dex.actions;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.model.OtmObject;
+import org.opentravel.schemacompiler.validate.ValidationFindings;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 
 /**
@@ -31,13 +34,98 @@ import javafx.beans.value.ObservableValue;
  * @author dmh
  *
  */
-public abstract class DexStringAction implements DexAction<String> {
+public abstract class DexStringAction extends DexActionBase implements DexAction<String> {
     private static Log log = LogFactory.getLog( DexStringAction.class );
 
-    public abstract String doIt(ObservableValue<? extends String> observable, String oldValue, String newValue);
+    protected String oldString;
+    protected String newString;
+    protected ObservableValue<? extends String> observable;
 
-    //
-    // public T undo();
+    /**
+     * @param otm
+     */
+    public DexStringAction(OtmObject otm) {
+        super( otm );
+        oldString = get();
+        if (oldString == null)
+            oldString = "";
+    }
+
+    /**
+     * Simply set the object's string field value
+     * 
+     * @param value
+     */
+    protected abstract void set(String value);
+
+    /**
+     * Simply get the object's string field value
+     */
+    protected abstract String get();
+
+    @Override
+    public void doIt(Object name) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return getSubject().isEditable();
+    }
+
+    @Override
+    public boolean isAllowed(String value) {
+        return getSubject().isEditable();
+    }
+
+    @Override
+    public ValidationFindings getVetoFindings() {
+        return null;
+    }
+
+    public String doIt(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+        if (newValue == null)
+            return "";
+        if (ignore)
+            return "";
+        ignore = true;
+
+        this.observable = observable;
+        this.newString = newValue;
+
+        // Set value into model and observable
+        set( newValue );
+        if (observable instanceof SimpleStringProperty)
+            ((SimpleStringProperty) observable).set( newValue );
+
+        coreActionManager.push( this );
+
+        log.debug( "Set to: " + newValue );
+        ignore = false;
+        return get();
+    }
+
+    @Override
+    public String undo() {
+        ignore = true;
+        set( oldString );
+        if (observable instanceof SimpleStringProperty)
+            ((SimpleStringProperty) observable).set( oldString );
+
+        log.debug( "Undo - restored base path to " + oldString );
+        ignore = false;
+        return oldString;
+    }
+
+    /**
+     * @return true if change already made is valid for this object for this application and user.
+     */
+    public boolean isValid() {
+        // Override if change can cause invalid objects
+        return true;
+    }
+
+
     //
     // // VETOable event??
     // /**
@@ -50,10 +138,6 @@ public abstract class DexStringAction implements DexAction<String> {
     // */
     // public boolean isAllowed(T value);
     //
-    // /**
-    // * @return true if change already made is valid for this object for this application and user.
-    // */
-    // public boolean isValid();
     //
     // // /**
     // // * @return true if change is valid for this object for this application and user.

@@ -16,34 +16,44 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.resource.OtmParameterGroup;
 
-public class DescriptionChangeAction extends DexStringAction {
-    private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+public class SetIdGroupAction extends DexBooleanAction {
+    // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
-    public DescriptionChangeAction(OtmObject otm) {
+    public SetIdGroupAction(OtmParameterGroup otm) {
         super( otm );
     }
 
     @Override
-    protected String get() {
-        return otm.getDescription();
+    public OtmParameterGroup getSubject() {
+        return (OtmParameterGroup) otm;
     }
 
-    @Override
-    protected void set(String value) {
-        otm.setDescription( value );
+    protected void set(boolean value) {
+        getSubject().setIdGroup( value );
     }
 
-    public static boolean isEnabled(OtmObject subject) {
-        return subject.isEditable();
+    protected boolean get() {
+        return getSubject().isIdGroup();
     }
+
+
 
     @Override
     public String toString() {
-        return "Changed description to " + newString;
+        return "ID Group set to " + get();
+    }
+
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmParameterGroup)
+            return subject.isEditable();
+        return false;
     }
 
 }

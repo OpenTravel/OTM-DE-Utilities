@@ -19,31 +19,44 @@ package org.opentravel.dex.actions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 
-public class DescriptionChangeAction extends DexStringAction {
-    private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+public class SetResourceExtensionAction extends DexStringAction {
+    private static Log log = LogFactory.getLog( SetResourceExtensionAction.class );
 
-    public DescriptionChangeAction(OtmObject otm) {
+    public SetResourceExtensionAction(OtmResource otm) {
         super( otm );
     }
 
     @Override
-    protected String get() {
-        return otm.getDescription();
+    public OtmResource getSubject() {
+        return (OtmResource) otm;
     }
 
-    @Override
     protected void set(String value) {
-        otm.setDescription( value );
+        getSubject().setExtendedResource( null );
     }
 
-    public static boolean isEnabled(OtmObject subject) {
-        return subject.isEditable();
+    protected String get() {
+
+        return getSubject().getExtendedResourceName();
     }
+
+
 
     @Override
     public String toString() {
-        return "Changed description to " + newString;
+        return "Changed extended resource to " + get();
+    }
+
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmResource)
+            return subject.isEditable();
+        return false;
     }
 
 }

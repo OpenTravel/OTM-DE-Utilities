@@ -32,39 +32,15 @@ import org.opentravel.schemacompiler.validate.ValidationFindings;
  */
 public interface DexAction<T> {
 
+
+    /**
+     * Run the action.
+     *
+     * @param data value to be applied in the action, must be of type defined in the generic parameter
+     */
+    public void doIt(Object data);
     // All implementations must implement, but the signatures will be different.
     // public T doIt(ObservableValue<? extends T> observable, T oldValue, T newValue);
-
-    /**
-     * Use the stored values to redo the change.
-     * 
-     * @return
-     */
-    // public T redo();
-    public T undo();
-
-    // VETOable event??
-    /**
-     * Is the action enabled for this subject?
-     * 
-     * @return true if change is enabled for this application and user.
-     */
-    public boolean isEnabled();
-
-    /**
-     * @return true if the requested change is allowed for object in this application and user.
-     */
-    public boolean isAllowed(T value);
-
-    /**
-     * @return true if change already made is valid for this object for this application and user.
-     */
-    public boolean isValid();
-
-    /**
-     * @return
-     */
-    ValidationFindings getVetoFindings();
 
     /**
      * Get the OTM object that is or will be acted upon.
@@ -74,12 +50,38 @@ public interface DexAction<T> {
     public OtmObject getSubject();
 
     /**
-     * Run the action.
+     * Test to see if the change is un-doable. Veto findings will be set if action can not be undone and therefore
+     * rejected.
      * 
-     * @param data value to be applied in the action, must be of type defined in the generic parameter
+     * @return null or veto findings
      */
-    public void doIt(Object data);
+    ValidationFindings getVetoFindings();
 
+    /**
+     * @return true if the requested change is allowed for object in this application and user.
+     */
+    public boolean isAllowed(T value);
+
+    /**
+     * Is the action enabled for this subject?
+     * 
+     * @return true if change is enabled for this application and user.
+     */
+    public boolean isEnabled();
+
+    /**
+     * @return true if change already made is valid for this object for this application and user.
+     */
+    public boolean isValid();
+
+    /**
+     * Use the stored values to redo the change.
+     * 
+     * @return
+     */
+    public T undo();
+
+    // public T redo();
     // /**
     // * @return true if change is valid for this object for this application and user.
     // */

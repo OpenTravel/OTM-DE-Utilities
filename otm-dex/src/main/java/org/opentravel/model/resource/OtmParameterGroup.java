@@ -21,6 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.dex.actions.DexActionManager.DexActions;
+import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
@@ -38,11 +40,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tooltip;
 
 /**
@@ -161,11 +163,9 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         return getTL().isIdGroup();
     }
 
-    public Node getIdGroupNode() {
-        CheckBox box = new CheckBox( IDGROUP_LABEL );
-        box.setSelected( isIdGroup() );
-        box.setDisable( !getOwningMember().isEditable() );
-        return box;
+    public Node getIdGroupNode(DexIncludedController<?> ec) {
+        BooleanProperty idGroupProperty = getActionManager().add( DexActions.SETIDGROUP, isIdGroup(), this );
+        return DexEditField.makeCheckBox( idGroupProperty, IDGROUP_LABEL, ec, this );
     }
 
     /**
@@ -173,7 +173,7 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
      * 
      * @return a string array of subject facet names.
      */
-    protected ObservableList<String> getSubjectFacets() {
+    protected ObservableList<String> getSubjectFacetCandidates() {
         ObservableList<String> facets = FXCollections.observableArrayList();
         if (getOwningMember() != null) {
             getOwningMember().getSubjectFacets().forEach( f -> {
@@ -189,18 +189,34 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         return facets;
     }
 
-    public Node getReferenceFacetNode() {
-        ComboBox<String> box = new ComboBox<>( getSubjectFacets() );
-        box.setEditable( getOwningMember().isEditable() );
-        box.getSelectionModel().select( getTL().getFacetRefName() );
-        return box;
+    public Node getReferenceFacetNode(DexIncludedController<?> ec) {
+        StringProperty selection =
+            getActionManager().add( DexActions.SETPARAMETERGROUPFACET, getReferenceFacetName(), this );
+        return DexEditField.makeComboBox( getSubjectFacetCandidates(), selection, ec, this );
+
+        // ComboBox<String> box = new ComboBox<>( getSubjectFacetCandidates() );
+        // box.setEditable( getOwningMember().isEditable() );
+        // box.getSelectionModel().select( getTL().getFacetRefName() );
+        // return box;
     }
 
+    public String getReferenceFacetName() {
+        return getTL().getFacetRefName();
+    }
+
+    public void setReferenceFacetString(String value) {
+        log.error( "FIXME - Set reference facet to " + value );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<DexEditField> getFields() {
+    public List<DexEditField> getFields(DexIncludedController<?> ec) {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, getReferenceFacetNode() ) );
-        fields.add( new DexEditField( 1, 0, null, IDGROUP_TOOLTIP, getIdGroupNode() ) );
+        fields.add(
+            new DexEditField( 0, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, getReferenceFacetNode( ec ) ) );
+        fields.add( new DexEditField( 1, 0, null, IDGROUP_TOOLTIP, getIdGroupNode( ec ) ) );
         return fields;
     }
 
@@ -216,6 +232,11 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
     private static final String REFERENCE_FACET_LABEL = "Facet Name";
     private static final String REFERENCE_FACET_TOOLTIP =
         "Name of the business object facet from which all parameters in this group will be referenced. Possible parameters will include any indicators and simple type attributes and elements that are not contained within repeating elements of the given facet or its children.";
+
+    public void setIdGroup(boolean value) {
+        getTL().setIdGroup( value );
+        log.debug( "Set id group to " + isIdGroup() );
+    }
 
     /**
      * @param otmResource

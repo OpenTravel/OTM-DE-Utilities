@@ -24,8 +24,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.dex.actions.DexActionManager;
+import org.opentravel.dex.actions.DexActionManager.DexActions;
+import org.opentravel.dex.actions.DexFullActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmParameterGroup;
@@ -38,8 +42,11 @@ import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLActionFacet;
 import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
+import org.opentravel.schemacompiler.model.TLLibrary;
+import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.model.TLParamGroup;
 import org.opentravel.schemacompiler.model.TLResource;
+import org.opentravel.schemacompiler.repository.RepositoryItemState;
 
 import java.util.List;
 
@@ -48,6 +55,10 @@ import java.util.List;
  */
 public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
     private static final String R_NAME = "Testbo";
+
+    private static final String INITIALBASEPATH = "/";
+    private static final String BASEPATH1 = "/MyRecordCollection";
+    private static final String BASEPATH2 = "/Sams/Records";
 
     private static Log log = LogFactory.getLog( TestResource.class );
     private static OtmBusinessObject exposedObject;
@@ -69,6 +80,54 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         // Then
         assertNotNull( r );
         assertTrue( !r.getChildren().isEmpty() );
+    }
+
+    @Test
+    public void testBasePathAction() {
+        // Givens
+        DexActionManager fullActionMgr = new DexFullActionManager( null );
+        OtmModelManager modelMgr = new OtmModelManager( fullActionMgr, null );
+
+        TLLibrary tlLib = new TLLibrary();
+        OtmLibrary lib = modelMgr.add( tlLib );
+        // OtmLibrary lib = new OtmLibrary( tlLib, modelMgr );
+        log.debug( "Status = " + lib.getStatus() + "  State = " + lib.getStateName() );
+        // Need to add to an editable library
+        assertTrue( lib.getStatus() == TLLibraryStatus.DRAFT && lib.getState() == RepositoryItemState.MANAGED_WIP
+            || lib.getState() == RepositoryItemState.UNMANAGED );
+
+        OtmResource r = buildOtm( modelMgr );
+        lib.add( r );
+        assertTrue( r.getLibrary() == lib );
+        // Given - resource is editable
+        assertTrue( r.getActionManager() != null );
+        assertTrue( r.isEditable() );
+        assertTrue( r.getActionManager().isEnabled( DexActions.BASEPATHCHANGE, r ) );
+
+        // Given - an initial base path
+        r.setBasePath( INITIALBASEPATH, true );
+        // Given - no actions in the queue
+        assertTrue( fullActionMgr.getQueueSize() == 0 );
+
+        // When
+        r.basePathProperty().set( BASEPATH1 );
+        log.debug( fullActionMgr.getQueueSize() );
+        assertTrue( r.getBasePath().equals( BASEPATH1 ) );
+
+        r.basePathProperty().set( BASEPATH2 );
+        assertTrue( r.getBasePath().equals( BASEPATH2 ) );
+
+        // Then - queue must have both actions
+        assertTrue( "Two actions must be in queue.", fullActionMgr.getQueueSize() == 2 );
+
+        // When - action is undone
+        fullActionMgr.undo();
+        assertTrue( r.getBasePath().equals( BASEPATH1 ) );
+        fullActionMgr.undo();
+        assertTrue( r.getBasePath().equals( INITIALBASEPATH ) );
+        assertTrue( fullActionMgr.getQueueSize() == 0 );
+
+        // Side-effect? changes to action requests?
     }
 
     @Override

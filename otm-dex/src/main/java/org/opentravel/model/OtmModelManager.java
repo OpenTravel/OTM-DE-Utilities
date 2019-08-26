@@ -134,6 +134,8 @@ public class OtmModelManager implements TaskResultHandlerI {
      * Add the TL library to the model if it is not already in the model. Adds all the members.
      * <p>
      * Does <b>not</b> resolve types. Does <b>not</b> validate the objects.
+     * <p>
+     * Create OtmLibrary facade.
      * 
      * @see #startValidatingAndResolvingTasks()
      * 

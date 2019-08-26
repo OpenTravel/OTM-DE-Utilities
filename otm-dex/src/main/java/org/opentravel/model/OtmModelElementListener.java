@@ -46,7 +46,7 @@ public class OtmModelElementListener implements ModelElementListener {
 
     @Override
     public void processValueChangeEvent(ValueChangeEvent<?,?> event) {
-        // log.debug( otm.getName() + " value change event: " + event.getType() );
+        log.debug( otm.getName() + " value change event: " + event.getType() );
         switch (event.getType()) {
             case NAME_MODIFIED:
                 // if (event.getNewValue() instanceof String && otm.nameProperty() != null)

@@ -58,7 +58,7 @@ public class TestDexActionManager {
 
     @Test
     public void testActionFactory() {
-        DexActionManager am = new DexReadOnlyActionManager();
+        DexActionManagerCore am = new DexReadOnlyActionManager();
         OtmModelManager mgr = new OtmModelManager( am, null );
 
         // Given an OtmObject
@@ -73,7 +73,7 @@ public class TestDexActionManager {
 
     @Test
     public void testNameChangeAction() {
-        DexActionManager am = new DexReadOnlyActionManager();
+        DexActionManagerCore am = new DexReadOnlyActionManager();
         OtmModelManager mgr = new OtmModelManager( am, null );
         assertTrue( am.getQueueSize() == 0 );
 
@@ -83,7 +83,8 @@ public class TestDexActionManager {
 
         // Actions are atomic but hidden from controller API
         //
-        DexAction<?> action = vwa.getActionManager().actionFactory( DexActions.TYPECHANGE, vwa );
+        DexAction<?> action =
+            ((DexActionManagerCore) vwa.getActionManager()).actionFactory( DexActions.TYPECHANGE, vwa );
         action.doIt( closedEnum );
         assertTrue( "Must have type.", vwa.getAssignedType() == closedEnum );
         assertTrue( !am.getLastActionName().isEmpty() );

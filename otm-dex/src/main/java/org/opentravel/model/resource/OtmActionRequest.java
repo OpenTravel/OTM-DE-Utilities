@@ -21,6 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.dex.actions.DexActionManager.DexActions;
+import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -39,9 +41,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuButton;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
@@ -103,18 +103,32 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         return ImageManager.Icons.RESOURCE_REQUEST;
     }
 
-    private Node getPayloadNode() {
+    public ObservableList<String> getPayloadCandidates() {
         ObservableList<String> actionFacets = FXCollections.observableArrayList();
         getOwningMember().getActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
-        ComboBox<String> box = DexEditField.makeComboBox( actionFacets, getPayloadActionFacetName(), this );
-        return box;
+        return actionFacets;
     }
 
-    private Node getParametersNode() {
+    private Node getPayloadNode(DexIncludedController<?> ec) {
+        StringProperty selection =
+            getActionManager().add( DexActions.SETREQUESTPAYLOAD, getPayloadActionFacetName(), this );
+        return DexEditField.makeComboBox( getPayloadCandidates(), selection, ec, this );
+    }
+
+    public void setPayloadActionFacet(String value) {
+        log.error( "FIXME - set payload action facet to " + value );
+    }
+
+    public ObservableList<String> getParameterGroupCandidates() {
         ObservableList<String> groups = FXCollections.observableArrayList();
         getOwningMember().getParameterGroups().forEach( pg -> groups.add( pg.getName() ) );
-        ComboBox<String> box = DexEditField.makeComboBox( groups, getParamGroupName(), this );
-        return box;
+        return groups;
+    }
+
+    private Node getParametersNode(DexIncludedController<?> ec) {
+        StringProperty selection =
+            getActionManager().add( DexActions.SETREQUESTPARAMETERGROUP, getParamGroupName(), this );
+        return DexEditField.makeComboBox( getParameterGroupCandidates(), selection, ec, this );
     }
 
     private Node getMimeNode() {
@@ -131,27 +145,39 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         return mb;
     }
 
-    private Node getMethodNode() {
+    public ObservableList<String> getMethodCandidates() {
         ObservableList<String> candidates = FXCollections.observableArrayList();
         for (TLHttpMethod m : TLHttpMethod.values())
             candidates.add( m.toString() );
-        ComboBox<String> box = DexEditField.makeComboBox( candidates, getTL().getHttpMethod().toString(), this );
-        return box;
+        return candidates;
     }
 
-    private Node getPathNode() {
-        TextField field = DexEditField.makeTextField( getPathTemplate(), this );
-        return field;
+    private Node getMethodNode(DexIncludedController<?> ec) {
+        StringProperty selection = getActionManager().add( DexActions.SETREQUESTMETHOD, getMethod(), this );
+        return DexEditField.makeComboBox( getMethodCandidates(), selection, ec, this );
+    }
+
+    public String getMethod() {
+        return getTL().getHttpMethod().toString();
+    }
+
+    public void setMethod(String value) {
+        log.error( "FIXME - Set method to " + value );
+    }
+
+    private Node getPathNode(DexIncludedController<?> ec) {
+        StringProperty selection = getActionManager().add( DexActions.SETREQUESTPATH, getPathTemplate(), this );
+        return DexEditField.makeTextField( selection, ec, this );
     }
 
     @Override
-    public List<DexEditField> getFields() {
+    public List<DexEditField> getFields(DexIncludedController<?> ec) {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, getPayloadNode() ) );
-        fields.add( new DexEditField( 1, 0, PARAMETERS_LABEL, PARAMETERS_TOOLTIP, getParametersNode() ) );
-        fields.add( new DexEditField( 2, 0, METHOD_LABEL, METHOD_TOOLTIP, getMethodNode() ) );
+        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, getPayloadNode( ec ) ) );
+        fields.add( new DexEditField( 1, 0, PARAMETERS_LABEL, PARAMETERS_TOOLTIP, getParametersNode( ec ) ) );
+        fields.add( new DexEditField( 2, 0, METHOD_LABEL, METHOD_TOOLTIP, getMethodNode( ec ) ) );
         fields.add( new DexEditField( 3, 0, MIME_LABEL, MIME_TOOLTIP, getMimeNode() ) );
-        fields.add( new DexEditField( 4, 0, PATH_LABEL, PATH_TOOLTIP, getPathNode() ) );
+        fields.add( new DexEditField( 4, 0, PATH_LABEL, PATH_TOOLTIP, getPathNode( ec ) ) );
 
         return fields;
     }
@@ -200,6 +226,10 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      */
     public void setParamGroup(OtmParameterGroup group) {
         getTL().setParamGroup( group.getTL() );
+    }
+
+    public void setParamGroup(String value) {
+        log.error( "FIXME - set parameter group to " + value );
     }
 
     /**

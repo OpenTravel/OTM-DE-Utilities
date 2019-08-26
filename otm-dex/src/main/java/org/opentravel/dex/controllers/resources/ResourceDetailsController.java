@@ -26,6 +26,7 @@ import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.DexResourceChangeEvent;
 import org.opentravel.dex.events.DexResourceChildSelectionEvent;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -74,7 +75,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     private OtmEventSubscriptionManager eventManager;
 
     // All event types fired by this controller.
-    private static final EventType[] publishedEvents = {};
+    private static final EventType[] publishedEvents = {DexResourceChangeEvent.RESOURCE_CHANGED};
 
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
@@ -150,7 +151,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
         postTitle( resource );
         postName( resource );
         postDescription( resource );
-        resource.getFields().forEach( f -> postField( f, resource ) );
+        resource.getFields( this ).forEach( f -> postField( f, resource ) );
     }
 
 
@@ -164,9 +165,12 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
             label.setDisable( !obj.isEditable() );
         }
         if (field.fxNode != null) {
-            if (field.fxNode instanceof Control)
+            if (field.fxNode instanceof Control) {
                 ((Control) field.fxNode).setTooltip( field.tooltip );
+            }
             propertyGrid.add( field.fxNode, column, field.row + rowIndex );
+
+            // fireEvent( new DexResourceChangeEvent((OtmResource)obj.getOwningMember()) );
         }
     }
 
@@ -209,7 +213,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
         postName( resourceChild );
         postDescription( resourceChild );
 
-        resourceChild.getFields().forEach( f -> postField( f, resourceChild ) );
+        resourceChild.getFields( this ).forEach( f -> postField( f, resourceChild ) );
     }
 
 

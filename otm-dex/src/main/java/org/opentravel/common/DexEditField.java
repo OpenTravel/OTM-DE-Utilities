@@ -18,11 +18,17 @@ package org.opentravel.common;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.dex.events.DexResourceChangeEvent;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -73,11 +79,29 @@ public class DexEditField {
         this.tooltip = new Tooltip( tooltip );
     }
 
+    @Deprecated
     public static CheckBox makeCheckBox(boolean value, String label, OtmObject object) {
         CheckBox box = new CheckBox( label );
         box.setSelected( value );
         box.setDisable( !object.getOwningMember().isEditable() );
         box.setOnAction( a -> log.debug( label + " check box selected." ) );
+        return box;
+    }
+
+    public static CheckBox makeCheckBox(BooleanProperty value, String label, DexIncludedController<?> ec,
+        OtmObject object) {
+        CheckBox box = new CheckBox( label );
+        box.setSelected( value.get() );
+        if (!(value instanceof ReadOnlyBooleanWrapper)) {
+            box.setDisable( false );
+            box.setOnAction( a -> {
+                value.set( box.isSelected() );
+                if (ec != null && object.getOwningMember() instanceof OtmResource)
+                    ec.fireEvent( new DexResourceChangeEvent( (OtmResource) object.getOwningMember() ) );
+                log.debug( label + " check box set to " + value.get() );
+            } );
+        } else
+            box.setDisable( true );
         return box;
     }
 
@@ -93,19 +117,57 @@ public class DexEditField {
         return hb;
     }
 
+    @Deprecated
     public static ComboBox<String> makeComboBox(ObservableList<String> candidates, String selection, OtmObject object) {
         ComboBox<String> box = new ComboBox<>( candidates );
         box.getSelectionModel().select( selection );
         box.setDisable( !object.getOwningMember().isEditable() );
-        box.setOnAction( a -> log.debug( "Combo box selected" ) );
+        box.setOnAction( a -> {
+            log.debug( "Combo box selected" );
+        } );
         return box;
     }
 
+    public static ComboBox<String> makeComboBox(ObservableList<String> candidates, StringProperty selection,
+        DexIncludedController<?> ec, OtmObject object) {
+        ComboBox<String> box = new ComboBox<>( candidates );
+
+        box.getSelectionModel().select( selection.get() );
+        box.setDisable( !object.getOwningMember().isEditable() );
+        box.setOnAction( a -> {
+            ec.fireEvent( new DexResourceChangeEvent() );
+            selection.set( box.getValue() );
+            log.debug( "Combo box selected" );
+        } );
+        return box;
+    }
+
+    @Deprecated
     public static TextField makeTextField(String value, OtmObject object) {
         TextField field = new TextField( value );
         field.setEditable( object.isEditable() );
         field.setDisable( !object.isEditable() );
         field.setOnAction( a -> log.debug( "Field edited" ) );
+        return field;
+    }
+
+
+    /**
+     * @param string property
+     * @param object
+     * @return
+     */
+    public static TextField makeTextField(StringProperty stringProperty, DexIncludedController<?> ec,
+        OtmObject object) {
+        TextField field = new TextField( stringProperty.get() );
+        field.setEditable( object.isEditable() );
+        field.setDisable( !object.isEditable() );
+        field.setOnAction( a -> {
+            stringProperty.set( ((TextField) a.getSource()).getText() );
+            if (ec != null && object.getOwningMember() instanceof OtmResource)
+                ec.fireEvent( new DexResourceChangeEvent( (OtmResource) object.getOwningMember() ) );
+            log.debug( "String Property Field edited" );
+        } );
         return field;
     }
 

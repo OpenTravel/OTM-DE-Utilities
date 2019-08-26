@@ -16,34 +16,44 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.resource.OtmAction;
 
-public class DescriptionChangeAction extends DexStringAction {
-    private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+public class SetCommonAction extends DexBooleanAction {
+    // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
-    public DescriptionChangeAction(OtmObject otm) {
+    public SetCommonAction(OtmAction otm) {
         super( otm );
     }
 
     @Override
-    protected String get() {
-        return otm.getDescription();
+    public OtmAction getSubject() {
+        return (OtmAction) otm;
     }
 
-    @Override
-    protected void set(String value) {
-        otm.setDescription( value );
+    protected void set(boolean value) {
+        getSubject().setCommon( value );
     }
 
-    public static boolean isEnabled(OtmObject subject) {
-        return subject.isEditable();
+    protected boolean get() {
+        return getSubject().isCommon();
     }
+
+
 
     @Override
     public String toString() {
-        return "Changed description to " + newString;
+        return "Common set to " + get();
+    }
+
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmAction)
+            return subject.isEditable();
+        return false;
     }
 
 }

@@ -17,6 +17,7 @@
 package org.opentravel.model;
 
 import org.opentravel.common.DexEditField;
+import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 
 import java.util.List;
@@ -37,9 +38,15 @@ public interface OtmResourceChild extends OtmObject {
     @Override
     public OtmResource getOwningMember();
 
-    /**
-     * @return
-     */
-    public abstract List<DexEditField> getFields();
+    // /**
+    // * @return
+    // */
+    // @Deprecated
+    // public abstract List<DexEditField> getFields();
 
+    /**
+     * @param controller to fire the change event or null
+     * @return list of edit fields containing FX Nodes ready for posting
+     */
+    public abstract List<DexEditField> getFields(DexIncludedController<?> eventController);
 }

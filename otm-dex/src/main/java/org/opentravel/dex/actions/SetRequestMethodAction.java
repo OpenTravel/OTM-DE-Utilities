@@ -16,34 +16,44 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.resource.OtmActionRequest;
 
-public class DescriptionChangeAction extends DexStringAction {
-    private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+public class SetRequestMethodAction extends DexStringAction {
+    // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
-    public DescriptionChangeAction(OtmObject otm) {
+    public SetRequestMethodAction(OtmActionRequest otm) {
         super( otm );
     }
 
     @Override
-    protected String get() {
-        return otm.getDescription();
+    public OtmActionRequest getSubject() {
+        return (OtmActionRequest) otm;
     }
 
-    @Override
     protected void set(String value) {
-        otm.setDescription( value );
+        getSubject().setMethod( value );
     }
 
-    public static boolean isEnabled(OtmObject subject) {
-        return subject.isEditable();
+    protected String get() {
+        return getSubject().getMethod();
     }
+
+
 
     @Override
     public String toString() {
-        return "Changed description to " + newString;
+        return "Action facet set to " + get();
+    }
+
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmActionRequest)
+            return subject.isEditable();
+        return false;
     }
 
 }

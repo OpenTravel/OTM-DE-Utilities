@@ -25,6 +25,7 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexFilterChangeEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.DexResourceChangeEvent;
 import org.opentravel.dex.events.DexResourceChildSelectionEvent;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
@@ -79,9 +80,9 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
     private boolean treeEditingEnabled = false;
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents =
-        {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED, DexMemberSelectionEvent.RESOURCE_SELECTED,
-            DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] subscribedEvents = {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED,
+        DexResourceChangeEvent.RESOURCE_CHANGED, DexMemberSelectionEvent.RESOURCE_SELECTED,
+        DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
 
     /**
@@ -218,6 +219,11 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
             post( (OtmResource) event.getMember() );
     }
 
+    private void handleEvent(DexResourceChangeEvent event) {
+        if (!ignoreEvents && event.getResource() instanceof OtmResource)
+            post( (OtmResource) event.getResource() );
+    }
+
     private void handleEvent(DexResourceChildSelectionEvent event) {
         if (!ignoreEvents && event.get() instanceof OtmResourceChild)
             post( event.get().getOwningMember() );
@@ -233,6 +239,8 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
                 handleEvent( (DexFilterChangeEvent) event );
             if (event instanceof DexResourceChildSelectionEvent)
                 handleEvent( (DexResourceChildSelectionEvent) event );
+            if (event instanceof DexResourceChangeEvent)
+                handleEvent( (DexResourceChangeEvent) event );
             if (event instanceof DexModelChangeEvent)
                 clear();
             else

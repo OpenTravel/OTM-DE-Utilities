@@ -16,38 +16,68 @@
 
 package org.opentravel.dex.actions;
 
-import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.model.OtmModelElement;
-import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 
 /**
- * DEx action manager interface. Used by OTM elements to determine what actions are available and to execute them.
+ * Dex action manager <b>public</b> interface.
  * <p>
- * Controls and manages actions. Maintains queue of past actions and creates new actions. Notifies user of performed
- * action status.
+ * Create actions associated with observable values or run actions associated with an OtmObject
+ * <p>
+ * Action managers control and manage actions. Maintains queue of past actions and creates new actions. Notifies user of
+ * performed action status.
+ * <p>
+ * See {@link DexActionManagerCore} for <b>protected</b> methods.
  * 
  * @author dmh
  *
  */
 public interface DexActionManager {
     public enum DexActions {
-        NAMECHANGE, DESCRIPTIONCHANGE, TYPECHANGE
+        NAMECHANGE,
+        DESCRIPTIONCHANGE,
+        TYPECHANGE,
+        BASEPATHCHANGE,
+        SETFIRSTCLASS,
+        SETABSTRACT,
+        SETIDGROUP,
+        SETCOMMONACTION,
+        SETRESOURCEEXTENSION,
+        SETPARENTPARAMETERGROUP,
+        SETPARENTPATHTEMPLATE,
+        SETPARENTREFPARENT,
+        SETAFREFERENCETYPE,
+        SETAFREFERENCEFACET,
+        SETREQUESTPAYLOAD,
+        SETREQUESTPARAMETERGROUP,
+        SETREQUESTMETHOD,
+        SETREQUESTPATH,
+        SETRESPONSEPAYLOAD,
+        SETPARAMETERLOCATION,
+        SETPARAMETERGROUPFACET
     }
 
-    /**
-     * @param actionName
-     * @param subject
-     * @return
-     */
-    public DexAction actionFactory(DexActions actionName, OtmObject subject);
+    // /**
+    // * <b>For use by DexActionManagers only.</b>
+    // * <p>
+    // * Get the action specific to the action name for the subject OtmObject.
+    // *
+    // * @param actionName
+    // * @param subject
+    // * @return
+    // */
+    // public DexAction<?> actionFactory(DexActions actionName, OtmObject subject);
+
+    public boolean addAction(DexActions action, ObservableValue<? extends Boolean> property, OtmObject subject);
 
     /**
-     * Set a listener on the FX observable property to invoke the action.
+     * Set a listener on the FX observable string property to invoke the action.
      * <p>
-     * Triggering of actions on observable properties is delegated to the observable via its listener.
+     * To be deprecated, it is preferred to use {@link #add(DexActions, String, OtmObject)}
      * 
      * @param action
      * @param op
@@ -57,137 +87,41 @@ public interface DexActionManager {
     public boolean addAction(DexActions action, ObservableValue<? extends String> op, OtmModelElement<?> subject);
 
     public String getLastActionName();
-    // {
-    // return queue.peek() != null ? queue.peek().getClass().getSimpleName() : "";
-    // }
 
-    // public void doString(DexStringAction action, ObservableValue<? extends String> o, String oldName, String name) {
-    // if (!ignore) {
-    // ignore = true;
-    // action.doIt(o, oldName, name);
-    // ignore = false;
-    // }
-    // }
+    // // Why?
+    // @Deprecated
+    // public DexMainController getMainController();
 
-    // Why?
-    @Deprecated
-    public DexMainController getMainController();
-    // {
-    // return mainController;
-    // }
-
-    // Why?
-    @Deprecated
-    public OtmModelManager getModelManager();
-    // {
-    // return modelManager;
-    // }
+    // // Why?
+    // @Deprecated
+    // public OtmModelManager getModelManager();
 
     public int getQueueSize();
-    // {
-    // return queue.size();
-    // }
 
     public boolean isEnabled(DexActions action, OtmObject subject);
-    // {
-    // switch (action) {
-    // case TYPECHANGE:
-    // return AssignedTypeChangeAction.isEnabled(subject);
-    // default:
-    // }
-    // return false;
-    // }
 
-    public void postWarning(String warning);
-    // {
-    // mainController.postError(null, warning);
-    //
-    // }
-
-    /**
-     * Record action to allow undo. Will validate results and warn user on errors. Veto'ed actions will not be pushed
-     * onto the queue.
-     * 
-     * @param action
-     */
-    // Why is this part of public interface? From consumers view -- doing an action pushes it.
-    @Deprecated
-    public void push(DexAction<?> action);
-    // {
-    // if (queue.contains(action)) {
-    // // TEST - make sure not a duplicate
-    // log.debug("Duplicate Action found!");
-    // return;
-    // }
-    // if (action.getVetoFindings() != null && !action.getVetoFindings().isEmpty()) {
-    // // Warn the user of the errors and back out the changes
-    // ValidationFindings findings = action.getVetoFindings();
-    // String msg = "Can not make change.\n" + ValidationUtils.getMessagesAsString(findings);
-    // mainController.postError(null, msg);
-    // ignore = true;
-    // action.undo();
-    // ignore = false;
-    // // TODO - if warnings, post them and allow undo option in dialog.
-    // } else {
-    // queue.push(action);
-    // mainController.updateActionQueueSize(getQueueSize());
-    // mainController.postStatus("Performed action: " + action.toString());
-    // log.debug("Put action on queue: " + action.getClass().getSimpleName());
-    // }
-    // action.getSubject().getOwningMember().isValid(true); // Force the owner to refresh its findings.
-    //
-    // }
+    // public void postWarning(String warning);
 
     // /**
-    // * @param otmModelManager
-    // */
-    // public void setModelManager(OtmModelManager otmModelManager) {
-    // this.modelManager = otmModelManager;
-    // }
-
-    // TODO - public static DexAction actionFactory(DexActions action, OtmModelElement<?> subject);
-
-    // public DexStringAction stringActionFactory(DexActions action, OtmModelElement<?> subject) {
-    // // Make sure the action can register itself and access main controller
-    // if (subject.getActionManager() == null)
-    // throw new IllegalStateException("Subject of an action must provide access to action manger.");
-    //
-    // DexStringAction a = null;
-    // switch (action) {
-    // case NAMECHANGE:
-    // a = new NameChangeAction(subject);
-    // break;
-    // case DESCRIPTIONCHANGE:
-    // a = new DescriptionChangeAction(subject);
-    // break;
-    // default:
-    // log.debug("Unknown action: " + action.toString());
-    // }
-    // return a;
-    // }
-
-    // /**
-    // * Create an action and run it.
+    // * <b>For use by DexActions only.</b>
+    // * <p>
+    // * Push performed action onto queue. This records the action to allow undo. Will validate results and warn user on
+    // * errors.
+    // * <p>
+    // * Note: Veto'ed actions ({@link DexAction#getVetoFindings()} will {@link DexAction#undo()} and not be added to
+    // the
+    // * queue.
     // *
     // * @param action
-    // * @param subject
     // */
-    // public void run(DexActions action, OtmObject subject);
-    // {
-    // switch (action) {
-    // case TYPECHANGE:
-    // if (AssignedTypeChangeAction.isEnabled(subject)) {
-    // ignore = true; // may fire a name change
-    // new AssignedTypeChangeAction((OtmTypeUser) subject).doIt();
-    // ignore = false;
-    // }
-    // break;
-    // default:
-    // }
-    // }
+    // public void push(DexAction<?> action);
+
 
     /**
      * Create an action and do it. If successful will be added to the queue.
+     * <p>
+     * Used for actions that are not associated with an observable property such as set assigned type that uses a dialog
+     * to get the type to assign.
      * 
      * @param actionType what action to perform
      * @param subject OTM object to act upon
@@ -199,17 +133,25 @@ public interface DexActionManager {
      * Pop an action from the queue and then undo it.
      */
     public void undo();
-    // {
-    // ignore = true;
-    // if (!queue.isEmpty()) {
-    // DexAction<?> action = queue.pop();
-    // log.debug("Undo action: " + action.getClass().getSimpleName());
-    // action.undo();
-    // action.getSubject().getOwningMember().isValid(true); // Force the owner to refresh its findings.
-    // mainController.updateActionQueueSize(getQueueSize());
-    // mainController.postStatus("Undid action: " + action.toString());
-    // }
-    // ignore = false;
-    // }
+
+    /**
+     * Create a string property and add an action if editable and enabled.
+     * 
+     * @param action action to perform
+     * @param currentValue of string
+     * @param subject otmObject to change when string property changes
+     * @return
+     */
+    public StringProperty add(DexActions action, String currentValue, OtmObject subject);
+
+    /**
+     * Create a boolean property and add an action if editable and enabled.
+     * 
+     * @param action action to perform
+     * @param currentValue of boolean
+     * @param subject otmObject to change when property changes
+     * @return
+     */
+    public BooleanProperty add(DexActions action, boolean currentValue, OtmObject subject);
 
 }

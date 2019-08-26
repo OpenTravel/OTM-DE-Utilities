@@ -23,6 +23,7 @@ import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.actions.DexActionManager;
 import org.opentravel.dex.actions.DexReadOnlyActionManager;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryPermission;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.TLInclude;
@@ -51,6 +52,12 @@ public class OtmLibrary {
 
     protected ValidationFindings findings;
 
+    /**
+     * Should only be called by OtmModelManager. See {@link OtmModelManager#add(AbstractLibrary)}
+     * 
+     * @param tl
+     * @param mgr
+     */
     public OtmLibrary(AbstractLibrary tl, OtmModelManager mgr) {
         this.mgr = mgr;
         tlLib = tl;
@@ -79,6 +86,14 @@ public class OtmLibrary {
             throw new IllegalArgumentException( "Can not add project item with wrong library." );
         projectItems.add( pi );
         log.debug( "Added project item to " + this.getName() + ". Now has " + projectItems.size() + " items." );
+    }
+
+    /**
+     * @param a library member
+     */
+    public void add(OtmLibraryMember member) {
+        getTL().addNamedMember( member.getTlLM() );
+        // TODO - make sure not already a member
     }
 
     /**
@@ -270,4 +285,5 @@ public class OtmLibrary {
     public void validate() {
         findings = TLModelCompileValidator.validateModelElement( getTL(), true );
     }
+
 }

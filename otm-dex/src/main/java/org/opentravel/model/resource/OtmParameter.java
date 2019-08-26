@@ -21,6 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.dex.actions.DexActionManager.DexActions;
+import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -42,7 +44,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tooltip;
 
 /**
@@ -96,10 +97,10 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
     }
 
     @Override
-    public List<DexEditField> getFields() {
+    public List<DexEditField> getFields(DexIncludedController<?> ec) {
         List<DexEditField> fields = new ArrayList<>();
         // fields.add( new DexEditField( 0, 0, FIELD_LABEL, FIELD_TOOLTIP, new ComboBox<String>() ) );
-        fields.add( new DexEditField( 0, 0, LOCATION_LABEL, LOCATION_TOOLTIP, getLocationsNode() ) );
+        fields.add( new DexEditField( 0, 0, LOCATION_LABEL, LOCATION_TOOLTIP, getLocationsNode( ec ) ) );
         return fields;
     }
 
@@ -156,18 +157,26 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
     }
 
 
-    private ObservableList<String> getLocations() {
+    private ObservableList<String> getLocationCandidates() {
         ObservableList<String> locations = FXCollections.observableArrayList();
         for (TLParamLocation l : TLParamLocation.values())
             locations.add( l.toString() );
         return locations;
     }
 
-    private Node getLocationsNode() {
-        ComboBox<String> box = new ComboBox<>( getLocations() );
-        box.getSelectionModel().select( getTL().getLocation().toString() );
-        box.setEditable( getOwningMember().isEditable() );
-        return box;
+    private Node getLocationsNode(DexIncludedController<?> ec) {
+        StringProperty selection =
+            getActionManager().add( DexActions.SETPARAMETERLOCATION, getLocation().toString(), this );
+        return DexEditField.makeComboBox( getLocationCandidates(), selection, ec, this );
+        // ComboBox<String> box = new ComboBox<>( getLocationCandidates() );
+        // box.getSelectionModel().select( getTL().getLocation().toString() );
+        // box.setEditable( getOwningMember().isEditable() );
+        // return box;
+    }
+
+
+    public void setLocation(String value) {
+        log.error( "FIXME - Set loction to " + value );
     }
 
     public Tooltip getTooltip() {

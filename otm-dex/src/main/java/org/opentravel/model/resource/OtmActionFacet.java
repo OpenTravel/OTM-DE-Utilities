@@ -21,6 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.dex.actions.DexActionManager.DexActions;
+import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -42,11 +44,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tooltip;
 
@@ -127,12 +129,14 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     }
 
     @Override
-    public List<DexEditField> getFields() {
+    public List<DexEditField> getFields(DexIncludedController<?> ec) {
         List<DexEditField> fields = new ArrayList<>();
         fields.add( new DexEditField( 0, 0, BASE_PAYLOAD_LABEL, BASE_PAYLOAD_TOOLTIP, getBasePayloadNode() ) );
         fields.add( new DexEditField( 0, 2, null, "Remove base payload.", new Button( "-Remove-" ) ) );
-        fields.add( new DexEditField( 1, 0, REFERENCE_TYPE_LABEL, REFERENCE_TYPE_TOOLTIP, getReferenceTypeNode() ) );
-        fields.add( new DexEditField( 2, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, getReferenceFacetNode() ) );
+        fields
+            .add( new DexEditField( 1, 0, REFERENCE_TYPE_LABEL, REFERENCE_TYPE_TOOLTIP, getReferenceTypeNode( ec ) ) );
+        fields.add(
+            new DexEditField( 2, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, getReferenceFacetNode( ec ) ) );
         fields.add( new DexEditField( 3, 0, REPEAT_COUNT_LABEL, REPEAT_COUNT_TOOLTIP, getRepeatCountNode() ) );
         return fields;
     }
@@ -174,13 +178,20 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         return getTL().getReferenceFacetName() != null ? getTL().getReferenceFacetName() : "";
     }
 
-    private Node getReferenceFacetNode() {
-        String selection = OtmResource.SUBGROUP;
+    private Node getReferenceFacetNode(DexIncludedController<?> ec) {
+        StringProperty selection = null;
         if (!getReferenceFacetName().isEmpty())
-            selection = getReferenceFacetName();
-        ComboBox<String> box = DexEditField.makeComboBox( getReferenceFacetCandidates(), selection, this );
-        box.setOnAction( a -> log.debug( "Reference Facet Selected" ) );
-        return box;
+            selection = getActionManager().add( DexActions.SETAFREFERENCEFACET, getReferenceFacetName(), this );
+        else
+            selection = getActionManager().add( DexActions.SETAFREFERENCEFACET, OtmResource.SUBGROUP, this );
+        return DexEditField.makeComboBox( getReferenceFacetCandidates(), selection, ec, this );
+
+        // String selection = OtmResource.SUBGROUP;
+        // if (!getReferenceFacetName().isEmpty())
+        // selection = getReferenceFacetName();
+        // ComboBox<String> box = DexEditField.makeComboBox( getReferenceFacetCandidates(), selection, this );
+        // box.setOnAction( a -> log.debug( "Reference Facet Selected" ) );
+        // return box;
     }
 
     public TLReferenceType getReferenceType() {
@@ -200,13 +211,25 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         return candidates;
     }
 
-    private Node getReferenceTypeNode() {
-        String selection = TLReferenceType.values()[0].toString();
+    private Node getReferenceTypeNode(DexIncludedController<?> ec) {
+        StringProperty selection = null;
         if (getReferenceType() != null)
-            selection = getReferenceType().toString();
-        ComboBox<String> box = DexEditField.makeComboBox( getReferenceTypeCandidates(), selection, this );
-        box.setOnAction( a -> log.debug( "Type Selected" ) );
-        return box;
+            selection = getActionManager().add( DexActions.SETAFREFERENCETYPE, getReferenceTypeString(), this );
+        else
+            selection =
+                getActionManager().add( DexActions.SETAFREFERENCETYPE, TLReferenceType.values()[0].toString(), this );
+        return DexEditField.makeComboBox( getReferenceTypeCandidates(), selection, ec, this );
+
+        // String selection = TLReferenceType.values()[0].toString();
+        // if (getReferenceType() != null)
+        // selection = getReferenceType().toString();
+        // ComboBox<String> box = DexEditField.makeComboBox( getReferenceTypeCandidates(), selection, this );
+        // box.setOnAction( a -> log.debug( "Type Selected" ) );
+        // return box;
+    }
+
+    public String getReferenceTypeString() {
+        return getReferenceType() != null ? getReferenceType().toString() : "";
     }
 
     private Node getRepeatCountNode() {
@@ -280,6 +303,10 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         return getName();
     }
 
+    public void setReferenceFacetName(String name) {
+        log.error( "FIXME - set reference facet to " + name );
+    }
+
     /**
      * Set the tlReferenceFacetName to the identity name of the facet. If set to null, then the object is used instead
      * of facet (substitution group)
@@ -300,6 +327,14 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         if (type == null)
             type = TLReferenceType.NONE;
         getTL().setReferenceType( type );
+    }
+
+
+    /**
+     * @param value
+     */
+    public void setReferenceTypeString(String value) {
+        log.error( "FIXME - Set reference type to " + value );
     }
 
 }

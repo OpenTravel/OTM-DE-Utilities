@@ -16,34 +16,26 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
 
-public class DescriptionChangeAction extends DexStringAction {
-    private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+public abstract class DexActionBase {
+    // private static Log log = LogFactory.getLog( DexActionBase.class );
 
-    public DescriptionChangeAction(OtmObject otm) {
-        super( otm );
+    protected OtmObject otm;
+    protected DexActionManagerCore coreActionManager = null;
+
+    // protected boolean outcome = false;
+    protected boolean ignore;
+
+    public DexActionBase(OtmObject otm) {
+        this.otm = otm;
+        if (otm.getActionManager() instanceof DexActionManagerCore)
+            coreActionManager = (DexActionManagerCore) otm.getActionManager();
+
+        assert (coreActionManager != null);
     }
 
-    @Override
-    protected String get() {
-        return otm.getDescription();
+    public OtmObject getSubject() {
+        return otm;
     }
-
-    @Override
-    protected void set(String value) {
-        otm.setDescription( value );
-    }
-
-    public static boolean isEnabled(OtmObject subject) {
-        return subject.isEditable();
-    }
-
-    @Override
-    public String toString() {
-        return "Changed description to " + newString;
-    }
-
 }

@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
@@ -28,13 +29,21 @@ import org.opentravel.schemacompiler.validate.ValidationFindings;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
+
 /**
  * Action manager base class. Implements factory and queue management.
  * 
  * @author dmh
  *
  */
-public abstract class DexActionManagerBase implements DexActionManager {
+public abstract class DexActionManagerBase implements DexActionManagerCore {
     private static Log log = LogFactory.getLog( DexActionManagerBase.class );
 
     // public enum DexActions {
@@ -138,6 +147,28 @@ public abstract class DexActionManagerBase implements DexActionManager {
     // }
     // }
 
+    public BooleanProperty add(DexActions action, boolean currentValue, OtmObject subject) {
+        BooleanProperty property = null;
+        if (subject.isEditable() && isEnabled( action, subject )) {
+            property = new SimpleBooleanProperty( currentValue );
+            addAction( action, property, subject );
+        } else
+            property = new ReadOnlyBooleanWrapper( currentValue );
+        return property;
+    }
+
+    @Override
+    public StringProperty add(DexActions action, String value, OtmObject subject) {
+        StringProperty property = null;
+        if (subject.isEditable() && isEnabled( action, subject )) {
+            property = new SimpleStringProperty( value );
+            addAction( action, property, (OtmModelElement<?>) subject );
+        } else
+            property = new ReadOnlyStringWrapper( value );
+        return property;
+    }
+
+
     @Override
     public DexAction<?> actionFactory(DexActions actionType, OtmObject subject) {
         DexAction<?> action = null;
@@ -157,6 +188,36 @@ public abstract class DexActionManagerBase implements DexActionManager {
         }
         return action;
     }
+
+    /**
+     * Change Listener for actions on strings. Assigned to observable strings by
+     * {@link DexFullActionManager#addAction(DexActionManager.DexActions, ObservableValue, OtmModelElement)}
+     * 
+     * @param action DexStringAction to execute
+     * @param o observable
+     * @param oldString
+     * @param newString
+     */
+    protected void doString(DexStringAction action, ObservableValue<? extends String> o, String oldString,
+        String newString) {
+        if (!ignore) {
+            ignore = true;
+            action.doIt( o, oldString, newString );
+            ignore = false;
+        }
+    }
+
+    /**
+     * Change Listener for actions on booleans.
+     */
+    protected void doBoolean(DexBooleanAction action, ObservableValue<? extends Boolean> o) {
+        if (!ignore) {
+            ignore = true;
+            action.doIt( o );
+            ignore = false;
+        }
+    }
+
     // public DexStringAction stringActionFactory(DexActions action, OtmModelElement<?> subject) {
     // // Make sure the action can register itself and access main controller
     // if (subject.getActionManager() == null)
@@ -181,16 +242,16 @@ public abstract class DexActionManagerBase implements DexActionManager {
         return queue.peek() != null ? queue.peek().getClass().getSimpleName() : "";
     }
 
-    // Used to get imageMrg to OtmModelElement
-    @Override
-    public DexMainController getMainController() {
-        return mainController;
-    }
+    // // Used to get imageMrg to OtmModelElement
+    // @Override
+    // public DexMainController getMainController() {
+    // return mainController;
+    // }
 
-    @Override
-    public OtmModelManager getModelManager() {
-        return modelManager;
-    }
+    // @Override
+    // public OtmModelManager getModelManager() {
+    // return modelManager;
+    // }
 
     @Override
     public int getQueueSize() {

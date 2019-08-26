@@ -21,6 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.dex.actions.DexActionManager.DexActions;
+import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
@@ -48,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -55,7 +58,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 
@@ -148,7 +150,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     public void setBasePath(String basePath, boolean override) {
         getTL().setBasePath( basePath );
         if (override)
-            getActionRequests().forEach( ar -> ar.getTL().setPathTemplate( basePath ) );
+            getActionRequests().forEach( ar -> ar.setPathTemplate( basePath, override ) );
         refresh( true );
     }
 
@@ -157,7 +159,16 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     public StringProperty basePathProperty() {
-        return new ReadOnlyStringWrapper( getBasePath() );
+        return getActionManager() != null ? getActionManager().add( DexActions.BASEPATHCHANGE, getBasePath(), this )
+            : new ReadOnlyStringWrapper( getBasePath() );
+
+        // Question - what to use as action enum? Field or base path?
+        // StringProperty bpProperty = new ReadOnlyStringWrapper( getBasePath() );
+        // if (isEditable() && getActionManager() != null) {
+        // bpProperty = new SimpleStringProperty( getBasePath() );
+        // getActionManager().addAction( DexActions.BASEPATHCHANGE, bpProperty, this );
+        // }
+        // return bpProperty;
     }
 
     @Override
@@ -377,6 +388,17 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     /**
+     * {@link TLResource#setExtension()}
+     * 
+     * @param extensionName
+     */
+    public void setExtendedResource(String extensionName) {
+        getTL().setExtension( null );
+        // FIXME - get the candidate list and match one
+        log.debug( "FIXME Set extension to " + extensionName );
+    }
+
+    /**
      * @see org.opentravel.model.OtmTypeUser#setTLTypeName(java.lang.String)
      */
     @Override
@@ -411,6 +433,15 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     /**
+     * Get the name with prefix of the extended resource or else "None"
+     * 
+     * @return
+     */
+    public String getExtendedResourceName() {
+        return getExtendedResource() == null ? NONE : getExtendedResource().getNameWithPrefix();
+    }
+
+    /**
      * 
      * If this is a minor version, returns ONLY the name of the extension object
      * 
@@ -425,18 +456,40 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return candidates;
     }
 
-    private Node getExtensionNode() {
-        ComboBox<String> box = new ComboBox<>( getExtensionCandidates() );
-        // box.setEditable( isEditable() ); -- do not use. editable allows typing into the combo box
+    // private Node getExtensionNode() {
+    // ComboBox<String> box = new ComboBox<>( getExtensionCandidates() );
+    // // box.setEditable( isEditable() ); -- do not use. editable allows typing into the combo box
+    // if (getExtendedResource() != null)
+    // box.getSelectionModel().select( getExtendedResource().getNameWithPrefix() );
+    // else
+    // box.getSelectionModel().select( NONE );
+    // // TO DO - create a cell factory to make them more visable.
+    // box.setDisable( !isEditable() );
+    // box.setOnAction( a -> log.debug( "Extension Selected" ) );
+    // // TO DO - how to set the selected value in the lamda?
+    // return box;
+    // }
+
+    private Node getExtensionNode(DexIncludedController<?> ec) {
+        StringProperty selection = null;
         if (getExtendedResource() != null)
-            box.getSelectionModel().select( getExtendedResource().getNameWithPrefix() );
+            selection = getActionManager().add( DexActions.SETRESOURCEEXTENSION,
+                getExtendedResource().getNameWithPrefix(), this );
         else
-            box.getSelectionModel().select( NONE );
-        // TO DO - create a cell factory to make them more visable.
-        box.setDisable( !isEditable() );
-        box.setOnAction( a -> log.debug( "Extension Selected" ) );
+            selection = getActionManager().add( DexActions.SETRESOURCEEXTENSION, NONE, this );
+        return DexEditField.makeComboBox( getExtensionCandidates(), selection, ec, this );
+
+        // ComboBox<String> box = new ComboBox<>( getExtensionCandidates() );
+        // // box.setEditable( isEditable() ); -- do not use. editable allows typing into the combo box
+        // if (getExtendedResource() != null)
+        // box.getSelectionModel().select( getExtendedResource().getNameWithPrefix() );
+        // else
+        // box.getSelectionModel().select( NONE );
+        // // TO DO - create a cell factory to make them more visable.
+        // box.setDisable( !isEditable() );
+        // box.setOnAction( a -> log.debug( "Extension Selected" ) );
         // TO DO - how to set the selected value in the lamda?
-        return box;
+        // return box;
     }
 
     private Node getSubectNode() {
@@ -446,19 +499,28 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return button;
     }
 
-    private Node getBasePathNode() {
-        TextField field = DexEditField.makeTextField( getBasePath(), this );
+    private Node getBasePathNode(DexIncludedController<?> ec) {
+        TextField field = DexEditField.makeTextField( basePathProperty(), ec, this );
+        // TextField field = DexEditField.makeTextField( getBasePath(), this );
+        if (basePathProperty().isEmpty().get())
+            field.setPromptText( basePath_PROMPT );
+        // field.setOnAction( a -> setBasePath( "NEW PATH", true ) );
         return field;
     }
+
 
 
     public boolean isAbstract() {
         return getTL().isAbstract();
     }
 
-    private Node getIsAbstractNode() {
-        CheckBox box = DexEditField.makeCheckBox( isAbstract(), abstract_LABEL, this );
-        box.setOnAction( a -> log.debug( "Abstract check box selected." ) );
+    private Node getIsAbstractNode(DexIncludedController<?> ec) {
+
+        BooleanProperty abstractProperty = getActionManager().add( DexActions.SETABSTRACT, isAbstract(), this );
+        CheckBox box = DexEditField.makeCheckBox( abstractProperty, abstract_LABEL, ec, this );
+
+        // CheckBox box = DexEditField.makeCheckBox( isAbstract(), abstract_LABEL, this );
+        // box.setOnAction( a -> log.debug( "Abstract check box selected." ) );
         return box;
     }
 
@@ -466,9 +528,13 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return getTL().isFirstClass();
     }
 
-    private Node getIsFirstClassNode() {
-        CheckBox box = DexEditField.makeCheckBox( isFirstClass(), firstClass_LABEL, this );
-        box.setOnAction( a -> log.debug( "First class check box selected." ) );
+    private Node getIsFirstClassNode(DexIncludedController<?> ec) {
+        // SimpleBooleanProperty firstClassProperty = new SimpleBooleanProperty( isFirstClass() );
+        BooleanProperty firstClassProperty = getActionManager().add( DexActions.SETFIRSTCLASS, isFirstClass(), this );
+        // getActionManager().addAction( DexActions.BASEPATHCHANGE, firstClassProperty, this );
+        CheckBox box = DexEditField.makeCheckBox( firstClassProperty, firstClass_LABEL, ec, this );
+        // CheckBox box = DexEditField.makeCheckBox( isFirstClass(), firstClass_LABEL, this );
+        // box.setOnAction( a -> log.debug( "First class check box selected." ) );
         return box;
     }
 
@@ -480,26 +546,44 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     // FIXME
     // Add namespace to fields.
-    public List<DexEditField> getFields() {
+    /**
+     * Get the fields for this object.
+     * 
+     * @param ec controller that can fire events when resource changes
+     * @return
+     */
+    public List<DexEditField> getFields(DexIncludedController<?> ec) {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, extension_LABEL, extension_TOOLTIP, getExtensionNode() ) );
+        fields.add( new DexEditField( 0, 0, extension_LABEL, extension_TOOLTIP, getExtensionNode( ec ) ) );
         fields.add( new DexEditField( 1, 0, businessObject_LABEL, businessObject_TOOLTIP, getSubectNode() ) );
-        fields.add( new DexEditField( 2, 0, basePath_LABEL, basePath_TOOLTIP, getBasePathNode() ) );
-        fields.add( new DexEditField( 3, 0, null, abstract_TOOLTIP, getIsAbstractNode() ) );
-        fields.add( new DexEditField( 3, 1, null, firstClass_TOOLTIP, getIsFirstClassNode() ) );
-
-        // fields.add( new DexEditField( 1, 0, name_LABEL, name_TOOLTIP, new Button() ) );
-        // fields.add( new DexEditField( 1, 0, parentRef_LABEL, parentRef_TOOLTIP, new Button() ) );
-        // fields.add( new DexEditField( 1, 0, parent_LABEL, parent_TOOLTIP, new Button() ) );
+        fields.add( new DexEditField( 2, 0, basePath_LABEL, basePath_TOOLTIP, getBasePathNode( ec ) ) );
+        fields.add( new DexEditField( 3, 0, null, abstract_TOOLTIP, getIsAbstractNode( ec ) ) );
+        fields.add( new DexEditField( 3, 1, null, firstClass_TOOLTIP, getIsFirstClassNode( ec ) ) );
         return fields;
+
     }
+
+    // public List<DexEditField> getFields() {
+    // List<DexEditField> fields = new ArrayList<>();
+    // fields.add( new DexEditField( 0, 0, extension_LABEL, extension_TOOLTIP, getExtensionNode() ) );
+    // fields.add( new DexEditField( 1, 0, businessObject_LABEL, businessObject_TOOLTIP, getSubectNode() ) );
+    // fields.add( new DexEditField( 2, 0, basePath_LABEL, basePath_TOOLTIP, getBasePathNode() ) );
+    // fields.add( new DexEditField( 3, 0, null, abstract_TOOLTIP, getIsAbstractNode( null ) ) );
+    // fields.add( new DexEditField( 3, 1, null, firstClass_TOOLTIP, getIsFirstClassNode( null ) ) );
+    //
+    // // fields.add( new DexEditField( 1, 0, name_LABEL, name_TOOLTIP, new Button() ) );
+    // // fields.add( new DexEditField( 1, 0, parentRef_LABEL, parentRef_TOOLTIP, new Button() ) );
+    // // fields.add( new DexEditField( 1, 0, parent_LABEL, parent_TOOLTIP, new Button() ) );
+    // return fields;
+    // }
 
     private static final String TOOLTIP =
         "Encapsulates all aspects of a RESTful resource used to expose and manage a particular business object.";
 
-    private static final String name_LABEL = "Resource Name";
-    private static final String name_TOOLTIP =
-        "The name of the resource.  This name is used to uniquely identify the resource within the OTM model, but will not conflict with any naming conventions used in generated XSD documents.";
+    // private static final String name_LABEL = "Resource Name";
+    // private static final String name_TOOLTIP =
+    // "The name of the resource. This name is used to uniquely identify the resource within the OTM model, but will not
+    // conflict with any naming conventions used in generated XSD documents.";
 
     private static final String businessObject_LABEL = "Business Object";
     private static final String businessObject_TOOLTIP =
@@ -514,10 +598,11 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     private static final String basePath_LABEL = "Base Path";
     private static final String basePath_TOOLTIP =
-        "Specifies the base path for this resource.  In usage, do not enter the name of the object because parameters are not allowed within a resource's base path. ";
+        "Specifies the base path for this resource. Changing will cause changes to action request path templates. ";
+    private static final String basePath_PROMPT = "Enter / to use the business object name as the collection name.";
 
-    private static final String parentRef_LABEL = "Parent";
-    private static final String parentRef_TOOLTIP = " The list of parent references for the resource. ";
+    // private static final String parentRef_LABEL = "Parent";
+    // private static final String parentRef_TOOLTIP = " The list of parent references for the resource. ";
 
     private static final String extension_LABEL = "Extends";
     private static final String extension_TOOLTIP =
@@ -622,6 +707,15 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      */
     public void setFirstClass(boolean b) {
         getTL().setFirstClass( b );
+        refresh( true );
+        log.debug( "First class set to " + isFirstClass() );
+    }
+
+    /**
+     * @param b
+     */
+    public void setAbstract(boolean b) {
+        getTL().setAbstract( b );
         refresh( true );
     }
 }

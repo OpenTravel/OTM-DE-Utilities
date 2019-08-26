@@ -21,6 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.dex.actions.DexActionManager.DexActions;
+import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -29,11 +31,11 @@ import org.opentravel.schemacompiler.model.TLResourceParentRef;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 
 /**
@@ -91,33 +93,72 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
         return (OtmParameterGroup) OtmModelElement.get( getTL().getParentParamGroup() );
     }
 
-    private Node getParentNode() {
-        String selection = "";
+    public String getParentResourceName() {
+        return getParentResource() != null ? getParentResource().getName() : "";
+    }
+
+    public void setParentResource(String name) {
+        log.error( "FIXME - set parent resource to " + name );
+    }
+
+    private Node getParentNode(DexIncludedController<?> ec) {
+        StringProperty selection = null;
         if (getParentResource() != null)
-            selection = getParentResource().getNameWithPrefix();
-        ComboBox<String> box = DexEditField.makeComboBox( getParentCandidates(), selection, this );
+            selection = getActionManager().add( DexActions.SETPARENTREFPARENT, getParentResourceName(), this );
+        else
+            selection = getActionManager().add( DexActions.SETPARENTREFPARENT, "", this );
+        ComboBox<String> box = DexEditField.makeComboBox( getParentCandidates(), selection, ec, this );
         return box;
     }
 
-    private Node getParameterGroupNode() {
-        ObservableList<String> groups = FXCollections.observableArrayList();
+    public ObservableList<String> getParameterGroupCandidates() {
+        ObservableList<String> candidates = FXCollections.observableArrayList();
         if (getParentResource() != null)
-            getParentResource().getParameterGroups().forEach( pg -> groups.add( pg.getName() ) );
-        ComboBox<String> box = DexEditField.makeComboBox( groups, getTL().getParentParamGroupName(), this );
-        return box;
+            getParentResource().getParameterGroups().forEach( pg -> candidates.add( pg.getName() ) );
+        return candidates;
     }
 
-    private Node getPathNode() {
-        TextField field = DexEditField.makeTextField( getTL().getPathTemplate(), this );
-        return field;
+    private Node getParameterGroupNode(DexIncludedController<?> ec) {
+        StringProperty selection =
+            getActionManager().add( DexActions.SETPARENTPARAMETERGROUP, getParameterGroupName(), this );
+        return DexEditField.makeComboBox( getParameterGroupCandidates(), selection, ec, this );
+    }
+
+    public String getParameterGroupName() {
+        return getTL().getParentParamGroupName();
+    }
+
+    /**
+     * @param path is the string to set or null
+     * @return
+     */
+    public void setPathTemplate(String path) {
+        getTL().setPathTemplate( path );
+    }
+
+    /**
+     * @return
+     */
+    public String getPathTemplate() {
+        return getTL().getPathTemplate();
+    }
+
+    public void setParameterGroup(String name) {
+        // getTL().getParentParamGroupName();
+        log.error( "FIXME - set parameter group name to " + name );
+    }
+
+    private Node getPathNode(DexIncludedController<?> ec) {
+        StringProperty selection = getActionManager().add( DexActions.SETPARENTPATHTEMPLATE, getPathTemplate(), this );
+        return DexEditField.makeTextField( selection, ec, this );
     }
 
     @Override
-    public List<DexEditField> getFields() {
+    public List<DexEditField> getFields(DexIncludedController<?> ec) {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, PARENT_LABEL, PARENT_TOOLTIP, getParentNode() ) );
-        fields.add( new DexEditField( 1, 0, PARAM_GROUP_LABEL, PARAM_GROUP_TOOLTIP, getParameterGroupNode() ) );
-        fields.add( new DexEditField( 2, 0, PATH_LABEL, PATH_LABEL, getPathNode() ) );
+        fields.add( new DexEditField( 0, 0, PARENT_LABEL, PARENT_TOOLTIP, getParentNode( ec ) ) );
+        fields.add( new DexEditField( 1, 0, PARAM_GROUP_LABEL, PARAM_GROUP_TOOLTIP, getParameterGroupNode( ec ) ) );
+        fields.add( new DexEditField( 2, 0, PATH_LABEL, PATH_LABEL, getPathNode( ec ) ) );
         return fields;
     }
 
@@ -136,20 +177,6 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
     private static final String PARENT_LABEL = "Parent";
     private static final String PARENT_TOOLTIP = "Specifies a parent reference for a REST resource.";
 
-    /**
-     * @param path is the string to set or null
-     * @return
-     */
-    public void setPathTemplate(String path) {
-        getTL().setPathTemplate( path );
-    }
-
-    /**
-     * @return
-     */
-    public String getPathTemplate() {
-        return getTL().getPathTemplate();
-    }
 
 
 }
