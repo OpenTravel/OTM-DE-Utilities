@@ -32,7 +32,7 @@ public class SetParentRefParentAction extends DexStringAction {
     }
 
     protected void set(String value) {
-        getSubject().setParentResource( value );
+        getSubject().setParentResourceString( value );
     }
 
     protected String get() {

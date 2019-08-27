@@ -52,7 +52,19 @@ import javafx.scene.control.Tooltip;
 public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmResourceChild, OtmChildrenOwner {
     private static Log log = LogFactory.getLog( OtmAction.class );
 
+    private static final String TOOLTIP = "Specify an action request and possible responses.";
+
+    private static final String COMMON_LABEL = "Common";
+
+    private static final String COMMON_TOOLTIP =
+        "Indicates that the action is a common or shared action, meaning that all other actions defined for the resource will inherit the characteristics (typically responses) defined for it.";
+
     private DexParentRefsEndpointMap endpoints = null;
+
+    public OtmAction(String name, OtmResource parent) {
+        super( new TLAction(), parent );
+        setName( name );
+    }
 
     public OtmAction(TLAction tla, OtmResource parent) {
         super( tla, parent );
@@ -62,21 +74,50 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
     }
 
     @Override
-    public Icons getIconType() {
-        return ImageManager.Icons.RESOURCE_ACTION;
+    public OtmObject add(OtmObject child) {
+        if (child instanceof OtmActionRequest || child instanceof OtmActionResponse)
+            if (!children.contains( child ))
+                children.add( child );
+        return null;
     }
 
-    /**
-     * @see org.opentravel.model.OtmModelElement#getName()
-     */
+
+
     @Override
-    public String getName() {
-        return getTL().getActionId();
+    public List<OtmObject> getChildren() {
+        if (children != null && children.isEmpty())
+            modelChildren();
+        return children;
     }
 
-    public OtmAction(String name, OtmResource parent) {
-        super( new TLAction(), parent );
-        setName( name );
+    @Override
+    public Collection<OtmObject> getChildrenHierarchy() {
+        return getChildren();
+    }
+
+    @Override
+    public Collection<OtmTypeProvider> getChildrenTypeProviders() {
+        return Collections.emptyList();
+    }
+
+    private Node getCommonNode(DexIncludedController<?> ec) {
+        BooleanProperty commonProperty = getActionManager().add( DexActions.SETCOMMONACTION, isCommon(), this );
+        return DexEditField.makeCheckBox( commonProperty, COMMON_LABEL, ec, this );
+    }
+
+    @Override
+    public Collection<OtmChildrenOwner> getDescendantsChildrenOwners() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<OtmTypeProvider> getDescendantsTypeProviders() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<OtmTypeUser> getDescendantsTypeUsers() {
+        return Collections.emptyList();
     }
 
     /**
@@ -112,7 +153,30 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         return path.toString();
     }
 
+    @Override
+    public List<DexEditField> getFields(DexIncludedController<?> ec) {
+        List<DexEditField> fields = new ArrayList<>();
+        fields.add( new DexEditField( 0, 0, null, COMMON_TOOLTIP, getCommonNode( ec ) ) );
+        return fields;
+    }
 
+    @Override
+    public Icons getIconType() {
+        return ImageManager.Icons.RESOURCE_ACTION;
+    }
+
+    @Override
+    public List<OtmObject> getInheritedChildren() {
+        return inheritedChildren != null ? inheritedChildren : Collections.emptyList();
+    }
+
+    /**
+     * @see org.opentravel.model.OtmModelElement#getName()
+     */
+    @Override
+    public String getName() {
+        return getTL().getActionId();
+    }
 
     public OtmActionRequest getRequest() {
         return (OtmActionRequest) OtmModelElement.get( getTL().getRequest() );
@@ -129,51 +193,22 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         return (TLAction) tlObject;
     }
 
-    @Override
-    public Collection<OtmObject> getChildrenHierarchy() {
-        return getChildren();
+    public Tooltip getTooltip() {
+        return new Tooltip( TOOLTIP );
     }
 
-    @Override
-    public OtmObject add(OtmObject child) {
-        if (child instanceof OtmActionRequest || child instanceof OtmActionResponse)
-            if (!children.contains( child ))
-                children.add( child );
-        return null;
+    public boolean isCommon() {
+        return getTL().isCommonAction();
     }
 
+    /**
+     * @see org.opentravel.model.OtmChildrenOwner#isExpanded()
+     */
     @Override
-    public List<OtmObject> getChildren() {
-        if (children != null && children.isEmpty())
-            modelChildren();
-        return children;
+    public boolean isExpanded() {
+        // TODO Auto-generated method stub
+        return false;
     }
-
-    @Override
-    public List<OtmObject> getInheritedChildren() {
-        return inheritedChildren != null ? inheritedChildren : Collections.emptyList();
-    }
-
-    @Override
-    public Collection<OtmTypeProvider> getChildrenTypeProviders() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Collection<OtmChildrenOwner> getDescendantsChildrenOwners() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Collection<OtmTypeProvider> getDescendantsTypeProviders() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Collection<OtmTypeUser> getDescendantsTypeUsers() {
-        return Collections.emptyList();
-    }
-
     /**
      * @see org.opentravel.model.OtmChildrenOwner#modelChildren()
      */
@@ -184,7 +219,6 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         if (getTL().getResponses() != null)
             getTL().getResponses().forEach( r -> new OtmActionResponse( r, this ) );
     }
-
     /**
      * @see org.opentravel.model.OtmChildrenOwner#modelInheritedChildren()
      */
@@ -204,40 +238,6 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
             }
         }
     }
-
-    /**
-     * @see org.opentravel.model.OtmChildrenOwner#isExpanded()
-     */
-    @Override
-    public boolean isExpanded() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public boolean isCommon() {
-        return getTL().isCommonAction();
-    }
-
-    private Node getCommonNode(DexIncludedController<?> ec) {
-        BooleanProperty commonProperty = getActionManager().add( DexActions.SETCOMMONACTION, isCommon(), this );
-        return DexEditField.makeCheckBox( commonProperty, COMMON_LABEL, ec, this );
-    }
-
-    @Override
-    public List<DexEditField> getFields(DexIncludedController<?> ec) {
-        List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, null, COMMON_TOOLTIP, getCommonNode( ec ) ) );
-        return fields;
-    }
-
-    public Tooltip getTooltip() {
-        return new Tooltip( TOOLTIP );
-    }
-
-    private static final String TOOLTIP = "Specify an action request and possible responses.";
-    private static final String COMMON_LABEL = "Common";
-    private static final String COMMON_TOOLTIP =
-        "Indicates that the action is a common or shared action, meaning that all other actions defined for the resource will inherit the characteristics (typically responses) defined for it.";
 
     /**
      * @param value

@@ -215,18 +215,30 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
         return new ReadOnlyStringWrapper( getPayloadName() );
     }
 
-    public void setPayloadActionFacetString(String value) {
-        log.error( "FIXME - Set action facet to " + value );
+    /**
+     * Set the payload action facet from owner's {@link OtmActionFacet#getName()} that matches value.
+     * 
+     * @param value
+     * @return
+     */
+    public OtmActionFacet setPayloadActionFacetString(String value) {
+        OtmActionFacet af = null;
+        for (OtmActionFacet c : getOwningMember().getActionFacets())
+            if (c.getName().equals( value ))
+                af = c;
+        return setPayloadActionFacet( af );
     }
 
     /**
      * @param action facet to set as payload type
      */
-    public void setPayloadActionFacet(OtmActionFacet actionFacet) {
+    public OtmActionFacet setPayloadActionFacet(OtmActionFacet actionFacet) {
         if (actionFacet != null)
             getTL().setPayloadType( actionFacet.getTL() );
         else
             getTL().setPayloadType( null );
+        log.debug( "Set action facet to " + getPayloadActionFacet() );
+        return getPayloadActionFacet();
     }
 
 

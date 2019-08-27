@@ -74,6 +74,26 @@ public class TestActionFacet<L extends TestOtmResourceBase<OtmActionFacet>>
     }
 
     @Test
+    public void testSetters() {
+        // Given a business object
+        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        bo.add( TestCustomFacet.buildOtm( staticModelManager ) );
+        bo.add( TestQueryFacet.buildOtm( staticModelManager ) );
+        // Given a resource
+        OtmResource resource = TestResource.buildOtm( staticModelManager );
+        resource.setSubject( bo );
+
+        // Given an action facet on that resource
+        OtmActionFacet af = buildOtm( resource );
+
+        af.getReferenceTypeCandidates().forEach( c -> af.setReferenceFacetName( c ) );
+
+        for (TLReferenceType t : TLReferenceType.values()) {
+            af.setReferenceTypeString( t.toString() );
+        }
+    }
+
+    @Test
     public void testGetReferenceFacet() {
         // Given a business object
         OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );

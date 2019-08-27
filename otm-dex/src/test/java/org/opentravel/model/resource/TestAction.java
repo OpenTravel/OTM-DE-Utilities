@@ -122,6 +122,16 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
     }
 
     @Test
+    public void testSetters() {
+        OtmAction a = buildOtm( testResource );
+
+        a.setCommon( true );
+        assertTrue( a.isCommon() );
+        a.setCommon( false );
+        assertFalse( a.isCommon() );
+    }
+
+    @Test
     public void testInheritedResponses() {
         // TODO
         // Make sure the inherited are not also children

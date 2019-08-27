@@ -32,7 +32,7 @@ public class SetParentParameterGroupAction extends DexStringAction {
     }
 
     protected void set(String value) {
-        getSubject().setParameterGroup( value );
+        getSubject().setParameterGroupString( value );
     }
 
     protected String get() {

@@ -96,6 +96,60 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
 
     }
 
+    @Test
+    public void testSetters() {
+        // Given a business object
+        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        bo.add( TestCustomFacet.buildOtm( staticModelManager ) );
+        bo.add( TestQueryFacet.buildOtm( staticModelManager ) );
+        // Given a resource
+        OtmResource resource = TestResource.buildOtm( staticModelManager );
+        resource.setSubject( bo );
+        // Given an action facet on that resource
+        OtmActionFacet af = TestActionFacet.buildOtm( resource );
+        // Given a core object set as base payload
+        OtmCore core = TestCore.buildOtm( staticModelManager );
+        af.setBasePayload( core );
+        // Given 3 more parameter groups
+        TestParamGroup.buildIdGroup( resource );
+        OtmParameterGroup pg = null;
+        for (int i = 1; i <= 3; i++) {
+            pg = TestParamGroup.buildOtm( resource );
+            pg.setName( "PG" + i );
+        }
+        assertTrue( resource.getParameterGroups().size() > 3 );
+        // Given - an action request
+        OtmActionRequest ar = resource.getActionRequests().get( 0 );
+        assertTrue( ar != null );
+
+        String value = null;
+        // Assure can set null without error
+        ar.setMethodString( value );
+        ar.setParamGroupString( value );
+        ar.setPathTemplate( value, true );
+        ar.setPayloadActionFacetString( value );
+
+        // Assure can be set to all candidate values
+        ar.getMethodCandidates().forEach( c -> assertTrue( ar.setMethodString( c ).toString().equals( c ) ) );
+        ar.getParameterGroupCandidates()
+            .forEach( c -> assertTrue( ar.setParamGroupString( c ).getName().equals( c ) ) );
+        ar.getPayloadCandidates()
+            .forEach( c -> assertTrue( ar.setPayloadActionFacetString( c ).getName().equals( c ) ) );
+
+        final String path1 = "/Path1";
+        final String path2 = "/Path2";
+
+        // Set path without parameters
+        assertTrue( ar.setPathTemplate( null, false ) == null );
+        assertTrue( ar.setPathTemplate( path1, false ).equals( path1 ) );
+        assertTrue( ar.setPathTemplate( path2, false ).equals( path2 ) );
+
+        // Set path with parameters
+        assertTrue( ar.setPathTemplate( null, true ) == null );
+        assertTrue( ar.setPathTemplate( path1, true ).startsWith( path1 ) );
+        assertTrue( ar.setPathTemplate( path2, true ).startsWith( path2 ) );
+    }
+
     /**
      * test with basePayload set
      */

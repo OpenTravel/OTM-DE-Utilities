@@ -201,7 +201,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     /**
      * @return all TL Modeled strings or for abstract resources just the first string (none)
      */
-    private ObservableList<String> getReferenceTypeCandidates() {
+    public ObservableList<String> getReferenceTypeCandidates() {
         ObservableList<String> candidates = FXCollections.observableArrayList();
         if (getOwningMember().isAbstract())
             candidates.add( TLReferenceType.values()[0].toString() );
@@ -303,8 +303,10 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         return getName();
     }
 
-    public void setReferenceFacetName(String name) {
-        log.error( "FIXME - set reference facet to " + name );
+    public String setReferenceFacetName(String name) {
+        getTL().setReferenceFacetName( name );
+        log.debug( "Set reference facet to " + name );
+        return getReferenceFacetName();
     }
 
     /**
@@ -323,18 +325,23 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         // log.debug( "Setting reference facet name to: " + name );
     }
 
-    public void setReferenceType(TLReferenceType type) {
+    public TLReferenceType setReferenceType(TLReferenceType type) {
         if (type == null)
             type = TLReferenceType.NONE;
         getTL().setReferenceType( type );
+        log.debug( "Set reference type to " + getReferenceType() );
+        return getReferenceType();
     }
-
 
     /**
      * @param value
      */
-    public void setReferenceTypeString(String value) {
-        log.error( "FIXME - Set reference type to " + value );
+    public TLReferenceType setReferenceTypeString(String value) {
+        TLReferenceType type = null;
+        for (TLReferenceType t : TLReferenceType.values())
+            if (t.toString().equals( value ))
+                type = t;
+        return setReferenceType( type );
     }
 
 }

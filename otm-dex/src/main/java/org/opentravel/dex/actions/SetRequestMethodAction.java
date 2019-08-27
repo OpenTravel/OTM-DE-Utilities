@@ -32,11 +32,11 @@ public class SetRequestMethodAction extends DexStringAction {
     }
 
     protected void set(String value) {
-        getSubject().setMethod( value );
+        getSubject().setMethodString( value );
     }
 
     protected String get() {
-        return getSubject().getMethod();
+        return getSubject().getMethodString();
     }
 
 

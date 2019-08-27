@@ -330,7 +330,8 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
             doc.setDescription( description );
         }
         // ModelEvents are only thrown when the documentation element changes.
-        descriptionProperty.setValue( description );
+        if (descriptionProperty != null)
+            descriptionProperty.setValue( description );
     }
 
     /**

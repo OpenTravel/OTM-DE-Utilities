@@ -16,6 +16,7 @@
 
 package org.opentravel.model.resource;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -25,16 +26,24 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmIdFacet;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
+import org.opentravel.model.otmLibraryMembers.TestCustomFacet;
+import org.opentravel.model.otmLibraryMembers.TestQueryFacet;
 import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLMemberField;
 import org.opentravel.schemacompiler.model.TLParamGroup;
 import org.opentravel.schemacompiler.model.TLParamLocation;
 import org.opentravel.schemacompiler.model.TLParameter;
+import org.opentravel.schemacompiler.model.TLResource;
+
+import java.util.List;
+
+import javafx.collections.ObservableList;
 
 /**
  * Test class for Action Facet resource descendants.
@@ -97,12 +106,43 @@ public class TestParamGroup extends TestOtmResourceBase<OtmParameterGroup> {
         }
     }
 
+    @Test
+    public void testSetters() {
+        // Given a business object
+        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        bo.add( TestCustomFacet.buildOtm( staticModelManager ) );
+        bo.add( TestQueryFacet.buildOtm( staticModelManager ) );
+        // Given a resource
+        OtmResource resource = TestResource.buildOtm( staticModelManager );
+        resource.setSubject( bo );
+        // Given a parameter group
+        OtmParameterGroup p = buildOtm( resource );
+
+        p.setIdGroup( false );
+        assertFalse( p.isIdGroup() );
+        p.setIdGroup( true );
+        assertTrue( p.isIdGroup() );
+
+        ObservableList<String> candidates = p.getReferenceFacetCandidates();
+        assertFalse( candidates.isEmpty() );
+        candidates.forEach( c -> assertTrue( c != null ) );
+        List<OtmObject> facets = p.getFacetCandidates();
+        assertFalse( facets.isEmpty() );
+        facets.forEach( c -> assertTrue( c != null ) );
+
+        for (String c : p.getReferenceFacetCandidates()) {
+            OtmObject result = p.setReferenceFacetString( c );
+            assertTrue( result != null );
+            assertTrue( result.getName().equals( c ) );
+        }
+    }
+
     public static OtmParameterGroup buildOtm(OtmResource testResource) {
-        OtmParameterGroup af = new OtmParameterGroup( buildTL(), testResource );
+        OtmParameterGroup af = new OtmParameterGroup( buildTL( testResource.getTL() ), testResource );
         return af;
     }
 
-    public static TLParamGroup buildTL() {
+    public static TLParamGroup buildTL(TLResource tlResource) {
         TLParamGroup tlpg = new TLParamGroup();
         tlpg.setName( "tlpg1" );
 
@@ -115,6 +155,7 @@ public class TestParamGroup extends TestOtmResourceBase<OtmParameterGroup> {
         tlp.setFieldRef( getMemberField() );
         tlpg.addParameter( tlp );
 
+        tlResource.addParamGroup( tlpg );
         return tlpg;
     }
 

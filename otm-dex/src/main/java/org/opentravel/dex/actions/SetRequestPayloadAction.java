@@ -32,7 +32,7 @@ public class SetRequestPayloadAction extends DexStringAction {
     }
 
     protected void set(String value) {
-        getSubject().setPayloadActionFacet( value );
+        getSubject().setPayloadActionFacetString( value );
     }
 
     protected String get() {

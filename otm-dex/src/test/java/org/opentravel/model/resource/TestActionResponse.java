@@ -54,6 +54,25 @@ public class TestActionResponse<L extends TestOtmResourceBase<OtmActionResponse>
         log.debug( "Before class ran." );
     }
 
+    @Test
+    public void testSetters() {
+        // Given a business object
+        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        bo.add( TestCustomFacet.buildOtm( staticModelManager ) );
+        bo.add( TestQueryFacet.buildOtm( staticModelManager ) );
+        // Given a core object to use as base payload
+        OtmCore core = TestCore.buildOtm( staticModelManager );
+        // Given a resource
+        OtmResource resource = TestResource.buildFullOtm( "SubjectCollection", "MySubject", staticModelManager );
+        resource.setSubject( bo );
+
+        for (OtmAction action : resource.getActions())
+            for (OtmActionResponse response : action.getResponses()) {
+                response.getPayloadCandidates()
+                    .forEach( c -> assertTrue( response.setPayloadActionFacetString( c ).getName().equals( c ) ) );
+            }
+    }
+
     /**
      * User is shown ???
      */

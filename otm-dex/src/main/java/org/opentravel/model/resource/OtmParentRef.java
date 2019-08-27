@@ -47,18 +47,34 @@ import javafx.scene.control.Tooltip;
 public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> implements OtmResourceChild {
     private static Log log = LogFactory.getLog( OtmParentRef.class );
 
+    private static final String TOOLTIP = "Specifies a parent reference for a REST resource.";
+
+    private static final String PARAM_GROUP_LABEL = "Parameter Group";
+
+    private static final String PARAM_GROUP_TOOLTIP =
+        "The name of the parameter group on the the parent resource with which this parent reference is associated.  The referenced group must be an ID parameter group.";
+
+    private static final String PATH_LABEL = "Path Template";
+
+    private static final String PATH_TOOLTIP =
+        "Specifies the path template for the parent resource. This path will be pre-pended to all action path templates when the child resource is treated as a sub-resource (non-first class).";
+
+    private static final String PARENT_LABEL = "Parent";
+
+    private static final String PARENT_TOOLTIP = "Specifies a parent reference for a REST resource.";
+
+
     public OtmParentRef(TLResourceParentRef tla, OtmResource owner) {
         super( tla, owner );
     }
 
     @Override
-    public String getName() {
-        return getParentResource().getName();
-    }
-
-    @Override
-    public TLResourceParentRef getTL() {
-        return (TLResourceParentRef) tlObject;
+    public List<DexEditField> getFields(DexIncludedController<?> ec) {
+        List<DexEditField> fields = new ArrayList<>();
+        fields.add( new DexEditField( 0, 0, PARENT_LABEL, PARENT_TOOLTIP, getParentNode( ec ) ) );
+        fields.add( new DexEditField( 1, 0, PARAM_GROUP_LABEL, PARAM_GROUP_TOOLTIP, getParameterGroupNode( ec ) ) );
+        fields.add( new DexEditField( 2, 0, PATH_LABEL, PATH_LABEL, getPathNode( ec ) ) );
+        return fields;
     }
 
     @Override
@@ -66,39 +82,46 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
         return ImageManager.Icons.RESOURCE_PARENTREF;
     }
 
-    private ObservableList<String> getParentCandidates() {
-        ObservableList<String> candidates = FXCollections.observableArrayList();
-        getOwningMember().getModelManager().getResources( true )
-            .forEach( r -> candidates.add( r.getNameWithPrefix() ) );
-        candidates.remove( getOwningMember().getNameWithPrefix() );
-        return candidates;
-    }
-
-    public OtmResource getParentResource() {
-        return (OtmResource) OtmModelElement.get( getTL().getParentResource() );
+    @Override
+    public String getName() {
+        return getParentResource().getName();
     }
 
     /**
-     * @return true if the parent resource exists and is first class
-     */
-    public boolean isParentFirstClass() {
-        return getParentResource() != null && getParentResource().isFirstClass();
-    }
-
-
-    /**
-     * @return the parameter group used by this parent reference.
+     * @return the parameter group used by this parent reference {@link TLResourceParentRef#getParentParamGroup()}.
      */
     public OtmParameterGroup getParameterGroup() {
         return (OtmParameterGroup) OtmModelElement.get( getTL().getParentParamGroup() );
     }
 
-    public String getParentResourceName() {
-        return getParentResource() != null ? getParentResource().getName() : "";
+    public ObservableList<String> getParameterGroupCandidates() {
+        ObservableList<String> candidates = FXCollections.observableArrayList();
+        if (getParentResource() != null)
+            getParentResource().getParameterGroups().forEach( pg -> candidates.add( pg.getName() ) );
+        return candidates;
     }
 
-    public void setParentResource(String name) {
-        log.error( "FIXME - set parent resource to " + name );
+    public String getParameterGroupName() {
+        return getTL().getParentParamGroupName();
+    }
+
+    private Node getParameterGroupNode(DexIncludedController<?> ec) {
+        StringProperty selection =
+            getActionManager().add( DexActions.SETPARENTPARAMETERGROUP, getParameterGroupName(), this );
+        return DexEditField.makeComboBox( getParameterGroupCandidates(), selection, ec, this );
+    }
+
+    /**
+     * Get all resources from the owner's model manager except the owner.
+     * 
+     * @return new observable list containing {@link OtmResource#getNameWithPrefix()}.
+     */
+    public ObservableList<String> getParentCandidates() {
+        ObservableList<String> candidates = FXCollections.observableArrayList();
+        getOwningMember().getModelManager().getResources( true )
+            .forEach( r -> candidates.add( r.getNameWithPrefix() ) );
+        candidates.remove( getOwningMember().getNameWithPrefix() );
+        return candidates;
     }
 
     private Node getParentNode(DexIncludedController<?> ec) {
@@ -111,29 +134,17 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
         return box;
     }
 
-    public ObservableList<String> getParameterGroupCandidates() {
-        ObservableList<String> candidates = FXCollections.observableArrayList();
-        if (getParentResource() != null)
-            getParentResource().getParameterGroups().forEach( pg -> candidates.add( pg.getName() ) );
-        return candidates;
+    public OtmResource getParentResource() {
+        return (OtmResource) OtmModelElement.get( getTL().getParentResource() );
     }
 
-    private Node getParameterGroupNode(DexIncludedController<?> ec) {
-        StringProperty selection =
-            getActionManager().add( DexActions.SETPARENTPARAMETERGROUP, getParameterGroupName(), this );
-        return DexEditField.makeComboBox( getParameterGroupCandidates(), selection, ec, this );
+    public String getParentResourceName() {
+        return getParentResource() != null ? getParentResource().getName() : "";
     }
 
-    public String getParameterGroupName() {
-        return getTL().getParentParamGroupName();
-    }
-
-    /**
-     * @param path is the string to set or null
-     * @return
-     */
-    public void setPathTemplate(String path) {
-        getTL().setPathTemplate( path );
+    private Node getPathNode(DexIncludedController<?> ec) {
+        StringProperty selection = getActionManager().add( DexActions.SETPARENTPATHTEMPLATE, getPathTemplate(), this );
+        return DexEditField.makeTextField( selection, ec, this );
     }
 
     /**
@@ -143,39 +154,79 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
         return getTL().getPathTemplate();
     }
 
-    public void setParameterGroup(String name) {
-        // getTL().getParentParamGroupName();
-        log.error( "FIXME - set parameter group name to " + name );
-    }
-
-    private Node getPathNode(DexIncludedController<?> ec) {
-        StringProperty selection = getActionManager().add( DexActions.SETPARENTPATHTEMPLATE, getPathTemplate(), this );
-        return DexEditField.makeTextField( selection, ec, this );
-    }
-
     @Override
-    public List<DexEditField> getFields(DexIncludedController<?> ec) {
-        List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, PARENT_LABEL, PARENT_TOOLTIP, getParentNode( ec ) ) );
-        fields.add( new DexEditField( 1, 0, PARAM_GROUP_LABEL, PARAM_GROUP_TOOLTIP, getParameterGroupNode( ec ) ) );
-        fields.add( new DexEditField( 2, 0, PATH_LABEL, PATH_LABEL, getPathNode( ec ) ) );
-        return fields;
+    public TLResourceParentRef getTL() {
+        return (TLResourceParentRef) tlObject;
     }
 
     public Tooltip getTooltip() {
         return new Tooltip( TOOLTIP );
     }
 
-    private static final String TOOLTIP = "Specifies a parent reference for a REST resource.";
+    /**
+     * @return true if the parent resource exists and is first class
+     */
+    public boolean isParentFirstClass() {
+        return getParentResource() != null && getParentResource().isFirstClass();
+    }
 
-    private static final String PARAM_GROUP_LABEL = "Parameter Group";
-    private static final String PARAM_GROUP_TOOLTIP =
-        "The name of the parameter group on the the parent resource with which this parent reference is associated.  The referenced group must be an ID parameter group.";
-    private static final String PATH_LABEL = "Path Template";
-    private static final String PATH_TOOLTIP =
-        "Specifies the path template for the parent resource. This path will be pre-pended to all action path templates when the child resource is treated as a sub-resource (non-first class).";
-    private static final String PARENT_LABEL = "Parent";
-    private static final String PARENT_TOOLTIP = "Specifies a parent reference for a REST resource.";
+    public OtmParameterGroup setParameterGroup(OtmParameterGroup parentParameterGroup) {
+        if (parentParameterGroup != null)
+            getTL().setParentParamGroup( parentParameterGroup.getTL() );
+        else
+            getTL().setParentParamGroup( null );
+        log.error( "Set parameter group name to " + getParameterGroup() );
+        return (getParameterGroup());
+    }
+
+    /**
+     * Set the parameter group from the parent's parameter groups that {@link OtmParameterGroup#getName()} match the
+     * name
+     * 
+     * @param name
+     * @return the actual group set or null
+     */
+    public OtmParameterGroup setParameterGroupString(String name) {
+        OtmParameterGroup pg = null;
+        for (OtmParameterGroup c : getParentResource().getParameterGroups())
+            if (c.getName().equals( name ))
+                pg = c;
+        return setParameterGroup( pg );
+    }
+
+    /**
+     * Set the parent resource to a resource from the model manager whose {@link OtmResource#getNameWithPrefix()}
+     * matches value.
+     * 
+     * @param value
+     * @return actual resource set or null
+     */
+    public OtmResource setParentResourceString(String value) {
+        OtmResource r = null;
+        for (OtmResource c : getOwningMember().getModelManager().getResources( false ))
+            if (c.getNameWithPrefix().equals( value ))
+                r = c;
+
+        return setParentResource( r );
+    }
+
+    public OtmResource setParentResource(OtmResource resource) {
+        if (resource != null)
+            getTL().setParentResource( resource.getTL() );
+        else
+            getTL().setParentResource( null );
+        log.debug( "Set parent resource to " + getParentResource() );
+        return getParentResource();
+    }
+
+    /**
+     * @param path is the string to set or null
+     * @return actual set string or null
+     */
+    public String setPathTemplate(String path) {
+        getTL().setPathTemplate( path );
+        return getTL().getPathTemplate();
+    }
 
 
 

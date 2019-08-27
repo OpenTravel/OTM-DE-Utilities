@@ -32,7 +32,7 @@ public class SetRequestParameterGroupAction extends DexStringAction {
     }
 
     protected void set(String value) {
-        getSubject().setParamGroup( value );
+        getSubject().setParamGroupString( value );
     }
 
     protected String get() {

@@ -108,6 +108,73 @@ public class TestParentRef<L extends TestOtmResourceBase<OtmParentRef>> extends 
     }
 
 
+    @Test
+    public void testSetters() {
+        // Given two resources
+        OtmResource p = TestResource.buildFullOtm( "/foo", "Foo", staticModelManager );
+        OtmResource r = TestResource.buildFullOtm( "bar", "Bar", staticModelManager );
+        // Given one is the parent and one is owner of parent ref
+        OtmParentRef pr = r.addParentRef( p );
+        check( pr, r, p );
+
+        final String s1 = "HowAboutThis";
+        final String s2 = "And this is different";
+        pr.setDescription( s1 );
+        assertTrue( s1.equals( pr.getDescription() ) );
+        assertTrue( pr.setName( s1 ).equals( pr.getName() ) );
+        pr.setDescription( s2 );
+        assertTrue( s2.equals( pr.getDescription() ) );
+        // assertFalse( pr.setName( s1 ).equals( pr.getName() ) );
+
+        // Given 3 more resources
+        TestResource.buildFullOtm( "/foo1", "Foo1", staticModelManager );
+        TestResource.buildFullOtm( "/foo2", "Foo2", staticModelManager );
+        TestResource.buildFullOtm( "/foo3", "Foo3", staticModelManager );
+        assertTrue( staticModelManager.getResources( false ).size() > 3 );
+
+        staticModelManager.getResources( false ).forEach( rs -> pr.setParentResource( rs ) );
+
+        pr.getParentCandidates()
+            .forEach( c -> assertTrue( pr.setParentResourceString( c ).getNameWithPrefix().equals( c ) ) );
+    }
+
+    @Test
+    public void testSetters_ParameterGroup() {
+        // Given two resources
+        OtmResource p = TestResource.buildFullOtm( "/foo", "Foo", staticModelManager );
+        OtmResource r = TestResource.buildFullOtm( "bar", "Bar", staticModelManager );
+        // Given one is the parent and one is owner of parent ref
+        OtmParentRef pr = r.addParentRef( p );
+        check( pr, r, p );
+
+        // When set to null
+        assertTrue( pr.setParameterGroupString( null ) == null );
+
+        // When set to a candidate value
+        pr.getParameterGroupCandidates()
+            .forEach( c -> assertTrue( pr.setParameterGroupString( c ).getName().equals( c ) ) );
+    }
+
+    @Test
+    public void testSetters_PathTemplate() {
+        // Given two resources
+        OtmResource p = TestResource.buildFullOtm( "/foo", "Foo", staticModelManager );
+        OtmResource r = TestResource.buildFullOtm( "bar", "Bar", staticModelManager );
+        // Given one is the parent and one is owner of parent ref
+        OtmParentRef pr = r.addParentRef( p );
+        check( pr, r, p );
+
+
+        final String path1 = "/Path1";
+        final String path2 = "/Path2";
+
+        // Set path
+        assertTrue( pr.setPathTemplate( null ) == null );
+        assertTrue( pr.setPathTemplate( path1 ).equals( path1 ) );
+        assertTrue( pr.setPathTemplate( path2 ).equals( path2 ) );
+
+    }
+
     public static OtmParentRef buildOtm(OtmResource owner) {
         OtmParentRef pr = new OtmParentRef( buildTL(), owner );
         return pr;
