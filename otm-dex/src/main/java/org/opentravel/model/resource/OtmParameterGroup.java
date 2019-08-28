@@ -21,8 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
-import org.opentravel.dex.actions.DexActionManager.DexActions;
-import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
@@ -120,11 +119,10 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
      * {@inheritDoc}
      */
     @Override
-    public List<DexEditField> getFields(DexIncludedController<?> ec) {
+    public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add(
-            new DexEditField( 0, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, getReferenceFacetNode( ec ) ) );
-        fields.add( new DexEditField( 1, 0, null, IDGROUP_TOOLTIP, getIdGroupNode( ec ) ) );
+        fields.add( new DexEditField( 0, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, getReferenceFacetNode() ) );
+        fields.add( new DexEditField( 1, 0, null, IDGROUP_TOOLTIP, getIdGroupNode() ) );
         return fields;
     }
 
@@ -133,9 +131,9 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         return ImageManager.Icons.RESOURCE_PARAMETERGROUP;
     }
 
-    public Node getIdGroupNode(DexIncludedController<?> ec) {
+    public Node getIdGroupNode() {
         BooleanProperty idGroupProperty = getActionManager().add( DexActions.SETIDGROUP, isIdGroup(), this );
-        return DexEditField.makeCheckBox( idGroupProperty, IDGROUP_LABEL, ec, this );
+        return DexEditField.makeCheckBox( idGroupProperty, IDGROUP_LABEL );
     }
 
     @Override
@@ -177,10 +175,10 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         return OtmModelElement.get( getTL().getFacetRef() );
     }
 
-    public Node getReferenceFacetNode(DexIncludedController<?> ec) {
+    public Node getReferenceFacetNode() {
         StringProperty selection =
             getActionManager().add( DexActions.SETPARAMETERGROUPFACET, getReferenceFacetName(), this );
-        return DexEditField.makeComboBox( getReferenceFacetCandidates(), selection, ec, this );
+        return DexEditField.makeComboBox( getReferenceFacetCandidates(), selection );
 
         // ComboBox<String> box = new ComboBox<>( getSubjectFacetCandidates() );
         // box.setEditable( getOwningMember().isEditable() );

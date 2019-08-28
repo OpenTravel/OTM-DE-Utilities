@@ -24,19 +24,21 @@ import org.opentravel.model.otmLibraryMembers.OtmResource;
 import javafx.event.EventType;
 
 /**
- * OTM DEX event for signaling when a model managed has a significant change to the model. This event signals that the
- * old model is invalid and users should reload from the manager.
+ * OTM DEX event for signaling when a resource has been modified. Modifications must not change the structure of the
+ * resource. For structural changes, use {@link DexResourceChangeEvent}. This event signals that a field has changed and
+ * other resource components may need to refresh.
  * 
  * @author dmh
  *
  */
-public class DexResourceChangeEvent extends DexChangeEvent {
-    private static Log log = LogFactory.getLog( DexResourceChangeEvent.class );
-    private static final long serialVersionUID = 20190409L;
+public class DexResourceModifiedEvent extends DexChangeEvent {
+    private static Log log = LogFactory.getLog( DexResourceModifiedEvent.class );
+    private static final long serialVersionUID = 20190909L;
 
-    public static final EventType<DexResourceChangeEvent> RESOURCE_CHANGED =
-        new EventType<>( DEX_ALL, "RESOURCE_CHANGED" );
+    public static final EventType<DexResourceModifiedEvent> RESOURCE_MODIFIED =
+        new EventType<>( DEX_ALL, "RESOURCE_MODIFIED" );
 
+    // private final transient OtmResource resource;
 
     public OtmResource getResource() {
         if (otmObject instanceof OtmResource)
@@ -49,15 +51,16 @@ public class DexResourceChangeEvent extends DexChangeEvent {
     /**
      * Filter change event with no subject.
      */
-    public DexResourceChangeEvent() {
-        super( RESOURCE_CHANGED );
+    public DexResourceModifiedEvent() {
+        super( RESOURCE_MODIFIED );
     }
 
     /**
      * @param otmLibrary
      */
-    public DexResourceChangeEvent(OtmResource resource) {
-        super( RESOURCE_CHANGED, resource );
+    public DexResourceModifiedEvent(OtmResource resource) {
+        super( RESOURCE_MODIFIED, resource );
+        // log.debug("DexEvent model manager constructor ran.");
     }
 
 }

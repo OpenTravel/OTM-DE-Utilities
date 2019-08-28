@@ -24,6 +24,7 @@ public class SetRequestPathAction extends DexStringAction {
 
     public SetRequestPathAction(OtmActionRequest otm) {
         super( otm );
+        action = DexActions.SETREQUESTPATH;
     }
 
     @Override

@@ -26,6 +26,7 @@ public class BasePathChangeAction extends DexStringAction {
 
     public BasePathChangeAction(OtmResource otm) {
         super( otm );
+        action = DexActions.BASEPATHCHANGE;
     }
 
     @Override
@@ -45,7 +46,7 @@ public class BasePathChangeAction extends DexStringAction {
 
     @Override
     public String toString() {
-        return "Changed base path to " + newString;
+        return "Changed base path to " + get();
     }
 
     /**

@@ -24,6 +24,7 @@ public class SetRequestParameterGroupAction extends DexStringAction {
 
     public SetRequestParameterGroupAction(OtmActionRequest otm) {
         super( otm );
+        action = DexActions.SETREQUESTPARAMETERGROUP;
     }
 
     @Override

@@ -16,14 +16,11 @@
 
 package org.opentravel.dex.controllers.resources;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.resource.OtmActionFacet;
 
 import java.util.List;
 
@@ -44,14 +41,12 @@ import javafx.scene.image.ImageView;
  *
  */
 public class ResourcesDAO implements DexDAO<OtmObject> {
-    private static Log log = LogFactory.getLog( ResourcesDAO.class );
+    // private static Log log = LogFactory.getLog( ResourcesDAO.class );
 
     protected OtmObject otmObject;
 
     public ResourcesDAO(OtmObject member) {
         this.otmObject = member;
-        if (member instanceof OtmActionFacet)
-            log.debug( "Action Facet Name: " + member.getName() );
     }
 
     public ResourcesDAO(OtmTypeProvider provider) {

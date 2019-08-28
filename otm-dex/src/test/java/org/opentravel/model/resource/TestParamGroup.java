@@ -135,6 +135,8 @@ public class TestParamGroup extends TestOtmResourceBase<OtmParameterGroup> {
             assertTrue( result != null );
             assertTrue( result.getName().equals( c ) );
         }
+
+        // TODO location
     }
 
     public static OtmParameterGroup buildOtm(OtmResource testResource) {

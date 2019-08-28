@@ -21,8 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
-import org.opentravel.dex.actions.DexActionManager.DexActions;
-import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
@@ -100,9 +99,9 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         return Collections.emptyList();
     }
 
-    private Node getCommonNode(DexIncludedController<?> ec) {
+    private Node getCommonNode() {
         BooleanProperty commonProperty = getActionManager().add( DexActions.SETCOMMONACTION, isCommon(), this );
-        return DexEditField.makeCheckBox( commonProperty, COMMON_LABEL, ec, this );
+        return DexEditField.makeCheckBox( commonProperty, COMMON_LABEL );
     }
 
     @Override
@@ -154,9 +153,9 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
     }
 
     @Override
-    public List<DexEditField> getFields(DexIncludedController<?> ec) {
+    public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, null, COMMON_TOOLTIP, getCommonNode( ec ) ) );
+        fields.add( new DexEditField( 0, 0, null, COMMON_TOOLTIP, getCommonNode() ) );
         return fields;
     }
 
@@ -209,6 +208,7 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         // TODO Auto-generated method stub
         return false;
     }
+
     /**
      * @see org.opentravel.model.OtmChildrenOwner#modelChildren()
      */
@@ -219,6 +219,7 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         if (getTL().getResponses() != null)
             getTL().getResponses().forEach( r -> new OtmActionResponse( r, this ) );
     }
+
     /**
      * @see org.opentravel.model.OtmChildrenOwner#modelInheritedChildren()
      */

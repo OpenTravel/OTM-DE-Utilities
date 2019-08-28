@@ -21,8 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
-import org.opentravel.dex.actions.DexActionManager.DexActions;
-import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -102,13 +101,13 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     @Override
-    public List<DexEditField> getFields(DexIncludedController<?> ec) {
+    public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, getPayloadNode( ec ) ) );
-        fields.add( new DexEditField( 1, 0, PARAMETERS_LABEL, PARAMETERS_TOOLTIP, getParametersNode( ec ) ) );
-        fields.add( new DexEditField( 2, 0, METHOD_LABEL, METHOD_TOOLTIP, getMethodNode( ec ) ) );
+        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, getPayloadNode() ) );
+        fields.add( new DexEditField( 1, 0, PARAMETERS_LABEL, PARAMETERS_TOOLTIP, getParametersNode() ) );
+        fields.add( new DexEditField( 2, 0, METHOD_LABEL, METHOD_TOOLTIP, getMethodNode() ) );
         fields.add( new DexEditField( 3, 0, MIME_LABEL, MIME_TOOLTIP, getMimeNode() ) );
-        fields.add( new DexEditField( 4, 0, PATH_LABEL, PATH_TOOLTIP, getPathNode( ec ) ) );
+        fields.add( new DexEditField( 4, 0, PATH_LABEL, PATH_TOOLTIP, getPathNode() ) );
 
         return fields;
     }
@@ -133,9 +132,9 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         return candidates;
     }
 
-    private Node getMethodNode(DexIncludedController<?> ec) {
+    private Node getMethodNode() {
         StringProperty selection = getActionManager().add( DexActions.SETREQUESTMETHOD, getMethodString(), this );
-        return DexEditField.makeComboBox( getMethodCandidates(), selection, ec, this );
+        return DexEditField.makeComboBox( getMethodCandidates(), selection );
     }
 
     private Node getMimeNode() {
@@ -167,10 +166,10 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         return groups;
     }
 
-    private Node getParametersNode(DexIncludedController<?> ec) {
+    private Node getParametersNode() {
         StringProperty selection =
             getActionManager().add( DexActions.SETREQUESTPARAMETERGROUP, getParamGroupName(), this );
-        return DexEditField.makeComboBox( getParameterGroupCandidates(), selection, ec, this );
+        return DexEditField.makeComboBox( getParameterGroupCandidates(), selection );
     }
 
     public OtmParameterGroup getParamGroup() {
@@ -189,9 +188,9 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         return (OtmAction) parent;
     }
 
-    private Node getPathNode(DexIncludedController<?> ec) {
+    private Node getPathNode() {
         StringProperty selection = getActionManager().add( DexActions.SETREQUESTPATH, getPathTemplate(), this );
-        return DexEditField.makeTextField( selection, ec, this );
+        return DexEditField.makeTextField( selection );
     }
 
     public String getPathTemplate() {
@@ -243,10 +242,10 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         return name;
     }
 
-    private Node getPayloadNode(DexIncludedController<?> ec) {
+    private Node getPayloadNode() {
         StringProperty selection =
             getActionManager().add( DexActions.SETREQUESTPAYLOAD, getPayloadActionFacetName(), this );
-        return DexEditField.makeComboBox( getPayloadCandidates(), selection, ec, this );
+        return DexEditField.makeComboBox( getPayloadCandidates(), selection );
     }
 
     @Override

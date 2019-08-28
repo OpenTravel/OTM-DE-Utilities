@@ -23,8 +23,9 @@ import static org.junit.Assert.assertTrue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.opentravel.dex.actions.DexActionManager.DexActions;
+import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmEnumerationOpen;
@@ -56,6 +57,19 @@ public class TestDexActionManager {
         log.debug( "Done." );
     }
 
+    @Test
+    public void testActionsX() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
+        for (DexActions a : DexActions.values()) {
+            Class<?> handlerClass = a.handlerClass();
+            log.debug( "Action: " + a.toString() + " class =" + handlerClass );
+
+            DexChangeEvent handler = DexActions.getHandler( a );
+            if (handler != null)
+                log.debug( handler.getEventType().toString() );
+        }
+    }
+
+    @Ignore
     @Test
     public void testActionFactory() {
         DexActionManagerCore am = new DexReadOnlyActionManager();

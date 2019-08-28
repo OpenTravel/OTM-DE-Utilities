@@ -19,7 +19,6 @@ package org.opentravel.dex.controllers.resources;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
-import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
@@ -27,7 +26,9 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.DexResourceChangeEvent;
+import org.opentravel.dex.events.DexResourceChildModifiedEvent;
 import org.opentravel.dex.events.DexResourceChildSelectionEvent;
+import org.opentravel.dex.events.DexResourceModifiedEvent;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -67,19 +68,21 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     @FXML
     private TextField memberDescription;
 
-    private OtmResourceChild selectedChild;
     private int rowIndex = 0; // last row populated with data
 
     private boolean ignoreClear = false;
 
-    private OtmEventSubscriptionManager eventManager;
+    private OtmObject postedObject; // Can't use PostedData
+
+    // private OtmEventSubscriptionManager eventManager;
 
     // All event types fired by this controller.
     private static final EventType[] publishedEvents = {DexResourceChangeEvent.RESOURCE_CHANGED};
 
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
-        {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED, DexMemberSelectionEvent.MEMBER_SELECTED,
+        {DexResourceModifiedEvent.RESOURCE_MODIFIED, DexResourceChildModifiedEvent.RESOURCE_CHILD_MODIFIED,
+            DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED, DexMemberSelectionEvent.MEMBER_SELECTED,
             DexMemberSelectionEvent.RESOURCE_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
 
     public ResourceDetailsController() {
@@ -108,17 +111,32 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     public void configure(DexMainController mainController) {
         super.configure( mainController );
         eventPublisherNode = resourceDetailsPane;
-        eventManager = mainController.getEventSubscriptionManager();
+        // eventManager = mainController.getEventSubscriptionManager();
     }
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
+        log.debug( "Event received: " + event.getClass().getSimpleName() );
         if (event instanceof DexMemberSelectionEvent)
             handleEvent( (DexMemberSelectionEvent) event );
         else if (event instanceof DexResourceChildSelectionEvent)
             handleEvent( (DexResourceChildSelectionEvent) event );
+        else if (event instanceof DexResourceChildModifiedEvent)
+            handleEvent( (DexResourceChildModifiedEvent) event );
+        else if (event instanceof DexResourceModifiedEvent)
+            handleEvent( (DexResourceModifiedEvent) event );
         else if (event instanceof DexModelChangeEvent)
             handleEvent( (DexModelChangeEvent) event );
+    }
+
+    public void handleEvent(DexResourceChildModifiedEvent event) {
+        if (event.get() == postedObject)
+            refresh();
+    }
+
+    public void handleEvent(DexResourceModifiedEvent event) {
+        if (event.get() == postedObject)
+            refresh();
     }
 
     public void handleEvent(DexResourceChildSelectionEvent event) {
@@ -141,17 +159,18 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     }
 
     public void post(OtmResource resource) {
+        log.debug( "Posting " + resource );
         if (resource == null) {
             clear();
             return;
         }
         propertyGrid.getChildren().clear();
-
+        postedObject = resource;
 
         postTitle( resource );
         postName( resource );
         postDescription( resource );
-        resource.getFields( this ).forEach( f -> postField( f, resource ) );
+        resource.getFields().forEach( f -> postField( f, resource ) );
     }
 
 
@@ -207,13 +226,13 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
         if (resourceChild == null)
             return;
 
-        selectedChild = resourceChild;
+        postedObject = resourceChild;
 
         postTitle( resourceChild );
         postName( resourceChild );
         postDescription( resourceChild );
 
-        resourceChild.getFields( this ).forEach( f -> postField( f, resourceChild ) );
+        resourceChild.getFields().forEach( f -> postField( f, resourceChild ) );
     }
 
 
@@ -221,7 +240,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     public void clear() {
         // When posting updated filter results, do not clear the filters.
         if (!ignoreClear) {
-            selectedChild = null;
+            postedObject = null;
             memberName.setText( "" );
             memberDescription.setText( "" );
             objectImageView.setImage( null );
@@ -232,7 +251,10 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
 
     @Override
     public void refresh() {
-        post( selectedChild );
+        if (postedObject instanceof OtmResource)
+            post( (OtmResource) postedObject );
+        else if (postedObject instanceof OtmResourceChild)
+            post( (OtmResourceChild) postedObject );
     }
 
 }

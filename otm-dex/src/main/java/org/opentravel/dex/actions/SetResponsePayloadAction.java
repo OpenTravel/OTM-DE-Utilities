@@ -24,6 +24,7 @@ public class SetResponsePayloadAction extends DexStringAction {
 
     public SetResponsePayloadAction(OtmActionResponse otm) {
         super( otm );
+        action = DexActions.SETRESPONSEPAYLOAD;
     }
 
     @Override

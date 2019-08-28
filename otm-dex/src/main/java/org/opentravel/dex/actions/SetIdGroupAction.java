@@ -24,6 +24,7 @@ public class SetIdGroupAction extends DexBooleanAction {
 
     public SetIdGroupAction(OtmParameterGroup otm) {
         super( otm );
+        action = DexActions.SETIDGROUP;
     }
 
     @Override

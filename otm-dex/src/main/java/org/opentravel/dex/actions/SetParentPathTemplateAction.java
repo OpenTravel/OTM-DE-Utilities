@@ -24,6 +24,7 @@ public class SetParentPathTemplateAction extends DexStringAction {
 
     public SetParentPathTemplateAction(OtmParentRef otm) {
         super( otm );
+        action = DexActions.SETPARENTPATHTEMPLATE;
     }
 
     @Override

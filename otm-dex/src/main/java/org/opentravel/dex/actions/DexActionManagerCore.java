@@ -29,46 +29,20 @@ import javafx.beans.value.ObservableValue;
  *
  */
 public interface DexActionManagerCore extends DexActionManager {
-    // public enum DexActions {
-    // NAMECHANGE, DESCRIPTIONCHANGE, TYPECHANGE, BASEPATHCHANGE
-    // }
 
     /**
-     * <b>For use by DexActionManagers only.</b>
-     * <p>
      * Get the action specific to the action name for the subject OtmObject.
+     * 
+     * @deprecated - create add(action, object) signature for these Only used for "run" actions <b>For use by
+     *             DexActionManagers only.</b>
      * 
      * @param actionName
      * @param subject
      * @return
      */
+    @Deprecated
     public DexAction<?> actionFactory(DexActions actionName, OtmObject subject);
 
-    // /**
-    // * Set a listener on the FX observable string property to invoke the action.
-    // * <p>
-    // * To be deprecated, it is preferred to use {@link #add(DexActions, String, OtmObject)}
-    // *
-    // * @param action
-    // * @param op
-    // * @param subject
-    // * @return
-    // */
-    // public boolean addAction(DexActions action, ObservableValue<? extends String> op, OtmModelElement<?> subject);
-    //
-    // public String getLastActionName();
-    //
-    // // // Why?
-    // // @Deprecated
-    // // public DexMainController getMainController();
-    //
-    // // // Why?
-    // // @Deprecated
-    // // public OtmModelManager getModelManager();
-    //
-    // public int getQueueSize();
-    //
-    // public boolean isEnabled(DexActions action, OtmObject subject);
 
     public void postWarning(String warning);
 
@@ -78,8 +52,8 @@ public interface DexActionManagerCore extends DexActionManager {
      * Push performed action onto queue. This records the action to allow undo. Will validate results and warn user on
      * errors.
      * <p>
-     * Note: Veto'ed actions ({@link DexAction#getVetoFindings()} will {@link DexAction#undo()} and not be added to the
-     * queue.
+     * Note: Veto'ed actions ({@link DexAction#getVetoFindings()} will {@link DexAction#undoIt()} and not be added to
+     * the queue.
      * 
      * @param action
      */

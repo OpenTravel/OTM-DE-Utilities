@@ -16,15 +16,17 @@
 
 package org.opentravel.dex.actions;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmObject;
 
 public abstract class DexActionBase {
-    // private static Log log = LogFactory.getLog( DexActionBase.class );
+    private static Log log = LogFactory.getLog( DexActionBase.class );
 
+    protected DexActions action = null; // Which enumeration does this action implement
     protected OtmObject otm;
     protected DexActionManagerCore coreActionManager = null;
-
-    // protected boolean outcome = false;
     protected boolean ignore;
 
     public DexActionBase(OtmObject otm) {
@@ -38,4 +40,19 @@ public abstract class DexActionBase {
     public OtmObject getSubject() {
         return otm;
     }
+
+    public DexChangeEvent getEvent() {
+        DexChangeEvent event = null;
+        try {
+            event = DexActions.getHandler( action );
+        } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException e) {
+            log.warn( "Failed to get event handler: " + e.getLocalizedMessage() );
+            return null;
+        }
+        if (event != null)
+            event.set( otm );
+        return event;
+    }
+
+
 }

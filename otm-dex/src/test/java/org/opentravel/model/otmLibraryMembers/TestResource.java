@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.actions.DexActionManager;
-import org.opentravel.dex.actions.DexActionManager.DexActions;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.actions.DexFullActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
@@ -82,6 +82,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         assertTrue( !r.getChildren().isEmpty() );
     }
 
+    // TODO - move to actions test package
     @Test
     public void testBasePathAction() {
         // Givens

@@ -18,7 +18,7 @@ package org.opentravel.dex.controllers.member.properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.dex.actions.DexActionManager.DexActions;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmTypeUser;
 

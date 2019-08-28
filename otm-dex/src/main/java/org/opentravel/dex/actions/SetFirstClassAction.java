@@ -26,6 +26,7 @@ public class SetFirstClassAction extends DexBooleanAction {
 
     public SetFirstClassAction(OtmResource otm) {
         super( otm );
+        action = DexActions.SETFIRSTCLASS;
     }
 
     @Override

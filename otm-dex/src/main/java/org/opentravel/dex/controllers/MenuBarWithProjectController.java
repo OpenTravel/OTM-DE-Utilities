@@ -18,11 +18,14 @@ package org.opentravel.dex.controllers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.common.DialogBox;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.controllers.popup.NewProjectDialogController;
 import org.opentravel.dex.controllers.resources.ResourcesWindowController;
+import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.dex.events.DexEventDispatcher;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
@@ -32,7 +35,10 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -93,6 +99,28 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     public MenuBarWithProjectController() {
         super( subscribedEvents, publishedEvents );
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Override to get all the event types published by actions since this eventPublisherNode will be used by main
+     * controller for action initiated events.
+     */
+    @Override
+    public List<EventType<? extends AbstractOtmEvent>> getPublishedEventTypes() {
+        // publishedEventTypes = Collections.unmodifiableList( Arrays.asList( publishedEvents ) );
+        publishedEventTypes = new ArrayList<>( Arrays.asList( publishedEvents ) );
+        for (DexActions action : DexActions.values()) {
+            DexChangeEvent event = null;
+            try {
+                event = DexActions.getHandler( action );
+                if (event != null && !publishedEventTypes.contains( event.getEventType() ))
+                    publishedEventTypes.add( event.getEventType() );
+            } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException e) {
+            }
+        }
+        return publishedEventTypes;
     }
 
     @FXML
@@ -178,7 +206,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     public void undoAction() {
         modelMgr.getActionManager().undo();
-        mainController.refresh();
+        // mainController.refresh();
     }
 
     @FXML

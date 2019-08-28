@@ -17,6 +17,7 @@
 package org.opentravel.dex.actions;
 
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.resource.OtmParentRef;
 
 public class SetParentRefParentAction extends DexStringAction {
@@ -24,6 +25,7 @@ public class SetParentRefParentAction extends DexStringAction {
 
     public SetParentRefParentAction(OtmParentRef otm) {
         super( otm );
+        this.action = DexActions.SETPARENTREFPARENT;
     }
 
     @Override
@@ -36,14 +38,15 @@ public class SetParentRefParentAction extends DexStringAction {
     }
 
     protected String get() {
-        return getSubject().getParentResourceName();
+        OtmResource r = getSubject().getParentResource();
+        return r != null ? r.getNameWithPrefix() : "";
     }
 
 
 
     @Override
     public String toString() {
-        return "ID Group set to " + get();
+        return "Parent reference set to " + get();
     }
 
     /**

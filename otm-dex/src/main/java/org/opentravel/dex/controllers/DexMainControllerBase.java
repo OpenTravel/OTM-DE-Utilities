@@ -25,6 +25,7 @@ import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.actions.DexFullActionManager;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
+import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
 
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.stage.Stage;
 
 /**
@@ -46,6 +48,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     protected DexMainController mainController;
     protected ImageManager imageMgr = null;
     protected OtmModelManager modelMgr = null;
+    protected Node eventPublisherNode = null; // Node to use for change events
 
     // preferences
     protected UserSettings userSettings;
@@ -120,6 +123,17 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     public UserSettings getUserSettings() {
         return userSettings;
     }
+
+    @Override
+    public void publishEvent(DexChangeEvent event) {
+        // Use the menu bar as the event publisher for change events.
+        if (eventPublisherNode == null && menuBarController != null)
+            eventPublisherNode = menuBarController.getEventPublisherNode();
+
+        if (eventPublisherNode != null)
+            eventPublisherNode.fireEvent( event );
+    }
+
 
     @FXML
     @Override

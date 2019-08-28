@@ -24,6 +24,7 @@ public class SetAFReferenceFacetAction extends DexStringAction {
 
     public SetAFReferenceFacetAction(OtmActionFacet otm) {
         super( otm );
+        action = DexActions.SETAFREFERENCEFACET;
     }
 
     @Override

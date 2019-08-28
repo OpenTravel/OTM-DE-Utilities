@@ -17,6 +17,7 @@
 package org.opentravel.dex.controllers;
 
 import org.opentravel.application.common.events.OtmEventSubscriptionManager;
+import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
@@ -48,6 +49,19 @@ public interface DexMainController extends DexController {
     void addIncludedController(DexIncludedController<?> controller, OtmEventSubscriptionManager eventManager);
 
     /**
+     * Inform application that a model change event has occurred. Limited to model change events. Other events should be
+     * thrown by their included controller.
+     * 
+     * @param event DexChangeEvent to publish
+     */
+    public void publishEvent(DexChangeEvent event);
+
+    /**
+     * @return
+     */
+    public OtmEventSubscriptionManager getEventSubscriptionManager();
+
+    /**
      * @return the model manager used by this controller or null
      */
     public OtmModelManager getModelManager();
@@ -66,6 +80,11 @@ public interface DexMainController extends DexController {
      * @return status controller used by this application
      */
     public DexStatusController getStatusController();
+
+    /**
+     * @return
+     */
+    public UserSettings getUserSettings();
 
     /**
      * Inform the user of an exception.
@@ -92,16 +111,6 @@ public interface DexMainController extends DexController {
     /**
      * @param queueSize
      */
-    void updateActionQueueSize(int queueSize);
-
-    /**
-     * @return
-     */
-    UserSettings getUserSettings();
-
-    /**
-     * @return
-     */
-    OtmEventSubscriptionManager getEventSubscriptionManager();
+    public void updateActionQueueSize(int queueSize);
 
 }

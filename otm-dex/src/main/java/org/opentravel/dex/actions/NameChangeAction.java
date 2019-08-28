@@ -88,9 +88,9 @@ public class NameChangeAction extends DexStringAction {
     }
 
     @Override
-    public String undo() {
+    public String undoIt() {
         ignore = true;
-        super.undo();
+        super.undoIt();
         // log.debug( "Undo-ing change" );
         // otm.setName( oldString );
         // if (observable instanceof SimpleStringProperty)

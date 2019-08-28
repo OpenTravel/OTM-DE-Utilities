@@ -88,15 +88,13 @@ public abstract class DexBooleanAction extends DexActionBase implements DexActio
         // if (observable instanceof SimpleBooleanProperty)
         // ((SimpleBooleanProperty) observable).set( get() );
 
-        coreActionManager.push( this );
-
         log.debug( "Set to: " + get() );
         ignore = false;
         return get();
     }
 
     @Override
-    public Boolean undo() {
+    public Boolean undoIt() {
         ignore = true;
         set( !get() );
         if (observable instanceof SimpleBooleanProperty)

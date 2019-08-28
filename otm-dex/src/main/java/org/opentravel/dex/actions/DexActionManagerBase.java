@@ -20,8 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmModelElement;
-import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
@@ -46,13 +46,9 @@ import javafx.beans.value.ObservableValue;
 public abstract class DexActionManagerBase implements DexActionManagerCore {
     private static Log log = LogFactory.getLog( DexActionManagerBase.class );
 
-    // public enum DexActions {
-    // NAMECHANGE, DESCRIPTIONCHANGE, TYPECHANGE
-    // }
-
     // Controller for accessing GUI controls
     private DexMainController mainController = null;
-    private OtmModelManager modelManager = null; // Made available to callers, not used internally
+    // private OtmModelManager modelManager = null; // Made available to callers, not used internally
 
     protected Deque<DexAction<?>> queue;
     protected boolean ignore;
@@ -64,89 +60,26 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
         queue = new ArrayDeque<>();
     }
 
-    /**
-     * Action manager that can not update status or display queue size and contents.
-     */
-    public DexActionManagerBase(OtmModelManager modelManager) {
-        this.modelManager = modelManager;
-        queue = new ArrayDeque<>();
-    }
+    // /**
+    // * Action manager that can not update status or display queue size and contents.
+    // */
+    // public DexActionManagerBase(OtmModelManager modelManager) {
+    // // this.modelManager = modelManager;
+    // queue = new ArrayDeque<>();
+    // }
 
     public DexActionManagerBase(DexMainController mainController) {
         this.mainController = mainController;
         queue = new ArrayDeque<>();
     }
 
-    public DexActionManagerBase(DexMainController mainController, OtmModelManager modelManager) {
-        this.mainController = mainController;
-        this.modelManager = modelManager;
-        queue = new ArrayDeque<>();
-    }
-
-    // /**
-    // * Triggering of actions on observable properties is delegated to the observable via its listener.
-    // *
-    // * @param action
-    // * @param op
-    // * @param subject
-    // * @return
-    // */
-    // public boolean addAction(DexActions action, ObservableValue<? extends String> op, OtmModelElement<?> subject) {
-    // // Make sure the action can register itself and access main controller
-    // if (subject.getActionManager() == null)
-    // throw new IllegalStateException("Subject of an action must provide access to action manger.");
-    //
-    // switch (action) {
-    // case NAMECHANGE:
-    // op.addListener((ObservableValue<? extends String> o, String old,
-    // String newVal) -> doString(new NameChangeAction(subject), o, old, newVal));
-    // break;
-    // case DESCRIPTIONCHANGE:
-    // op.addListener((ObservableValue<? extends String> o, String old,
-    // String newVal) -> doString(new DescriptionChangeAction(subject), o, old, newVal));
-    // break;
-    // default:
-    // return false;
-    // }
-    // return true;
-    // }
-    //
-    // /**
-    // * Actions available for OTM Properties wrapped by PropertiesDAO.
-    // *
-    // * @param action
-    // * @param subject
-    // */
-    // public void addAction(DexActions action, OtmObject subject) {
-    // switch (action) {
-    // case TYPECHANGE:
-    // if (AssignedTypeChangeAction.isEnabled(subject)) {
-    // ignore = true; // may fire a name change
-    // new AssignedTypeChangeAction((OtmTypeUser) subject).doIt();
-    // ignore = false;
-    // }
-    // break;
-    // default:
-    // }
-    // }
-    //
-    // public boolean isEnabled(DexActions action, OtmObject subject) {
-    // switch (action) {
-    // case TYPECHANGE:
-    // return AssignedTypeChangeAction.isEnabled(subject);
-    // default:
-    // }
-    // return false;
+    // public DexActionManagerBase(DexMainController mainController, OtmModelManager modelManager) {
+    // this.mainController = mainController;
+    // // this.modelManager = modelManager;
+    // queue = new ArrayDeque<>();
     // }
 
-    // public void doString(DexStringAction action, ObservableValue<? extends String> o, String oldName, String name) {
-    // if (!ignore) {
-    // ignore = true;
-    // action.doIt(o, oldName, name);
-    // ignore = false;
-    // }
-    // }
-
+    @Override
     public BooleanProperty add(DexActions action, boolean currentValue, OtmObject subject) {
         BooleanProperty property = null;
         if (subject.isEditable() && isEnabled( action, subject )) {
@@ -158,17 +91,19 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
     }
 
     @Override
-    public StringProperty add(DexActions action, String value, OtmObject subject) {
+    public StringProperty add(DexActions action, String currentValue, OtmObject subject) {
         StringProperty property = null;
         if (subject.isEditable() && isEnabled( action, subject )) {
-            property = new SimpleStringProperty( value );
+            property = new SimpleStringProperty( currentValue );
             addAction( action, property, (OtmModelElement<?>) subject );
         } else
-            property = new ReadOnlyStringWrapper( value );
+            property = new ReadOnlyStringWrapper( currentValue );
         return property;
     }
 
 
+    // Only used for a "run" actions
+    @Deprecated
     @Override
     public DexAction<?> actionFactory(DexActions actionType, OtmObject subject) {
         DexAction<?> action = null;
@@ -203,6 +138,7 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
         if (!ignore) {
             ignore = true;
             action.doIt( o, oldString, newString );
+            push( action );
             ignore = false;
         }
     }
@@ -214,44 +150,15 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
         if (!ignore) {
             ignore = true;
             action.doIt( o );
+            push( action );
             ignore = false;
         }
     }
-
-    // public DexStringAction stringActionFactory(DexActions action, OtmModelElement<?> subject) {
-    // // Make sure the action can register itself and access main controller
-    // if (subject.getActionManager() == null)
-    // throw new IllegalStateException("Subject of an action must provide access to action manger.");
-    //
-    // DexStringAction a = null;
-    // switch (action) {
-    // case NAMECHANGE:
-    // a = new NameChangeAction(subject);
-    // break;
-    // case DESCRIPTIONCHANGE:
-    // a = new DescriptionChangeAction(subject);
-    // break;
-    // default:
-    // log.debug("Unknown action: " + action.toString());
-    // }
-    // return a;
-    // }
 
     @Override
     public String getLastActionName() {
         return queue.peek() != null ? queue.peek().getClass().getSimpleName() : "";
     }
-
-    // // Used to get imageMrg to OtmModelElement
-    // @Override
-    // public DexMainController getMainController() {
-    // return mainController;
-    // }
-
-    // @Override
-    // public OtmModelManager getModelManager() {
-    // return modelManager;
-    // }
 
     @Override
     public int getQueueSize() {
@@ -268,6 +175,8 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
     /**
      * Record action to allow undo. Will validate results and warn user on errors. Veto'ed actions will not be pushed
      * onto the queue.
+     * <p>
+     * Publish an action event for actions that are added to queue.
      * 
      * @param action
      */
@@ -285,11 +194,17 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
             if (mainController != null)
                 mainController.postError( null, msg );
             ignore = true;
-            action.undo();
+            action.undoIt();
             ignore = false;
             // TODO - if warnings, post them and allow undo option in dialog.
         } else {
             queue.push( action );
+
+            // Throw an event if defined
+            DexChangeEvent event = action.getEvent();
+            if (event != null && mainController != null)
+                mainController.publishEvent( event );
+
             if (mainController != null)
                 mainController.updateActionQueueSize( getQueueSize() );
             if (mainController != null)
@@ -297,27 +212,22 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
             log.debug( "Put action on queue: " + action.getClass().getSimpleName() );
         }
         action.getSubject().getOwningMember().isValid( true ); // Force the owner to refresh its findings.
-
     }
 
-    // /**
-    // * @param otmModelManager
-    // */
-    // public void setModelManager(OtmModelManager otmModelManager) {
-    // this.modelManager = otmModelManager;
-    // }
-
-    /**
-     * Pop an action from the queue and then undo it.
-     */
     @Override
     public void undo() {
         ignore = true;
         if (!queue.isEmpty()) {
             DexAction<?> action = queue.pop();
             log.debug( "Undo action: " + action.getClass().getSimpleName() );
-            action.undo();
+            action.undoIt();
             action.getSubject().getOwningMember().isValid( true ); // Force the owner to refresh its findings.
+
+            // Throw an event if defined
+            DexChangeEvent event = action.getEvent();
+            if (event != null && mainController != null)
+                mainController.publishEvent( event );
+
             if (mainController != null)
                 mainController.updateActionQueueSize( getQueueSize() );
             if (mainController != null)

@@ -98,21 +98,19 @@ public abstract class DexStringAction extends DexActionBase implements DexAction
         if (observable instanceof SimpleStringProperty)
             ((SimpleStringProperty) observable).set( newValue );
 
-        coreActionManager.push( this );
-
         log.debug( "Set to: " + newValue );
         ignore = false;
         return get();
     }
 
     @Override
-    public String undo() {
+    public String undoIt() {
         ignore = true;
         set( oldString );
         if (observable instanceof SimpleStringProperty)
             ((SimpleStringProperty) observable).set( oldString );
 
-        log.debug( "Undo - restored base path to " + oldString );
+        log.debug( "Undo - " + toString() + " using " + oldString );
         ignore = false;
         return oldString;
     }

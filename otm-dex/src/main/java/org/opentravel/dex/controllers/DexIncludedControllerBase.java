@@ -120,9 +120,15 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
         log.debug( "Main controller set." );
     }
 
+    // Only use to fire events from Undo actions
+    public Node getEventPublisherNode() {
+        return eventPublisherNode;
+    }
+
     @Override
     public void fireEvent(DexEvent event) {
-        if (publishedEventTypes != null && publishedEventTypes.contains( event.getEventType() ))
+        if (eventPublisherNode != null && publishedEventTypes != null
+            && publishedEventTypes.contains( event.getEventType() ))
             eventPublisherNode.fireEvent( event );
         else
             log.warn( event.getEventType() + "event not fired." );

@@ -26,6 +26,7 @@ public class SetResourceExtensionAction extends DexStringAction {
 
     public SetResourceExtensionAction(OtmResource otm) {
         super( otm );
+        action = DexActions.SETRESOURCEEXTENSION;
     }
 
     @Override
@@ -34,7 +35,7 @@ public class SetResourceExtensionAction extends DexStringAction {
     }
 
     protected void set(String value) {
-        getSubject().setExtendedResource( null );
+        getSubject().setExtendedResourceString( value );
     }
 
     protected String get() {

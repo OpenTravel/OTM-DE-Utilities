@@ -21,8 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
-import org.opentravel.dex.actions.DexActionManager.DexActions;
-import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
@@ -42,6 +41,7 @@ import org.opentravel.schemacompiler.codegen.util.ResourceCodegenUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
+import org.opentravel.schemacompiler.model.TLExtension;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLResource;
 import org.opentravel.schemacompiler.model.TLResourceParentRef;
@@ -107,7 +107,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         getParentRefs().forEach( pr -> {
             if (!firstClassOnly || pr.isParentFirstClass())
                 refs.add( pr );
-            refs.addAll( pr.getParentResource().getAllParentRefs( firstClassOnly ) );
+            if (pr.getParentResource() != null)
+                refs.addAll( pr.getParentResource().getAllParentRefs( firstClassOnly ) );
         } );
         return refs;
     }
@@ -392,10 +393,29 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      * 
      * @param extensionName
      */
-    public void setExtendedResource(String extensionName) {
-        getTL().setExtension( null );
-        // FIXME - get the candidate list and match one
-        log.debug( "FIXME Set extension to " + extensionName );
+    public OtmResource setExtendedResource(OtmResource superType) {
+        if (superType == null)
+            getTL().setExtension( null );
+        else {
+            TLExtension extension = getTL().getExtension();
+            if (extension == null) {
+                extension = new TLExtension();
+                getTL().setExtension( extension );
+            }
+            extension.setExtendsEntity( superType.getTL() );
+        }
+        log.debug( "Set extension to " + getExtendedResource() );
+        return getExtendedResource();
+    }
+
+    public OtmResource setExtendedResourceString(String extensionName) {
+        OtmResource superType = null;
+        // get the candidate list and match one
+        for (OtmResource c : getModelManager().getResources( true ))
+            if (c.getNameWithPrefix().equals( extensionName ))
+                superType = c;
+
+        return setExtendedResource( superType );
     }
 
     /**
@@ -445,7 +465,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      * 
      * If this is a minor version, returns ONLY the name of the extension object
      * 
-     * @return an array of other resources including NONE
+     * @return an array of other resource {@link #getNameWithPrefix()} including NONE
      */
     public ObservableList<String> getExtensionCandidates() {
         ObservableList<String> candidates = FXCollections.observableArrayList();
@@ -456,40 +476,14 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return candidates;
     }
 
-    // private Node getExtensionNode() {
-    // ComboBox<String> box = new ComboBox<>( getExtensionCandidates() );
-    // // box.setEditable( isEditable() ); -- do not use. editable allows typing into the combo box
-    // if (getExtendedResource() != null)
-    // box.getSelectionModel().select( getExtendedResource().getNameWithPrefix() );
-    // else
-    // box.getSelectionModel().select( NONE );
-    // // TO DO - create a cell factory to make them more visable.
-    // box.setDisable( !isEditable() );
-    // box.setOnAction( a -> log.debug( "Extension Selected" ) );
-    // // TO DO - how to set the selected value in the lamda?
-    // return box;
-    // }
-
-    private Node getExtensionNode(DexIncludedController<?> ec) {
+    private Node getExtensionNode() {
         StringProperty selection = null;
         if (getExtendedResource() != null)
             selection = getActionManager().add( DexActions.SETRESOURCEEXTENSION,
                 getExtendedResource().getNameWithPrefix(), this );
         else
             selection = getActionManager().add( DexActions.SETRESOURCEEXTENSION, NONE, this );
-        return DexEditField.makeComboBox( getExtensionCandidates(), selection, ec, this );
-
-        // ComboBox<String> box = new ComboBox<>( getExtensionCandidates() );
-        // // box.setEditable( isEditable() ); -- do not use. editable allows typing into the combo box
-        // if (getExtendedResource() != null)
-        // box.getSelectionModel().select( getExtendedResource().getNameWithPrefix() );
-        // else
-        // box.getSelectionModel().select( NONE );
-        // // TO DO - create a cell factory to make them more visable.
-        // box.setDisable( !isEditable() );
-        // box.setOnAction( a -> log.debug( "Extension Selected" ) );
-        // TO DO - how to set the selected value in the lamda?
-        // return box;
+        return DexEditField.makeComboBox( getExtensionCandidates(), selection );
     }
 
     private Node getSubectNode() {
@@ -499,8 +493,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return button;
     }
 
-    private Node getBasePathNode(DexIncludedController<?> ec) {
-        TextField field = DexEditField.makeTextField( basePathProperty(), ec, this );
+    private Node getBasePathNode() {
+        TextField field = DexEditField.makeTextField( basePathProperty() );
         // TextField field = DexEditField.makeTextField( getBasePath(), this );
         if (basePathProperty().isEmpty().get())
             field.setPromptText( basePath_PROMPT );
@@ -514,10 +508,10 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return getTL().isAbstract();
     }
 
-    private Node getIsAbstractNode(DexIncludedController<?> ec) {
+    private Node getIsAbstractNode() {
 
         BooleanProperty abstractProperty = getActionManager().add( DexActions.SETABSTRACT, isAbstract(), this );
-        CheckBox box = DexEditField.makeCheckBox( abstractProperty, abstract_LABEL, ec, this );
+        CheckBox box = DexEditField.makeCheckBox( abstractProperty, abstract_LABEL );
 
         // CheckBox box = DexEditField.makeCheckBox( isAbstract(), abstract_LABEL, this );
         // box.setOnAction( a -> log.debug( "Abstract check box selected." ) );
@@ -528,11 +522,11 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return getTL().isFirstClass();
     }
 
-    private Node getIsFirstClassNode(DexIncludedController<?> ec) {
+    private Node getIsFirstClassNode() {
         // SimpleBooleanProperty firstClassProperty = new SimpleBooleanProperty( isFirstClass() );
         BooleanProperty firstClassProperty = getActionManager().add( DexActions.SETFIRSTCLASS, isFirstClass(), this );
         // getActionManager().addAction( DexActions.BASEPATHCHANGE, firstClassProperty, this );
-        CheckBox box = DexEditField.makeCheckBox( firstClassProperty, firstClass_LABEL, ec, this );
+        CheckBox box = DexEditField.makeCheckBox( firstClassProperty, firstClass_LABEL );
         // CheckBox box = DexEditField.makeCheckBox( isFirstClass(), firstClass_LABEL, this );
         // box.setOnAction( a -> log.debug( "First class check box selected." ) );
         return box;
@@ -552,13 +546,13 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      * @param ec controller that can fire events when resource changes
      * @return
      */
-    public List<DexEditField> getFields(DexIncludedController<?> ec) {
+    public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, extension_LABEL, extension_TOOLTIP, getExtensionNode( ec ) ) );
+        fields.add( new DexEditField( 0, 0, extension_LABEL, extension_TOOLTIP, getExtensionNode() ) );
         fields.add( new DexEditField( 1, 0, businessObject_LABEL, businessObject_TOOLTIP, getSubectNode() ) );
-        fields.add( new DexEditField( 2, 0, basePath_LABEL, basePath_TOOLTIP, getBasePathNode( ec ) ) );
-        fields.add( new DexEditField( 3, 0, null, abstract_TOOLTIP, getIsAbstractNode( ec ) ) );
-        fields.add( new DexEditField( 3, 1, null, firstClass_TOOLTIP, getIsFirstClassNode( ec ) ) );
+        fields.add( new DexEditField( 2, 0, basePath_LABEL, basePath_TOOLTIP, getBasePathNode() ) );
+        fields.add( new DexEditField( 3, 0, null, abstract_TOOLTIP, getIsAbstractNode() ) );
+        fields.add( new DexEditField( 3, 1, null, firstClass_TOOLTIP, getIsFirstClassNode() ) );
         return fields;
 
     }

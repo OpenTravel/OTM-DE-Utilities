@@ -24,6 +24,7 @@ public class SetParameterLocationAction extends DexStringAction {
 
     public SetParameterLocationAction(OtmParameter otm) {
         super( otm );
+        action = DexActions.SETPARAMETERLOCATION;
     }
 
     @Override
@@ -32,7 +33,7 @@ public class SetParameterLocationAction extends DexStringAction {
     }
 
     protected void set(String value) {
-        getSubject().setLocation( value );
+        getSubject().setLocationString( value );
     }
 
     protected String get() {

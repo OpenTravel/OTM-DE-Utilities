@@ -21,8 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
-import org.opentravel.dex.actions.DexActionManager.DexActions;
-import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -131,10 +130,10 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
         return actionFacets;
     }
 
-    private Node getPayloadNode(DexIncludedController<?> ec) {
+    private Node getPayloadNode() {
         StringProperty selection =
             getActionManager().add( DexActions.SETRESPONSEPAYLOAD, getPayloadActionFacetName(), this );
-        return DexEditField.makeComboBox( getPayloadCandidates(), selection, ec, this );
+        return DexEditField.makeComboBox( getPayloadCandidates(), selection );
     }
 
     private Node getMimeNode() {
@@ -167,9 +166,9 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
     }
 
     @Override
-    public List<DexEditField> getFields(DexIncludedController<?> ec) {
+    public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, getPayloadNode( ec ) ) );
+        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, getPayloadNode() ) );
         fields.add( new DexEditField( 1, 0, MIME_TYPE_LABEL, MIME_TYPE_TOOLTIP, getMimeNode() ) );
         fields.add( new DexEditField( 2, 0, STATUS_CODES_LABEL, STATUS_CODES_TOOLTIP, getStatus1Node() ) );
         fields.add( new DexEditField( 3, 0, STATUS_CODES_LABEL, STATUS_CODES_TOOLTIP, getStatus2Node() ) );

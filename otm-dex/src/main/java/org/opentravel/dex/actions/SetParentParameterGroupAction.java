@@ -24,6 +24,7 @@ public class SetParentParameterGroupAction extends DexStringAction {
 
     public SetParentParameterGroupAction(OtmParentRef otm) {
         super( otm );
+        this.action = DexActions.SETPARENTPARAMETERGROUP;
     }
 
     @Override
@@ -38,8 +39,6 @@ public class SetParentParameterGroupAction extends DexStringAction {
     protected String get() {
         return getSubject().getParameterGroupName();
     }
-
-
 
     @Override
     public String toString() {

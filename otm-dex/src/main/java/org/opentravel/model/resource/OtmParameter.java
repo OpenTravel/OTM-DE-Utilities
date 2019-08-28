@@ -21,8 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
-import org.opentravel.dex.actions.DexActionManager.DexActions;
-import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -97,10 +96,10 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
     }
 
     @Override
-    public List<DexEditField> getFields(DexIncludedController<?> ec) {
+    public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
         // fields.add( new DexEditField( 0, 0, FIELD_LABEL, FIELD_TOOLTIP, new ComboBox<String>() ) );
-        fields.add( new DexEditField( 0, 0, LOCATION_LABEL, LOCATION_TOOLTIP, getLocationsNode( ec ) ) );
+        fields.add( new DexEditField( 0, 0, LOCATION_LABEL, LOCATION_TOOLTIP, getLocationsNode() ) );
         return fields;
     }
 
@@ -164,10 +163,10 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
         return locations;
     }
 
-    private Node getLocationsNode(DexIncludedController<?> ec) {
+    private Node getLocationsNode() {
         StringProperty selection =
             getActionManager().add( DexActions.SETPARAMETERLOCATION, getLocation().toString(), this );
-        return DexEditField.makeComboBox( getLocationCandidates(), selection, ec, this );
+        return DexEditField.makeComboBox( getLocationCandidates(), selection );
         // ComboBox<String> box = new ComboBox<>( getLocationCandidates() );
         // box.getSelectionModel().select( getTL().getLocation().toString() );
         // box.setEditable( getOwningMember().isEditable() );
@@ -175,8 +174,18 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
     }
 
 
-    public void setLocation(String value) {
-        log.error( "FIXME - Set loction to " + value );
+    public TLParamLocation setLocation(TLParamLocation location) {
+        getTL().setLocation( location );
+        log.debug( "Set loction to " + location );
+        return getLocation();
+    }
+
+    public TLParamLocation setLocationString(String value) {
+        TLParamLocation location = null;
+        for (TLParamLocation c : TLParamLocation.values())
+            if (c.toString().equals( value ))
+                location = c;
+        return setLocation( location );
     }
 
     public Tooltip getTooltip() {

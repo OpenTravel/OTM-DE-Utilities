@@ -24,6 +24,7 @@ public class SetCommonAction extends DexBooleanAction {
 
     public SetCommonAction(OtmAction otm) {
         super( otm );
+        action = DexActions.SETCOMMONACTION;
     }
 
     @Override

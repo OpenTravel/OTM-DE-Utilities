@@ -37,40 +37,26 @@ import javafx.beans.value.ObservableValue;
  *
  */
 public interface DexActionManager {
-    public enum DexActions {
-        NAMECHANGE,
-        DESCRIPTIONCHANGE,
-        TYPECHANGE,
-        BASEPATHCHANGE,
-        SETFIRSTCLASS,
-        SETABSTRACT,
-        SETIDGROUP,
-        SETCOMMONACTION,
-        SETRESOURCEEXTENSION,
-        SETPARENTPARAMETERGROUP,
-        SETPARENTPATHTEMPLATE,
-        SETPARENTREFPARENT,
-        SETAFREFERENCETYPE,
-        SETAFREFERENCEFACET,
-        SETREQUESTPAYLOAD,
-        SETREQUESTPARAMETERGROUP,
-        SETREQUESTMETHOD,
-        SETREQUESTPATH,
-        SETRESPONSEPAYLOAD,
-        SETPARAMETERLOCATION,
-        SETPARAMETERGROUPFACET
-    }
 
-    // /**
-    // * <b>For use by DexActionManagers only.</b>
-    // * <p>
-    // * Get the action specific to the action name for the subject OtmObject.
-    // *
-    // * @param actionName
-    // * @param subject
-    // * @return
-    // */
-    // public DexAction<?> actionFactory(DexActions actionName, OtmObject subject);
+    /**
+     * Create a boolean property and add an action if editable and enabled.
+     * 
+     * @param action action to perform
+     * @param currentValue of boolean
+     * @param subject otmObject to change when property changes
+     * @return
+     */
+    public BooleanProperty add(DexActions action, boolean currentValue, OtmObject subject);
+
+    /**
+     * Create a string property and add an action if editable and enabled.
+     * 
+     * @param action action to perform
+     * @param currentValue of string
+     * @param subject otmObject to change when string property changes
+     * @return simple string property if editable and action enabled, read only property otherwise
+     */
+    public StringProperty add(DexActions action, String currentValue, OtmObject subject);
 
     public boolean addAction(DexActions action, ObservableValue<? extends Boolean> property, OtmObject subject);
 
@@ -88,34 +74,9 @@ public interface DexActionManager {
 
     public String getLastActionName();
 
-    // // Why?
-    // @Deprecated
-    // public DexMainController getMainController();
-
-    // // Why?
-    // @Deprecated
-    // public OtmModelManager getModelManager();
-
     public int getQueueSize();
 
     public boolean isEnabled(DexActions action, OtmObject subject);
-
-    // public void postWarning(String warning);
-
-    // /**
-    // * <b>For use by DexActions only.</b>
-    // * <p>
-    // * Push performed action onto queue. This records the action to allow undo. Will validate results and warn user on
-    // * errors.
-    // * <p>
-    // * Note: Veto'ed actions ({@link DexAction#getVetoFindings()} will {@link DexAction#undo()} and not be added to
-    // the
-    // * queue.
-    // *
-    // * @param action
-    // */
-    // public void push(DexAction<?> action);
-
 
     /**
      * Create an action and do it. If successful will be added to the queue.
@@ -131,27 +92,9 @@ public interface DexActionManager {
 
     /**
      * Pop an action from the queue and then undo it.
+     * 
+     * @param publishEvent if true, publish the event associated with the action
      */
     public void undo();
-
-    /**
-     * Create a string property and add an action if editable and enabled.
-     * 
-     * @param action action to perform
-     * @param currentValue of string
-     * @param subject otmObject to change when string property changes
-     * @return
-     */
-    public StringProperty add(DexActions action, String currentValue, OtmObject subject);
-
-    /**
-     * Create a boolean property and add an action if editable and enabled.
-     * 
-     * @param action action to perform
-     * @param currentValue of boolean
-     * @param subject otmObject to change when property changes
-     * @return
-     */
-    public BooleanProperty add(DexActions action, boolean currentValue, OtmObject subject);
 
 }

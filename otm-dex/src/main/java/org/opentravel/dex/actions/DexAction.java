@@ -16,6 +16,7 @@
 
 package org.opentravel.dex.actions;
 
+import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmObject;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
@@ -41,6 +42,15 @@ public interface DexAction<T> {
     public void doIt(Object data);
     // All implementations must implement, but the signatures will be different.
     // public T doIt(ObservableValue<? extends T> observable, T oldValue, T newValue);
+
+    /**
+     * Return the event object if the action defines an event to throw when action is done or undone.
+     * 
+     * @see {@link DexActions#getHandler(DexActions)}
+     * 
+     * @return event object or null
+     */
+    public DexChangeEvent getEvent();
 
     /**
      * Get the OTM object that is or will be acted upon.
@@ -75,11 +85,13 @@ public interface DexAction<T> {
     public boolean isValid();
 
     /**
-     * Use the stored values to redo the change.
+     * Use the stored values to undo the change.
+     * 
+     * @param fireEvent if true, also fire the associated change event
      * 
      * @return
      */
-    public T undo();
+    public T undoIt();
 
     // public T redo();
     // /**

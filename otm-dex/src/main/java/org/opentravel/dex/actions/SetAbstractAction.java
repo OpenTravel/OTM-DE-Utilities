@@ -24,6 +24,7 @@ public class SetAbstractAction extends DexBooleanAction {
 
     public SetAbstractAction(OtmResource otm) {
         super( otm );
+        action = DexActions.SETABSTRACT;
     }
 
     @Override

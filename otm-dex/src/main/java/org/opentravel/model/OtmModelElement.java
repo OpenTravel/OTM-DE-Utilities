@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.actions.DexActionManager;
-import org.opentravel.dex.actions.DexActionManager.DexActions;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.schemacompiler.event.ModelElementListener;

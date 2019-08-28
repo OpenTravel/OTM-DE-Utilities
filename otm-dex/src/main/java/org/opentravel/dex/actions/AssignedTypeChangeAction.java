@@ -165,7 +165,7 @@ public class AssignedTypeChangeAction extends DexActionBase implements DexAction
     }
 
     @Override
-    public OtmTypeProvider undo() {
+    public OtmTypeProvider undoIt() {
         log.debug( " TODO -Undo-ing change" );
         if (oldProvider != null) {
             if (oldProvider != user.setAssignedType( oldProvider ))

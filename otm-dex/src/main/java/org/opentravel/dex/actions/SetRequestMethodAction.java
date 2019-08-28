@@ -24,6 +24,7 @@ public class SetRequestMethodAction extends DexStringAction {
 
     public SetRequestMethodAction(OtmActionRequest otm) {
         super( otm );
+        action = DexActions.SETREQUESTMETHOD;
     }
 
     @Override

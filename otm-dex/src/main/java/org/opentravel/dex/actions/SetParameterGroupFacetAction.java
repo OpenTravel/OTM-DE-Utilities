@@ -24,6 +24,7 @@ public class SetParameterGroupFacetAction extends DexStringAction {
 
     public SetParameterGroupFacetAction(OtmParameterGroup otm) {
         super( otm );
+        action = DexActions.SETPARAMETERGROUPFACET;
     }
 
     @Override

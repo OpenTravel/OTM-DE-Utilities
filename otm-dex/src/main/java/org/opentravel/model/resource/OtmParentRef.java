@@ -21,8 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
-import org.opentravel.dex.actions.DexActionManager.DexActions;
-import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -35,7 +34,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tooltip;
 
 /**
@@ -69,11 +67,11 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
     }
 
     @Override
-    public List<DexEditField> getFields(DexIncludedController<?> ec) {
+    public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, PARENT_LABEL, PARENT_TOOLTIP, getParentNode( ec ) ) );
-        fields.add( new DexEditField( 1, 0, PARAM_GROUP_LABEL, PARAM_GROUP_TOOLTIP, getParameterGroupNode( ec ) ) );
-        fields.add( new DexEditField( 2, 0, PATH_LABEL, PATH_LABEL, getPathNode( ec ) ) );
+        fields.add( new DexEditField( 0, 0, PARENT_LABEL, PARENT_TOOLTIP, getParentNode() ) );
+        fields.add( new DexEditField( 1, 0, PARAM_GROUP_LABEL, PARAM_GROUP_TOOLTIP, getParameterGroupNode() ) );
+        fields.add( new DexEditField( 2, 0, PATH_LABEL, PATH_LABEL, getPathNode() ) );
         return fields;
     }
 
@@ -84,7 +82,8 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
 
     @Override
     public String getName() {
-        return getParentResource().getName();
+        return getParentResourceName();
+        // return getParentResource().getName();
     }
 
     /**
@@ -105,10 +104,10 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
         return getTL().getParentParamGroupName();
     }
 
-    private Node getParameterGroupNode(DexIncludedController<?> ec) {
+    private Node getParameterGroupNode() {
         StringProperty selection =
             getActionManager().add( DexActions.SETPARENTPARAMETERGROUP, getParameterGroupName(), this );
-        return DexEditField.makeComboBox( getParameterGroupCandidates(), selection, ec, this );
+        return DexEditField.makeComboBox( getParameterGroupCandidates(), selection );
     }
 
     /**
@@ -124,27 +123,31 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
         return candidates;
     }
 
-    private Node getParentNode(DexIncludedController<?> ec) {
+    private Node getParentNode() {
         StringProperty selection = null;
         if (getParentResource() != null)
-            selection = getActionManager().add( DexActions.SETPARENTREFPARENT, getParentResourceName(), this );
+            selection =
+                getActionManager().add( DexActions.SETPARENTREFPARENT, getParentResource().getNameWithPrefix(), this );
         else
             selection = getActionManager().add( DexActions.SETPARENTREFPARENT, "", this );
-        ComboBox<String> box = DexEditField.makeComboBox( getParentCandidates(), selection, ec, this );
-        return box;
+        return DexEditField.makeComboBox( getParentCandidates(), selection );
     }
 
     public OtmResource getParentResource() {
         return (OtmResource) OtmModelElement.get( getTL().getParentResource() );
     }
 
+    /**
+     * 
+     * @return name of parent resource or empty string
+     */
     public String getParentResourceName() {
         return getParentResource() != null ? getParentResource().getName() : "";
     }
 
-    private Node getPathNode(DexIncludedController<?> ec) {
+    private Node getPathNode() {
         StringProperty selection = getActionManager().add( DexActions.SETPARENTPATHTEMPLATE, getPathTemplate(), this );
-        return DexEditField.makeTextField( selection, ec, this );
+        return DexEditField.makeTextField( selection );
     }
 
     /**
@@ -206,6 +209,8 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
         for (OtmResource c : getOwningMember().getModelManager().getResources( false ))
             if (c.getNameWithPrefix().equals( value ))
                 r = c;
+        // else if (c.getNamespace().equals( getOwningMember().getNamespace() ) && c.getName().equals( value ))
+        // r = c; // Could be without prefix
 
         return setParentResource( r );
     }
