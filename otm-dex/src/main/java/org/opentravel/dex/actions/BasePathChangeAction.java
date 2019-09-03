@@ -16,17 +16,31 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 
 public class BasePathChangeAction extends DexStringAction {
-    private static Log log = LogFactory.getLog( BasePathChangeAction.class );
+    // private static Log log = LogFactory.getLog( BasePathChangeAction.class );
+
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmResource)
+            return subject.isEditable();
+        return false;
+    }
+
+    public BasePathChangeAction() {}
 
     public BasePathChangeAction(OtmResource otm) {
         super( otm );
         action = DexActions.BASEPATHCHANGE;
+    }
+
+    protected String get() {
+        return getSubject().getBasePath();
     }
 
     @Override
@@ -38,25 +52,19 @@ public class BasePathChangeAction extends DexStringAction {
         getSubject().setBasePath( value, true );
     }
 
-    protected String get() {
-        return getSubject().getBasePath();
+
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmResource))
+            return false;
+        otm = subject;
+        return true;
     }
-
-
 
     @Override
     public String toString() {
         return "Changed base path to " + get();
-    }
-
-    /**
-     * @param subject
-     * @return
-     */
-    public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmResource)
-            return subject.isEditable();
-        return false;
     }
 
 }

@@ -28,10 +28,11 @@ import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLExtension;
 import org.opentravel.schemacompiler.model.TLExtensionOwner;
+import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.util.List;
 
@@ -139,6 +140,24 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
     public void testWhereUsed(L otm) {
         assertNotNull( otm.getUsedTypes() );
         assertNotNull( otm.getWhereUsed() );
+    }
+
+    @Test
+    public void testLibrary() {
+        if (subject != null)
+            testLibrary( (L) subject );
+    }
+
+    public void testLibrary(L member) {
+        OtmLibrary lib = staticModelManager.add( new TLLibrary() );
+        assertTrue( "Must register library.", staticModelManager.get( lib ) == lib.getTL() );
+        OtmLibraryMember result = lib.add( member );
+
+        // Then the underlying TL model changed.
+        if (result != null) {
+            assertTrue( lib.getTL().getNamedMembers().contains( member.getTL() ) );
+            assertTrue( member.getLibrary() == lib );
+        }
     }
 
     @SuppressWarnings("unchecked")

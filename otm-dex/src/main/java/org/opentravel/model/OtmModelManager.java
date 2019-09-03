@@ -81,7 +81,8 @@ public class OtmModelManager implements TaskResultHandlerI {
     // All members - Library Members are TLLibraryMembers and contextual facets
     private Map<LibraryMember,OtmLibraryMember> members = new HashMap<>();
 
-    private DexActionManager actionMgr;
+    private DexActionManager readOnlyActionManager = new DexReadOnlyActionManager();
+    private DexActionManager fullActionManager;
     private DexStatusController statusController;
     private ProjectManager projectManager;
     private RepositoryManager repositoryManager;
@@ -92,9 +93,9 @@ public class OtmModelManager implements TaskResultHandlerI {
      * Create a model manager.
      * 
      * @param controller
-     * @param actionManager action manager to assign to all members
+     * @param fullActionManager action manager to assign to all members
      */
-    public OtmModelManager(DexActionManager actionManager, RepositoryManager repositoryManager) {
+    public OtmModelManager(DexActionManager fullActionManager, RepositoryManager repositoryManager) {
         // Create a TL Model to manager
         try {
             tlModel = new TLModel();
@@ -111,10 +112,11 @@ public class OtmModelManager implements TaskResultHandlerI {
             projectManager = new ProjectManager( tlModel );
         this.repositoryManager = repositoryManager;
 
-        if (actionManager == null)
-            this.actionMgr = new DexReadOnlyActionManager();
-        this.actionMgr = actionManager;
-
+        // Main controller will pass one if enabled by settings
+        if (fullActionManager == null)
+            this.fullActionManager = new DexReadOnlyActionManager();
+        else
+            this.fullActionManager = fullActionManager;
         log.debug( "TL Model created and integrity checker added." );
     }
 
@@ -379,7 +381,7 @@ public class OtmModelManager implements TaskResultHandlerI {
             if (absLibrary != null)
                 log.warn( "Missing library associated with: " + absLibrary.getName() );
             else
-                log.warn( "Missing library." );
+                log.warn( "Can not get library because TL library is null." );
             printLibraries();
         }
         return libraries.get( absLibrary );
@@ -414,8 +416,14 @@ public class OtmModelManager implements TaskResultHandlerI {
         return null;
     }
 
-    public DexActionManager getActionManager() {
-        return actionMgr;
+    /**
+     * Return an action manager. Intended only for use by libraries.
+     * 
+     * @param editable
+     * @return read-only or full action manager
+     */
+    public DexActionManager getActionManager(boolean full) {
+        return full ? fullActionManager : readOnlyActionManager;
     }
 
     /**

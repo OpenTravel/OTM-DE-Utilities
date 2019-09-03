@@ -22,6 +22,8 @@ import org.opentravel.model.resource.OtmActionFacet;
 public class SetAFReferenceTypeAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
+    protected SetAFReferenceTypeAction() {}
+
     public SetAFReferenceTypeAction(OtmActionFacet otm) {
         super( otm );
         action = DexActions.SETAFREFERENCETYPE;
@@ -30,6 +32,14 @@ public class SetAFReferenceTypeAction extends DexStringAction {
     @Override
     public OtmActionFacet getSubject() {
         return (OtmActionFacet) otm;
+    }
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmActionFacet))
+            return false;
+        otm = subject;
+        return true;
     }
 
     protected void set(String value) {

@@ -509,13 +509,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     private Node getIsAbstractNode() {
-
         BooleanProperty abstractProperty = getActionManager().add( DexActions.SETABSTRACT, isAbstract(), this );
-        CheckBox box = DexEditField.makeCheckBox( abstractProperty, abstract_LABEL );
-
-        // CheckBox box = DexEditField.makeCheckBox( isAbstract(), abstract_LABEL, this );
-        // box.setOnAction( a -> log.debug( "Abstract check box selected." ) );
-        return box;
+        return DexEditField.makeCheckBox( abstractProperty, abstract_LABEL );
     }
 
     public boolean isFirstClass() {

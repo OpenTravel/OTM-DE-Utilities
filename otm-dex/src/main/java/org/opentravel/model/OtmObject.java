@@ -59,7 +59,7 @@ public interface OtmObject {
     public Tooltip getTooltip();
 
     /**
-     * @return this, member's, or owning object's library or null
+     * @return this member's, or owning object's library from the TLLibrary or null
      */
     public OtmLibrary getLibrary();
 

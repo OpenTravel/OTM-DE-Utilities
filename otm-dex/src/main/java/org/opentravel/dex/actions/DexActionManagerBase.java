@@ -23,7 +23,6 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.OtmTypeUser;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.util.ArrayDeque;
@@ -48,7 +47,6 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
 
     // Controller for accessing GUI controls
     private DexMainController mainController = null;
-    // private OtmModelManager modelManager = null; // Made available to callers, not used internally
 
     protected Deque<DexAction<?>> queue;
     protected boolean ignore;
@@ -60,31 +58,19 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
         queue = new ArrayDeque<>();
     }
 
-    // /**
-    // * Action manager that can not update status or display queue size and contents.
-    // */
-    // public DexActionManagerBase(OtmModelManager modelManager) {
-    // // this.modelManager = modelManager;
-    // queue = new ArrayDeque<>();
-    // }
 
     public DexActionManagerBase(DexMainController mainController) {
         this.mainController = mainController;
         queue = new ArrayDeque<>();
     }
 
-    // public DexActionManagerBase(DexMainController mainController, OtmModelManager modelManager) {
-    // this.mainController = mainController;
-    // // this.modelManager = modelManager;
-    // queue = new ArrayDeque<>();
-    // }
-
     @Override
     public BooleanProperty add(DexActions action, boolean currentValue, OtmObject subject) {
         BooleanProperty property = null;
-        if (subject.isEditable() && isEnabled( action, subject )) {
+        if (isEnabled( action, subject )) {
             property = new SimpleBooleanProperty( currentValue );
-            addAction( action, property, subject );
+            setListener( property, action, subject );
+            // addAction( action, property, subject );
         } else
             property = new ReadOnlyBooleanWrapper( currentValue );
         return property;
@@ -93,36 +79,125 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
     @Override
     public StringProperty add(DexActions action, String currentValue, OtmObject subject) {
         StringProperty property = null;
-        if (subject.isEditable() && isEnabled( action, subject )) {
+        if (isEnabled( action, subject )) {
             property = new SimpleStringProperty( currentValue );
-            addAction( action, property, (OtmModelElement<?>) subject );
+            setListener( property, action, subject );
+            // addAction( action, property, (OtmModelElement<?>) subject );
         } else
             property = new ReadOnlyStringWrapper( currentValue );
         return property;
     }
 
+    @Override
+    public void run(DexActions action, OtmObject subject) {
+        DexAction<?> actionHandler;
+        try {
+            actionHandler = DexActions.getAction( action, subject );
+            if (actionHandler instanceof DexRunAction) {
+                ((DexRunAction) actionHandler).doIt();
+            }
+        } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException | SecurityException
+            | IllegalArgumentException e) {
+            log.warn( "Could not create action. " + e.getLocalizedMessage() );
+        }
+        // // DexAction<?> action = null;
+        // switch (action) {
+        // // case NAMECHANGE:
+        // // action = new NameChangeAction( subject );
+        // // break;
+        // // case DESCRIPTIONCHANGE:
+        // // action = new DescriptionChangeAction( subject );
+        // // break;
+        // case TYPECHANGE:
+        // if (subject instanceof OtmTypeUser)
+        // new AssignedTypeChangeAction( (OtmTypeUser) subject ).doIt();
+        // break;
+        // default:
+        // log.debug( "Unknown action: " + actionType.toString() );
+        // }
+
+        // ((AssignedTypeChangeAction) actionFactory( actionType, subject )).doIt();
+    }
+
+    // TODO
+    // The ObservableValue stores a strong reference to the listener which will prevent the listener from being garbage
+    // collected and may result in a memory leak. It is recommended to either unregister a listener by calling
+    // removeListener after use or to use an instance of WeakChangeListener avoid this situation.
+    //
+    // BUT: Note: You have to keep a reference to the ListChangeListener, that was passed in as long as it is in use,
+    // otherwise it will be garbage collected to soon.
+    // WeakChangeListener<String> wcl =
+    // new WeakChangeListener<>( (ObservableValue<? extends String> o, String oldValue,
+    // String newValue) -> doString( (DexStringAction) actionHandler, o, oldValue, newValue ) );
+    // op.addListener( wcl );
+
+    /**
+     * Get action from {@link DexActions} enumeration and use it as the string change listener.
+     * 
+     * @param op
+     * @param action
+     * @param subject
+     * @return
+     */
+    protected DexAction<?> setListener(StringProperty op, DexActions action, OtmObject subject) {
+        try {
+            DexAction<?> actionHandler = DexActions.getAction( action, subject );
+            if (actionHandler instanceof DexStringAction) {
+                op.addListener( (ObservableValue<? extends String> o, String oldValue,
+                    String newValue) -> doString( (DexStringAction) actionHandler, o, oldValue, newValue ) );
+                return actionHandler;
+            }
+        } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException | SecurityException
+            | IllegalArgumentException e) {
+            log.warn( "Failed to set listener on " + action + " because: " + e.getLocalizedMessage() );
+        }
+        return null;
+    }
+
+    /**
+     * Get action from {@link DexActions} enumeration and use it as the boolean change listener.
+     * 
+     * @param op
+     * @param action
+     * @param subject
+     * @return
+     */
+    protected DexAction<?> setListener(BooleanProperty op, DexActions action, OtmObject subject) {
+        try {
+            DexAction<?> actionHandler = DexActions.getAction( action, subject );
+            if (actionHandler instanceof DexBooleanAction) {
+                op.addListener( (ObservableValue<? extends Boolean> o, Boolean oldValue,
+                    Boolean newValue) -> doBoolean( (DexBooleanAction) actionHandler, o ) );
+                return actionHandler;
+            }
+        } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException | SecurityException
+            | IllegalArgumentException e) {
+            log.warn( "Failed to set listener on " + action + " because: " + e.getLocalizedMessage() );
+        }
+        return null;
+    }
+
 
     // Only used for a "run" actions
-    @Deprecated
-    @Override
-    public DexAction<?> actionFactory(DexActions actionType, OtmObject subject) {
-        DexAction<?> action = null;
-        switch (actionType) {
-            case NAMECHANGE:
-                action = new NameChangeAction( subject );
-                break;
-            case DESCRIPTIONCHANGE:
-                action = new DescriptionChangeAction( subject );
-                break;
-            case TYPECHANGE:
-                if (subject instanceof OtmTypeUser)
-                    action = new AssignedTypeChangeAction( (OtmTypeUser) subject );
-                break;
-            default:
-                log.debug( "Unknown action: " + actionType.toString() );
-        }
-        return action;
-    }
+    // @Override
+    // public DexAction<?> actionFactory(DexActions actionType, OtmObject subject) {
+    // DexAction<?> action = null;
+    // switch (actionType) {
+    // case NAMECHANGE:
+    // action = new NameChangeAction( subject );
+    // break;
+    // case DESCRIPTIONCHANGE:
+    // action = new DescriptionChangeAction( subject );
+    // break;
+    // case TYPECHANGE:
+    // if (subject instanceof OtmTypeUser)
+    // action = new AssignedTypeChangeAction( (OtmTypeUser) subject );
+    // break;
+    // default:
+    // log.debug( "Unknown action: " + actionType.toString() );
+    // }
+    // return action;
+    // }
 
     /**
      * Change Listener for actions on strings. Assigned to observable strings by

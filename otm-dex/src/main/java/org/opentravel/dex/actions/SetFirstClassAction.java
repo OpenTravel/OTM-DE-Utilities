@@ -24,9 +24,19 @@ import org.opentravel.model.otmLibraryMembers.OtmResource;
 public class SetFirstClassAction extends DexBooleanAction {
     private static Log log = LogFactory.getLog( SetFirstClassAction.class );
 
+    protected SetFirstClassAction() {}
+
     public SetFirstClassAction(OtmResource otm) {
         super( otm );
         action = DexActions.SETFIRSTCLASS;
+    }
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmResource))
+            return false;
+        otm = subject;
+        return true;
     }
 
     @Override

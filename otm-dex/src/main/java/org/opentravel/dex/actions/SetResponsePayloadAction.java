@@ -22,6 +22,8 @@ import org.opentravel.model.resource.OtmActionResponse;
 public class SetResponsePayloadAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
+    protected SetResponsePayloadAction() {}
+
     public SetResponsePayloadAction(OtmActionResponse otm) {
         super( otm );
         action = DexActions.SETRESPONSEPAYLOAD;
@@ -30,6 +32,14 @@ public class SetResponsePayloadAction extends DexStringAction {
     @Override
     public OtmActionResponse getSubject() {
         return (OtmActionResponse) otm;
+    }
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmActionResponse))
+            return false;
+        otm = subject;
+        return true;
     }
 
     protected void set(String value) {

@@ -22,6 +22,8 @@ import org.opentravel.model.resource.OtmParentRef;
 public class SetParentParameterGroupAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
+    protected SetParentParameterGroupAction() {}
+
     public SetParentParameterGroupAction(OtmParentRef otm) {
         super( otm );
         this.action = DexActions.SETPARENTPARAMETERGROUP;
@@ -30,6 +32,14 @@ public class SetParentParameterGroupAction extends DexStringAction {
     @Override
     public OtmParentRef getSubject() {
         return (OtmParentRef) otm;
+    }
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmParentRef))
+            return false;
+        otm = subject;
+        return true;
     }
 
     protected void set(String value) {

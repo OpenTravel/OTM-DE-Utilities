@@ -154,8 +154,9 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
         else
             typeName = getAssignedType().getName();
 
-        typeName = OtmTypeUserUtils.assignedTypeWithPrefix( typeName, getLibrary().getTL(),
-            getAssignedType().getLibrary().getTL() );
+        if (getLibrary() != null && getAssignedType() != null && getAssignedType().getLibrary() != null)
+            typeName = OtmTypeUserUtils.assignedTypeWithPrefix( typeName, getLibrary().getTL(),
+                getAssignedType().getLibrary().getTL() );
 
         if (isEditable())
             return new SimpleStringProperty( typeName );

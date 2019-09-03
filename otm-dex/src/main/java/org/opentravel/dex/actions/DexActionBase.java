@@ -26,25 +26,41 @@ public abstract class DexActionBase {
 
     protected DexActions action = null; // Which enumeration does this action implement
     protected OtmObject otm;
-    protected DexActionManagerCore coreActionManager = null;
+    // protected DexActionManagerCore coreActionManager = null;
     protected boolean ignore;
 
-    public DexActionBase(OtmObject otm) {
-        this.otm = otm;
-        if (otm.getActionManager() instanceof DexActionManagerCore)
-            coreActionManager = (DexActionManagerCore) otm.getActionManager();
+    public DexActionBase() {}
 
-        assert (coreActionManager != null);
+    public DexActionBase(OtmObject otm) {
+        // if (otm.getActionManager() instanceof DexActionManagerCore)
+        // coreActionManager = (DexActionManagerCore) otm.getActionManager();
+
+        // assert (coreActionManager != null);
+        this.otm = otm;
     }
 
+    // /**
+    // * Must be set before running. Needed because actions are created using reflection.
+    // */
+    // public void setCoreActionManager(DexActionManagerCore coreActionManger) {
+    // this.coreActionManager = coreActionManger;
+    // }
+    //
     public OtmObject getSubject() {
         return otm;
     }
 
+    // /**
+    // * Set the subject for this action to act upon.
+    // * @param subject
+    // * @return false if the subject could not be set
+    // */
+    // public abstract boolean setSubject(OtmObject subject);
+
     public DexChangeEvent getEvent() {
         DexChangeEvent event = null;
         try {
-            event = DexActions.getHandler( action );
+            event = DexActions.getEvent( action );
         } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException e) {
             log.warn( "Failed to get event handler: " + e.getLocalizedMessage() );
             return null;

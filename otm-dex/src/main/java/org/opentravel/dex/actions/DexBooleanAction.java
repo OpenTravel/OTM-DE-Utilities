@@ -35,6 +35,8 @@ public abstract class DexBooleanAction extends DexActionBase implements DexActio
 
     protected ObservableValue<? extends Boolean> observable;
 
+    public DexBooleanAction() {}
+
     /**
      * @param otm
      */
@@ -54,20 +56,20 @@ public abstract class DexBooleanAction extends DexActionBase implements DexActio
      */
     protected abstract boolean get();
 
-    @Override
-    public void doIt(Object name) {
-        // NO-OP
-    }
+    // @Override
+    // public void doIt(Object name) {
+    // // NO-OP
+    // }
 
-    @Override
-    public boolean isEnabled() {
-        return getSubject().isEditable();
-    }
+    // @Override
+    // public boolean isEnabled() {
+    // return getSubject().isEditable();
+    // }
 
-    @Override
-    public boolean isAllowed(Boolean value) {
-        return getSubject().isEditable();
-    }
+    // @Override
+    // public boolean isAllowed(Boolean value) {
+    // return getSubject().isEditable();
+    // }
 
     @Override
     public ValidationFindings getVetoFindings() {

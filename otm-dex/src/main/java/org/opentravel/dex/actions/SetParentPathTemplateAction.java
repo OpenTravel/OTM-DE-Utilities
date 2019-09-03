@@ -22,9 +22,25 @@ import org.opentravel.model.resource.OtmParentRef;
 public class SetParentPathTemplateAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmParentRef)
+            return subject.isEditable();
+        return false;
+    }
+
+    protected SetParentPathTemplateAction() {}
+
     public SetParentPathTemplateAction(OtmParentRef otm) {
         super( otm );
         action = DexActions.SETPARENTPATHTEMPLATE;
+    }
+
+    protected String get() {
+        return getSubject().getPathTemplate();
     }
 
     @Override
@@ -36,25 +52,19 @@ public class SetParentPathTemplateAction extends DexStringAction {
         getSubject().setPathTemplate( value );
     }
 
-    protected String get() {
-        return getSubject().getPathTemplate();
+
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmParentRef))
+            return false;
+        otm = subject;
+        return true;
     }
-
-
 
     @Override
     public String toString() {
         return "ID Group set to " + get();
-    }
-
-    /**
-     * @param subject
-     * @return
-     */
-    public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmParentRef)
-            return subject.isEditable();
-        return false;
     }
 
 }

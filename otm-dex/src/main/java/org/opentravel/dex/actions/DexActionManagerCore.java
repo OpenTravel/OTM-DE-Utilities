@@ -16,10 +16,6 @@
 
 package org.opentravel.dex.actions;
 
-import org.opentravel.model.OtmObject;
-
-import javafx.beans.value.ObservableValue;
-
 /**
  * DEx action manager <b>protected</b> interface. Intended <b>only</b> for use by actions and action managers.
  * <p>
@@ -30,21 +26,21 @@ import javafx.beans.value.ObservableValue;
  */
 public interface DexActionManagerCore extends DexActionManager {
 
-    /**
-     * Get the action specific to the action name for the subject OtmObject.
-     * 
-     * @deprecated - create add(action, object) signature for these Only used for "run" actions <b>For use by
-     *             DexActionManagers only.</b>
-     * 
-     * @param actionName
-     * @param subject
-     * @return
-     */
-    @Deprecated
-    public DexAction<?> actionFactory(DexActions actionName, OtmObject subject);
+    // /**
+    // * Get the action specific to the action name for the subject OtmObject.
+    // *
+    // * @deprecated - create add(action, object) signature for these Only used for "run" actions <b>For use by
+    // * DexActionManagers only.</b>
+    // *
+    // * @param actionName
+    // * @param subject
+    // * @return
+    // */
+    // @Deprecated
+    // public DexAction<?> actionFactory(DexActions actionName, OtmObject subject);
 
 
-    public void postWarning(String warning);
+    // public void postWarning(String warning);
 
     /**
      * <b>For use by DexActions only.</b>
@@ -59,13 +55,13 @@ public interface DexActionManagerCore extends DexActionManager {
      */
     public void push(DexAction<?> action);
 
-    /**
-     * @param action
-     * @param property
-     * @param subject
-     * @return
-     */
-    boolean addAction(DexActions action, ObservableValue<? extends Boolean> o, OtmObject subject);
+    // /**
+    // * @param action
+    // * @param property
+    // * @param subject
+    // * @return
+    // */
+    // boolean addAction(DexActions action, ObservableValue<? extends Boolean> o, OtmObject subject);
 
     // /**
     // * @return

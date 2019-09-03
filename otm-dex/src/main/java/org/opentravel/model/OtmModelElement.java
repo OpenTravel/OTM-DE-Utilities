@@ -41,7 +41,6 @@ import java.util.List;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -90,9 +89,9 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     // Use lazy inflation on the getter.
     protected List<OtmObject> inheritedChildren = null;
 
-    private SimpleStringProperty nameProperty;
-    private SimpleStringProperty descriptionProperty;
-    private SimpleStringProperty validationProperty;
+    private StringProperty nameProperty;
+    private StringProperty descriptionProperty;
+    private StringProperty validationProperty;
     private ObjectProperty<ImageView> validationImageProperty;
 
     // private DexActionManager actionMgr = null;
@@ -119,13 +118,14 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     @Override
     public StringProperty descriptionProperty() {
         if (descriptionProperty == null) {
-            if (isEditable()) {
-                descriptionProperty = new SimpleStringProperty( getDescription() );
-                if (getActionManager() != null)
-                    getActionManager().addAction( DexActions.DESCRIPTIONCHANGE, descriptionProperty(), this );
-            } else {
-                descriptionProperty = new ReadOnlyStringWrapper( getDescription() );
-            }
+            descriptionProperty = getActionManager().add( DexActions.DESCRIPTIONCHANGE, getDescription(), this );
+            // if (isEditable()) {
+            // descriptionProperty = new SimpleStringProperty( getDescription() );
+            // if (getActionManager() != null)
+            // getActionManager().addAction( DexActions.DESCRIPTIONCHANGE, descriptionProperty(), this );
+            // } else {
+            // descriptionProperty = new ReadOnlyStringWrapper( getDescription() );
+            // }
         }
         return descriptionProperty;
     }
@@ -308,13 +308,14 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     @Override
     public StringProperty nameProperty() {
         if (nameProperty == null) {
-            if (isEditable()) {
-                nameProperty = new SimpleStringProperty( getName() );
-                if (getActionManager() != null)
-                    getActionManager().addAction( DexActions.NAMECHANGE, nameProperty, this );
-            } else {
-                nameProperty = new ReadOnlyStringWrapper( "" + getName() );
-            }
+            nameProperty = getActionManager().add( DexActions.NAMECHANGE, getName(), this );
+            // if (isEditable()) {
+            // nameProperty = new SimpleStringProperty( getName() );
+            // if (getActionManager() != null)
+            // getActionManager().addAction( DexActions.NAMECHANGE, nameProperty, this );
+            // } else {
+            // nameProperty = new ReadOnlyStringWrapper( "" + getName() );
+            // }
         }
         return nameProperty;
     }

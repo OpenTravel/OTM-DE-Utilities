@@ -187,7 +187,6 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         this.mainController = null;
 
         // Initialize managers
-        // TODO - use user settings to select which action manager to use
         modelMgr = new OtmModelManager( new DexFullActionManager( this ), getRepositoryManager() );
         imageMgr = new ImageManager( primaryStage );
 

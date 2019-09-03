@@ -23,6 +23,8 @@ import org.opentravel.model.resource.OtmParentRef;
 public class SetParentRefParentAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
+    protected SetParentRefParentAction() {}
+
     public SetParentRefParentAction(OtmParentRef otm) {
         super( otm );
         this.action = DexActions.SETPARENTREFPARENT;
@@ -32,6 +34,15 @@ public class SetParentRefParentAction extends DexStringAction {
     public OtmParentRef getSubject() {
         return (OtmParentRef) otm;
     }
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmParentRef))
+            return false;
+        otm = subject;
+        return true;
+    }
+
 
     protected void set(String value) {
         getSubject().setParentResourceString( value );

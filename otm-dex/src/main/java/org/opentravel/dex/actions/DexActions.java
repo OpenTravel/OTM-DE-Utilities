@@ -19,6 +19,7 @@ package org.opentravel.dex.actions;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.dex.events.DexResourceChildModifiedEvent;
 import org.opentravel.dex.events.DexResourceModifiedEvent;
+import org.opentravel.model.OtmObject;
 
 /**
  * Listing of all actions that can change model and their associated event object class (if any).
@@ -28,39 +29,79 @@ import org.opentravel.dex.events.DexResourceModifiedEvent;
  */
 public enum DexActions {
 
-    NAMECHANGE(null),
-    DESCRIPTIONCHANGE(null),
-    TYPECHANGE(null),
+    NAMECHANGE(NameChangeAction.class, null),
+    DESCRIPTIONCHANGE(DescriptionChangeAction.class, null),
+    TYPECHANGE(AssignedTypeChangeAction.class, null),
     //
-    BASEPATHCHANGE(DexResourceModifiedEvent.class),
-    SETABSTRACT(DexResourceModifiedEvent.class),
-    SETFIRSTCLASS(DexResourceModifiedEvent.class),
-    SETRESOURCEEXTENSION(DexResourceModifiedEvent.class),
+    BASEPATHCHANGE(BasePathChangeAction.class, DexResourceModifiedEvent.class),
+    SETABSTRACT(SetAbstractAction.class, DexResourceModifiedEvent.class),
+    SETFIRSTCLASS(SetFirstClassAction.class, DexResourceModifiedEvent.class),
+    SETRESOURCEEXTENSION(SetResourceExtensionAction.class, DexResourceModifiedEvent.class),
     //
-    SETIDGROUP(DexResourceChildModifiedEvent.class),
-    SETCOMMONACTION(DexResourceChildModifiedEvent.class),
-    SETPARENTPARAMETERGROUP(DexResourceChildModifiedEvent.class),
-    SETPARENTPATHTEMPLATE(DexResourceChildModifiedEvent.class),
-    SETPARENTREFPARENT(DexResourceChildModifiedEvent.class),
-    SETAFREFERENCETYPE(DexResourceChildModifiedEvent.class),
-    SETAFREFERENCEFACET(DexResourceChildModifiedEvent.class),
-    SETREQUESTPAYLOAD(DexResourceChildModifiedEvent.class),
-    SETREQUESTPARAMETERGROUP(DexResourceChildModifiedEvent.class),
-    SETREQUESTMETHOD(DexResourceChildModifiedEvent.class),
-    SETREQUESTPATH(DexResourceChildModifiedEvent.class),
-    SETRESPONSEPAYLOAD(DexResourceChildModifiedEvent.class),
-    SETPARAMETERLOCATION(DexResourceChildModifiedEvent.class),
-    SETPARAMETERGROUPFACET(DexResourceChildModifiedEvent.class);
+    SETIDGROUP(SetIdGroupAction.class, DexResourceChildModifiedEvent.class),
+    SETCOMMONACTION(SetCommonAction.class, DexResourceChildModifiedEvent.class),
+    SETPARENTPARAMETERGROUP(SetParentParameterGroupAction.class, DexResourceChildModifiedEvent.class),
+    SETPARENTPATHTEMPLATE(SetParentPathTemplateAction.class, DexResourceChildModifiedEvent.class),
+    SETPARENTREFPARENT(SetParentRefParentAction.class, DexResourceChildModifiedEvent.class),
+    SETAFREFERENCETYPE(SetAFReferenceTypeAction.class, DexResourceChildModifiedEvent.class),
+    SETAFREFERENCEFACET(SetAFReferenceFacetAction.class, DexResourceChildModifiedEvent.class),
+    SETREQUESTPAYLOAD(SetRequestPayloadAction.class, DexResourceChildModifiedEvent.class),
+    SETREQUESTPARAMETERGROUP(SetRequestParameterGroupAction.class, DexResourceChildModifiedEvent.class),
+    SETREQUESTMETHOD(SetRequestMethodAction.class, DexResourceChildModifiedEvent.class),
+    SETREQUESTPATH(SetRequestPathAction.class, DexResourceChildModifiedEvent.class),
+    SETRESPONSEPAYLOAD(SetResponsePayloadAction.class, DexResourceChildModifiedEvent.class),
+    SETPARAMETERLOCATION(SetParameterLocationAction.class, DexResourceChildModifiedEvent.class),
+    SETPARAMETERGROUPFACET(SetParameterGroupFacetAction.class, DexResourceChildModifiedEvent.class);
 
-    private final Class<? extends DexChangeEvent> handlerClass;
+    private final Class<? extends DexChangeEvent> eventClass;
 
-    public Class<? extends DexChangeEvent> handlerClass() {
-        return handlerClass;
+    public Class<? extends DexChangeEvent> eventClass() {
+        return eventClass;
     }
 
-    private DexActions(Class<? extends DexChangeEvent> handlerClass) {
-        this.handlerClass = handlerClass;
+    private final Class<? extends DexAction<?>> actionClass;
+
+    public Class<? extends DexAction<?>> actionClass() {
+        return actionClass;
     }
+
+    private DexActions(Class<? extends DexAction<?>> actionClass, Class<? extends DexChangeEvent> eventClass) {
+        this.actionClass = actionClass;
+        this.eventClass = eventClass;
+    }
+
+    /**
+     * Get the action handler associated with the action. Will return null if subject can't be set, action is not
+     * enabled or no action manager is assigned to the subject.
+     * 
+     * @param action
+     * @param subject the otm object the action will act upon
+     * @return handler or null
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws ExceptionInInitializerError
+     */
+    public static DexAction<?> getAction(DexActions action, OtmObject subject)
+        throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
+
+        DexAction<?> handler = null;
+
+        // Action subject must have an action handler assigned.
+        if (subject.getActionManager() != null && subject.getActionManager().isEnabled( action, subject )) {
+            if (action != null && action.actionClass != null) {
+                handler = action.actionClass.newInstance();
+            }
+            // do not return the handler if the subject can't be set
+            if (handler != null && !handler.setSubject( subject ))
+                handler = null;
+        }
+        return handler;
+    }
+    // Reflection Development notes - Constructors take many sub-types of OtmObject which are not returned.
+    // Constructor<? extends DexAction<?>> constructor;
+    // constructor = action.actionClass.getDeclaredConstructor( OtmObject.class );
+    // if (constructor != null)
+    // handler = constructor.newInstance( subject );
 
     /**
      * Get the event handler associated with the action.
@@ -70,14 +111,32 @@ public enum DexActions {
      * @throws IllegalAccessException
      * @throws ExceptionInInitializerError
      */
-    public static DexChangeEvent getHandler(DexActions action)
+    public static DexChangeEvent getEvent(DexActions action)
         throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
         DexChangeEvent handler = null;
-        if (action != null && action.handlerClass != null)
-            handler = action.handlerClass.newInstance();
+        if (action != null && action.eventClass != null)
+            handler = action.eventClass.newInstance();
         return handler;
     }
 
+    /**
+     * Get the event handler associated with the action.
+     * 
+     * @param subject to set into event handler
+     * @return handler or null
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws ExceptionInInitializerError
+     */
+    public static DexChangeEvent getEvent(DexActions action, OtmObject subject)
+        throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
+        DexChangeEvent handler = null;
+        if (action != null && action.eventClass != null)
+            handler = action.eventClass.newInstance();
+        if (handler != null)
+            handler.set( subject );
+        return handler;
+    }
 }
 
 

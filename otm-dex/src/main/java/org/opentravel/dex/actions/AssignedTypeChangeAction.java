@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
-import org.opentravel.dex.controllers.member.properties.PropertiesDAO;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
 import org.opentravel.model.OtmModelManager;
@@ -30,59 +29,96 @@ import org.opentravel.model.OtmTypeUser;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
-public class AssignedTypeChangeAction extends DexActionBase implements DexAction<OtmTypeProvider> {
+public class AssignedTypeChangeAction extends DexRunAction {
     private static Log log = LogFactory.getLog( AssignedTypeChangeAction.class );
-
-    // private OtmObject otm;
-    private OtmTypeUser user = null;
-    // private boolean outcome = false;
-
-    // private PropertiesDAO propertiesDAO;
-    private OtmTypeProvider oldProvider;
-    private NamedEntity oldTLType;
-    private String oldName;
-    private OtmTypeProvider newProvider;
-    // private boolean ignore;
-
-    // private ImageManager imageMgr = null;
-
-    private String oldTLTypeName;
 
     private static final String VETO1 = "org.opentravel.schemacompiler.TLProperty.name.ELEMENT_REF_NAME_MISMATCH";
     private static final String VETO2 = ".OBSOLETE_TYPE_REFERENCE";
     private static final String VETO3 = ".ILLEGAL_REFERENCE";
     private static final String[] VETOKEYS = {VETO1, VETO2, VETO3};
 
-    public AssignedTypeChangeAction(OtmTypeUser user) {
-        super( user );
-        this.user = user;
-        // this.otm = user;
+    public static boolean isEnabled(OtmObject subject) {
+        return (subject.isEditable() && subject instanceof OtmTypeUser);
     }
 
-    public AssignedTypeChangeAction(PropertiesDAO prop) {
-        super( prop.getValue() );
-        if (prop != null) {
-            if (prop.getValue() instanceof OtmTypeUser)
-                this.user = (OtmTypeUser) prop.getValue();
-            // this.otm = prop.getValue();
-        }
-    }
+    private OtmTypeUser user = null;
 
-    // @Override
-    // public OtmObject getSubject() {
-    // return otm;
-    // }
+    private OtmTypeProvider oldProvider;
+    private NamedEntity oldTLType;
+    private String oldName;
+    private String oldTLTypeName;
+    private OtmTypeProvider newProvider;
+
+    private DexActionManagerBase actionManager = null;
+
+
+    public AssignedTypeChangeAction() {
+        // Constructor for reflection
+    }
 
     /**
      * {@inheritDoc} This action will get the data from the user via modal dialog
      */
+    public OtmTypeProvider doIt() {
+        log.debug( "Ready to set assigned type to " + otm + " " + ignore );
+        if (ignore)
+            return null;
+        // Actions only created if action is enabled
+        // if (!isEnabled())
+        // return null;
+        if (user == null || otm == null)
+            return null;
+
+        // Is action manager needed any more? For undo?
+        if (actionManager == null)
+            return null;
+
+        if (otm.getOwningMember() == null)
+            return null;
+        OtmModelManager modelMgr = otm.getOwningMember().getModelManager();
+        if (modelMgr == null)
+            return null;
+
+        // Get the user's selected new provider
+        MemberAndProvidersDAO selected = null;
+        TypeSelectionContoller controller = TypeSelectionContoller.init();
+        controller.setManager( modelMgr );
+        if (controller.showAndWait( "MSG" ) == Results.OK) {
+            selected = controller.getSelected();
+            if (selected == null || !(selected.getValue() instanceof OtmTypeProvider))
+                log.error( "Missing selection from Type Selection Controller" ); // cancel?
+            else
+                doIt( selected.getValue() );
+            // log.debug( "action - Set Assigned Type on: " + selected.getValue().getName() );
+        }
+
+        // Make the change and test the results
+        // if (selected != null && selected.getValue() instanceof OtmTypeProvider)
+        // doIt( selected.getValue() );
+
+        return newProvider;
+    }
+
+    /**
+     * This action will get the data from the user via modal dialog
+     */
     @Override
     public void doIt(Object data) {
+        if (actionManager == null)
+            return;
         if (data == null)
             doIt();
         else {
             if (!(data instanceof OtmTypeProvider))
                 return;
+
+            // Hold onto old values
+            user = (OtmTypeUser) otm;
+            oldProvider = user.getAssignedType();
+            oldTLType = user.getAssignedTLType();
+            oldName = otm.getName();
+            oldTLTypeName = oldTLType.getLocalName();
+
             newProvider = (OtmTypeProvider) data;
             // Set value into model
             OtmTypeProvider p = user.setAssignedType( newProvider );
@@ -96,119 +132,14 @@ public class AssignedTypeChangeAction extends DexActionBase implements DexAction
             // outcome = true;
 
             // Record action to allow undo. Will validate results and warn user.
-            coreActionManager.push( this );
-        }
-    }
-
-    /**
-     * {@inheritDoc} This action will get the data from the user via modal dialog
-     */
-    public OtmTypeProvider doIt() {
-        log.debug( "Ready to set assigned type to " + otm + " " + ignore );
-        if (ignore)
-            return null;
-        if (!isEnabled())
-            return null;
-        if (user == null || otm == null)
-            return null;
-
-        // Is action manager needed any more? For undo?
-        if (coreActionManager == null)
-            return null;
-
-        if (otm.getOwningMember() == null)
-            return null;
-        OtmModelManager modelMgr = otm.getOwningMember().getModelManager();
-        if (modelMgr == null)
-            return null;
-
-        // Hold onto old value
-        user = (OtmTypeUser) otm;
-        oldProvider = user.getAssignedType();
-        oldTLType = user.getAssignedTLType();
-        oldName = otm.getName();
-        oldTLTypeName = user.assignedTypeProperty().get();
-
-        // Get the user's selected new provider
-        MemberAndProvidersDAO selected = null;
-        TypeSelectionContoller controller = TypeSelectionContoller.init();
-        controller.setManager( modelMgr );
-        if (controller.showAndWait( "MSG" ) == Results.OK) {
-            selected = controller.getSelected();
-            if (selected == null || selected.getValue() == null)
-                log.error( "Missing selection from Type Selection Controller" ); // cancel?
-            else
-                log.debug( "action - Set Assigned Type on: " + selected.getValue().getName() );
-        }
-
-        // Make the change and test the results
-        if (selected != null && selected.getValue() instanceof OtmTypeProvider) {
-            doIt( selected.getValue() );
-            // newProvider = (OtmTypeProvider) selected.getValue();
-            // // Set value into model
-            // OtmTypeProvider p = user.setAssignedType(newProvider);
-            //
-            // if (p != newProvider)
-            // outcome = false; // there was an error
-            // // TODO - how to process the error? Veto does not look at this.
-            //
-            // // Validate results. Note: TL will not veto (prevent) change.
-            // if (isValid())
-            // outcome = true;
-            //
-            // // Record action to allow undo. Will validate results and warn user.
-            // otm.getActionManager().push(this);
-
+            actionManager.push( this );
             log.debug( "Set type to " + newProvider );
         }
-        return newProvider;
     }
 
     @Override
-    public OtmTypeProvider undoIt() {
-        log.debug( " TODO -Undo-ing change" );
-        if (oldProvider != null) {
-            if (oldProvider != user.setAssignedType( oldProvider ))
-                coreActionManager.postWarning( "Error undoing change." );
-        } else if (oldTLType != null) {
-            // If provider was not in model manager
-            if (oldTLType != user.setAssignedTLType( oldTLType ))
-                coreActionManager.postWarning( "Error undoing change." );
-        } else {
-            // Sometimes, only the name is known because the tl model does not have the type loaded.
-            user.setTLTypeName( oldTLTypeName );
-            otm.setName( oldName );
-        }
-        otm.setName( oldName ); // May have been changed by assignment
-        return oldProvider;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Assure the object is a type user and editable.
-     */
-    @Override
-    public boolean isEnabled() {
-        if (!(otm instanceof OtmTypeUser))
-            return false;
-        if (!otm.isEditable())
-            return false;
-        return true;
-    }
-
-    public static boolean isEnabled(OtmObject subject) {
-        if (!(subject instanceof OtmTypeUser))
-            return false;
-        if (!subject.isEditable())
-            return false;
-        return true;
-    }
-
-    @Override
-    public boolean isAllowed(OtmTypeProvider value) {
-        // TODO Auto-generated method stub
-        return false;
+    public OtmTypeProvider get() {
+        return user.getAssignedType();
     }
 
     @Override
@@ -217,6 +148,11 @@ public class AssignedTypeChangeAction extends DexActionBase implements DexAction
         return ValidationUtils.getRelevantFindings( VETOKEYS, otm.getFindings() );
     }
 
+    // @Override
+    // public boolean isAllowed(OtmObject value) {
+    // return user instanceof OtmTypeUser && value instanceof OtmTypeProvider;
+    // }
+
     @Override
     public boolean isValid() {
         return otm.isValid( true ) ? true
@@ -224,7 +160,46 @@ public class AssignedTypeChangeAction extends DexActionBase implements DexAction
     }
 
     @Override
+    public boolean set(OtmObject subject) {
+        if (subject instanceof OtmTypeProvider) {
+            user.setAssignedType( (OtmTypeProvider) subject );
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmTypeUser))
+            return false;
+        otm = subject;
+        user = (OtmTypeUser) subject;
+        if (otm.getActionManager() instanceof DexActionManagerBase)
+            actionManager = (DexActionManagerBase) otm.getActionManager();
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "Assigned Type: " + newProvider;
+    }
+
+    @Override
+    public OtmTypeProvider undoIt() {
+        log.debug( " TODO -Undo-ing change" );
+        if (oldProvider != null) {
+            if (oldProvider != user.setAssignedType( oldProvider ))
+                actionManager.postWarning( "Error undoing change." );
+        } else if (oldTLType != null) {
+            // If provider was not in model manager
+            if (oldTLType != user.setAssignedTLType( oldTLType ))
+                actionManager.postWarning( "Error undoing change." );
+        } else {
+            // Sometimes, only the name is known because the tl model does not have the type loaded.
+            user.setTLTypeName( oldTLTypeName );
+            otm.setName( oldName );
+        }
+        otm.setName( oldName ); // May have been changed by assignment
+        return oldProvider;
     }
 }

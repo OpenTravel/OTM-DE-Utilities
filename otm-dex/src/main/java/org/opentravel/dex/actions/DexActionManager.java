@@ -24,9 +24,17 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 
 /**
- * Dex action manager <b>public</b> interface.
+ * Dex action manager <b>public</b> interface. Action manager can work with FX observable properties using the
+ * {@code add()} methods or with OtmObjects using {@code run()} actions. Various instances of {@code DexActionManager}
+ * control what actions are enabled.
  * <p>
- * Create actions associated with observable values or run actions associated with an OtmObject
+ * {@code add()} wraps the passed value in a FX observable property If {@code isEnabled()} the returned property is
+ * writable and has an action assigned to its listener. If not, {@code add()} will return a read-only property.
+ * <p>
+ * {@code run()} is used in menu or button {@code onAction()} event handlers. If enabled, run executes the action on the
+ * associated OtmObject. These actions must acquire their own data, typically from a modal dialog.
+ * <p>
+ * The action handler used will be retrieved from {@link DexActions}.
  * <p>
  * Action managers control and manage actions. Maintains queue of past actions and creates new actions. Notifies user of
  * performed action status.
@@ -41,8 +49,8 @@ public interface DexActionManager {
     /**
      * Create a boolean property and add an action if editable and enabled.
      * 
-     * @param action action to perform
-     * @param currentValue of boolean
+     * @param action to perform
+     * @param boolean to wrap
      * @param subject otmObject to change when property changes
      * @return
      */
@@ -51,19 +59,19 @@ public interface DexActionManager {
     /**
      * Create a string property and add an action if editable and enabled.
      * 
-     * @param action action to perform
-     * @param currentValue of string
+     * @param action to perform
+     * @param string to wrap
      * @param subject otmObject to change when string property changes
      * @return simple string property if editable and action enabled, read only property otherwise
      */
     public StringProperty add(DexActions action, String currentValue, OtmObject subject);
 
-    public boolean addAction(DexActions action, ObservableValue<? extends Boolean> property, OtmObject subject);
 
     /**
      * Set a listener on the FX observable string property to invoke the action.
      * <p>
-     * To be deprecated, it is preferred to use {@link #add(DexActions, String, OtmObject)}
+     * 
+     * @deprecated - use {@link #add(DexActions, String, OtmObject)}
      * 
      * @param action
      * @param op
@@ -78,6 +86,8 @@ public interface DexActionManager {
 
     public boolean isEnabled(DexActions action, OtmObject subject);
 
+    public void postWarning(String warning);
+
     /**
      * Create an action and do it. If successful will be added to the queue.
      * <p>
@@ -86,9 +96,16 @@ public interface DexActionManager {
      * 
      * @param actionType what action to perform
      * @param subject OTM object to act upon
-     * @param data used to modify the subject, may be null if action will run dialog to get data
      */
-    void run(DexActions actionType, OtmObject subject, Object data);
+    void run(DexActions actionType, OtmObject subject);
+
+    // /**
+    // * @deprecated
+    // * @param actionType
+    // * @param subject
+    // * @param data used to modify the subject, may be null if action will run dialog to get data
+    // */
+    // void run(DexActions actionType, OtmObject subject, Object data);
 
     /**
      * Pop an action from the queue and then undo it.

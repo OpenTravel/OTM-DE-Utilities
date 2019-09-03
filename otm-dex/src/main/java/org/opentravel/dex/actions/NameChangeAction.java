@@ -33,6 +33,12 @@ public class NameChangeAction extends DexStringAction {
     private static final String VETO3 = "org.opentravel.schemacompiler.TLProperty.name.PATTERN_MISMATCH";
     private static final String[] VETOKEYS = {VETO1, VETO2, VETO3};
 
+    public static boolean isEnabled(OtmObject subject) {
+        return subject.isEditable();
+    }
+
+    public NameChangeAction() {}
+
     public NameChangeAction(OtmObject otm) {
         super( otm );
     }
@@ -45,6 +51,12 @@ public class NameChangeAction extends DexStringAction {
     @Override
     protected void set(String value) {
         otm.setName( value );
+    }
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        otm = subject;
+        return true;
     }
 
 
@@ -78,7 +90,7 @@ public class NameChangeAction extends DexStringAction {
         // // outcome = true;
 
         if (!name.equals( modifiedName ))
-            coreActionManager.postWarning( "Changed name from " + name + " to " + modifiedName );
+            otm.getActionManager().postWarning( "Changed name from " + name + " to " + modifiedName );
 
         // // Record action to allow undo
         // coreActionManager.push( this );

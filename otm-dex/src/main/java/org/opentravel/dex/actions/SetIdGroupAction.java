@@ -22,6 +22,8 @@ import org.opentravel.model.resource.OtmParameterGroup;
 public class SetIdGroupAction extends DexBooleanAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
+    protected SetIdGroupAction() {}
+
     public SetIdGroupAction(OtmParameterGroup otm) {
         super( otm );
         action = DexActions.SETIDGROUP;
@@ -30,6 +32,14 @@ public class SetIdGroupAction extends DexBooleanAction {
     @Override
     public OtmParameterGroup getSubject() {
         return (OtmParameterGroup) otm;
+    }
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmParameterGroup))
+            return false;
+        otm = subject;
+        return true;
     }
 
     protected void set(boolean value) {

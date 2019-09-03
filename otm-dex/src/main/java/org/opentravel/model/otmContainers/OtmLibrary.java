@@ -21,11 +21,11 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.actions.DexActionManager;
-import org.opentravel.dex.actions.DexReadOnlyActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryPermission;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
+import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLInclude;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
@@ -89,11 +89,26 @@ public class OtmLibrary {
     }
 
     /**
+     * Simply add the TL member to the Tl library
+     * 
      * @param a library member
+     * @return the member if added OK
      */
-    public void add(OtmLibraryMember member) {
-        getTL().addNamedMember( member.getTlLM() );
-        // TODO - make sure not already a member
+    public OtmLibraryMember add(OtmLibraryMember member) {
+
+        // getTL().addNamedMember( member.getTlLM() );
+        if (member.getTL() instanceof LibraryMember)
+            try {
+                // make sure not already a member
+                if (getTL().getNamedMember( ((LibraryMember) member.getTL()).getLocalName() ) == null)
+                    getTL().addNamedMember( (LibraryMember) member.getTL() );
+                return member;
+            } catch (IllegalArgumentException e) {
+                log.warn( "Exception: " + e.getLocalizedMessage() );
+            }
+        else
+            log.warn( "Tried to add a non-library member " + member + " to library." );
+        return null;
     }
 
     /**
@@ -121,8 +136,9 @@ public class OtmLibrary {
     }
 
     public DexActionManager getActionManager() {
-        // FIXME - action manager should be based on library state
-        return getModelManager().getActionManager();
+        // TEST ME - action manager based on library state
+        return getModelManager().getActionManager( isEditable() );
+        // return getModelManager().getActionManager();
     }
 
     /**
@@ -263,15 +279,16 @@ public class OtmLibrary {
     }
 
     /**
-     * A library is editable if any associated project item state is Managed_WIP -OR- unmanaged.
+     * A library is editable if any associated project item state is Managed_WIP -OR- unmanaged. Regardless of action
+     * manager.
      * 
      * @return
      */
     public boolean isEditable() {
         // log.debug( "State of " + getName() + " is " + getState().toString() );
         // Can only edit if there is an appropriate action manager
-        if (getActionManager() instanceof DexReadOnlyActionManager)
-            return false;
+        // if (getActionManager() instanceof DexReadOnlyActionManager)
+        // return false;
         // Can only edit Draft libraries
         if (getStatus() != TLLibraryStatus.DRAFT)
             return false;

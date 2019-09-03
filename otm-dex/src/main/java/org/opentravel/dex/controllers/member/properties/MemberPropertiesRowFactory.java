@@ -63,7 +63,8 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
         addMenu.getItems().addAll( addObject, changeType, separator, upObject, downObject );
         setContextMenu( addMenu );
 
-        // Create action for addObject event
+        // Create action for addObject event. The actual object is not known, so there is no access to action manager
+        // instance
         addObject.setOnAction( this::addMemberEvent );
         changeType.setOnAction( e -> changeAssignedTypeListener() );
 
@@ -97,7 +98,7 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
         TreeItem<PropertiesDAO> treeItem = getTreeItem();
         if (treeItem != null && treeItem.getValue() != null && treeItem.getValue().getValue() instanceof OtmTypeUser) {
             OtmTypeUser user = (OtmTypeUser) treeItem.getValue().getValue();
-            user.getActionManager().run( DexActions.TYPECHANGE, user, null );
+            user.getActionManager().run( DexActions.TYPECHANGE, user );
         }
         controller.getMainController().refresh();
     }

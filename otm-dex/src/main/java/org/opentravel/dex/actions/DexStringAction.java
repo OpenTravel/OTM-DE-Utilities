@@ -41,46 +41,15 @@ public abstract class DexStringAction extends DexActionBase implements DexAction
     protected String newString;
     protected ObservableValue<? extends String> observable;
 
+    public DexStringAction() {
+        super();
+    }
+
     /**
      * @param otm
      */
     public DexStringAction(OtmObject otm) {
         super( otm );
-        oldString = get();
-        if (oldString == null)
-            oldString = "";
-    }
-
-    /**
-     * Simply set the object's string field value
-     * 
-     * @param value
-     */
-    protected abstract void set(String value);
-
-    /**
-     * Simply get the object's string field value
-     */
-    protected abstract String get();
-
-    @Override
-    public void doIt(Object name) {
-        // NO-OP
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return getSubject().isEditable();
-    }
-
-    @Override
-    public boolean isAllowed(String value) {
-        return getSubject().isEditable();
-    }
-
-    @Override
-    public ValidationFindings getVetoFindings() {
-        return null;
     }
 
     public String doIt(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -90,6 +59,9 @@ public abstract class DexStringAction extends DexActionBase implements DexAction
             return "";
         ignore = true;
 
+        oldString = get();
+        if (oldString == null)
+            oldString = "";
         this.observable = observable;
         this.newString = newValue;
 
@@ -103,6 +75,46 @@ public abstract class DexStringAction extends DexActionBase implements DexAction
         return get();
     }
 
+    /**
+     * Simply get the object's string field value
+     */
+    protected abstract String get();
+
+    // @Override
+    // public void doIt(Object name) {
+    // // NO-OP
+    // }
+
+    @Override
+    public ValidationFindings getVetoFindings() {
+        return null;
+    }
+
+    // @Override
+    // public boolean isAllowed(String value) {
+    // return getSubject().isEditable();
+    // }
+
+    // @Override
+    // public boolean isEnabled() {
+    // return getSubject().isEditable();
+    // }
+
+    /**
+     * @return true if change already made is valid for this object for this application and user.
+     */
+    public boolean isValid() {
+        // Override if change can cause invalid objects
+        return true;
+    }
+
+    /**
+     * Simply set the object's string field value
+     * 
+     * @param value
+     */
+    protected abstract void set(String value);
+
     @Override
     public String undoIt() {
         ignore = true;
@@ -113,14 +125,6 @@ public abstract class DexStringAction extends DexActionBase implements DexAction
         log.debug( "Undo - " + toString() + " using " + oldString );
         ignore = false;
         return oldString;
-    }
-
-    /**
-     * @return true if change already made is valid for this object for this application and user.
-     */
-    public boolean isValid() {
-        // Override if change can cause invalid objects
-        return true;
     }
 
 

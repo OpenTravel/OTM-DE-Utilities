@@ -114,7 +114,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         for (DexActions action : DexActions.values()) {
             DexChangeEvent event = null;
             try {
-                event = DexActions.getHandler( action );
+                event = DexActions.getEvent( action );
                 if (event != null && !publishedEventTypes.contains( event.getEventType() ))
                     publishedEventTypes.add( event.getEventType() );
             } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException e) {
@@ -205,7 +205,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     }
 
     public void undoAction() {
-        modelMgr.getActionManager().undo();
+        modelMgr.getActionManager( true ).undo();
         // mainController.refresh();
     }
 

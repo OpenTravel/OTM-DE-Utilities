@@ -24,6 +24,8 @@ import org.opentravel.model.otmLibraryMembers.OtmResource;
 public class SetResourceExtensionAction extends DexStringAction {
     private static Log log = LogFactory.getLog( SetResourceExtensionAction.class );
 
+    public SetResourceExtensionAction() {}
+
     public SetResourceExtensionAction(OtmResource otm) {
         super( otm );
         action = DexActions.SETRESOURCEEXTENSION;
@@ -32,6 +34,14 @@ public class SetResourceExtensionAction extends DexStringAction {
     @Override
     public OtmResource getSubject() {
         return (OtmResource) otm;
+    }
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmResource))
+            return false;
+        otm = subject;
+        return true;
     }
 
     protected void set(String value) {

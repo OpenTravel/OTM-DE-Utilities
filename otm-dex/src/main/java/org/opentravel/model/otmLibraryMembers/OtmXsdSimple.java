@@ -48,7 +48,7 @@ public class OtmXsdSimple extends OtmSimpleObjects<XSDSimpleType> implements Otm
 
     @Override
     public OtmLibrary getLibrary() {
-        OtmLibrary l = super.getLibrary();
+        // OtmLibrary l = super.getLibrary();
         return super.getLibrary();
     }
 

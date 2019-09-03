@@ -16,12 +16,16 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
 
 public class DescriptionChangeAction extends DexStringAction {
-    private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+    // private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+
+    public static boolean isEnabled(OtmObject subject) {
+        return subject.isEditable();
+    }
+
+    public DescriptionChangeAction() {}
 
     public DescriptionChangeAction(OtmObject otm) {
         super( otm );
@@ -37,8 +41,11 @@ public class DescriptionChangeAction extends DexStringAction {
         otm.setDescription( value );
     }
 
-    public static boolean isEnabled(OtmObject subject) {
-        return subject.isEditable();
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        otm = subject;
+        return true;
     }
 
     @Override

@@ -42,19 +42,25 @@ public class DexReadOnlyActionManager extends DexActionManagerBase {
         return false;
     }
 
-    /**
-     * {@inheritDoc} Does nothing and returns false.
-     */
-    @Override
-    public boolean addAction(DexActions action, ObservableValue<? extends Boolean> property, OtmObject subject) {
-        return false;
-    }
+    // /**
+    // * {@inheritDoc} Does nothing and returns false.
+    // */
+    // @Override
+    // public boolean addAction(DexActions action, ObservableValue<? extends Boolean> property, OtmObject subject) {
+    // return false;
+    // }
 
-    /**
-     * {@inheritDoc} Does nothing and returns false.
-     */
+    // // FIXME - these should not be needed any longer
+    // /**
+    // * {@inheritDoc} Does nothing and returns false.
+    // */
+    // @Override
+    // public void run(DexActions action, OtmObject subject, Object data) {
+    // // Do Nothing - READ ONLY!
+    // }
+
     @Override
-    public void run(DexActions action, OtmObject subject, Object data) {
+    public void run(DexActions action, OtmObject subject) {
         // Do Nothing - READ ONLY!
     }
 

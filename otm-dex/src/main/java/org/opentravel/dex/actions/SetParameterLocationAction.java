@@ -22,6 +22,8 @@ import org.opentravel.model.resource.OtmParameter;
 public class SetParameterLocationAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
+    protected SetParameterLocationAction() {}
+
     public SetParameterLocationAction(OtmParameter otm) {
         super( otm );
         action = DexActions.SETPARAMETERLOCATION;
@@ -30,6 +32,14 @@ public class SetParameterLocationAction extends DexStringAction {
     @Override
     public OtmParameter getSubject() {
         return (OtmParameter) otm;
+    }
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmParameter))
+            return false;
+        otm = subject;
+        return true;
     }
 
     protected void set(String value) {

@@ -22,6 +22,8 @@ import org.opentravel.model.resource.OtmParameterGroup;
 public class SetParameterGroupFacetAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
+    protected SetParameterGroupFacetAction() {}
+
     public SetParameterGroupFacetAction(OtmParameterGroup otm) {
         super( otm );
         action = DexActions.SETPARAMETERGROUPFACET;
@@ -31,6 +33,15 @@ public class SetParameterGroupFacetAction extends DexStringAction {
     public OtmParameterGroup getSubject() {
         return (OtmParameterGroup) otm;
     }
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmParameterGroup))
+            return false;
+        otm = subject;
+        return true;
+    }
+
 
     protected void set(String value) {
         getSubject().setReferenceFacetString( value );

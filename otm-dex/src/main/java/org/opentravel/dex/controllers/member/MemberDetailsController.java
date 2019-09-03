@@ -261,7 +261,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     private void setAssignedType() {
         log.debug( "Set assigned type event." );
         if (selectedMember instanceof OtmTypeUser)
-            selectedMember.getActionManager().run( DexActions.TYPECHANGE, selectedMember, null );
+            selectedMember.getActionManager().run( DexActions.TYPECHANGE, selectedMember );
         refresh();
     }
 

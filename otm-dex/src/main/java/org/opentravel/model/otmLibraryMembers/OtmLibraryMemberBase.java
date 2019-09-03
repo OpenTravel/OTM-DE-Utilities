@@ -105,7 +105,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public DexActionManager getActionManager() {
-        return mgr.getActionManager();
+        return getLibrary() != null ? getLibrary().getActionManager() : null;
     }
 
     @Override
@@ -229,6 +229,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public OtmLibrary getLibrary() {
+        if (mgr == null)
+            return null;
         // AbstractLibrary absLib = getTlLM().getOwningLibrary();
         return getTlLM() != null ? mgr.get( getTlLM().getOwningLibrary() ) : null;
     }
