@@ -74,17 +74,16 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     private static final EventType[] subscribedEvents =
         {DexModelChangeEvent.MODEL_CHANGED, DexLibrarySelectionEvent.LIBRARY_SELECTED};
 
-    private static final String ALL = "All Objects";
-    private static final String BUSINESS = "Business";
-    private static final String CHOICE = "Choice";
-    private static final String CORE = "Core";
-    private static final String RESOURCE = "Resource";
-    private static final String SERVICE = "Service";
-    private static final String SIMPLE = "Simple";
+    public static final String ALL = "All Objects";
+    public static final String BUSINESS = "Business";
+    public static final String CHOICE = "Choice";
+    public static final String CORE = "Core";
+    public static final String RESOURCE = "Resource";
+    public static final String SERVICE = "Service";
+    public static final String SIMPLE = "Simple";
+    public static final String ENUMERATION = "Enumeration";
+    public static final String VWA = "Value With Attributes";
 
-    private static final String ENUMERATION = "Enumeration";
-
-    private static final String VWA = "Value With Attributes";
     /**
      * FXML Java FX Nodes this controller is dependent upon
      */
@@ -398,28 +397,33 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     private void setTypeFilter(ActionEvent e) {
         if (memberTypeCombo.getValue() != null) {
             String value = memberTypeCombo.getValue();
-            if (value.isEmpty() || value.equals( ALL ))
-                classNameFilter = null;
-            else if (value.startsWith( RESOURCE ))
-                classNameFilter = OtmResource.class.getSimpleName();
-            else if (value.startsWith( SERVICE ))
-                classNameFilter = OtmServiceObject.class.getSimpleName();
-            else if (value.startsWith( BUSINESS ))
-                classNameFilter = OtmBusinessObject.class.getSimpleName();
-            else if (value.startsWith( CHOICE ))
-                classNameFilter = OtmChoiceObject.class.getSimpleName();
-            else if (value.startsWith( CORE ))
-                classNameFilter = OtmCore.class.getSimpleName();
-            else if (value.startsWith( SIMPLE ))
-                classNameFilter = OtmSimpleObject.class.getSimpleName();
-            else if (value.startsWith( ENUMERATION ))
-                classNameFilter = OtmEnumeration.class.getSimpleName();
-            else if (value.startsWith( VWA ))
-                classNameFilter = OtmValueWithAttributes.class.getSimpleName();
-
+            setTypeFilter( value );
         }
+    }
+
+    public void setTypeFilter(String value) {
+        if (value.isEmpty() || value.equals( ALL ))
+            classNameFilter = null;
+        else if (value.startsWith( RESOURCE ))
+            classNameFilter = OtmResource.class.getSimpleName();
+        else if (value.startsWith( SERVICE ))
+            classNameFilter = OtmServiceObject.class.getSimpleName();
+        else if (value.startsWith( BUSINESS ))
+            classNameFilter = OtmBusinessObject.class.getSimpleName();
+        else if (value.startsWith( CHOICE ))
+            classNameFilter = OtmChoiceObject.class.getSimpleName();
+        else if (value.startsWith( CORE ))
+            classNameFilter = OtmCore.class.getSimpleName();
+        else if (value.startsWith( SIMPLE ))
+            classNameFilter = OtmSimpleObject.class.getSimpleName();
+        else if (value.startsWith( ENUMERATION ))
+            classNameFilter = OtmEnumeration.class.getSimpleName();
+        else if (value.startsWith( VWA ))
+            classNameFilter = OtmValueWithAttributes.class.getSimpleName();
+
         // log.debug("Set Type Filter: " + classNameFilter);
         fireFilterChangeEvent();
     }
+
 
 }

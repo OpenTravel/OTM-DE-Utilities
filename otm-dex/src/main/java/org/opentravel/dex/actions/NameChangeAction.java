@@ -37,10 +37,8 @@ public class NameChangeAction extends DexStringAction {
         return subject.isEditable();
     }
 
-    public NameChangeAction() {}
-
-    public NameChangeAction(OtmObject otm) {
-        super( otm );
+    public NameChangeAction() {
+        action = DexActions.NAMECHANGE;
     }
 
     @Override
@@ -64,38 +62,18 @@ public class NameChangeAction extends DexStringAction {
     public String doIt(ObservableValue<? extends String> o, String oldName, String name) {
         log.debug( "Ready to set name to " + name + "  from: " + oldName + " on: " + otm.getClass().getSimpleName()
             + " " + ignore );
-        // if (ignore)
-        // return "";
-        // if (otm.getActionManager() == null)
-        // return "";
-        // // TODO - should we allow empty name?
-        // if (name == null || name.isEmpty())
-        // return "";
-        //
-        // this.observable = o;
-        // this.oldString = oldName;
-        // this.modifiedName = name;
 
         // Force upper case
         String modifiedName = name;
         if (otm instanceof OtmObject)
             modifiedName = name.substring( 0, 1 ).toUpperCase() + name.substring( 1 );
+
         super.doIt( o, oldName, modifiedName );
 
-        // // Set value into model and GUI
-        // otm.setName( modifiedName );
-        //
-        // // // Validate results. Note: TL will not veto (prevent) change.
-        // // if (isValid())
-        // // outcome = true;
-
         if (!name.equals( modifiedName ))
-            otm.getActionManager().postWarning( "Changed name from " + name + " to " + modifiedName );
+            otm.getActionManager()
+                .postWarning( "Warning: Changed the value entered: " + name + " to valid name of " + modifiedName );
 
-        // // Record action to allow undo
-        // coreActionManager.push( this );
-        //
-        // log.debug( "Set name to " + name );
         return get();
     }
 

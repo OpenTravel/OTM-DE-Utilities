@@ -25,9 +25,24 @@ public abstract class DexActionBase {
     private static Log log = LogFactory.getLog( DexActionBase.class );
 
     protected DexActions action = null; // Which enumeration does this action implement
+
     protected OtmObject otm;
     // protected DexActionManagerCore coreActionManager = null;
     protected boolean ignore;
+    // protected ChangeListener<?> changeListner;
+
+    // public ChangeListener<?> getChangeListner() {
+    // return changeListner;
+    // }
+    //
+    // public void setChangeListener(ChangeListener<?> changeListner) {
+    // // this.changeListner = changeListner;
+    // }
+
+    public void removeChangeListener() {
+        // this.changeListner = changeListner;
+    }
+
 
     public DexActionBase() {}
 
@@ -37,6 +52,10 @@ public abstract class DexActionBase {
 
         // assert (coreActionManager != null);
         this.otm = otm;
+    }
+
+    public DexActions getType() {
+        return action;
     }
 
     // /**

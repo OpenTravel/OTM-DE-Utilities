@@ -22,16 +22,31 @@ import org.opentravel.model.resource.OtmParameterGroup;
 public class SetIdGroupAction extends DexBooleanAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
-    protected SetIdGroupAction() {}
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmParameterGroup)
+            return subject.isEditable();
+        return false;
+    }
 
-    public SetIdGroupAction(OtmParameterGroup otm) {
-        super( otm );
+    protected SetIdGroupAction() {
         action = DexActions.SETIDGROUP;
+    }
+
+    protected boolean get() {
+        return getSubject().isIdGroup();
     }
 
     @Override
     public OtmParameterGroup getSubject() {
         return (OtmParameterGroup) otm;
+    }
+
+    protected void set(boolean value) {
+        getSubject().setIdGroup( value );
     }
 
     @Override
@@ -42,29 +57,9 @@ public class SetIdGroupAction extends DexBooleanAction {
         return true;
     }
 
-    protected void set(boolean value) {
-        getSubject().setIdGroup( value );
-    }
-
-    protected boolean get() {
-        return getSubject().isIdGroup();
-    }
-
-
-
     @Override
     public String toString() {
         return "ID Group set to " + get();
-    }
-
-    /**
-     * @param subject
-     * @return
-     */
-    public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmParameterGroup)
-            return subject.isEditable();
-        return false;
     }
 
 }

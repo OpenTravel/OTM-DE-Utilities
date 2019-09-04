@@ -299,6 +299,10 @@ public class OtmLibrary {
         return mgr.isLatest( this );
     }
 
+    public String toString() {
+        return getNameWithBasenamespace();
+    }
+
     public void validate() {
         findings = TLModelCompileValidator.validateModelElement( getTL(), true );
     }

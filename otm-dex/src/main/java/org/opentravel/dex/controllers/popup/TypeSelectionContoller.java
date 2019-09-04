@@ -92,6 +92,10 @@ public class TypeSelectionContoller extends DexPopupControllerBase {
     @FXML
     private MemberFilterController memberFilterController;
 
+    public MemberFilterController getMemberFilterController() {
+        return memberFilterController;
+    }
+
     private OtmModelManager modelManager;
 
     // private ImageManager imageMgr;

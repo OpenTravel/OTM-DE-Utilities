@@ -20,6 +20,9 @@ import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmObject;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+
 /**
  * Actions are invoked by the view controllers to perform <i>actions</i> on the model.
  * <p>
@@ -98,6 +101,8 @@ public interface DexAction<T> {
      */
     public boolean setSubject(OtmObject subject);
 
+    public DexActions getType();
+
     /**
      * Use the stored values to undo the change.
      * 
@@ -106,6 +111,19 @@ public interface DexAction<T> {
      * @return
      */
     public T undoIt();
+
+    /**
+     * @param changeListener
+     */
+    public void setChangeListener(ChangeListener<T> changeListener, ObservableValue<? extends T> observable);
+
+    public void removeChangeListener();
+
+    /**
+     * @return
+     */
+    public ObservableValue<? extends T> getObservable();
+
 
     // public T redo();
     // /**

@@ -22,6 +22,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
 /**
@@ -41,9 +42,44 @@ public abstract class DexStringAction extends DexActionBase implements DexAction
     protected String newString;
     protected ObservableValue<? extends String> observable;
 
+
+    protected ChangeListener<String> changeListener;
+
     public DexStringAction() {
         super();
     }
+
+    @Override
+    public void removeChangeListener() {
+        observable.removeListener( changeListener );
+    }
+
+    @Override
+    public ObservableValue<? extends String> getObservable() {
+        return observable;
+    }
+
+    @Override
+    public void setChangeListener(ChangeListener<String> listener, ObservableValue<? extends String> o) {
+        // Remove any previously set listeners
+        if (changeListener != null && observable != null)
+            removeChangeListener();
+
+        this.changeListener = listener;
+        this.observable = o;
+
+        if (observable != null && changeListener != null)
+            observable.addListener( listener );
+    }
+
+    // public ChangeListener<?> getChangeListner() {
+    // return changeListner;
+    // }
+    //
+    // @Override
+    // public void setChangeListner(ChangeListener<?> changeListner) {
+    // this.changeListner = changeListner;
+    // }
 
     /**
      * @param otm

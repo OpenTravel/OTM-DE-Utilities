@@ -26,7 +26,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
@@ -48,6 +47,7 @@ import javafx.beans.property.StringProperty;
  * Verifies the functions of the <code>UserSettings</code> class.
  */
 public class TestDexActionManager {
+
     private static Log log = LogFactory.getLog( TestDexActionManager.class );
 
     private static OtmModelManager staticModelManager = null;
@@ -127,22 +127,36 @@ public class TestDexActionManager {
         assertTrue( mgr.getQueueSize() > 0 );
     }
 
-    // @Ignore
-    // @Test
-    // public void testActionFactory() {
-    // DexActionManagerCore am = new DexReadOnlyActionManager();
-    // OtmModelManager mgr = new OtmModelManager( am, null );
-    //
-    // // Given an OtmObject
-    // OtmEnumerationOpen openEnum = TestEnumerationOpen.buildOtm( mgr );
-    // OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtm( mgr );
-    // // Action Factory - type users all return actions
-    // // FIXME
-    // // for (DexActions action : DexActions.values()) {
-    // // assertNotNull( "Must return an action for " + action.toString() + ".", am.actionFactory( action, vwa ) );
-    // // }
-    // log.debug( "Factory Test complete." );
-    // }
+    private static final String CHANGED_NAME1 = "VwaWithNewName1";
+    private static final String CHANGED_NAME2 = "VwaWithNewName2";
+
+    @Test
+    public void testPushAction() {
+        lib = staticModelManager.add( new TLLibrary() );
+        DexActionManager am = lib.getActionManager();
+        assertTrue( am.getQueueSize() == 0 );
+
+        // Given an OtmObject with action added
+        OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtm( staticModelManager );
+        lib.add( vwa );
+        SimpleStringProperty nameProperty = (SimpleStringProperty) am.add( DexActions.NAMECHANGE, vwa.getName(), vwa );
+        assertTrue( !(nameProperty instanceof ReadOnlyStringWrapper) );
+
+        // When - action is run by changing string property
+        nameProperty.set( CHANGED_NAME1 );
+
+        // Queue must be larger
+        assertTrue( am.getQueueSize() == 1 );
+
+        // When - action is run by changing string property
+        nameProperty.set( CHANGED_NAME2 );
+
+        // Then - Queue must be larger
+        // If not, action may have been duplicate and not added
+        assertTrue( am.getQueueSize() == 2 );
+
+        log.debug( "Push Test complete." );
+    }
 
     private final static String NEW_NAME = "MyNewName";
 
@@ -214,48 +228,48 @@ public class TestDexActionManager {
 
     }
 
-    @Test
-    public void testAssignTypeAction()
-        throws ExceptionInInitializerError, InstantiationException, IllegalAccessException, NoSuchMethodException,
-        SecurityException, IllegalArgumentException, InvocationTargetException {
-        DexActionManagerCore am = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( am, null );
-        assertTrue( am.getQueueSize() == 0 );
-        lib = mgr.add( new TLLibrary() );
-
-        // Given a OtmObjects
-        OtmEnumeration<?> closedEnum = TestEnumerationClosed.buildOtm( mgr );
-        lib.add( closedEnum );
-        OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtm( mgr );
-        lib.add( vwa );
-        assertFalse( "Must not have type.", vwa.getAssignedType() == closedEnum );
-        OtmTypeProvider originalType = vwa.getAssignedType();
-        assertTrue( vwa.getActionManager() instanceof DexFullActionManager );
-
-        // As run from the GUI, the run will launch a dialog
-        // user.getActionManager().run( DexActions.TYPECHANGE, user );
-        // The action uses doIt(otmTypeProvider);
-        // Action manager uses actionHandler = DexActions.getAction( action, subject );
-
-        // Given - an action for type change on VWA
-        DexRunAction action = (DexRunAction) DexActions.getAction( DexActions.TYPECHANGE, vwa );
-        assertNotNull( action );
-
-        // When - executed using action's method
-        action.doIt( closedEnum );
-
-        // Then
-        assertTrue( "Must have type.", vwa.getAssignedType() == closedEnum );
-        assertTrue( !am.getLastActionName().isEmpty() );
-        assertTrue( am.getQueueSize() > 0 );
-
-        // When - undo the change
-        am.undo();
-        // Then
-        assertTrue( "Undo must restore type.", vwa.getAssignedType() == originalType );
-
-        log.debug( "Name Change Test complete." );
-    }
+    // @Test
+    // public void testAssignTypeAction()
+    // throws ExceptionInInitializerError, InstantiationException, IllegalAccessException, NoSuchMethodException,
+    // SecurityException, IllegalArgumentException, InvocationTargetException {
+    // DexFullActionManager am = new DexFullActionManager( null );
+    // OtmModelManager mgr = new OtmModelManager( am, null );
+    // assertTrue( am.getQueueSize() == 0 );
+    // lib = mgr.add( new TLLibrary() );
+    //
+    // // Given a OtmObjects
+    // OtmEnumeration<?> closedEnum = TestEnumerationClosed.buildOtm( mgr );
+    // lib.add( closedEnum );
+    // OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtm( mgr );
+    // lib.add( vwa );
+    // assertFalse( "Must not have type.", vwa.getAssignedType() == closedEnum );
+    // OtmTypeProvider originalType = vwa.getAssignedType();
+    // assertTrue( vwa.getActionManager() instanceof DexFullActionManager );
+    //
+    // // As run from the GUI, the run will launch a dialog
+    // // user.getActionManager().run( DexActions.TYPECHANGE, user );
+    // // The action uses doIt(otmTypeProvider);
+    // // Action manager uses actionHandler = DexActions.getAction( action, subject );
+    //
+    // // Given - an action for type change on VWA
+    // DexRunAction action = (DexRunAction) DexActions.getAction( DexActions.TYPECHANGE, vwa );
+    // assertNotNull( action );
+    //
+    // // When - executed using action's method
+    // action.doIt( closedEnum );
+    //
+    // // Then
+    // assertTrue( "Must have type.", vwa.getAssignedType() == closedEnum );
+    // assertTrue( !am.getLastActionName().isEmpty() );
+    // assertTrue( am.getQueueSize() > 0 );
+    //
+    // // When - undo the change
+    // am.undo();
+    // // Then
+    // assertTrue( "Undo must restore type.", vwa.getAssignedType() == originalType );
+    //
+    // log.debug( "Name Change Test complete." );
+    // }
 
     @Test
     public void testReadOnlyActionManager() {

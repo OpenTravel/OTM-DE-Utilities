@@ -26,6 +26,8 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.OtmObjectChangeEvent;
+import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -92,7 +94,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
 
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
-        {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+        {OtmObjectModifiedEvent.OBJECT_MODIFIED, OtmObjectChangeEvent.OBJECT_CHANGED,
+            DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
 
     public MemberDetailsController() {
         super( subscribedEvents, publishedEvents );
@@ -140,10 +143,25 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
+        log.debug( "Received event: " + event.getClass().getSimpleName() );
         if (event instanceof DexMemberSelectionEvent)
             memberSelectionHandler( (DexMemberSelectionEvent) event );
         if (event instanceof DexModelChangeEvent)
             modelChangeEvent( (DexModelChangeEvent) event );
+        else if (event instanceof OtmObjectChangeEvent)
+            handleEvent( (OtmObjectChangeEvent) event );
+        else if (event instanceof OtmObjectModifiedEvent)
+            handleEvent( (OtmObjectModifiedEvent) event );
+    }
+
+    public void handleEvent(OtmObjectChangeEvent event) {
+        if (event != null && event.get() == selectedMember)
+            refresh();
+    }
+
+    public void handleEvent(OtmObjectModifiedEvent event) {
+        if (event != null && event.get() == selectedMember)
+            refresh();
     }
 
     public void modelChangeEvent(DexModelChangeEvent event) {

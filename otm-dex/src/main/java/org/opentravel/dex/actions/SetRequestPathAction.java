@@ -22,16 +22,31 @@ import org.opentravel.model.resource.OtmActionRequest;
 public class SetRequestPathAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
-    protected SetRequestPathAction() {}
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmActionRequest)
+            return subject.isEditable();
+        return false;
+    }
 
-    public SetRequestPathAction(OtmActionRequest otm) {
-        super( otm );
+    protected SetRequestPathAction() {
         action = DexActions.SETREQUESTPATH;
+    }
+
+    protected String get() {
+        return getSubject().getPathTemplate();
     }
 
     @Override
     public OtmActionRequest getSubject() {
         return (OtmActionRequest) otm;
+    }
+
+    protected void set(String value) {
+        getSubject().setPathTemplate( value, true );
     }
 
     @Override
@@ -42,29 +57,9 @@ public class SetRequestPathAction extends DexStringAction {
         return true;
     }
 
-    protected void set(String value) {
-        getSubject().setPathTemplate( value, true );
-    }
-
-    protected String get() {
-        return getSubject().getPathTemplate();
-    }
-
-
-
     @Override
     public String toString() {
         return "Request path set to " + get();
-    }
-
-    /**
-     * @param subject
-     * @return
-     */
-    public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmActionRequest)
-            return subject.isEditable();
-        return false;
     }
 
 }

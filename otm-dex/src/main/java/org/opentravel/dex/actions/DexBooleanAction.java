@@ -22,6 +22,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
 /**
@@ -36,6 +37,31 @@ public abstract class DexBooleanAction extends DexActionBase implements DexActio
     protected ObservableValue<? extends Boolean> observable;
 
     public DexBooleanAction() {}
+
+    protected ChangeListener<Boolean> changeListener;
+
+    @Override
+    public void removeChangeListener() {
+        observable.removeListener( changeListener );
+    }
+
+    @Override
+    public ObservableValue<? extends Boolean> getObservable() {
+        return observable;
+    }
+
+    @Override
+    public void setChangeListener(ChangeListener<Boolean> listener, ObservableValue<? extends Boolean> o) {
+        // Remove any previously set listeners
+        if (changeListener != null && observable != null)
+            removeChangeListener();
+
+        this.changeListener = listener;
+        this.observable = o;
+
+        if (observable != null && changeListener != null)
+            observable.addListener( listener );
+    }
 
     /**
      * @param otm

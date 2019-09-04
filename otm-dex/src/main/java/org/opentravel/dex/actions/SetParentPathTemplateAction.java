@@ -32,10 +32,7 @@ public class SetParentPathTemplateAction extends DexStringAction {
         return false;
     }
 
-    protected SetParentPathTemplateAction() {}
-
-    public SetParentPathTemplateAction(OtmParentRef otm) {
-        super( otm );
+    protected SetParentPathTemplateAction() {
         action = DexActions.SETPARENTPATHTEMPLATE;
     }
 
@@ -52,8 +49,6 @@ public class SetParentPathTemplateAction extends DexStringAction {
         getSubject().setPathTemplate( value );
     }
 
-
-
     @Override
     public boolean setSubject(OtmObject subject) {
         if (!(subject instanceof OtmParentRef))
@@ -64,7 +59,7 @@ public class SetParentPathTemplateAction extends DexStringAction {
 
     @Override
     public String toString() {
-        return "ID Group set to " + get();
+        return "Path template set to " + get();
     }
 
 }

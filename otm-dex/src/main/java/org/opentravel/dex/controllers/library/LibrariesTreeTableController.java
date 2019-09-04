@@ -77,7 +77,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     // Editable Columns
     // None
 
-    private OtmModelManager modelMgr;
+    // private OtmModelManager modelMgr;
 
     public LibrariesTreeTableController() {
         super( subscribedEvents, publishedEvents );
@@ -94,8 +94,8 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         super.configure( parent );
         eventPublisherNode = libraries;
 
-        modelMgr = parent.getModelManager();
-        if (modelMgr == null)
+        postedData = parent.getModelManager();
+        if (postedData == null)
             throw new IllegalStateException( "Model manager is null but needed for the library view controller." );
 
         // Set the hidden root item
@@ -117,8 +117,9 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         // Enable context menus at the row level and add change listener for for applying style
         librariesTreeTable.setRowFactory( (TreeTableView<LibraryDAO> p) -> new LibraryRowFactory( this ) );
 
+        // TODO - why is this here?
         // create cells for members
-        for (OtmLibrary lib : modelMgr.getLibraries()) {
+        for (OtmLibrary lib : postedData.getLibraries()) {
             createTreeItem( lib, root );
         }
     }
@@ -134,34 +135,38 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
      */
     @Override
     public void post(OtmModelManager modelMgr) {
-        if (modelMgr != null)
-            this.modelMgr = modelMgr;
-        refresh();
+        if (modelMgr != null) {
+            postedData = modelMgr;
+
+            log.debug( "Refreshing library tree table. Ready to post " + modelMgr.getBaseNamespaces().size()
+                + " base namespaces." );
+            librariesTreeTable.getSelectionModel().clearSelection();
+            librariesTreeTable.getRoot().getChildren().clear();
+            modelMgr.printLibraries();
+
+            // create cells for libraries in a namespace. Latest at top, older ones under it.
+            for (String baseNS : modelMgr.getBaseNamespaces()) {
+                log.debug( "Posting base namespace: " + baseNS );
+                TreeItem<LibraryDAO> latestItem = null;
+                OtmLibrary latest = null;
+                Set<OtmLibrary> libs = modelMgr.getLibraryChain( baseNS );
+                for (OtmLibrary lib : libs)
+                    if (lib != null && lib.isLatestVersion()) {
+                        latestItem = createTreeItem( lib, root );
+                        latest = lib;
+                    }
+                // Put 1st item at root, all rest under it.
+                if (latest != null)
+                    for (OtmLibrary lib : libs)
+                        if (lib != latest)
+                            createTreeItem( lib, latestItem );
+            }
+        }
     }
 
     @Override
     public void refresh() {
-        log.debug( "Refreshing library tree table. Ready to post " + modelMgr.getBaseNamespaces().size()
-            + " base namespaces." );
-        librariesTreeTable.getSelectionModel().clearSelection();
-        librariesTreeTable.getRoot().getChildren().clear();
-
-        // create cells for libraries in a namespace. Latest at top, older ones under it.
-        for (String baseNS : modelMgr.getBaseNamespaces()) {
-            TreeItem<LibraryDAO> latestItem = null;
-            OtmLibrary latest = null;
-            Set<OtmLibrary> libs = modelMgr.getLibraryChain( baseNS );
-            for (OtmLibrary lib : libs)
-                if (lib != null && lib.isLatestVersion()) {
-                    latestItem = createTreeItem( lib, root );
-                    latest = lib;
-                }
-            // Put 1st item at root, all rest under it.
-            if (latest != null)
-                for (OtmLibrary lib : libs)
-                    if (lib != latest)
-                        createTreeItem( lib, latestItem );
-        }
+        post( postedData );
     }
 
     private boolean ignore = false;
@@ -266,6 +271,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
      * @return
      */
     private TreeItem<LibraryDAO> createTreeItem(OtmLibrary library, TreeItem<LibraryDAO> parent) {
+        log.debug( "Create tree item for: " + library );
         if (library != null) {
             TreeItem<LibraryDAO> item = new TreeItem<>( new LibraryDAO( library ) );
             item.setExpanded( false );

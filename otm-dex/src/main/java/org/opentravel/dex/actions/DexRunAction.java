@@ -20,6 +20,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+
 /**
  * Actions invoked to perform actions on an OtmObject from the model. Action must acquire its own data.
  * <p>
@@ -32,6 +35,26 @@ public abstract class DexRunAction extends DexActionBase implements DexAction<Ot
 
     public DexRunAction() {
         super();
+    }
+
+    // protected ChangeListener<String> changeListener;
+
+    @Override
+    public void removeChangeListener() {
+        // observable.removeListener( changeListener );
+    }
+
+    @Override
+    public void setChangeListener(ChangeListener<OtmObject> changeListener, ObservableValue<? extends OtmObject> o) {
+        // this.changeListener = listener;
+    }
+
+    /**
+     * @see org.opentravel.dex.actions.DexAction#getObservable()
+     */
+    @Override
+    public ObservableValue<? extends OtmObject> getObservable() {
+        return null; // There is no observable for directly run actions
     }
 
     /**
@@ -63,10 +86,7 @@ public abstract class DexRunAction extends DexActionBase implements DexAction<Ot
      * 
      * @param data to apply to the action
      */
-    public void doIt(Object data) {
-        // TODO Auto-generated method stub
-
-    }
+    public abstract void doIt(Object data);
 
     // @Override
     // public ValidationFindings getVetoFindings() {

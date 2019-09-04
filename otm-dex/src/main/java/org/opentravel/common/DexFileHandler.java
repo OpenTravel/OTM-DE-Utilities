@@ -23,17 +23,23 @@ import org.opentravel.application.common.DirectoryChooserDelegate;
 import org.opentravel.application.common.FileChooserDelegate;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.loader.LibraryInputSource;
 import org.opentravel.schemacompiler.loader.LibraryLoaderException;
 import org.opentravel.schemacompiler.loader.LibraryModelLoader;
 import org.opentravel.schemacompiler.loader.impl.LibraryStreamInputSource;
+import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLModel;
 import org.opentravel.schemacompiler.repository.ProjectManager;
+import org.opentravel.schemacompiler.saver.LibraryModelSaver;
+import org.opentravel.schemacompiler.saver.LibrarySaveException;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
 
 import javafx.stage.Stage;
 
@@ -47,7 +53,6 @@ public class DexFileHandler extends AbstractMainWindowController {
     public static final String PROJECT_FILE_EXTENSION = ".otp";
     private static final String LIBRARY_FILE_EXTENSION = ".otm";
     public static final String FILE_SEPARATOR = "/";
-
 
     ValidationFindings findings = null;
 
@@ -192,6 +197,51 @@ public class DexFileHandler extends AbstractMainWindowController {
             }
         }
         return manager;
+    }
+
+    public static String saveLibraries(List<OtmLibrary> libraries) {
+        if (libraries == null || libraries.isEmpty())
+            return "No libraries to save.";
+
+        final LibraryModelSaver lms = new LibraryModelSaver();
+        final StringBuilder successfulSaves = new StringBuilder();
+        final StringBuilder errorSaves = new StringBuilder();
+        final ValidationFindings findings = new ValidationFindings();
+        for (final OtmLibrary library : libraries) {
+            if (library.isEditable() && library.getTL() instanceof TLLibrary) {
+                final TLLibrary tlLib = (TLLibrary) library.getTL();
+                final String libraryName = library.getName();
+                final URL libraryUrl = tlLib.getLibraryUrl();
+
+                try {
+                    log.debug( "Saving library: " + libraryName + " " + libraryUrl );
+                    findings.addAll( lms.saveLibrary( tlLib ) );
+                    successfulSaves.append( "\n" ).append( libraryName ).append( " (" ).append( libraryUrl )
+                        .append( ")" );
+                } catch (final LibrarySaveException e) {
+                    final Throwable t = e.getCause();
+                    errorSaves.append( "\n" ).append( libraryName ).append( " (" ).append( libraryUrl ).append( ")" )
+                        .append( " - " ).append( e.getMessage() );
+                    if (t != null && t.getMessage() != null) {
+                        errorSaves.append( " (" ).append( t.getMessage() ).append( ")" );
+                    }
+                }
+            }
+        }
+        return buildSaveResults( successfulSaves, errorSaves );
+    }
+
+    private static String buildSaveResults(StringBuilder successfulSaves, StringBuilder errorSaves) {
+        // Return the results
+        final StringBuilder userMessage = new StringBuilder();
+        if (successfulSaves.length() > 0)
+            userMessage.append( "Successfully saved:" ).append( successfulSaves ).append( "\n\n" );
+
+        if (errorSaves.length() > 0)
+            userMessage.append( "Failed to save:" ).append( errorSaves ).append( "\n\n" )
+                .append( "You may need to use the .bak file to restore your work" );
+
+        return userMessage.toString();
     }
 
     @Override

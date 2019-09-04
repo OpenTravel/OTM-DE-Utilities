@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -10,6 +9,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.VBox?>
@@ -26,9 +26,10 @@
                 <Menu mnemonicParsing="false" text="File">
                   <items>
                     <MenuItem fx:id="doNewProjectItem" mnemonicParsing="false" onAction="#doNewProject" text="New Project..." />
+                    <MenuItem fx:id="fileOpenItem" mnemonicParsing="false" onAction="#fileOpen" text="Open..." />
                     <SeparatorMenuItem mnemonicParsing="false" />
                     <MenuItem fx:id="doCloseItem" mnemonicParsing="false" onAction="#doClose" text="Close" />
-                    <MenuItem fx:id="fileOpenItem" mnemonicParsing="false" onAction="#fileOpen" text="Open..." />
+                        <MenuItem fx:id="doSaveAllItem" mnemonicParsing="false" onAction="#doSaveAll" text="Save All" />
                     <SeparatorMenuItem mnemonicParsing="false" />
                     <MenuItem fx:id="appExitItem" mnemonicParsing="false" onAction="#appExit" text="Exit" />
                   </items>
@@ -41,7 +42,7 @@
                 </Menu>
               </menus>
             </MenuBar>
-            <ToggleButton fx:id="launchResourceWindow" onAction="#launchResourceWindow" mnemonicParsing="false" text="Resource Window" />
+            <ToggleButton fx:id="launchResourceWindow" mnemonicParsing="false" onAction="#launchResourceWindow" text="Resource Window" />
             <Label fx:id="projectLabel" text="Select Project">
                <padding>
                   <Insets left="50.0" right="5.0" />
@@ -63,7 +64,7 @@
                   <Insets right="5.0" />
                </padding>
             </Label>
-            <Button fx:id="undoActionButton" onAction="#undoAction" mnemonicParsing="false" text="Undo" />
+            <Button fx:id="undoActionButton" mnemonicParsing="false" onAction="#undoAction" text="Undo" />
          </items>
       </ToolBar>
    </children>

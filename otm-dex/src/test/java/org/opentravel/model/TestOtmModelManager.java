@@ -16,13 +16,13 @@
 
 package org.opentravel.model;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractOTMApplication;
@@ -41,7 +41,7 @@ import java.util.Collection;
 /**
  * Verifies the functions of the <code>Otm Model Manager</code>.
  */
-@Ignore
+// @Ignore
 public class TestOtmModelManager extends AbstractFxTest {
     private static Log log = LogFactory.getLog( TestOtmModelManager.class );
 
@@ -81,6 +81,37 @@ public class TestOtmModelManager extends AbstractFxTest {
         mgr.getBaseNamespaces().forEach( b -> assertTrue( !mgr.getLibraryChain( b ).isEmpty() ) );
 
         mapTests( mgr );
+    }
+
+    @Test
+    public void testClose() throws Exception {
+        // Given - project added to the model manager
+        OtmModelManager mgr = new OtmModelManager( null, repoManager );
+        TestDexFileHandler.loadManagedProject( mgr );
+        mgr.addProjects();
+        mapTests( mgr );
+
+        // Given assertions
+        assertFalse( mgr.getBaseNamespaces().isEmpty() );
+        for (String baseNS : mgr.getBaseNamespaces()) {
+            assertFalse( mgr.getLibraryChain( baseNS ).isEmpty() );
+        }
+        int baseNSCount = mgr.getBaseNamespaces().size();
+
+        // When - cleared
+        mgr.clear();
+
+        // Then
+        assertTrue( mgr.getBaseNamespaces().isEmpty() );
+        assertTrue( mgr.getUserProjects().isEmpty() );
+        assertTrue( mgr.getProjects().isEmpty() );
+        assertTrue( mgr.getMembers().isEmpty() );
+        assertTrue( mgr.getLibraries().isEmpty() );
+
+        // When - loaded again
+        TestDexFileHandler.loadManagedProject( mgr );
+        mgr.addProjects();
+        assertTrue( mgr.getBaseNamespaces().size() == baseNSCount );
     }
 
     @Test
@@ -143,6 +174,11 @@ public class TestOtmModelManager extends AbstractFxTest {
 
     }
 
+    /**
+     * Test libraries in the manger to assure they have TL libraries and managing projects.
+     * 
+     * @param mgr
+     */
     private void mapTests(OtmModelManager mgr) {
 
         // Then - assure each library maps to the same TL as the otmLibrary's tlObject

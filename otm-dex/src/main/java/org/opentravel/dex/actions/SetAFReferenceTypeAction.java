@@ -22,16 +22,31 @@ import org.opentravel.model.resource.OtmActionFacet;
 public class SetAFReferenceTypeAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
-    protected SetAFReferenceTypeAction() {}
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmActionFacet)
+            return subject.isEditable();
+        return false;
+    }
 
-    public SetAFReferenceTypeAction(OtmActionFacet otm) {
-        super( otm );
+    protected SetAFReferenceTypeAction() {
         action = DexActions.SETAFREFERENCETYPE;
+    }
+
+    protected String get() {
+        return getSubject().getReferenceTypeString();
     }
 
     @Override
     public OtmActionFacet getSubject() {
         return (OtmActionFacet) otm;
+    }
+
+    protected void set(String value) {
+        getSubject().setReferenceTypeString( value );
     }
 
     @Override
@@ -42,29 +57,9 @@ public class SetAFReferenceTypeAction extends DexStringAction {
         return true;
     }
 
-    protected void set(String value) {
-        getSubject().setReferenceTypeString( value );
-    }
-
-    protected String get() {
-        return getSubject().getReferenceTypeString();
-    }
-
-
-
     @Override
     public String toString() {
-        return "ID Group set to " + get();
-    }
-
-    /**
-     * @param subject
-     * @return
-     */
-    public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmActionFacet)
-            return subject.isEditable();
-        return false;
+        return "Reference Type set to " + get();
     }
 
 }

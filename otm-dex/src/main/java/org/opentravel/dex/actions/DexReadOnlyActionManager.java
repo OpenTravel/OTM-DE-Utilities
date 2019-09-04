@@ -16,10 +16,7 @@
 
 package org.opentravel.dex.actions;
 
-import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
-
-import javafx.beans.value.ObservableValue;
 
 /**
  * Read Only action manager. All actions are disabled (isEnabled = false) and run commands ignored.
@@ -34,35 +31,10 @@ public class DexReadOnlyActionManager extends DexActionManagerBase {
         super();
     }
 
-    /**
-     * {@inheritDoc} Does nothing and returns false.
-     */
-    @Override
-    public boolean addAction(DexActions action, ObservableValue<? extends String> op, OtmModelElement<?> subject) {
-        return false;
-    }
-
-    // /**
-    // * {@inheritDoc} Does nothing and returns false.
-    // */
     // @Override
-    // public boolean addAction(DexActions action, ObservableValue<? extends Boolean> property, OtmObject subject) {
-    // return false;
+    // public void run(DexActions action, OtmObject subject) {
+    // // READ ONLY! Do Nothing
     // }
-
-    // // FIXME - these should not be needed any longer
-    // /**
-    // * {@inheritDoc} Does nothing and returns false.
-    // */
-    // @Override
-    // public void run(DexActions action, OtmObject subject, Object data) {
-    // // Do Nothing - READ ONLY!
-    // }
-
-    @Override
-    public void run(DexActions action, OtmObject subject) {
-        // Do Nothing - READ ONLY!
-    }
 
     @Override
     public boolean isEnabled(DexActions action, OtmObject subject) {

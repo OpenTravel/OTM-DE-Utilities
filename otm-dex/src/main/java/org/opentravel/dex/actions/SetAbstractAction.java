@@ -22,19 +22,22 @@ import org.opentravel.model.otmLibraryMembers.OtmResource;
 public class SetAbstractAction extends DexBooleanAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
-    protected SetAbstractAction() {}
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmResource)
+            return subject.isEditable();
+        return false;
+    }
 
-    public SetAbstractAction(OtmResource otm) {
-        super( otm );
+    protected SetAbstractAction() {
         action = DexActions.SETABSTRACT;
     }
 
-    @Override
-    public boolean setSubject(OtmObject subject) {
-        if (!(subject instanceof OtmResource))
-            return false;
-        otm = subject;
-        return true;
+    protected boolean get() {
+        return getSubject().isAbstract();
     }
 
     @Override
@@ -46,25 +49,19 @@ public class SetAbstractAction extends DexBooleanAction {
         getSubject().setAbstract( value );
     }
 
-    protected boolean get() {
-        return getSubject().isAbstract();
+
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmResource))
+            return false;
+        otm = subject;
+        return true;
     }
-
-
 
     @Override
     public String toString() {
         return "Abstract set to " + get();
-    }
-
-    /**
-     * @param subject
-     * @return
-     */
-    public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmResource)
-            return subject.isEditable();
-        return false;
     }
 
 }

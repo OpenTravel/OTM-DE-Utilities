@@ -135,8 +135,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     }
 
     public void handleEvent(DexResourceModifiedEvent event) {
-        if (event.get() == postedObject)
-            refresh();
+        refresh();
     }
 
     public void handleEvent(DexResourceChildSelectionEvent event) {

@@ -22,16 +22,31 @@ import org.opentravel.model.resource.OtmActionRequest;
 public class SetRequestMethodAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
-    protected SetRequestMethodAction() {}
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmActionRequest)
+            return subject.isEditable();
+        return false;
+    }
 
-    public SetRequestMethodAction(OtmActionRequest otm) {
-        super( otm );
+    protected SetRequestMethodAction() {
         action = DexActions.SETREQUESTMETHOD;
+    }
+
+    protected String get() {
+        return getSubject().getMethodString();
     }
 
     @Override
     public OtmActionRequest getSubject() {
         return (OtmActionRequest) otm;
+    }
+
+    protected void set(String value) {
+        getSubject().setMethodString( value );
     }
 
     @Override
@@ -42,30 +57,9 @@ public class SetRequestMethodAction extends DexStringAction {
         return true;
     }
 
-
-    protected void set(String value) {
-        getSubject().setMethodString( value );
-    }
-
-    protected String get() {
-        return getSubject().getMethodString();
-    }
-
-
-
     @Override
     public String toString() {
-        return "Action facet set to " + get();
-    }
-
-    /**
-     * @param subject
-     * @return
-     */
-    public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmActionRequest)
-            return subject.isEditable();
-        return false;
+        return "Request method set to " + get();
     }
 
 }

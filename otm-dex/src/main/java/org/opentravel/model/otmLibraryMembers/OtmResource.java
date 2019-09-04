@@ -385,7 +385,9 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      * @param subject
      */
     public OtmBusinessObject setSubject(OtmBusinessObject subject) {
-        return (OtmBusinessObject) setAssignedType( subject );
+        OtmBusinessObject result = (OtmBusinessObject) setAssignedType( subject );
+        refresh( true );
+        return result;
     }
 
     /**
@@ -489,8 +491,13 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     private Node getSubectNode() {
         Button button = new Button( getSubjectName() );
         button.setDisable( !isEditable() );
-        button.setOnAction( a -> log.debug( "Button selected" ) );
+        button.setOnAction( a -> assignSubject() );
         return button;
+    }
+
+    private void assignSubject() {
+        log.debug( "Button selected" );
+        getActionManager().run( DexActions.ASSIGNSUBJECT, this );
     }
 
     private Node getBasePathNode() {

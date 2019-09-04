@@ -19,6 +19,7 @@ package org.opentravel.dex.actions;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.dex.events.DexResourceChildModifiedEvent;
 import org.opentravel.dex.events.DexResourceModifiedEvent;
+import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.model.OtmObject;
 
 /**
@@ -29,10 +30,11 @@ import org.opentravel.model.OtmObject;
  */
 public enum DexActions {
 
-    NAMECHANGE(NameChangeAction.class, null),
-    DESCRIPTIONCHANGE(DescriptionChangeAction.class, null),
-    TYPECHANGE(AssignedTypeChangeAction.class, null),
+    NAMECHANGE(NameChangeAction.class, OtmObjectModifiedEvent.class),
+    DESCRIPTIONCHANGE(DescriptionChangeAction.class, OtmObjectModifiedEvent.class),
+    TYPECHANGE(AssignedTypeChangeAction.class, OtmObjectModifiedEvent.class),
     //
+    ASSIGNSUBJECT(AssignResourceSubjectAction.class, DexResourceModifiedEvent.class),
     BASEPATHCHANGE(BasePathChangeAction.class, DexResourceModifiedEvent.class),
     SETABSTRACT(SetAbstractAction.class, DexResourceModifiedEvent.class),
     SETFIRSTCLASS(SetFirstClassAction.class, DexResourceModifiedEvent.class),
@@ -87,7 +89,8 @@ public enum DexActions {
         DexAction<?> handler = null;
 
         // Action subject must have an action handler assigned.
-        if (subject.getActionManager() != null && subject.getActionManager().isEnabled( action, subject )) {
+        if (subject != null && subject.getActionManager() != null
+            && subject.getActionManager().isEnabled( action, subject )) {
             if (action != null && action.actionClass != null) {
                 handler = action.actionClass.newInstance();
             }

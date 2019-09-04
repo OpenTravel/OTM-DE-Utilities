@@ -24,9 +24,10 @@ import org.opentravel.common.cellfactories.AssignedTypePropertiesTreeTableCellFa
 import org.opentravel.common.cellfactories.ValidationPropertiesTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.OtmObjectChangeEvent;
+import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.event.EventType;
@@ -46,13 +47,14 @@ import javafx.scene.layout.VBox;
  * @author dmh
  *
  */
-public class MemberPropertiesTreeTableController extends DexIncludedControllerBase<MemberAndProvidersDAO> {
+public class MemberPropertiesTreeTableController extends DexIncludedControllerBase<OtmLibraryMember> {
     private static Log log = LogFactory.getLog( MemberPropertiesTreeTableController.class );
 
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
 
     private static final EventType[] subscribedEvents =
-        {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+        {OtmObjectChangeEvent.OBJECT_CHANGED, OtmObjectModifiedEvent.OBJECT_MODIFIED,
+            DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
     @FXML
     protected TreeTableView<PropertiesDAO> propertiesTable;
     @FXML
@@ -181,6 +183,18 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
             handleMemberSelection( (DexMemberSelectionEvent) e );
         if (e instanceof DexModelChangeEvent)
             handleModelChange( (DexModelChangeEvent) e );
+        if (e instanceof OtmObjectChangeEvent)
+            handleEvent( (OtmObjectChangeEvent) e );
+        if (e instanceof OtmObjectModifiedEvent)
+            handleEvent( (OtmObjectModifiedEvent) e );
+    }
+
+    private void handleEvent(OtmObjectChangeEvent e) {
+        refresh();
+    }
+
+    private void handleEvent(OtmObjectModifiedEvent e) {
+        refresh();
     }
 
     public void handleMaxEdit(TreeTableColumn.CellEditEvent<PropertiesDAO,String> event) {
@@ -219,6 +233,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     }
 
     public void post(OtmLibraryMember member) {
+        postedData = member;
         clear();
         if (member != null)
             new PropertiesDAO( member, this ).createChildrenItems( root, null );
@@ -253,6 +268,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     @Override
     public void refresh() {
         propertiesTable.refresh();
+        post( postedData );
     }
 
     /**

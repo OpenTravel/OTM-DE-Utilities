@@ -25,10 +25,8 @@ public class DescriptionChangeAction extends DexStringAction {
         return subject.isEditable();
     }
 
-    public DescriptionChangeAction() {}
-
-    public DescriptionChangeAction(OtmObject otm) {
-        super( otm );
+    public DescriptionChangeAction() {
+        action = DexActions.DESCRIPTIONCHANGE;
     }
 
     @Override

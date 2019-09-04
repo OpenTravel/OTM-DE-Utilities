@@ -34,6 +34,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
 /**
@@ -42,26 +43,26 @@ import javafx.beans.value.ObservableValue;
  * @author dmh
  *
  */
-public abstract class DexActionManagerBase implements DexActionManagerCore {
+public abstract class DexActionManagerBase implements DexActionManager {
     private static Log log = LogFactory.getLog( DexActionManagerBase.class );
 
     // Controller for accessing GUI controls
     private DexMainController mainController = null;
 
-    protected Deque<DexAction<?>> queue;
+    private final Deque<DexAction<?>> queue = new ArrayDeque<>();
     protected boolean ignore;
 
     /**
      * Action manager that can not update status or display queue size and contents.
      */
     public DexActionManagerBase() {
-        queue = new ArrayDeque<>();
+        // queue = new ArrayDeque<>();
     }
 
 
     public DexActionManagerBase(DexMainController mainController) {
         this.mainController = mainController;
-        queue = new ArrayDeque<>();
+        // queue = new ArrayDeque<>();
     }
 
     @Override
@@ -70,7 +71,6 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
         if (isEnabled( action, subject )) {
             property = new SimpleBooleanProperty( currentValue );
             setListener( property, action, subject );
-            // addAction( action, property, subject );
         } else
             property = new ReadOnlyBooleanWrapper( currentValue );
         return property;
@@ -82,7 +82,6 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
         if (isEnabled( action, subject )) {
             property = new SimpleStringProperty( currentValue );
             setListener( property, action, subject );
-            // addAction( action, property, (OtmModelElement<?>) subject );
         } else
             property = new ReadOnlyStringWrapper( currentValue );
         return property;
@@ -90,46 +89,36 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
 
     @Override
     public void run(DexActions action, OtmObject subject) {
+        run( action, subject, null );
+    }
+
+    // TESTING method to bypass action handler getting its own data
+    public void run(DexActions action, OtmObject subject, Object value) {
         DexAction<?> actionHandler;
         try {
             actionHandler = DexActions.getAction( action, subject );
             if (actionHandler instanceof DexRunAction) {
-                ((DexRunAction) actionHandler).doIt();
+                if (value == null)
+                    ((DexRunAction) actionHandler).doIt();
+                else
+                    ((DexRunAction) actionHandler).doIt( value );
             }
         } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException | SecurityException
             | IllegalArgumentException e) {
             log.warn( "Could not create action. " + e.getLocalizedMessage() );
         }
-        // // DexAction<?> action = null;
-        // switch (action) {
-        // // case NAMECHANGE:
-        // // action = new NameChangeAction( subject );
-        // // break;
-        // // case DESCRIPTIONCHANGE:
-        // // action = new DescriptionChangeAction( subject );
-        // // break;
-        // case TYPECHANGE:
-        // if (subject instanceof OtmTypeUser)
-        // new AssignedTypeChangeAction( (OtmTypeUser) subject ).doIt();
-        // break;
-        // default:
-        // log.debug( "Unknown action: " + actionType.toString() );
-        // }
-
-        // ((AssignedTypeChangeAction) actionFactory( actionType, subject )).doIt();
     }
 
-    // TODO
+    // Development Notes:
     // The ObservableValue stores a strong reference to the listener which will prevent the listener from being garbage
-    // collected and may result in a memory leak. It is recommended to either unregister a listener by calling
-    // removeListener after use or to use an instance of WeakChangeListener avoid this situation.
+    // collected and may result in a memory leak. (If the observable outlives the listener.) It is recommended to either
+    // unregister a listener by calling removeListener after use or to use an instance of WeakChangeListener avoid this
+    // situation.
     //
-    // BUT: Note: You have to keep a reference to the ListChangeListener, that was passed in as long as it is in use,
-    // otherwise it will be garbage collected to soon.
-    // WeakChangeListener<String> wcl =
-    // new WeakChangeListener<>( (ObservableValue<? extends String> o, String oldValue,
-    // String newValue) -> doString( (DexStringAction) actionHandler, o, oldValue, newValue ) );
-    // op.addListener( wcl );
+    // To protect against this, we add the listener and observable and remove the listener when the action is
+    // successfully pushed
+    // onto the queue.
+
 
     /**
      * Get action from {@link DexActions} enumeration and use it as the string change listener.
@@ -139,7 +128,7 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
      * @param subject
      * @return
      */
-    protected DexAction<?> setListener(StringProperty op, DexActions action, OtmObject subject) {
+    protected DexAction<?> setListener2(StringProperty op, DexActions action, OtmObject subject) {
         try {
             DexAction<?> actionHandler = DexActions.getAction( action, subject );
             if (actionHandler instanceof DexStringAction) {
@@ -154,20 +143,27 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
         return null;
     }
 
-    /**
-     * Get action from {@link DexActions} enumeration and use it as the boolean change listener.
-     * 
-     * @param op
-     * @param action
-     * @param subject
-     * @return
-     */
-    protected DexAction<?> setListener(BooleanProperty op, DexActions action, OtmObject subject) {
+    protected DexAction<?> setListener(ObservableValue<?> o, DexActions action, OtmObject subject) {
+        if (o instanceof StringProperty)
+            return setListener( ((StringProperty) o), action, subject );
+        if (o instanceof BooleanProperty)
+            return setListener( ((BooleanProperty) o), action, subject );
+        return null;
+    }
+
+    protected DexAction<?> setListener(StringProperty op, DexActions action, OtmObject subject) {
         try {
             DexAction<?> actionHandler = DexActions.getAction( action, subject );
-            if (actionHandler instanceof DexBooleanAction) {
-                op.addListener( (ObservableValue<? extends Boolean> o, Boolean oldValue,
-                    Boolean newValue) -> doBoolean( (DexBooleanAction) actionHandler, o ) );
+            if (actionHandler instanceof DexStringAction) {
+                ChangeListener<String> changeListener = new ChangeListener<String>() {
+                    @Override
+                    public void changed(ObservableValue<? extends String> observable, String oldValue,
+                        String newValue) {
+                        doString( (DexStringAction) actionHandler, op, oldValue, newValue );
+                    }
+                };
+                // Set and Save listener so it can be removed later.
+                ((DexStringAction) actionHandler).setChangeListener( changeListener, op );
                 return actionHandler;
             }
         } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException | SecurityException
@@ -178,26 +174,51 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
     }
 
 
-    // Only used for a "run" actions
-    // @Override
-    // public DexAction<?> actionFactory(DexActions actionType, OtmObject subject) {
-    // DexAction<?> action = null;
-    // switch (actionType) {
-    // case NAMECHANGE:
-    // action = new NameChangeAction( subject );
-    // break;
-    // case DESCRIPTIONCHANGE:
-    // action = new DescriptionChangeAction( subject );
-    // break;
-    // case TYPECHANGE:
-    // if (subject instanceof OtmTypeUser)
-    // action = new AssignedTypeChangeAction( (OtmTypeUser) subject );
-    // break;
-    // default:
-    // log.debug( "Unknown action: " + actionType.toString() );
+    // /**
+    // * Get action from {@link DexActions} enumeration and use it as the boolean change listener.
+    // *
+    // * @param op
+    // * @param action
+    // * @param subject
+    // * @return
+    // */
+    // protected DexAction<?> setListener2(BooleanProperty op, DexActions action, OtmObject subject) {
+    // try {
+    // DexAction<?> actionHandler = DexActions.getAction( action, subject );
+    // if (actionHandler instanceof DexBooleanAction) {
+    // op.addListener( (ObservableValue<? extends Boolean> o, Boolean oldValue,
+    // Boolean newValue) -> doBoolean( (DexBooleanAction) actionHandler, o ) );
+    // return actionHandler;
     // }
-    // return action;
+    // } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException | SecurityException
+    // | IllegalArgumentException e) {
+    // log.warn( "Failed to set listener on " + action + " because: " + e.getLocalizedMessage() );
     // }
+    // return null;
+    // }
+
+    protected DexAction<?> setListener(BooleanProperty op, DexActions action, OtmObject subject) {
+        try {
+            DexAction<?> actionHandler = DexActions.getAction( action, subject );
+            if (actionHandler instanceof DexBooleanAction) {
+                ChangeListener<Boolean> changeListener = new ChangeListener<Boolean>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue,
+                        Boolean newValue) {
+                        doBoolean( (DexBooleanAction) actionHandler, op );
+                    }
+                };
+
+                // Set and save listener
+                ((DexBooleanAction) actionHandler).setChangeListener( changeListener, op );
+                return actionHandler;
+            }
+        } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException | SecurityException
+            | IllegalArgumentException e) {
+            log.warn( "Failed to set listener on " + action + " because: " + e.getLocalizedMessage() );
+        }
+        return null;
+    }
 
     /**
      * Change Listener for actions on strings. Assigned to observable strings by
@@ -258,7 +279,7 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
     @Override
     public void push(DexAction<?> action) {
         if (queue.contains( action )) {
-            // TEST - make sure not a duplicate
+            // Make sure not a duplicate
             log.debug( "Duplicate Action found!" );
             return;
         }
@@ -271,21 +292,32 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
             ignore = true;
             action.undoIt();
             ignore = false;
+            log.debug( "Action vetoed!" );
             // TODO - if warnings, post them and allow undo option in dialog.
-        } else {
-            queue.push( action );
-
-            // Throw an event if defined
-            DexChangeEvent event = action.getEvent();
-            if (event != null && mainController != null)
-                mainController.publishEvent( event );
-
-            if (mainController != null)
-                mainController.updateActionQueueSize( getQueueSize() );
-            if (mainController != null)
-                mainController.postStatus( "Performed action: " + action.toString() );
-            log.debug( "Put action on queue: " + action.getClass().getSimpleName() );
+            return;
         }
+
+        int queueSize = queue.size();
+        queue.push( action );
+        // Now that the action is on the queue, release its listener and create a new action for the observable
+        action.removeChangeListener();
+        setListener( action.getObservable(), action.getType(), action.getSubject() );
+
+        // Throw an event if defined
+        DexChangeEvent event = action.getEvent();
+        if (event != null && mainController != null) {
+            event.set( action.getSubject() );
+            mainController.publishEvent( event );
+        }
+
+        if (mainController != null)
+            mainController.updateActionQueueSize( getQueueSize() );
+        if (mainController != null)
+            mainController.postStatus( "Performed action: " + action.toString() );
+
+        log.debug( "Put action on queue: " + action.getClass().getSimpleName() );
+        assert queue.size() == queueSize + 1;
+
         action.getSubject().getOwningMember().isValid( true ); // Force the owner to refresh its findings.
     }
 
@@ -300,9 +332,10 @@ public abstract class DexActionManagerBase implements DexActionManagerCore {
 
             // Throw an event if defined
             DexChangeEvent event = action.getEvent();
-            if (event != null && mainController != null)
+            if (event != null && mainController != null) {
+                event.set( action.getSubject() );
                 mainController.publishEvent( event );
-
+            }
             if (mainController != null)
                 mainController.updateActionQueueSize( getQueueSize() );
             if (mainController != null)

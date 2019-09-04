@@ -24,19 +24,22 @@ import org.opentravel.model.otmLibraryMembers.OtmResource;
 public class SetFirstClassAction extends DexBooleanAction {
     private static Log log = LogFactory.getLog( SetFirstClassAction.class );
 
-    protected SetFirstClassAction() {}
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmResource)
+            return subject.isEditable();
+        return false;
+    }
 
-    public SetFirstClassAction(OtmResource otm) {
-        super( otm );
+    protected SetFirstClassAction() {
         action = DexActions.SETFIRSTCLASS;
     }
 
-    @Override
-    public boolean setSubject(OtmObject subject) {
-        if (!(subject instanceof OtmResource))
-            return false;
-        otm = subject;
-        return true;
+    protected boolean get() {
+        return getSubject().isFirstClass();
     }
 
     @Override
@@ -48,25 +51,16 @@ public class SetFirstClassAction extends DexBooleanAction {
         getSubject().setFirstClass( value );
     }
 
-    protected boolean get() {
-        return getSubject().isFirstClass();
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmResource))
+            return false;
+        otm = subject;
+        return true;
     }
-
-
 
     @Override
     public String toString() {
         return "First class set to " + get();
     }
-
-    /**
-     * @param subject
-     * @return
-     */
-    public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmResource)
-            return subject.isEditable();
-        return false;
-    }
-
 }

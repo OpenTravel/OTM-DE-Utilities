@@ -24,16 +24,32 @@ import org.opentravel.model.otmLibraryMembers.OtmResource;
 public class SetResourceExtensionAction extends DexStringAction {
     private static Log log = LogFactory.getLog( SetResourceExtensionAction.class );
 
-    public SetResourceExtensionAction() {}
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmResource)
+            return subject.isEditable();
+        return false;
+    }
 
-    public SetResourceExtensionAction(OtmResource otm) {
-        super( otm );
+    public SetResourceExtensionAction() {
         action = DexActions.SETRESOURCEEXTENSION;
+    }
+
+    protected String get() {
+
+        return getSubject().getExtendedResourceName();
     }
 
     @Override
     public OtmResource getSubject() {
         return (OtmResource) otm;
+    }
+
+    protected void set(String value) {
+        getSubject().setExtendedResourceString( value );
     }
 
     @Override
@@ -44,30 +60,9 @@ public class SetResourceExtensionAction extends DexStringAction {
         return true;
     }
 
-    protected void set(String value) {
-        getSubject().setExtendedResourceString( value );
-    }
-
-    protected String get() {
-
-        return getSubject().getExtendedResourceName();
-    }
-
-
-
     @Override
     public String toString() {
         return "Changed extended resource to " + get();
-    }
-
-    /**
-     * @param subject
-     * @return
-     */
-    public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmResource)
-            return subject.isEditable();
-        return false;
     }
 
 }

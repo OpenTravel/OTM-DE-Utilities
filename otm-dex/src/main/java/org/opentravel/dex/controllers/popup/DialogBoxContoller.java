@@ -151,6 +151,9 @@ public class DialogBoxContoller extends DexPopupControllerBase {
         if (userSettings != null) {
             hideDialog.setOnAction( this::setHideDialog );
             hideDialog.setSelected( userSettings.getHideOpenProjectDialog() );
+        } else {
+            dialogTitleLabel.setVisible( false );
+            hideDialog.setVisible( false );
         }
 
         // TODO - how to know if/when to show OK or not?

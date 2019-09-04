@@ -238,7 +238,7 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
     }
 
     private void handleEvent(DexResourceModifiedEvent event) {
-        if (!ignoreEvents && event.get() instanceof OtmResource && event.get() == postedData)
+        if (!ignoreEvents && event.get() instanceof OtmResource)
             refresh();
     }
 

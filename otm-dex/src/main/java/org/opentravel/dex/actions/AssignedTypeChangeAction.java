@@ -63,13 +63,9 @@ public class AssignedTypeChangeAction extends DexRunAction {
         log.debug( "Ready to set assigned type to " + otm + " " + ignore );
         if (ignore)
             return null;
-        // Actions only created if action is enabled
-        // if (!isEnabled())
-        // return null;
         if (user == null || otm == null)
             return null;
 
-        // Is action manager needed any more? For undo?
         if (actionManager == null)
             return null;
 
@@ -89,12 +85,7 @@ public class AssignedTypeChangeAction extends DexRunAction {
                 log.error( "Missing selection from Type Selection Controller" ); // cancel?
             else
                 doIt( selected.getValue() );
-            // log.debug( "action - Set Assigned Type on: " + selected.getValue().getName() );
         }
-
-        // Make the change and test the results
-        // if (selected != null && selected.getValue() instanceof OtmTypeProvider)
-        // doIt( selected.getValue() );
 
         return newProvider;
     }
@@ -106,24 +97,24 @@ public class AssignedTypeChangeAction extends DexRunAction {
     public void doIt(Object data) {
         if (actionManager == null)
             return;
-        if (data == null)
-            doIt();
-        else {
-            if (!(data instanceof OtmTypeProvider))
-                return;
+
+        if (data instanceof OtmTypeProvider) {
 
             // Hold onto old values
             user = (OtmTypeUser) otm;
             oldProvider = user.getAssignedType();
             oldTLType = user.getAssignedTLType();
             oldName = otm.getName();
-            oldTLTypeName = oldTLType.getLocalName();
+            if (oldTLType != null)
+                oldTLTypeName = oldTLType.getLocalName();
 
             newProvider = (OtmTypeProvider) data;
             // Set value into model
             OtmTypeProvider p = user.setAssignedType( newProvider );
 
-            // if (p != newProvider)
+            if (p != newProvider)
+                log.error( "Could not set type to " + newProvider );
+
             // outcome = false; // there was an error
             // // TODO - how to process the error? Veto does not look at this.
             //
@@ -133,7 +124,8 @@ public class AssignedTypeChangeAction extends DexRunAction {
 
             // Record action to allow undo. Will validate results and warn user.
             actionManager.push( this );
-            log.debug( "Set type to " + newProvider );
+
+            log.debug( "Set type to " + get() );
         }
     }
 
@@ -186,7 +178,6 @@ public class AssignedTypeChangeAction extends DexRunAction {
 
     @Override
     public OtmTypeProvider undoIt() {
-        log.debug( " TODO -Undo-ing change" );
         if (oldProvider != null) {
             if (oldProvider != user.setAssignedType( oldProvider ))
                 actionManager.postWarning( "Error undoing change." );
@@ -200,6 +191,7 @@ public class AssignedTypeChangeAction extends DexRunAction {
             otm.setName( oldName );
         }
         otm.setName( oldName ); // May have been changed by assignment
+        log.debug( "Undo type assignment. Set to " + get() );
         return oldProvider;
     }
 }

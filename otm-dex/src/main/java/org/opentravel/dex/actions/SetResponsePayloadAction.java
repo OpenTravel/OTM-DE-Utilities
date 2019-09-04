@@ -22,16 +22,31 @@ import org.opentravel.model.resource.OtmActionResponse;
 public class SetResponsePayloadAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
-    protected SetResponsePayloadAction() {}
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmActionResponse)
+            return subject.isEditable();
+        return false;
+    }
 
-    public SetResponsePayloadAction(OtmActionResponse otm) {
-        super( otm );
+    protected SetResponsePayloadAction() {
         action = DexActions.SETRESPONSEPAYLOAD;
+    }
+
+    protected String get() {
+        return getSubject().getPayloadActionFacetName();
     }
 
     @Override
     public OtmActionResponse getSubject() {
         return (OtmActionResponse) otm;
+    }
+
+    protected void set(String value) {
+        getSubject().setPayloadActionFacetString( value );
     }
 
     @Override
@@ -42,29 +57,9 @@ public class SetResponsePayloadAction extends DexStringAction {
         return true;
     }
 
-    protected void set(String value) {
-        getSubject().setPayloadActionFacetString( value );
-    }
-
-    protected String get() {
-        return getSubject().getPayloadActionFacetName();
-    }
-
-
-
     @Override
     public String toString() {
-        return "Action facet set to " + get();
-    }
-
-    /**
-     * @param subject
-     * @return
-     */
-    public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmActionResponse)
-            return subject.isEditable();
-        return false;
+        return "Response payload set to " + get();
     }
 
 }

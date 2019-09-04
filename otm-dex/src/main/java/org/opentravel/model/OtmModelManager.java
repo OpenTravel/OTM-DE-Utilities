@@ -93,7 +93,8 @@ public class OtmModelManager implements TaskResultHandlerI {
      * Create a model manager.
      * 
      * @param controller
-     * @param fullActionManager action manager to assign to all members
+     * @param fullActionManager edit-enabled action manager to assign to all members. If null, read-only action manager
+     *        will be used.
      */
     public OtmModelManager(DexActionManager fullActionManager, RepositoryManager repositoryManager) {
         // Create a TL Model to manager
@@ -347,16 +348,19 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
     /**
-     * 
+     * Clear the model. Clears the model manager's data, the TL Model, and Project Manager.
      */
     public void clear() {
-        projects.clear();
         baseNSManaged.clear();
         baseNSUnmanaged.clear();
         libraries.clear();
         members.clear();
+        projects.clear();
+
         tlModel.clearModel();
-        log.debug( "Cleared model. " + tlModel.getAllLibraries().size() );
+        projectManager.closeAll();
+
+        // log.debug( "Cleared model. " + tlModel.getAllLibraries().size() );
     }
 
     public List<OtmLibraryMember> findUsersOf(OtmTypeProvider p) {
@@ -604,7 +608,7 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
 
-    private void printLibraries() {
+    public void printLibraries() {
         libraries.entrySet().forEach( l -> log.debug( l.getValue().getName() ) );
     }
 
@@ -640,6 +644,19 @@ public class OtmModelManager implements TaskResultHandlerI {
         if (sort)
             resources.sort( (one, other) -> one.getName().compareTo( other.getName() ) );
         return resources;
+    }
+
+
+    /**
+     * @return
+     */
+    public List<OtmLibrary> getSaveableLibraries() {
+        List<OtmLibrary> libs = new ArrayList<>();
+        libraries.values().forEach( l -> {
+            if (l.isEditable())
+                libs.add( l );
+        } );
+        return libs;
     }
 
 

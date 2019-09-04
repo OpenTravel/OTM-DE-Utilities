@@ -16,12 +16,10 @@
 
 package org.opentravel.dex.actions;
 
-import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
 
 /**
  * Dex action manager <b>public</b> interface. Action manager can work with FX observable properties using the
@@ -66,19 +64,19 @@ public interface DexActionManager {
      */
     public StringProperty add(DexActions action, String currentValue, OtmObject subject);
 
-
-    /**
-     * Set a listener on the FX observable string property to invoke the action.
-     * <p>
-     * 
-     * @deprecated - use {@link #add(DexActions, String, OtmObject)}
-     * 
-     * @param action
-     * @param op
-     * @param subject
-     * @return
-     */
-    public boolean addAction(DexActions action, ObservableValue<? extends String> op, OtmModelElement<?> subject);
+    //
+    // /**
+    // * Set a listener on the FX observable string property to invoke the action.
+    // * <p>
+    // *
+    // * @deprecated - use {@link #add(DexActions, String, OtmObject)}
+    // *
+    // * @param action
+    // * @param op
+    // * @param subject
+    // * @return
+    // */
+    // public boolean addAction(DexActions action, ObservableValue<? extends String> op, OtmModelElement<?> subject);
 
     public String getLastActionName();
 
@@ -98,6 +96,19 @@ public interface DexActionManager {
      * @param subject OTM object to act upon
      */
     void run(DexActions actionType, OtmObject subject);
+
+    /**
+     * <b>For use by DexActions only.</b> Push is automatically performed when actions are executed.
+     * <p>
+     * Push performed action onto queue. This records the action to allow undo. Will validate results and warn user on
+     * errors.
+     * <p>
+     * Note: Veto'ed actions ({@link DexAction#getVetoFindings()} will {@link DexAction#undoIt()} and not be added to
+     * the queue.
+     * 
+     * @param action
+     */
+    public void push(DexAction<?> action);
 
     // /**
     // * @deprecated

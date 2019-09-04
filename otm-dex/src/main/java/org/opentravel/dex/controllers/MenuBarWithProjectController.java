@@ -77,6 +77,10 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     @FXML
     public MenuItem doCloseItem;
     @FXML
+    public MenuItem doSaveAllItem;
+    @FXML
+    public MenuItem doNewProjectItem;
+    @FXML
     public MenuItem fileOpenItem;
     @FXML
     private Label actionCount;
@@ -158,6 +162,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         // Set up to handle opening and closing files
         setFileOpenHandler( this::handleOpenMenu );
         setdoCloseHandler( this::handleCloseMenu );
+        setdoSaveAllHandler( this::handleSaveAllMenu );
         setUndoAction( e -> undoAction() );
 
         rwc = ResourcesWindowController.init();
@@ -166,9 +171,9 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     }
 
-    private DialogBoxContoller getDialogBox() {
+    private DialogBoxContoller getDialogBox(UserSettings settings) {
         dialogBox = DialogBoxContoller.init();
-        dialogBox.setUserSettings( userSettings );
+        dialogBox.setUserSettings( settings );
         return dialogBox;
     }
 
@@ -213,7 +218,13 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     public void doClose(ActionEvent e) {
         // This is only run if the handler is not set.
         log.debug( "Close menu item selected." );
-        getDialogBox().show( "Close", "Not Implemented" );
+        getDialogBox( null ).show( "Close", "Not Implemented" );
+    }
+
+    @FXML
+    public void doSaveAll(ActionEvent e) {
+        // This is only run if the handler is not set.
+        getDialogBox( null ).show( "Save All", "Not Implemented" );
     }
 
     @FXML
@@ -227,7 +238,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     public void fileOpen(ActionEvent e) {
         // This is only run if the handler is not set.
         log.debug( "File Open selected." );
-        getDialogBox().show( "Open", "Not implemented" );
+        getDialogBox( null ).show( "Open", "Not implemented" );
     }
 
     /**
@@ -258,12 +269,12 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         if (selectedFile != null) {
             if (selectedFile.getName().endsWith( ".otm" )) {
                 if (!userSettings.getHideOpenProjectDialog())
-                    getDialogBox().show( "Opening Library", "Please wait." );
+                    getDialogBox( userSettings ).show( "Opening Library", "Please wait." );
                 new OpenLibraryFileTask( selectedFile, modelMgr, this::handleTaskComplete,
                     mainController.getStatusController() ).go();
             } else {
                 if (!userSettings.getHideOpenProjectDialog())
-                    getDialogBox().show( "Opening Project", "Please wait." );
+                    getDialogBox( userSettings ).show( "Opening Project", "Please wait." );
                 new OpenProjectFileTask( selectedFile, modelMgr, this::handleTaskComplete,
                     mainController.getStatusController() ).go();
             }
@@ -288,6 +299,13 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         log.debug( "project selection event" );
         if (e.getTarget() instanceof ComboBox)
             openFile( projectMap.get( ((ComboBox<?>) e.getTarget()).getValue() ) );
+    }
+
+    public void handleSaveAllMenu(ActionEvent event) {
+        log.debug( "Handle save all action event." );
+        String results = DexFileHandler.saveLibraries( modelMgr.getSaveableLibraries() );
+        DialogBoxContoller dialog = getDialogBox( null );
+        dialog.show( "Save Results", results );
     }
 
     public void handleCloseMenu(ActionEvent event) {
@@ -332,6 +350,10 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     public void setdoCloseHandler(EventHandler<ActionEvent> handler) {
         doCloseItem.setOnAction( handler );
+    }
+
+    public void setdoSaveAllHandler(EventHandler<ActionEvent> handler) {
+        doSaveAllItem.setOnAction( handler );
     }
 
     public void setFileOpenHandler(EventHandler<ActionEvent> handler) {

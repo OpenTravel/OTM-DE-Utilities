@@ -22,39 +22,6 @@ import org.opentravel.model.resource.OtmParentRef;
 public class SetParentParameterGroupAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
-    protected SetParentParameterGroupAction() {}
-
-    public SetParentParameterGroupAction(OtmParentRef otm) {
-        super( otm );
-        this.action = DexActions.SETPARENTPARAMETERGROUP;
-    }
-
-    @Override
-    public OtmParentRef getSubject() {
-        return (OtmParentRef) otm;
-    }
-
-    @Override
-    public boolean setSubject(OtmObject subject) {
-        if (!(subject instanceof OtmParentRef))
-            return false;
-        otm = subject;
-        return true;
-    }
-
-    protected void set(String value) {
-        getSubject().setParameterGroupString( value );
-    }
-
-    protected String get() {
-        return getSubject().getParameterGroupName();
-    }
-
-    @Override
-    public String toString() {
-        return "ID Group set to " + get();
-    }
-
     /**
      * @param subject
      * @return
@@ -65,4 +32,33 @@ public class SetParentParameterGroupAction extends DexStringAction {
         return false;
     }
 
+    protected SetParentParameterGroupAction() {
+        action = DexActions.SETPARENTPARAMETERGROUP;
+    }
+
+    protected String get() {
+        return getSubject().getParameterGroupName();
+    }
+
+    @Override
+    public OtmParentRef getSubject() {
+        return (OtmParentRef) otm;
+    }
+
+    protected void set(String value) {
+        getSubject().setParameterGroupString( value );
+    }
+
+    @Override
+    public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmParentRef))
+            return false;
+        otm = subject;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Parent parameter group set to " + get();
+    }
 }

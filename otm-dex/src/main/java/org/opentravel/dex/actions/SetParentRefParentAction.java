@@ -23,16 +23,32 @@ import org.opentravel.model.resource.OtmParentRef;
 public class SetParentRefParentAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
-    protected SetParentRefParentAction() {}
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmParentRef)
+            return subject.isEditable();
+        return false;
+    }
 
-    public SetParentRefParentAction(OtmParentRef otm) {
-        super( otm );
-        this.action = DexActions.SETPARENTREFPARENT;
+    protected SetParentRefParentAction() {
+        action = DexActions.SETPARENTREFPARENT;
+    }
+
+    protected String get() {
+        OtmResource r = getSubject().getParentResource();
+        return r != null ? r.getNameWithPrefix() : "";
     }
 
     @Override
     public OtmParentRef getSubject() {
         return (OtmParentRef) otm;
+    }
+
+    protected void set(String value) {
+        getSubject().setParentResourceString( value );
     }
 
     @Override
@@ -43,31 +59,9 @@ public class SetParentRefParentAction extends DexStringAction {
         return true;
     }
 
-
-    protected void set(String value) {
-        getSubject().setParentResourceString( value );
-    }
-
-    protected String get() {
-        OtmResource r = getSubject().getParentResource();
-        return r != null ? r.getNameWithPrefix() : "";
-    }
-
-
-
     @Override
     public String toString() {
         return "Parent reference set to " + get();
-    }
-
-    /**
-     * @param subject
-     * @return
-     */
-    public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmParentRef)
-            return subject.isEditable();
-        return false;
     }
 
 }

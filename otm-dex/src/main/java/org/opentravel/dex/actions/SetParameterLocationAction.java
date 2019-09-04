@@ -22,16 +22,31 @@ import org.opentravel.model.resource.OtmParameter;
 public class SetParameterLocationAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
-    protected SetParameterLocationAction() {}
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmParameter)
+            return subject.isEditable();
+        return false;
+    }
 
-    public SetParameterLocationAction(OtmParameter otm) {
-        super( otm );
+    protected SetParameterLocationAction() {
         action = DexActions.SETPARAMETERLOCATION;
+    }
+
+    protected String get() {
+        return getSubject().getLocation().toString();
     }
 
     @Override
     public OtmParameter getSubject() {
         return (OtmParameter) otm;
+    }
+
+    protected void set(String value) {
+        getSubject().setLocationString( value );
     }
 
     @Override
@@ -42,29 +57,9 @@ public class SetParameterLocationAction extends DexStringAction {
         return true;
     }
 
-    protected void set(String value) {
-        getSubject().setLocationString( value );
-    }
-
-    protected String get() {
-        return getSubject().getLocation().toString();
-    }
-
-
-
     @Override
     public String toString() {
         return "Action facet set to " + get();
-    }
-
-    /**
-     * @param subject
-     * @return
-     */
-    public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmParameter)
-            return subject.isEditable();
-        return false;
     }
 
 }

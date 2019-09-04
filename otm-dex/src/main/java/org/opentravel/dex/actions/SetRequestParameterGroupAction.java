@@ -22,16 +22,31 @@ import org.opentravel.model.resource.OtmActionRequest;
 public class SetRequestParameterGroupAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
-    public SetRequestParameterGroupAction() {}
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmActionRequest)
+            return subject.isEditable();
+        return false;
+    }
 
-    public SetRequestParameterGroupAction(OtmActionRequest otm) {
-        super( otm );
+    public SetRequestParameterGroupAction() {
         action = DexActions.SETREQUESTPARAMETERGROUP;
+    }
+
+    protected String get() {
+        return getSubject().getParamGroupName();
     }
 
     @Override
     public OtmActionRequest getSubject() {
         return (OtmActionRequest) otm;
+    }
+
+    protected void set(String value) {
+        getSubject().setParamGroupString( value );
     }
 
     @Override
@@ -42,29 +57,9 @@ public class SetRequestParameterGroupAction extends DexStringAction {
         return true;
     }
 
-    protected void set(String value) {
-        getSubject().setParamGroupString( value );
-    }
-
-    protected String get() {
-        return getSubject().getParamGroupName();
-    }
-
-
-
     @Override
     public String toString() {
-        return "Action facet set to " + get();
-    }
-
-    /**
-     * @param subject
-     * @return
-     */
-    public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmActionRequest)
-            return subject.isEditable();
-        return false;
+        return "Parameter group set to " + get();
     }
 
 }

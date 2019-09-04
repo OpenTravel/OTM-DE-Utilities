@@ -32,10 +32,7 @@ public class BasePathChangeAction extends DexStringAction {
         return false;
     }
 
-    public BasePathChangeAction() {}
-
-    public BasePathChangeAction(OtmResource otm) {
-        super( otm );
+    public BasePathChangeAction() {
         action = DexActions.BASEPATHCHANGE;
     }
 

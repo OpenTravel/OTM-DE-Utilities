@@ -22,16 +22,31 @@ import org.opentravel.model.resource.OtmAction;
 public class SetCommonAction extends DexBooleanAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
-    protected SetCommonAction() {}
+    /**
+     * @param subject
+     * @return
+     */
+    public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmAction)
+            return subject.isEditable();
+        return false;
+    }
 
-    public SetCommonAction(OtmAction otm) {
-        super( otm );
+    protected SetCommonAction() {
         action = DexActions.SETCOMMONACTION;
+    }
+
+    protected boolean get() {
+        return getSubject().isCommon();
     }
 
     @Override
     public OtmAction getSubject() {
         return (OtmAction) otm;
+    }
+
+    protected void set(boolean value) {
+        getSubject().setCommon( value );
     }
 
     @Override
@@ -42,30 +57,9 @@ public class SetCommonAction extends DexBooleanAction {
         return true;
     }
 
-
-    protected void set(boolean value) {
-        getSubject().setCommon( value );
-    }
-
-    protected boolean get() {
-        return getSubject().isCommon();
-    }
-
-
-
     @Override
     public String toString() {
         return "Common set to " + get();
-    }
-
-    /**
-     * @param subject
-     * @return
-     */
-    public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmAction)
-            return subject.isEditable();
-        return false;
     }
 
 }
