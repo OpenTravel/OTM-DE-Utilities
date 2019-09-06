@@ -22,6 +22,7 @@ import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexFilterChangeEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
@@ -38,6 +39,7 @@ import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.resource.OtmAction;
+import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.model.resource.OtmActionResponse;
 import org.opentravel.model.resource.OtmParameter;
 
@@ -86,7 +88,8 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         DexResourceModifiedEvent.RESOURCE_MODIFIED, DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED,
         DexResourceChangeEvent.RESOURCE_CHANGED, DexMemberSelectionEvent.RESOURCE_SELECTED,
         DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
-    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
+    private static final EventType[] publishedEvents =
+        {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED, DexMemberSelectionEvent.MEMBER_SELECTED};
 
     /**
      * Construct a member tree table controller that can publish and receive events.
@@ -276,20 +279,40 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         if (item.getValue() != null && item.getValue().getValue() != null) {
             // log.debug( "Selection Listener: " + item.getValue() );
             OtmObject obj = item.getValue().getValue();
-            OtmLibraryMember member = null;
-            if (obj instanceof OtmContributedFacet)
-                obj = ((OtmContributedFacet) obj).getContributor();
-            if (obj instanceof OtmLibraryMember)
-                member = (OtmLibraryMember) obj;
-            else if (obj instanceof OtmParameter && ((OtmParameter) obj).getFieldAssignedType() != null)
-                member = ((OtmParameter) obj).getFieldAssignedType().getOwningMember();
-            else if (obj instanceof OtmTypeUser && ((OtmTypeUser) obj).getAssignedType() != null)
-                member = ((OtmTypeUser) obj).getAssignedType().getOwningMember();
-            ignoreEvents = true;
-            if (member != null)
-                eventPublisherNode.fireEvent( new DexMemberSelectionEvent( member ) );
-            ignoreEvents = false;
+            if (obj instanceof OtmParameter)
+                fireSelectionEvent( (OtmParameter) obj );
+            else if (obj instanceof OtmResourceChild) {
+                fireSelectionEvent( new DexResourceChildSelectionEvent( (OtmResourceChild) obj ) );
+            } else {
+                if (obj instanceof OtmContributedFacet)
+                    obj = ((OtmContributedFacet) obj).getContributor();
+                if (obj instanceof OtmLibraryMember)
+                    fireSelectionEvent( (OtmLibraryMember) obj );
+                else if (obj instanceof OtmTypeUser)
+                    fireSelectionEvent( (OtmTypeUser) obj );
+            }
         }
+    }
+
+    private void fireSelectionEvent(OtmParameter obj) {
+        if (obj.getFieldAssignedType() != null)
+            fireSelectionEvent( obj.getFieldAssignedType().getOwningMember() );
+    }
+
+    private void fireSelectionEvent(OtmTypeUser user) {
+        if (user != null && user.getAssignedType() != null)
+            fireSelectionEvent( user.getAssignedType().getOwningMember() );
+    }
+
+    private void fireSelectionEvent(OtmLibraryMember member) {
+        if (member != null)
+            fireSelectionEvent( new DexMemberSelectionEvent( member ) );
+    }
+
+    private void fireSelectionEvent(DexEvent event) {
+        ignoreEvents = true;
+        eventPublisherNode.fireEvent( event );
+        ignoreEvents = false;
     }
 
     /**
@@ -341,7 +364,20 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         for (OtmActionResponse response : action.getResponses()) {
             TreeItem<ActionsDAO> responseItem = new ActionsDAO( response ).createTreeItem( actionItem );
             // responseItem.setExpanded( true );
-            createPayloadItems( response.getPayload(), responseItem );
+            OtmObject payload = response.getPayload();
+            if (response.getPayload() instanceof OtmActionFacet) {
+                responseItem = new ActionsDAO( response.getPayload() ).createTreeItem( responseItem );
+
+                if (((OtmActionFacet) response.getPayload()).getBasePayload() != null)
+                    createPayloadItems( ((OtmActionFacet) response.getPayload()).getBasePayload(), responseItem );
+
+                payload = ((OtmActionFacet) response.getPayload()).getReferenceFacet();
+                if (payload == null)
+                    payload = response.getOwningMember().getSubject();
+                // payload = ((OtmActionFacet) response.getPayload()).getWrappedObject();
+                // log.debug( "TESTME" );
+            }
+            createPayloadItems( payload, responseItem );
         }
 
         // Test - inherited responses

@@ -116,6 +116,7 @@ public class ActionsDAO implements DexDAO<OtmObject> {
     }
 
     public StringProperty contentProperty() {
+        // NOT USED
         StringProperty wrapper = new ReadOnlyStringWrapper( "" );
         if (otmObject instanceof OtmActionRequest)
             wrapper = ((OtmActionRequest) otmObject).examplePayloadProperty();

@@ -94,13 +94,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     private StringProperty validationProperty;
     private ObjectProperty<ImageView> validationImageProperty;
 
-    // private DexActionManager actionMgr = null;
-
-    // @Deprecated
-    // public OtmModelElement(T tl, DexActionManager dexActionManager) {
-    // this( tl );
-    // }
-
     public OtmModelElement(T tl) {
         if (tl == null)
             throw new IllegalArgumentException( "Must have a tl element to create facade." );
@@ -109,23 +102,10 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         // checkListener();
     }
 
-    // private void checkListener() {
-    // for (ModelElementListener l : tlObject.getListeners())
-    // if (l instanceof OtmModelElementListener)
-    // assert this == ((OtmModelElementListener) l).get();
-    // }
-
     @Override
     public StringProperty descriptionProperty() {
         if (descriptionProperty == null) {
             descriptionProperty = getActionManager().add( DexActions.DESCRIPTIONCHANGE, getDescription(), this );
-            // if (isEditable()) {
-            // descriptionProperty = new SimpleStringProperty( getDescription() );
-            // if (getActionManager() != null)
-            // getActionManager().addAction( DexActions.DESCRIPTIONCHANGE, descriptionProperty(), this );
-            // } else {
-            // descriptionProperty = new ReadOnlyStringWrapper( getDescription() );
-            // }
         }
         return descriptionProperty;
     }
@@ -308,14 +288,10 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     @Override
     public StringProperty nameProperty() {
         if (nameProperty == null) {
-            nameProperty = getActionManager().add( DexActions.NAMECHANGE, getName(), this );
-            // if (isEditable()) {
-            // nameProperty = new SimpleStringProperty( getName() );
-            // if (getActionManager() != null)
-            // getActionManager().addAction( DexActions.NAMECHANGE, nameProperty, this );
-            // } else {
-            // nameProperty = new ReadOnlyStringWrapper( "" + getName() );
-            // }
+            if (getActionManager() != null)
+                nameProperty = getActionManager().add( DexActions.NAMECHANGE, getName(), this );
+            else
+                nameProperty = new ReadOnlyStringWrapper( getName() );
         }
         return nameProperty;
     }

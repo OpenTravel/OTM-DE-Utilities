@@ -33,7 +33,7 @@ public class SetRequestMethodAction extends DexStringAction {
     }
 
     protected SetRequestMethodAction() {
-        action = DexActions.SETREQUESTMETHOD;
+        actionType = DexActions.SETREQUESTMETHOD;
     }
 
     protected String get() {

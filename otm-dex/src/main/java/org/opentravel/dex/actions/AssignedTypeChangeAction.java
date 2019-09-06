@@ -115,13 +115,6 @@ public class AssignedTypeChangeAction extends DexRunAction {
             if (p != newProvider)
                 log.error( "Could not set type to " + newProvider );
 
-            // outcome = false; // there was an error
-            // // TODO - how to process the error? Veto does not look at this.
-            //
-            // // Validate results. Note: TL will not veto (prevent) change.
-            // if (isValid())
-            // outcome = true;
-
             // Record action to allow undo. Will validate results and warn user.
             actionManager.push( this );
 
@@ -140,24 +133,10 @@ public class AssignedTypeChangeAction extends DexRunAction {
         return ValidationUtils.getRelevantFindings( VETOKEYS, otm.getFindings() );
     }
 
-    // @Override
-    // public boolean isAllowed(OtmObject value) {
-    // return user instanceof OtmTypeUser && value instanceof OtmTypeProvider;
-    // }
-
     @Override
     public boolean isValid() {
         return otm.isValid( true ) ? true
             : ValidationUtils.getRelevantFindings( VETOKEYS, otm.getFindings() ).isEmpty();
-    }
-
-    @Override
-    public boolean set(OtmObject subject) {
-        if (subject instanceof OtmTypeProvider) {
-            user.setAssignedType( (OtmTypeProvider) subject );
-            return true;
-        }
-        return false;
     }
 
     @Override

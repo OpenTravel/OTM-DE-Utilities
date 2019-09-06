@@ -187,8 +187,6 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
                 ((Control) field.fxNode).setTooltip( field.tooltip );
             }
             propertyGrid.add( field.fxNode, column, field.row + rowIndex );
-
-            // fireEvent( new DexResourceChangeEvent((OtmResource)obj.getOwningMember()) );
         }
     }
 

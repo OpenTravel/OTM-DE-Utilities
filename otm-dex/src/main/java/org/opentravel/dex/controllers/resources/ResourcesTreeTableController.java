@@ -30,6 +30,7 @@ import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.DexResourceChildSelectionEvent;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -165,33 +166,11 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
         resourcesTreeTable.getSelectionModel().selectedItemProperty()
             .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
+        // Enable context menus at the row level and add change listener for for applying style
+        resourcesTreeTable.setRowFactory( (TreeTableView<ResourcesDAO> p) -> new ResourcesTreeTableRowFactory( this ) );
+
         refresh();
     }
-
-    // /**
-    // * Note: TreeItem class does not extend the Node class. Therefore, you cannot apply any visual effects or add
-    // menus
-    // * to the tree items. Use the cell factory mechanism to overcome this obstacle and define as much custom behavior
-    // * for the tree items as your application requires.
-    // *
-    // * @param member the Otm Library Member to add to the tree
-    // * @param parent the tree root or parent member
-    // * @return
-    // */
-    // public void createTreeItem(OtmLibraryMember member, TreeItem<ResourcesDAO> parent) {
-    // // log.debug("Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName());
-    //
-    // // Skip over contextual facets that have been injected into an object. Their contributed facets will be modeled.
-    // if ((member instanceof OtmContextualFacet && ((OtmContextualFacet) member).getWhereContributed() != null))
-    // return;
-    //
-    // // Create item for the library member
-    // TreeItem<ResourcesDAO> item = new ResourcesDAO( member ).createTreeItem( parent );
-    //
-    // // Create and add items for children
-    // if (member instanceof OtmChildrenOwner)
-    // createChildrenItems( member, item );
-    // }
 
     public void createTreeItem(OtmResource resource, TreeItem<ResourcesDAO> parent) {
         // The resource
@@ -275,22 +254,28 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
      * @param item
      */
     private void memberSelectionListener(TreeItem<ResourcesDAO> item) {
-        if (item == null || item.getValue() == null)
+        if (item == null || item.getValue() == null || !(item.getValue().getValue() instanceof OtmObject))
             return;
+        OtmObject object = item.getValue().getValue();
+        if (mainController != null)
+            if (object.isValid( true ))
+                mainController.postStatus( object.getName() + " is valid." );
+            else
+                mainController.postStatus( object.getName() + " is not valid." );
         // log.debug("Selection Listener: " + item.getValue());
 
         // Fire event for selecting resources
         if (eventPublisherNode != null) {
             DexEvent event = null;
-            if (item.getValue().getValue() instanceof OtmResource)
-                event = new DexMemberSelectionEvent( (OtmResource) item.getValue().getValue() );
-            else if (item.getValue().getValue() instanceof OtmLibraryMember)
-                event = new DexMemberSelectionEvent( (OtmLibraryMember) item.getValue().getValue() );
-            else if (item.getValue().getValue() instanceof OtmResourceChild)
-                event = new DexResourceChildSelectionEvent( (OtmResourceChild) item.getValue().getValue() );
+            if (object instanceof OtmResource)
+                event = new DexMemberSelectionEvent( (OtmResource) object );
+            else if (object instanceof OtmLibraryMember)
+                event = new DexMemberSelectionEvent( (OtmLibraryMember) object );
+            else if (object instanceof OtmResourceChild)
+                event = new DexResourceChildSelectionEvent( (OtmResourceChild) object );
 
             ignoreEvents = true;
-            if (eventPublisherNode != null && event != null)
+            if (event != null)
                 eventPublisherNode.fireEvent( event );
             ignoreEvents = false;
         }

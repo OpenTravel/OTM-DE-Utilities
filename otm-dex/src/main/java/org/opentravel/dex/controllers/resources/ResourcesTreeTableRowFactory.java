@@ -31,8 +31,8 @@ import javafx.scene.control.TreeTableRow;
  *
  */
 @SuppressWarnings("squid:MaximumInheritanceDepth")
-public final class ActionRowFactory extends TreeTableRow<ActionsDAO> {
-    private static Log log = LogFactory.getLog( ActionRowFactory.class );
+public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDAO> {
+    private static Log log = LogFactory.getLog( ResourcesTreeTableRowFactory.class );
 
     private static final PseudoClass EDITABLE = PseudoClass.getPseudoClass( "editable" );
     private static final PseudoClass INHERITED = PseudoClass.getPseudoClass( "inherited" );
@@ -41,7 +41,7 @@ public final class ActionRowFactory extends TreeTableRow<ActionsDAO> {
     private final ContextMenu addMenu = new ContextMenu();
     private DexIncludedController<?> controller;
 
-    public ActionRowFactory(DexIncludedController<?> controller) {
+    public ResourcesTreeTableRowFactory(DexIncludedController<?> controller) {
         this.controller = controller;
 
         // Create Context menu
@@ -79,7 +79,7 @@ public final class ActionRowFactory extends TreeTableRow<ActionsDAO> {
      * @return
      * @return
      */
-    private void setCSSClass(TreeTableRow<ActionsDAO> tc, TreeItem<ActionsDAO> newTreeItem) {
+    private void setCSSClass(TreeTableRow<ResourcesDAO> tc, TreeItem<ResourcesDAO> newTreeItem) {
         if (newTreeItem != null && newTreeItem.getValue() != null) {
             // tc.pseudoClassStateChanged( EDITABLE, false );
             tc.pseudoClassStateChanged( EDITABLE, newTreeItem.getValue().isEditable() );

@@ -62,19 +62,16 @@ public interface DexAction<T> {
     public DexChangeEvent getEvent();
 
     /**
+     * @return
+     */
+    public ObservableValue<? extends T> getObservable();
+
+    /**
      * Get the OTM object that is or will be acted upon.
      * 
      * @return
      */
     public OtmObject getSubject();
-
-    /**
-     * Test to see if the change is un-doable. Veto findings will be set if action can not be undone and therefore
-     * rejected.
-     * 
-     * @return null or veto findings
-     */
-    ValidationFindings getVetoFindings();
 
     // /**
     // * @return true if the requested change is allowed for object in this application and user.
@@ -88,10 +85,27 @@ public interface DexAction<T> {
     // */
     // public boolean isEnabled();
 
+    public DexActions getType();
+
+    /**
+     * Test to see if the change is un-doable. Veto findings will be set if action can not be undone and therefore
+     * rejected.
+     * 
+     * @return null or veto findings
+     */
+    ValidationFindings getVetoFindings();
+
     /**
      * @return true if change already made is valid for this object for this application and user.
      */
     public boolean isValid();
+
+    public void removeChangeListener();
+
+    /**
+     * @param changeListener
+     */
+    public void setChangeListener(ChangeListener<T> changeListener, ObservableValue<? extends T> observable);
 
     /**
      * Set the subject for this action to act upon.
@@ -101,8 +115,6 @@ public interface DexAction<T> {
      */
     public boolean setSubject(OtmObject subject);
 
-    public DexActions getType();
-
     /**
      * Use the stored values to undo the change.
      * 
@@ -111,18 +123,6 @@ public interface DexAction<T> {
      * @return
      */
     public T undoIt();
-
-    /**
-     * @param changeListener
-     */
-    public void setChangeListener(ChangeListener<T> changeListener, ObservableValue<? extends T> observable);
-
-    public void removeChangeListener();
-
-    /**
-     * @return
-     */
-    public ObservableValue<? extends T> getObservable();
 
 
     // public T redo();

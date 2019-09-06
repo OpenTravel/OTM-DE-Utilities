@@ -19,6 +19,7 @@ package org.opentravel.model.resource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
+import org.opentravel.common.DexMimeTypeHandler;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.actions.DexActions;
@@ -137,12 +138,17 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
     }
 
     private Node getMimeNode() {
-        SortedMap<String,Boolean> values = new TreeMap<>();
-        for (TLMimeType t : TLMimeType.values())
-            values.put( t.toString(), getTL().getMimeTypes().contains( t ) );
-        HBox hbox = DexEditField.makeCheckBoxRow( values, this );
-        return hbox;
+        return new DexMimeTypeHandler( this ).makeMimeTypeBox();
     }
+
+    public List<TLMimeType> getMimeTypes() {
+        return getTL().getMimeTypes();
+    }
+
+    public void setMimeTypes(List<TLMimeType> list) {
+        getTL().setMimeTypes( list );
+    }
+
 
     private Node getStatus1Node() {
         SortedMap<String,Boolean> values = new TreeMap<>();

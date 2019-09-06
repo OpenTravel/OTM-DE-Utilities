@@ -33,7 +33,7 @@ public class SetResponsePayloadAction extends DexStringAction {
     }
 
     protected SetResponsePayloadAction() {
-        action = DexActions.SETRESPONSEPAYLOAD;
+        actionType = DexActions.SETRESPONSEPAYLOAD;
     }
 
     protected String get() {

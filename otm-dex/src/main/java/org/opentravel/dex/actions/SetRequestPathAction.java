@@ -33,7 +33,7 @@ public class SetRequestPathAction extends DexStringAction {
     }
 
     protected SetRequestPathAction() {
-        action = DexActions.SETREQUESTPATH;
+        actionType = DexActions.SETREQUESTPATH;
     }
 
     protected String get() {

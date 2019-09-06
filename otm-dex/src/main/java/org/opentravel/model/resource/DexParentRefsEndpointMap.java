@@ -19,6 +19,7 @@ package org.opentravel.model.resource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.schemacompiler.model.TLHttpMethod;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -301,9 +302,14 @@ public class DexParentRefsEndpointMap {
      */
     public static String getPayloadExample(OtmActionRequest request) {
         String pn = "";
-        if (request != null)
+        String noPayload = NO_PAYLOAD;
+        if (request != null) {
             pn = request.getPayloadName();
-        return !pn.isEmpty() ? " <" + pn + ">...</" + pn + ">" : NO_PAYLOAD;
+            // Present "None" only for methods that use payloads
+            if (request.getMethod() == TLHttpMethod.GET || request.getMethod() == TLHttpMethod.DELETE)
+                noPayload = "--";
+        }
+        return !pn.isEmpty() ? " <" + pn + ">...</" + pn + ">" : noPayload;
     }
 
     public static String getPayloadExample(OtmActionResponse response) {

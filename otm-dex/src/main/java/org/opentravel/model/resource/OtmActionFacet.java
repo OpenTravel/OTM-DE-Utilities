@@ -91,6 +91,12 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     }
 
 
+    /**
+     * Add this action facet to the OtmResource. Do not change the TL object.
+     * 
+     * @param tla
+     * @param parent
+     */
     public OtmActionFacet(TLActionFacet tla, OtmResource parent) {
         super( tla, parent );
 
@@ -98,6 +104,14 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         // tla.getBasePayloadName();
         // tla.getReferenceRepeat();
         // tla.getReferenceType();
+    }
+
+    /**
+     * 
+     * @return base payload if any or else the reference facet
+     */
+    public OtmObject getWrappedObject() {
+        return getBasePayload() != null ? getBasePayload() : getReferenceFacet();
     }
 
     /**
@@ -251,7 +265,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         // Early Exit Conditions
         if (subject == null)
             return rqPayload; // Error, resource is not complete
-        if (rfName.equals( OtmResource.SUBGROUP ))
+        if (rfName.equals( OtmResource.SUBGROUP ) || rfName.isEmpty())
             return subject; // The whole object is the substitution group
         if (getReferenceType() == TLReferenceType.NONE)
             return null; // User set to have No request payload

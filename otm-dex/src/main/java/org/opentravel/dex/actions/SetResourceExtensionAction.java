@@ -35,7 +35,7 @@ public class SetResourceExtensionAction extends DexStringAction {
     }
 
     public SetResourceExtensionAction() {
-        action = DexActions.SETRESOURCEEXTENSION;
+        actionType = DexActions.SETRESOURCEEXTENSION;
     }
 
     protected String get() {

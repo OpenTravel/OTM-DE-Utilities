@@ -48,7 +48,7 @@ public class AssignResourceSubjectAction extends DexRunAction {
 
     public AssignResourceSubjectAction() {
         // Constructor for reflection
-        action = DexActions.ASSIGNSUBJECT;
+        actionType = DexActions.ASSIGNSUBJECT;
     }
 
     /**
@@ -62,14 +62,6 @@ public class AssignResourceSubjectAction extends DexRunAction {
             return null;
         if (resource.getActionManager() == null)
             return null;
-
-        // if (otm.getOwningMember() == null)
-        // return null;
-        // OtmModelManager modelMgr = otm.getOwningMember().getModelManager();
-        // if (modelMgr == null)
-        // return null;
-
-        // OtmBusinessObject newSubject = null;
 
         // Get the user's selected business object
         MemberAndProvidersDAO selected = null;
@@ -110,14 +102,6 @@ public class AssignResourceSubjectAction extends DexRunAction {
         if (result != newSubject)
             log.debug( "ERROR setting subject." );
 
-        // if (p != newProvider)
-        // outcome = false; // there was an error
-        // // TODO - how to process the error? Veto does not look at this.
-        //
-        // // Validate results. Note: TL will not veto (prevent) change.
-        // if (isValid())
-        // outcome = true;
-
         // Record action to allow undo. Will validate results and warn user.
         resource.getActionManager().push( this );
 
@@ -133,24 +117,11 @@ public class AssignResourceSubjectAction extends DexRunAction {
     @Override
     public ValidationFindings getVetoFindings() {
         return null;
-        // // TODO create a finding if the outcome is false
-        // return ValidationUtils.getRelevantFindings( VETOKEYS, otm.getFindings() );
     }
 
     @Override
     public boolean isValid() {
         return true;
-        // return otm.isValid( true ) ? true
-        // : ValidationUtils.getRelevantFindings( VETOKEYS, otm.getFindings() ).isEmpty();
-    }
-
-    @Override
-    public boolean set(OtmObject subject) {
-        if (subject instanceof OtmBusinessObject) {
-            oldSubject = (OtmBusinessObject) subject;
-            return true;
-        }
-        return false;
     }
 
     @Override

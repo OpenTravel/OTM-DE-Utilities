@@ -47,6 +47,7 @@ public enum DexActions {
     SETPARENTREFPARENT(SetParentRefParentAction.class, DexResourceChildModifiedEvent.class),
     SETAFREFERENCETYPE(SetAFReferenceTypeAction.class, DexResourceChildModifiedEvent.class),
     SETAFREFERENCEFACET(SetAFReferenceFacetAction.class, DexResourceChildModifiedEvent.class),
+    SETMIMETYPES(SetMimeTypesAction.class, DexResourceChildModifiedEvent.class),
     SETREQUESTPAYLOAD(SetRequestPayloadAction.class, DexResourceChildModifiedEvent.class),
     SETREQUESTPARAMETERGROUP(SetRequestParameterGroupAction.class, DexResourceChildModifiedEvent.class),
     SETREQUESTMETHOD(SetRequestMethodAction.class, DexResourceChildModifiedEvent.class),

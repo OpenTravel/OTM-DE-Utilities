@@ -25,14 +25,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Default action manager used by OTM elements to determine what actions are available and adding listeners to
- * observable values (properties) to execute the action.
+ * The <i>full</i> action manager implements isEnabled() to return the value from the actions. This class extends
+ * {@link DexActionManagerBase} which controls and manages actions; maintains queue of actions and notifies user of
+ * performed action status.
  * <p>
- * To create a StringProperty with associated un-doable action use
- * {@link #add(DexActionManager.DexActions, CurrentValue, OtmObject)} when creating an observable property.
- * <p>
- * Extends {@link DexActionManagerBase} which controls and manages actions; maintains queue of actions and notifies user
- * of performed action status.
+ * To disable editing, use {@link DexReadOnlyActionManager}
  * 
  * @author dmh
  *

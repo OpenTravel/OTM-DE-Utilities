@@ -33,7 +33,7 @@ public class SetIdGroupAction extends DexBooleanAction {
     }
 
     protected SetIdGroupAction() {
-        action = DexActions.SETIDGROUP;
+        actionType = DexActions.SETIDGROUP;
     }
 
     protected boolean get() {

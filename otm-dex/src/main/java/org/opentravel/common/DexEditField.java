@@ -52,15 +52,6 @@ public class DexEditField {
     public int row;
     public int column;
 
-    @Deprecated
-    public DexEditField(String label, Node fxNode, int row) {
-        this.label = label;
-        this.fxNode = fxNode;
-        this.row = row;
-        this.column = 1;
-    }
-
-
     /**
      * 
      * @param row integer 0 to n. 0 is placed right after description row
@@ -112,17 +103,6 @@ public class DexEditField {
         return hb;
     }
 
-    // @Deprecated
-    // public static ComboBox<String> makeComboBox(ObservableList<String> candidates, String selection, OtmObject
-    // object) {
-    // ComboBox<String> box = new ComboBox<>( candidates );
-    // box.getSelectionModel().select( selection );
-    // box.setDisable( !object.getOwningMember().isEditable() );
-    // box.setOnAction( a -> {
-    // log.debug( "Combo box selected" );
-    // } );
-    // return box;
-    // }
 
     public static ComboBox<String> makeComboBox(ObservableList<String> candidates, StringProperty selection) {
         ComboBox<String> box = new ComboBox<>( candidates );
@@ -135,16 +115,6 @@ public class DexEditField {
         } );
         return box;
     }
-
-    // @Deprecated
-    // public static TextField makeTextField(String value, OtmObject object) {
-    // TextField field = new TextField( value );
-    // field.setEditable( object.isEditable() );
-    // field.setDisable( !object.isEditable() );
-    // field.setOnAction( a -> log.debug( "Field edited" ) );
-    // return field;
-    // }
-
 
     /**
      * @param string property

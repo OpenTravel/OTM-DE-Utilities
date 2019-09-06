@@ -34,7 +34,7 @@ public class SetParentRefParentAction extends DexStringAction {
     }
 
     protected SetParentRefParentAction() {
-        action = DexActions.SETPARENTREFPARENT;
+        actionType = DexActions.SETPARENTREFPARENT;
     }
 
     protected String get() {

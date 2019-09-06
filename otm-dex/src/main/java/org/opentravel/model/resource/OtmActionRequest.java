@@ -19,6 +19,7 @@ package org.opentravel.model.resource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
+import org.opentravel.common.DexMimeTypeHandler;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.actions.DexActions;
@@ -31,8 +32,6 @@ import org.opentravel.schemacompiler.model.TLMimeType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
@@ -42,7 +41,6 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.HBox;
 
 /**
  * OTM Object for Resource objects.
@@ -138,11 +136,16 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     private Node getMimeNode() {
-        SortedMap<String,Boolean> values = new TreeMap<>();
-        for (TLMimeType t : TLMimeType.values())
-            values.put( t.toString(), getTL().getMimeTypes().contains( t ) );
-        HBox hbox = DexEditField.makeCheckBoxRow( values, this );
-        return hbox;
+        return new DexMimeTypeHandler( this ).makeMimeTypeBox();
+    }
+
+    public List<TLMimeType> getMimeTypes() {
+        return getTL().getMimeTypes();
+    }
+
+    public void setMimeTypes(List<TLMimeType> list) {
+        getTL().setMimeTypes( list );
+        log.debug( "Mime Types set: " + getTL().getMimeTypes() );
     }
 
     //
@@ -152,7 +155,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     @Override
     public String getName() {
         // Get the name of the parent then add method
-        return getOwner() != null ? getOwner().getName() : "";
+        return getOwner() != null ? getOwner().getName() + " " + getMethodString() : getMethodString();
     }
 
     public OtmAction getOwner() {
@@ -288,7 +291,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
             getTL().setParamGroup( group.getTL() );
         else
             getTL().setParamGroup( null );
-        log.debug( "Set parameter group to " + group );
+        // log.debug( "Set parameter group to " + group );
         return group;
     }
 
@@ -363,7 +366,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         } else {
             getTL().setPayloadType( actionFacet.getTL() );
         }
-        log.debug( "Set payload action facet to " + getPayloadActionFacet() );
+        // log.debug( "Set payload action facet to " + getPayloadActionFacet() );
         return getPayloadActionFacet();
     }
 

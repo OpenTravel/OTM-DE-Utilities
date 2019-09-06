@@ -310,6 +310,12 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
 
     /** ****************************************************** **/
 
+    /**
+     * Create OtmResource with one action facet, one action and one parameter group
+     * 
+     * @param mgr
+     * @return
+     */
     public static OtmResource buildOtm(OtmModelManager mgr) {
         OtmResource resource = new OtmResource( buildTL(), mgr );
         mgr.add( resource );
@@ -347,11 +353,11 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
     }
 
     /**
-     * Create 1st class resource with ID parameter group and make it a parent to the passed resource. Set ID Group in
-     * the parent resource reference.
+     * Create 1st class resource with its own Subject, ID parameter group and make it a parent to the passed resource.
+     * Set ID Group in the parent resource reference.
      * 
-     * @param r
-     * @param name
+     * @param r resource to make into sub-resource
+     * @param name to give parent resource and its subject
      * @param mgr
      * @return
      */

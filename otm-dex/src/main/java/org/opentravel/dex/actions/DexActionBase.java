@@ -24,62 +24,31 @@ import org.opentravel.model.OtmObject;
 public abstract class DexActionBase {
     private static Log log = LogFactory.getLog( DexActionBase.class );
 
-    protected DexActions action = null; // Which enumeration does this action implement
-
-    protected OtmObject otm;
-    // protected DexActionManagerCore coreActionManager = null;
-    protected boolean ignore;
-    // protected ChangeListener<?> changeListner;
-
-    // public ChangeListener<?> getChangeListner() {
-    // return changeListner;
-    // }
-    //
-    // public void setChangeListener(ChangeListener<?> changeListner) {
-    // // this.changeListner = changeListner;
-    // }
-
-    public void removeChangeListener() {
-        // this.changeListner = changeListner;
-    }
-
+    protected DexActions actionType = null; // Which enumeration does this action implement
+    protected OtmObject otm; // Actions are performed on the subject OtmObject
+    protected boolean ignore; // If true, other actions are events are not invoked
 
     public DexActionBase() {}
 
-    public DexActionBase(OtmObject otm) {
-        // if (otm.getActionManager() instanceof DexActionManagerCore)
-        // coreActionManager = (DexActionManagerCore) otm.getActionManager();
-
-        // assert (coreActionManager != null);
-        this.otm = otm;
-    }
 
     public DexActions getType() {
-        return action;
+        return actionType;
     }
 
-    // /**
-    // * Must be set before running. Needed because actions are created using reflection.
-    // */
-    // public void setCoreActionManager(DexActionManagerCore coreActionManger) {
-    // this.coreActionManager = coreActionManger;
-    // }
-    //
+    // Override if the action has specific sub-type of OtmObject as its subject.
     public OtmObject getSubject() {
         return otm;
     }
 
-    // /**
-    // * Set the subject for this action to act upon.
-    // * @param subject
-    // * @return false if the subject could not be set
-    // */
-    // public abstract boolean setSubject(OtmObject subject);
-
+    /**
+     * Get the event and set its subject associated with this action's actionType.
+     * 
+     * @return
+     */
     public DexChangeEvent getEvent() {
         DexChangeEvent event = null;
         try {
-            event = DexActions.getEvent( action );
+            event = DexActions.getEvent( actionType );
         } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException e) {
             log.warn( "Failed to get event handler: " + e.getLocalizedMessage() );
             return null;

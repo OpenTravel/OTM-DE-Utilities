@@ -89,6 +89,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     public String getPayloadExample(OtmActionRequest request) {
+        // log.debug( DexParentRefsEndpointMap.getPayloadExample( request ) );
         return DexParentRefsEndpointMap.getPayloadExample( request );
     }
 
@@ -677,6 +678,11 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return groups;
     }
 
+    /**
+     * Get the list of action facets from the TL object and return their OtmActionFacet facades.
+     * 
+     * @return
+     */
     public List<OtmActionFacet> getActionFacets() {
         List<OtmActionFacet> actionFacets = new ArrayList<>();
         getTL().getActionFacets().forEach( af -> {

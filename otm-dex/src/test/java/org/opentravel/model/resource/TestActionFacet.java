@@ -33,6 +33,7 @@ import org.opentravel.model.otmLibraryMembers.TestQueryFacet;
 import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.schemacompiler.model.TLActionFacet;
 import org.opentravel.schemacompiler.model.TLReferenceType;
+import org.opentravel.schemacompiler.model.TLResource;
 
 /**
  * Test class for Action Facet resource descendants.
@@ -105,7 +106,11 @@ public class TestActionFacet<L extends TestOtmResourceBase<OtmActionFacet>>
 
         // Given an action facet on that resource
         OtmActionFacet af = buildOtm( resource );
+        assertTrue( resource.getActionFacets().contains( af ) );
+        assertTrue( "TLResource must contain tlActionFacet.",
+            resource.getTL().getActionFacets().contains( af.getTL() ) );
         af.setReferenceType( TLReferenceType.REQUIRED );
+
         for (OtmObject f : bo.getChildren())
             if (f instanceof OtmFacet) {
                 // When - set to facet
@@ -125,8 +130,15 @@ public class TestActionFacet<L extends TestOtmResourceBase<OtmActionFacet>>
     }
 
     public static OtmActionFacet buildOtm(OtmResource testResource) {
-        OtmActionFacet af = new OtmActionFacet( buildTL(), testResource );
+        OtmActionFacet af = new OtmActionFacet( buildTL( testResource.getTL() ), testResource );
         return af;
+    }
+
+    public static TLActionFacet buildTL(TLResource tlr) {
+        TLActionFacet tlaf = new TLActionFacet();
+        tlr.addActionFacet( tlaf );
+        tlaf.setName( "af1" );
+        return tlaf;
     }
 
     public static TLActionFacet buildTL() {

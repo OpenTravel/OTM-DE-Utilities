@@ -18,7 +18,6 @@ package org.opentravel.dex.actions;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.model.OtmObject;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import javafx.beans.property.SimpleBooleanProperty;
@@ -64,13 +63,6 @@ public abstract class DexBooleanAction extends DexActionBase implements DexActio
     }
 
     /**
-     * @param otm
-     */
-    public DexBooleanAction(OtmObject otm) {
-        super( otm );
-    }
-
-    /**
      * Simply set the object's string field value
      * 
      * @param value
@@ -82,29 +74,12 @@ public abstract class DexBooleanAction extends DexActionBase implements DexActio
      */
     protected abstract boolean get();
 
-    // @Override
-    // public void doIt(Object name) {
-    // // NO-OP
-    // }
-
-    // @Override
-    // public boolean isEnabled() {
-    // return getSubject().isEditable();
-    // }
-
-    // @Override
-    // public boolean isAllowed(Boolean value) {
-    // return getSubject().isEditable();
-    // }
-
     @Override
     public ValidationFindings getVetoFindings() {
         return null;
     }
 
     public boolean doIt(ObservableValue<? extends Boolean> observable) {
-        // if (newValue == null)
-        // return "";
         if (ignore)
             return get();
         ignore = true;
@@ -113,8 +88,6 @@ public abstract class DexBooleanAction extends DexActionBase implements DexActio
 
         // Set value into model and observable
         set( !get() );
-        // if (observable instanceof SimpleBooleanProperty)
-        // ((SimpleBooleanProperty) observable).set( get() );
 
         log.debug( "Set to: " + get() );
         ignore = false;

@@ -33,7 +33,7 @@ public class BasePathChangeAction extends DexStringAction {
     }
 
     public BasePathChangeAction() {
-        action = DexActions.BASEPATHCHANGE;
+        actionType = DexActions.BASEPATHCHANGE;
     }
 
     protected String get() {

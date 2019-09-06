@@ -33,7 +33,7 @@ public class SetAFReferenceFacetAction extends DexStringAction {
     }
 
     protected SetAFReferenceFacetAction() {
-        action = DexActions.SETAFREFERENCEFACET;
+        actionType = DexActions.SETAFREFERENCEFACET;
     }
 
     protected String get() {

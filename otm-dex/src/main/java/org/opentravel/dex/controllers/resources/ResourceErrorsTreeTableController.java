@@ -26,6 +26,9 @@ import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.DexResourceChangeEvent;
+import org.opentravel.dex.events.DexResourceChildModifiedEvent;
+import org.opentravel.dex.events.DexResourceModifiedEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -77,8 +80,10 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
     private boolean treeEditingEnabled = true;
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED,
-        DexMemberSelectionEvent.RESOURCE_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] subscribedEvents =
+        {DexResourceChildModifiedEvent.RESOURCE_CHILD_MODIFIED, DexResourceModifiedEvent.RESOURCE_MODIFIED,
+            DexResourceChangeEvent.RESOURCE_CHANGED, DexMemberSelectionEvent.MEMBER_SELECTED,
+            DexMemberSelectionEvent.RESOURCE_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
 
     /**
@@ -188,11 +193,6 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
         return resourceErrors.getSelectionModel().getSelectedItem() != null
             ? resourceErrors.getSelectionModel().getSelectedItem().getValue() : null;
     }
-
-    // private void handleEvent(DexFilterChangeEvent event) {
-    // if (!ignoreEvents)
-    // refresh();
-    // }
 
     private void handleEvent(DexMemberSelectionEvent event) {
         if (!ignoreEvents && event != null && event.getMember() instanceof OtmResource)

@@ -18,7 +18,6 @@ package org.opentravel.dex.actions;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.model.OtmObject;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -72,22 +71,6 @@ public abstract class DexStringAction extends DexActionBase implements DexAction
             observable.addListener( listener );
     }
 
-    // public ChangeListener<?> getChangeListner() {
-    // return changeListner;
-    // }
-    //
-    // @Override
-    // public void setChangeListner(ChangeListener<?> changeListner) {
-    // this.changeListner = changeListner;
-    // }
-
-    /**
-     * @param otm
-     */
-    public DexStringAction(OtmObject otm) {
-        super( otm );
-    }
-
     public String doIt(ObservableValue<? extends String> observable, String oldValue, String newValue) {
         if (newValue == null)
             return "";
@@ -116,25 +99,10 @@ public abstract class DexStringAction extends DexActionBase implements DexAction
      */
     protected abstract String get();
 
-    // @Override
-    // public void doIt(Object name) {
-    // // NO-OP
-    // }
-
     @Override
     public ValidationFindings getVetoFindings() {
         return null;
     }
-
-    // @Override
-    // public boolean isAllowed(String value) {
-    // return getSubject().isEditable();
-    // }
-
-    // @Override
-    // public boolean isEnabled() {
-    // return getSubject().isEditable();
-    // }
 
     /**
      * @return true if change already made is valid for this object for this application and user.
@@ -162,23 +130,4 @@ public abstract class DexStringAction extends DexActionBase implements DexAction
         ignore = false;
         return oldString;
     }
-
-
-    //
-    // // VETOable event??
-    // /**
-    // * @return true if change is enabled for this application and user.
-    // */
-    // public boolean isEnabled();
-    //
-    // /**
-    // * @return true if the requested change is allowed for object in this application and user.
-    // */
-    // public boolean isAllowed(T value);
-    //
-    //
-    // // /**
-    // // * @return true if change is valid for this object for this application and user.
-    // // */
-    // // public boolean wouldBeValid(T value);
 }

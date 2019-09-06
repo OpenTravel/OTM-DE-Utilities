@@ -33,7 +33,7 @@ public class SetAbstractAction extends DexBooleanAction {
     }
 
     protected SetAbstractAction() {
-        action = DexActions.SETABSTRACT;
+        actionType = DexActions.SETABSTRACT;
     }
 
     protected boolean get() {

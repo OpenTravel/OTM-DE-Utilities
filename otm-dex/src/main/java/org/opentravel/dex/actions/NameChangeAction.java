@@ -38,7 +38,7 @@ public class NameChangeAction extends DexStringAction {
     }
 
     public NameChangeAction() {
-        action = DexActions.NAMECHANGE;
+        actionType = DexActions.NAMECHANGE;
     }
 
     @Override

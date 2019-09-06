@@ -16,6 +16,7 @@
 
 package org.opentravel.model.resource;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
@@ -34,6 +35,7 @@ import org.opentravel.model.otmLibraryMembers.TestCustomFacet;
 import org.opentravel.model.otmLibraryMembers.TestQueryFacet;
 import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.schemacompiler.model.TLActionRequest;
+import org.opentravel.schemacompiler.model.TLHttpMethod;
 import org.opentravel.schemacompiler.model.TLReferenceType;
 
 /**
@@ -56,7 +58,74 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
     }
 
     /**
+     * ActionDAO: wrapper = ((OtmActionRequest) otmObject).examplePayloadProperty();
+     * 
+     */
+    @Test
+    public void testExamplePayloadProperty() {
+        // Given a business object
+        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        bo.add( TestCustomFacet.buildOtm( staticModelManager ) );
+        bo.add( TestQueryFacet.buildOtm( staticModelManager ) );
+        // Given a resource
+        OtmResource resource = TestResource.buildOtm( staticModelManager );
+        resource.setSubject( bo );
+        // Given - request on the sub-resource
+        OtmActionRequest request = resource.getActionRequests().get( 0 );
+        assertNotNull( request );
+        // Request set to: POST, uses action facet as payload type
+        request.setMethod( TLHttpMethod.POST );
+
+        // Given - AF set to: ReferenceFacet = substitution group, No base payload
+        OtmActionFacet af = TestActionFacet.buildOtm( resource );
+        af.setBasePayload( null );
+        af.setReferenceFacet( null ); // substitution group setting
+
+        // When - action facet is set
+        request.setPayloadType( af );
+        // Then - example property is subject
+        String ex = request.examplePayloadProperty().get();
+        assertTrue( request.examplePayloadProperty().get().contains( bo.getName() ) );
+
+        // When - action facet RFName is empty, use subject (substitution group)
+        af.setReferenceFacetName( "" );
+        // Then - example property is subject
+        ex = request.examplePayloadProperty().get();
+        assertTrue( request.examplePayloadProperty().get().contains( bo.getName() ) );
+        af.setReferenceFacetName( null );
+        // Then - example property is subject
+        ex = request.examplePayloadProperty().get();
+        assertTrue( request.examplePayloadProperty().get().contains( bo.getName() ) );
+
+        // When - made into non-first class sub-resource to a parent resource
+        OtmResource resourceParent = TestResource.buildParentResource( resource, "ParentResorce", staticModelManager );
+        resource.setFirstClass( false );
+        // Then - example property is subject
+        ex = request.examplePayloadProperty().get();
+        assertTrue( request.examplePayloadProperty().get().contains( bo.getName() ) );
+
+        // When - extends a baseResource
+        OtmResource baseResource = TestResource.buildOtm( staticModelManager );
+        resource.setExtendedResource( baseResource );
+        // Then - example property is subject
+        ex = request.examplePayloadProperty().get();
+        assertTrue( request.examplePayloadProperty().get().contains( bo.getName() ) );
+
+        // When - base resource has an action facet with base payload
+        OtmCore basePayload = TestCore.buildOtm( staticModelManager );
+        basePayload.setName( "BasePayloadCore" );
+        OtmActionFacet baseAF = TestActionFacet.buildOtm( baseResource );
+        baseAF.setBasePayload( basePayload );
+        // Then - example property is subject
+        ex = request.examplePayloadProperty().get();
+        assertTrue( request.examplePayloadProperty().get().contains( bo.getName() ) );
+
+
+    }
+
+    /**
      * User is shown the a formated getName() of the request payload
+     * 
      */
     @Test
     public void testRequestPayload() {
