@@ -46,7 +46,7 @@ public class SetMimeTypesAction extends DexRunAction {
 
     public SetMimeTypesAction() {
         // Constructor for reflection
-        actionType = DexActions.SETMIMETYPES;
+        // actionType = DexActions.SETMIMETYPES;
     }
 
     /**
@@ -63,9 +63,10 @@ public class SetMimeTypesAction extends DexRunAction {
      * This action will get the data from the user via modal dialog
      */
     @Override
-    public void doIt(Object data) {
+    public Object doIt(Object data) {
         if (data instanceof MimeTypeMap)
             doIt( (MimeTypeMap) data );
+        return null;
     }
 
     public void doIt(MimeTypeMap data) {

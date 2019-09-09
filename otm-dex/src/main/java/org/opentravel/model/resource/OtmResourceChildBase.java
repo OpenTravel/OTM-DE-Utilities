@@ -37,6 +37,12 @@ public abstract class OtmResourceChildBase<C> extends OtmModelElement<TLModelEle
     protected OtmResource owner = null;
     protected OtmResourceChild parent = null;
 
+    /**
+     * Add this object to parent and set owner to parent.
+     * 
+     * @param tlo
+     * @param parent
+     */
     public OtmResourceChildBase(TLModelElement tlo, OtmResource parent) {
         super( tlo );
         this.owner = parent;

@@ -33,7 +33,7 @@ public class SetCommonAction extends DexBooleanAction {
     }
 
     protected SetCommonAction() {
-        actionType = DexActions.SETCOMMONACTION;
+        // actionType = DexActions.SETCOMMONACTION;
     }
 
     protected boolean get() {

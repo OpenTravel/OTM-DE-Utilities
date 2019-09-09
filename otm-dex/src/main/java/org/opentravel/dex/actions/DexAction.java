@@ -96,4 +96,9 @@ public interface DexAction<T> {
      * @return
      */
     public T undoIt();
+
+    /**
+     * @param action
+     */
+    public void setType(DexActions action);
 }

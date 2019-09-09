@@ -62,6 +62,12 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
     private static final String PARENT_TOOLTIP = "Specifies a parent reference for a REST resource.";
 
 
+    /**
+     * Create OTM facade for the TL object. The TL object is not modified.
+     * 
+     * @param tla
+     * @param owner
+     */
     public OtmParentRef(TLResourceParentRef tla, OtmResource owner) {
         super( tla, owner );
     }

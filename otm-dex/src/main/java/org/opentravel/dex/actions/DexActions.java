@@ -17,6 +17,7 @@
 package org.opentravel.dex.actions;
 
 import org.opentravel.dex.events.DexChangeEvent;
+import org.opentravel.dex.events.DexResourceChangeEvent;
 import org.opentravel.dex.events.DexResourceChildModifiedEvent;
 import org.opentravel.dex.events.DexResourceModifiedEvent;
 import org.opentravel.dex.events.OtmObjectModifiedEvent;
@@ -33,6 +34,10 @@ public enum DexActions {
     NAMECHANGE(NameChangeAction.class, OtmObjectModifiedEvent.class),
     DESCRIPTIONCHANGE(DescriptionChangeAction.class, OtmObjectModifiedEvent.class),
     TYPECHANGE(AssignedTypeChangeAction.class, OtmObjectModifiedEvent.class),
+    //
+    ADDRESOURCECHILD(AddResourceChildAction.class, DexResourceChangeEvent.class),
+    ADDRESOURCEPARAMETER(AddResourceParameterAction.class, DexResourceChangeEvent.class),
+    ADDRESOURCERESPONSE(AddResourceResponseAction.class, DexResourceChangeEvent.class),
     //
     ASSIGNSUBJECT(AssignResourceSubjectAction.class, DexResourceModifiedEvent.class),
     BASEPATHCHANGE(BasePathChangeAction.class, DexResourceModifiedEvent.class),
@@ -99,6 +104,8 @@ public enum DexActions {
             if (handler != null && !handler.setSubject( subject ))
                 handler = null;
         }
+        if (handler != null)
+            handler.setType( action );
         return handler;
     }
     // Reflection Development notes - Constructors take many sub-types of OtmObject which are not returned.

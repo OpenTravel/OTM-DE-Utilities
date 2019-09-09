@@ -201,9 +201,12 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     protected boolean contains(List<OtmObject> list, OtmObject child) {
         if (list.contains( child ))
             return true;
+        if (child == null || child.getTL() == null)
+            return false;
+
         ArrayList<OtmObject> localList = new ArrayList<>( list );
         for (OtmObject c : localList)
-            if (c.getTL() == child.getTL())
+            if (c != null && c.getTL() != null && c.getTL() == child.getTL())
                 return true;
         return false;
     }

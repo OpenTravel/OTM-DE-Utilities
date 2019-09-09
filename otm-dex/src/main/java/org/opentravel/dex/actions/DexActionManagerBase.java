@@ -186,25 +186,27 @@ public abstract class DexActionManagerBase implements DexActionManager {
     }
 
     @Override
-    public void run(DexActions action, OtmObject subject) {
-        run( action, subject, null );
+    public Object run(DexActions action, OtmObject subject) {
+        return run( action, subject, null );
     }
 
     @Override
-    public void run(DexActions action, OtmObject subject, Object value) {
+    public Object run(DexActions action, OtmObject subject, Object value) {
         DexAction<?> actionHandler;
+        Object result = null;
         try {
             actionHandler = DexActions.getAction( action, subject );
             if (actionHandler instanceof DexRunAction) {
                 if (value == null)
-                    ((DexRunAction) actionHandler).doIt();
+                    result = ((DexRunAction) actionHandler).doIt();
                 else
-                    ((DexRunAction) actionHandler).doIt( value );
+                    result = ((DexRunAction) actionHandler).doIt( value );
             }
         } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException | SecurityException
             | IllegalArgumentException e) {
             log.warn( "Could not create action. " + e.getLocalizedMessage() );
         }
+        return result;
     }
 
     protected DexAction<?> setListener(BooleanProperty op, DexActions action, OtmObject subject) {

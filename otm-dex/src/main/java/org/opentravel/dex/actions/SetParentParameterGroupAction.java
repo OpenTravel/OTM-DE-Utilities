@@ -33,7 +33,7 @@ public class SetParentParameterGroupAction extends DexStringAction {
     }
 
     protected SetParentParameterGroupAction() {
-        actionType = DexActions.SETPARENTPARAMETERGROUP;
+        // actionType = DexActions.SETPARENTPARAMETERGROUP;
     }
 
     protected String get() {

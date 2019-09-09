@@ -33,7 +33,7 @@ public class SetParameterGroupFacetAction extends DexStringAction {
     }
 
     protected SetParameterGroupFacetAction() {
-        actionType = DexActions.SETPARAMETERGROUPFACET;
+        // actionType = DexActions.SETPARAMETERGROUPFACET;
     }
 
     protected String get() {

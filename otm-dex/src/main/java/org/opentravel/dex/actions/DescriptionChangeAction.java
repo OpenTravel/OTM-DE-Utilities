@@ -26,7 +26,7 @@ public class DescriptionChangeAction extends DexStringAction {
     }
 
     public DescriptionChangeAction() {
-        actionType = DexActions.DESCRIPTIONCHANGE;
+        // actionType = DexActions.DESCRIPTIONCHANGE;
     }
 
     @Override

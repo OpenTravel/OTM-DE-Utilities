@@ -33,7 +33,7 @@ public class SetParameterLocationAction extends DexStringAction {
     }
 
     protected SetParameterLocationAction() {
-        actionType = DexActions.SETPARAMETERLOCATION;
+        // actionType = DexActions.SETPARAMETERLOCATION;
     }
 
     protected String get() {

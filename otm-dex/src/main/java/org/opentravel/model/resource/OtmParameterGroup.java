@@ -34,6 +34,7 @@ import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLParamGroup;
+import org.opentravel.schemacompiler.model.TLParameter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,6 +71,12 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
     private static final String REFERENCE_FACET_TOOLTIP =
         "Name of the business object facet from which all parameters in this group will be referenced. Possible parameters will include any indicators and simple type attributes and elements that are not contained within repeating elements of the given facet or its children.";
 
+    /**
+     * Create an Otm Parameter Group, add it to the parent and model its children. Do not change TL object.
+     * 
+     * @param tla
+     * @param parent
+     */
     public OtmParameterGroup(TLParamGroup tla, OtmResource parent) {
         super( tla, parent );
         // Model the children to set their identity listeners
@@ -81,6 +88,23 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         if (child instanceof OtmParameter && !children.contains( child ))
             children.add( child );
         return null;
+    }
+
+    /**
+     * Add the passed action to the TL resource if not already owned, child list and set action's parent.
+     * 
+     * @param tlGroup
+     * @return
+     */
+    public OtmParameter add(TLParameter tlParameter) {
+        OtmParameter parameter = null;
+        if (tlParameter != null && !getTL().getParameters().contains( tlParameter )) {
+            getTL().addParameter( tlParameter );
+            parameter = new OtmParameter( tlParameter, this );
+            log.debug( "Added parameter to " + this );
+            getOwningMember().refresh( true );
+        }
+        return parameter;
     }
 
     @Override
@@ -298,5 +322,13 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         if (f == null)
             log.debug( "Did not find a facet matching " + value );
         return setReferenceFacet( f );
+    }
+
+    /**
+     * @param parameter
+     */
+    public void remove(OtmParameter param) {
+        getTL().removeParameter( param.getTL() );
+        children.remove( param );
     }
 }

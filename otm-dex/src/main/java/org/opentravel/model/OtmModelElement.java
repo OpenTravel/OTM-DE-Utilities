@@ -113,7 +113,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     @Override
     public DexActionManager getActionManager() {
         return getOwningMember().getActionManager();
-        // return actionMgr;
     }
 
     @Override

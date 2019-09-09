@@ -33,7 +33,7 @@ public class SetRequestPayloadAction extends DexStringAction {
     }
 
     protected SetRequestPayloadAction() {
-        actionType = DexActions.SETREQUESTPAYLOAD;
+        // actionType = DexActions.SETREQUESTPAYLOAD;
     }
 
     protected String get() {

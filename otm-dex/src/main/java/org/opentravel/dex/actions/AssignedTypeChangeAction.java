@@ -92,11 +92,13 @@ public class AssignedTypeChangeAction extends DexRunAction {
 
     /**
      * This action will get the data from the user via modal dialog
+     * 
+     * @return
      */
     @Override
-    public void doIt(Object data) {
+    public Object doIt(Object data) {
         if (actionManager == null)
-            return;
+            return null;
 
         if (data instanceof OtmTypeProvider) {
 
@@ -120,6 +122,7 @@ public class AssignedTypeChangeAction extends DexRunAction {
 
             log.debug( "Set type to " + get() );
         }
+        return null;
     }
 
     @Override

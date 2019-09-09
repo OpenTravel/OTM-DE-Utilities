@@ -35,6 +35,10 @@ public abstract class DexActionBase {
         return actionType;
     }
 
+    public void setType(DexActions type) {
+        this.actionType = type;
+    }
+
     // Override if the action has specific sub-type of OtmObject as its subject.
     public OtmObject getSubject() {
         return otm;

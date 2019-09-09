@@ -100,4 +100,5 @@ public abstract class DexChangeEvent extends DexEvent {
     public OtmObject get() {
         return otmObject;
     }
+
 }

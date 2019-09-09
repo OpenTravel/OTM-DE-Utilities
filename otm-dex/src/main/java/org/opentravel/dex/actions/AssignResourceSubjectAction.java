@@ -48,7 +48,7 @@ public class AssignResourceSubjectAction extends DexRunAction {
 
     public AssignResourceSubjectAction() {
         // Constructor for reflection
-        actionType = DexActions.ASSIGNSUBJECT;
+        // actionType = DexActions.ASSIGNSUBJECT;
     }
 
     /**
@@ -84,13 +84,15 @@ public class AssignResourceSubjectAction extends DexRunAction {
 
     /**
      * This action will get the data from the user via modal dialog
+     * 
+     * @return
      */
     @Override
-    public void doIt(Object data) {
+    public Object doIt(Object data) {
         if (resource.getActionManager() == null)
-            return;
+            return null;
         if (!(data instanceof OtmBusinessObject))
-            return;
+            return null;
 
 
         oldSubject = resource.getSubject();
@@ -106,7 +108,7 @@ public class AssignResourceSubjectAction extends DexRunAction {
         resource.getActionManager().push( this );
 
         log.debug( "Set resource subject to " + newSubject );
-
+        return null;
     }
 
     @Override

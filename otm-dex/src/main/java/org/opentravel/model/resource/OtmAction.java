@@ -80,6 +80,22 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         return null;
     }
 
+    /**
+     * Add the passed action to the TL resource if not already owned, child list and set action's parent.
+     * 
+     * @param tlGroup
+     * @return
+     */
+    public OtmActionResponse add(TLActionResponse tlActionResponse) {
+        OtmActionResponse response = null;
+        if (tlActionResponse != null && !getTL().getResponses().contains( tlActionResponse )) {
+            getTL().addResponse( tlActionResponse );
+            response = new OtmActionResponse( tlActionResponse, this );
+            log.debug( "Added response to " + this );
+            getOwningMember().refresh( true );
+        }
+        return response;
+    }
 
 
     @Override
@@ -245,5 +261,13 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
      */
     public void setCommon(boolean value) {
         getTL().setCommonAction( value );
+    }
+
+    /**
+     * @param response
+     */
+    public void remove(OtmActionResponse response) {
+        getTL().removeResponse( response.getTL() );
+        children.remove( response );
     }
 }

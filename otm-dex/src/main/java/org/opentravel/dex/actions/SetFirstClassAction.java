@@ -35,7 +35,7 @@ public class SetFirstClassAction extends DexBooleanAction {
     }
 
     protected SetFirstClassAction() {
-        actionType = DexActions.SETFIRSTCLASS;
+        // actionType = DexActions.SETFIRSTCLASS;
     }
 
     protected boolean get() {

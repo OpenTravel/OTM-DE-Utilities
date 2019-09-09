@@ -33,7 +33,7 @@ public class SetAFReferenceTypeAction extends DexStringAction {
     }
 
     protected SetAFReferenceTypeAction() {
-        actionType = DexActions.SETAFREFERENCETYPE;
+        // actionType = DexActions.SETAFREFERENCETYPE;
     }
 
     protected String get() {

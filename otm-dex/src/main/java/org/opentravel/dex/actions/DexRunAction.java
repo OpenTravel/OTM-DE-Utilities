@@ -43,8 +43,12 @@ public abstract class DexRunAction extends DexActionBase implements DexAction<Ob
      * Perform the action using supplied data.
      * 
      * @param data to apply to the action
+     * @return
      */
-    public abstract void doIt(Object data);
+    public abstract Object doIt(Object data);
+
+    // @Override
+    // public abstract Object undoIt();
 
     /**
      * Simply get the object's field value

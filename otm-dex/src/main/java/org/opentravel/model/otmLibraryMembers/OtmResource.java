@@ -40,9 +40,11 @@ import org.opentravel.model.resource.OtmParentRef;
 import org.opentravel.schemacompiler.codegen.util.ResourceCodegenUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAction;
+import org.opentravel.schemacompiler.model.TLActionFacet;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLExtension;
 import org.opentravel.schemacompiler.model.TLModelElement;
+import org.opentravel.schemacompiler.model.TLParamGroup;
 import org.opentravel.schemacompiler.model.TLResource;
 import org.opentravel.schemacompiler.model.TLResourceParentRef;
 
@@ -70,10 +72,65 @@ import javafx.scene.control.Tooltip;
 public class OtmResource extends OtmLibraryMemberBase<TLResource> implements OtmTypeUser {
     private static Log log = LogFactory.getLog( OtmResource.class );
 
-    private DexParentRefsEndpointMap parentRefsEndpointMap;
-    private ResourceCodegenUtils codegenUtils;
     public static final String NONE = "None";
     public static final String SUBGROUP = "Substitution Group";
+    private static final String TOOLTIP =
+        "Encapsulates all aspects of a RESTful resource used to expose and manage a particular business object.";
+    private static final String businessObject_LABEL = "Business Object";
+
+    private static final String businessObject_TOOLTIP =
+        "The name of the business object with which this resource is associated. ";
+
+    private static final String abstract_LABEL = "Abstract";
+
+    private static final String abstract_TOOLTIP = "Indicates whether this is an abstract resource.";
+
+    private static final String firstClass_LABEL = "First Class";
+
+    private static final String firstClass_TOOLTIP =
+        "Indicates whether this is a first-class resource. If checked the generated SWAGGER will have paths with and without the parent resource. First class resources may exist independently of a parent resource.";
+
+    private static final String basePath_LABEL = "Base Path";
+
+    private static final String basePath_TOOLTIP =
+        "Specifies the base path for this resource. Changing will cause changes to action request path templates. ";
+
+    private static final String basePath_PROMPT = "Enter / to use the business object name as the collection name.";
+
+    private static final String extension_LABEL = "Extends";
+
+    private static final String extension_TOOLTIP =
+        "Reference to the resource from which the child resource will inherit.";
+
+    private static final String parent_LABEL = "Parent";
+
+    private static final String parent_TOOLTIP = "Reference to the parent resource for this sub-resource.";
+
+    private static final String baseResponseWizard_LABEL = "Base Response Wizard";
+
+    private static final String baseResponseWizard_TOOLTIP =
+        "Set base response on all Action Facets used for responses.";
+
+    private DexParentRefsEndpointMap parentRefsEndpointMap;
+
+    // @Override
+    // public Collection<OtmObject> getChildrenHierarchy() {
+    // Collection<OtmObject> ch = new ArrayList<>();
+    // // children.forEach(c -> {
+    // // if (c instanceof OtmIdFacet)
+    // // ch.add(c);
+    // // if (c instanceof OtmAlias)
+    // // ch.add(c);
+    // // });
+    // return ch;
+    // }
+
+    private ResourceCodegenUtils codegenUtils;
+
+    public OtmResource(String name, OtmModelManager mgr) {
+        super( new TLResource(), mgr );
+        setName( name );
+    }
 
     public OtmResource(TLResource tlo, OtmModelManager mgr) {
         super( tlo, mgr );
@@ -82,19 +139,208 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         // parentRefsEndpointMap = new DexParentRefsEndpointMap( this );
     }
 
-    public DexParentRefsEndpointMap getParentRefEndpointsMap() {
-        if (parentRefsEndpointMap == null)
-            parentRefsEndpointMap = new DexParentRefsEndpointMap( this );
-        return parentRefsEndpointMap;
+    @Override
+    public OtmResourceChild add(OtmObject child) {
+        if (child instanceof OtmResourceChild) {
+            // Make sure it has not already been added
+            if (children == null)
+                children = new ArrayList<>();
+            else if (contains( children, child ))
+                return null;
+
+            if (inheritedChildren == null)
+                inheritedChildren = new ArrayList<>();
+            else if (contains( inheritedChildren, child ))
+                return null;
+
+            if (!child.isInherited())
+                children.add( child );
+            else
+                inheritedChildren.add( child );
+            return (OtmResourceChild) child;
+        }
+        return null;
     }
 
-    public String getPayloadExample(OtmActionRequest request) {
-        // log.debug( DexParentRefsEndpointMap.getPayloadExample( request ) );
-        return DexParentRefsEndpointMap.getPayloadExample( request );
+
+    /**
+     * Add the passed group to the TL resource, child list and set group's parent.
+     * 
+     * @param group
+     */
+    public void addParameterGroup(OtmParameterGroup group) {
+        if (group != null) {
+            getTL().addParamGroup( group.getTL() );
+            add( group ); // Add to children list
+            group.setParent( this );
+        }
     }
 
-    public String getPayloadExample(OtmActionResponse response) {
-        return DexParentRefsEndpointMap.getPayloadExample( response );
+    /**
+     * Add the passed group to the TL resource if not already owned, child list and set group's parent.
+     * 
+     * @param tlGroup
+     * @return
+     */
+    public OtmParameterGroup add(TLParamGroup tlGroup) {
+        OtmParameterGroup group = null;
+        if (tlGroup != null && !getTL().getParamGroups().contains( tlGroup )) {
+            getTL().addParamGroup( tlGroup );
+            group = new OtmParameterGroup( tlGroup, this );
+            log.debug( "Added parameter group to " + this );
+            refresh( true );
+        }
+        return group;
+    }
+
+    /**
+     * Add the passed action to the TL resource if not already owned, child list and set action's parent.
+     * 
+     * @param tlGroup
+     * @return
+     */
+    public OtmAction add(TLAction tlAction) {
+        OtmAction action = null;
+        if (tlAction != null && !getTL().getActions().contains( tlAction )) {
+            getTL().addAction( tlAction );
+            action = new OtmAction( tlAction, this );
+            log.debug( "Added action to " + this );
+            refresh( true );
+        }
+        return action;
+    }
+
+    /**
+     * Add the passed action facet to the TL resource if not already owned, child list and set facet's parent.
+     * 
+     * @param tlGroup
+     * @return
+     */
+    public OtmActionFacet add(TLActionFacet tlAction) {
+        OtmActionFacet action = null;
+        if (tlAction != null && !getTL().getActionFacets().contains( tlAction )) {
+            getTL().addActionFacet( tlAction );
+            action = new OtmActionFacet( tlAction, this );
+            log.debug( "Added action facet to " + this );
+            refresh( true );
+        }
+        return action;
+    }
+
+    /**
+     * Add theTL parent reference to TL and Otm resource, set its path and parent if present
+     * 
+     * @param parent the parent resource to reference (not owner)
+     * @return
+     */
+    public OtmParentRef add(TLResourceParentRef tlParentRef) {
+        return add( tlParentRef, null );
+    }
+
+    public OtmParentRef add(TLResourceParentRef tlParentRef, OtmResource parent) {
+        // Do we need to test if already done?
+        OtmParentRef parentRef = null;
+        if (tlParentRef != null) {
+            if (!getTL().getParentRefs().contains( tlParentRef )) {
+                getTL().addParentRef( tlParentRef );
+                parentRef = new OtmParentRef( tlParentRef, this );
+            }
+            if (parent != null) {
+                // Set parent and initial path template
+                tlParentRef.setPathTemplate( parent.getBasePath() );
+                tlParentRef.setParentResource( parent.getTL() );
+            }
+            refresh( true );
+            log.debug( "Added parent reference to " + this );
+        }
+        return parentRef;
+    }
+
+    public OtmResourceChild add(TLModelElement tlChild) {
+        log.debug( "Add " + tlChild.getClass().getSimpleName() + " to " + this + " not supported yet." );
+        return null; // Not supported (yet).
+    }
+
+    /** ************************************** */
+    /**
+     * @see org.opentravel.model.OtmTypeUser#assignedTypeProperty()
+     */
+    @Override
+    public StringProperty assignedTypeProperty() {
+        String typeName = "";
+        if (getAssignedType() != null)
+            typeName = getAssignedType().getName();
+        return new ReadOnlyStringWrapper( typeName );
+    }
+
+    private void assignSubject() {
+        log.debug( "Button selected" );
+        getActionManager().run( DexActions.ASSIGNSUBJECT, this );
+    }
+
+    public StringProperty basePathProperty() {
+        return getActionManager() != null ? getActionManager().add( DexActions.BASEPATHCHANGE, getBasePath(), this )
+            : new ReadOnlyStringWrapper( getBasePath() );
+
+        // Question - what to use as action enum? Field or base path?
+        // StringProperty bpProperty = new ReadOnlyStringWrapper( getBasePath() );
+        // if (isEditable() && getActionManager() != null) {
+        // bpProperty = new SimpleStringProperty( getBasePath() );
+        // getActionManager().addAction( DexActions.BASEPATHCHANGE, bpProperty, this );
+        // }
+        // return bpProperty;
+    }
+
+    /**
+     * Create a TL parent reference, set its path and parent if present, add to TL and Otm resource
+     * 
+     * @param parent the parent resource to reference (not owner)
+     * @return
+     */
+    public OtmParentRef createParentRef(OtmResource parent) {
+        return add( new TLResourceParentRef(), parent );
+    }
+
+    /**
+     * Get the list of action facets from the TL object and return their OtmActionFacet facades.
+     * 
+     * @return
+     */
+    public List<OtmActionFacet> getActionFacets() {
+        List<OtmActionFacet> actionFacets = new ArrayList<>();
+        getTL().getActionFacets().forEach( af -> {
+            if (OtmModelElement.get( af ) instanceof OtmActionFacet)
+                actionFacets.add( (OtmActionFacet) OtmModelElement.get( af ) );
+        } );
+        return actionFacets;
+    }
+
+    /**
+     * Get all the actions in the resource
+     * 
+     * @return new list of OtmAction
+     */
+    public List<OtmActionRequest> getActionRequests() {
+        List<OtmActionRequest> requests = new ArrayList<>();
+        // List<TLAction> tlas = getTL().getActions();
+        for (TLAction ta : getTL().getActions()) {
+            if (OtmModelElement.get( ta ) instanceof OtmAction
+                && ((OtmAction) OtmModelElement.get( ta )).getRequest() != null)
+                requests.add( ((OtmAction) OtmModelElement.get( ta )).getRequest() );
+        }
+        return requests;
+    }
+
+    /**
+     * @return
+     */
+    public List<OtmAction> getActions() {
+        List<OtmAction> actions = new ArrayList<>();
+        getTL().getActions().forEach( ta -> {
+            if (OtmModelElement.get( ta ) instanceof OtmAction)
+                actions.add( (OtmAction) OtmModelElement.get( ta ) );
+        } );
+        return actions;
     }
 
     /**
@@ -138,143 +384,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return subResources;
     }
 
-    public OtmResource(String name, OtmModelManager mgr) {
-        super( new TLResource(), mgr );
-        setName( name );
-    }
-
-    /**
-     * Set the base path on this resource. If override is true, do all the action resources also.
-     * 
-     * @param basePath
-     * @param override
-     */
-    public void setBasePath(String basePath, boolean override) {
-        getTL().setBasePath( basePath );
-        if (override)
-            getActionRequests().forEach( ar -> ar.setPathTemplate( basePath, override ) );
-        refresh( true );
-    }
-
-    public String getBasePath() {
-        return getTL().getBasePath();
-    }
-
-    public StringProperty basePathProperty() {
-        return getActionManager() != null ? getActionManager().add( DexActions.BASEPATHCHANGE, getBasePath(), this )
-            : new ReadOnlyStringWrapper( getBasePath() );
-
-        // Question - what to use as action enum? Field or base path?
-        // StringProperty bpProperty = new ReadOnlyStringWrapper( getBasePath() );
-        // if (isEditable() && getActionManager() != null) {
-        // bpProperty = new SimpleStringProperty( getBasePath() );
-        // getActionManager().addAction( DexActions.BASEPATHCHANGE, bpProperty, this );
-        // }
-        // return bpProperty;
-    }
-
-    @Override
-    public String setName(String name) {
-        getTL().setName( name );
-        isValid( true );
-        return getName();
-    }
-
-    @Override
-    public TLResource getTL() {
-        return (TLResource) tlObject;
-    }
-
-    @Override
-    public Icons getIconType() {
-        return ImageManager.Icons.RESOURCE;
-    }
-
-    public Tooltip getTooltip() {
-        return new Tooltip( TOOLTIP );
-    }
-
-    @Override
-    public OtmResource getBaseType() {
-        return (OtmResource) super.getBaseType();
-    }
-
-    // @Override
-    // public Collection<OtmObject> getChildrenHierarchy() {
-    // Collection<OtmObject> ch = new ArrayList<>();
-    // // children.forEach(c -> {
-    // // if (c instanceof OtmIdFacet)
-    // // ch.add(c);
-    // // if (c instanceof OtmAlias)
-    // // ch.add(c);
-    // // });
-    // return ch;
-    // }
-
-    @Override
-    public OtmLibraryMember getOwningMember() {
-        return this;
-    }
-
-    @Override
-    public boolean isExpanded() {
-        return true;
-    }
-
-    @Override
-    public boolean isNameControlled() {
-        return false;
-    }
-
-    @Override
-    public OtmResourceChild add(OtmObject child) {
-        if (child instanceof OtmResourceChild) {
-            // Make sure it has not already been added
-            if (children == null)
-                children = new ArrayList<>();
-            else if (contains( children, child ))
-                return null;
-
-            if (inheritedChildren == null)
-                inheritedChildren = new ArrayList<>();
-            else if (contains( inheritedChildren, child ))
-                return null;
-
-            if (!child.isInherited())
-                children.add( child );
-            else
-                inheritedChildren.add( child );
-            return (OtmResourceChild) child;
-        }
-        return null;
-    }
-
-
-    /**
-     * @see org.opentravel.model.otmLibraryMembers.OtmLibraryMemberBase#modelChildren()
-     */
-    @Override
-    public void modelChildren() {
-        getTL().getActionFacets().forEach( a -> new OtmActionFacet( a, this ) );
-        getTL().getActions().forEach( a -> new OtmAction( a, this ) );
-        getTL().getParamGroups().forEach( a -> new OtmParameterGroup( a, this ) );
-        getTL().getParentRefs().forEach( a -> new OtmParentRef( a, this ) );
-
-        // log.debug( "Modeled " + children.size() + " resource children for " + getName() );
-    }
-
-    /** ************************************** */
-    /**
-     * @see org.opentravel.model.OtmTypeUser#assignedTypeProperty()
-     */
-    @Override
-    public StringProperty assignedTypeProperty() {
-        String typeName = "";
-        if (getAssignedType() != null)
-            typeName = getAssignedType().getName();
-        return new ReadOnlyStringWrapper( typeName );
-    }
-
     /**
      * Returns the business object reference
      * 
@@ -293,156 +402,30 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return (OtmBusinessObject) OtmModelElement.get( (TLModelElement) getAssignedTLType() );
     }
 
+    public String getBasePath() {
+        return getTL().getBasePath();
+    }
+
+    private Node getBasePathNode() {
+        TextField field = DexEditField.makeTextField( basePathProperty() );
+        // TextField field = DexEditField.makeTextField( getBasePath(), this );
+        if (basePathProperty().isEmpty().get())
+            field.setPromptText( basePath_PROMPT );
+        // field.setOnAction( a -> setBasePath( "NEW PATH", true ) );
+        return field;
+    }
+
+    @Override
+    public OtmResource getBaseType() {
+        return (OtmResource) super.getBaseType();
+    }
+
     public OtmBusinessObject getBusinessObject() {
         return getAssignedType();
     }
 
     public String getBusinessObjectName() {
         return getAssignedType() != null ? getAssignedType().getName() : "";
-    }
-
-    /**
-     * {@inheritDoc} Returns the TL business object reference name not getName() of the assigned type
-     * 
-     * @see org.opentravel.model.OtmTypeUser#getTlAssignedTypeName()
-     */
-    @Override
-    public String getTlAssignedTypeName() {
-        return getTL().getBusinessObjectRefName() != null ? getTL().getBusinessObjectRefName() : "";
-    }
-
-    /**
-     * @see org.opentravel.model.OtmTypeUser#setAssignedTLType(org.opentravel.schemacompiler.model.NamedEntity)
-     */
-    @Override
-    public NamedEntity setAssignedTLType(NamedEntity type) {
-        if (type instanceof TLBusinessObject) {
-            getTL().setBusinessObjectRef( (TLBusinessObject) type );
-            return type;
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc} For resources, <b>must</b> be a business object.
-     * 
-     * @see org.opentravel.model.OtmTypeUser#setAssignedType(org.opentravel.model.OtmTypeProvider)
-     */
-    @Override
-    public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
-        OtmLibraryMember oldUser = getAssignedType() == null ? null : getAssignedType().getOwningMember();
-        if (setAssignedTLType( (NamedEntity) type.getTL() ) != null)
-            // add to type's typeUsers
-            type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
-
-        return getAssignedType();
-    }
-
-    /**
-     * Get facets from subject business object. Replace contributed facets with their contributor.
-     * 
-     * @return a non-null list of subject facets and contextual facets.
-     */
-    public List<OtmObject> getSubjectFacets() {
-        List<OtmObject> facets = null;
-        if (getSubject() != null) {
-            facets = new ArrayList<>();
-            for (OtmObject object : getSubject().getChildren()) {
-                if (object instanceof OtmFacet) {
-                    if (object instanceof OtmContributedFacet)
-                        object = ((OtmContributedFacet) object).getContributor();
-                    if (object != null)
-                        facets.add( object );
-                }
-            }
-        }
-        return facets != null ? facets : Collections.emptyList();
-    }
-
-    /**
-     * Get the name of the business object. First trys the business object and if that is missing, trys the business
-     * object reference name field.
-     * 
-     * @return name of the business object assigned or empty string
-     */
-    public String getSubjectName() {
-        if (getAssignedType() == null)
-            return getTlAssignedTypeName();
-        return getAssignedType().getName();
-    }
-
-    /**
-     * Convenience method for {@link #getAssignedType()}
-     * 
-     * @return business object assigned
-     */
-    public OtmBusinessObject getSubject() {
-        return getAssignedType();
-    }
-
-    /**
-     * Convenience method for {@link #setAssignedType(OtmTypeProvider)}
-     * 
-     * @param subject
-     */
-    public OtmBusinessObject setSubject(OtmBusinessObject subject) {
-        OtmBusinessObject result = (OtmBusinessObject) setAssignedType( subject );
-        refresh( true );
-        return result;
-    }
-
-    /**
-     * {@link TLResource#setExtension()}
-     * 
-     * @param extensionName
-     */
-    public OtmResource setExtendedResource(OtmResource superType) {
-        if (superType == null)
-            getTL().setExtension( null );
-        else {
-            TLExtension extension = getTL().getExtension();
-            if (extension == null) {
-                extension = new TLExtension();
-                getTL().setExtension( extension );
-            }
-            extension.setExtendsEntity( superType.getTL() );
-        }
-        log.debug( "Set extension to " + getExtendedResource() );
-        return getExtendedResource();
-    }
-
-    public OtmResource setExtendedResourceString(String extensionName) {
-        OtmResource superType = null;
-        // get the candidate list and match one
-        for (OtmResource c : getModelManager().getResources( true ))
-            if (c.getNameWithPrefix().equals( extensionName ))
-                superType = c;
-
-        return setExtendedResource( superType );
-    }
-
-    /**
-     * @see org.opentravel.model.OtmTypeUser#setTLTypeName(java.lang.String)
-     */
-    @Override
-    public void setTLTypeName(String name) {
-        // no-op
-    }
-
-    /**
-     * Get all the actions in the resource
-     * 
-     * @return new list of OtmAction
-     */
-    public List<OtmActionRequest> getActionRequests() {
-        List<OtmActionRequest> requests = new ArrayList<>();
-        // List<TLAction> tlas = getTL().getActions();
-        for (TLAction ta : getTL().getActions()) {
-            if (OtmModelElement.get( ta ) instanceof OtmAction
-                && ((OtmAction) OtmModelElement.get( ta )).getRequest() != null)
-                requests.add( ((OtmAction) OtmModelElement.get( ta )).getRequest() );
-        }
-        return requests;
     }
 
     public OtmResource getExtendedResource() {
@@ -489,58 +472,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return DexEditField.makeComboBox( getExtensionCandidates(), selection );
     }
 
-    private Node getSubectNode() {
-        Button button = new Button( getSubjectName() );
-        button.setDisable( !isEditable() );
-        button.setOnAction( a -> assignSubject() );
-        return button;
-    }
-
-    private void assignSubject() {
-        log.debug( "Button selected" );
-        getActionManager().run( DexActions.ASSIGNSUBJECT, this );
-    }
-
-    private Node getBasePathNode() {
-        TextField field = DexEditField.makeTextField( basePathProperty() );
-        // TextField field = DexEditField.makeTextField( getBasePath(), this );
-        if (basePathProperty().isEmpty().get())
-            field.setPromptText( basePath_PROMPT );
-        // field.setOnAction( a -> setBasePath( "NEW PATH", true ) );
-        return field;
-    }
-
-
-
-    public boolean isAbstract() {
-        return getTL().isAbstract();
-    }
-
-    private Node getIsAbstractNode() {
-        BooleanProperty abstractProperty = getActionManager().add( DexActions.SETABSTRACT, isAbstract(), this );
-        return DexEditField.makeCheckBox( abstractProperty, abstract_LABEL );
-    }
-
-    public boolean isFirstClass() {
-        return getTL().isFirstClass();
-    }
-
-    private Node getIsFirstClassNode() {
-        // SimpleBooleanProperty firstClassProperty = new SimpleBooleanProperty( isFirstClass() );
-        BooleanProperty firstClassProperty = getActionManager().add( DexActions.SETFIRSTCLASS, isFirstClass(), this );
-        // getActionManager().addAction( DexActions.BASEPATHCHANGE, firstClassProperty, this );
-        CheckBox box = DexEditField.makeCheckBox( firstClassProperty, firstClass_LABEL );
-        // CheckBox box = DexEditField.makeCheckBox( isFirstClass(), firstClass_LABEL, this );
-        // box.setOnAction( a -> log.debug( "First class check box selected." ) );
-        return box;
-    }
-
-    @Override
-    public boolean isEditable() {
-        return getLibrary() != null && getLibrary().isEditable();
-        // return getName().startsWith( "S" ); // testing only
-    }
-
     // FIXME
     // Add namespace to fields.
     /**
@@ -560,6 +491,60 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     }
 
+    @Override
+    public Icons getIconType() {
+        return ImageManager.Icons.RESOURCE;
+    }
+
+
+
+    private Node getIsAbstractNode() {
+        BooleanProperty abstractProperty = getActionManager().add( DexActions.SETABSTRACT, isAbstract(), this );
+        return DexEditField.makeCheckBox( abstractProperty, abstract_LABEL );
+    }
+
+    private Node getIsFirstClassNode() {
+        // SimpleBooleanProperty firstClassProperty = new SimpleBooleanProperty( isFirstClass() );
+        BooleanProperty firstClassProperty = getActionManager().add( DexActions.SETFIRSTCLASS, isFirstClass(), this );
+        // getActionManager().addAction( DexActions.BASEPATHCHANGE, firstClassProperty, this );
+        CheckBox box = DexEditField.makeCheckBox( firstClassProperty, firstClass_LABEL );
+        // CheckBox box = DexEditField.makeCheckBox( isFirstClass(), firstClass_LABEL, this );
+        // box.setOnAction( a -> log.debug( "First class check box selected." ) );
+        return box;
+    }
+
+    @Override
+    public OtmLibraryMember getOwningMember() {
+        return this;
+    }
+
+    public List<OtmParameterGroup> getParameterGroups() {
+        List<OtmParameterGroup> groups = new ArrayList<>();
+        getTL().getParamGroups().forEach( pg -> {
+            if (OtmModelElement.get( pg ) instanceof OtmParameterGroup)
+                groups.add( (OtmParameterGroup) OtmModelElement.get( pg ) );
+        } );
+        return groups;
+    }
+
+    public DexParentRefsEndpointMap getParentRefEndpointsMap() {
+        if (parentRefsEndpointMap == null)
+            parentRefsEndpointMap = new DexParentRefsEndpointMap( this );
+        return parentRefsEndpointMap;
+    }
+
+    /**
+     * @return non-null list of parent refs
+     */
+    public List<OtmParentRef> getParentRefs() {
+        List<OtmParentRef> parents = new ArrayList<>();
+        getTL().getParentRefs().forEach( pr -> {
+            if (OtmModelElement.get( pr ) instanceof OtmParentRef)
+                parents.add( (OtmParentRef) OtmModelElement.get( pr ) );
+        } );
+        return parents;
+    }
+
     // public List<DexEditField> getFields() {
     // List<DexEditField> fields = new ArrayList<>();
     // fields.add( new DexEditField( 0, 0, extension_LABEL, extension_TOOLTIP, getExtensionNode() ) );
@@ -574,72 +559,167 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     // return fields;
     // }
 
-    private static final String TOOLTIP =
-        "Encapsulates all aspects of a RESTful resource used to expose and manage a particular business object.";
+    public String getPayloadExample(OtmActionRequest request) {
+        // log.debug( DexParentRefsEndpointMap.getPayloadExample( request ) );
+        return DexParentRefsEndpointMap.getPayloadExample( request );
+    }
 
     // private static final String name_LABEL = "Resource Name";
     // private static final String name_TOOLTIP =
     // "The name of the resource. This name is used to uniquely identify the resource within the OTM model, but will not
     // conflict with any naming conventions used in generated XSD documents.";
 
-    private static final String businessObject_LABEL = "Business Object";
-    private static final String businessObject_TOOLTIP =
-        "The name of the business object with which this resource is associated. ";
+    public String getPayloadExample(OtmActionResponse response) {
+        return DexParentRefsEndpointMap.getPayloadExample( response );
+    }
 
-    private static final String abstract_LABEL = "Abstract";
-    private static final String abstract_TOOLTIP = "Indicates whether this is an abstract resource.";
+    private Node getSubectNode() {
+        Button button = new Button( getSubjectName() );
+        button.setDisable( !isEditable() );
+        button.setOnAction( a -> assignSubject() );
+        return button;
+    }
 
-    private static final String firstClass_LABEL = "First Class";
-    private static final String firstClass_TOOLTIP =
-        "Indicates whether this is a first-class resource. If checked the generated SWAGGER will have paths with and without the parent resource. First class resources may exist independently of a parent resource.";
+    /**
+     * Convenience method for {@link #getAssignedType()}
+     * 
+     * @return business object assigned
+     */
+    public OtmBusinessObject getSubject() {
+        return getAssignedType();
+    }
 
-    private static final String basePath_LABEL = "Base Path";
-    private static final String basePath_TOOLTIP =
-        "Specifies the base path for this resource. Changing will cause changes to action request path templates. ";
-    private static final String basePath_PROMPT = "Enter / to use the business object name as the collection name.";
+    /**
+     * Get facets from subject business object. Replace contributed facets with their contributor.
+     * 
+     * @return a non-null list of subject facets and contextual facets.
+     */
+    public List<OtmObject> getSubjectFacets() {
+        List<OtmObject> facets = null;
+        if (getSubject() != null) {
+            facets = new ArrayList<>();
+            for (OtmObject object : getSubject().getChildren()) {
+                if (object instanceof OtmFacet) {
+                    if (object instanceof OtmContributedFacet)
+                        object = ((OtmContributedFacet) object).getContributor();
+                    if (object != null)
+                        facets.add( object );
+                }
+            }
+        }
+        return facets != null ? facets : Collections.emptyList();
+    }
+
+    /**
+     * Get the name of the business object. First trys the business object and if that is missing, trys the business
+     * object reference name field.
+     * 
+     * @return name of the business object assigned or empty string
+     */
+    public String getSubjectName() {
+        if (getAssignedType() == null)
+            return getTlAssignedTypeName();
+        return getAssignedType().getName();
+    }
+
+    @Override
+    public TLResource getTL() {
+        return (TLResource) tlObject;
+    }
+
+    /**
+     * {@inheritDoc} Returns the TL business object reference name not getName() of the assigned type
+     * 
+     * @see org.opentravel.model.OtmTypeUser#getTlAssignedTypeName()
+     */
+    @Override
+    public String getTlAssignedTypeName() {
+        return getTL().getBusinessObjectRefName() != null ? getTL().getBusinessObjectRefName() : "";
+    }
+
+    public Tooltip getTooltip() {
+        return new Tooltip( TOOLTIP );
+    }
+
+    public boolean isAbstract() {
+        return getTL().isAbstract();
+    }
 
     // private static final String parentRef_LABEL = "Parent";
     // private static final String parentRef_TOOLTIP = " The list of parent references for the resource. ";
 
-    private static final String extension_LABEL = "Extends";
-    private static final String extension_TOOLTIP =
-        "Reference to the resource from which the child resource will inherit.";
+    @Override
+    public boolean isEditable() {
+        return getLibrary() != null && getLibrary().isEditable();
+        // return getName().startsWith( "S" ); // testing only
+    }
 
-    private static final String parent_LABEL = "Parent";
-    private static final String parent_TOOLTIP = "Reference to the parent resource for this sub-resource.";
+    @Override
+    public boolean isExpanded() {
+        return true;
+    }
 
-    private static final String baseResponseWizard_LABEL = "Base Response Wizard";
-    private static final String baseResponseWizard_TOOLTIP =
-        "Set base response on all Action Facets used for responses.";
+    public boolean isFirstClass() {
+        return getTL().isFirstClass();
+    }
+
+    @Override
+    public boolean isNameControlled() {
+        return false;
+    }
 
     /**
-     * @return non-null list of parent refs
+     * @see org.opentravel.model.otmLibraryMembers.OtmLibraryMemberBase#modelChildren()
      */
-    public List<OtmParentRef> getParentRefs() {
-        List<OtmParentRef> parents = new ArrayList<>();
-        getTL().getParentRefs().forEach( pr -> {
-            if (OtmModelElement.get( pr ) instanceof OtmParentRef)
-                parents.add( (OtmParentRef) OtmModelElement.get( pr ) );
-        } );
-        return parents;
+    @Override
+    public void modelChildren() {
+        getTL().getActionFacets().forEach( a -> new OtmActionFacet( a, this ) );
+        getTL().getActions().forEach( a -> new OtmAction( a, this ) );
+        getTL().getParamGroups().forEach( a -> new OtmParameterGroup( a, this ) );
+        getTL().getParentRefs().forEach( a -> new OtmParentRef( a, this ) );
+
+        // log.debug( "Modeled " + children.size() + " resource children for " + getName() );
     }
 
-    public OtmParentRef addParentRef(OtmResource parent) {
-        // Do we need to test if already done?
-        // Create the TL parent ref and set to
-        TLResourceParentRef tlParentRef = new TLResourceParentRef();
-        // Set initial path template
-        tlParentRef.setPathTemplate( parent.getBasePath() );
-
-        tlParentRef.setParentResource( parent.getTL() );
-        OtmParentRef parentRef = new OtmParentRef( tlParentRef, this );
-
-        // parentRef.setOwner( parent.getTL() );
-        getTL().addParentRef( parentRef.getTL() );
-        add( parentRef );
-        refresh( true );
-        return parentRef;
-    }
+    // /**
+    // * Use the TL object to create a new child of this resource.
+    // *
+    // * @param tlChild
+    // * @return
+    // */
+    // public OtmResourceChild newChild(TLResourceParentRef tlChild) {
+    // return addParentRef( tlChild, null );
+    // }
+    //
+    // /**
+    // * Use the TL object to create a new child of this resource.
+    // *
+    // * @param tlChild
+    // * @return
+    // */
+    // public OtmResourceChild newChild(TLParamGroup tlChild) {
+    // return addParameterGroup( tlChild );
+    // }
+    //
+    // /**
+    // * Use the TL object to create a new child of this resource.
+    // *
+    // * @param tlChild
+    // * @return
+    // */
+    // public OtmResourceChild newChild(TLAction tlChild) {
+    // return addAction( tlChild );
+    // }
+    //
+    // /**
+    // * Use the TL object to create a new child of this resource.
+    // *
+    // * @param tlChild
+    // * @return
+    // */
+    // public OtmResourceChild newChild(TLActionFacet tlChild) {
+    // return addActionFacet( tlChild );
+    // }
 
     /**
      * Something changed in this resource so refresh it. To refresh all who use this resource as parent
@@ -662,46 +742,107 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
             getAllSubResources().forEach( sr -> sr.refresh( true ) );
     }
 
-    public void addParameterGroup(OtmParameterGroup group) {
-        if (group != null)
-            getTL().addParamGroup( group.getTL() );
-        add( group ); // Add to children list
-        group.setParent( this );
-    }
-
-    public List<OtmParameterGroup> getParameterGroups() {
-        List<OtmParameterGroup> groups = new ArrayList<>();
-        getTL().getParamGroups().forEach( pg -> {
-            if (OtmModelElement.get( pg ) instanceof OtmParameterGroup)
-                groups.add( (OtmParameterGroup) OtmModelElement.get( pg ) );
-        } );
-        return groups;
-    }
-
     /**
-     * Get the list of action facets from the TL object and return their OtmActionFacet facades.
+     * Remove the child from the Otm and TL objects
      * 
-     * @return
+     * @param child
      */
-    public List<OtmActionFacet> getActionFacets() {
-        List<OtmActionFacet> actionFacets = new ArrayList<>();
-        getTL().getActionFacets().forEach( af -> {
-            if (OtmModelElement.get( af ) instanceof OtmActionFacet)
-                actionFacets.add( (OtmActionFacet) OtmModelElement.get( af ) );
-        } );
-        return actionFacets;
+    public void remove(OtmResourceChild child) {
+        if (child != null) {
+            TLModelElement tlChild = child.getTL();
+            // Remove from TL Resource
+            if (tlChild instanceof TLResourceParentRef)
+                getTL().removeParentRef( (TLResourceParentRef) tlChild );
+            else if (tlChild instanceof TLParamGroup)
+                getTL().removeParamGroup( (TLParamGroup) tlChild );
+            else if (tlChild instanceof TLAction)
+                getTL().removeAction( (TLAction) tlChild );
+            else if (tlChild instanceof TLActionFacet)
+                getTL().removeActionFacet( (TLActionFacet) tlChild );
+            else
+                log.debug( "Can't remove " + child + " from " + this );
+
+            if (contains( children, child ))
+                children.remove( child );
+        }
     }
 
     /**
-     * @return
+     * @param b
      */
-    public List<OtmAction> getActions() {
-        List<OtmAction> actions = new ArrayList<>();
-        getTL().getActions().forEach( ta -> {
-            if (OtmModelElement.get( ta ) instanceof OtmAction)
-                actions.add( (OtmAction) OtmModelElement.get( ta ) );
-        } );
-        return actions;
+    public void setAbstract(boolean b) {
+        getTL().setAbstract( b );
+        refresh( true );
+    }
+
+    /**
+     * @see org.opentravel.model.OtmTypeUser#setAssignedTLType(org.opentravel.schemacompiler.model.NamedEntity)
+     */
+    @Override
+    public NamedEntity setAssignedTLType(NamedEntity type) {
+        if (type instanceof TLBusinessObject) {
+            getTL().setBusinessObjectRef( (TLBusinessObject) type );
+            return type;
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc} For resources, <b>must</b> be a business object.
+     * 
+     * @see org.opentravel.model.OtmTypeUser#setAssignedType(org.opentravel.model.OtmTypeProvider)
+     */
+    @Override
+    public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
+        OtmLibraryMember oldUser = getAssignedType() == null ? null : getAssignedType().getOwningMember();
+        if (setAssignedTLType( (NamedEntity) type.getTL() ) != null)
+            // add to type's typeUsers
+            type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
+
+        return getAssignedType();
+    }
+
+    /**
+     * Set the base path on this resource. If override is true, do all the action resources also.
+     * 
+     * @param basePath
+     * @param override
+     */
+    public void setBasePath(String basePath, boolean override) {
+        getTL().setBasePath( basePath );
+        if (override)
+            getActionRequests().forEach( ar -> ar.setPathTemplate( basePath, override ) );
+        refresh( true );
+    }
+
+    /**
+     * {@link TLResource#setExtension()}
+     * 
+     * @param extensionName
+     */
+    public OtmResource setExtendedResource(OtmResource superType) {
+        if (superType == null)
+            getTL().setExtension( null );
+        else {
+            TLExtension extension = getTL().getExtension();
+            if (extension == null) {
+                extension = new TLExtension();
+                getTL().setExtension( extension );
+            }
+            extension.setExtendsEntity( superType.getTL() );
+        }
+        log.debug( "Set extension to " + getExtendedResource() );
+        return getExtendedResource();
+    }
+
+    public OtmResource setExtendedResourceString(String extensionName) {
+        OtmResource superType = null;
+        // get the candidate list and match one
+        for (OtmResource c : getModelManager().getResources( true ))
+            if (c.getNameWithPrefix().equals( extensionName ))
+                superType = c;
+
+        return setExtendedResource( superType );
     }
 
     /**
@@ -713,11 +854,29 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         log.debug( "First class set to " + isFirstClass() );
     }
 
+    @Override
+    public String setName(String name) {
+        getTL().setName( name );
+        isValid( true );
+        return getName();
+    }
+
     /**
-     * @param b
+     * Convenience method for {@link #setAssignedType(OtmTypeProvider)}
+     * 
+     * @param subject
      */
-    public void setAbstract(boolean b) {
-        getTL().setAbstract( b );
+    public OtmBusinessObject setSubject(OtmBusinessObject subject) {
+        OtmBusinessObject result = (OtmBusinessObject) setAssignedType( subject );
         refresh( true );
+        return result;
+    }
+
+    /**
+     * @see org.opentravel.model.OtmTypeUser#setTLTypeName(java.lang.String)
+     */
+    @Override
+    public void setTLTypeName(String name) {
+        // no-op
     }
 }

@@ -214,7 +214,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         assertTrue( staticModelManager.getResources( false ).contains( parent ) );
 
         // When - parent ref is added
-        OtmParentRef parentRef = resource.addParentRef( parent );
+        OtmParentRef parentRef = resource.createParentRef( parent );
         assertTrue( parent.getAllSubResources().contains( resource ) );
 
         // Then - the parent ref check is OK
@@ -231,9 +231,9 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         OtmResource parent3 = buildOtm( staticModelManager );
 
         // When - parent ref is added
-        OtmParentRef parentRef3 = parent2.addParentRef( parent3 );
-        OtmParentRef parentRef2 = parent1.addParentRef( parent2 );
-        OtmParentRef parentRef1 = resource.addParentRef( parent1 );
+        OtmParentRef parentRef3 = parent2.createParentRef( parent3 );
+        OtmParentRef parentRef2 = parent1.createParentRef( parent2 );
+        OtmParentRef parentRef1 = resource.createParentRef( parent1 );
 
         assertTrue( resource.getParentRefs().size() == 1 );
         assertTrue( parent1.getParentRefs().size() == 1 );
@@ -259,9 +259,9 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         OtmResource parent3 = buildOtm( staticModelManager );
 
         // When - parent ref is added
-        OtmParentRef parentRef1 = resource.addParentRef( parent1 );
-        OtmParentRef parentRef2 = resource.addParentRef( parent2 );
-        OtmParentRef parentRef3 = resource.addParentRef( parent3 );
+        OtmParentRef parentRef1 = resource.createParentRef( parent1 );
+        OtmParentRef parentRef2 = resource.createParentRef( parent2 );
+        OtmParentRef parentRef3 = resource.createParentRef( parent3 );
 
         // Then - 3 parent refs
         assertTrue( resource.getParentRefs().size() == 3 );
@@ -376,7 +376,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         parentR.getTL().setFirstClass( true );
         OtmParameterGroup idGroup = TestParamGroup.buildIdGroup( parentR );
 
-        OtmParentRef parentRef = r.addParentRef( parentR );
+        OtmParentRef parentRef = r.createParentRef( parentR );
         parentRef.getTL().setParentParamGroup( idGroup.getTL() );
         parentRef.getTL().setPathTemplate( null ); // do NOT use the override
 

@@ -131,7 +131,7 @@ public interface DexActionManager {
      * @param actionType what action to perform
      * @param subject OTM object to act upon
      */
-    public void run(DexActions actionType, OtmObject subject);
+    public Object run(DexActions actionType, OtmObject subject);
 
     /**
      * Create an action and do it. If successful the action will be added to the queue.
@@ -145,7 +145,7 @@ public interface DexActionManager {
      * @param subject
      * @param data used to modify the subject, may be null if action will run dialog to get data
      */
-    void run(DexActions actionType, OtmObject subject, Object data);
+    public Object run(DexActions actionType, OtmObject subject, Object data);
 
     /**
      * Pop an action from the queue and then undo it. The event associated with the action, if any, will be published.
