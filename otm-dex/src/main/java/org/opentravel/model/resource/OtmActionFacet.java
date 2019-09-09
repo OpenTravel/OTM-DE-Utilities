@@ -263,12 +263,12 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         OtmLibraryMember base = getBasePayload(); // creates wrapper object
 
         // Early Exit Conditions
+        if (getReferenceType() == TLReferenceType.NONE)
+            return null; // User set to have No request payload
         if (subject == null)
             return rqPayload; // Error, resource is not complete
         if (rfName.equals( OtmResource.SUBGROUP ) || rfName.isEmpty())
             return subject; // The whole object is the substitution group
-        if (getReferenceType() == TLReferenceType.NONE)
-            return null; // User set to have No request payload
 
         rqPayload = getReferenceFacet();
         return rqPayload;
@@ -282,7 +282,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     public OtmObject getResponsePayload(OtmActionResponse response) {
         TLActionResponse source = response.getTL();
         NamedEntity plt = ResourceCodegenUtils.getPayloadType( source.getPayloadType() );
-        return OtmModelElement.get( (TLModelElement) plt );
+        return plt != null ? OtmModelElement.get( (TLModelElement) plt ) : this;
     }
 
     @Override

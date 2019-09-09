@@ -127,7 +127,7 @@ public class TestActionResponse<L extends TestOtmResourceBase<OtmActionResponse>
                 ar.setPayloadActionFacet( afWithRefFacet );
                 // Then - same payload name which is base payload name
                 log.debug( ar.getPayloadName() );
-                assertTrue( afWithRefFacet.getName().equals( ar.getPayloadName() ) ); // Used in GUI
+                assertTrue( ar.getPayloadName().contains( resource.getSubject().getName() ) ); // Used in GUI
             }
     }
 

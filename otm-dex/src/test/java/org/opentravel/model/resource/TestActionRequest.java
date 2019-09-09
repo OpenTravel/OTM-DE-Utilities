@@ -147,12 +147,12 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
         assertTrue( "Payload must be null.", af.getRequestPayload() == null );
 
         // When - the reference facet is set null
+        af.setReferenceType( TLReferenceType.REQUIRED );
         af.setReferenceFacet( null );
         // Then
         assertTrue( "Payload must be the object.", af.getRequestPayload() == bo );
 
         // When - the reference facet is set to any business object facet
-        af.setReferenceType( TLReferenceType.REQUIRED );
         for (OtmObject facet : bo.getChildren()) {
             af.setReferenceFacet( (OtmFacet<?>) facet );
 

@@ -36,22 +36,6 @@ import javafx.beans.value.ObservableValue;
  */
 public interface DexAction<T> {
 
-
-    // /**
-    // *
-    // * @param data value to be applied in the action, must be of type defined in the generic parameter
-    // */
-    // public void doIt();
-
-    // /**
-    // * @deprecated - all actions NO-OP this method Run the action.
-    // */
-    // @Deprecated
-    // public void doIt(Object data);
-
-    // All implementations must implement, but the signatures will be different.
-    // public T doIt(ObservableValue<? extends T> observable, T oldValue, T newValue);
-
     /**
      * Return the event object if the action defines an event to throw when action is done or undone.
      * 
@@ -73,17 +57,6 @@ public interface DexAction<T> {
      */
     public OtmObject getSubject();
 
-    // /**
-    // * @return true if the requested change is allowed for object in this application and user.
-    // */
-    // public boolean isAllowed(T value);
-
-    // /**
-    // * Is the action enabled for this subject?
-    // *
-    // * @return true if change is enabled for this application and user.
-    // */
-    // public boolean isEnabled();
 
     public DexActions getType();
 
@@ -123,11 +96,4 @@ public interface DexAction<T> {
      * @return
      */
     public T undoIt();
-
-
-    // public T redo();
-    // /**
-    // * @return true if change is valid for this object for this application and user.
-    // */
-    // public boolean wouldBeValid(T value);
 }

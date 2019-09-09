@@ -120,7 +120,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     public String getMethodString() {
-        return getTL().getHttpMethod().toString();
+        return getTL().getHttpMethod() != null ? getTL().getHttpMethod().toString() : "";
     }
 
     public ObservableList<String> getMethodCandidates() {
