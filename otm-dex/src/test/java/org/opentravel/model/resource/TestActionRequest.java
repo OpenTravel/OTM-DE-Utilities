@@ -144,8 +144,8 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
         OtmActionFacet af = TestActionFacet.buildOtm( resource );
         af.setBasePayload( null );
 
-        // // When - the reference type is set to NONE
         // // Reference type is IGNORED for requests
+        // // When - the reference type is set to NONE
         // af.setReferenceType( TLReferenceType.NONE );
         // // Then
         // assertTrue( "Payload must be null.", af.getRequestPayload() == null );

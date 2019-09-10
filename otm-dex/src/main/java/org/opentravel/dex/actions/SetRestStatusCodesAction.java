@@ -18,39 +18,27 @@ package org.opentravel.dex.actions;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.common.MimeTypeMap;
+import org.opentravel.common.RestStatusCodesMap;
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmActionResponse;
-import org.opentravel.schemacompiler.model.TLMimeType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.util.Collections;
 import java.util.List;
 
-public class SetMimeTypesAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( SetMimeTypesAction.class );
+public class SetRestStatusCodesAction extends DexRunAction {
+    private static Log log = LogFactory.getLog( SetRestStatusCodesAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
-        return (subject.isEditable() && subject instanceof OtmActionRequest || subject instanceof OtmActionResponse);
+        return (subject.isEditable() && subject instanceof OtmActionResponse);
     }
 
     private OtmObject object = null;
-    private MimeTypeMap oldMap = null;
+    private RestStatusCodesMap oldMap = null;
 
 
-    public SetMimeTypesAction() {
+    public SetRestStatusCodesAction() {
         // Constructor for reflection
-    }
-
-    /**
-     * {@inheritDoc} Not valid for this action
-     * 
-     * @return
-     */
-    public Object doIt() {
-        log.debug( "Must provide DexMimeTypeHandler to perform action." );
-        return null;
     }
 
     /**
@@ -58,25 +46,23 @@ public class SetMimeTypesAction extends DexRunAction {
      */
     @Override
     public Object doIt(Object data) {
-        if (data instanceof MimeTypeMap)
-            doIt( (MimeTypeMap) data );
+        if (data instanceof RestStatusCodesMap)
+            doIt( (RestStatusCodesMap) data );
         return null;
     }
 
-    public void doIt(MimeTypeMap data) {
+    public void doIt(RestStatusCodesMap data) {
         if (isEnabled( object )) {
-            oldMap = new MimeTypeMap( object );
+            oldMap = new RestStatusCodesMap( object );
             set( data.getTLList() );
             object.getActionManager().push( this );
         }
     }
 
     @Override
-    public List<TLMimeType> get() {
-        if (object instanceof OtmActionRequest)
-            return ((OtmActionRequest) object).getMimeTypes();
+    public List<Integer> get() {
         if (object instanceof OtmActionResponse)
-            return ((OtmActionResponse) object).getMimeTypes();
+            return ((OtmActionResponse) object).getRestStatusCodes();
         return Collections.emptyList();
     }
 
@@ -90,13 +76,9 @@ public class SetMimeTypesAction extends DexRunAction {
         return true;
     }
 
-    public boolean set(List<TLMimeType> list) {
-        if (object instanceof OtmActionRequest) {
-            ((OtmActionRequest) object).setMimeTypes( list );
-            return true;
-        }
+    public boolean set(List<Integer> list) {
         if (object instanceof OtmActionResponse) {
-            ((OtmActionResponse) object).setMimeTypes( list );
+            ((OtmActionResponse) object).setRestStatusCodes( list );
             return true;
         }
         return false;
@@ -104,7 +86,7 @@ public class SetMimeTypesAction extends DexRunAction {
 
     @Override
     public boolean setSubject(OtmObject subject) {
-        if (subject instanceof OtmActionRequest || subject instanceof OtmActionResponse) {
+        if (subject instanceof OtmActionResponse) {
             object = subject;
             return true;
         }
@@ -118,18 +100,25 @@ public class SetMimeTypesAction extends DexRunAction {
 
     @Override
     public String toString() {
-        return "Set Mime Types to: " + get();
+        return "Set Rest Status Codes to: " + get();
     }
 
     @Override
-    public List<TLMimeType> undoIt() {
+    public List<Integer> undoIt() {
         log.debug( "Undo-ing mime type change." );
         if (oldMap != null) {
-            if (object instanceof OtmActionRequest)
-                ((OtmActionRequest) object).setMimeTypes( oldMap.getTLList() );
             if (object instanceof OtmActionResponse)
-                ((OtmActionResponse) object).setMimeTypes( oldMap.getTLList() );
+                ((OtmActionResponse) object).setRestStatusCodes( oldMap.getTLList() );
         }
         return get();
+    }
+
+    /**
+     * @see org.opentravel.dex.actions.DexRunAction#doIt()
+     */
+    @Override
+    public Object doIt() {
+        // No-op
+        return null;
     }
 }

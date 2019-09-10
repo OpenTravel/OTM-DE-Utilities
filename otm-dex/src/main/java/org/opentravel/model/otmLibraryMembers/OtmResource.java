@@ -111,18 +111,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     private DexParentRefsEndpointMap parentRefsEndpointMap;
 
-    // @Override
-    // public Collection<OtmObject> getChildrenHierarchy() {
-    // Collection<OtmObject> ch = new ArrayList<>();
-    // // children.forEach(c -> {
-    // // if (c instanceof OtmIdFacet)
-    // // ch.add(c);
-    // // if (c instanceof OtmAlias)
-    // // ch.add(c);
-    // // });
-    // return ch;
-    // }
-
     // private ResourceCodegenUtils codegenUtils;
 
     public OtmResource(String name, OtmModelManager mgr) {
@@ -162,36 +150,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
 
     /**
-     * Add the passed group to the TL resource, child list and set group's parent.
-     * 
-     * @param group
-     */
-    public void addParameterGroup(OtmParameterGroup group) {
-        if (group != null) {
-            getTL().addParamGroup( group.getTL() );
-            add( group ); // Add to children list
-            group.setParent( this );
-        }
-    }
-
-    /**
-     * Add the passed group to the TL resource if not already owned, child list and set group's parent.
-     * 
-     * @param tlGroup
-     * @return
-     */
-    public OtmParameterGroup add(TLParamGroup tlGroup) {
-        OtmParameterGroup group = null;
-        if (tlGroup != null && !getTL().getParamGroups().contains( tlGroup )) {
-            getTL().addParamGroup( tlGroup );
-            group = new OtmParameterGroup( tlGroup, this );
-            log.debug( "Added parameter group to " + this );
-            refresh( true );
-        }
-        return group;
-    }
-
-    /**
      * Add the passed action to the TL resource if not already owned, child list and set action's parent.
      * 
      * @param tlGroup
@@ -225,6 +183,28 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return action;
     }
 
+    public OtmResourceChild add(TLModelElement tlChild) {
+        log.debug( "Add " + tlChild.getClass().getSimpleName() + " to " + this + " not supported yet." );
+        return null; // Not supported (yet).
+    }
+
+    /**
+     * Add the passed group to the TL resource if not already owned, child list and set group's parent.
+     * 
+     * @param tlGroup
+     * @return
+     */
+    public OtmParameterGroup add(TLParamGroup tlGroup) {
+        OtmParameterGroup group = null;
+        if (tlGroup != null && !getTL().getParamGroups().contains( tlGroup )) {
+            getTL().addParamGroup( tlGroup );
+            group = new OtmParameterGroup( tlGroup, this );
+            log.debug( "Added parameter group to " + this );
+            refresh( true );
+        }
+        return group;
+    }
+
     /**
      * Add theTL parent reference to TL and Otm resource, set its path and parent if present
      * 
@@ -254,9 +234,17 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return parentRef;
     }
 
-    public OtmResourceChild add(TLModelElement tlChild) {
-        log.debug( "Add " + tlChild.getClass().getSimpleName() + " to " + this + " not supported yet." );
-        return null; // Not supported (yet).
+    /**
+     * Add the passed group to the TL resource, child list and set group's parent.
+     * 
+     * @param group
+     */
+    public void addParameterGroup(OtmParameterGroup group) {
+        if (group != null) {
+            getTL().addParamGroup( group.getTL() );
+            add( group ); // Add to children list
+            group.setParent( this );
+        }
     }
 
     /** ************************************** */
@@ -279,14 +267,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     public StringProperty basePathProperty() {
         return getActionManager() != null ? getActionManager().add( DexActions.BASEPATHCHANGE, getBasePath(), this )
             : new ReadOnlyStringWrapper( getBasePath() );
-
-        // Question - what to use as action enum? Field or base path?
-        // StringProperty bpProperty = new ReadOnlyStringWrapper( getBasePath() );
-        // if (isEditable() && getActionManager() != null) {
-        // bpProperty = new SimpleStringProperty( getBasePath() );
-        // getActionManager().addAction( DexActions.BASEPATHCHANGE, bpProperty, this );
-        // }
-        // return bpProperty;
     }
 
     /**
@@ -538,29 +518,11 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return parents;
     }
 
-    // public List<DexEditField> getFields() {
-    // List<DexEditField> fields = new ArrayList<>();
-    // fields.add( new DexEditField( 0, 0, extension_LABEL, extension_TOOLTIP, getExtensionNode() ) );
-    // fields.add( new DexEditField( 1, 0, businessObject_LABEL, businessObject_TOOLTIP, getSubectNode() ) );
-    // fields.add( new DexEditField( 2, 0, basePath_LABEL, basePath_TOOLTIP, getBasePathNode() ) );
-    // fields.add( new DexEditField( 3, 0, null, abstract_TOOLTIP, getIsAbstractNode( null ) ) );
-    // fields.add( new DexEditField( 3, 1, null, firstClass_TOOLTIP, getIsFirstClassNode( null ) ) );
-    //
-    // // fields.add( new DexEditField( 1, 0, name_LABEL, name_TOOLTIP, new Button() ) );
-    // // fields.add( new DexEditField( 1, 0, parentRef_LABEL, parentRef_TOOLTIP, new Button() ) );
-    // // fields.add( new DexEditField( 1, 0, parent_LABEL, parent_TOOLTIP, new Button() ) );
-    // return fields;
-    // }
 
     public String getPayloadExample(OtmActionRequest request) {
         // log.debug( DexParentRefsEndpointMap.getPayloadExample( request ) );
         return DexParentRefsEndpointMap.getPayloadExample( request );
     }
-
-    // private static final String name_LABEL = "Resource Name";
-    // private static final String name_TOOLTIP =
-    // "The name of the resource. This name is used to uniquely identify the resource within the OTM model, but will not
-    // conflict with any naming conventions used in generated XSD documents.";
 
     public String getPayloadExample(OtmActionResponse response) {
         return DexParentRefsEndpointMap.getPayloadExample( response );
@@ -638,19 +600,11 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return getTL().isAbstract();
     }
 
-    // private static final String parentRef_LABEL = "Parent";
-    // private static final String parentRef_TOOLTIP = " The list of parent references for the resource. ";
-
     @Override
     public boolean isEditable() {
         return getLibrary() != null && getLibrary().isEditable();
         // return getName().startsWith( "S" ); // testing only
     }
-
-    // @Override
-    // public boolean isExpanded() {
-    // return true;
-    // }
 
     public boolean isFirstClass() {
         return getTL().isFirstClass();
@@ -673,46 +627,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
         // log.debug( "Modeled " + children.size() + " resource children for " + getName() );
     }
-
-    // /**
-    // * Use the TL object to create a new child of this resource.
-    // *
-    // * @param tlChild
-    // * @return
-    // */
-    // public OtmResourceChild newChild(TLResourceParentRef tlChild) {
-    // return addParentRef( tlChild, null );
-    // }
-    //
-    // /**
-    // * Use the TL object to create a new child of this resource.
-    // *
-    // * @param tlChild
-    // * @return
-    // */
-    // public OtmResourceChild newChild(TLParamGroup tlChild) {
-    // return addParameterGroup( tlChild );
-    // }
-    //
-    // /**
-    // * Use the TL object to create a new child of this resource.
-    // *
-    // * @param tlChild
-    // * @return
-    // */
-    // public OtmResourceChild newChild(TLAction tlChild) {
-    // return addAction( tlChild );
-    // }
-    //
-    // /**
-    // * Use the TL object to create a new child of this resource.
-    // *
-    // * @param tlChild
-    // * @return
-    // */
-    // public OtmResourceChild newChild(TLActionFacet tlChild) {
-    // return addActionFacet( tlChild );
-    // }
 
     /**
      * Something changed in this resource so refresh it. To refresh all who use this resource as parent

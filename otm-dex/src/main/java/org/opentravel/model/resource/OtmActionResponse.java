@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.DexMimeTypeHandler;
+import org.opentravel.common.DexRestStatusCodesHandler;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.actions.DexActions;
@@ -31,8 +32,6 @@ import org.opentravel.schemacompiler.model.TLMimeType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
@@ -103,6 +102,10 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
         return getTL().getMimeTypes();
     }
 
+    public List<Integer> getRestStatusCodes() {
+        return getTL().getStatusCodes();
+    }
+
     /**
      * @see org.opentravel.model.OtmModelElement#getName()
      */
@@ -169,22 +172,25 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
     }
 
     private Node getStatus1Node() {
-        SortedMap<String,Boolean> values = new TreeMap<>();
-        int cnt = 0;
-        for (RestStatusCodes t : RestStatusCodes.values()) {
-            if (cnt++ < 4)
-                values.put( t.toString(), getTL().getStatusCodes().contains( t.value() ) );
-        }
-        return DexEditField.makeCheckBoxRow( values, this );
+        return new DexRestStatusCodesHandler( this ).makeMimeTypeBox1();
+
+        // SortedMap<String,Boolean> values = new TreeMap<>();
+        // int cnt = 0;
+        // for (RestStatusCodes t : RestStatusCodes.values()) {
+        // if (cnt++ < 4)
+        // values.put( t.toString(), getTL().getStatusCodes().contains( t.value() ) );
+        // }
+        // return DexEditField.makeCheckBoxRow( values, this );
     }
 
     private Node getStatus2Node() {
-        SortedMap<String,Boolean> values = new TreeMap<>();
-        int cnt = 0;
-        for (RestStatusCodes t : RestStatusCodes.values())
-            if (cnt++ >= 4)
-                values.put( t.toString(), getTL().getStatusCodes().contains( t.value() ) );
-        return DexEditField.makeCheckBoxRow( values, this );
+        return new DexRestStatusCodesHandler( this ).makeMimeTypeBox2();
+        // SortedMap<String,Boolean> values = new TreeMap<>();
+        // int cnt = 0;
+        // for (RestStatusCodes t : RestStatusCodes.values())
+        // if (cnt++ >= 4)
+        // values.put( t.toString(), getTL().getStatusCodes().contains( t.value() ) );
+        // return DexEditField.makeCheckBoxRow( values, this );
     }
 
     @Override
@@ -202,6 +208,10 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
 
     public void setMimeTypes(List<TLMimeType> list) {
         getTL().setMimeTypes( list );
+    }
+
+    public void setRestStatusCodes(List<Integer> codes) {
+        getTL().setStatusCodes( codes );
     }
 
     /**
