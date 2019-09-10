@@ -57,7 +57,6 @@ import javafx.event.EventType;
 public abstract class DexChangeEvent extends DexEvent {
     // private static Log log = LogFactory.getLog( DexChangeEvent.class );
     private static final long serialVersionUID = 20190826L;
-    // public static final EventType<DexChangeEvent> DEX_ALL = new EventType<>( "DEX_ALL" );
 
     protected transient OtmObject otmObject = null;
 
@@ -80,17 +79,8 @@ public abstract class DexChangeEvent extends DexEvent {
         otmObject = otm;
     }
 
-    //
-    // public DexChangeEvent(Object source, EventTarget target, EventType<? extends DexChangeEvent> eventType) {
-    // super( source, target, eventType );
-    // // log.debug("DexEvent source/target/type constructor ran for " + getClass().getSimpleName());
-    // // If there is data, extract it from source or target here
-    // }
-    //
     public DexChangeEvent(Object source, EventTarget target) {
         super( source, target, DEX_ALL );
-        // log.debug("DexEvent source/target/type constructor ran for " + getClass().getSimpleName());
-        // If there is data, extract it from source or target here
     }
 
     public void set(OtmObject otm) {

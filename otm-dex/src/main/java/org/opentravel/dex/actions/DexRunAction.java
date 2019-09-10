@@ -47,17 +47,11 @@ public abstract class DexRunAction extends DexActionBase implements DexAction<Ob
      */
     public abstract Object doIt(Object data);
 
-    // @Override
-    // public abstract Object undoIt();
-
     /**
      * Simply get the object's field value
      */
     protected abstract Object get();
 
-    /**
-     * @see org.opentravel.dex.actions.DexAction#getObservable()
-     */
     @Override
     public ObservableValue<? extends OtmObject> getObservable() {
         return null; // There is no observable for directly run actions
@@ -67,13 +61,6 @@ public abstract class DexRunAction extends DexActionBase implements DexAction<Ob
     public void removeChangeListener() {
         // run actions do not use listeners
     }
-
-    // /**
-    // * Simply set the action's field to value
-    // *
-    // * @param value
-    // */
-    // protected abstract boolean set(Object value);
 
     @Override
     public void setChangeListener(ChangeListener<Object> changeListener, ObservableValue<? extends Object> o) {

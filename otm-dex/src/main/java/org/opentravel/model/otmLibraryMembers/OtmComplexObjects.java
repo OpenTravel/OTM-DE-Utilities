@@ -104,10 +104,10 @@ public abstract class OtmComplexObjects<T extends TLComplexTypeBase> extends Otm
         return true;
     }
 
-    @Override
-    public boolean isExpanded() {
-        return true;
-    }
+    // @Override
+    // public boolean isExpanded() {
+    // return true;
+    // }
 
     /**
      * @return

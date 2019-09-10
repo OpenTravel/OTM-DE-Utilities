@@ -87,13 +87,8 @@ public class AddResourceChildAction extends DexRunAction {
 
     @Override
     public OtmResourceChild undoIt() {
-        OtmResourceChild result = null;
-
-        // Remove OTM Object from resource (-sub-type detail can be here)
         getSubject().remove( newChild );
-        // Remove TL object from its owner
-        // resource.getTL().removeParentRef( parentRef );
-        return result;
+        return null;
     }
 
     /**
@@ -131,6 +126,9 @@ public class AddResourceChildAction extends DexRunAction {
 
     @Override
     public String toString() {
-        return "Added " + newChild.getClass().getSimpleName() + " to " + getSubject();
+        String result = "";
+        if (newChild != null)
+            result = "Added " + newChild.getClass().getSimpleName() + " to " + getSubject();
+        return result;
     }
 }

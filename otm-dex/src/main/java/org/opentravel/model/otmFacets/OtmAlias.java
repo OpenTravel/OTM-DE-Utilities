@@ -76,10 +76,10 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
         return children;
     }
 
-    @Override
-    public boolean isExpanded() {
-        return false;
-    }
+    // @Override
+    // public boolean isExpanded() {
+    // return false;
+    // }
 
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {

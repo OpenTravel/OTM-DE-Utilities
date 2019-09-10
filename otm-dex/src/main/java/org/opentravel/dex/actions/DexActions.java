@@ -38,6 +38,7 @@ public enum DexActions {
     ADDRESOURCECHILD(AddResourceChildAction.class, DexResourceChangeEvent.class),
     ADDRESOURCEPARAMETER(AddResourceParameterAction.class, DexResourceChangeEvent.class),
     ADDRESOURCERESPONSE(AddResourceResponseAction.class, DexResourceChangeEvent.class),
+    DELETERESOURCECHILD(DeleteResourceChildAction.class, DexResourceChangeEvent.class),
     //
     ASSIGNSUBJECT(AssignResourceSubjectAction.class, DexResourceModifiedEvent.class),
     BASEPATHCHANGE(BasePathChangeAction.class, DexResourceModifiedEvent.class),

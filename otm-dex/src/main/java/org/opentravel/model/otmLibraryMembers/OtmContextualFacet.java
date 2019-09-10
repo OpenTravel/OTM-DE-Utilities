@@ -131,10 +131,10 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         // return this.getClass().getSimpleName();
     }
 
-    @Override
-    public boolean isExpanded() {
-        return true;
-    }
+    // @Override
+    // public boolean isExpanded() {
+    // return true;
+    // }
 
     @Override
     public boolean isNameControlled() {

@@ -73,10 +73,10 @@ public abstract class OtmSimpleObjects<T extends TLLibraryMember> extends OtmLib
         return (TLLibraryMember) tlObject;
     }
 
-    @Override
-    public boolean isExpanded() {
-        return true;
-    }
+    // @Override
+    // public boolean isExpanded() {
+    // return true;
+    // }
 
     @Override
     public boolean isNameControlled() {

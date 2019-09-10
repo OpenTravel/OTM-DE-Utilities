@@ -66,10 +66,10 @@ public class OtmOperationFacet extends OtmAbstractFacet<TLFacet> {
         return getParent().getOwningMember();
     }
 
-    @Override
-    public boolean isExpanded() {
-        return false;
-    }
+    // @Override
+    // public boolean isExpanded() {
+    // return false;
+    // }
 
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {

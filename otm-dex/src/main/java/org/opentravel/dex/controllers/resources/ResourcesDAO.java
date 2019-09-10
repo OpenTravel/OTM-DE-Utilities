@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.resources;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.model.OtmObject;
@@ -29,6 +31,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeItem.TreeModificationEvent;
 import javafx.scene.image.ImageView;
 
 /**
@@ -41,7 +44,7 @@ import javafx.scene.image.ImageView;
  *
  */
 public class ResourcesDAO implements DexDAO<OtmObject> {
-    // private static Log log = LogFactory.getLog( ResourcesDAO.class );
+    private static Log log = LogFactory.getLog( ResourcesDAO.class );
 
     protected OtmObject otmObject;
 
@@ -123,9 +126,14 @@ public class ResourcesDAO implements DexDAO<OtmObject> {
      */
     public TreeItem<ResourcesDAO> createTreeItem(TreeItem<ResourcesDAO> parent) {
         TreeItem<ResourcesDAO> item = new TreeItem<>( this );
-        item.setExpanded( false );
+        item.setExpanded( otmObject.isExpanded() );
+        // log.debug( "Tree item for " + otmObject + " is expanded? " + item.isExpanded() );
         if (parent != null)
             parent.getChildren().add( item );
+
+        // Track the expansion state of the object.
+        item.addEventHandler( TreeItem.branchExpandedEvent(), this::expansionHandler );
+        item.addEventHandler( TreeItem.branchCollapsedEvent(), this::expansionHandler );
 
         // Decorate if possible
         ImageView graphic = ImageManager.get( otmObject );
@@ -134,4 +142,16 @@ public class ResourcesDAO implements DexDAO<OtmObject> {
         return item;
     }
 
+    public void expansionHandler(TreeModificationEvent<TreeItem<ResourcesDAO>> e) {
+        // log.debug( "Expansion: was expanded = " + e.wasExpanded() + " was collasped =" + e.wasCollapsed() );
+        TreeItem<TreeItem<ResourcesDAO>> item = e.getTreeItem();
+        Object object = item.getValue();
+        OtmObject obj = null;
+        if (object instanceof ResourcesDAO)
+            obj = ((ResourcesDAO) object).getValue();
+        if (obj instanceof OtmObject) {
+            obj.setExpanded( e.wasExpanded() );
+            log.debug( "Set " + obj + " is expanded to " + obj.isExpanded() + " " + e.wasExpanded() );
+        }
+    }
 }

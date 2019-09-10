@@ -37,7 +37,6 @@ import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmActionResponse;
 import org.opentravel.model.resource.OtmParameterGroup;
 import org.opentravel.model.resource.OtmParentRef;
-import org.opentravel.schemacompiler.codegen.util.ResourceCodegenUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLActionFacet;
@@ -59,7 +58,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 
@@ -125,7 +123,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     // return ch;
     // }
 
-    private ResourceCodegenUtils codegenUtils;
+    // private ResourceCodegenUtils codegenUtils;
 
     public OtmResource(String name, OtmModelManager mgr) {
         super( new TLResource(), mgr );
@@ -504,13 +502,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     private Node getIsFirstClassNode() {
-        // SimpleBooleanProperty firstClassProperty = new SimpleBooleanProperty( isFirstClass() );
         BooleanProperty firstClassProperty = getActionManager().add( DexActions.SETFIRSTCLASS, isFirstClass(), this );
-        // getActionManager().addAction( DexActions.BASEPATHCHANGE, firstClassProperty, this );
-        CheckBox box = DexEditField.makeCheckBox( firstClassProperty, firstClass_LABEL );
-        // CheckBox box = DexEditField.makeCheckBox( isFirstClass(), firstClass_LABEL, this );
-        // box.setOnAction( a -> log.debug( "First class check box selected." ) );
-        return box;
+        return DexEditField.makeCheckBox( firstClassProperty, firstClass_LABEL );
     }
 
     @Override
@@ -654,10 +647,10 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         // return getName().startsWith( "S" ); // testing only
     }
 
-    @Override
-    public boolean isExpanded() {
-        return true;
-    }
+    // @Override
+    // public boolean isExpanded() {
+    // return true;
+    // }
 
     public boolean isFirstClass() {
         return getTL().isFirstClass();

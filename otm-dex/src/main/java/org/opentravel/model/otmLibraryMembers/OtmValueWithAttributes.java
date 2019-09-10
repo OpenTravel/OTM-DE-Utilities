@@ -219,10 +219,10 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
         return false;
     }
 
-    @Override
-    public boolean isExpanded() {
-        return true;
-    }
+    // @Override
+    // public boolean isExpanded() {
+    // return true;
+    // }
 
     /**
      * {@inheritDoc}

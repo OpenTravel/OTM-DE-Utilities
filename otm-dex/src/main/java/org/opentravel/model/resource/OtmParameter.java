@@ -115,6 +115,11 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
         return isPathParam() ? "{" + getName() + "}" : "";
     }
 
+    @Override
+    public OtmParameterGroup getParent() {
+        return (OtmParameterGroup) parent;
+    }
+
     public boolean isQueryParam() {
         return getTL().getLocation() == TLParamLocation.QUERY;
     }

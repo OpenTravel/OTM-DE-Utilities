@@ -122,7 +122,7 @@ public class AssignedTypeChangeAction extends DexRunAction {
 
             log.debug( "Set type to " + get() );
         }
-        return null;
+        return get();
     }
 
     @Override

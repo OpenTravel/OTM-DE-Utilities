@@ -40,7 +40,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.HBox;
 
 /**
  * OTM Object for Resource objects.
@@ -51,22 +50,58 @@ import javafx.scene.layout.HBox;
 public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> implements OtmResourceChild {
     private static Log log = LogFactory.getLog( OtmActionResponse.class );
 
+    private static final String TOOLTIP = "Specifies the characteristics and payload for a REST Action response.";
+
+    private static final String PAYLOAD_LABEL = "Payload Type";
+
+    private static final String PAYLOAD_TOOLTIP =
+        "Name of the action facet or core object that specifies the payload (if any) for the response.";
+
+    private static final String MIME_TYPE_LABEL = "MIME Types";
+
+    private static final String MIME_TYPE_TOOLTIP = "List of supported MIME types.";
+
+    private static final String STATUS_CODES_LABEL = " HTTP Status Codes";
+
+    private static final String STATUS_CODES_TOOLTIP = "Specifies the acceptable HTTP response codes.";
+
     public OtmActionResponse(TLActionResponse tla, OtmAction parent) {
         super( tla, parent );
     }
 
-    public boolean isInherited() {
-        return getParent().getResponses().contains( this );
+    /**
+     * Get the example pay load from the resources URL helper in a string property
+     * 
+     * @return
+     */
+    public StringProperty examplePayloadProperty() {
+        // if (getOwningMember() != null)
+        // return new ReadOnlyStringWrapper( getOwningMember().getPayloadExample( this ) );
+        return new ReadOnlyStringWrapper( getPayloadName() );
     }
 
     @Override
-    public OtmAction getParent() {
-        return (OtmAction) parent;
+    public List<DexEditField> getFields() {
+        List<DexEditField> fields = new ArrayList<>();
+        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, getPayloadNode() ) );
+        fields.add( new DexEditField( 1, 0, MIME_TYPE_LABEL, MIME_TYPE_TOOLTIP, getMimeNode() ) );
+        fields.add( new DexEditField( 2, 0, STATUS_CODES_LABEL, STATUS_CODES_TOOLTIP, getStatus1Node() ) );
+        fields.add( new DexEditField( 3, 0, STATUS_CODES_LABEL, STATUS_CODES_TOOLTIP, getStatus2Node() ) );
+        return fields;
     }
-    // public OtmActionResponse(String name, OtmAction parent) {
-    // super( new TLActionResponse(), parent );
-    // setName( name );
-    // }
+
+    @Override
+    public Icons getIconType() {
+        return ImageManager.Icons.RESOURCE_RESPONSE;
+    }
+
+    private Node getMimeNode() {
+        return new DexMimeTypeHandler( this ).makeMimeTypeBox();
+    }
+
+    public List<TLMimeType> getMimeTypes() {
+        return getTL().getMimeTypes();
+    }
 
     /**
      * @see org.opentravel.model.OtmModelElement#getName()
@@ -77,14 +112,10 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
     }
 
     @Override
-    public Icons getIconType() {
-        return ImageManager.Icons.RESOURCE_RESPONSE;
+    public OtmAction getParent() {
+        return (OtmAction) parent;
     }
 
-    @Override
-    public TLActionResponse getTL() {
-        return (TLActionResponse) tlObject;
-    }
 
     /**
      * Get the payload name from the action facet returned from {@link #getPayloadActionFacet()}
@@ -93,16 +124,6 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
      */
     public OtmObject getPayload() {
         return getPayloadActionFacet() != null ? getPayloadActionFacet().getResponsePayload( this ) : null;
-    }
-
-    /**
-     * @return the name of the payload which in responses is the name of the action facet
-     */
-    public String getPayloadName() {
-        String name = "";
-        if (getPayloadActionFacet() != null && getPayloadActionFacet().getResponsePayload( this ) != null)
-            name = getPayloadActionFacet().getResponsePayload( this ).getName();
-        return name;
     }
 
     /**
@@ -131,24 +152,21 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
         return actionFacets;
     }
 
+    /**
+     * @return the name of the payload which in responses is the name of the action facet
+     */
+    public String getPayloadName() {
+        String name = "";
+        if (getPayloadActionFacet() != null && getPayloadActionFacet().getResponsePayload( this ) != null)
+            name = getPayloadActionFacet().getResponsePayload( this ).getName();
+        return name;
+    }
+
     private Node getPayloadNode() {
         StringProperty selection =
             getActionManager().add( DexActions.SETRESPONSEPAYLOAD, getPayloadActionFacetName(), this );
         return DexEditField.makeComboBox( getPayloadCandidates(), selection );
     }
-
-    private Node getMimeNode() {
-        return new DexMimeTypeHandler( this ).makeMimeTypeBox();
-    }
-
-    public List<TLMimeType> getMimeTypes() {
-        return getTL().getMimeTypes();
-    }
-
-    public void setMimeTypes(List<TLMimeType> list) {
-        getTL().setMimeTypes( list );
-    }
-
 
     private Node getStatus1Node() {
         SortedMap<String,Boolean> values = new TreeMap<>();
@@ -157,8 +175,7 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
             if (cnt++ < 4)
                 values.put( t.toString(), getTL().getStatusCodes().contains( t.value() ) );
         }
-        HBox hbox = DexEditField.makeCheckBoxRow( values, this );
-        return hbox;
+        return DexEditField.makeCheckBoxRow( values, this );
     }
 
     private Node getStatus2Node() {
@@ -167,57 +184,36 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
         for (RestStatusCodes t : RestStatusCodes.values())
             if (cnt++ >= 4)
                 values.put( t.toString(), getTL().getStatusCodes().contains( t.value() ) );
-        HBox hbox = DexEditField.makeCheckBoxRow( values, this );
-        return hbox;
+        return DexEditField.makeCheckBoxRow( values, this );
     }
 
     @Override
-    public List<DexEditField> getFields() {
-        List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, getPayloadNode() ) );
-        fields.add( new DexEditField( 1, 0, MIME_TYPE_LABEL, MIME_TYPE_TOOLTIP, getMimeNode() ) );
-        fields.add( new DexEditField( 2, 0, STATUS_CODES_LABEL, STATUS_CODES_TOOLTIP, getStatus1Node() ) );
-        fields.add( new DexEditField( 3, 0, STATUS_CODES_LABEL, STATUS_CODES_TOOLTIP, getStatus2Node() ) );
-        return fields;
+    public TLActionResponse getTL() {
+        return (TLActionResponse) tlObject;
     }
 
     public Tooltip getTooltip() {
         return new Tooltip( TOOLTIP );
     }
 
-    private static final String TOOLTIP = "Specifies the characteristics and payload for a REST Action response.";
-    private static final String PAYLOAD_LABEL = "Payload Type";
-    private static final String PAYLOAD_TOOLTIP =
-        "Name of the action facet or core object that specifies the payload (if any) for the response.";
-    private static final String MIME_TYPE_LABEL = "MIME Types";
-    private static final String MIME_TYPE_TOOLTIP = "List of supported MIME types.";
-    private static final String STATUS_CODES_LABEL = " HTTP Status Codes";
-    private static final String STATUS_CODES_TOOLTIP = "Specifies the acceptable HTTP response codes.";
+    public boolean isInherited() {
+        return getParent().getResponses().contains( this );
+    }
 
-    /**
-     * @return
-     */
-    public StringProperty statusCodeProperty() {
-        StringBuilder codes = new StringBuilder();
-        getTL().getStatusCodes().forEach( code -> {
-            if (!codes.toString().isEmpty())
-                codes.append( ", " );
-            codes.append( RestStatusCodes.getLabel( code ) );
-            codes.append( " [" + code + "] " );
-        } );
-        return new ReadOnlyStringWrapper( codes.toString() );
-        // return new ReadOnlyStringWrapper( getTL().getStatusCodes().toString() );
+    public void setMimeTypes(List<TLMimeType> list) {
+        getTL().setMimeTypes( list );
     }
 
     /**
-     * Get the example pay load from the resources URL helper in a string property
-     * 
-     * @return
+     * @param action facet to set as payload type
      */
-    public StringProperty examplePayloadProperty() {
-        // if (getOwningMember() != null)
-        // return new ReadOnlyStringWrapper( getOwningMember().getPayloadExample( this ) );
-        return new ReadOnlyStringWrapper( getPayloadName() );
+    public OtmActionFacet setPayloadActionFacet(OtmActionFacet actionFacet) {
+        if (actionFacet != null)
+            getTL().setPayloadType( actionFacet.getTL() );
+        else
+            getTL().setPayloadType( null );
+        log.debug( "Set action facet to " + getPayloadActionFacet() );
+        return getPayloadActionFacet();
     }
 
     /**
@@ -235,15 +231,18 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
     }
 
     /**
-     * @param action facet to set as payload type
+     * @return
      */
-    public OtmActionFacet setPayloadActionFacet(OtmActionFacet actionFacet) {
-        if (actionFacet != null)
-            getTL().setPayloadType( actionFacet.getTL() );
-        else
-            getTL().setPayloadType( null );
-        log.debug( "Set action facet to " + getPayloadActionFacet() );
-        return getPayloadActionFacet();
+    public StringProperty statusCodeProperty() {
+        StringBuilder codes = new StringBuilder();
+        getTL().getStatusCodes().forEach( code -> {
+            if (!codes.toString().isEmpty())
+                codes.append( ", " );
+            codes.append( RestStatusCodes.getLabel( code ) );
+            codes.append( " [" + code + "] " );
+        } );
+        return new ReadOnlyStringWrapper( codes.toString() );
+        // return new ReadOnlyStringWrapper( getTL().getStatusCodes().toString() );
     }
 
 

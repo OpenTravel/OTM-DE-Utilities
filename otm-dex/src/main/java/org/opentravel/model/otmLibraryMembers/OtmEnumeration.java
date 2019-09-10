@@ -114,10 +114,10 @@ public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
         return false;
     }
 
-    @Override
-    public boolean isExpanded() {
-        return true;
-    }
+    // @Override
+    // public boolean isExpanded() {
+    // return true;
+    // }
 
     /**
      * Does NOT add to backing TL Enumeration

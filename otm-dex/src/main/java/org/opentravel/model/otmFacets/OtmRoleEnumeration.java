@@ -144,10 +144,10 @@ public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
         return Collections.emptyList();
     }
 
-    @Override
-    public boolean isExpanded() {
-        return false;
-    }
+    // @Override
+    // public boolean isExpanded() {
+    // return false;
+    // }
 
     @Override
     public Icons getIconType() {

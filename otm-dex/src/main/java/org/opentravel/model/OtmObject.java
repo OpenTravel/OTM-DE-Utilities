@@ -56,8 +56,6 @@ public interface OtmObject {
 
     public ImageManager.Icons getIconType();
 
-    public Tooltip getTooltip();
-
     /**
      * @return this member's, or owning object's library from the TLLibrary or null
      */
@@ -89,9 +87,25 @@ public interface OtmObject {
 
     public TLModelElement getTL();
 
+    public Tooltip getTooltip();
+
     public String getValidationFindingsAsString();
 
     public boolean isEditable();
+
+    /**
+     * Used by any view to remember if the object has been expanded.
+     * 
+     * @param expanded will be set to flag.
+     */
+    public void setExpanded(boolean flag);
+
+    /**
+     * Used by any view to remember if the object has been expanded.
+     * 
+     * @return
+     */
+    public boolean isExpanded();
 
     /**
      * Is the property inherited? Properties use the property specific TL Owner and compare with parent's TL object.

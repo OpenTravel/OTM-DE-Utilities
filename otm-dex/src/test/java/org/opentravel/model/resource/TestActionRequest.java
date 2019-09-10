@@ -84,7 +84,7 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
         // When - action facet is set
         request.setPayloadType( af );
         // Then - example property is subject
-        String ex = request.examplePayloadProperty().get();
+        String ex = request.examplePayloadProperty().get(); // FIXME - getting None
         assertTrue( request.examplePayloadProperty().get().contains( bo.getName() ) );
 
         // When - action facet RFName is empty, use subject (substitution group)

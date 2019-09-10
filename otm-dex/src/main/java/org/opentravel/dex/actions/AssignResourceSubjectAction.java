@@ -31,11 +31,6 @@ import org.opentravel.schemacompiler.validate.ValidationFindings;
 public class AssignResourceSubjectAction extends DexRunAction {
     private static Log log = LogFactory.getLog( AssignResourceSubjectAction.class );
 
-    // private static final String VETO1 = "org.opentravel.schemacompiler.TLProperty.name.ELEMENT_REF_NAME_MISMATCH";
-    // private static final String VETO2 = ".OBSOLETE_TYPE_REFERENCE";
-    // private static final String VETO3 = ".ILLEGAL_REFERENCE";
-    // private static final String[] VETOKEYS = {VETO1, VETO2, VETO3};
-
     public static boolean isEnabled(OtmObject subject) {
         return (subject.isEditable() && subject instanceof OtmResource);
     }
@@ -43,12 +38,8 @@ public class AssignResourceSubjectAction extends DexRunAction {
     private OtmResource resource = null;
     private OtmBusinessObject oldSubject = null;
 
-    // private DexActionManagerBase actionManager = null;
-
-
     public AssignResourceSubjectAction() {
         // Constructor for reflection
-        // actionType = DexActions.ASSIGNSUBJECT;
     }
 
     /**
@@ -107,8 +98,8 @@ public class AssignResourceSubjectAction extends DexRunAction {
         // Record action to allow undo. Will validate results and warn user.
         resource.getActionManager().push( this );
 
-        log.debug( "Set resource subject to " + newSubject );
-        return null;
+        log.debug( "Set resource subject to " + get() );
+        return get();
     }
 
     @Override
@@ -146,21 +137,10 @@ public class AssignResourceSubjectAction extends DexRunAction {
 
     @Override
     public OtmBusinessObject undoIt() {
-        log.debug( " TODO -Undo-ing change" );
-        if (oldSubject != null) {
-            if (oldSubject != resource.setAssignedType( oldSubject ))
-                resource.getActionManager().postWarning( "Error undoing change." );
-            // } else if (oldTLType != null) {
-            // // If provider was not in model manager
-            // if (oldTLType != user.setAssignedTLType( oldTLType ))
-            // actionManager.postWarning( "Error undoing change." );
-            // } else {
-            // // Sometimes, only the name is known because the tl model does not have the type loaded.
-            // user.setTLTypeName( oldTLTypeName );
-            // otm.setName( oldName );
-            // }
-            // otm.setName( oldName ); // May have been changed by assignment
-        }
+        log.debug( "Undo-ing change" );
+        if (oldSubject != null && oldSubject != resource.setAssignedType( oldSubject ))
+            resource.getActionManager().postWarning( "Error undoing change." );
+
         return get();
     }
 }

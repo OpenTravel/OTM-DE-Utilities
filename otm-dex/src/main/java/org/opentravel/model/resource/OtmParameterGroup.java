@@ -87,7 +87,7 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
     public OtmObject add(OtmObject child) {
         if (child instanceof OtmParameter && !children.contains( child ))
             children.add( child );
-        return null;
+        return child;
     }
 
     /**
@@ -182,6 +182,7 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         return list;
     }
 
+
     /**
      * 
      * @return {@link TLParamGroup#getFacetRefName()}
@@ -257,14 +258,14 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         return new Tooltip( TOOLTIP );
     }
 
-    /**
-     * @see org.opentravel.model.OtmChildrenOwner#isExpanded()
-     */
-    @Override
-    public boolean isExpanded() {
-        // TODO Auto-generated method stub
-        return false;
-    }
+    // /**
+    // * @see org.opentravel.model.OtmChildrenOwner#isExpanded()
+    // */
+    // @Override
+    // public boolean isExpanded() {
+    // // TODO Auto-generated method stub
+    // return false;
+    // }
 
     public boolean isIdGroup() {
         return getTL().isIdGroup();
@@ -325,6 +326,8 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
     }
 
     /**
+     * Remove the parameter from the TL and Otm parent.
+     * 
      * @param parameter
      */
     public void remove(OtmParameter param) {

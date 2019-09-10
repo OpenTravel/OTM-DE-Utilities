@@ -94,10 +94,10 @@ public class OtmOperation extends OtmModelElement<TLOperation> implements OtmChi
         return parent;
     }
 
-    @Override
-    public boolean isExpanded() {
-        return true;
-    }
+    // @Override
+    // public boolean isExpanded() {
+    // return true;
+    // }
 
     @Override
     public List<OtmObject> getChildren() {

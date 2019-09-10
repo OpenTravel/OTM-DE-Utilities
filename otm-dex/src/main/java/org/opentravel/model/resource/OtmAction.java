@@ -77,7 +77,7 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         if (child instanceof OtmActionRequest || child instanceof OtmActionResponse)
             if (!children.contains( child ))
                 children.add( child );
-        return null;
+        return child;
     }
 
     /**
@@ -216,14 +216,13 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         return getTL().isCommonAction();
     }
 
-    /**
-     * @see org.opentravel.model.OtmChildrenOwner#isExpanded()
-     */
-    @Override
-    public boolean isExpanded() {
-        // TODO Auto-generated method stub
-        return false;
-    }
+    // /**
+    // * @see org.opentravel.model.OtmChildrenOwner#isExpanded()
+    // */
+    // @Override
+    // public boolean isExpanded() {
+    // return false;
+    // }
 
     /**
      * @see org.opentravel.model.OtmChildrenOwner#modelChildren()
@@ -264,6 +263,8 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
     }
 
     /**
+     * Remove the response from the TL and Otm parents.
+     * 
      * @param response
      */
     public void remove(OtmActionResponse response) {

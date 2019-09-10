@@ -203,10 +203,10 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
         return tlObject.getFacetType().getIdentityName();
     }
 
-    @Override
-    public boolean isExpanded() {
-        return true;
-    }
+    // @Override
+    // public boolean isExpanded() {
+    // return true;
+    // }
 
     @Override
     public String toString() {

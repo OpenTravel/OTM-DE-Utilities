@@ -93,9 +93,9 @@ public class OtmServiceObject extends OtmLibraryMemberBase<TLService> {
         return false;
     }
 
-    @Override
-    public boolean isExpanded() {
-        return true;
-    }
+    // @Override
+    // public boolean isExpanded() {
+    // return true;
+    // }
 
 }

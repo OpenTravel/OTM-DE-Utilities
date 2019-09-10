@@ -94,6 +94,8 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     private StringProperty validationProperty;
     private ObjectProperty<ImageView> validationImageProperty;
 
+    private boolean expanded = false;
+
     public OtmModelElement(T tl) {
         if (tl == null)
             throw new IllegalArgumentException( "Must have a tl element to create facade." );
@@ -243,6 +245,16 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     @Override
     public boolean isEditable() {
         return getOwningMember() != null && getOwningMember().isEditable();
+    }
+
+    @Override
+    public void setExpanded(boolean flag) {
+        expanded = flag;
+    }
+
+    @Override
+    public boolean isExpanded() {
+        return expanded;
     }
 
     @Override

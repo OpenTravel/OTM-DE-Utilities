@@ -65,19 +65,28 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         addItem( "Add Action Facet", e -> addChild( new TLActionFacet() ) );
         addItem( "Add ParentRef", e -> addChild( new TLResourceParentRef() ) );
         addItem( "Add Parameter Group", e -> addChild( new TLParamGroup() ) );
-        SeparatorMenuItem separatorMenuItem = new SeparatorMenuItem();
-        resourceMenu.getItems().add( separatorMenuItem );
+
+        resourceMenu.getItems().add( new SeparatorMenuItem() );
         arItem = addItem( "Add Action Response", e -> addResponse() );
         paramItem = addItem( "Add Parameter", e -> addParameter() );
-        arItem.setDisable( true );
-        paramItem.setDisable( true );
+
+        resourceMenu.getItems().add( new SeparatorMenuItem() );
+        addItem( "Delete", this::deleteChild );
 
         // Add the menu to the factory
         setContextMenu( resourceMenu );
 
+        // TreeItem<?> item = getTreeItem();
+        // BooleanProperty p = getTreeItem().expandedProperty();
+        // p.addListener( (obs, oldV, newV) -> expanded( getTreeItem(), newV ) );
+
         // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
     }
+
+    // private void expanded(TreeItem<?> item, boolean value) {
+    // log.debug( "Set to " + value );
+    // }
 
     private MenuItem addItem(String label, EventHandler<ActionEvent> handler) {
         MenuItem item = new MenuItem( label );
@@ -86,45 +95,46 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         return item;
     }
 
+    private void deleteChild(ActionEvent e) {
+        OtmObject obj = getValue();
+        Object parent = null;
+        // Run delete action
+        if (obj instanceof OtmResourceChild)
+            parent = obj.getActionManager().run( DexActions.DELETERESOURCECHILD, obj );
+        // Update display
+        if (parent instanceof OtmObject)
+            super.updateTreeItem( getTreeItem().getParent() ); // needed to apply stylesheet to new item
+    }
+
     private void addChild(TLModelElement tlChild) {
         OtmObject obj = getValue();
         if (obj != null && obj.getOwningMember() instanceof OtmResource) {
             OtmResource resource = (OtmResource) obj.getOwningMember();
             Object result = resource.getActionManager().run( DexActions.ADDRESOURCECHILD, resource, tlChild );
-
-            if (result instanceof OtmResourceChild) {
-                // Update GUI
-                TreeItem<ResourcesDAO> item =
-                    new ResourcesDAO( (OtmObject) result ).createTreeItem( getTreeItem().getParent() );
-                super.updateTreeItem( item ); // needed to apply stylesheet to new item
-            }
+            refresh( result );
         }
     }
 
     private void addResponse() {
         OtmObject obj = getValue();
-        if (obj instanceof OtmAction) {
-            Object result = obj.getActionManager().run( DexActions.ADDRESOURCERESPONSE, obj );
-            if (result instanceof OtmResourceChild) {
-                // Update GUI
-                TreeItem<ResourcesDAO> item =
-                    new ResourcesDAO( (OtmObject) result ).createTreeItem( getTreeItem().getParent() );
-                super.updateTreeItem( item ); // needed to apply stylesheet to new item
-            }
-        }
+        if (obj instanceof OtmAction)
+            refresh( obj.getActionManager().run( DexActions.ADDRESOURCERESPONSE, obj ) );
     }
 
     private void addParameter() {
         OtmObject obj = getValue();
-        if (obj instanceof OtmParameterGroup) {
-            Object result = obj.getActionManager().run( DexActions.ADDRESOURCEPARAMETER, obj );
-            if (result instanceof OtmResourceChild) {
-                // Update GUI
-                TreeItem<ResourcesDAO> item =
-                    new ResourcesDAO( (OtmObject) result ).createTreeItem( getTreeItem().getParent() );
-                super.updateTreeItem( item ); // needed to apply stylesheet to new item
-            }
+        if (obj instanceof OtmParameterGroup)
+            refresh( obj.getActionManager().run( DexActions.ADDRESOURCEPARAMETER, obj ) );
+    }
+
+    // Update GUI
+    private void refresh(Object newObject) {
+        if (newObject instanceof OtmResourceChild) {
+            TreeItem<ResourcesDAO> item =
+                new ResourcesDAO( (OtmObject) newObject ).createTreeItem( getTreeItem().getParent() );
+            super.updateTreeItem( item ); // needed to apply stylesheet to new item
         }
+
     }
 
     /**
@@ -151,6 +161,9 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
             // Turn on/off context sensitive items
             arItem.setDisable( !(getValue() instanceof OtmAction) );
             paramItem.setDisable( !(getValue() instanceof OtmParameterGroup) );
+
+            // item.getValue().getValue().isExpanded( item.isExpanded() );
+            // log.debug( "Item " + item.getValue().getValue() + " is expanded? " + item.isExpanded() );
         }
 
     }

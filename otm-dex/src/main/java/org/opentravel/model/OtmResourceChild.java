@@ -41,4 +41,10 @@ public interface OtmResourceChild extends OtmObject {
      * @return list of edit fields containing FX Nodes ready for posting
      */
     public abstract List<DexEditField> getFields();
+
+    /**
+     * 
+     * @return resource or resourceChild parent
+     */
+    public OtmObject getParent();
 }
