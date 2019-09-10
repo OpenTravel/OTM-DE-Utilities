@@ -121,7 +121,10 @@ public class TestActionResponse<L extends TestOtmResourceBase<OtmActionResponse>
                 ar.setPayloadActionFacet( afNoRefFacet );
                 // Then - payload name is base payload name
                 log.debug( ar.getPayloadName() );
-                assertTrue( afNoRefFacet.getName().equals( ar.getPayloadName() ) ); // Used in GUI
+                String foo = ar.getPayloadName();
+                // Value is delivered from the code gen utils
+                assertTrue( ar.getPayloadName().equals( bo.getName() ) ); // Used in GUI
+                // assertTrue( ar.getPayloadName().equals( afNoRefFacet.getName() ) ); // Used in GUI
 
                 // When action facet has reference facet
                 ar.setPayloadActionFacet( afWithRefFacet );

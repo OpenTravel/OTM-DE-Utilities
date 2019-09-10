@@ -70,7 +70,7 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
         // Given a resource
         OtmResource resource = TestResource.buildOtm( staticModelManager );
         resource.setSubject( bo );
-        // Given - request on the sub-resource
+        // Given - request on the resource
         OtmActionRequest request = resource.getActionRequests().get( 0 );
         assertNotNull( request );
         // Request set to: POST, uses action facet as payload type
@@ -80,11 +80,14 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
         OtmActionFacet af = TestActionFacet.buildOtm( resource );
         af.setBasePayload( null );
         af.setReferenceFacet( null ); // substitution group setting
+        af.setReferenceType( TLReferenceType.REQUIRED ); // only used for response
+        // ? What reference type?
+        // Mime type settings?
 
         // When - action facet is set
         request.setPayloadType( af );
         // Then - example property is subject
-        String ex = request.examplePayloadProperty().get(); // FIXME - getting None
+        String ex = request.examplePayloadProperty().get();
         assertTrue( request.examplePayloadProperty().get().contains( bo.getName() ) );
 
         // When - action facet RFName is empty, use subject (substitution group)
@@ -141,10 +144,11 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
         OtmActionFacet af = TestActionFacet.buildOtm( resource );
         af.setBasePayload( null );
 
-        // When - the reference type is set to NONE
-        af.setReferenceType( TLReferenceType.NONE );
-        // Then
-        assertTrue( "Payload must be null.", af.getRequestPayload() == null );
+        // // When - the reference type is set to NONE
+        // // Reference type is IGNORED for requests
+        // af.setReferenceType( TLReferenceType.NONE );
+        // // Then
+        // assertTrue( "Payload must be null.", af.getRequestPayload() == null );
 
         // When - the reference facet is set null
         af.setReferenceType( TLReferenceType.REQUIRED );
@@ -248,12 +252,13 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
 
         // When - reference type is NONE and reference facet is null (subgroup)
         af.setReferenceType( TLReferenceType.NONE );
-        assert (af.getReferenceType() == TLReferenceType.NONE);
+        assert (af.getReferenceType() == TLReferenceType.NONE); // don't care! response only
         assertTrue( af.getRequestPayload() == bo );
 
         // When - NONE and a facet
         af.setReferenceFacet( bo.getIdFacet() );
-        assertTrue( "With a facet and NONE must be null.", af.getRequestPayload() == null );
+        OtmObject foo = af.getRequestPayload();
+        assertTrue( "With a facet and NONE must be null.", af.getRequestPayload() == bo.getIdFacet() );
 
         // When - regardless of basePayload, when required each of the facets must respond with is own facet
         af.setReferenceType( TLReferenceType.REQUIRED );
