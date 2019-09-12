@@ -201,11 +201,15 @@ public abstract class DexActionManagerBase implements DexActionManager {
                     result = ((DexRunAction) actionHandler).doIt();
                 else
                     result = ((DexRunAction) actionHandler).doIt( value );
+            } else {
+                postWarning( "Error running " + action.toString() + " action." );
+                log.warn( "Action is null or not a run action." );
             }
         } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException | SecurityException
             | IllegalArgumentException e) {
             log.warn( "Could not create action. " + e.getLocalizedMessage() );
         }
+        // TODO - move pushing results onto queue to here
         return result;
     }
 

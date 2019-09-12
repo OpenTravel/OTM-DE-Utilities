@@ -17,6 +17,7 @@
 package org.opentravel.dex.actions;
 
 import org.opentravel.dex.events.DexChangeEvent;
+import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.DexResourceChangeEvent;
 import org.opentravel.dex.events.DexResourceChildModifiedEvent;
 import org.opentravel.dex.events.DexResourceModifiedEvent;
@@ -34,6 +35,7 @@ public enum DexActions {
     NAMECHANGE(NameChangeAction.class, OtmObjectModifiedEvent.class),
     DESCRIPTIONCHANGE(DescriptionChangeAction.class, OtmObjectModifiedEvent.class),
     TYPECHANGE(AssignedTypeChangeAction.class, OtmObjectModifiedEvent.class),
+    NEWLIBRARYMEMBER(NewLibraryMemberAction.class, DexModelChangeEvent.class),
     //
     ADDRESOURCECHILD(AddResourceChildAction.class, DexResourceChangeEvent.class),
     ADDRESOURCEPARAMETER(AddResourceParameterAction.class, DexResourceChangeEvent.class),

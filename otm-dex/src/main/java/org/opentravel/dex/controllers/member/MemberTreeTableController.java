@@ -353,6 +353,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             }
         }
         ignoreEvents = false;
+        log.debug( "Posted member tree." );
     }
 
     @Override

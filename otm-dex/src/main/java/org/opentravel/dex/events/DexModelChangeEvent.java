@@ -29,7 +29,7 @@ import javafx.event.EventType;
  * @author dmh
  *
  */
-public class DexModelChangeEvent extends DexEvent {
+public class DexModelChangeEvent extends DexChangeEvent {
     private static Log log = LogFactory.getLog( DexModelChangeEvent.class );
     private static final long serialVersionUID = 20190409L;
 

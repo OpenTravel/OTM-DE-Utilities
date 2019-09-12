@@ -123,13 +123,23 @@ public class OtmModelManager implements TaskResultHandlerI {
 
 
     /**
-     * Simply add the member to the maps if it is not already in the maps.
+     * Simply add the member to the maps if it is not already in the map.
      * 
      * @param member
      */
     public void add(OtmLibraryMember member) {
         if (member != null && member.getTL() instanceof LibraryMember && !contains( member.getTlLM() ))
             members.put( member.getTlLM(), member );
+    }
+
+    /**
+     * Simply remove the member from the map.
+     * 
+     * @param member
+     */
+    public void remove(OtmLibraryMember member) {
+        if (member != null && member.getTL() instanceof LibraryMember && contains( member.getTlLM() ))
+            members.remove( member.getTlLM(), member );
     }
 
 
@@ -386,7 +396,7 @@ public class OtmModelManager implements TaskResultHandlerI {
                 log.warn( "Missing library associated with: " + absLibrary.getName() );
             else
                 log.warn( "Can not get library because TL library is null." );
-            printLibraries();
+            // printLibraries();
         }
         return libraries.get( absLibrary );
     }
@@ -423,7 +433,7 @@ public class OtmModelManager implements TaskResultHandlerI {
     /**
      * Return an action manager. Intended only for use by libraries.
      * 
-     * @param editable
+     * @param full if false, only return readOnly action manager
      * @return read-only or full action manager
      */
     public DexActionManager getActionManager(boolean full) {
@@ -658,6 +668,17 @@ public class OtmModelManager implements TaskResultHandlerI {
         } );
         return libs;
     }
+
+    /**
+     * @return true if any library is editable
+     */
+    public boolean hasSaveableLibraries() {
+        for (OtmLibrary l : libraries.values())
+            if (l.isEditable())
+                return true;
+        return false;
+    }
+
 
 
 }

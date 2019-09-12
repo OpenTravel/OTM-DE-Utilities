@@ -19,6 +19,7 @@ package org.opentravel.dex.controllers.resources;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.actions.LibraryMemberType;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -35,6 +36,7 @@ import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeItem;
@@ -55,44 +57,66 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
     private final ContextMenu resourceMenu = new ContextMenu();
     MenuItem arItem = null;
     MenuItem paramItem = null;
-    // private DexIncludedController<?> controller;
+    Menu addMenu = null;
+    private MenuItem deleteItem = null;
+    private MenuItem addResource = null;
+
 
     public ResourcesTreeTableRowFactory(DexIncludedController<?> controller) {
         // this.controller = controller;
 
         // Create Context menu
-        addItem( "Add Action", e -> addChild( new TLAction() ) );
-        addItem( "Add Action Facet", e -> addChild( new TLActionFacet() ) );
-        addItem( "Add ParentRef", e -> addChild( new TLResourceParentRef() ) );
-        addItem( "Add Parameter Group", e -> addChild( new TLParamGroup() ) );
 
+        // Add is a sub-menu
+        addMenu = new Menu( "Add" ); // Menu is sub-type of menuItem
+        addItem( addMenu, "Add Action", e -> addChild( new TLAction() ) );
+        addItem( addMenu, "Add Action Facet", e -> addChild( new TLActionFacet() ) );
+        addItem( addMenu, "Add ParentRef", e -> addChild( new TLResourceParentRef() ) );
+        addItem( addMenu, "Add Parameter Group", e -> addChild( new TLParamGroup() ) );
+        addMenu.getItems().add( new SeparatorMenuItem() );
+        arItem = addItem( addMenu, "Add Action Response", e -> addResponse() );
+        paramItem = addItem( addMenu, "Add Parameter", e -> addParameter() );
+        resourceMenu.getItems().add( addMenu );
+        //
         resourceMenu.getItems().add( new SeparatorMenuItem() );
-        arItem = addItem( "Add Action Response", e -> addResponse() );
-        paramItem = addItem( "Add Parameter", e -> addParameter() );
-
+        deleteItem = addItem( "Delete", this::deleteChild );
+        //
         resourceMenu.getItems().add( new SeparatorMenuItem() );
-        addItem( "Delete", this::deleteChild );
+        addResource = addItem( "New Resource", e -> newResource() );
 
         // Add the menu to the factory
         setContextMenu( resourceMenu );
 
-        // TreeItem<?> item = getTreeItem();
-        // BooleanProperty p = getTreeItem().expandedProperty();
-        // p.addListener( (obs, oldV, newV) -> expanded( getTreeItem(), newV ) );
-
         // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
     }
-
-    // private void expanded(TreeItem<?> item, boolean value) {
-    // log.debug( "Set to " + value );
-    // }
 
     private MenuItem addItem(String label, EventHandler<ActionEvent> handler) {
         MenuItem item = new MenuItem( label );
         resourceMenu.getItems().add( item );
         item.setOnAction( handler );
         return item;
+    }
+
+    private MenuItem addItem(Menu menu, String label, EventHandler<ActionEvent> handler) {
+        MenuItem item = new MenuItem( label );
+        menu.getItems().add( item );
+        item.setOnAction( handler );
+        return item;
+    }
+
+    private void newResource() {
+        OtmObject obj = getValue();
+        Object result = null;
+        // Run action
+        if (obj != null)
+            result = obj.getActionManager().run( DexActions.NEWLIBRARYMEMBER, obj, LibraryMemberType.RESOURCE );
+        // Update display
+        if (result instanceof OtmObject) {
+            TreeItem<ResourcesDAO> item =
+                new ResourcesDAO( (OtmObject) result ).createTreeItem( getTreeItem().getParent() );
+            super.updateTreeItem( item );
+        }
     }
 
     private void deleteChild(ActionEvent e) {
@@ -159,13 +183,12 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
             // tc.pseudoClassStateChanged( DIVIDER, item.getValue().getValue() instanceof OtmAction );
 
             // Turn on/off context sensitive items
+            addResource.setDisable( !item.getValue().isEditable() );
+            addMenu.setDisable( !item.getValue().isEditable() );
+            deleteItem.setDisable( !item.getValue().isEditable() );
             arItem.setDisable( !(getValue() instanceof OtmAction) );
             paramItem.setDisable( !(getValue() instanceof OtmParameterGroup) );
-
-            // item.getValue().getValue().isExpanded( item.isExpanded() );
-            // log.debug( "Item " + item.getValue().getValue() + " is expanded? " + item.isExpanded() );
         }
-
     }
 }
 

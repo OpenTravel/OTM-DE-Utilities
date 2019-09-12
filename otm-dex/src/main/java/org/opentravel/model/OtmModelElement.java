@@ -106,7 +106,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     @Override
     public StringProperty descriptionProperty() {
-        if (descriptionProperty == null) {
+        if (descriptionProperty == null && getActionManager() != null) {
             descriptionProperty = getActionManager().add( DexActions.DESCRIPTIONCHANGE, getDescription(), this );
         }
         return descriptionProperty;
@@ -115,6 +115,13 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     @Override
     public DexActionManager getActionManager() {
         return getOwningMember().getActionManager();
+    }
+
+    @Override
+    public OtmModelManager getModelManager() {
+        if (getOwningMember() != null)
+            return getOwningMember().getModelManager();
+        return null;
     }
 
     @Override

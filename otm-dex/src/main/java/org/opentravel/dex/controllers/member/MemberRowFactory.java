@@ -18,11 +18,16 @@ package org.opentravel.dex.controllers.member;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.actions.LibraryMemberType;
 import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.model.OtmObject;
 
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableRow;
@@ -35,20 +40,26 @@ import javafx.scene.control.TreeTableRow;
 public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> {
     private static Log log = LogFactory.getLog( MemberRowFactory.class );
 
-    private final ContextMenu addMenu = new ContextMenu();
+    private final ContextMenu memberMenu = new ContextMenu();
     private static final PseudoClass EDITABLE = PseudoClass.getPseudoClass( "editable" );
     private DexIncludedController<?> controller;
+
+    Menu newMenu = null;
 
     public MemberRowFactory(DexIncludedController<?> controller) {
         this.controller = controller;
 
         // Create Context menu
-        MenuItem addObject = new MenuItem( "Add Object (Future)" );
-        addMenu.getItems().add( addObject );
-        setContextMenu( addMenu );
+        // MenuItem addObject = new MenuItem( "Add Object " );
 
         // Create action for addObject event
-        addObject.setOnAction( this::addMemberEvent );
+        // addObject.setOnAction( this::addMemberEvent );
+        newMenu = new Menu( "New" );
+        for (LibraryMemberType type : LibraryMemberType.values())
+            addItem( newMenu, type.label(), e -> newMember( type ) );
+
+        memberMenu.getItems().add( newMenu );
+        setContextMenu( memberMenu );
 
         // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
@@ -59,17 +70,49 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         }
     }
 
-    /**
-     * Add a new member to the tree
-     * 
-     * @param t
-     */
-    private void addMemberEvent(ActionEvent t) {
-        // Works - but business logic is wrong.
-        // TreeItem<LibraryMemberTreeDAO> item = controller
-        // .createTreeItem(new OtmCoreObject("new", controller.getModelManager()), getTreeItem().getParent());
-        // super.updateTreeItem(item); // needed to apply stylesheet to new item
+    // TODO - create utils class with statics for row factories
+    private MenuItem addItem(Menu menu, String label, EventHandler<ActionEvent> handler) {
+        MenuItem item = new MenuItem( label );
+        menu.getItems().add( item );
+        item.setOnAction( handler );
+        return item;
     }
+
+    // /**
+    // * Add a new member to the tree
+    // *
+    // * @param t
+    // */
+    // private void addMemberEvent(ActionEvent t) {
+    // // Works - but business logic is wrong.
+    // // TreeItem<LibraryMemberTreeDAO> item = controller
+    // // .createTreeItem(new OtmCoreObject("new", controller.getModelManager()), getTreeItem().getParent());
+    // // super.updateTreeItem(item); // needed to apply stylesheet to new item
+    // }
+    private void newMember(LibraryMemberType type) {
+        OtmObject obj = getValue();
+        Object result = null;
+        // Run action
+        if (obj != null)
+            result = obj.getActionManager().run( DexActions.NEWLIBRARYMEMBER, obj, type );
+        // Update display
+        if (result instanceof OtmObject) {
+            TreeItem<MemberAndProvidersDAO> item =
+                new MemberAndProvidersDAO( (OtmObject) result ).createTreeItem( getTreeItem().getParent() );
+            super.updateTreeItem( item );
+        }
+    }
+
+    /**
+     * @return the value OtmObject or null
+     */
+    private OtmObject getValue() {
+        if (getTreeItem() != null && getTreeItem().getValue() != null
+            && getTreeItem().getValue().getValue() instanceof OtmObject)
+            return getTreeItem().getValue().getValue();
+        return null;
+    }
+
 
     /**
      * @param tc
@@ -81,6 +124,8 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
     private void setCSSClass(TreeTableRow<MemberAndProvidersDAO> tc, TreeItem<MemberAndProvidersDAO> newTreeItem) {
         if (newTreeItem != null) {
             tc.pseudoClassStateChanged( EDITABLE, newTreeItem.getValue().isEditable() );
+
+            newMenu.setDisable( !newTreeItem.getValue().isEditable() );
         }
     }
     // TODO - investigate using ControlsFX for decoration

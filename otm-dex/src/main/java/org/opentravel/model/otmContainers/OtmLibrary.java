@@ -95,7 +95,6 @@ public class OtmLibrary {
      * @return the member if added OK
      */
     public OtmLibraryMember add(OtmLibraryMember member) {
-
         // getTL().addNamedMember( member.getTlLM() );
         if (member.getTL() instanceof LibraryMember)
             try {
@@ -109,6 +108,16 @@ public class OtmLibrary {
         else
             log.warn( "Tried to add a non-library member " + member + " to library." );
         return null;
+    }
+
+    /**
+     * Simply remove the TL member from the Tl library
+     * 
+     * @param a library member
+     * @return the member if added OK
+     */
+    public void remove(OtmLibraryMember member) {
+        getTL().removeNamedMember( member.getTlLM() );
     }
 
     /**
@@ -135,10 +144,11 @@ public class OtmLibrary {
         return false;
     }
 
+    /**
+     * @return readOnly or Full action manager based on library state and status (isEditable).
+     */
     public DexActionManager getActionManager() {
-        // TEST ME - action manager based on library state
         return getModelManager().getActionManager( isEditable() );
-        // return getModelManager().getActionManager();
     }
 
     /**

@@ -40,6 +40,7 @@ import org.opentravel.model.resource.OtmParentRef;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLActionFacet;
+import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLExtension;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -121,6 +122,9 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     public OtmResource(TLResource tlo, OtmModelManager mgr) {
         super( tlo, mgr );
         modelChildren();
+
+        // Factory will add object to mgr
+
         // Do not build on construction - all parents may not exist
         // parentRefsEndpointMap = new DexParentRefsEndpointMap( this );
     }
@@ -150,7 +154,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
 
     /**
-     * Add the passed action to the TL resource if not already owned, child list and set action's parent.
+     * Add the passed action to the TL resource if not already owned, child list and set action's parent. Adds a request
+     * if the tlAction does not have one.
      * 
      * @param tlGroup
      * @return
@@ -159,6 +164,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         OtmAction action = null;
         if (tlAction != null && !getTL().getActions().contains( tlAction )) {
             getTL().addAction( tlAction );
+            if (tlAction.getRequest() == null)
+                tlAction.setRequest( new TLActionRequest() );
             action = new OtmAction( tlAction, this );
             log.debug( "Added action to " + this );
             refresh( true );

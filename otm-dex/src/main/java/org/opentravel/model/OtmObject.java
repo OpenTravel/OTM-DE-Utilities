@@ -44,6 +44,8 @@ public interface OtmObject {
 
     public DexActionManager getActionManager();
 
+    public OtmModelManager getModelManager();
+
     public String getDeprecation();
 
     public String getDescription();
@@ -91,6 +93,11 @@ public interface OtmObject {
 
     public String getValidationFindingsAsString();
 
+    /**
+     * @deprecated - use the action manager or owning library
+     * @return
+     */
+    @Deprecated
     public boolean isEditable();
 
     /**

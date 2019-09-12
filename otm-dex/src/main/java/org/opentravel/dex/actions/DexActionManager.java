@@ -126,7 +126,7 @@ public interface DexActionManager {
      * Create an action and do it. If successful the action will be added to the queue.
      * <p>
      * Used for actions that are not associated with an observable property such as set assigned type that uses a dialog
-     * to get the type to assign. To pass in the value, see {@link #run(DexActions, OtmObject)}
+     * to get the type to assign. To pass in the value, see {@link #run(DexActions, OtmObject, Object)}
      * 
      * @param actionType what action to perform
      * @param subject OTM object to act upon
@@ -141,9 +141,10 @@ public interface DexActionManager {
      * {@link #run(DexActions, OtmObject)}
      * 
      * @see #run(DexActions, OtmObject)
-     * @param actionType
-     * @param subject
-     * @param data used to modify the subject, may be null if action will run dialog to get data
+     * @param actionType what action to perform
+     * @param subject OTM object to act upon
+     * @param data passed to the actions's doIt() method used to modify the subject, may be null if action will run
+     *        dialog to get data
      */
     public Object run(DexActions actionType, OtmObject subject, Object data);
 
