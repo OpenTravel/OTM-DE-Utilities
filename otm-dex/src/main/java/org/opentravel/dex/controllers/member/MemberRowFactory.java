@@ -94,7 +94,8 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         Object result = null;
         // Run action
         if (obj != null)
-            result = obj.getActionManager().run( DexActions.NEWLIBRARYMEMBER, obj, type );
+            result = obj.getModelManager().getActionManager( true ).run( DexActions.NEWLIBRARYMEMBER, obj, type );
+        // result = obj.getActionManager().run( DexActions.NEWLIBRARYMEMBER, obj, type );
         // Update display
         if (result instanceof OtmObject) {
             TreeItem<MemberAndProvidersDAO> item =
@@ -125,7 +126,7 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         if (newTreeItem != null) {
             tc.pseudoClassStateChanged( EDITABLE, newTreeItem.getValue().isEditable() );
 
-            newMenu.setDisable( !newTreeItem.getValue().isEditable() );
+            // newMenu.setDisable( !newTreeItem.getValue().isEditable() );
         }
     }
     // TODO - investigate using ControlsFX for decoration

@@ -21,6 +21,7 @@ import org.opentravel.application.common.OTA2ApplicationSpec;
 import org.opentravel.application.common.OTA2LauncherTabSpec;
 import org.opentravel.repositoryviewer.Images;
 
+
 /**
  * Application provider for the OTM-DEX Model Editor application.
  */

@@ -45,6 +45,14 @@ public interface DexAction<T> {
      */
     public DexChangeEvent getEvent();
 
+    // /**
+    // * Do the action. Actions that can run without data must implement this method accept null data.
+    // *
+    // * @param data may be null
+    // * @return
+    // */
+    // public Object doIt(Object data);
+
     /**
      * @return
      */

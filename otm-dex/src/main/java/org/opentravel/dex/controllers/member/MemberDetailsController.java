@@ -34,6 +34,8 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.StringProperty;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -185,19 +187,15 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             return;
         }
         selectedMember = member;
-        // Collection<OtmTypeUser> u = member.getDescendantsTypeUsers();
-        // Collection<OtmTypeProvider> p = member.getDescendantsTypeProviders();
-        // Collection<OtmTypeProvider> c = member.getChildrenTypeProviders();
 
         objectLabel.setTooltip( new Tooltip( member.getObjectTypeName() ) );
-        // if (imageMgr != null)
-        // objectImageView.setImage( imageMgr.get_OLD( member.getIconType() ) );
         objectImageView.setImage( ImageManager.getImage( member.getIconType() ) );
-        memberName.setEditable( member.isEditable() );
-        memberName.setEditable( member.isEditable() );
-        // memberName.textProperty().bind(member.nameProperty());
-        memberName.setText( member.nameProperty().get() );
-        memberName.setOnAction( e -> member.nameProperty().set( memberName.getText() ) );
+
+        // Member name
+        StringProperty property = member.nameProperty();
+        memberName.setEditable( !(property instanceof ReadOnlyStringWrapper) );
+        memberName.setText( property.get() );
+        memberName.setOnAction( e -> property.set( memberName.getText() ) );
 
         // Set library
         libraryName.setEditable( false );

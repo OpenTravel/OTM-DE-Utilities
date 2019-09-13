@@ -46,9 +46,9 @@ public class AddResourceChildAction extends DexRunAction {
         super();
     }
 
-    public Object doIt() {
-        return null; // No-Op
-    }
+    // public Object doIt() {
+    // return doIt(null);
+    // }
 
     /**
      * @see org.opentravel.dex.actions.DexRunAction#doIt(java.lang.Object)
@@ -72,8 +72,8 @@ public class AddResourceChildAction extends DexRunAction {
             else if (tlChild instanceof TLActionFacet)
                 newChild = resource.add( (TLActionFacet) tlChild );
 
-            // Record action to allow undo. Will validate results and warn user.
-            resource.getActionManager().push( this );
+            // // Record action to allow undo. Will validate results and warn user.
+            // resource.getActionManager().push( this );
         }
         return newChild;
     }

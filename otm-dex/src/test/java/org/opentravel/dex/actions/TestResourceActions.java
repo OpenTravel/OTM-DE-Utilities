@@ -23,6 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.dex.action.manager.DexActionManager;
+import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
@@ -70,7 +72,7 @@ public class TestResourceActions {
     @Test
     public void testConstructors() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
 
-        DexAction<?> action = DexActions.getAction( DexActions.ASSIGNSUBJECT, resource );
+        DexAction<?> action = DexActions.getAction( DexActions.ASSIGNSUBJECT, resource, resource.getActionManager() );
         assertNotNull( action );
 
         log.debug( "Done." );
@@ -83,8 +85,8 @@ public class TestResourceActions {
         throws ExceptionInInitializerError, InstantiationException, IllegalAccessException, NoSuchMethodException,
         SecurityException, IllegalArgumentException, InvocationTargetException {
 
-        AssignResourceSubjectAction action =
-            (AssignResourceSubjectAction) DexActions.getAction( DexActions.ASSIGNSUBJECT, resource );
+        AssignResourceSubjectAction action = (AssignResourceSubjectAction) DexActions
+            .getAction( DexActions.ASSIGNSUBJECT, resource, resource.getActionManager() );
         OtmBusinessObject otherBO = TestBusiness.buildOtm( staticModelManager, "OtherBO" );
         OtmBusinessObject originalSubject = resource.getSubject();
 

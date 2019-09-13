@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.actions;
+package org.opentravel.dex.action.manager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ValidationUtils;
+import org.opentravel.dex.actions.DexAction;
+import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.actions.DexBooleanAction;
+import org.opentravel.dex.actions.DexRunAction;
+import org.opentravel.dex.actions.DexStringAction;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmObject;
@@ -142,6 +147,10 @@ public abstract class DexActionManagerBase implements DexActionManager {
 
     @Override
     public void push(DexAction<?> action) {
+        if (action == null) {
+            log.debug( "Pushed a null action!" );
+            return;
+        }
         if (queue.contains( action )) {
             // Make sure not a duplicate
             log.debug( "Duplicate Action found!" );
@@ -192,30 +201,34 @@ public abstract class DexActionManagerBase implements DexActionManager {
 
     @Override
     public Object run(DexActions action, OtmObject subject, Object value) {
-        DexAction<?> actionHandler;
+        DexAction<?> actionHandler = null;
         Object result = null;
         try {
-            actionHandler = DexActions.getAction( action, subject );
+            actionHandler = DexActions.getAction( action, subject, this );
             if (actionHandler instanceof DexRunAction) {
-                if (value == null)
-                    result = ((DexRunAction) actionHandler).doIt();
-                else
-                    result = ((DexRunAction) actionHandler).doIt( value );
+                result = ((DexRunAction) actionHandler).doIt( value );
             } else {
-                postWarning( "Error running " + action.toString() + " action." );
+                String warning = "Error running action ";
+                if (action != null)
+                    warning += action.toString();
+                postWarning( warning );
                 log.warn( "Action is null or not a run action." );
             }
         } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException | SecurityException
             | IllegalArgumentException e) {
             log.warn( "Could not create action. " + e.getLocalizedMessage() );
         }
-        // TODO - move pushing results onto queue to here
+
+        // push results onto queue
+        if (result != null)
+            push( actionHandler );
+
         return result;
     }
 
     protected DexAction<?> setListener(BooleanProperty op, DexActions action, OtmObject subject) {
         try {
-            DexAction<?> actionHandler = DexActions.getAction( action, subject );
+            DexAction<?> actionHandler = DexActions.getAction( action, subject, this );
             if (actionHandler instanceof DexBooleanAction) {
                 ChangeListener<Boolean> changeListener = new ChangeListener<Boolean>() {
                     @Override
@@ -236,7 +249,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
         return null;
     }
 
-    protected DexAction<?> setListener(ObservableValue<?> o, DexActions action, OtmObject subject) {
+    public DexAction<?> setListener(ObservableValue<?> o, DexActions action, OtmObject subject) {
         if (o instanceof StringProperty)
             return setListener( ((StringProperty) o), action, subject );
         if (o instanceof BooleanProperty)
@@ -246,7 +259,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
 
     protected DexAction<?> setListener(StringProperty op, DexActions action, OtmObject subject) {
         try {
-            DexAction<?> actionHandler = DexActions.getAction( action, subject );
+            DexAction<?> actionHandler = DexActions.getAction( action, subject, this );
             if (actionHandler instanceof DexStringAction) {
                 ChangeListener<String> changeListener = new ChangeListener<String>() {
                     @Override

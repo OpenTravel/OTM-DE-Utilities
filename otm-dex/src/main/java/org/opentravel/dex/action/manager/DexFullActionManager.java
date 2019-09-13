@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.actions;
+package org.opentravel.dex.action.manager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.model.OtmObject;
 
@@ -49,15 +50,16 @@ public class DexFullActionManager extends DexActionManagerBase {
     @Override
     public boolean isEnabled(DexActions action, OtmObject subject) {
         boolean result = false;
-        if (subject.getOwningMember().isEditable())
-            try {
-                Method m = action.actionClass().getMethod( "isEnabled", OtmObject.class );
-                result = (boolean) m.invoke( null, subject );
-                // log.debug( "Method " + action.toString() + " isEnabled invoke result: " + result );
-            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException e) {
-                log.error( "Could not invoke action.isEnabled( ):" + e.getMessage() );
-            }
+        // The action manager is only available to editable objects.
+        // if (subject.getOwningMember().isEditable())
+        try {
+            Method m = action.actionClass().getMethod( "isEnabled", OtmObject.class );
+            result = (boolean) m.invoke( null, subject );
+            // log.debug( "Method " + action.toString() + " isEnabled invoke result: " + result );
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+            | InvocationTargetException e) {
+            log.error( "Could not invoke action.isEnabled( ):" + e.getMessage() );
+        }
         return result;
     }
 

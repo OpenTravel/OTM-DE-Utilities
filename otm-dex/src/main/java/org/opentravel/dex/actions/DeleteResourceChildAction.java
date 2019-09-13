@@ -62,8 +62,8 @@ public class DeleteResourceChildAction extends DexRunAction {
             else if (parent instanceof OtmAction && otm instanceof OtmActionResponse)
                 ((OtmAction) parent).remove( (OtmActionResponse) otm );
 
-            // Record action to allow undo. Will validate results and warn user.
-            otm.getActionManager().push( this );
+            // // Record action to allow undo. Will validate results and warn user.
+            // otm.getActionManager().push( this );
         }
         return parent;
     }

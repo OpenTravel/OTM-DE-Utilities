@@ -16,6 +16,7 @@
 
 package org.opentravel.dex.actions;
 
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.DexResourceChangeEvent;
@@ -88,24 +89,33 @@ public enum DexActions {
      * 
      * @param action
      * @param subject the otm object the action will act upon
+     * @param action handler to use to see if action is enabled. If null, use subject's action handler.
      * @return handler or null
      * @throws InstantiationException
      * @throws IllegalAccessException
      * @throws ExceptionInInitializerError
      */
-    public static DexAction<?> getAction(DexActions action, OtmObject subject)
+    public static DexAction<?> getAction(DexActions action, OtmObject subject, DexActionManager actionManager)
         throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
 
-        DexAction<?> handler = null;
+        if (subject == null)
+            throw new IllegalArgumentException( "Missing subject." );
+        if (actionManager == null)
+            actionManager = subject.getActionManager();
+        if (actionManager == null)
+            throw new IllegalArgumentException( "Missing action manager." );
+        if (action == null)
+            throw new IllegalArgumentException( "Missing action or action class." );
 
-        // Action subject must have an action handler assigned.
-        if (subject != null && subject.getActionManager() != null
-            && subject.getActionManager().isEnabled( action, subject )) {
-            if (action != null && action.actionClass != null) {
-                handler = action.actionClass.newInstance();
-            }
+        if (action.actionClass == null)
+            return null; // Enum does not define action
+
+        // Create handler to return
+        DexAction<?> handler = null;
+        if (actionManager.isEnabled( action, subject )) {
+            handler = action.actionClass.newInstance();
             // do not return the handler if the subject can't be set
-            if (handler != null && !handler.setSubject( subject ))
+            if (!handler.setSubject( subject ))
                 handler = null;
         }
         if (handler != null)

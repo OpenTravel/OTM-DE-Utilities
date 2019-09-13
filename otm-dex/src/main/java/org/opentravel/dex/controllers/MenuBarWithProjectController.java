@@ -36,7 +36,6 @@ import org.opentravel.objecteditor.UserSettings;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -114,7 +113,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     @Override
     public List<EventType<? extends AbstractOtmEvent>> getPublishedEventTypes() {
         // publishedEventTypes = Collections.unmodifiableList( Arrays.asList( publishedEvents ) );
-        publishedEventTypes = new ArrayList<>( Arrays.asList( publishedEvents ) );
+        publishedEventTypes = new ArrayList<>();
+        publishedEventTypes.add( DexModelChangeEvent.MODEL_CHANGED );
         for (DexActions action : DexActions.values()) {
             DexChangeEvent event = null;
             try {

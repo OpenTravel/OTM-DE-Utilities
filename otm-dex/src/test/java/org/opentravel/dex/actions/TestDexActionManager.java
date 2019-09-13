@@ -24,6 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.dex.action.manager.DexActionManager;
+import org.opentravel.dex.action.manager.DexFullActionManager;
+import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
@@ -103,7 +106,7 @@ public class TestDexActionManager {
             // Test getting action objects
             Class<?> actionClass = a.actionClass();
             assertTrue( actionClass != null );
-            DexAction<?> action = DexActions.getAction( a, resource );
+            DexAction<?> action = DexActions.getAction( a, resource, resource.getActionManager() );
             // Some of these will fail because the subject is the wrong class
             log.debug( "Got action " + action + " for action type " + a );
 

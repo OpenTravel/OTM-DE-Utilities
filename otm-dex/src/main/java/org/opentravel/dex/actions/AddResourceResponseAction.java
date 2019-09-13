@@ -42,16 +42,18 @@ public class AddResourceResponseAction extends DexRunAction {
     public AddResourceResponseAction() {
         super();
     }
-
-    public Object doIt() {
-        return doIt( new TLActionResponse() );
-    }
+    //
+    // public Object doIt() {
+    // return doIt( new TLActionResponse() );
+    // }
 
     /**
      * @see org.opentravel.dex.actions.DexRunAction#doIt(java.lang.Object)
      */
     @Override
     public Object doIt(Object data) {
+        if (data == null)
+            data = new TLActionResponse();
         if (data instanceof TLActionResponse)
             return doIt( getSubject(), (TLActionResponse) data );
         return null;
@@ -61,8 +63,8 @@ public class AddResourceResponseAction extends DexRunAction {
         if (action != null && tlChild != null) {
             newChild = action.add( tlChild );
 
-            // Record action to allow undo. Will validate results and warn user.
-            action.getActionManager().push( this );
+            // // Record action to allow undo. Will validate results and warn user.
+            // action.getActionManager().push( this );
         }
         return newChild;
     }

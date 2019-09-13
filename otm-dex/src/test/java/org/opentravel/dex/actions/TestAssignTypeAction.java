@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
@@ -148,7 +149,7 @@ public class TestAssignTypeAction {
         // Action manager uses actionHandler = DexActions.getAction( action, subject );
 
         // Given - an action for type change on VWA
-        DexRunAction action = (DexRunAction) DexActions.getAction( DexActions.TYPECHANGE, vwa );
+        DexRunAction action = (DexRunAction) DexActions.getAction( DexActions.TYPECHANGE, vwa, vwa.getActionManager() );
         assertNotNull( action );
 
         // When - executed using action's method

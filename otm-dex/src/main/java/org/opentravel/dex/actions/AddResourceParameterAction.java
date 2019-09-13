@@ -43,15 +43,17 @@ public class AddResourceParameterAction extends DexRunAction {
         super();
     }
 
-    public Object doIt() {
-        return doIt( new TLParameter() );
-    }
+    // public Object doIt() {
+    // return doIt( new TLParameter() );
+    // }
 
     /**
      * @see org.opentravel.dex.actions.DexRunAction#doIt(java.lang.Object)
      */
     @Override
     public Object doIt(Object data) {
+        if (data == null)
+            data = new TLParameter();
         if (data instanceof TLParameter)
             return doIt( getSubject(), (TLParameter) data );
         return null;
@@ -61,8 +63,8 @@ public class AddResourceParameterAction extends DexRunAction {
         if (group != null && tlChild != null) {
             newChild = group.add( tlChild );
 
-            // Record action to allow undo. Will validate results and warn user.
-            group.getActionManager().push( this );
+            // // Record action to allow undo. Will validate results and warn user.
+            // group.getActionManager().push( this );
         }
         return newChild;
     }

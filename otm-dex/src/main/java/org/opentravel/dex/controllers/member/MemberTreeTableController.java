@@ -32,6 +32,8 @@ import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
+import java.util.Collection;
+
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -267,14 +269,15 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        // log.debug(event.getEventType() + " event received. Ignore? " + ignoreEvents);
+        log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
             if (event instanceof DexFilterChangeEvent)
                 handleEvent( (DexFilterChangeEvent) event );
             if (event instanceof DexModelChangeEvent)
-                post( ((DexModelChangeEvent) event).getModelManager() );
+                refresh();
+            // post( ((DexModelChangeEvent) event).getModelManager() );
             else
                 refresh();
         }
@@ -344,6 +347,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             memberTree.getRoot().getChildren().clear();
 
             // create cells for members
+            Collection<OtmLibraryMember> members = currentModelMgr.getMembers();
             currentModelMgr.getMembers().forEach( m -> createTreeItem( m, root ) );
             try {
                 memberTree.sort();

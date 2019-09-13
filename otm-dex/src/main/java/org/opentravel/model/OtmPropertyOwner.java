@@ -16,7 +16,7 @@
 
 package org.opentravel.model;
 
-import org.opentravel.dex.actions.DexActionManager;
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.schemacompiler.model.TLModelElement;

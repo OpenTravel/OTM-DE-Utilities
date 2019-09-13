@@ -37,8 +37,9 @@ public abstract class DexRunAction extends DexActionBase implements DexAction<Ob
         super();
     }
 
-    public abstract Object doIt();
-
+    // @Deprecated
+    // public abstract Object doIt();
+    //
     /**
      * Perform the action using supplied data.
      * 

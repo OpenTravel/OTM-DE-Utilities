@@ -80,11 +80,11 @@ public class AssignResourceSubjectAction extends DexRunAction {
      */
     @Override
     public Object doIt(Object data) {
+        if (!(data instanceof OtmBusinessObject))
+            return doIt();
+
         if (resource.getActionManager() == null)
             return null;
-        if (!(data instanceof OtmBusinessObject))
-            return null;
-
 
         oldSubject = resource.getSubject();
         OtmBusinessObject newSubject = (OtmBusinessObject) data;
@@ -95,8 +95,8 @@ public class AssignResourceSubjectAction extends DexRunAction {
         if (result != newSubject)
             log.debug( "ERROR setting subject." );
 
-        // Record action to allow undo. Will validate results and warn user.
-        resource.getActionManager().push( this );
+        // // Record action to allow undo. Will validate results and warn user.
+        // resource.getActionManager().push( this );
 
         log.debug( "Set resource subject to " + get() );
         return get();

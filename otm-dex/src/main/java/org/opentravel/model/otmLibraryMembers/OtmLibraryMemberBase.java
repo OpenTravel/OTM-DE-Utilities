@@ -18,7 +18,7 @@ package org.opentravel.model.otmLibraryMembers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.dex.actions.DexActionManager;
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
@@ -74,6 +74,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     protected List<OtmLibraryMember> whereUsed = null;
     // private DexActionManager actionMgr = null;
 
+    private DexActionManager noLibraryActionManager;
+
     /**
      */
     public OtmLibraryMemberBase(T tl, OtmModelManager mgr) {
@@ -105,7 +107,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public DexActionManager getActionManager() {
-        return getLibrary() != null ? getLibrary().getActionManager() : getModelManager().getActionManager( false );
+        return getLibrary() != null ? getLibrary().getActionManager() : noLibraryActionManager;
     }
 
     @Override
@@ -395,6 +397,10 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             // if (ghosts.size() > 0)
             // log.debug("Found and modeled " + ghosts.size() + " ghost facets on " + this.getName());
         }
+    }
+
+    public void setNoLibraryActionManager(DexActionManager actionManager) {
+        this.noLibraryActionManager = actionManager;
     }
 
     private void setContributor(OtmObject i, OtmObject baseType) {

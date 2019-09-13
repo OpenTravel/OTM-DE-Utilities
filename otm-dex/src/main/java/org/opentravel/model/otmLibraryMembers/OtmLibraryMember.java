@@ -16,6 +16,7 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
@@ -114,5 +115,14 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      * @param newUser to add to the where used list
      */
     void addWhereUsed(OtmLibraryMember oldUser, OtmLibraryMember newUser);
+
+    /**
+     * Set or clear action manager that overrides action manager from library. Will only be returned by
+     * {@link #getActionManager()} when library is null. Should only be used when member is being worked on in a wizard
+     * or task.
+     * 
+     * @param actionManager
+     */
+    public void setNoLibraryActionManager(DexActionManager dexActionManager);
 
 }

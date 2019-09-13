@@ -55,7 +55,7 @@ public class SetRestStatusCodesAction extends DexRunAction {
         if (isEnabled( object )) {
             oldMap = new RestStatusCodesMap( object );
             set( data.getTLList() );
-            object.getActionManager().push( this );
+            // object.getActionManager().push( this );
         }
     }
 
@@ -113,12 +113,12 @@ public class SetRestStatusCodesAction extends DexRunAction {
         return get();
     }
 
-    /**
-     * @see org.opentravel.dex.actions.DexRunAction#doIt()
-     */
-    @Override
-    public Object doIt() {
-        // No-op
-        return null;
-    }
+    // /**
+    // * @see org.opentravel.dex.actions.DexRunAction#doIt()
+    // */
+    // @Override
+    // public Object doIt() {
+    // // No-op
+    // return null;
+    // }
 }

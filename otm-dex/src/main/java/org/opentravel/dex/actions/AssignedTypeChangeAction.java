@@ -19,6 +19,7 @@ package org.opentravel.dex.actions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ValidationUtils;
+import org.opentravel.dex.action.manager.DexActionManagerBase;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
@@ -57,7 +58,7 @@ public class AssignedTypeChangeAction extends DexRunAction {
     }
 
     /**
-     * {@inheritDoc} This action will get the data from the user via modal dialog
+     * This action will get the data from the user via modal dialog
      */
     public OtmTypeProvider doIt() {
         log.debug( "Ready to set assigned type to " + otm + " " + ignore );
@@ -87,7 +88,7 @@ public class AssignedTypeChangeAction extends DexRunAction {
                 doIt( selected.getValue() );
         }
 
-        return newProvider;
+        return get();
     }
 
     /**
@@ -97,6 +98,9 @@ public class AssignedTypeChangeAction extends DexRunAction {
      */
     @Override
     public Object doIt(Object data) {
+        if (data == null)
+            doIt();
+
         if (actionManager == null)
             return null;
 
@@ -117,8 +121,8 @@ public class AssignedTypeChangeAction extends DexRunAction {
             if (p != newProvider)
                 log.error( "Could not set type to " + newProvider );
 
-            // Record action to allow undo. Will validate results and warn user.
-            actionManager.push( this );
+            // // Record action to allow undo. Will validate results and warn user.
+            // actionManager.push( this );
 
             log.debug( "Set type to " + get() );
         }

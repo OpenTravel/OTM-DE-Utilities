@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.actions;
+package org.opentravel.dex.action.manager;
 
+import org.opentravel.dex.actions.DexAction;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.model.OtmObject;
 
