@@ -660,7 +660,7 @@ public class OtmModelManager implements TaskResultHandlerI {
     /**
      * @return
      */
-    public List<OtmLibrary> getSaveableLibraries() {
+    public List<OtmLibrary> getEditableLibraries() {
         List<OtmLibrary> libs = new ArrayList<>();
         libraries.values().forEach( l -> {
             if (l.isEditable())
@@ -672,9 +672,21 @@ public class OtmModelManager implements TaskResultHandlerI {
     /**
      * @return true if any library is editable
      */
-    public boolean hasSaveableLibraries() {
+    public boolean hasEditableLibraries() {
         for (OtmLibrary l : libraries.values())
             if (l.isEditable())
+                return true;
+        return false;
+    }
+
+
+    /**
+     * @param library
+     * @return true if any library except the passed library is editable
+     */
+    public boolean hasEditableLibraries(OtmLibrary library) {
+        for (OtmLibrary l : libraries.values())
+            if (l != library && l.isEditable())
                 return true;
         return false;
     }

@@ -303,7 +303,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     public void handleSaveAllMenu(ActionEvent event) {
         log.debug( "Handle save all action event." );
-        String results = DexFileHandler.saveLibraries( modelMgr.getSaveableLibraries() );
+        String results = DexFileHandler.saveLibraries( modelMgr.getEditableLibraries() );
         DialogBoxContoller dialog = getDialogBox( null );
         dialog.show( "Save Results", results );
     }

@@ -113,6 +113,11 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
     @Override
     public void clear() {}
 
+    /**
+     * {@inheritDoc} check nodes and set main controller
+     * 
+     * @see org.opentravel.dex.controllers.DexIncludedController#configure(org.opentravel.dex.controllers.DexMainController)
+     */
     @Override
     public void configure(DexMainController parent) {
         checkNodes();

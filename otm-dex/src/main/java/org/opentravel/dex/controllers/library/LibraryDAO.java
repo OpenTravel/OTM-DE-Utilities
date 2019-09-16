@@ -28,6 +28,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 
 /**
@@ -118,6 +119,26 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
 
     public StringProperty versionProperty() {
         return new SimpleStringProperty( library.getTL().getVersion() );
+    }
+
+    /**
+     * TreeItem class does not extend the Node class.
+     * 
+     * Therefore, you cannot apply any visual effects or add menus to the tree items. Use the cell factory mechanism to
+     * overcome this obstacle and define as much custom behavior for the tree items as your application requires.
+     * 
+     * @param item
+     * @return
+     */
+    public TreeItem<LibraryDAO> createTreeItem(TreeItem<LibraryDAO> parent) {
+        // log.debug( "Create tree item for: " + library );
+        if (parent != null) {
+            TreeItem<LibraryDAO> item = new TreeItem<>( this );
+            item.setExpanded( false );
+            parent.getChildren().add( item );
+            return item;
+        }
+        return null;
     }
 
 }

@@ -37,11 +37,6 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         OK, CANCEL, ERROR;
     }
 
-    // Define LAYOUT_FILE
-    // public static final String LAYOUT_FILE = "/UnlockLibraryDialog.fxml";
-
-    // @FXML declarations
-
     protected static String helpText = "";
     protected String title = "";
 
@@ -57,37 +52,6 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         // Only implement if needed for this controller
     }
 
-    // UNCOMMENT - needs to be static to simplify creating the popup dialog
-    //
-    // /**
-    // * Initialize this controller using the passed FXML loader.
-    // * <p>
-    // * Note: This approach using a static stage and main controller hides the complexity from calling controller.
-    // * Otherwise, this code must migrate into the calling controller.
-    // */
-    // public static DexPopupControllerBase init() {
-    // FXMLLoader loader = new FXMLLoader(DexPopupControllerBase.class.getResource(LAYOUT_FILE));
-    // DexPopupControllerBase controller = null;
-    // try {
-    // // Load the fxml file initialize controller it declares.
-    // Pane pane = loader.load();
-    // // Create scene and stage
-    // Stage dialogStage = new Stage();
-    // dialogStage.setScene(new Scene(pane));
-    // dialogStage.initModality(Modality.APPLICATION_MODAL);
-    // popupStage = dialogStage;
-    //
-    // // get the controller from it.
-    // controller = loader.getController();
-    // if (!(controller instanceof DexPopupControllerBase))
-    // throw new IllegalStateException("Error creating dialog box controller.");
-    // } catch (IOException e1) {
-    // log.error("Error loading dialog box. " + e1.getLocalizedMessage());
-    // throw new IllegalStateException(
-    // "Error loading dialog box. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString());
-    // }
-    // return controller;
-    // }
 
     public void doCancel() {
         clear();

@@ -32,8 +32,6 @@ import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
-import java.util.Collection;
-
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -142,11 +140,15 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     }
 
     /**
-     * {@inheritDoc} Remove all items from the member tree.
+     * {@inheritDoc}
      */
     @Override
     public void clear() {
-        memberTree.getRoot().getChildren().clear();
+        if (memberTree.getSelectionModel() != null)
+            memberTree.getSelectionModel().clearSelection();
+
+        if (memberTree.getRoot() != null)
+            memberTree.getRoot().getChildren().clear();
     }
 
     /**
@@ -343,11 +345,10 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         ignoreEvents = true;
         if (modelMgr != null && memberTree != null) {
             currentModelMgr = modelMgr;
-            memberTree.getSelectionModel().clearSelection();
-            memberTree.getRoot().getChildren().clear();
+            clear();
 
             // create cells for members
-            Collection<OtmLibraryMember> members = currentModelMgr.getMembers();
+            // Collection<OtmLibraryMember> members = currentModelMgr.getMembers();
             currentModelMgr.getMembers().forEach( m -> createTreeItem( m, root ) );
             try {
                 memberTree.sort();

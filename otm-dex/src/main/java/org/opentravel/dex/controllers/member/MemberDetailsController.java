@@ -195,13 +195,20 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         StringProperty property = member.nameProperty();
         memberName.setEditable( !(property instanceof ReadOnlyStringWrapper) );
         memberName.setText( property.get() );
-        memberName.setOnAction( e -> property.set( memberName.getText() ) );
+        memberName.setOnAction( e -> {
+            property.set( memberName.getText() );
+            memberName.setText( property.get() );
+        } );
 
         // Set library
         libraryName.setEditable( false );
         libraryName.setText( member.libraryProperty().get() );
-        changeLibraryButton.setDisable( !member.isEditable() );
-        changeLibraryButton.setDisable( true ); // TEMP
+        changeLibraryButton.setDisable( !member.getActionManager().isEnabled( DexActions.SETMEMBERLIBRARY, member ) );
+        changeLibraryButton.setOnAction( e -> {
+            member.getActionManager().run( DexActions.SETMEMBERLIBRARY, member );
+            member.libraryProperty().set( member.getLibraryName() );
+            libraryName.setText( member.getLibraryName() );
+        } );
 
         // Description
         memberDescription.setEditable( member.isEditable() );
