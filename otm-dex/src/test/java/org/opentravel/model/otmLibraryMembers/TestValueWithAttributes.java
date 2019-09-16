@@ -22,7 +22,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
-import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLValueWithAttributes;
 
@@ -72,5 +71,17 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
         assertNotNull( tlvwa.getParentType() );
         assertTrue( tlvwa.getAttributes().size() == i - 1 );
         return tlvwa;
+    }
+
+
+    /**
+     * @param mgr
+     * @param string
+     * @return
+     */
+    public static OtmValueWithAttributes buildOtm(OtmModelManager mgr, String string) {
+        OtmValueWithAttributes vwa = buildOtm( mgr );
+        vwa.setName( string );
+        return vwa;
     }
 }

@@ -25,6 +25,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLExample;
@@ -55,12 +57,23 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
         assertNotNull( bo.getDetail() );
     }
 
-
-
     /** ****************************************************** **/
     public static OtmBusinessObject buildOtm(OtmModelManager mgr, String name) {
         BoName = name;
         return buildOtm( mgr );
+    }
+
+    /**
+     * Get an element from the summary facet
+     * 
+     * @param member
+     * @return
+     */
+    public static OtmElement<?> getElement(OtmBusinessObject member) {
+        for (OtmObject child : member.getSummary().getChildren())
+            if (child instanceof OtmElement)
+                return (OtmElement<?>) child;
+        return null;
     }
 
     public static OtmBusinessObject buildOtm(OtmModelManager mgr) {

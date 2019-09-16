@@ -55,69 +55,6 @@ public class MemberAndProvidersDAO implements DexDAO<OtmObject> {
         this.otmObject = provider;
     }
 
-    @Override
-    public ImageView getIcon(ImageManager imageMgr) {
-        return ImageManager.get( otmObject );
-    }
-
-    @Override
-    public OtmObject getValue() {
-        return otmObject;
-    }
-
-    public boolean isEditable() {
-        return otmObject.isEditable();
-    }
-
-    public StringProperty usedTypesProperty() {
-        String usedTypeCount = "";
-        if (otmObject instanceof OtmLibraryMember) {
-            List<OtmTypeProvider> u = ((OtmLibraryMember) otmObject).getUsedTypes();
-            if (u != null)
-                usedTypeCount = Integer.toString( u.size() );
-        }
-        return new ReadOnlyStringWrapper( usedTypeCount );
-    }
-
-    public StringProperty errorProperty() {
-        return otmObject.validationProperty();
-    }
-
-    public ObjectProperty<ImageView> errorImageProperty() {
-        return otmObject.validationImageProperty();
-    }
-
-    public StringProperty libraryProperty() {
-        if (otmObject instanceof OtmLibraryMember)
-            return ((OtmLibraryMember) otmObject).libraryProperty();
-        return new ReadOnlyStringWrapper( otmObject.getLibrary().getName() );
-    }
-
-    public StringProperty prefixProperty() {
-        if (otmObject instanceof OtmLibraryMember)
-            return ((OtmLibraryMember) otmObject).prefixProperty();
-        return new ReadOnlyStringWrapper( otmObject.getPrefix() );
-    }
-
-    public StringProperty nameProperty() {
-        return (otmObject.nameProperty());
-    }
-
-    public void setName(String name) {
-        otmObject.setName( name );
-    }
-
-    @Override
-    public String toString() {
-        return otmObject != null ? otmObject.getPrefix() + ":" + otmObject.toString() : "";
-    }
-
-    public StringProperty versionProperty() {
-        if (otmObject instanceof OtmLibraryMember)
-            return ((OtmLibraryMember) otmObject).versionProperty();
-        return new ReadOnlyStringWrapper( "" );
-    }
-
     /**
      * Create and add to tree with no conditional logic.
      * 
@@ -134,6 +71,69 @@ public class MemberAndProvidersDAO implements DexDAO<OtmObject> {
         item.setGraphic( graphic );
         Tooltip.install( graphic, new Tooltip( otmObject.getObjectTypeName() ) );
         return item;
+    }
+
+    public ObjectProperty<ImageView> errorImageProperty() {
+        return otmObject.validationImageProperty();
+    }
+
+    public StringProperty errorProperty() {
+        return otmObject.validationProperty();
+    }
+
+    @Override
+    public ImageView getIcon(ImageManager imageMgr) {
+        return ImageManager.get( otmObject );
+    }
+
+    @Override
+    public OtmObject getValue() {
+        return otmObject;
+    }
+
+    public boolean isEditable() {
+        return otmObject.isEditable();
+    }
+
+    public StringProperty libraryProperty() {
+        if (otmObject instanceof OtmLibraryMember)
+            return ((OtmLibraryMember) otmObject).libraryProperty();
+        return new ReadOnlyStringWrapper( otmObject.getLibrary().getName() );
+    }
+
+    public StringProperty nameProperty() {
+        return (otmObject.nameProperty());
+    }
+
+    public StringProperty prefixProperty() {
+        if (otmObject instanceof OtmLibraryMember)
+            return ((OtmLibraryMember) otmObject).prefixProperty();
+        return new ReadOnlyStringWrapper( otmObject.getPrefix() );
+    }
+
+    public void setName(String name) {
+        otmObject.setName( name );
+    }
+
+    @Override
+    public String toString() {
+        return otmObject != null ? otmObject.getPrefix() + ":" + otmObject.toString() : "";
+    }
+
+    public StringProperty usedTypesProperty() {
+        String usedTypeCount = "";
+        if (otmObject instanceof OtmLibraryMember) {
+            List<OtmTypeProvider> u = ((OtmLibraryMember) otmObject).getUsedTypes();
+            if (u != null)
+                usedTypeCount = Integer.toString( u.size() );
+        }
+        return new ReadOnlyStringWrapper( usedTypeCount );
+    }
+
+    public StringProperty versionProperty() {
+        if (otmObject instanceof OtmLibraryMember)
+            return ((OtmLibraryMember) otmObject).versionProperty();
+        return new ReadOnlyStringWrapper( "" );
     }
 
 }

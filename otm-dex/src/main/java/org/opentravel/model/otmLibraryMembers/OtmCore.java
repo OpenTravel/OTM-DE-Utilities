@@ -152,12 +152,12 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
 
     @Override
     public StringProperty assignedTypeProperty() {
-        if (assignedTypeProperty == null) {
+        if (assignedTypeProperty == null)
             if (isEditable())
-                assignedTypeProperty = new SimpleStringProperty( OtmTypeUserUtils.formatAssignedType( this ) );
+                assignedTypeProperty = new SimpleStringProperty();
             else
-                assignedTypeProperty = new ReadOnlyStringWrapper( OtmTypeUserUtils.formatAssignedType( this ) );
-        }
+                assignedTypeProperty = new ReadOnlyStringWrapper();
+        assignedTypeProperty.set( OtmTypeUserUtils.formatAssignedType( this ) );
         return assignedTypeProperty;
     }
 

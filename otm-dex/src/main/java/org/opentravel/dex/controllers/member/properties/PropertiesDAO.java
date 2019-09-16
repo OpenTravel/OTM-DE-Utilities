@@ -59,38 +59,6 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
     static final String REQUIRED = "Required";
     static final String OPTIONAL = "Optional";
 
-    protected OtmObject element;
-    protected DexIncludedController<?> controller;
-    protected boolean inherited; // contextual facets will not know if they are inherited, only the contributed facet
-                                 // will know and it is not saved in the DAO.
-
-    public PropertiesDAO(OtmFacet<?> property) {
-        this.element = property;
-    }
-
-    /**
-     * 
-     * @param element
-     * @param controller
-     * @param inherited Only the parent DAO of a child will know if the parent contextual facet is inherited.
-     */
-    public PropertiesDAO(OtmObject element, DexIncludedController<?> controller, TreeItem<PropertiesDAO> parent) {
-        this( element, controller );
-        if (!inherited && parent != null && parent.getValue() != null)
-            this.inherited = parent.getValue().inherited;
-        // log.debug("Created2 DAO for " + element + " Inherited? " + inherited);
-    }
-
-    public PropertiesDAO(OtmObject element, DexIncludedController<?> controller) {
-        this.inherited = element.isInherited();
-        this.element = element;
-        // Save the contributor since the Contributed's children does not contain properties and contextual facets
-        if (element instanceof OtmContributedFacet)
-            this.element = ((OtmContributedFacet) element).getContributor();
-        this.controller = controller;
-        // log.debug("Created1 DAO for " + element + " Inherited? " + inherited);
-    }
-
     /**
      * 
      * @return an observable list of property roles
@@ -110,6 +78,41 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
         return list;
     }
 
+    protected OtmObject element;
+
+    protected DexIncludedController<?> controller;
+
+    protected boolean inherited; // contextual facets will not know if they are inherited, only the contributed facet
+                                 // will know and it is not saved in the DAO.
+
+    public PropertiesDAO(OtmFacet<?> property) {
+        this.element = property;
+        // log.debug( "Created DAO for " + element + " Inherited? " + inherited );
+    }
+
+    public PropertiesDAO(OtmObject element, DexIncludedController<?> controller) {
+        this.inherited = element.isInherited();
+        this.element = element;
+        // Save the contributor since the Contributed's children does not contain properties and contextual facets
+        if (element instanceof OtmContributedFacet)
+            this.element = ((OtmContributedFacet) element).getContributor();
+        this.controller = controller;
+        // log.debug( "Created1 DAO for " + element + " Inherited? " + inherited );
+    }
+
+    /**
+     * 
+     * @param element
+     * @param controller
+     * @param inherited Only the parent DAO of a child will know if the parent contextual facet is inherited.
+     */
+    public PropertiesDAO(OtmObject element, DexIncludedController<?> controller, TreeItem<PropertiesDAO> parent) {
+        this( element, controller );
+        if (!inherited && parent != null && parent.getValue() != null)
+            this.inherited = parent.getValue().inherited;
+        // log.debug( "Created2 DAO for " + element + " Inherited? " + inherited );
+    }
+
     /**
      * If the property is a type user, create a simple string property with listener. Otherwise, create a read-only
      * property.
@@ -118,17 +121,72 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
      */
     public StringProperty assignedTypeProperty() {
         StringProperty ssp;
-        if (element instanceof OtmTypeUser) {
+        if (element instanceof OtmTypeUser)
             ssp = ((OtmTypeUser) element).assignedTypeProperty();
-            // if (ssp instanceof SimpleStringProperty)
-            // ssp.addListener((v, o, n) -> {
-            // new AssignedTypesMenuHandler().handle(n, this);
-            // controller.refresh();
-            // });
-        } else {
+        else
             ssp = new ReadOnlyStringWrapper( "" );
-        }
         return ssp;
+    }
+
+    /**
+     * Add tree items to parent for each descendant of the child owner.
+     * 
+     * @param filter a filter that will exclude some members, returning a null item. Can be null for no filter.
+     * @param member a child owning library member. Non-child owning properties are ignored.
+     */
+    public void createChildrenItems(TreeItem<PropertiesDAO> parent, DexFilter<OtmObject> filter) {
+        OtmChildrenOwner member = null;
+
+        if (element instanceof OtmChildrenOwner) {
+            // Skip over the parent
+
+            // create cells for member's facets and properties
+            member = (OtmChildrenOwner) element;
+
+            // Create a local copy to prevent concurrent modification
+            Collection<OtmObject> kids = new ArrayList<>( member.getChildrenHierarchy() );
+            for (OtmObject child : kids) {
+                // Create item and add to tree at parent
+                TreeItem<PropertiesDAO> item =
+                    new PropertiesDAO( child, getController(), parent ).createTreeItem( parent, filter );
+
+                // Recurse to Create tree items for children if any
+                if (child instanceof OtmChildrenOwner) {
+                    // If the item was filtered out, continue using the parent for the tree item
+                    if (item == null)
+                        item = parent;
+                    // TO DO - sort order
+                    new PropertiesDAO( child, getController(), item ).createChildrenItems( item, filter );
+                }
+            }
+        }
+
+    }
+
+    /**
+     * Create a tree item for this DAO's element and add to parent. No business logic.
+     * 
+     * @param parent to add item as child
+     * @return
+     */
+    public TreeItem<PropertiesDAO> createTreeItem(TreeItem<PropertiesDAO> parent, DexFilter<OtmObject> filter) {
+        // Apply Filter (if any)
+        if (filter != null && !filter.isSelected( element ))
+            return null;
+
+        TreeItem<PropertiesDAO> item = new TreeItem<>( this );
+        if (element instanceof OtmChildrenOwner)
+            item.setExpanded( ((OtmChildrenOwner) element).isExpanded() );
+        if (parent != null)
+            parent.getChildren().add( item );
+
+        // Decorate if possible
+        if (controller != null && controller.getMainController() != null) {
+            ImageView graphic = ImageManager.get( element );
+            item.setGraphic( graphic );
+            Tooltip.install( graphic, getTooltip() );
+        }
+        return item;
     }
 
     public StringProperty deprecationProperty() {
@@ -164,11 +222,6 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
         // return desc;
     }
 
-    public void setDescription(String description) {
-        element.setDescription( description );
-        // log.debug("setDescription " + description + " on " + element);
-    }
-
     public StringProperty exampleProperty() {
         String value = element.getExample();
 
@@ -188,9 +241,39 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
         return desc;
     }
 
+    public String getBaseTypeName() {
+        if (isInherited() && element.getOwningMember() != null && element.getOwningMember().getBaseType() != null)
+            return element.getOwningMember().getBaseType().getName();
+        return "";
+    }
+
+    public DexIncludedController<?> getController() {
+        return controller;
+    }
+
     @Override
     public ImageView getIcon(ImageManager imageMgr) {
         return ImageManager.get( element );
+    }
+
+    protected Tooltip getTooltip() {
+        Tooltip tip = null;
+        if (isInherited()) {
+            if (getBaseTypeName().isEmpty())
+                tip = new Tooltip( element.getObjectTypeName() + " inherited" );
+            else
+                tip = new Tooltip( element.getObjectTypeName() + " inherited from " + getBaseTypeName() );
+        } else {
+            tip = new Tooltip( element.getObjectTypeName() );
+        }
+        return tip;
+    }
+
+    public String getValidationFindingsAsString() {
+        if (inherited)
+            return "Not validated here because it is inherited.";
+        else
+            return element.getValidationFindingsAsString();
     }
 
     @Override
@@ -198,12 +281,15 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
         return element;
     }
 
-    public DexIncludedController<?> getController() {
-        return controller;
-    }
-
     public boolean isEditable() {
         return element.isEditable();
+    }
+
+    /**
+     * @return true if the OtmProperty is inherited
+     */
+    public boolean isInherited() {
+        return inherited;
     }
 
     public IntegerProperty maxProperty() {
@@ -257,22 +343,13 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
         return ssp;
     }
 
+    public void setDescription(String description) {
+        element.setDescription( description );
+        // log.debug("setDescription " + description + " on " + element);
+    }
+
     public void setMax(String newValue) {
         log.debug( "TODO: Set max to: " + newValue );
-    }
-
-    public String getValidationFindingsAsString() {
-        if (inherited)
-            return "Not validated here because it is inherited.";
-        else
-            return element.getValidationFindingsAsString();
-    }
-
-    public ObjectProperty<ImageView> validationImageProperty() {
-        if (inherited)
-            return null;
-        element.isValid(); // create findings if none existed
-        return element.validationImageProperty();
     }
 
     @Override
@@ -282,91 +359,11 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
         return element.toString();
     }
 
-    /**
-     * Create a tree item for this DAO's element and add to parent. No business logic.
-     * 
-     * @param parent to add item as child
-     * @return
-     */
-    public TreeItem<PropertiesDAO> createTreeItem(TreeItem<PropertiesDAO> parent, DexFilter<OtmObject> filter) {
-        // Apply Filter (if any)
-        if (filter != null && !filter.isSelected( element ))
+    public ObjectProperty<ImageView> validationImageProperty() {
+        if (inherited)
             return null;
-
-        TreeItem<PropertiesDAO> item = new TreeItem<>( this );
-        if (element instanceof OtmChildrenOwner)
-            item.setExpanded( ((OtmChildrenOwner) element).isExpanded() );
-        if (parent != null)
-            parent.getChildren().add( item );
-
-        // Decorate if possible
-        if (controller != null && controller.getMainController() != null) {
-            ImageView graphic = ImageManager.get( element );
-            item.setGraphic( graphic );
-            Tooltip.install( graphic, getTooltip() );
-        }
-        return item;
-    }
-
-    protected Tooltip getTooltip() {
-        Tooltip tip = null;
-        if (isInherited()) {
-            if (getBaseTypeName().isEmpty())
-                tip = new Tooltip( element.getObjectTypeName() + " inherited" );
-            else
-                tip = new Tooltip( element.getObjectTypeName() + " inherited from " + getBaseTypeName() );
-        } else {
-            tip = new Tooltip( element.getObjectTypeName() );
-        }
-        return tip;
-    }
-
-    /**
-     * Add tree items to parent for each descendant of the child owner.
-     * 
-     * @param filter a filter that will exclude some members, returning a null item. Can be null for no filter.
-     * @param member a child owning library member. Non-child owning properties are ignored.
-     */
-    public void createChildrenItems(TreeItem<PropertiesDAO> parent, DexFilter<OtmObject> filter) {
-        OtmChildrenOwner member = null;
-
-        if (element instanceof OtmChildrenOwner) {
-            // Skip over the parent
-
-            // create cells for member's facets and properties
-            member = (OtmChildrenOwner) element;
-
-            // Create a local copy to prevent concurrent modification
-            Collection<OtmObject> kids = new ArrayList<>( member.getChildrenHierarchy() );
-            for (OtmObject child : kids) {
-                // Create item and add to tree at parent
-                TreeItem<PropertiesDAO> item =
-                    new PropertiesDAO( child, getController(), parent ).createTreeItem( parent, filter );
-
-                // Recurse to Create tree items for children if any
-                if (child instanceof OtmChildrenOwner) {
-                    // If the item was filtered out, continue using the parent for the tree item
-                    if (item == null)
-                        item = parent;
-                    // TO DO - sort order
-                    new PropertiesDAO( child, getController(), item ).createChildrenItems( item, filter );
-                }
-            }
-        }
-
-    }
-
-    /**
-     * @return true if the OtmProperty is inherited
-     */
-    public boolean isInherited() {
-        return inherited;
-    }
-
-    public String getBaseTypeName() {
-        if (isInherited() && element.getOwningMember() != null && element.getOwningMember().getBaseType() != null)
-            return element.getOwningMember().getBaseType().getName();
-        return "";
+        element.isValid(); // create findings if none existed
+        return element.validationImageProperty();
     }
 
     // ((TLProperty)tl).getDocumentation().addImplementer(implementer);(null);

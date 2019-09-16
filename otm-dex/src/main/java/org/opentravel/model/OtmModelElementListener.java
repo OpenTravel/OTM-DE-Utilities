@@ -41,7 +41,7 @@ public class OtmModelElementListener implements ModelElementListener {
 
     @Override
     public void processOwnershipEvent(OwnershipEvent<?,?> event) {
-        // log.debug( otm.getName() + " ownership event: " + event.getType() );
+        log.debug( otm.getName() + " ownership event: " + event.getType() );
     }
 
     @Override

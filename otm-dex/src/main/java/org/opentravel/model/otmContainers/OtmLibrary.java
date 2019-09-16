@@ -101,6 +101,8 @@ public class OtmLibrary {
                 // make sure not already a member
                 if (getTL().getNamedMember( ((LibraryMember) member.getTL()).getLocalName() ) == null)
                     getTL().addNamedMember( (LibraryMember) member.getTL() );
+                else
+                    log.warn( "Did not add member to library because it was already a member." );
                 return member;
             } catch (IllegalArgumentException e) {
                 log.warn( "Exception: " + e.getLocalizedMessage() );
@@ -114,7 +116,6 @@ public class OtmLibrary {
      * Simply remove the TL member from the Tl library
      * 
      * @param a library member
-     * @return the member if added OK
      */
     public void remove(OtmLibraryMember member) {
         getTL().removeNamedMember( member.getTlLM() );

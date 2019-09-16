@@ -57,12 +57,12 @@ public class OtmAttribute<T extends TLAttribute> extends OtmProperty<TLAttribute
 
     @Override
     public StringProperty assignedTypeProperty() {
-        if (assignedTypeProperty == null) {
+        if (assignedTypeProperty == null)
             if (isEditable())
-                assignedTypeProperty = new SimpleStringProperty( OtmTypeUserUtils.formatAssignedType( this ) );
+                assignedTypeProperty = new SimpleStringProperty();
             else
-                assignedTypeProperty = new ReadOnlyStringWrapper( OtmTypeUserUtils.formatAssignedType( this ) );
-        }
+                assignedTypeProperty = new ReadOnlyStringWrapper();
+        assignedTypeProperty.set( OtmTypeUserUtils.formatAssignedType( this ) );
         return assignedTypeProperty;
     }
 

@@ -16,6 +16,8 @@
 
 package org.opentravel.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
@@ -32,12 +34,18 @@ import org.opentravel.schemacompiler.model.TLModelElement;
  *
  */
 public class OtmTypeUserUtils {
-    // private static Log log = LogFactory.getLog(OtmTypeUserUtils.class);
+    private static Log log = LogFactory.getLog( OtmTypeUserUtils.class );
 
     private OtmTypeUserUtils() {
         // NO-OP - static methods only. Do not instantiate this class.
     }
 
+    /**
+     * Get the assigned type name directly from TL object. Add prefix if in a different library.
+     * 
+     * @param user
+     * @return
+     */
     public static String formatAssignedType(OtmTypeUser user) {
         assert user != null;
         assert user.getLibrary() != null;
@@ -47,7 +55,7 @@ public class OtmTypeUserUtils {
         NamedEntity tlType = user.getAssignedTLType();
         if (tlType == null)
             // If the type is not found, use the TypeName from the tl object.
-            name = user.getTlAssignedTypeName();
+            name = "? : " + user.getTlAssignedTypeName();
         else {
             // If the libraries are different add the prefix of the provider library.
             if (user.getLibrary() != null) {
@@ -74,6 +82,7 @@ public class OtmTypeUserUtils {
         if (userLib == null || providerLib == null)
             return localName;
         String prefix = userLib != providerLib ? providerLib.getPrefix() + " : " : "";
+        // log.debug( "Name Utils returning: " + prefix + localName );
         return prefix + localName;
     }
 

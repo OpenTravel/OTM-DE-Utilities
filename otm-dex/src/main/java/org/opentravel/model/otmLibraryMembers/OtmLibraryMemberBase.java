@@ -162,6 +162,20 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return owners;
     }
 
+    // @Override
+    // public Collection<OtmObject> getDescendants() {
+    // List<OtmObject> children = new ArrayList<>( getChildren() );
+    // List<OtmObject> descendants = new ArrayList<>( getChildren() );
+    // for (OtmObject child : children) {
+    // if (child instanceof OtmChildrenOwner) {
+    // descendants.add( child );
+    // // Recurse
+    // descendants.addAll( ((OtmChildrenOwner) child).getDescendantsChildrenOwners() );
+    // }
+    // }
+    // return descendants;
+    // }
+
     @Override
     public Collection<OtmTypeUser> getDescendantsTypeUsers() {
         memberTypeUsers.clear();
@@ -192,6 +206,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     public boolean contains(OtmObject o) {
         return children.contains( o );
     }
+
 
     /**
      * Return true if the list contains the child or the list member.getTL() contains the child.getTL()
@@ -308,6 +323,12 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return getWhereUsed( false );
     }
 
+    /**
+     * Get the where used list after the action manager recomputes it.
+     * 
+     * @param force
+     * @return
+     */
     public List<OtmLibraryMember> getWhereUsed(boolean force) {
         if (force)
             whereUsed = null;

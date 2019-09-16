@@ -59,10 +59,11 @@ public class OtmSimpleObject extends OtmSimpleObjects<TLSimple> implements OtmTy
     public StringProperty assignedTypeProperty() {
         if (assignedTypeProperty == null) {
             if (isEditable())
-                assignedTypeProperty = new SimpleStringProperty( OtmTypeUserUtils.formatAssignedType( this ) );
+                assignedTypeProperty = new SimpleStringProperty();
             else
-                assignedTypeProperty = new ReadOnlyStringWrapper( OtmTypeUserUtils.formatAssignedType( this ) );
+                assignedTypeProperty = new ReadOnlyStringWrapper();
         }
+        assignedTypeProperty.set( OtmTypeUserUtils.formatAssignedType( this ) );
         return assignedTypeProperty;
     }
 

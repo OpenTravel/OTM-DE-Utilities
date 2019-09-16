@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLCoreObject;
 import org.opentravel.schemacompiler.model.TLProperty;
@@ -77,5 +76,16 @@ public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
         TLCoreObject tlCore = new TLCoreObject();
         tlCore.setName( CORE_NAME );
         return tlCore;
+    }
+
+    /**
+     * @param mgr
+     * @param name
+     * @return
+     */
+    public static OtmCore buildOtm(OtmModelManager mgr, String name) {
+        OtmCore core = buildOtm( mgr );
+        core.setName( name );
+        return core;
     }
 }

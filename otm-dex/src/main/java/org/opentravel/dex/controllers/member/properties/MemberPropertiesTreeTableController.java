@@ -161,7 +161,10 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
      */
     @Override
     public void clear() {
-        propertiesTable.getRoot().getChildren().clear();
+        if (propertiesTable.getRoot().getChildren() != null)
+            propertiesTable.getRoot().getChildren().clear();
+        if (propertiesTable.getSelectionModel() != null)
+            propertiesTable.getSelectionModel().clearSelection();
     }
 
     @Override
@@ -178,7 +181,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
     @Override
     public void handleEvent(AbstractOtmEvent e) {
-        // log.debug("event handler.");
+        log.debug( "event handler: " + e.getClass().getSimpleName() );
         if (e instanceof DexMemberSelectionEvent)
             handleMemberSelection( (DexMemberSelectionEvent) e );
         if (e instanceof DexModelChangeEvent)
@@ -252,6 +255,8 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     private void propertySelectionListener(TreeItem<PropertiesDAO> item) {
         if (item == null || item.getValue() == null)
             return;
+        // Other controllers do this via RowFactory not listener
+        // Which is better? Make consistent.
         nameCol.setEditable( item.getValue().isEditable() );
         roleCol.setEditable( item.getValue().isEditable() );
         typeCol.setEditable( item.getValue().isEditable() );

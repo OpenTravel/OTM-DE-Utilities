@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.common.OtmTypeUserUtils;
-import org.opentravel.dex.controllers.member.properties.MemberPropertiesTreeTableController;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
@@ -41,7 +40,7 @@ import javafx.beans.property.StringProperty;
  * 
  */
 public class OtmElement<T extends TLProperty> extends OtmProperty<TLProperty> implements OtmTypeUser {
-    private static Log log = LogFactory.getLog( MemberPropertiesTreeTableController.class );
+    private static Log log = LogFactory.getLog( OtmElement.class );
 
     private StringProperty assignedTypeProperty;
 
@@ -49,21 +48,17 @@ public class OtmElement<T extends TLProperty> extends OtmProperty<TLProperty> im
      */
     public OtmElement(T tl, OtmPropertyOwner parent) {
         super( tl, parent );
-
-        // if (!(tl instanceof TLProperty))
-        // throw new IllegalArgumentException("OtmElement constructor not passed a tl property.");
-        // if (tl.isReference())
-        // throw new IllegalArgumentException("OtmElement constructor passed a property reference.");
     }
 
     @Override
     public StringProperty assignedTypeProperty() {
-        if (assignedTypeProperty == null) {
+        if (assignedTypeProperty == null)
             if (isEditable())
-                assignedTypeProperty = new SimpleStringProperty( OtmTypeUserUtils.formatAssignedType( this ) );
+                assignedTypeProperty = new SimpleStringProperty();
             else
-                assignedTypeProperty = new ReadOnlyStringWrapper( OtmTypeUserUtils.formatAssignedType( this ) );
-        }
+                assignedTypeProperty = new ReadOnlyStringWrapper();
+        assignedTypeProperty.set( OtmTypeUserUtils.formatAssignedType( this ) );
+        // log.debug( "returning assigned type property: " + assignedTypeProperty.toString() );
         return assignedTypeProperty;
     }
 
@@ -123,9 +118,12 @@ public class OtmElement<T extends TLProperty> extends OtmProperty<TLProperty> im
 
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
-        OtmLibraryMember oldUser = getAssignedType().getOwningMember();
         if (type == null)
             return null; // May not be a modeled type on undo
+
+        OtmLibraryMember oldUser = null;
+        if (getAssignedType() != null)
+            oldUser = getAssignedType().getOwningMember();
         if (type.getTL() instanceof TLPropertyType)
             setAssignedTLType( (TLPropertyType) type.getTL() );
         if (type.isNameControlled())
