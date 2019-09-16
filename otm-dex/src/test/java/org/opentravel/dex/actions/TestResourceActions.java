@@ -78,61 +78,21 @@ public class TestResourceActions {
         log.debug( "Done." );
     }
 
-
-
     @Test
     public void testAssignSubjectAction()
         throws ExceptionInInitializerError, InstantiationException, IllegalAccessException, NoSuchMethodException,
         SecurityException, IllegalArgumentException, InvocationTargetException {
 
-        AssignResourceSubjectAction action = (AssignResourceSubjectAction) DexActions
-            .getAction( DexActions.ASSIGNSUBJECT, resource, resource.getActionManager() );
         OtmBusinessObject otherBO = TestBusiness.buildOtm( staticModelManager, "OtherBO" );
         OtmBusinessObject originalSubject = resource.getSubject();
 
         // When - action is done with subject
-        action.doIt( otherBO );
+        actionMgr.run( DexActions.ASSIGNSUBJECT, resource, otherBO );
         assertTrue( resource.getSubject() == otherBO );
 
         actionMgr.undo();
         assertTrue( resource.getSubject() == originalSubject );
 
-        // DexActionManagerCore am = new DexFullActionManager( null );
-        // OtmModelManager mgr = new OtmModelManager( am, null );
-        // assertTrue( am.getQueueSize() == 0 );
-        // lib = mgr.add( new TLLibrary() );
-        //
-        // // Given a OtmObjects
-        // OtmEnumeration<?> closedEnum = TestEnumerationClosed.buildOtm( mgr );
-        // lib.add( closedEnum );
-        // OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtm( mgr );
-        // lib.add( vwa );
-        // assertFalse( "Must not have type.", vwa.getAssignedType() == closedEnum );
-        // OtmTypeProvider originalType = vwa.getAssignedType();
-        // assertTrue( vwa.getActionManager() instanceof DexFullActionManager );
-
-        // // As run from the GUI, the run will launch a dialog
-        // // user.getActionManager().run( DexActions.TYPECHANGE, user );
-        // // The action uses doIt(otmTypeProvider);
-        // // Action manager uses actionHandler = DexActions.getAction( action, subject );
-        //
-        // // Given - an action for type change on VWA
-        // DexRunAction action = (DexRunAction) DexActions.getAction( DexActions.TYPECHANGE, vwa );
-        // assertNotNull( action );
-        //
-        // // When - executed using action's method
-        // action.doIt( closedEnum );
-        //
-        // // Then
-        // assertTrue( "Must have type.", vwa.getAssignedType() == closedEnum );
-        // assertTrue( !am.getLastActionName().isEmpty() );
-        // assertTrue( am.getQueueSize() > 0 );
-        //
-        // // When - undo the change
-        // am.undo();
-        // // Then
-        // assertTrue( "Undo must restore type.", vwa.getAssignedType() == originalType );
-        //
         log.debug( "Set Subject Test complete." );
     }
 }

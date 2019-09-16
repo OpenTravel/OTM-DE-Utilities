@@ -29,6 +29,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
@@ -132,7 +133,7 @@ public class TestAssignTypeAction {
         DexFullActionManager am = new DexFullActionManager( null );
         OtmModelManager mgr = new OtmModelManager( am, null );
         assertTrue( am.getQueueSize() == 0 );
-        lib = mgr.add( new TLLibrary() );
+        lib = TestLibrary.buildOtm( mgr );
 
         // Given a OtmObjects
         OtmEnumeration<?> closedEnum = TestEnumerationClosed.buildOtm( mgr );
@@ -153,8 +154,8 @@ public class TestAssignTypeAction {
         assertNotNull( action );
 
         // When - executed using action's method
-        action.doIt( closedEnum );
-
+        // action.doIt( closedEnum );
+        am.run( DexActions.TYPECHANGE, vwa, closedEnum );
         // Then
         assertTrue( "Must have type.", vwa.getAssignedType() == closedEnum );
         assertTrue( !am.getLastActionName().isEmpty() );
