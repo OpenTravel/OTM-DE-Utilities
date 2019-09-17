@@ -23,6 +23,7 @@ import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.MemberDetailsPopupController;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.lang.reflect.InvocationTargetException;
@@ -104,10 +105,10 @@ public class NewLibraryMemberAction extends DexRunAction {
     @Override
     public Object doIt(Object data) {
         OtmLibraryMember member = null;
-        if (otm != null && otm.getModelManager() != null && data instanceof LibraryMemberType) {
+        if (otm != null && otm.getModelManager() != null && data instanceof OtmLibraryMemberType) {
             try {
                 // Build and hold onto for undo
-                member = LibraryMemberType.buildMember( (LibraryMemberType) data, "New", otm.getModelManager() );
+                member = OtmLibraryMemberType.buildMember( (OtmLibraryMemberType) data, "New", otm.getModelManager() );
 
                 // Provide a temporary wizardActionManager
                 member.setNoLibraryActionManager( new DexWizardActionManager( null ) );

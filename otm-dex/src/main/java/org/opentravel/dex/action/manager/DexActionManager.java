@@ -156,4 +156,11 @@ public interface DexActionManager {
      */
     public void undo();
 
+    /**
+     * @return the main controller for GUI controls
+     */
+    public DexMainController getMainController();
+
+    public void setMainController(DexMainController mainController);
+
 }

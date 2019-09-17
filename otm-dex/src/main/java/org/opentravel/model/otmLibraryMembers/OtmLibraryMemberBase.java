@@ -77,11 +77,11 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     private DexActionManager noLibraryActionManager;
 
     /**
+     * Construct library member. Set its model manager, TL object and add a listener.
      */
     public OtmLibraryMemberBase(T tl, OtmModelManager mgr) {
         super( tl );
         this.mgr = mgr;
-        // this.actionMgr = mgr.getActionManager();
     }
 
     @Override
@@ -236,11 +236,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     /**
-     * @deprecated - use action manager to determine if editable.
-     * 
      * @see org.opentravel.model.OtmModelElement#isEditable()
      */
-    @Deprecated
     @Override
     public boolean isEditable() {
         return getLibrary() != null && getLibrary().isEditable();

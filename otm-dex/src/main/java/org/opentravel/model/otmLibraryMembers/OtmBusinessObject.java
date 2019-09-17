@@ -43,6 +43,12 @@ import java.util.Collection;
 public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
     private static Log log = LogFactory.getLog( OtmBusinessObject.class );
 
+    /**
+     * Construct business object library member. Set its model manager, TL object and add a listener.
+     * 
+     * @param tlo
+     * @param mgr
+     */
     public OtmBusinessObject(TLBusinessObject tlo, OtmModelManager mgr) {
         super( tlo, mgr );
     }

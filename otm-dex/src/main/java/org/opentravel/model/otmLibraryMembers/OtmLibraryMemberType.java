@@ -14,33 +14,23 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.actions;
+package org.opentravel.model.otmLibraryMembers;
 
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
-import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
-import org.opentravel.model.otmLibraryMembers.OtmCore;
-import org.opentravel.model.otmLibraryMembers.OtmEnumerationClosed;
-import org.opentravel.model.otmLibraryMembers.OtmEnumerationOpen;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.otmLibraryMembers.OtmResource;
-import org.opentravel.model.otmLibraryMembers.OtmServiceObject;
-import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
-import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public enum LibraryMemberType {
+public enum OtmLibraryMemberType {
     BUSINESS("Business", OtmBusinessObject.class),
     CHOICE("Choice", OtmChoiceObject.class),
     CORE("Core", OtmCore.class),
-    RESOURCE("Resource", OtmResource.class),
-    SERVICE("Service", OtmServiceObject.class),
+    VWA("Value With Attributes", OtmValueWithAttributes.class),
     SIMPLE("Simple", OtmSimpleObject.class),
     ENUMERATIONOPEN("Open Enumeration", OtmEnumerationOpen.class),
     ENUMERATIONCLOSED("Closed Enumeration", OtmEnumerationClosed.class),
-    VWA("Value With Attributes", OtmValueWithAttributes.class);
+    RESOURCE("Resource", OtmResource.class),
+    SERVICE("Service", OtmServiceObject.class);
 
     private final String label;
     private Class<? extends OtmLibraryMember> memberClass;
@@ -53,25 +43,39 @@ public enum LibraryMemberType {
         return label;
     }
 
-    private LibraryMemberType(String label, Class<? extends OtmLibraryMember> objectClass) {
+    private OtmLibraryMemberType(String label, Class<? extends OtmLibraryMember> objectClass) {
         this.label = label;
         this.memberClass = objectClass;
     }
 
 
-    public static OtmLibraryMember buildMember(LibraryMemberType memberType, String name, OtmModelManager mgr)
+    /**
+     * Build a library member. Set its model manager, TL object and adds a listener.
+     * 
+     * @param memberType
+     * @param name
+     * @param mgr
+     * @return the library member or null
+     * 
+     *         <p>
+     *         Throws reflection related exceptions.
+     * @throws ExceptionInInitializerError
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     */
+    public static OtmLibraryMember buildMember(OtmLibraryMemberType memberType, String name, OtmModelManager mgr)
         throws ExceptionInInitializerError, InstantiationException, IllegalAccessException, NoSuchMethodException,
-        SecurityException, IllegalArgumentException, InvocationTargetException {
+        InvocationTargetException {
 
         OtmLibraryMember member = null;
         if (memberType != null && name != null && mgr != null) {
-            Constructor<? extends OtmLibraryMember> constructor;
-            constructor = memberType.memberClass.getDeclaredConstructor( String.class, OtmModelManager.class );
+            Constructor<? extends OtmLibraryMember> constructor =
+                memberType.memberClass.getDeclaredConstructor( String.class, OtmModelManager.class );
             if (constructor != null)
                 member = constructor.newInstance( name, mgr );
         }
-        // if (memberType != null && memberType.memberClass != null)
-        // member = memberType.memberClass().newInstance();
         return member;
     }
 }

@@ -24,7 +24,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentravel.dex.actions.LibraryMemberType;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
@@ -98,8 +97,8 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
         OtmModelManager mgr = new OtmModelManager( null, null );
         OtmLibrary lib = mgr.add( new TLLibrary() );
 
-        for (LibraryMemberType type : LibraryMemberType.values()) {
-            OtmLibraryMember member = LibraryMemberType.buildMember( type, "Test", mgr );
+        for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
+            OtmLibraryMember member = OtmLibraryMemberType.buildMember( type, "Test", mgr );
 
             // When added
             lib.add( member );
@@ -121,8 +120,8 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
     @Test
     public void testEnumFactory() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
         NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
-        for (LibraryMemberType lmType : LibraryMemberType.values()) {
-            OtmLibraryMember member = LibraryMemberType.buildMember( lmType, "Hi", staticModelManager );
+        for (OtmLibraryMemberType lmType : OtmLibraryMemberType.values()) {
+            OtmLibraryMember member = OtmLibraryMemberType.buildMember( lmType, "Hi", staticModelManager );
             assertNotNull( member );
         }
     }

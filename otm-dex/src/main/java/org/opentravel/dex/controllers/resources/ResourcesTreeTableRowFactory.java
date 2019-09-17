@@ -19,10 +19,10 @@ package org.opentravel.dex.controllers.resources;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexActions;
-import org.opentravel.dex.actions.LibraryMemberType;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmParameterGroup;
@@ -110,7 +110,7 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         Object result = null;
         // Run action
         if (obj != null)
-            result = obj.getActionManager().run( DexActions.NEWLIBRARYMEMBER, obj, LibraryMemberType.RESOURCE );
+            result = obj.getActionManager().run( DexActions.NEWLIBRARYMEMBER, obj, OtmLibraryMemberType.RESOURCE );
         // Update display
         if (result instanceof OtmObject) {
             TreeItem<ResourcesDAO> item =

@@ -96,6 +96,11 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     private boolean expanded = false;
 
+    /**
+     * Construct model element. Set its TL object and add a listener.
+     * 
+     * @param tl
+     */
     public OtmModelElement(T tl) {
         if (tl == null)
             throw new IllegalArgumentException( "Must have a tl element to create facade." );

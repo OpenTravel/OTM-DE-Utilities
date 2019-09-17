@@ -275,9 +275,9 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
-            if (event instanceof DexFilterChangeEvent)
+            else if (event instanceof DexFilterChangeEvent)
                 handleEvent( (DexFilterChangeEvent) event );
-            if (event instanceof DexModelChangeEvent)
+            else if (event instanceof DexModelChangeEvent)
                 refresh();
             // post( ((DexModelChangeEvent) event).getModelManager() );
             else

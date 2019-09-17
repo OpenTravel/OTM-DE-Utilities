@@ -94,10 +94,8 @@ public interface OtmObject {
     public String getValidationFindingsAsString();
 
     /**
-     * @deprecated - use the action manager or owning library
      * @return
      */
-    @Deprecated
     public boolean isEditable();
 
     /**

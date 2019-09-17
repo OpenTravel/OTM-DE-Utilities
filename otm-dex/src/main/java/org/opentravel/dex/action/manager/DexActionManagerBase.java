@@ -61,7 +61,20 @@ public abstract class DexActionManagerBase implements DexActionManager {
     // duplicates.
 
     // Controller for accessing GUI controls
-    private DexMainController mainController = null;
+    protected DexMainController mainController = null;
+
+    public DexMainController getMainController() {
+        return mainController;
+    }
+
+    /**
+     * Set the main controller used for pop-up warning dialogs and status
+     * 
+     * @param controller
+     */
+    public void setMainController(DexMainController mainController) {
+        this.mainController = mainController;
+    }
 
     // Queue for holding actions that were successful
     private final Deque<DexAction<?>> queue = new ArrayDeque<>();

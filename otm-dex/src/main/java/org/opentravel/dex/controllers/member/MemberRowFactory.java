@@ -19,9 +19,10 @@ package org.opentravel.dex.controllers.member;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexActions;
-import org.opentravel.dex.actions.LibraryMemberType;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
@@ -45,29 +46,27 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
     private DexIncludedController<?> controller;
 
     Menu newMenu = null;
+    MenuItem deleteItem = null;
 
     public MemberRowFactory(DexIncludedController<?> controller) {
         this.controller = controller;
 
         // Create Context menu
-        // MenuItem addObject = new MenuItem( "Add Object " );
-
-        // Create action for addObject event
-        // addObject.setOnAction( this::addMemberEvent );
+        deleteItem = addItem( memberMenu, "Delete", e -> deleteMember() );
         newMenu = new Menu( "New" );
-        for (LibraryMemberType type : LibraryMemberType.values())
+        // Create sub-menu for new objects
+        for (OtmLibraryMemberType type : OtmLibraryMemberType.values())
             addItem( newMenu, type.label(), e -> newMember( type ) );
-
         memberMenu.getItems().add( newMenu );
         setContextMenu( memberMenu );
 
         // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
 
-        // Not sure this helps!
-        if (getTreeItem() != null && getTreeItem().getValue() != null) {
-            setEditable( getTreeItem().getValue().isEditable() );
-        }
+        // // Not sure this helps!
+        // if (getTreeItem() != null && getTreeItem().getValue() != null) {
+        // setEditable( getTreeItem().getValue().isEditable() );
+        // }
     }
 
     // TODO - create utils class with statics for row factories
@@ -78,24 +77,27 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         return item;
     }
 
-    // /**
-    // * Add a new member to the tree
-    // *
-    // * @param t
-    // */
-    // private void addMemberEvent(ActionEvent t) {
-    // // Works - but business logic is wrong.
-    // // TreeItem<LibraryMemberTreeDAO> item = controller
-    // // .createTreeItem(new OtmCoreObject("new", controller.getModelManager()), getTreeItem().getParent());
-    // // super.updateTreeItem(item); // needed to apply stylesheet to new item
-    // }
-    private void newMember(LibraryMemberType type) {
+    private MenuItem addItem(ContextMenu menu, String label, EventHandler<ActionEvent> handler) {
+        MenuItem item = new MenuItem( label );
+        menu.getItems().add( item );
+        item.setOnAction( handler );
+        return item;
+    }
+
+    private void deleteMember() {
+        OtmObject obj = getValue();
+        if (obj instanceof OtmLibraryMember)
+            obj.getActionManager().run( DexActions.DELETELIBRARYMEMBER, (OtmLibraryMember) obj );
+        super.updateTreeItem( getTreeItem().getParent() );
+    }
+
+    private void newMember(OtmLibraryMemberType type) {
         OtmObject obj = getValue();
         Object result = null;
         // Run action
         if (obj != null)
             result = obj.getModelManager().getActionManager( true ).run( DexActions.NEWLIBRARYMEMBER, obj, type );
-        // result = obj.getActionManager().run( DexActions.NEWLIBRARYMEMBER, obj, type );
+
         // Update display
         if (result instanceof OtmObject) {
             TreeItem<MemberAndProvidersDAO> item =
@@ -123,9 +125,10 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
      */
     // TODO - use style class for warning and error
     private void setCSSClass(TreeTableRow<MemberAndProvidersDAO> tc, TreeItem<MemberAndProvidersDAO> newTreeItem) {
-        if (newTreeItem != null) {
+        if (newTreeItem != null && newTreeItem.getValue() instanceof MemberAndProvidersDAO) {
             tc.pseudoClassStateChanged( EDITABLE, newTreeItem.getValue().isEditable() );
 
+            deleteItem.setDisable( !newTreeItem.getValue().isEditable() );
             // newMenu.setDisable( !newTreeItem.getValue().isEditable() );
         }
     }

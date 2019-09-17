@@ -30,6 +30,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.schemacompiler.model.TLLibrary;
 
@@ -79,7 +80,7 @@ public class TestNewLibraryMemberAction {
 
         Object result = null;
         OtmLibraryMember member = null;
-        for (LibraryMemberType type : LibraryMemberType.values()) {
+        for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
             // FIXED - DexActions no longer only uses subject's AM, not the caller
             result = actionManager.run( DexActions.NEWLIBRARYMEMBER, testBO, type );
             assertTrue( "Must create library member.", result instanceof OtmLibraryMember );
@@ -110,7 +111,7 @@ public class TestNewLibraryMemberAction {
 
         Object result = null;
         OtmLibraryMember member = null;
-        for (LibraryMemberType type : LibraryMemberType.values()) {
+        for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
             // FIXED - DexActions no longer only uses subject's AM, not the caller
             result = wizardAM.run( DexActions.NEWLIBRARYMEMBER, testBO, type );
             assertTrue( "Must create library member.", result instanceof OtmLibraryMember );

@@ -89,7 +89,9 @@ public class OtmLibrary {
     }
 
     /**
-     * Simply add the TL member to the Tl library
+     * Simply add the TL member to the Tl library.
+     * <p>
+     * <b>Note:</b> does not add member to the model manager!
      * 
      * @param a library member
      * @return the member if added OK

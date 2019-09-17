@@ -42,6 +42,7 @@ public abstract class OtmComplexObjects<T extends TLComplexTypeBase> extends Otm
     private static Log log = LogFactory.getLog( OtmComplexObjects.class );
 
     /**
+     * Construct complex library member. Set its model manager, TL object and add a listener.
      */
     public OtmComplexObjects(T tl, OtmModelManager mgr) {
         super( tl, mgr );

@@ -89,6 +89,7 @@ public class OtmModelManager implements TaskResultHandlerI {
 
     private TLModel tlModel = null;
 
+
     /**
      * Create a model manager.
      * 
@@ -118,6 +119,9 @@ public class OtmModelManager implements TaskResultHandlerI {
             this.fullActionManager = new DexReadOnlyActionManager();
         else
             this.fullActionManager = fullActionManager;
+        // Set main controller for warnings if one is provided.
+        readOnlyActionManager.setMainController( this.fullActionManager.getMainController() );
+
         log.debug( "TL Model created and integrity checker added." );
     }
 
@@ -393,9 +397,9 @@ public class OtmModelManager implements TaskResultHandlerI {
         if (!libraries.containsKey( absLibrary )) {
             // abstract library may be in the library pi list
             if (absLibrary != null)
-                log.warn( "Missing library associated with: " + absLibrary.getName() );
+                log.debug( "Missing library associated with: " + absLibrary.getName() );
             else
-                log.warn( "Can not get library because TL library is null." );
+                log.debug( "Can not get library because TL library is null." );
             // printLibraries();
         }
         return libraries.get( absLibrary );
@@ -503,7 +507,7 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
     /**
-     * @return all the library members being managed
+     * @return all the library members being managed in a unmodifiableCollection
      */
     public Collection<OtmLibraryMember> getMembers() {
         return Collections.unmodifiableCollection( members.values() );

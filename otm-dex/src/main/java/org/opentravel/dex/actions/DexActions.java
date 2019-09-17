@@ -38,6 +38,7 @@ public enum DexActions {
     TYPECHANGE(AssignedTypeChangeAction.class, OtmObjectModifiedEvent.class),
     NEWLIBRARYMEMBER(NewLibraryMemberAction.class, DexModelChangeEvent.class),
     SETMEMBERLIBRARY(SetLibraryAction.class, DexModelChangeEvent.class),
+    DELETELIBRARYMEMBER(DeleteLibraryMemberAction.class, DexModelChangeEvent.class),
     //
     ADDRESOURCECHILD(AddResourceChildAction.class, DexResourceChangeEvent.class),
     ADDRESOURCEPARAMETER(AddResourceParameterAction.class, DexResourceChangeEvent.class),

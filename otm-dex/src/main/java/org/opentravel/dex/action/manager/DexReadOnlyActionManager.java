@@ -32,11 +32,6 @@ public class DexReadOnlyActionManager extends DexActionManagerBase {
         super();
     }
 
-    // @Override
-    // public void run(DexActions action, OtmObject subject) {
-    // // READ ONLY! Do Nothing
-    // }
-
     @Override
     public boolean isEnabled(DexActions action, OtmObject subject) {
         return false;
