@@ -61,9 +61,11 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
     private MenuItem deleteItem = null;
     private MenuItem addResource = null;
 
+    private DexIncludedController<?> controller;
+
 
     public ResourcesTreeTableRowFactory(DexIncludedController<?> controller) {
-        // this.controller = controller;
+        this.controller = controller;
 
         // Create Context menu
 
@@ -106,28 +108,38 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
     }
 
     private void newResource() {
+        // Get something to use as the subject. Where the menu item was, what was selected or just any resource.
         OtmObject obj = getValue();
+        if (obj == null && controller.getSelection() != null
+            && controller.getSelection().getValue() instanceof OtmObject)
+            obj = (OtmObject) controller.getSelection().getValue();
+        // If there is nothing selected, use any object
+        if (obj == null)
+            obj = controller.getMainController().getModelManager().getResources( false ).get( 0 );
+
         Object result = null;
         // Run action
         if (obj != null)
             result = obj.getActionManager().run( DexActions.NEWLIBRARYMEMBER, obj, OtmLibraryMemberType.RESOURCE );
-        // Update display
-        if (result instanceof OtmObject) {
-            TreeItem<ResourcesDAO> item =
-                new ResourcesDAO( (OtmObject) result ).createTreeItem( getTreeItem().getParent() );
-            super.updateTreeItem( item );
-        }
+        // // Update display
+        // if (result instanceof OtmObject) {
+        // TreeItem<ResourcesDAO> item =
+        // new ResourcesDAO( (OtmObject) result ).createTreeItem( getTreeItem().getParent() );
+        // super.updateTreeItem( item );
+        // }
     }
 
     private void deleteChild(ActionEvent e) {
         OtmObject obj = getValue();
         Object parent = null;
         // Run delete action
-        if (obj instanceof OtmResourceChild)
+        if (obj instanceof OtmResource)
+            obj.getActionManager().run( DexActions.DELETELIBRARYMEMBER, (OtmResource) obj );
+        else if (obj instanceof OtmResourceChild)
             parent = obj.getActionManager().run( DexActions.DELETERESOURCECHILD, obj );
-        // Update display
-        if (parent instanceof OtmObject)
-            super.updateTreeItem( getTreeItem().getParent() ); // needed to apply stylesheet to new item
+        // // Update display
+        // if (parent instanceof OtmObject)
+        // super.updateTreeItem( getTreeItem().getParent() ); // needed to apply stylesheet to new item
     }
 
     private void addChild(TLModelElement tlChild) {
@@ -188,7 +200,8 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
             deleteItem.setDisable( !item.getValue().isEditable() );
             arItem.setDisable( !(getValue() instanceof OtmAction) );
             paramItem.setDisable( !(getValue() instanceof OtmParameterGroup) );
-        }
+        } else
+            addMenu.setDisable( true );
     }
 }
 

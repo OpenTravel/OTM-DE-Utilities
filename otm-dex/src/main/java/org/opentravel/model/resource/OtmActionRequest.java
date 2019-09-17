@@ -264,7 +264,10 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      * 
      */
     public StringProperty methodProperty() {
-        return new ReadOnlyStringWrapper( getTL().getHttpMethod().toString() );
+        String method = "";
+        if (getTL().getHttpMethod() != null)
+            method = getTL().getHttpMethod().toString();
+        return new ReadOnlyStringWrapper( method );
     }
 
     public TLHttpMethod setMethodString(String value) {

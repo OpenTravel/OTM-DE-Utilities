@@ -218,7 +218,8 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
         return root;
     }
 
-    public ResourcesDAO getSelected() {
+    @Override
+    public ResourcesDAO getSelection() {
         return resourcesTreeTable.getSelectionModel().getSelectedItem() != null
             ? resourcesTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
     }
@@ -235,7 +236,7 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        // log.debug(event.getEventType() + " event received. Ignore? " + ignoreEvents);
+        log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
@@ -290,8 +291,9 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
     @Override
     public void post(OtmModelManager modelMgr) {
         ignoreEvents = true;
-        if (modelMgr != null && resourcesTreeTable != null) {
+        if (modelMgr != null)
             currentModelMgr = modelMgr;
+        if (resourcesTreeTable != null) {
             resourcesTreeTable.getSelectionModel().clearSelection();
             resourcesTreeTable.getRoot().getChildren().clear();
 

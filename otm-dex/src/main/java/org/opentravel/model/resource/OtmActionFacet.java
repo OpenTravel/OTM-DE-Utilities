@@ -25,6 +25,8 @@ import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
+import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
@@ -57,7 +59,7 @@ import javafx.scene.control.Tooltip;
  * @author Dave Hollander
  * 
  */
-public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implements OtmResourceChild {
+public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implements OtmResourceChild, OtmTypeUser {
     private static Log log = LogFactory.getLog( OtmActionFacet.class );
 
     private static final String TOOLTIP =
@@ -117,11 +119,18 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     /**
      * Could be Choice or Core
      * 
-     * @return
+     * @return core, choice or null
      */
     public OtmLibraryMember getBasePayload() {
         OtmObject obj = OtmModelElement.get( (TLModelElement) getTL().getBasePayload() );
         return obj instanceof OtmLibraryMember ? (OtmLibraryMember) obj : null;
+    }
+
+    private Node getRemoveBasePayloadNode() {
+        Button button = new Button( "-Remove-" );
+        button.setDisable( !isEditable() );
+        button.setOnAction( a -> getActionManager().run( DexActions.REMOVEAFBASEPAYLOAD, this ) );
+        return button;
     }
 
     private Node getBasePayloadNode() {
@@ -130,7 +139,8 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
             name = getBasePayload().getNameWithPrefix();
         Button button = new Button( name );
         button.setDisable( !isEditable() );
-        button.setOnAction( a -> log.debug( "Base Payload Button selected" ) );
+        button.setOnAction( a -> getActionManager().run( DexActions.TYPECHANGE, this ) );
+        // button.setOnAction( a -> log.debug( "Base Payload Button selected" ) );
         return button;
     }
 
@@ -145,7 +155,8 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
         fields.add( new DexEditField( 0, 0, BASE_PAYLOAD_LABEL, BASE_PAYLOAD_TOOLTIP, getBasePayloadNode() ) );
-        fields.add( new DexEditField( 0, 2, null, "Remove base payload.", new Button( "-Remove-" ) ) );
+        // fields.add( new DexEditField( 0, 2, null, "Remove base payload.", new Button( "-Remove-" ) ) );
+        fields.add( new DexEditField( 0, 2, null, "Remove base payload.", getRemoveBasePayloadNode() ) );
         fields.add( new DexEditField( 1, 0, REFERENCE_TYPE_LABEL, REFERENCE_TYPE_TOOLTIP, getReferenceTypeNode() ) );
         fields.add( new DexEditField( 2, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, getReferenceFacetNode() ) );
         fields.add( new DexEditField( 3, 0, REPEAT_COUNT_LABEL, REPEAT_COUNT_TOOLTIP, getRepeatCountNode() ) );
@@ -356,5 +367,78 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
                 type = t;
         return setReferenceType( type );
     }
+
+
+
+    /**
+     * Not-implemented
+     * 
+     * @see org.opentravel.model.OtmTypeUser#assignedTypeProperty()
+     */
+    @Override
+    public StringProperty assignedTypeProperty() {
+        return null;
+    }
+
+
+    /**
+     * Not-implemented
+     * 
+     * @see org.opentravel.model.OtmTypeUser#getAssignedTLType()
+     */
+    @Override
+    public NamedEntity getAssignedTLType() {
+        return null;
+    }
+
+
+    /**
+     * @see org.opentravel.model.OtmTypeUser#getAssignedType()
+     */
+    @Override
+    public OtmTypeProvider getAssignedType() {
+        return (OtmTypeProvider) getBasePayload();
+    }
+
+
+    /**
+     * Not-implemented
+     * 
+     * @see org.opentravel.model.OtmTypeUser#getTlAssignedTypeName()
+     */
+    @Override
+    public String getTlAssignedTypeName() {
+        return null;
+    }
+
+
+    /**
+     * Not-implemented
+     * 
+     * @see org.opentravel.model.OtmTypeUser#setAssignedTLType(org.opentravel.schemacompiler.model.NamedEntity)
+     */
+    @Override
+    public NamedEntity setAssignedTLType(NamedEntity type) {
+        return null;
+    }
+
+
+    /**
+     * @see org.opentravel.model.OtmTypeUser#setAssignedType(org.opentravel.model.OtmTypeProvider)
+     */
+    @Override
+    public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
+        setBasePayload( type );
+        return getAssignedType();
+    }
+
+
+    /**
+     * Not-implemented
+     * 
+     * @see org.opentravel.model.OtmTypeUser#setTLTypeName(java.lang.String)
+     */
+    @Override
+    public void setTLTypeName(String name) {}
 
 }

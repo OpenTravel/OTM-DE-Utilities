@@ -29,6 +29,7 @@ import org.opentravel.dex.events.DexResourceChangeEvent;
 import org.opentravel.dex.events.DexResourceChildModifiedEvent;
 import org.opentravel.dex.events.DexResourceChildSelectionEvent;
 import org.opentravel.dex.events.DexResourceModifiedEvent;
+import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -80,10 +81,10 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     private static final EventType[] publishedEvents = {DexResourceChangeEvent.RESOURCE_CHANGED};
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents =
-        {DexResourceModifiedEvent.RESOURCE_MODIFIED, DexResourceChildModifiedEvent.RESOURCE_CHILD_MODIFIED,
-            DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED, DexMemberSelectionEvent.MEMBER_SELECTED,
-            DexMemberSelectionEvent.RESOURCE_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] subscribedEvents = {DexResourceModifiedEvent.RESOURCE_MODIFIED,
+        DexResourceChildModifiedEvent.RESOURCE_CHILD_MODIFIED, DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED,
+        DexMemberSelectionEvent.MEMBER_SELECTED, DexMemberSelectionEvent.RESOURCE_SELECTED,
+        OtmObjectModifiedEvent.OBJECT_MODIFIED, DexModelChangeEvent.MODEL_CHANGED};
 
     public ResourceDetailsController() {
         super( subscribedEvents, publishedEvents );
@@ -127,9 +128,16 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
             handleEvent( (DexResourceModifiedEvent) event );
         else if (event instanceof DexModelChangeEvent)
             handleEvent( (DexModelChangeEvent) event );
+        else if (event instanceof OtmObjectModifiedEvent)
+            handleEvent( (OtmObjectModifiedEvent) event );
     }
 
     public void handleEvent(DexResourceChildModifiedEvent event) {
+        if (event.get() == postedObject)
+            refresh();
+    }
+
+    public void handleEvent(OtmObjectModifiedEvent event) {
         if (event.get() == postedObject)
             refresh();
     }

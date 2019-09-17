@@ -37,12 +37,6 @@ import javafx.application.Platform;
 public class NewLibraryMemberAction extends DexRunAction {
     private static Log log = LogFactory.getLog( NewLibraryMemberAction.class );
 
-    // private static final String VETO1 = "org.opentravel.schemacompiler.TLProperty.name.ELEMENT_REF_NAME_MISMATCH";
-    // private static final String VETO2 = ".OBSOLETE_TYPE_REFERENCE";
-    // private static final String VETO3 = ".ILLEGAL_REFERENCE";
-    // private static final String[] VETOKEYS = {VETO1, VETO2, VETO3};
-
-
     /**
      * Any OTM object that uses the intended model manager.
      * 
@@ -51,24 +45,9 @@ public class NewLibraryMemberAction extends DexRunAction {
      */
     public static boolean isEnabled(OtmObject subject) {
         return true;
-        // return (subject.getLibrary().isEditable());
-        // if (subject.getModelManager() != null)
-        // return subject.getModelManager().hasSaveableLibraries();
-        // return false;
     }
 
     private OtmLibraryMember newMember = null;
-
-    // private OtmTypeUser user = null;
-    //
-    // private OtmTypeProvider oldProvider;
-    // private NamedEntity oldTLType;
-    // private String oldName;
-    // private String oldTLTypeName;
-    // private OtmTypeProvider newProvider;
-    //
-    // private DexActionManagerBase actionManager = null;
-
 
     public NewLibraryMemberAction() {
         // Constructor for reflection
@@ -113,23 +92,17 @@ public class NewLibraryMemberAction extends DexRunAction {
                 // Provide a temporary wizardActionManager
                 member.setNoLibraryActionManager( new DexWizardActionManager( null ) );
 
+                // Set initial library - user may chanage it
+                if (otm.getLibrary().isEditable())
+                    otm.getLibrary().add( member );
+
                 // If in gui thread, Let user set library and other details
                 if (Platform.isFxApplicationThread()) {
                     MemberDetailsPopupController controller = MemberDetailsPopupController.init();
                     controller.setMember( member );
-                    if (controller.showAndWait( "MSG" ) == Results.OK) {
-                        // Add member to model manager model and library
-                        // otm.getModelManager().add( member );
-                        // // FIXME - remove after setLibraryAction is done
-                        // otm.getLibrary().add( member );
-                        // // Remove temporary wizardActionManager
-                        // member.setNoLibraryActionManager( null );
-                        // // Record action to allow undo. Will validate results and warn user.
-                        // otm.getActionManager().push( this );
-                    } else {
+                    if (controller.showAndWait( "MSG" ) != Results.OK)
                         // Cancel
                         member = null;
-                    }
                 }
             } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException
                 | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
@@ -157,14 +130,8 @@ public class NewLibraryMemberAction extends DexRunAction {
             // Add member to model manager model and library
             otm.getModelManager().add( newMember );
 
-            // FIXME - remove after setLibraryAction is done
-            otm.getLibrary().add( newMember );
-
             // Remove temporary wizardActionManager
             newMember.setNoLibraryActionManager( null );
-
-            // // Record action to allow undo. Will validate results and warn user.
-            // otm.getActionManager().push( this );
         }
         return newMember;
     }
@@ -183,15 +150,11 @@ public class NewLibraryMemberAction extends DexRunAction {
 
     @Override
     public ValidationFindings getVetoFindings() {
-        // // TODO create a finding if the outcome is false
-        // return ValidationUtils.getRelevantFindings( VETOKEYS, otm.getFindings() );
         return null;
     }
 
     @Override
     public boolean isValid() {
-        // return otm.isValid( true ) ? true
-        // : ValidationUtils.getRelevantFindings( VETOKEYS, otm.getFindings() ).isEmpty();
         return newMember != null ? newMember.isValid() : false;
     }
 

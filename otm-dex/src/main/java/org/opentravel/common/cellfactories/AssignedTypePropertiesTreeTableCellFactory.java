@@ -56,7 +56,8 @@ public class AssignedTypePropertiesTreeTableCellFactory extends TreeTableCell<Pr
             OtmObject element = getTreeTableRow().getItem().getValue();
             ImageView graphic = null;
 
-            setText( getTreeTableRow().getItem().assignedTypeProperty().get() );
+            if (getTreeTableRow().getItem().assignedTypeProperty() != null)
+                setText( getTreeTableRow().getItem().assignedTypeProperty().get() );
 
             if (element instanceof OtmTypeUser)
                 assignedType = ((OtmTypeUser) element).getAssignedType();

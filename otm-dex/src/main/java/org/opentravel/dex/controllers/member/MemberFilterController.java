@@ -401,6 +401,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         }
     }
 
+    // TODO - use OtmLibraryMemberType enumeration
     public void setTypeFilter(String value) {
         if (value.isEmpty() || value.equals( ALL ))
             classNameFilter = null;

@@ -21,12 +21,15 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.action.manager.DexActionManagerBase;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
+import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
@@ -79,6 +82,13 @@ public class AssignedTypeChangeAction extends DexRunAction {
         // Get the user's selected new provider
         MemberAndProvidersDAO selected = null;
         TypeSelectionContoller controller = TypeSelectionContoller.init();
+
+        // Set applicable filters
+        if (otm instanceof OtmResource)
+            controller.getMemberFilterController().setTypeFilter( MemberFilterController.BUSINESS );
+        if (otm instanceof OtmActionFacet)
+            controller.getMemberFilterController().setTypeFilter( MemberFilterController.CORE );
+
         controller.setManager( modelMgr );
         if (controller.showAndWait( "MSG" ) == Results.OK) {
             selected = controller.getSelected();
@@ -171,11 +181,14 @@ public class AssignedTypeChangeAction extends DexRunAction {
             // If provider was not in model manager
             if (oldTLType != user.setAssignedTLType( oldTLType ))
                 actionManager.postWarning( "Error undoing change." );
-        } else {
+        } else if (oldTLTypeName != null && !oldTLTypeName.isEmpty()) {
             // Sometimes, only the name is known because the tl model does not have the type loaded.
             user.setTLTypeName( oldTLTypeName );
             otm.setName( oldName );
-        }
+        } else
+            // No clues about what to set it to, so clear it.
+            user.setAssignedType( null );
+
         otm.setName( oldName ); // May have been changed by assignment
         log.debug( "Undo type assignment. Set to " + get() );
         return oldProvider;

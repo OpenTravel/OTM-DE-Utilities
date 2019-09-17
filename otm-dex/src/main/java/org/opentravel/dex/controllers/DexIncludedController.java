@@ -135,7 +135,9 @@ public interface DexIncludedController<T> extends DexController {
     void fireEvent(DexEvent event);
 
     /**
-     * 
+     * @return the currently selected DAO
      */
+    public DexDAO<?> getSelection();
+
 
 }

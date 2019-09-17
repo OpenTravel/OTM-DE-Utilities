@@ -64,6 +64,14 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
         return mainController;
     }
 
+    /**
+     * @see org.opentravel.dex.controllers.DexIncludedController#getSelection()
+     */
+    @Override
+    public DexDAO<?> getSelection() {
+        return null; // MUST OVERRIDE!
+    }
+
     public DexIncludedControllerBase(EventType<? extends AbstractOtmEvent>[] subscribed) {
         log.debug( "Constructing included controller with subscribed event types." );
         if (subscribed != null && subscribed.length > 0)
