@@ -36,7 +36,6 @@ public interface DexDAO<T> {
      * @param imageMgr manages access to image views for icons
      * @return JavaFX imageView for the icon representing the data item.
      */
-    @SuppressWarnings("restriction")
     public ImageView getIcon(ImageManager imageMgr);
 
     /**

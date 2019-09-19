@@ -148,13 +148,21 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         log.debug( "Mime Types set: " + getTL().getMimeTypes() );
     }
 
-    //
+    @Override
+    public StringProperty nameProperty() {
+        if (nameProperty == null)
+            nameProperty = new ReadOnlyStringWrapper();
+        nameProperty.set( getName() );
+        return nameProperty;
+    }
+
     /**
+     * Get the name of the parent then add method
+     * 
      * @see org.opentravel.model.OtmModelElement#getName()
      */
     @Override
     public String getName() {
-        // Get the name of the parent then add method
         return getOwner() != null ? getOwner().getName() + " " + getMethodString() : getMethodString();
     }
 
@@ -231,6 +239,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
 
     public ObservableList<String> getPayloadCandidates() {
         ObservableList<String> actionFacets = FXCollections.observableArrayList();
+        actionFacets.add( "NONE" );
         getOwningMember().getActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
         return actionFacets;
     }
@@ -343,7 +352,9 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     /**
-     * Set the payload from owner's action facet with the passed {@link OtmActionFacet#getName()} value.
+     * Set the payload from owner's action facet with the passed {@link OtmActionFacet#getName()} value. *
+     * <p>
+     * Unknown names, included "NONE" will result in setting to null.
      * 
      * @param value
      * @return
@@ -353,8 +364,6 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         for (OtmActionFacet c : getOwningMember().getActionFacets())
             if (c.getName().equals( value ))
                 af = c;
-        // if (af == null)
-        // log.debug( "No action facet found for value " + value );
         return setPayloadType( af );
     }
 

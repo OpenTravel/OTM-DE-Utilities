@@ -43,32 +43,23 @@ public class SetMimeTypesAction extends DexRunAction {
         // Constructor for reflection
     }
 
-    // /**
-    // * {@inheritDoc} Not valid for this action
-    // *
-    // * @return
-    // */
-    // public Object doIt() {
-    // log.debug( "Must provide DexMimeTypeHandler to perform action." );
-    // return null;
-    // }
-
     /**
      * This action will get the data from the user via modal dialog
      */
     @Override
     public Object doIt(Object data) {
         if (data instanceof MimeTypeMap)
-            doIt( (MimeTypeMap) data );
+            return doIt( (MimeTypeMap) data );
         return null;
     }
 
-    public void doIt(MimeTypeMap data) {
+    public Object doIt(MimeTypeMap data) {
         if (isEnabled( object )) {
             oldMap = new MimeTypeMap( object );
             set( data.getTLList() );
-            // object.getActionManager().push( this );
+            return get();
         }
+        return null;
     }
 
     @Override

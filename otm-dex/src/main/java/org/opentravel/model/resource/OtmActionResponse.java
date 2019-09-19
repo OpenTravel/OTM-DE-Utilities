@@ -107,11 +107,21 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
     }
 
     /**
+     * Name is the combination of status code and payload type name
+     * 
      * @see org.opentravel.model.OtmModelElement#getName()
      */
     @Override
     public String getName() {
         return getTL().getStatusCodes().toString() + "  " + getTL().getPayloadTypeName();
+    }
+
+    @Override
+    public StringProperty nameProperty() {
+        if (nameProperty == null)
+            nameProperty = new ReadOnlyStringWrapper();
+        nameProperty.set( getName() );
+        return nameProperty;
     }
 
     @Override
@@ -151,6 +161,7 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
 
     public ObservableList<String> getPayloadCandidates() {
         ObservableList<String> actionFacets = FXCollections.observableArrayList();
+        actionFacets.add( "NONE" );
         getOwningMember().getActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
         return actionFacets;
     }
@@ -202,8 +213,9 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
         return new Tooltip( TOOLTIP );
     }
 
+    // If the response is inherited, its parent will be the base type.
     public boolean isInherited() {
-        return getParent().getResponses().contains( this );
+        return !getParent().getResponses().contains( this );
     }
 
     public void setMimeTypes(List<TLMimeType> list) {
@@ -228,6 +240,8 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
 
     /**
      * Set the payload action facet from owner's {@link OtmActionFacet#getName()} that matches value.
+     * <p>
+     * Unknown names, included "NONE" will result in setting to null.
      * 
      * @param value
      * @return

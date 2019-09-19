@@ -155,7 +155,6 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
         fields.add( new DexEditField( 0, 0, BASE_PAYLOAD_LABEL, BASE_PAYLOAD_TOOLTIP, getBasePayloadNode() ) );
-        // fields.add( new DexEditField( 0, 2, null, "Remove base payload.", new Button( "-Remove-" ) ) );
         fields.add( new DexEditField( 0, 2, null, "Remove base payload.", getRemoveBasePayloadNode() ) );
         fields.add( new DexEditField( 1, 0, REFERENCE_TYPE_LABEL, REFERENCE_TYPE_TOOLTIP, getReferenceTypeNode() ) );
         fields.add( new DexEditField( 2, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, getReferenceFacetNode() ) );
@@ -173,12 +172,17 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
      * 
      * @return OtmFacet or null
      */
-    public OtmFacet<?> getReferenceFacet() {
-        TLBusinessObject referencedBO = getOwningMember().getSubject().getTL();
-        TLFacet tlFacet = ResourceCodegenUtils.getReferencedFacet( referencedBO, getReferenceFacetName() );
+    public OtmFacet<? extends TLFacet> getReferenceFacet() {
+        TLBusinessObject referencedBO = null;
+        TLFacet tlFacet = null;
+        if (getOwningMember() != null && getOwningMember().getSubject() != null)
+            referencedBO = getOwningMember().getSubject().getTL();
+        if (referencedBO != null)
+            tlFacet = ResourceCodegenUtils.getReferencedFacet( referencedBO, getReferenceFacetName() );
         OtmObject obj = OtmModelElement.get( tlFacet );
         if (obj instanceof OtmContextualFacet)
             obj = ((OtmContextualFacet) obj).getWhereContributed();
+
         return obj instanceof OtmFacet ? (OtmFacet<?>) obj : null;
     }
 

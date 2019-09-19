@@ -28,12 +28,12 @@ public class BasePathChangeAction extends DexStringAction {
      */
     public static boolean isEnabled(OtmObject subject) {
         if (subject instanceof OtmResource)
-            return subject.isEditable();
+            return subject.isEditable() && !((OtmResource) subject).isAbstract();
         return false;
     }
 
     public BasePathChangeAction() {
-        // actionType = DexActions.BASEPATHCHANGE;
+        // Constructor of reflection
     }
 
     protected String get() {

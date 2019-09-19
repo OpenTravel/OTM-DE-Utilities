@@ -745,6 +745,9 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
             }
             extension.setExtendsEntity( superType.getTL() );
         }
+        // With a change to the class, remodel inheritance
+        getActions().forEach( a -> a.modelInheritedChildren() );
+
         log.debug( "Set extension to " + getExtendedResource() );
         return getExtendedResource();
     }

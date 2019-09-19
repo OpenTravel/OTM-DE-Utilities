@@ -33,6 +33,7 @@ import org.opentravel.model.otmLibraryMembers.TestCore;
 import org.opentravel.model.otmLibraryMembers.TestCustomFacet;
 import org.opentravel.model.otmLibraryMembers.TestQueryFacet;
 import org.opentravel.model.otmLibraryMembers.TestResource;
+import org.opentravel.schemacompiler.codegen.util.ResourceCodegenUtils;
 import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLActionResponse;
@@ -133,8 +134,44 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
 
     @Test
     public void testInheritedResponses() {
-        // TODO
-        // Make sure the inherited are not also children
+        OtmResource resource = TestResource.buildFullOtm( "Basepath", "BaseResource", staticModelManager );
+        OtmResource baseResource = TestResource.buildBaseOtm( resource, staticModelManager );
+        // Need to have common actions or the same actionID to have inheritance
+
+        assertTrue( "Given", resource.getExtendedResource() == baseResource );
+        assertFalse( "Given", baseResource.getActions().isEmpty() );
+        TestResource.getResponses( baseResource ).forEach( r -> TestActionResponse.print( r ) );
+        // TestResource.getResponses( resource ).forEach( r -> TestActionResponse.print( r ) );
+
+        // Make sure there are inherited children
+        for (OtmAction a : baseResource.getActions()) {
+            // log.debug( "Base action - Inherited children? " + a.getInheritedChildren() );
+            assertTrue( "Then base resource actions have no inherited children.", a.getInheritedChildren().isEmpty() );
+            for (OtmActionResponse response : a.getResponses())
+                assertFalse( "Then - this response is not inherited.", response.isInherited() );
+            for (OtmObject response : a.getInheritedChildren()) {
+                assertTrue( response instanceof OtmActionResponse );
+                assertTrue( "Then - this response is inherited.", response.isInherited() );
+            }
+        }
+
+        for (OtmAction a : resource.getActions()) {
+            log.debug( "Extended - Inherited children? " + a.getInheritedChildren() );
+            for (TLActionResponse tlAR : ResourceCodegenUtils.getInheritedResponses( a.getTL() )) {
+                log.debug( "Found one." );
+            }
+            List<OtmObject> inherited = a.getInheritedChildren();
+            List<OtmObject> children = a.getChildren();
+            assertTrue( "Then base resource actions has inherited children.", !a.getInheritedChildren().isEmpty() );
+            for (OtmActionResponse response : a.getResponses())
+                assertFalse( "Then - this response must not be inherited.", response.isInherited() );
+            for (OtmObject response : a.getInheritedChildren()) {
+                assertTrue( response instanceof OtmActionResponse );
+                assertTrue( "Then - this response must be inherited.", response.isInherited() );
+            }
+        }
+
+        // TODO - test deep inheritance
     }
 
     public static final String THEPATH = "/MySubjectPath";
@@ -281,6 +318,10 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
     }
 
     /**
+     * **********************************************************************************
+     * 
+     */
+    /**
      * Build an action with one request and response.
      * 
      * @param resource
@@ -300,7 +341,8 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
     public static TLAction buildTL(TLResource tlResource) {
         TLAction tla = new TLAction();
         tla.setActionId( "Create" );
-        tla.addResponse( new TLActionResponse() );
+
+        tla.addResponse( TestActionResponse.buildTL( tla ) );
         tla.setRequest( new TLActionRequest() );
         tla.getRequest().setHttpMethod( TLHttpMethod.POST );
         tla.getRequest().setPathTemplate( tlResource.getBasePath() );
@@ -313,7 +355,7 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
      * 
      * @param resource
      */
-    public static void buildFullOtm(OtmResource resource) {
+    public static OtmAction buildFullOtm(OtmResource resource) {
         assertTrue( "Resource must have base path set.", resource.getBasePath() != null );
         assertTrue( "Resource must have base path set.", !resource.getBasePath().isEmpty() );
         OtmAction action = TestAction.buildOtm( resource );
@@ -322,6 +364,21 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
         OtmParameterGroup group1 = TestParamGroup.buildOtm( resource );
         action.getRequest().setParamGroup( group1 );
         // To do - assumes group contains a path and query parameter
+        return action;
     }
 
+    public static void printResponses(OtmAction action) {
+        for (OtmActionResponse r : action.getResponses())
+            TestActionResponse.print( r );
+    }
+
+    /**
+     * @param resource
+     * @param af
+     */
+    public static OtmAction buildFullOtm(OtmResource resource, OtmActionFacet af) {
+        OtmAction action = buildFullOtm( resource );
+        action.add( TestActionResponse.buildOtm( action, af ) );
+        return action;
+    }
 }

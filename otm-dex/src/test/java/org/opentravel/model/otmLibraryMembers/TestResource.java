@@ -31,11 +31,15 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.resource.OtmAction;
+import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.model.resource.OtmActionRequest;
+import org.opentravel.model.resource.OtmActionResponse;
 import org.opentravel.model.resource.OtmParameterGroup;
 import org.opentravel.model.resource.OtmParentRef;
+import org.opentravel.model.resource.RestStatusCodes;
 import org.opentravel.model.resource.TestAction;
 import org.opentravel.model.resource.TestActionFacet;
+import org.opentravel.model.resource.TestActionResponse;
 import org.opentravel.model.resource.TestParamGroup;
 import org.opentravel.model.resource.TestParentRef;
 import org.opentravel.schemacompiler.model.TLAction;
@@ -44,10 +48,12 @@ import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
+import org.opentravel.schemacompiler.model.TLMimeType;
 import org.opentravel.schemacompiler.model.TLParamGroup;
 import org.opentravel.schemacompiler.model.TLResource;
 import org.opentravel.schemacompiler.repository.RepositoryItemState;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -288,27 +294,20 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         assertTrue( requests.size() == initialRQsize + 2 );
     }
 
-    // @Test
-    // public void testSWAGGERTransformer() {
-    // OtmResource r = buildFullOtm( "/thisPath", "Subject", staticModelManager );
-    // OtmResource p = buildParentResource( r, "Parent", staticModelManager );
-    // TLResource source = r.getTL();
-    //
-    // for (QualifiedAction qAction : ResourceCodegenUtils.getQualifiedActions( source )) {
-    // if (qAction.getAction().isCommonAction()) {
-    // continue;
-    // }
-    // OtmAction action = (OtmAction) OtmModelElement.get( qAction.getAction() );
-    // log.debug( r.getName() + " " + qAction.getActionRequest().getHttpMethod() + " action: " + action.getName()
-    // + " on path " + qAction.getPathTemplate() );
-    // TLActionRequest actionRequest = qAction.getActionRequest();
-    // String pathTemplate = qAction.getPathTemplate();
-    // TLHttpMethod httpMethod = actionRequest.getHttpMethod();
-    // }
-    //
-    // }
 
     /** ****************************************************** **/
+
+    /**
+     * Return list of responses accumulated from each action.getResponses()
+     * 
+     * @param resource
+     * @return
+     */
+    public static List<OtmActionResponse> getResponses(OtmResource resource) {
+        List<OtmActionResponse> responses = new ArrayList<>();
+        resource.getActions().forEach( a -> responses.addAll( a.getResponses() ) );
+        return responses;
+    }
 
     /**
      * Create OtmResource with one action facet, one action and one parameter group
@@ -404,15 +403,50 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
     public static OtmResource buildFullOtm(String pathString, String subjectName, OtmModelManager mgr) {
         OtmResource resource = TestResource.buildOtm( mgr );
         resource.setBasePath( pathString, true );
-        resource.getTL().setFirstClass( true );
+        resource.setFirstClass( true );
 
         OtmBusinessObject testBO = TestBusiness.buildOtm( mgr );
         testBO.setName( subjectName );
         resource.setAssignedType( testBO );
 
-        TestAction.buildFullOtm( resource );
-        TestActionFacet.buildOtm( resource );
+        OtmActionFacet af = TestActionFacet.buildOtm( resource );
+        TestAction.buildFullOtm( resource, af );
 
         return resource;
+    }
+
+    /**
+     * Build an abstract base resource with common actions, 1 action facet and action response for each status code.
+     * 
+     * @param resource
+     * @param staticModelManager
+     * @return
+     */
+    public static OtmResource buildBaseOtm(OtmResource resource, OtmModelManager mgr) {
+        OtmResource base = TestResource.buildOtm( mgr );
+        base.setBasePath( "BasePath", true );
+        base.setFirstClass( false );
+        base.setAbstract( true );
+        OtmActionFacet af = TestActionFacet.buildOtm( base );
+        af.setName( "BaseAF" );
+
+        // Make all the actions common actions
+        OtmAction action = TestAction.buildOtm( base );
+        base.getActions().forEach( a -> a.setCommon( true ) );
+        // Make responses
+        for (RestStatusCodes statusCode : RestStatusCodes.values()) {
+            OtmActionResponse response = TestActionResponse.buildOtm( action, af );
+            List<Integer> codes = new ArrayList<>( response.getTL().getStatusCodes() );
+            codes.forEach( c -> response.getTL().removeStatusCode( c ) );
+            response.getTL().addStatusCode( statusCode.value() );
+            response.getTL().addMimeType( TLMimeType.APPLICATION_JSON );
+            response.getTL().addMimeType( TLMimeType.APPLICATION_XML );
+        }
+        resource.setExtendedResource( base );
+
+        assertTrue( "Given", resource.getExtendedResource() == base );
+        assertFalse( "Given", base.getActions().isEmpty() );
+
+        return base;
     }
 }

@@ -47,16 +47,17 @@ public class SetRestStatusCodesAction extends DexRunAction {
     @Override
     public Object doIt(Object data) {
         if (data instanceof RestStatusCodesMap)
-            doIt( (RestStatusCodesMap) data );
+            return doIt( (RestStatusCodesMap) data );
         return null;
     }
 
-    public void doIt(RestStatusCodesMap data) {
+    public Object doIt(RestStatusCodesMap data) {
         if (isEnabled( object )) {
             oldMap = new RestStatusCodesMap( object );
             set( data.getTLList() );
-            // object.getActionManager().push( this );
+            return get();
         }
+        return null;
     }
 
     @Override

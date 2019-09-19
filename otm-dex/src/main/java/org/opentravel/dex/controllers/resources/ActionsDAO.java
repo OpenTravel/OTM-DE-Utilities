@@ -50,8 +50,26 @@ public class ActionsDAO implements DexDAO<OtmObject> {
     protected OtmObject otmObject;
     protected OtmAction action = null;
 
+    private OtmObject iniheritingParent = null;
+
     public ActionsDAO(OtmObject member) {
         this.otmObject = member;
+    }
+
+    /**
+     * Constructor for action children that are inherited by the inheriting parent. These object's parent will be the
+     * actual parent.
+     * 
+     * @param member
+     * @param inheritingParent
+     */
+    public ActionsDAO(OtmObject member, OtmObject inheritingParent) {
+        this.otmObject = member;
+        this.iniheritingParent = inheritingParent;
+    }
+
+    public boolean isInherited() {
+        return iniheritingParent != null;
     }
 
     /**

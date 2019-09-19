@@ -55,23 +55,11 @@ public final class ActionRowFactory extends TreeTableRow<ActionsDAO> {
         // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
 
-        // Not sure this helps!
-        if (getTreeItem() != null && getTreeItem().getValue() != null) {
-            setEditable( getTreeItem().getValue().isEditable() );
-        }
+        // // Not sure this helps!
+        // if (getTreeItem() != null && getTreeItem().getValue() != null) {
+        // setEditable( getTreeItem().getValue().isEditable() );
+        // }
     }
-
-    // /**
-    // * Add a new member to the tree
-    // *
-    // * @param t
-    // */
-    // private void addMemberEvent(ActionEvent t) {
-    // // Works - but business logic is wrong.
-    // // TreeItem<LibraryMemberTreeDAO> item = controller
-    // // .createTreeItem(new OtmCoreObject("new", controller.getModelManager()), getTreeItem().getParent());
-    // // super.updateTreeItem(item); // needed to apply stylesheet to new item
-    // }
 
     /**
      * @param tc
@@ -86,12 +74,9 @@ public final class ActionRowFactory extends TreeTableRow<ActionsDAO> {
 
             // Make Actions dividers
             tc.pseudoClassStateChanged( DIVIDER, newTreeItem.getValue().getValue() instanceof OtmAction );
-            // if (newTreeItem.getValue().getValue() instanceof OtmAction) {
-            // tc.pseudoClassStateChanged( DIVIDER, true );
-            // }
+
+            // Ask the DAO if it is inherited
+            tc.pseudoClassStateChanged( INHERITED, newTreeItem.getValue().isInherited() );
         }
     }
-    // TODO - investigate using ControlsFX for decoration
-    // TODO - Dragboard db = r.startDragAndDrop(TransferMode.MOVE);
-    // https://www.programcreek.com/java-api-examples/index.php?api=javafx.scene.control.TreeTableRow
 }

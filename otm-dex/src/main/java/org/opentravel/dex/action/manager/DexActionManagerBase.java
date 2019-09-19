@@ -203,6 +203,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
             mainController.postStatus( "Performed action: " + action.toString() );
 
         action.getSubject().getOwningMember().isValid( true ); // Force the owner to refresh its findings.
+        action.getSubject().isValid( true ); // Force the subject to refresh its findings.
 
         log.debug( "Put action on queue: " + action.getClass().getSimpleName() );
     }

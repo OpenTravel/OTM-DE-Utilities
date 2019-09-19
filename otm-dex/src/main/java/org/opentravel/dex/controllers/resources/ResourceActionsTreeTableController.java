@@ -363,7 +363,6 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         // Create response items
         for (OtmActionResponse response : action.getResponses()) {
             TreeItem<ActionsDAO> responseItem = new ActionsDAO( response ).createTreeItem( actionItem );
-            // responseItem.setExpanded( true );
             OtmObject payload = response.getPayload();
             if (response.getPayload() instanceof OtmActionFacet) {
                 responseItem = new ActionsDAO( response.getPayload() ).createTreeItem( responseItem );
@@ -383,7 +382,7 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
         // Test - inherited responses
         for (OtmObject inherited : action.getInheritedChildren())
             // TreeItem<ActionsDAO> responseItem =
-            new ActionsDAO( inherited ).createTreeItem( actionItem );
+            new ActionsDAO( inherited, action ).createTreeItem( actionItem );
 
     }
 

@@ -47,9 +47,15 @@ public class ResourcesDAO implements DexDAO<OtmObject> {
     private static Log log = LogFactory.getLog( ResourcesDAO.class );
 
     protected OtmObject otmObject;
+    private OtmObject iniheritingParent = null;
 
     public ResourcesDAO(OtmObject member) {
         this.otmObject = member;
+    }
+
+    public ResourcesDAO(OtmObject member, OtmObject inheritingParent) {
+        this.otmObject = member;
+        this.iniheritingParent = inheritingParent;
     }
 
     public ResourcesDAO(OtmTypeProvider provider) {
@@ -120,6 +126,19 @@ public class ResourcesDAO implements DexDAO<OtmObject> {
     }
 
     /**
+     * @param cfItem
+     * @param p
+     */
+    public TreeItem<ResourcesDAO> createTreeItem(TreeItem<ResourcesDAO> cfItem, OtmObject p) {
+        this.iniheritingParent = p;
+        return createTreeItem( cfItem );
+    }
+
+    public boolean isInherited() {
+        return iniheritingParent != null;
+    }
+
+    /**
      * Create and add to tree with no conditional logic.
      * 
      * @return new tree item added to tree at the parent
@@ -154,4 +173,5 @@ public class ResourcesDAO implements DexDAO<OtmObject> {
             log.debug( "Set " + obj + " is expanded to " + obj.isExpanded() + " " + e.wasExpanded() );
         }
     }
+
 }

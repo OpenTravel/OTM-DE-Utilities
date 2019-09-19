@@ -51,7 +51,7 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
     private static Log log = LogFactory.getLog( ResourcesTreeTableRowFactory.class );
 
     private static final PseudoClass EDITABLE = PseudoClass.getPseudoClass( "editable" );
-    // private static final PseudoClass INHERITED = PseudoClass.getPseudoClass( "inherited" );
+    private static final PseudoClass INHERITED = PseudoClass.getPseudoClass( "inherited" );
     private static final PseudoClass DIVIDER = PseudoClass.getPseudoClass( "divider" );
 
     private final ContextMenu resourceMenu = new ContextMenu();
@@ -191,8 +191,7 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         if (item != null && item.getValue() != null && item.getValue().getValue() != null) {
             tc.pseudoClassStateChanged( EDITABLE, item.getValue().isEditable() );
 
-            // Make Actions dividers
-            // tc.pseudoClassStateChanged( DIVIDER, item.getValue().getValue() instanceof OtmAction );
+            tc.pseudoClassStateChanged( INHERITED, item.getValue().isInherited() );
 
             // Turn on/off context sensitive items
             addResource.setDisable( !item.getValue().isEditable() );

@@ -34,6 +34,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Control;
@@ -212,8 +213,10 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
         label.setTooltip( obj.getTooltip() );
         propertyGrid.add( label, 0, rowIndex );
 
-        memberName.setEditable( obj.isEditable() );
+        memberName.setDisable( obj.nameProperty() instanceof ReadOnlyStringWrapper );
+        memberName.setEditable( !(obj.nameProperty() instanceof ReadOnlyStringWrapper) );
         memberName.setText( obj.nameProperty().get() );
+        // Changing the property will trigger the action
         memberName.setOnAction( e -> obj.nameProperty().set( memberName.getText() ) );
         propertyGrid.add( memberName, 1, rowIndex++ );
     }

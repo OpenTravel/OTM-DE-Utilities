@@ -131,6 +131,16 @@ public class MemberDetailsPopupController extends DexPopupControllerBase {
         this.currentMember = model;
     }
 
+    /**
+     * @see org.opentravel.dex.controllers.popup.DexPopupControllerBase#doOK()
+     */
+    @Override
+    public void doOK() {
+        // TODO Capture any uncommitted text changes
+        memberDetailsController.commitChanges();
+        super.doOK();
+    }
+
     @Override
     protected void setup(String message) {
         super.setStage( dialogTitle, dialogStage );

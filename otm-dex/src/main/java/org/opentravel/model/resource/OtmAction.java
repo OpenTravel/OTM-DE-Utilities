@@ -182,6 +182,7 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
 
     @Override
     public List<OtmObject> getInheritedChildren() {
+        modelInheritedChildren();
         return inheritedChildren != null ? inheritedChildren : Collections.emptyList();
     }
 
@@ -193,6 +194,17 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         return getTL().getActionId();
     }
 
+    /**
+     * @see org.opentravel.model.OtmModelElement#setName(java.lang.String)
+     */
+    @Override
+    public String setName(String name) {
+        getTL().setActionId( name );
+        if (getRequest() != null)
+            getRequest().nameProperty();
+        return getName();
+    }
+
     public OtmActionRequest getRequest() {
         return (OtmActionRequest) OtmModelElement.get( getTL().getRequest() );
     }
@@ -200,6 +212,18 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
     public List<OtmActionResponse> getResponses() {
         List<OtmActionResponse> list = new ArrayList<>();
         getTL().getResponses().forEach( r -> list.add( (OtmActionResponse) OtmModelElement.get( r ) ) );
+        return list;
+    }
+
+    /**
+     * 
+     * @return this action's responses and any inherited responses
+     */
+    public List<OtmActionResponse> getAllResponses() {
+        List<OtmActionResponse> list = new ArrayList<>();
+        ResourceCodegenUtils.getInheritedResponses( getTL() )
+            .forEach( r -> list.add( (OtmActionResponse) OtmModelElement.get( r ) ) );
+        // getTL().getResponses().forEach( r -> list.add( (OtmActionResponse) OtmModelElement.get( r ) ) );
         return list;
     }
 
@@ -247,9 +271,9 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
 
         for (TLActionResponse tlAR : ResourceCodegenUtils.getInheritedResponses( getTL() )) {
             if (!getTL().getResponses().contains( tlAR )) {
-                if (OtmModelElement.get( tlAR ) == null)
-                    inheritedChildren.add( new OtmActionResponse( tlAR, this ) );
-                else
+                if (OtmModelElement.get( tlAR ) != null)
+                    // inheritedChildren.add( new OtmActionResponse( tlAR, this ) );
+                    // else
                     inheritedChildren.add( OtmModelElement.get( tlAR ) );
             }
         }

@@ -32,7 +32,9 @@ import org.opentravel.model.otmLibraryMembers.TestCustomFacet;
 import org.opentravel.model.otmLibraryMembers.TestQueryFacet;
 import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.schemacompiler.model.TLAction;
+import org.opentravel.schemacompiler.model.TLActionFacet;
 import org.opentravel.schemacompiler.model.TLActionResponse;
+import org.opentravel.schemacompiler.model.TLMimeType;
 import org.opentravel.schemacompiler.model.TLReferenceType;
 
 /**
@@ -201,6 +203,20 @@ public class TestActionResponse<L extends TestOtmResourceBase<OtmActionResponse>
             }
     }
 
+    /**
+     * *****************************************************************************
+     */
+    public static OtmActionResponse buildOtm(OtmAction testAction, OtmActionFacet actionFacet) {
+        OtmActionResponse ar = new OtmActionResponse( buildTL( testAction.getTL(), actionFacet.getTL() ), testAction );
+        return ar;
+    }
+
+    public static TLActionResponse buildTL(TLAction tlAction, TLActionFacet tlActionFacet) {
+        TLActionResponse r = buildTL( tlAction );
+        r.setPayloadType( tlActionFacet );
+        r.setPayloadTypeName( tlActionFacet.getName() );
+        return r;
+    }
 
     public static OtmActionResponse buildOtm(OtmAction testAction) {
         OtmActionResponse ar = new OtmActionResponse( buildTL( testAction.getTL() ), testAction );
@@ -209,7 +225,15 @@ public class TestActionResponse<L extends TestOtmResourceBase<OtmActionResponse>
 
     public static TLActionResponse buildTL(TLAction tlAction) {
         TLActionResponse tlar = new TLActionResponse();
+        tlar.addMimeType( TLMimeType.APPLICATION_JSON );
+        tlar.addMimeType( TLMimeType.APPLICATION_XML );
+        tlar.addStatusCode( 400 );
+        tlar.addStatusCode( 401 );
         tlAction.addResponse( tlar );
         return tlar;
+    }
+
+    public static void print(OtmActionResponse response) {
+        log.debug( "Response: " + response.getName() + " MimeTypes = " + response.getMimeTypes() );
     }
 }

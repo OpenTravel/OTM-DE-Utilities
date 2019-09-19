@@ -89,7 +89,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     // Use lazy inflation on the getter.
     protected List<OtmObject> inheritedChildren = null;
 
-    private StringProperty nameProperty;
+    protected StringProperty nameProperty;
     private StringProperty descriptionProperty;
     private StringProperty validationProperty;
     private ObjectProperty<ImageView> validationImageProperty;
@@ -315,7 +315,8 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
                 nameProperty = getActionManager().add( DexActions.NAMECHANGE, getName(), this );
             else
                 nameProperty = new ReadOnlyStringWrapper( getName() );
-        }
+        } else
+            nameProperty.set( getName() );
         return nameProperty;
     }
 

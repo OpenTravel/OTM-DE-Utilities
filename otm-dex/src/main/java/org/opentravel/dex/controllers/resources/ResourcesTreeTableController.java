@@ -36,6 +36,7 @@ import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.model.resource.OtmAction;
 
 import java.util.List;
 
@@ -207,6 +208,11 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
             // Only use contextual facet for recursing
             if (p instanceof OtmContributedFacet && ((OtmContributedFacet) p).getContributor() != null)
                 p = ((OtmContributedFacet) p).getContributor();
+
+            // Inherited responses
+            if (p instanceof OtmAction)
+                for (OtmObject inherited : ((OtmAction) p).getInheritedChildren())
+                    new ResourcesDAO( inherited ).createTreeItem( cfItem, p );
 
             // Recurse
             if (p instanceof OtmChildrenOwner)

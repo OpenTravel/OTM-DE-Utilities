@@ -323,4 +323,12 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         post( selectedMember );
     }
 
+    /**
+     * Scan text fields name and description and force changes to be saved
+     */
+    public void commitChanges() {
+        selectedMember.setName( memberName.getText() );
+        selectedMember.setDescription( memberDescription.getText() );
+    }
+
 }
