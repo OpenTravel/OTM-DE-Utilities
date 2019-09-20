@@ -22,7 +22,7 @@ import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
-import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLFacetType;
 
@@ -59,11 +59,11 @@ public class OtmSummaryFacet extends OtmFacet<TLFacet> {
         Collection<OtmObject> hierarchy = new ArrayList<>();
         // Add inherited properties
         getInheritedChildren().forEach( c -> {
-            if (c instanceof OtmProperty)
+            if (c instanceof OtmPropertyBase)
                 hierarchy.add( c );
         } );
         children.forEach( c -> {
-            if (c instanceof OtmProperty)
+            if (c instanceof OtmPropertyBase)
                 hierarchy.add( c );
         } );
         if (getParent() instanceof OtmChildrenOwner) {

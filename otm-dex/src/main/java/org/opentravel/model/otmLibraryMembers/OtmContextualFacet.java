@@ -25,7 +25,7 @@ import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
-import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLModelElement;
 
@@ -50,8 +50,8 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
     }
 
     @Override
-    public OtmProperty<?> add(OtmObject child) {
-        if (child instanceof OtmProperty) {
+    public OtmPropertyBase<?> add(OtmObject child) {
+        if (child instanceof OtmPropertyBase) {
             // Make sure it has not already been added
             if (children == null)
                 children = new ArrayList<>();
@@ -68,7 +68,7 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
             else
                 inheritedChildren.add( child );
         }
-        return (OtmProperty<?>) child;
+        return (OtmPropertyBase<?>) child;
     }
 
 

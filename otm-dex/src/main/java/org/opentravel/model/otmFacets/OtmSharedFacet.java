@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
-import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLFacetType;
 
@@ -56,11 +56,11 @@ public class OtmSharedFacet extends OtmFacet<TLFacet> {
     public Collection<OtmObject> getChildrenHierarchy() {
         Collection<OtmObject> hierarchy = new ArrayList<>();
         getInheritedChildren().forEach( c -> {
-            if (c instanceof OtmProperty)
+            if (c instanceof OtmPropertyBase)
                 hierarchy.add( c );
         } );
         children.forEach( c -> {
-            if (c instanceof OtmProperty)
+            if (c instanceof OtmPropertyBase)
                 hierarchy.add( c );
         } );
         if (getParent() instanceof OtmChildrenOwner)

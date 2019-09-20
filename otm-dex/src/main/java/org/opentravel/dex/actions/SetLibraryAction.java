@@ -117,8 +117,6 @@ public class SetLibraryAction extends DexRunAction {
         return get();
     }
 
-    // private void runWizard(OtmLibraryMember member) {}
-
     /**
      * Return the new member or null if none created.
      * 
@@ -131,17 +129,12 @@ public class SetLibraryAction extends DexRunAction {
 
     @Override
     public ValidationFindings getVetoFindings() {
-        // // TODO create a finding if the outcome is false
-        // return ValidationUtils.getRelevantFindings( VETOKEYS, otm.getFindings() );
         return null;
     }
 
     @Override
     public boolean isValid() {
-        // return otm.isValid( true ) ? true
-        // : ValidationUtils.getRelevantFindings( VETOKEYS, otm.getFindings() ).isEmpty();
         return get() != null;
-        // FIXME - ? get().isValid() : false;
     }
 
     @Override

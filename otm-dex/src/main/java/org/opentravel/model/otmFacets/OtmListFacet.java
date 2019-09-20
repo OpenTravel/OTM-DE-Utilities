@@ -20,7 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.schemacompiler.model.TLListFacet;
 import org.opentravel.schemacompiler.model.TLModelElement;
 
@@ -55,7 +55,7 @@ public class OtmListFacet<T extends TLListFacet> extends OtmAbstractFacet<TLList
      * @see org.opentravel.model.OtmPropertyOwner#add(org.opentravel.schemacompiler.model.TLModelElement)
      */
     @Override
-    public OtmProperty<?> add(TLModelElement newTL) {
+    public OtmPropertyBase<?> add(TLModelElement newTL) {
         // NO-OP
         return null;
     }

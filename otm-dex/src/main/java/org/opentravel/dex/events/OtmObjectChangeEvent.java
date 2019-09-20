@@ -32,7 +32,7 @@ public class OtmObjectChangeEvent extends DexChangeEvent {
 
     public static final EventType<OtmObjectChangeEvent> OBJECT_CHANGED = new EventType<>( DEX_ALL, "OBJECT_CHANGED" );
 
-    private final transient OtmObject object;
+    // private final transient OtmObject object;
 
     public OtmObject getObject() {
         return get();
@@ -40,7 +40,12 @@ public class OtmObjectChangeEvent extends DexChangeEvent {
 
     @Override
     public OtmObject get() {
-        return object;
+        return otmObject;
+    }
+
+    public OtmObjectChangeEvent() {
+        super( OBJECT_CHANGED );
+        otmObject = null;
     }
 
     /**
@@ -48,7 +53,7 @@ public class OtmObjectChangeEvent extends DexChangeEvent {
      */
     public OtmObjectChangeEvent(OtmObject object) {
         super( OBJECT_CHANGED );
-        this.object = object;
+        this.otmObject = object;
     }
 
 }

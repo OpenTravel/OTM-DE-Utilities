@@ -94,16 +94,23 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
     private void newMember(OtmLibraryMemberType type) {
         OtmObject obj = getValue();
         Object result = null;
+        // If they didn't select anything
+        if (obj == null && controller.getMainController() != null)
+            // Use any member the model manager delivers
+            for (OtmLibraryMember member : controller.getMainController().getModelManager().getMembers()) {
+            obj = member;
+            break;
+            }
         // Run action
         if (obj != null)
             result = obj.getModelManager().getActionManager( true ).run( DexActions.NEWLIBRARYMEMBER, obj, type );
 
-        // Update display
-        if (result instanceof OtmObject) {
-            TreeItem<MemberAndProvidersDAO> item =
-                new MemberAndProvidersDAO( (OtmObject) result ).createTreeItem( getTreeItem().getParent() );
-            super.updateTreeItem( item );
-        }
+        // // Update display
+        // if (result instanceof OtmObject) {
+        // TreeItem<MemberAndProvidersDAO> item =
+        // new MemberAndProvidersDAO( (OtmObject) result ).createTreeItem( getTreeItem().getParent() );
+        // super.updateTreeItem( item );
+        // }
     }
 
     /**

@@ -16,68 +16,44 @@
 
 package org.opentravel.model.otmProperties;
 
-import org.opentravel.model.OtmModelElement;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.schemacompiler.model.TLModelElement;
 
 /**
- * Abstract OTM Node for properties.
+ * Abstract base class for all OTM properties.
  * 
  * @author Dave Hollander
  * 
  */
-public abstract class OtmProperty<T extends TLModelElement> extends OtmModelElement<TLModelElement> {
+public interface OtmProperty extends OtmObject {
 
-    private OtmPropertyOwner parent;
 
-    /**
-     * @param tl property owner
-     */
-    public OtmProperty(T tl, OtmPropertyOwner parent) {
-        super( tl );
-        this.parent = parent;
-        if (parent != null)
-            parent.add( this );
-    }
+    public String getName();
 
-    @Override
-    public abstract String getName();
+    public String getNamespace();
 
-    @Override
-    public String getNamespace() {
-        return getOwningMember().getNamespace();
-    }
+    public OtmLibraryMember getOwningMember();
 
-    @Override
-    public OtmLibraryMember getOwningMember() {
-        return parent.getOwningMember();
-    }
+    public OtmPropertyOwner getParent();
 
-    public OtmPropertyOwner getParent() {
-        return parent;
-    }
+    public OtmPropertyType getPropertyType();
 
-    @Override
-    public boolean isEditable() {
-        return getOwningMember() != null && getOwningMember().isEditable();
-    }
+    public String getRole();
 
-    @Override
-    public abstract boolean isInherited();
+    public boolean isEditable();
+
+    public boolean isInherited();
 
     /**
      * @return
      */
-    public abstract boolean isManditory();
+    public boolean isManditory();
 
     /**
      * @param value
      */
     public abstract void setManditory(boolean value);
 
-    @Override
-    public String toString() {
-        return getName();
-    }
+    public String toString();
 }

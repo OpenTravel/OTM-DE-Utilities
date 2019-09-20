@@ -31,11 +31,11 @@ import javax.xml.namespace.QName;
  * @author Dave Hollander
  * 
  */
-public class OtmElementReference<TL extends TLProperty> extends OtmElement<TLProperty> implements OtmTypeUser {
+public class OtmIdReferenceElement<TL extends TLProperty> extends OtmElement<TLProperty> implements OtmTypeUser {
 
     /**
      */
-    protected OtmElementReference(TL tl, OtmPropertyOwner parent) {
+    protected OtmIdReferenceElement(TL tl, OtmPropertyOwner parent) {
         super( tl, parent );
 
         if (!(tl instanceof TLProperty))

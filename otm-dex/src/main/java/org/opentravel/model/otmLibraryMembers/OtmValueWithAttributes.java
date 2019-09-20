@@ -29,6 +29,7 @@ import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.model.otmProperties.OtmPropertyFactory;
 import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
@@ -100,7 +101,7 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
     }
 
     @Override
-    public OtmProperty<?> add(TLModelElement tl) {
+    public OtmPropertyBase<?> add(TLModelElement tl) {
         if (tl instanceof TLIndicator)
             getTL().addIndicator( (TLIndicator) tl );
         else if (tl instanceof TLAttribute)
@@ -112,8 +113,8 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
     }
 
     @Override
-    public OtmProperty<?> add(OtmObject child) {
-        if (child instanceof OtmProperty) {
+    public OtmPropertyBase<?> add(OtmObject child) {
+        if (child instanceof OtmPropertyBase) {
             // Make sure it has not already been added
             if (children == null)
                 children = new ArrayList<>();
@@ -129,7 +130,7 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
                 children.add( child );
             else
                 inheritedChildren.add( child );
-            return (OtmProperty<?>) child;
+            return (OtmPropertyBase<?>) child;
         }
         return null;
     }
@@ -297,6 +298,29 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
     @Override
     public boolean isInherited() {
         return false;
+    }
+
+    /**
+     * @see org.opentravel.model.OtmPropertyOwner#delete(org.opentravel.model.otmProperties.OtmProperty)
+     */
+    @Override
+    public void delete(OtmProperty property) {
+        if (property.getTL() instanceof TLIndicator)
+            getTL().removeIndicator( (TLIndicator) property.getTL() );
+        else if (property.getTL() instanceof TLAttribute)
+            getTL().removeAttribute( (TLAttribute) property.getTL() );
+        remove( property );
+    }
+
+    /**
+     * @see org.opentravel.model.OtmPropertyOwner#remove(org.opentravel.model.otmProperties.OtmProperty)
+     */
+    @Override
+    public void remove(OtmProperty property) {
+        if (getChildren().contains( property ))
+            getChildren().remove( property );
+        if (getInheritedChildren().contains( property ))
+            getInheritedChildren().remove( property );
     }
 
 }

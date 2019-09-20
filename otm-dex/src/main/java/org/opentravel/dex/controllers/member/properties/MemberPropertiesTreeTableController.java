@@ -272,7 +272,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
     @Override
     public void refresh() {
-        propertiesTable.refresh();
+        // propertiesTable.refresh();
         post( postedData );
     }
 

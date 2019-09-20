@@ -39,15 +39,24 @@ import javafx.beans.property.StringProperty;
  * @author Dave Hollander
  * 
  */
-public class OtmElement<T extends TLProperty> extends OtmProperty<TLProperty> implements OtmTypeUser {
+public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty> implements OtmTypeUser {
     private static Log log = LogFactory.getLog( OtmElement.class );
 
     private StringProperty assignedTypeProperty;
 
     /**
+     * Create a new element and set the parent. Adds tl to parent's tl.
+     * 
+     * @param property owner of this element
      */
     public OtmElement(T tl, OtmPropertyOwner parent) {
         super( tl, parent );
+
+        // // Set the TL owner if not set.
+        // if (tl.getOwner() == null && parent != null && parent.getTL() instanceof TLPropertyOwner) {
+        // ((TLPropertyOwner) parent.getTL()).addElement( tl );
+        // parent.add( this );
+        // }
     }
 
     @Override
@@ -80,6 +89,12 @@ public class OtmElement<T extends TLProperty> extends OtmProperty<TLProperty> im
     @Override
     public String getName() {
         return getTL().getName();
+    }
+
+    @Override
+    public OtmPropertyType getPropertyType() {
+        // FIXME - attr ref?
+        return OtmPropertyType.ELEMENT;
     }
 
     @Override

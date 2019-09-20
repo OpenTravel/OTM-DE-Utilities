@@ -40,19 +40,18 @@ import javafx.beans.property.StringProperty;
  * @author Dave Hollander
  * 
  */
-public class OtmAttribute<T extends TLAttribute> extends OtmProperty<TLAttribute> implements OtmTypeUser {
+public class OtmAttribute<T extends TLAttribute> extends OtmPropertyBase<TLAttribute> implements OtmTypeUser {
     private static Log log = LogFactory.getLog( OtmAttribute.class );
 
     private StringProperty assignedTypeProperty;
 
     /**
-     * Create a new attribute and set the parent.
+     * Create a new attribute and set the parent. Adds tl to parent's tl.
      * 
      * @param property owner of this attribute
      */
     public OtmAttribute(T tl, OtmPropertyOwner parent) {
         super( tl, parent );
-        tlObject = tl;
     }
 
     @Override
@@ -65,6 +64,7 @@ public class OtmAttribute<T extends TLAttribute> extends OtmProperty<TLAttribute
         assignedTypeProperty.set( OtmTypeUserUtils.formatAssignedType( this ) );
         return assignedTypeProperty;
     }
+
 
     @Override
     public TLPropertyType getAssignedTLType() {
@@ -84,6 +84,12 @@ public class OtmAttribute<T extends TLAttribute> extends OtmProperty<TLAttribute
     @Override
     public String getName() {
         return getTL().getName();
+    }
+
+    @Override
+    public OtmPropertyType getPropertyType() {
+        // FIXME - attr ref?
+        return OtmPropertyType.ATTRIBUTE;
     }
 
     @Override

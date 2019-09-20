@@ -85,8 +85,6 @@ public interface OtmObject {
      */
     public String getPrefix();
 
-    public String getRole();
-
     public TLModelElement getTL();
 
     public Tooltip getTooltip();

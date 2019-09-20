@@ -28,6 +28,9 @@ import org.opentravel.schemacompiler.model.TLModelElement;
 /**
  * OTM Object for Resource objects.
  * 
+ * FIXME - inheritance is different than for other otmObjects. Those create otm facades for inherited objects, resources
+ * share the otmResourceChild
+ * 
  * @author Dave Hollander
  * 
  */

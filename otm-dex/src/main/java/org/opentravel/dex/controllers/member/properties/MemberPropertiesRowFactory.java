@@ -20,11 +20,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmChildrenOwner;
+import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyBase;
+import org.opentravel.model.otmProperties.OtmPropertyType;
 
 import javafx.css.PseudoClass;
-import javafx.event.ActionEvent;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeItem;
@@ -47,34 +51,42 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
     private static final PseudoClass EDITABLE = PseudoClass.getPseudoClass( "editable" );
     private static final PseudoClass INHERITED = PseudoClass.getPseudoClass( "inherited" );
     private static final PseudoClass DIVIDER = PseudoClass.getPseudoClass( "divider" );
-    private final ContextMenu addMenu = new ContextMenu();
+    private final ContextMenu contextMenu = new ContextMenu();
     private MemberPropertiesTreeTableController controller;
+    private MenuItem addProperty;
+    private Menu addMenu;
+    private MenuItem deleteProperty;
 
     // Constructor does not have access to content, just the empty row
     public MemberPropertiesRowFactory(MemberPropertiesTreeTableController controller) {
         this.controller = controller;
 
         // Create Context menu
-        MenuItem addObject = new MenuItem( "Add Property (Demo)" );
+        addMenu = new Menu( "Add" );
+        setupAddMenu( addMenu );
+        deleteProperty = new MenuItem( "Delete" );
+
         MenuItem changeType = new MenuItem( "Change Assigned Type" );
         MenuItem upObject = new MenuItem( "Move Up (Future)" );
         MenuItem downObject = new MenuItem( "Move Down (Future)" );
         SeparatorMenuItem separator = new SeparatorMenuItem();
-        addMenu.getItems().addAll( addObject, changeType, separator, upObject, downObject );
-        setContextMenu( addMenu );
+        contextMenu.getItems().addAll( addMenu, deleteProperty, changeType, separator, upObject, downObject );
+        setContextMenu( contextMenu );
 
-        // Create action for addObject event. The actual object is not known, so there is no access to action manager
-        // instance
-        addObject.setOnAction( this::addMemberEvent );
         changeType.setOnAction( e -> changeAssignedTypeListener() );
+        deleteProperty.setOnAction( e -> deleteProperty() );
 
         // // Set editable style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
+    }
 
-        // treeItemProperty().getValue() is always null!
-        // getItem() is always null!
-
-        // log.debug("");
+    private void setupAddMenu(Menu menu) {
+        MenuItem item;
+        for (OtmPropertyType type : OtmPropertyType.values()) {
+            item = new MenuItem( type.label() );
+            item.setOnAction( e -> addProperty( type ) );
+            menu.getItems().add( item );
+        }
     }
 
     /**
@@ -82,15 +94,43 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
      * 
      * @param t
      */
-    private void addMemberEvent(ActionEvent t) {
-        log.debug( "TODO - implement add member event in Properties Row Factory." );
-        // TreeItem<OtmTreeTableNode> item = createTreeItem(new OtmCoreObject("new"), getTreeItem().getParent());
-        // super.updateTreeItem(item); // needed to apply stylesheet to new item
+    private void addProperty(OtmPropertyType type) {
+        OtmPropertyOwner owner = getPropertyOwner();
+        // Get a valid subject
+        if (owner != null) {
+            owner.getActionManager().run( DexActions.NEWPROPERTY, owner, type );
+        }
+        log.debug( "Test - add in Properties Row Factory." );
+    }
 
-        // TreeItem<PropertiesDAO> treeItem = getTreeItem();
-        // if (treeItem != null) {
-        // OtmObject otm = treeItem.getValue().getValue();
-        // }
+    private void deleteProperty() {
+        OtmProperty p = getProperty();
+        if (p != null) {
+            p.getActionManager().run( DexActions.DELETEPROPERTY, p );
+        }
+    }
+
+    private OtmProperty getProperty() {
+        PropertiesDAO dao = null;
+        if (getTreeItem() != null)
+            dao = getTreeItem().getValue();
+        if (dao != null && dao.getValue() != null && dao.getValue() instanceof OtmProperty)
+            return ((OtmProperty) dao.getValue());
+        return null;
+    }
+
+    private OtmPropertyOwner getPropertyOwner() {
+        PropertiesDAO dao = null;
+        if (getTreeItem() != null)
+            dao = getTreeItem().getValue();
+        if (dao != null && dao.getValue() != null) {
+            if (dao.getValue() instanceof OtmPropertyBase)
+                return ((OtmPropertyBase<?>) dao.getValue()).getParent();
+            if (dao.getValue() instanceof OtmPropertyOwner) {
+                return (OtmPropertyOwner) dao.getValue();
+            }
+        }
+        return null;
     }
 
     // Runs if menu item on a row is selected
@@ -111,9 +151,15 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
     // TODO - use style class for warning and error
     private void setCSSClass(TreeTableRow<PropertiesDAO> tc, TreeItem<PropertiesDAO> newTreeItem) {
         if (newTreeItem != null && newTreeItem.getValue() != null) {
+
             // Disable context menu items
-            // TODO - leave add property enabled
             getContextMenu().getItems().forEach( i -> i.setDisable( !newTreeItem.getValue().isEditable() ) );
+            if (getPropertyOwner() != null && getPropertyOwner().getActionManager() != null)
+                addMenu.setDisable(
+                    !getPropertyOwner().getActionManager().isEnabled( DexActions.NEWPROPERTY, getPropertyOwner() ) );
+            if (getProperty() != null && getProperty().getActionManager() != null)
+                deleteProperty.setDisable(
+                    !getProperty().getActionManager().isEnabled( DexActions.DELETEPROPERTY, getProperty() ) );
 
             if (newTreeItem.getValue().getValue() instanceof OtmChildrenOwner) {
                 // Make facets dividers

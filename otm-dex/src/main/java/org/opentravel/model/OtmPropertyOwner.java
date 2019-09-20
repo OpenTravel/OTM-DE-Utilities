@@ -40,20 +40,22 @@ public interface OtmPropertyOwner extends OtmChildrenOwner {
      * Add the OtmProperty to the owner if the owner does not already contain it. If the child reports it is inherited
      * (isInherited() = true) then it is added to inherited children.
      * <p>
+     * Does not modify the TL object.
+     * <p>
      * Typically, the child will add itself when constructed with non-null parent.
      * 
      * @param child
      * @return
      */
     @Override
-    public OtmProperty<?> add(OtmObject child);
+    public OtmProperty add(OtmObject child);
 
     /**
      * Add the passed TL property/attribute/indicator to this and then create OtmProperty
      * 
      * @return the new OtmProperty
      */
-    public OtmProperty<?> add(TLModelElement newTL);
+    public OtmProperty add(TLModelElement newTL);
 
     /**
      * @return
@@ -67,4 +69,17 @@ public interface OtmPropertyOwner extends OtmChildrenOwner {
     @Override
     public boolean isInherited();
 
+    /**
+     * Delete the property from facade and underlying TL object. See also: {@link #remove(OtmProperty)}
+     * 
+     * @param property
+     */
+    public void delete(OtmProperty property);
+
+    /**
+     * Simply remove the property from the children or inherited children list. See also: {@link #delete(OtmProperty)}
+     * 
+     * @param property
+     */
+    public void remove(OtmProperty property);
 }

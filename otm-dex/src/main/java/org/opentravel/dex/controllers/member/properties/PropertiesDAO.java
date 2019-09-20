@@ -28,7 +28,7 @@ import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmProperties.OtmElement;
-import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.model.otmProperties.UserSelectablePropertyTypes;
 
 import java.util.ArrayList;
@@ -301,18 +301,18 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
     }
 
     public StringProperty minProperty() {
-        if (!(element instanceof OtmProperty))
+        if (!(element instanceof OtmPropertyBase))
             return new ReadOnlyStringWrapper( "" );
 
         String value = OPTIONAL;
-        if (((OtmProperty<?>) element).isManditory())
+        if (((OtmPropertyBase<?>) element).isManditory())
             value = REQUIRED;
 
         SimpleStringProperty ssp = new SimpleStringProperty( value );
         if (element.isEditable())
             // TODO - move to action handler
             ssp.addListener( (ObservableValue<? extends String> ov, String oldVal, String newVal) -> {
-                ((OtmProperty<?>) element).setManditory( newVal.equals( REQUIRED ) );
+                ((OtmPropertyBase<?>) element).setManditory( newVal.equals( REQUIRED ) );
                 // log.debug("Set optional/manditory of " + element.getName() + " to " + newVal);
             } );
 
@@ -331,8 +331,8 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
 
     public StringProperty roleProperty() {
         StringProperty ssp;
-        if (element instanceof OtmProperty) {
-            ssp = new SimpleStringProperty( ((OtmProperty<?>) element).getRole() );
+        if (element instanceof OtmPropertyBase) {
+            ssp = new SimpleStringProperty( ((OtmPropertyBase<?>) element).getRole() );
             // TODO - create action handler
             ssp.addListener( (ObservableValue<? extends String> ov, String oldVal, String newVal) -> {
                 log.debug( "TODO - set role of " + element.getName() + " to " + newVal );

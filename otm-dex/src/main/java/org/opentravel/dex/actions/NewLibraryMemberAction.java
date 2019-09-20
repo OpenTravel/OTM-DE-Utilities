@@ -53,29 +53,6 @@ public class NewLibraryMemberAction extends DexRunAction {
         // Constructor for reflection
     }
 
-    // /**
-    // * {@inheritDoc} This action will get the data from the user via modal dialog
-    // */
-    // public OtmLibraryMember doIt() {
-    // if (ignore)
-    // return null;
-    // log.debug( "Ready to create new library member." );
-    //
-    // // Get the user's selected new provider
-    // TypeSelectionContoller controller = TypeSelectionContoller.init();
-    // controller.setManager( otm.getOwningMember().getModelManager() );
-    //
-    // if (controller.showAndWait( "New Library Member" ) == Results.OK) {
-    // MemberAndProvidersDAO selected = controller.getSelected();
-    // if (selected == null || !(selected.getValue() instanceof OtmLibraryMember))
-    // log.error( "Missing selection from Controller" ); // cancel?
-    // else
-    // doIt( selected.getValue() );
-    // }
-    //
-    // return newMember;
-    // }
-
     /**
      * {@inheritDoc} The new library action adds library members to the model manager.
      * 
@@ -92,7 +69,7 @@ public class NewLibraryMemberAction extends DexRunAction {
                 // Provide a temporary wizardActionManager
                 member.setNoLibraryActionManager( new DexWizardActionManager( null ) );
 
-                // Set initial library - user may chanage it
+                // If the subject is editable, use it to set initial library - user may change it
                 if (otm.getLibrary().isEditable())
                     otm.getLibrary().add( member );
 

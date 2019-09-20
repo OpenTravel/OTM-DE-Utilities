@@ -215,15 +215,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
             ? getOwningMember().getLibrary().getPrefix() : "---";
     }
 
-    /**
-     * @return
-     */
-    // FIXME
-    @Override
-    public String getRole() {
-        return getClass().getSimpleName();
-    }
-
     @Override
     public T getTL() {
         return tlObject;

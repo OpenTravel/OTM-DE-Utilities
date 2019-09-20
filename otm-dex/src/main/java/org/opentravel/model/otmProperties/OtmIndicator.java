@@ -29,17 +29,16 @@ import org.opentravel.schemacompiler.model.TLIndicator;
  * @author Dave Hollander
  * 
  */
-public class OtmIndicator<TL extends TLIndicator> extends OtmProperty<TLIndicator> {
+public class OtmIndicator<TL extends TLIndicator> extends OtmPropertyBase<TLIndicator> {
     private static Log log = LogFactory.getLog( OtmIndicator.class );
 
     /**
-     * @param tlBusinessObject
+     * Create a new indicator and set the parent. Adds tl to parent's tl.
+     * 
+     * @param property owner of this indicator
      */
     public OtmIndicator(TL tl, OtmPropertyOwner parent) {
         super( tl, parent );
-
-        if (!(tl instanceof TLIndicator))
-            throw new IllegalArgumentException( "OtmAttribute constructor not passed a tl attribute." );
     }
 
     @Override
@@ -55,6 +54,12 @@ public class OtmIndicator<TL extends TLIndicator> extends OtmProperty<TLIndicato
     @Override
     public String getRole() {
         return UserSelectablePropertyTypes.Attribute.toString();
+    }
+
+    @Override
+    public OtmPropertyType getPropertyType() {
+        // FIXME - attr ref?
+        return OtmPropertyType.INDICATOR;
     }
 
     @Override

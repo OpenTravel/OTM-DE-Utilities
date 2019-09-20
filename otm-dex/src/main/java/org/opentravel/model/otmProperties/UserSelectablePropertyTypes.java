@@ -16,9 +16,6 @@
 
 package org.opentravel.model.otmProperties;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -51,16 +48,16 @@ public enum UserSelectablePropertyTypes {
         return label;
     }
 
-    /**
-     * @param label
-     * @return the value of the label or ELEMENT
-     */
-    public static UserSelectablePropertyTypes lookup(String label) {
-        for (UserSelectablePropertyTypes v : values())
-            if (v.label.equals( label ))
-                return v;
-        return UserSelectablePropertyTypes.Element;
-    }
+    // /**
+    // * @param label
+    // * @return the value of the label or ELEMENT
+    // */
+    // public static UserSelectablePropertyTypes lookup(String label) {
+    // for (UserSelectablePropertyTypes v : values())
+    // if (v.label.equals( label ))
+    // return v;
+    // return UserSelectablePropertyTypes.Element;
+    // }
 
     // TODO - refactor to somewhere out of model since it is fx specific
     public static final ObservableList<String> getObservableList() {
@@ -71,12 +68,12 @@ public enum UserSelectablePropertyTypes {
         return list;
     }
 
-    public static final List<String> getList() {
-        List<String> list = new ArrayList<>();
-        for (Object value : UserSelectablePropertyTypes.values()) {
-            list.add( value.toString() );
-        }
-        return list;
-    }
+    // public static final List<String> getList() {
+    // List<String> list = new ArrayList<>();
+    // for (Object value : UserSelectablePropertyTypes.values()) {
+    // list.add( value.toString() );
+    // }
+    // return list;
+    // }
 
 }
