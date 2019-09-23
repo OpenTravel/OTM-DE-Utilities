@@ -22,12 +22,15 @@ import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.DexRepeatMaxConverter;
 import org.opentravel.common.cellfactories.AssignedTypePropertiesTreeTableCellFactory;
 import org.opentravel.common.cellfactories.ValidationPropertiesTreeTableCellFactory;
+import org.opentravel.dex.action.manager.DexActionManager;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.OtmObjectChangeEvent;
 import org.opentravel.dex.events.OtmObjectModifiedEvent;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.event.EventType;
@@ -87,19 +90,42 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
      */
     @SuppressWarnings("unchecked")
     private void buildColumns(TreeTableView<PropertiesDAO> table) {
+
+        // Name Column
         nameCol = new TreeTableColumn<>( "Name" );
-        // iconCol = new TreeTableColumn<>("");
+        setColumnProps( nameCol, true, true, false, 200, "name" );
+
+        // Role Column
         roleCol = new TreeTableColumn<>( "Role" );
+        setColumnProps( roleCol, true, true, false, 100 );
+        roleCol.setCellValueFactory( new TreeItemPropertyValueFactory<PropertiesDAO,String>( "role" ) );
+        roleCol.setCellFactory( ChoiceBoxTreeTableCell.forTreeTableColumn( PropertiesDAO.getRoleList() ) );
+
+        // Assigned type column
         typeCol = new TreeTableColumn<>( "Assigned Type" );
+        setColumnProps( typeCol, true, true, false, 150 );
+        typeCol.setCellValueFactory( new TreeItemPropertyValueFactory<PropertiesDAO,String>( "assignedType" ) );
+        typeCol.setCellFactory( c -> new AssignedTypePropertiesTreeTableCellFactory( this ) );
+
+        // Example Column
+        exampleCol = new TreeTableColumn<>( "Example" );
+        setColumnProps( exampleCol, true, true, false, 0, "example" );
+        // setColumnProps( exampleCol, false, false, false, 0 );
 
         TreeTableColumn<PropertiesDAO,String> documentationCol = new TreeTableColumn<>( "Documentation" );
+        // Description Column
         descCol = new TreeTableColumn<>( "Description" );
+        setColumnProps( descCol, true, true, false, 150, "description" );
+        // Deprecation Column
         deprecatedCol = new TreeTableColumn<>( "Deprecation" );
-        otherDocCol = new TreeTableColumn<>( "Other" );
-        documentationCol.getColumns().addAll( descCol, deprecatedCol, otherDocCol );
-        setColumnProps( descCol, true, true, false, 0 );
-        setColumnProps( deprecatedCol, false, false, false, 0 );
-        setColumnProps( otherDocCol, false, false, false, 0 );
+        setColumnProps( deprecatedCol, true, true, false, 50, "deprecation" );
+        documentationCol.getColumns().addAll( descCol, deprecatedCol );
+        // Other
+        // otherDocCol = new TreeTableColumn<>( "Other" );
+        // setColumnProps( otherDocCol, false, false, false, 0 );
+        // documentationCol.getColumns().addAll( descCol, deprecatedCol, otherDocCol );
+        // setColumnProps( descCol, true, true, false, 0 );
+        // setColumnProps( deprecatedCol, false, false, false, 0 );
 
         // Repeat: min and max Column
         minCol = new TreeTableColumn<>( "min" );
@@ -124,30 +150,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         valCol.setSortable( false );
         valCol.setCellFactory( c -> new ValidationPropertiesTreeTableCellFactory() );
 
-        exampleCol = new TreeTableColumn<>( "Example" );
-        setColumnProps( exampleCol, false, false, false, 0 );
-
         table.getColumns().addAll( nameCol, valCol, typeCol, roleCol, constraintCol, exampleCol, documentationCol );
-
-        // Name Column
-        setColumnProps( nameCol, true, true, false, 200, "name" );
-
-        // Assigned type column
-        setColumnProps( typeCol, true, true, false, 150 );
-        typeCol.setCellValueFactory( new TreeItemPropertyValueFactory<PropertiesDAO,String>( "assignedType" ) );
-        typeCol.setCellFactory( c -> new AssignedTypePropertiesTreeTableCellFactory( this ) );
-
-        // Role Column
-        setColumnProps( roleCol, true, true, false, 100 );
-        roleCol.setCellValueFactory( new TreeItemPropertyValueFactory<PropertiesDAO,String>( "role" ) );
-        roleCol.setCellFactory( ChoiceBoxTreeTableCell.forTreeTableColumn( PropertiesDAO.getRoleList() ) );
-
-        // Description Column
-        setColumnProps( descCol, true, true, false, 150, "description" );
-        // Deprecation Column
-        setColumnProps( deprecatedCol, true, true, false, 50, "deprecation" );
-        // Example Column
-        setColumnProps( exampleCol, true, true, false, 0, "example" );
     }
 
     @Override
@@ -253,26 +256,22 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
      * @param item
      */
     private void propertySelectionListener(TreeItem<PropertiesDAO> item) {
-        if (item == null || item.getValue() == null)
+        if (item == null || item.getValue() == null || item.getValue().getValue() == null)
             return;
-        // Other controllers do this via RowFactory not listener
-        // Which is better? Make consistent.
-        nameCol.setEditable( item.getValue().isEditable() );
-        roleCol.setEditable( item.getValue().isEditable() );
-        typeCol.setEditable( item.getValue().isEditable() );
-        minCol.setEditable( item.getValue().isEditable() );
-        maxCol.setEditable( item.getValue().isEditable() );
-        exampleCol.setEditable( item.getValue().isEditable() );
-        descCol.setEditable( item.getValue().isEditable() );
-        deprecatedCol.setEditable( item.getValue().isEditable() );
-        // log.debug("DAO " + item.getValue().isInherited() + " object "
-        // + item.getValue().getValue().getClass().getSimpleName() + "? "
-        // + item.getValue().getValue().isInherited());
+        OtmObject obj = item.getValue().getValue();
+        DexActionManager actionManager = obj.getActionManager();
+        nameCol.setEditable( actionManager.isEnabled( DexActions.NAMECHANGE, obj ) );
+        descCol.setEditable( actionManager.isEnabled( DexActions.DESCRIPTIONCHANGE, obj ) );
+        typeCol.setEditable( actionManager.isEnabled( DexActions.TYPECHANGE, obj ) );
+        roleCol.setEditable( actionManager.isEnabled( DexActions.PROPERTYROLECHANGE, obj ) );
+        minCol.setEditable( actionManager.isEnabled( DexActions.MANDITORYCHANGE, obj ) );
+        maxCol.setEditable( actionManager.isEnabled( DexActions.SETREPEATCOUNT, obj ) );
+        exampleCol.setEditable( actionManager.isEnabled( DexActions.EXAMPLECHANGE, obj ) );
+        deprecatedCol.setEditable( actionManager.isEnabled( DexActions.DEPRECATIONCHANGE, obj ) );
     }
 
     @Override
     public void refresh() {
-        // propertiesTable.refresh();
         post( postedData );
     }
 

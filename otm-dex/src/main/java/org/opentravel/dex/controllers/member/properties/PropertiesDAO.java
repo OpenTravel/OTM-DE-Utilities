@@ -19,6 +19,10 @@ package org.opentravel.dex.controllers.member.properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
+import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.actions.ManditoryChangeAction;
+import org.opentravel.dex.actions.PropertyRoleChangeAction;
+import org.opentravel.dex.actions.SetRepeatCountAction;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.dex.controllers.DexFilter;
 import org.opentravel.dex.controllers.DexIncludedController;
@@ -28,17 +32,16 @@ import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmProperties.OtmElement;
-import org.opentravel.model.otmProperties.OtmPropertyBase;
-import org.opentravel.model.otmProperties.UserSelectablePropertyTypes;
+import org.opentravel.model.otmProperties.OtmPropertyType;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -56,15 +59,18 @@ import javafx.scene.image.ImageView;
 public class PropertiesDAO implements DexDAO<OtmObject> {
     private static Log log = LogFactory.getLog( PropertiesDAO.class );
 
-    static final String REQUIRED = "Required";
-    static final String OPTIONAL = "Optional";
-
     /**
      * 
      * @return an observable list of property roles
      */
     public static ObservableList<String> getRoleList() {
-        return UserSelectablePropertyTypes.getObservableList();
+        // return UserSelectablePropertyTypes.getObservableList();
+        ObservableList<String> list = FXCollections.observableArrayList();
+        for (OtmPropertyType value : OtmPropertyType.values()) {
+            list.add( value.label() );
+        }
+        return list;
+
     }
 
     /**
@@ -73,8 +79,8 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
      */
     public static ObservableList<String> minList() {
         ObservableList<String> list = FXCollections.observableArrayList();
-        list.add( OPTIONAL );
-        list.add( REQUIRED );
+        list.add( ManditoryChangeAction.OPTIONAL );
+        list.add( ManditoryChangeAction.REQUIRED );
         return list;
     }
 
@@ -190,55 +196,15 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
     }
 
     public StringProperty deprecationProperty() {
-        String value = element.getDeprecation();
-
-        if (element instanceof OtmFacet)
-            return new ReadOnlyStringWrapper( "" );
-        if (!element.isEditable())
-            return new ReadOnlyStringWrapper( value );
-
-        StringProperty desc = new SimpleStringProperty( value );
-        // TODO - move to action handler
-        desc.addListener( (ObservableValue<? extends String> ov, String oldValue, String newValue) -> {
-            // element.setDesc(newValue);
-            log.debug( "TODO: Set " + element + " deprecation to " + newValue );
-        } );
-        return desc;
+        return element.getActionManager().add( DexActions.DEPRECATIONCHANGE, element.getDeprecation(), element );
     }
 
     public StringProperty descriptionProperty() {
         return element.descriptionProperty();
-        // if (!(element.getTL() instanceof TLDocumentationOwner))
-        // return new ReadOnlyStringWrapper("");
-        //
-        // String value = element.getDescription();
-        // if (!element.isEditable())
-        // return new ReadOnlyStringWrapper(value);
-        //
-        // StringProperty desc = new SimpleStringProperty(value);
-        // // TODO - move to action handler
-        // desc.addListener(
-        // (ObservableValue<? extends String> ov, String oldValue, String newValue) -> setDescription(newValue));
-        // return desc;
     }
 
     public StringProperty exampleProperty() {
-        String value = element.getExample();
-
-        // Add empty for properties with complex types
-        // if (element.isAssignedComplexType())
-        if (element instanceof OtmFacet)
-            return new ReadOnlyStringWrapper( "" );
-        if (!element.isEditable())
-            return new ReadOnlyStringWrapper( value );
-
-        StringProperty desc = new SimpleStringProperty( value );
-        // TODO - move to action handler
-        desc.addListener( (ObservableValue<? extends String> ov, String oldValue, String newValue) -> {
-            // element.setDesc(newValue);
-            log.debug( "TODO: Set " + element + " example to " + newValue );
-        } );
-        return desc;
+        return element.getActionManager().add( DexActions.EXAMPLECHANGE, element.getExample(), element );
     }
 
     public String getBaseTypeName() {
@@ -293,59 +259,40 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
     }
 
     public IntegerProperty maxProperty() {
+        // If there are other integer properties, move this into action manager as another action sub-type like boolean
+        // and string
+        IntegerProperty property = null;
         Integer value = -1;
         if (element instanceof OtmElement)
-            value = ((OtmElement<?>) element).getTL().getRepeat();
-        return new SimpleIntegerProperty( value );
-        // TODO - add listener
+            value = ((OtmElement<?>) element).getRepeatCount();
+        if (SetRepeatCountAction.isEnabled( element )) {
+            property = new SimpleIntegerProperty( value );
+            property.addListener( (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+                element.getActionManager().run( DexActions.SETREPEATCOUNT, element, newValue );
+            } );
+        } else {
+            property = new ReadOnlyIntegerWrapper( value );
+        }
+        return property;
     }
 
     public StringProperty minProperty() {
-        if (!(element instanceof OtmPropertyBase))
-            return new ReadOnlyStringWrapper( "" );
-
-        String value = OPTIONAL;
-        if (((OtmPropertyBase<?>) element).isManditory())
-            value = REQUIRED;
-
-        SimpleStringProperty ssp = new SimpleStringProperty( value );
-        if (element.isEditable())
-            // TODO - move to action handler
-            ssp.addListener( (ObservableValue<? extends String> ov, String oldVal, String newVal) -> {
-                ((OtmPropertyBase<?>) element).setManditory( newVal.equals( REQUIRED ) );
-                // log.debug("Set optional/manditory of " + element.getName() + " to " + newVal);
-            } );
-
-        return ssp;
+        return element.getActionManager().add( DexActions.MANDITORYCHANGE, ManditoryChangeAction.getCurrent( element ),
+            element );
     }
 
+    /**
+     * Name property from otmObject. If editable, it will have listener.
+     * 
+     * @return
+     */
     public StringProperty nameProperty() {
-        if (element.nameProperty() != null)
-            return element.nameProperty();
-        // if (element instanceof OtmProperty)
-        // return ((OtmProperty<?>) element).nameProperty();
-        else
-            // TODO - have facet return property
-            return new ReadOnlyStringWrapper( "" + element.getName() );
+        return element.nameProperty();
     }
 
     public StringProperty roleProperty() {
-        StringProperty ssp;
-        if (element instanceof OtmPropertyBase) {
-            ssp = new SimpleStringProperty( ((OtmPropertyBase<?>) element).getRole() );
-            // TODO - create action handler
-            ssp.addListener( (ObservableValue<? extends String> ov, String oldVal, String newVal) -> {
-                log.debug( "TODO - set role of " + element.getName() + " to " + newVal );
-            } );
-        } else {
-            ssp = new ReadOnlyStringWrapper( "" );
-        }
-        return ssp;
-    }
-
-    public void setDescription(String description) {
-        element.setDescription( description );
-        // log.debug("setDescription " + description + " on " + element);
+        String current = PropertyRoleChangeAction.getCurrent( element );
+        return element.getActionManager().add( DexActions.PROPERTYROLECHANGE, current, element );
     }
 
     public void setMax(String newValue) {

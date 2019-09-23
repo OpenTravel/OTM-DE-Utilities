@@ -41,6 +41,11 @@ public class OtmIdAttribute<TL extends TLAttribute> extends OtmAttribute<TLAttri
         return ImageManager.Icons.IDATTR;
     }
 
+    // @Override
+    // public OtmPropertyType getPropertyType() {
+    // return OtmPropertyType.ID;
+    // }
+
 
     // FIXME
     // /**

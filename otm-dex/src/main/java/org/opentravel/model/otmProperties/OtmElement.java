@@ -92,12 +92,6 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
     }
 
     @Override
-    public OtmPropertyType getPropertyType() {
-        // FIXME - attr ref?
-        return OtmPropertyType.ELEMENT;
-    }
-
-    @Override
     public TLProperty getTL() {
         return (TLProperty) tlObject;
     }
@@ -110,6 +104,15 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
     @Override
     public boolean isManditory() {
         return getTL().isMandatory();
+    }
+
+    public int getRepeatCount() {
+        return getTL().getRepeat();
+    }
+
+    public int setRepeatCount(int value) {
+        getTL().setRepeat( value );
+        return getRepeatCount();
     }
 
     @Override

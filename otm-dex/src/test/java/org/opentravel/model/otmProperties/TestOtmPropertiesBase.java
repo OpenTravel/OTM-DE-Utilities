@@ -24,16 +24,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.opentravel.dex.action.manager.DexFullActionManager;
+import org.opentravel.dex.actions.PropertyRoleChangeAction;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmResourceChild;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
 import org.opentravel.model.otmLibraryMembers.TestChoice;
+import org.opentravel.model.otmLibraryMembers.TestXsdSimple;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLIndicator;
@@ -89,6 +93,7 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
             assertTrue( p.getClass() == type.propertyClass() );
             assertTrue( OtmPropertyType.getType( p.getClass() ) == type );
             assertTrue( OtmPropertyType.getType( p ) == type );
+            assertTrue( p.getPropertyType() == type );
             test( p );
             assertTrue( facet.getChildren().contains( p ) );
         }
@@ -138,6 +143,92 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
         assertTrue( "Then", tlFacet.getAttributes().contains( tlAttr ) );
     }
 
+    @Test
+    public void testTypeChange() {
+        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
+        OtmChoiceObject choice = TestChoice.buildOtm( staticModelManager );
+        // Get a facet with one of each property type
+        OtmFacet<?> facet = choice.getShared();
+        List<OtmObject> kids = new ArrayList<>( facet.getChildren() );
+        kids.forEach( k -> facet.delete( (OtmProperty) k ) );
+        buildOneOfEach( facet );
+        int kidCount = facet.getChildren().size();
+
+        PropertyRoleChangeAction action = null;
+
+        for (OtmPropertyType type : OtmPropertyType.values()) {
+            kids = new ArrayList<>( facet.getChildren() );
+            for (OtmObject k : kids) {
+                if (k instanceof OtmProperty) {
+                    OtmPropertyType oldType = ((OtmProperty) k).getPropertyType();
+                    action = new PropertyRoleChangeAction();
+                    action.setSubject( k );
+                    // Change it
+                    OtmProperty newProperty = action.change( type.label() );
+                    // Then - if not the same type, there should be a new property
+                    if (newProperty == null)
+                        assertTrue( oldType == type );
+                    else {
+                        assertTrue( newProperty.getPropertyType() == type );
+                        assertTrue( facet.getChildren().size() == kidCount );
+                        assertTrue( facet.getChildren().contains( newProperty ) );
+                        assertFalse( facet.getChildren().contains( k ) );
+                        assertTrue( newProperty.getParent() == facet );
+                        if (newProperty instanceof OtmElement)
+                            assertTrue( ((OtmElement) newProperty).getTL().getOwner() == facet.getTL() );
+                        if (newProperty instanceof OtmAttribute)
+                            assertTrue( ((OtmAttribute) newProperty).getTL().getOwner() == facet.getTL() );
+                        if (newProperty instanceof OtmIndicator)
+                            assertTrue( ((OtmIndicator) newProperty).getTL().getOwner() == facet.getTL() );
+                        assertFalse( newProperty.isInherited() );
+
+                        // Change it back
+                        action.undo();
+                        assertTrue( facet.getChildren().size() == kidCount );
+                        assertTrue( ((OtmProperty) k).getPropertyType() == oldType );
+                        assertFalse( facet.getChildren().contains( newProperty ) );
+                        assertTrue( facet.getChildren().contains( k ) );
+                        if (k instanceof OtmElement)
+                            assertTrue( ((OtmElement) k).getTL().getOwner() == facet.getTL() );
+                        if (k instanceof OtmAttribute)
+                            assertTrue( ((OtmAttribute) k).getTL().getOwner() == facet.getTL() );
+                        if (k instanceof OtmIndicator)
+                            assertTrue( ((OtmIndicator) k).getTL().getOwner() == facet.getTL() );
+                        assertFalse( k.isInherited() );
+                    }
+                    log.debug( "Changed " + oldType + " and undid change." );
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testCloneTypeAssignments() {
+        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
+        OtmChoiceObject choice = TestChoice.buildOtm( staticModelManager );
+        // Given an empty facet
+        OtmFacet<?> facet = choice.getShared();
+        List<OtmObject> kids = new ArrayList<>( facet.getChildren() );
+        kids.forEach( k -> facet.delete( (OtmProperty) k ) );
+        // Given - a simple type to assign
+        OtmXsdSimple simple = TestXsdSimple.buildOtm( staticModelManager );
+
+        // Given - two type user properties
+        OtmTypeUser p1 = (OtmTypeUser) OtmPropertyType.build( OtmPropertyType.ELEMENT, facet );
+        p1.setAssignedType( simple );
+        OtmTypeUser p2 = (OtmTypeUser) OtmPropertyType.build( OtmPropertyType.ATTRIBUTE, facet );
+
+        // When - cloned
+        ((OtmProperty) p2).clone( (OtmProperty) p1 );
+
+        assertTrue( "Then - must have assigned type.", p2.getAssignedType() == simple );
+        assertTrue( "Then - must have assigned type.", p2.getAssignedTLType() == simple.getTL() );
+    }
+
+    /**
+     * *****************************************************************
+     */
+
     /**
      * Assure:
      * <ol>
@@ -158,13 +249,8 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
     }
 
     /**
-     * *****************************************************************
-     */
-
-    /**
      * @deprecated - use OtmPropertyType.buildTL() Add one of each type of property to the passed property owner
      */
-    @Deprecated
     public static void buildOneOfEach(OtmPropertyOwner owner) {
         TLModelElement tl = null;
         OtmProperty property = null;

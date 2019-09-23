@@ -18,6 +18,7 @@ package org.opentravel.model.otmProperties;
 
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmPropertyOwner;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.TLModelElement;
 
@@ -43,8 +44,17 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
             parent.add( this );
     }
 
+    // @Override
+    // public abstract String getName();
+
     @Override
-    public abstract String getName();
+    public void clone(OtmProperty source) {
+        setName( source.getName() );
+        setDescription( source.getDescription() );
+        if (this instanceof OtmTypeUser && source instanceof OtmTypeUser)
+            ((OtmTypeUser) this).setAssignedType( ((OtmTypeUser) source).getAssignedType() );
+        setManditory( source.isManditory() );
+    }
 
     @Override
     public String getNamespace() {
@@ -73,18 +83,18 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
         return getOwningMember() != null && getOwningMember().isEditable();
     }
 
-    @Override
-    public abstract boolean isInherited();
+    // @Override
+    // public abstract boolean isInherited();
 
-    /**
-     * @return
-     */
-    public abstract boolean isManditory();
+    // /**
+    // * @return
+    // */
+    // public abstract boolean isManditory();
 
-    /**
-     * @param value
-     */
-    public abstract void setManditory(boolean value);
+    // /**
+    // * @param value
+    // */
+    // public abstract void setManditory(boolean value);
 
     @Override
     public String toString() {

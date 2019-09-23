@@ -86,11 +86,6 @@ public class OtmAttribute<T extends TLAttribute> extends OtmPropertyBase<TLAttri
         return getTL().getName();
     }
 
-    @Override
-    public OtmPropertyType getPropertyType() {
-        // FIXME - attr ref?
-        return OtmPropertyType.ATTRIBUTE;
-    }
 
     @Override
     public String getRole() {

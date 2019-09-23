@@ -35,12 +35,12 @@ public enum OtmPropertyType {
     private final String label;
     private Class<? extends OtmProperty> propertyClass;
 
-    public Class<? extends OtmProperty> propertyClass() {
-        return propertyClass;
-    }
-
     public String label() {
         return label;
+    }
+
+    public Class<? extends OtmProperty> propertyClass() {
+        return propertyClass;
     }
 
     private OtmPropertyType(String label, Class<? extends OtmProperty> objectClass) {
@@ -64,7 +64,20 @@ public enum OtmPropertyType {
         return null;
     }
 
+    public static OtmPropertyType getType(String label) {
+        for (OtmPropertyType type : values())
+            if (type.label == label)
+                return type;
+        return null;
+    }
 
+    /**
+     * Build a new property of the given type. Add to the owner (both facade and TL).
+     * 
+     * @param propertyType
+     * @param owner
+     * @return
+     */
     public static OtmProperty build(OtmPropertyType propertyType, OtmPropertyOwner owner) {
         OtmProperty property = null;
         TLModelElement tl = buildTL( propertyType );

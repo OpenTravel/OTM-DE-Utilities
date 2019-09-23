@@ -82,6 +82,8 @@ public class OtmPropertyFactory {
     }
 
     /**
+     * Create a facade for the TL model element. Assure the model element is owned by the parent.
+     * <p>
      * The preferred method to create a new property is to {@link OtmAbstractFacet#add(TLModelElement)} the tl property
      * to the facet.
      * 

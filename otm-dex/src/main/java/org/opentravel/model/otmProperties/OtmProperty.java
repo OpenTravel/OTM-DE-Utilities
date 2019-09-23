@@ -56,4 +56,11 @@ public interface OtmProperty extends OtmObject {
     public abstract void setManditory(boolean value);
 
     public String toString();
+
+    /**
+     * Copy content from property to this one.
+     * 
+     * @param oldProperty
+     */
+    public void clone(OtmProperty property);
 }

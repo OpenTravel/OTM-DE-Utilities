@@ -76,7 +76,7 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
         changeType.setOnAction( e -> changeAssignedTypeListener() );
         deleteProperty.setOnAction( e -> deleteProperty() );
 
-        // // Set editable style listener (css class)
+        // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
     }
 

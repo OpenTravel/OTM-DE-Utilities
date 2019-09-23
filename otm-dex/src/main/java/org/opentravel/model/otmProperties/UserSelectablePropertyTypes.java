@@ -22,9 +22,11 @@ import javafx.collections.ObservableList;
 /**
  * GUI oriented listing of property types
  * 
+ * @deprecated {@link OtmPropertyType}
  * @author Dave Hollander
  * 
  */
+@Deprecated
 public enum UserSelectablePropertyTypes {
 
     Element("Element"),

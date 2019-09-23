@@ -37,6 +37,10 @@ public enum DexActions {
     NAMECHANGE(NameChangeAction.class, OtmObjectModifiedEvent.class),
     DESCRIPTIONCHANGE(DescriptionChangeAction.class, OtmObjectModifiedEvent.class),
     TYPECHANGE(AssignedTypeChangeAction.class, OtmObjectModifiedEvent.class),
+    DEPRECATIONCHANGE(DeprecationChangeAction.class, OtmObjectModifiedEvent.class),
+    EXAMPLECHANGE(ExampleChangeAction.class, OtmObjectModifiedEvent.class),
+    MANDITORYCHANGE(ManditoryChangeAction.class, OtmObjectModifiedEvent.class),
+    PROPERTYROLECHANGE(PropertyRoleChangeAction.class, OtmObjectModifiedEvent.class),
     //
     NEWLIBRARYMEMBER(NewLibraryMemberAction.class, DexModelChangeEvent.class),
     SETMEMBERLIBRARY(SetLibraryAction.class, DexModelChangeEvent.class),
@@ -44,6 +48,7 @@ public enum DexActions {
     //
     NEWPROPERTY(NewPropertyAction.class, OtmObjectChangeEvent.class),
     DELETEPROPERTY(DeletePropertyAction.class, OtmObjectChangeEvent.class),
+    SETREPEATCOUNT(SetRepeatCountAction.class, OtmObjectModifiedEvent.class),
     //
     ADDRESOURCECHILD(AddResourceChildAction.class, DexResourceChangeEvent.class),
     ADDRESOURCEPARAMETER(AddResourceParameterAction.class, DexResourceChangeEvent.class),

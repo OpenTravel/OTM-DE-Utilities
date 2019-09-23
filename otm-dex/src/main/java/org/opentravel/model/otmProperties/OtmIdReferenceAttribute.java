@@ -40,18 +40,4 @@ public class OtmIdReferenceAttribute<TL extends TLAttribute> extends OtmAttribut
     public Icons getIconType() {
         return ImageManager.Icons.IDREFATTR;
     }
-
-
-    // FIXME
-    // /**
-    // * {@inheritDoc}
-    // * <p>
-    // * Get the name from the compiler based on the assigned type. responsible for setting the name to *Ref
-    // *
-    // * @param name <b>ignored</b> unless compiler does not return a name
-    // */
-    // @Override
-    // public String setName(String name) {
-    // return getName();
-    // }
 }

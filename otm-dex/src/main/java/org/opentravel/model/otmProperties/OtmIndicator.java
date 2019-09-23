@@ -56,11 +56,6 @@ public class OtmIndicator<TL extends TLIndicator> extends OtmPropertyBase<TLIndi
         return UserSelectablePropertyTypes.Attribute.toString();
     }
 
-    @Override
-    public OtmPropertyType getPropertyType() {
-        // FIXME - attr ref?
-        return OtmPropertyType.INDICATOR;
-    }
 
     @Override
     public boolean isInherited() {

@@ -40,7 +40,7 @@ public interface OtmPropertyOwner extends OtmChildrenOwner {
      * Add the OtmProperty to the owner if the owner does not already contain it. If the child reports it is inherited
      * (isInherited() = true) then it is added to inherited children.
      * <p>
-     * Does not modify the TL object.
+     * Does not modify the TL object. Use {@link #add(TLModelElement)} to add to TL and Otm parents.
      * <p>
      * Typically, the child will add itself when constructed with non-null parent.
      * 
@@ -51,11 +51,13 @@ public interface OtmPropertyOwner extends OtmChildrenOwner {
     public OtmProperty add(OtmObject child);
 
     /**
-     * Add the passed TL property/attribute/indicator to this and then create OtmProperty
-     * 
-     * @return the new OtmProperty
+     * Add the tl object (TLAttribute, TLIndicator or TLProperty) to this facade's underlying TLFacet. Then If the TL
+     * object has a facade, add it to this parent; if not, create a OtmProperty to wrap the TL property setting this as
+     * the parent.
+     * <p>
+     * To simply add to this facade, use {@link #add(OtmObject)}
      */
-    public OtmProperty add(TLModelElement newTL);
+    public OtmProperty add(TLModelElement tlChild);
 
     /**
      * @return

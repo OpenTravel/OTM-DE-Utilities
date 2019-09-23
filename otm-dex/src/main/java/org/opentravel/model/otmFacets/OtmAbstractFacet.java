@@ -29,7 +29,6 @@ import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
-import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.model.otmProperties.OtmPropertyFactory;
 import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
 import org.opentravel.schemacompiler.model.TLAbstractFacet;
@@ -63,25 +62,31 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
         super( tl );
     }
 
-    // /**
-    // * Create a facet for OtmOperations which are not library members
-    // *
-    // * @param tl
-    // * @param actionMgr
-    // */
-    // // The only time this is used is for operations - operationFacet/operations which are not library members
-    // public OtmAbstractFacet(T tl) {
-    // super( tl );
-    // }
-
-    /**
-     * Add the tl object (TLAttribute, TLIndicator or TLProperty) to this facade's underlying TLFacet. Then create a
-     * OtmProperty to wrap the TL property setting this as the parent.
-     * 
-     * @see org.opentravel.model.OtmPropertyOwner#add(org.opentravel.schemacompiler.model.TLModelElement)
-     */
     @Override
-    public OtmPropertyBase<?> add(TLModelElement tl) {
+    public OtmProperty add(OtmObject child) {
+        if (child instanceof OtmProperty) {
+            // Make sure it has not already been added
+            if (children == null)
+                children = new ArrayList<>();
+            else if (contains( children, child ))
+                return null;
+
+            if (inheritedChildren == null)
+                inheritedChildren = new ArrayList<>();
+            else if (contains( inheritedChildren, child ))
+                return null;
+
+            if (!child.isInherited())
+                children.add( child );
+            else
+                inheritedChildren.add( child );
+        }
+        return (OtmProperty) child;
+    }
+
+    @Override
+    public OtmProperty add(TLModelElement tl) {
+        // Add the TL object to the TL owner
         if (getTL() instanceof TLAttributeOwner && tl instanceof TLAttribute)
             ((TLAttributeOwner) getTL()).addAttribute( (TLAttribute) tl );
 
@@ -91,7 +96,137 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
         if (getTL() instanceof TLPropertyOwner && tl instanceof TLProperty)
             ((TLPropertyOwner) getTL()).addElement( (TLProperty) tl );
 
-        return OtmPropertyFactory.create( tl, this );
+        // Add the facade to this
+        OtmObject otm = OtmModelElement.get( tl );
+        if (otm instanceof OtmProperty)
+            add( otm );
+        else
+            otm = OtmPropertyFactory.create( tl, this );
+        return (OtmProperty) otm;
+    }
+
+    private boolean contains(List<OtmObject> list, OtmObject child) {
+        if (list.contains( child ))
+            return true;
+        for (OtmObject c : list)
+            if (c.getTL() == child.getTL())
+                return true;
+
+        return false;
+    }
+
+    @Override
+    public void delete(OtmProperty property) {
+        if (getTL() instanceof TLAttributeOwner && property.getTL() instanceof TLAttribute)
+            ((TLAttributeOwner) getTL()).removeAttribute( ((TLAttribute) property.getTL()) );
+        if (getTL() instanceof TLIndicatorOwner && property.getTL() instanceof TLIndicator)
+            ((TLIndicatorOwner) getTL()).removeIndicator( ((TLIndicator) property.getTL()) );
+        if (getTL() instanceof TLPropertyOwner && property.getTL() instanceof TLProperty)
+            ((TLPropertyOwner) getTL()).removeProperty( ((TLProperty) property.getTL()) );
+        remove( property );
+    }
+
+    public abstract DexActionManager getActionManger();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<OtmObject> getChildren() {
+        if (children != null && children.isEmpty())
+            modelChildren();
+        return children;
+    }
+
+    @Override
+    public Collection<OtmObject> getChildrenHierarchy() {
+        // Will only run for "leaf" detail facets
+        Collection<OtmObject> hierarchy = new ArrayList<>();
+        getInheritedChildren().forEach( hierarchy::add );
+        getChildren().forEach( hierarchy::add );
+        return hierarchy;
+    }
+
+    @Override
+    public Collection<OtmTypeProvider> getChildrenTypeProviders() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<OtmChildrenOwner> getDescendantsChildrenOwners() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<OtmTypeProvider> getDescendantsTypeProviders() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<OtmTypeUser> getDescendantsTypeUsers() {
+        Collection<OtmTypeUser> users = new ArrayList<>();
+        if (getChildren() != null)
+            getChildren().forEach( c -> {
+                if (c instanceof OtmTypeUser)
+                    users.add( (OtmTypeUser) c );
+            } );
+        return users;
+    }
+
+    @Override
+    public Icons getIconType() {
+        return ImageManager.Icons.FACET;
+    }
+
+    @Override
+    public List<OtmObject> getInheritedChildren() {
+        modelInheritedChildren();
+        return inheritedChildren;
+    }
+
+    @Override
+    public String getName() {
+        return tlObject.getLocalName();
+    }
+
+    @Override
+    public String getNamespace() {
+        return tlObject.getNamespace();
+    }
+
+    public abstract OtmObject getParent();
+
+
+    public String getRole() {
+        return tlObject.getFacetType().getIdentityName();
+    }
+
+    /**
+     * Facet edit-ability is the ability to add/remove properties.
+     * 
+     * @see org.opentravel.model.OtmModelElement#isEditable()
+     */
+    @Override
+    public boolean isEditable() {
+        return getOwningMember().isEditable();
+    }
+
+    @Override
+    public boolean isExpanded() {
+        return true;
+    }
+
+    @Override
+    public boolean isInherited() {
+        // log.debug("Is " + this + " inherited? " + !getParent().contains(this));
+        if (getParent() instanceof OtmLibraryMember)
+            return !((OtmLibraryMember) getParent()).contains( this );
+        return false;
+    }
+
+    @Override
+    public boolean isNameControlled() {
+        return true;
     }
 
     /**
@@ -107,15 +242,6 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
             ((TLAttributeOwner) getTL()).getAttributes().forEach( p -> OtmPropertyFactory.create( p, this ) );
         if (getTL() instanceof TLPropertyOwner)
             ((TLPropertyOwner) getTL()).getElements().forEach( p -> OtmPropertyFactory.create( p, this ) );
-    }
-
-    @Override
-    public Collection<OtmObject> getChildrenHierarchy() {
-        // Will only run for "leaf" detail facets
-        Collection<OtmObject> hierarchy = new ArrayList<>();
-        getInheritedChildren().forEach( hierarchy::add );
-        getChildren().forEach( hierarchy::add );
-        return hierarchy;
     }
 
     @Override
@@ -142,163 +268,6 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
     }
 
     @Override
-    public List<OtmObject> getInheritedChildren() {
-        modelInheritedChildren();
-        return inheritedChildren;
-    }
-
-    public abstract DexActionManager getActionManger();
-
-    public abstract OtmObject getParent();
-
-    @Override
-    public boolean isInherited() {
-        // log.debug("Is " + this + " inherited? " + !getParent().contains(this));
-        if (getParent() instanceof OtmLibraryMember)
-            return !((OtmLibraryMember) getParent()).contains( this );
-        return false;
-    }
-
-    @Override
-    public boolean isNameControlled() {
-        return true;
-    }
-
-    @Override
-    public Collection<OtmTypeProvider> getChildrenTypeProviders() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Collection<OtmTypeProvider> getDescendantsTypeProviders() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Collection<OtmChildrenOwner> getDescendantsChildrenOwners() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Collection<OtmTypeUser> getDescendantsTypeUsers() {
-        Collection<OtmTypeUser> users = new ArrayList<>();
-        if (getChildren() != null)
-            getChildren().forEach( c -> {
-                if (c instanceof OtmTypeUser)
-                    users.add( (OtmTypeUser) c );
-            } );
-        return users;
-    }
-
-    @Override
-    public String getNamespace() {
-        return tlObject.getNamespace();
-    }
-
-    @Override
-    public String getName() {
-        return tlObject.getLocalName();
-    }
-
-    /**
-     * Facet edit-ability is the ability to add/remove properties.
-     * 
-     * @see org.opentravel.model.OtmModelElement#isEditable()
-     */
-    @Override
-    public boolean isEditable() {
-        return getOwningMember().isEditable();
-    }
-
-
-    public String getRole() {
-        return tlObject.getFacetType().getIdentityName();
-    }
-
-    @Override
-    public boolean isExpanded() {
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return getName();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<OtmObject> getChildren() {
-        if (children != null && children.isEmpty())
-            modelChildren();
-        return children;
-    }
-
-    @Override
-    public Icons getIconType() {
-        return ImageManager.Icons.FACET;
-    }
-
-    // @Override
-    // public abstract OtmLibraryMember getOwningMember();
-
-    // @Override
-    // public OtmProperty<?> add(TLModelElement tl) {
-    // if (tl instanceof TLIndicator)
-    // getTL().addIndicator( (TLIndicator) tl );
-    // else if (tl instanceof TLProperty)
-    // getTL().addElement( (TLProperty) tl );
-    // else if (tl instanceof TLAttribute)
-    // getTL().addAttribute( (TLAttribute) tl );
-    // else
-    // log.debug( "unknown/not-implemented property type." );
-    //
-    // return OtmPropertyFactory.create( tl, this );
-    // }
-
-    // /**
-    // * {@inheritDoc}
-    // * <p>
-    // * Creates properties to represent facet children.
-    // */
-    // @Override
-    // public void modelChildren() {
-    // tlObject.getIndicators().forEach( i -> OtmPropertyFactory.create( i, this ) );
-    // tlObject.getAttributes().forEach( i -> OtmPropertyFactory.create( i, this ) );
-    // tlObject.getElements().forEach( i -> OtmPropertyFactory.create( i, this ) );
-    // // for (TLAttribute c : tlObject.getAttributes())
-    // // add( OtmPropertyFactory.create( c, this ) );
-    // // for (TLProperty c : tlObject.getElements())
-    // // add( OtmPropertyFactory.create( c, this ) );
-    // // for (TLAlias c : tlObject.getAliases())
-    // // getOwningMember().addAlias( c );
-    // }
-
-
-    @Override
-    public OtmProperty add(OtmObject child) {
-        if (child instanceof OtmProperty) {
-            // Make sure it has not already been added
-            if (children == null)
-                children = new ArrayList<>();
-            else if (contains( children, child ))
-                return null;
-
-            if (inheritedChildren == null)
-                inheritedChildren = new ArrayList<>();
-            else if (contains( inheritedChildren, child ))
-                return null;
-
-            if (!child.isInherited())
-                children.add( child );
-            else
-                inheritedChildren.add( child );
-        }
-        return (OtmProperty) child;
-    }
-
-    @Override
     public void remove(OtmProperty property) {
         if (children.contains( property ))
             children.remove( property );
@@ -307,24 +276,8 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
     }
 
     @Override
-    public void delete(OtmProperty property) {
-        if (getTL() instanceof TLAttributeOwner && property.getTL() instanceof TLAttribute)
-            ((TLAttributeOwner) getTL()).removeAttribute( ((TLAttribute) property.getTL()) );
-        if (getTL() instanceof TLIndicatorOwner && property.getTL() instanceof TLIndicator)
-            ((TLIndicatorOwner) getTL()).removeIndicator( ((TLIndicator) property.getTL()) );
-        if (getTL() instanceof TLPropertyOwner && property.getTL() instanceof TLProperty)
-            ((TLPropertyOwner) getTL()).removeProperty( ((TLProperty) property.getTL()) );
-        remove( property );
-    }
-
-    private boolean contains(List<OtmObject> list, OtmObject child) {
-        if (list.contains( child ))
-            return true;
-        for (OtmObject c : list)
-            if (c.getTL() == child.getTL())
-                return true;
-
-        return false;
+    public String toString() {
+        return getName();
     }
 
 }

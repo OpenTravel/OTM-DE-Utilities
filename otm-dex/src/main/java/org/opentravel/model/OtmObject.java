@@ -134,10 +134,9 @@ public interface OtmObject {
     public boolean isValid(boolean refresh);
 
     /**
-     * FX observable property for this name. The nameProperty will be updated by the {@link OtmModelElementListener}
-     * when the value changes.
+     * FX observable property for this name. If editable, a listener for the action will be set.
      * 
-     * @return
+     * @return a string property either read only or from action manager (never null)
      */
     public StringProperty nameProperty();
 
@@ -159,4 +158,21 @@ public interface OtmObject {
     public ObjectProperty<ImageView> validationImageProperty();
 
     public StringProperty validationProperty();
+
+    /**
+     * Set the deprecation documentation value. Even though the TL maintains a list, the facades only use the first
+     * item.
+     * 
+     * @param deprecation set to this string. Remove deprecation if string is null or empty.
+     * @return the deprecation string.
+     */
+    public String setDeprecation(String deprecation);
+
+    /**
+     * Set the example value. Even though the TL maintains a list, the facades only use the first item.
+     * 
+     * @param value to set the example. Remove example if string is null or empty.
+     * @return the example string.
+     */
+    public String setExample(String value);
 }

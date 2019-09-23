@@ -27,6 +27,7 @@ import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.schemacompiler.event.ModelElementListener;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLDocumentation;
+import org.opentravel.schemacompiler.model.TLDocumentationItem;
 import org.opentravel.schemacompiler.model.TLDocumentationOwner;
 import org.opentravel.schemacompiler.model.TLExample;
 import org.opentravel.schemacompiler.model.TLExampleOwner;
@@ -58,6 +59,8 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     private static final String NONAMESPACE = "no-namespace-for-for-this-object";
 
     private static final String NONAME = "no-name-for-for-this-object";
+
+    private static final String EXAMPLE_CONTEXT = "Example";
 
     /**
      * Utility to <i>get</i> the OTM facade object that wraps the TL Model object. Uses the listener added to all TL
@@ -140,6 +143,31 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     }
 
     @Override
+    public String setDeprecation(String deprecation) {
+        if (getTL() instanceof TLDocumentationOwner) {
+            TLDocumentation doc = ((TLDocumentationOwner) getTL()).getDocumentation();
+            if (doc != null) {
+                // Remove any deprecation
+                List<TLDocumentationItem> list = new ArrayList<>( doc.getDeprecations() );
+                // list.forEach( d -> doc.removeDeprecation( d ) );
+                list.forEach( doc::removeDeprecation );
+            }
+            // Set deprecation if not null or empty
+            if (deprecation != null && !deprecation.isEmpty()) {
+                if (doc == null) {
+                    // Create new documentation object
+                    doc = new TLDocumentation();
+                    ((TLDocumentationOwner) getTL()).setDocumentation( doc );
+                }
+                TLDocumentationItem docItem = new TLDocumentationItem();
+                docItem.setText( deprecation );
+                doc.addDeprecation( docItem );
+            }
+        }
+        return getDeprecation();
+    }
+
+    @Override
     public String getDescription() {
         if (getTL() instanceof TLDocumentationOwner) {
             TLDocumentation doc = ((TLDocumentationOwner) getTL()).getDocumentation();
@@ -157,6 +185,23 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
                 return exs.get( 0 ).getValue();
         }
         return "";
+    }
+
+    @Override
+    public String setExample(String value) {
+        if (getTL() instanceof TLExampleOwner) {
+            // Remove any existing examples
+            List<TLExample> examples = new ArrayList<>( ((TLExampleOwner) getTL()).getExamples() );
+            examples.forEach( ((TLExampleOwner) getTL())::removeExample );
+            // If value is not null and not empty
+            if (value != null && !value.isEmpty()) {
+                TLExample tlEx = new TLExample();
+                tlEx.setValue( value );
+                tlEx.setContext( EXAMPLE_CONTEXT );
+                ((TLExampleOwner) getTL()).addExample( tlEx );
+            }
+        }
+        return getExample();
     }
 
     @Override
@@ -293,12 +338,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         return findings == null || findings.isEmpty();
     }
 
-    /**
-     * FX observable property for this name. The nameProperty will be updated by the {@link OtmModelElementListener}
-     * when the value changes.
-     * 
-     * @return
-     */
     @Override
     public StringProperty nameProperty() {
         if (nameProperty == null) {
@@ -306,8 +345,8 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
                 nameProperty = getActionManager().add( DexActions.NAMECHANGE, getName(), this );
             else
                 nameProperty = new ReadOnlyStringWrapper( getName() );
-        } else
-            nameProperty.set( getName() );
+        }
+        nameProperty.set( getName() );
         return nameProperty;
     }
 
