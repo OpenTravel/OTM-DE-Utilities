@@ -17,12 +17,16 @@
 package org.opentravel.dex.actions;
 
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmTypeUser;
+import org.opentravel.schemacompiler.model.TLExampleOwner;
 
 public class ExampleChangeAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
-        return subject.isEditable();
+        if (subject.isEditable() && subject.getTL() instanceof TLExampleOwner && subject instanceof OtmTypeUser)
+            return !((OtmTypeUser) subject).getAssignedType().isNameControlled();
+        return false;
     }
 
     public ExampleChangeAction() {

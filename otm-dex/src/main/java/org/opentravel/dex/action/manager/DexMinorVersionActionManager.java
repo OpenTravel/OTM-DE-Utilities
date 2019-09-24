@@ -18,12 +18,10 @@ package org.opentravel.dex.action.manager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexActions;
-import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.model.OtmObject;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import org.opentravel.model.otmProperties.OtmProperty;
 
 /**
  * The <i>minor version</i> action manager first checks its lists to rule out actions not allowed in minor versions. If
@@ -38,9 +36,26 @@ import java.lang.reflect.Method;
  */
 public class DexMinorVersionActionManager extends DexActionManagerBase {
     private static Log log = LogFactory.getLog( DexMinorVersionActionManager.class );
+    private DexActionManager actionManager = null;
 
-    public DexMinorVersionActionManager(DexMainController mainController) {
-        super( mainController );
+    /**
+     * Creates an action manager for minor versions. Anything allowed in minor versions will be passed to the full
+     * action manager allowing the sharing of the queue.
+     * 
+     * @param fullActionManager
+     */
+    public DexMinorVersionActionManager(DexActionManager fullActionManager) {
+        super();
+        this.actionManager = fullActionManager;
+        this.mainController = fullActionManager.getMainController();
+    }
+
+    /**
+     * {@inheritDoc} Use the queue from the passed action manager.
+     */
+    @Override
+    public void push(DexAction<?> action) {
+        actionManager.push( action );
     }
 
     /**
@@ -52,24 +67,49 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
     public boolean isEnabled(DexActions action, OtmObject subject) {
         if (!isAllowedInMinor( action, subject ))
             return false;
+        if (actionManager != null)
+            return actionManager.isEnabled( action, subject );
+        return false;
 
-        boolean result = false;
-        // The action manager is only available to editable objects.
-        // if (subject.getOwningMember().isEditable())
-        try {
-            Method m = action.actionClass().getMethod( "isEnabled", OtmObject.class );
-            result = (boolean) m.invoke( null, subject );
-            // log.debug( "Method " + action.toString() + " isEnabled invoke result: " + result );
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-            | InvocationTargetException e) {
-            log.error( "Could not invoke action.isEnabled( ):" + e.getMessage() );
-        }
-        return result;
+        // boolean result = false;
+        // // The action manager is only available to editable objects.
+        // // if (subject.getOwningMember().isEditable())
+        // try {
+        // Method m = action.actionClass().getMethod( "isEnabled", OtmObject.class );
+        // result = (boolean) m.invoke( null, subject );
+        // // log.debug( "Method " + action.toString() + " isEnabled invoke result: " + result );
+        // } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+        // | InvocationTargetException e) {
+        // log.error( "Could not invoke action.isEnabled( ):" + e.getMessage() );
+        // }
+        // return result;
     }
 
+    // Done - change description, deprecation, examples
+    // Done - new property
+    //
+    // Done - TEST - New properties to this version have full permission
+    // --> is in editable minor && not inherited
+    //
+    // add role to core
+    // add enum value, , service operation
+    // assign type to later version of current type
     private boolean isAllowedInMinor(DexActions action, OtmObject subject) {
-        if (action == DexActions.DESCRIPTIONCHANGE)
-            return true;
+        switch (action) {
+            case DESCRIPTIONCHANGE:
+            case DEPRECATIONCHANGE:
+            case EXAMPLECHANGE:
+            case NEWPROPERTY:
+                return true;
+            default:
+                return isNewProperty( subject );
+        }
+    }
+
+    private boolean isNewProperty(OtmObject subject) {
+        if (subject instanceof OtmProperty) {
+            return !subject.isInherited(); // if not in latest minor, the lib will not be editable
+        }
         return false;
     }
 }

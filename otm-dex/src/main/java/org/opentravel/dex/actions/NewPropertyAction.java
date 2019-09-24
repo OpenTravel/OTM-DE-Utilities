@@ -95,7 +95,13 @@ public class NewPropertyAction extends DexRunAction {
 
     @Override
     public String toString() {
-        return "Created new library member: " + newProperty;
+        String name = "";
+        if (newProperty != null)
+            if (newProperty.getName() != null)
+                name = newProperty.getName();
+            else
+                name = OtmPropertyType.getType( newProperty ).label();
+        return "Created new property: " + name;
     }
 
     @Override
@@ -104,7 +110,7 @@ public class NewPropertyAction extends DexRunAction {
             newProperty.getParent().delete( newProperty );
             newProperty = null;
         }
-        log.debug( "FIXME - Undo new property." );
+        log.debug( "Undo new property." );
         return newProperty;
     }
 }

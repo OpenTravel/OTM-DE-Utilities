@@ -19,6 +19,7 @@ package org.opentravel.model;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
+import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
@@ -82,7 +83,9 @@ public class OtmModelManager implements TaskResultHandlerI {
     private Map<LibraryMember,OtmLibraryMember> members = new HashMap<>();
 
     private DexActionManager readOnlyActionManager = new DexReadOnlyActionManager();
+    private DexActionManager minorActionManager;
     private DexActionManager fullActionManager;
+
     private DexStatusController statusController;
     private ProjectManager projectManager;
     private RepositoryManager repositoryManager;
@@ -121,6 +124,7 @@ public class OtmModelManager implements TaskResultHandlerI {
             this.fullActionManager = fullActionManager;
         // Set main controller for warnings if one is provided.
         readOnlyActionManager.setMainController( this.fullActionManager.getMainController() );
+        minorActionManager = new DexMinorVersionActionManager( fullActionManager );
 
         log.debug( "TL Model created and integrity checker added." );
     }
@@ -442,6 +446,10 @@ public class OtmModelManager implements TaskResultHandlerI {
      */
     public DexActionManager getActionManager(boolean full) {
         return full ? fullActionManager : readOnlyActionManager;
+    }
+
+    public DexActionManager getMinorActionManager(boolean full) {
+        return full ? minorActionManager : readOnlyActionManager;
     }
 
     /**

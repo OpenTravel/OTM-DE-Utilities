@@ -54,7 +54,7 @@ public enum OtmPropertyType {
      * @return
      */
     public static OtmPropertyType getType(OtmProperty p) {
-        return getType( p.getClass() );
+        return p != null ? getType( p.getClass() ) : null;
     }
 
     public static OtmPropertyType getType(Class<?> propertyClass) {

@@ -148,6 +148,11 @@ public abstract class DexActionManagerBase implements DexActionManager {
     }
 
     @Override
+    public DexAction getLastAction() {
+        return queue.peek() != null ? queue.peek() : null;
+    }
+
+    @Override
     public int getQueueSize() {
         return queue.size();
     }

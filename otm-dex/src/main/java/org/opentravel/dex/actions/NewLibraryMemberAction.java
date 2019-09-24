@@ -143,7 +143,10 @@ public class NewLibraryMemberAction extends DexRunAction {
 
     @Override
     public String toString() {
-        return "Created new library member: " + newMember;
+        String name = "";
+        if (newMember.getName() != null)
+            name = newMember.getName();
+        return "Created new library member: " + name;
     }
 
     @Override

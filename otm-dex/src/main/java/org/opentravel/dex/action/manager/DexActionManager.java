@@ -170,4 +170,11 @@ public interface DexActionManager {
      */
     public void undo();
 
+    /**
+     * Peek at the last action put onto the queue. See {@link #undo()}
+     * 
+     * @return
+     */
+    public DexAction getLastAction();
+
 }

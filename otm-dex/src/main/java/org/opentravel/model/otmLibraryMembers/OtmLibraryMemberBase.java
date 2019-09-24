@@ -82,6 +82,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     public OtmLibraryMemberBase(T tl, OtmModelManager mgr) {
         super( tl );
         this.mgr = mgr;
+        this.noLibraryActionManager = getModelManager().getActionManager( false );
     }
 
     @Override
@@ -417,8 +418,13 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         }
     }
 
+    /**
+     * Used by actions to allow editing on incomplete members.
+     */
     public void setNoLibraryActionManager(DexActionManager actionManager) {
         this.noLibraryActionManager = actionManager;
+        if (actionManager == null)
+            this.noLibraryActionManager = getModelManager().getActionManager( false );
     }
 
     private void setContributor(OtmObject i, OtmObject baseType) {

@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.action.manager.DexActionManager;
-import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryPermission;
@@ -156,7 +155,7 @@ public class OtmLibrary {
      */
     public DexActionManager getActionManager() {
         if (isMinorVersion())
-            return new DexMinorVersionActionManager( null ); // FIXME
+            return getModelManager().getMinorActionManager( isEditable() );
         return getModelManager().getActionManager( isEditable() );
     }
 
@@ -307,20 +306,23 @@ public class OtmLibrary {
      * @return the minor version number
      * @throws VersionSchemeException
      */
-    public int getMinorVersion() throws VersionSchemeException {
-        String versionScheme = getTL().getVersionScheme();
-        VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
-        String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
-        return Integer.valueOf( vScheme.getMinorVersion( versionId ) );
+    public int getMinorVersion() {
+        int vn = 0;
+        try {
+            String versionScheme = getTL().getVersionScheme();
+            VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
+            String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
+            vn = Integer.valueOf( vScheme.getMinorVersion( versionId ) );
+        } catch (NumberFormatException e) {
+            log.debug( "Error converting version string." + e.getCause() );
+        } catch (VersionSchemeException e) {
+            log.debug( "Error determining version. " + e.getCause() );
+        }
+        return vn;
     }
 
     public boolean isMinorVersion() {
-        try {
-            return (getMinorVersion() > 0 && getState() != RepositoryItemState.UNMANAGED);
-        } catch (VersionSchemeException e) {
-            log.debug( "Error determining version." );
-            return false;
-        }
+        return (getMinorVersion() > 0 && getState() != RepositoryItemState.UNMANAGED);
     }
 
     /**

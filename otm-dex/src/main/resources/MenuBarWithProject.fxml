@@ -65,6 +65,11 @@
                </padding>
             </Label>
             <Button fx:id="undoActionButton" mnemonicParsing="false" onAction="#undoAction" text="Undo" />
+            <Label fx:id="lastAction" text="0">
+               <padding>
+                  <Insets right="5.0" />
+               </padding>
+            </Label>
          </items>
       </ToolBar>
    </children>

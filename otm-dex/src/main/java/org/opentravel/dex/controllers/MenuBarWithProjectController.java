@@ -84,6 +84,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     @FXML
     private Label actionCount;
     @FXML
+    private Label lastAction;
+    @FXML
     private Button undoActionButton;
     @FXML
     private ToolBar menuToolBar;
@@ -207,6 +209,11 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     public void updateActionQueueSize(int size) {
         actionCount.setText( Integer.toString( size ) );
         undoActionButton.setDisable( size <= 0 );
+        String last = "";
+        if (modelMgr != null && modelMgr.getActionManager( true ) != null
+            && modelMgr.getActionManager( true ).getLastAction() != null)
+            last = modelMgr.getActionManager( true ).getLastAction().toString();
+        lastAction.setText( last );
     }
 
     public void undoAction() {
