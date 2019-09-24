@@ -159,6 +159,12 @@ public abstract class DexActionManagerBase implements DexActionManager {
     }
 
     @Override
+    public void postStatus(String status) {
+        if (mainController != null)
+            mainController.postStatus( status );
+    }
+
+    @Override
     public void push(DexAction<?> action) {
         if (action == null) {
             log.debug( "Pushed a null action!" );

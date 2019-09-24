@@ -39,6 +39,16 @@ public class OtmEnumerationValue extends OtmModelElement<TLEnumValue> {
         this.parent = parent;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * No rules applied
+     */
+    @Override
+    public String fixName(String name) {
+        return name;
+    }
+
     @Override
     public Icons getIconType() {
         return ImageManager.Icons.ENUMERATION_VALUE;

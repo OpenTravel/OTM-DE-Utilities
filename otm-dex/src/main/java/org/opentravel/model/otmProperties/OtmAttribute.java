@@ -65,6 +65,15 @@ public class OtmAttribute<T extends TLAttribute> extends OtmPropertyBase<TLAttri
         return assignedTypeProperty;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Apply initial lower case rule.
+     */
+    @Override
+    public String fixName(String name) {
+        return name.substring( 0, 1 ).toLowerCase() + name.substring( 1 );
+    }
 
     @Override
     public TLPropertyType getAssignedTLType() {

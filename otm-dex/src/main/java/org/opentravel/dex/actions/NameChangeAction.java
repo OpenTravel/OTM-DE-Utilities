@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -34,11 +35,13 @@ public class NameChangeAction extends DexStringAction {
     private static final String[] VETOKEYS = {VETO1, VETO2, VETO3};
 
     public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmTypeUser && ((OtmTypeUser) subject).getAssignedType().isNameControlled())
+            return false;
         return subject.isEditable();
     }
 
     public NameChangeAction() {
-        // actionType = DexActions.NAMECHANGE;
+        // constructor for reflection
     }
 
     @Override
@@ -63,16 +66,17 @@ public class NameChangeAction extends DexStringAction {
         log.debug( "Ready to set name to " + name + "  from: " + oldName + " on: " + otm.getClass().getSimpleName()
             + " " + ignore );
 
-        // Force upper case
+        // Apply naming rules
         String modifiedName = name;
         if (otm instanceof OtmObject)
-            modifiedName = name.substring( 0, 1 ).toUpperCase() + name.substring( 1 );
+            modifiedName = otm.fixName( name );
 
         super.doIt( o, oldName, modifiedName );
 
-        if (!name.equals( modifiedName ))
-            otm.getActionManager()
-                .postWarning( "Warning: Changed the value entered: " + name + " to valid name of " + modifiedName );
+        // Status is quickly overriden, use warning when user settings created
+        // if (!name.equals( modifiedName ))
+        // otm.getActionManager()
+        // .postStatus( "Warning: Changed the value entered: " + name + " to valid name of " + modifiedName );
 
         return get();
     }
@@ -81,10 +85,6 @@ public class NameChangeAction extends DexStringAction {
     public String undoIt() {
         ignore = true;
         super.undoIt();
-        // log.debug( "Undo-ing change" );
-        // otm.setName( oldString );
-        // if (observable instanceof SimpleStringProperty)
-        // ((SimpleStringProperty) observable).set( oldString );
 
         if (!isValid()) {
             // You will get a loop if the old name is not valid!
@@ -103,9 +103,6 @@ public class NameChangeAction extends DexStringAction {
 
     @Override
     public boolean isValid() {
-        // validation does not catch:
-        // incorrect case
-        // elements assigned to type provider
         return otm.isValid( true ) ? true
             : ValidationUtils.getRelevantFindings( VETOKEYS, otm.getFindings() ).isEmpty();
     }

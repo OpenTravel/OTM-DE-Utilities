@@ -42,6 +42,14 @@ public interface OtmObject {
      */
     public StringProperty descriptionProperty();
 
+    /**
+     * Apply any naming rules specific to the object type and return the corrected name.
+     * 
+     * @param candidateName
+     * @return
+     */
+    public String fixName(String candidateName);
+
     public DexActionManager getActionManager();
 
     public OtmModelManager getModelManager();

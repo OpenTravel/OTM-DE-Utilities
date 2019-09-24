@@ -39,6 +39,21 @@ public class OtmIndicatorElement<TL extends TLIndicator> extends OtmIndicator<TL
         super( tl, parent );
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Apply initial upper case rule. Apply "Ind" suffix, prohibit initial "is"
+     */
+    @Override
+    public String fixName(String name) {
+        name = name.substring( 0, 1 ).toUpperCase() + name.substring( 1 );
+        if (name.startsWith( IndicatorBannedPrefix )) {
+            name = name.substring( IndicatorBannedPrefix.length() );
+            name = name.substring( 0, 1 ).toUpperCase() + name.substring( 1 );
+        }
+        return name.endsWith( IndicatorSuffix ) ? name : name.concat( IndicatorSuffix );
+    }
+
     @Override
     public Icons getIconType() {
         return ImageManager.Icons.INDICATORELEMENT;

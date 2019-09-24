@@ -86,6 +86,11 @@ public interface DexActionManager {
     public String getLastActionName();
 
     /**
+     * @return the main controller for GUI controls
+     */
+    public DexMainController getMainController();
+
+    /**
      * 
      * @return number of entries in the queue
      */
@@ -104,8 +109,15 @@ public interface DexActionManager {
     public boolean isEnabled(DexActions action, OtmObject subject);
 
     /**
+     * If the controller has been set, use it to post the status message.
+     * 
+     * @param status
+     */
+    void postStatus(String status);
+
+    /**
      * If the controller has been set, use it to post the warning message.
-     * ({@link DexMainController#postError(Exception, String)} displays waring in a dialog box).
+     * ({@link DexMainController#postError(Exception, String)} displays warning in a dialog box).
      * 
      * @param warning
      */
@@ -150,17 +162,12 @@ public interface DexActionManager {
      */
     public Object run(DexActions actionType, OtmObject subject, Object data);
 
+    public void setMainController(DexMainController mainController);
+
     /**
      * Pop an action from the queue and then undo it. The event associated with the action, if any, will be published.
      * 
      */
     public void undo();
-
-    /**
-     * @return the main controller for GUI controls
-     */
-    public DexMainController getMainController();
-
-    public void setMainController(DexMainController mainController);
 
 }

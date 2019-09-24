@@ -70,8 +70,10 @@ public class TestActionResponse<L extends TestOtmResourceBase<OtmActionResponse>
 
         for (OtmAction action : resource.getActions())
             for (OtmActionResponse response : action.getResponses()) {
-                response.getPayloadCandidates()
-                    .forEach( c -> assertTrue( response.setPayloadActionFacetString( c ).getName().equals( c ) ) );
+                response.getPayloadCandidates().forEach( c -> {
+                    if (!c.equals( "NONE" ))
+                        assertTrue( response.setPayloadActionFacetString( c ).getName().equals( c ) );
+                } );
             }
     }
 

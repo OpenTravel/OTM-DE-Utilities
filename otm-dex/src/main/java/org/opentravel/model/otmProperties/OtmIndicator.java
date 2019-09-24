@@ -46,6 +46,25 @@ public class OtmIndicator<TL extends TLIndicator> extends OtmPropertyBase<TLIndi
         return (TLIndicator) tlObject;
     }
 
+    public static final String IndicatorSuffix = "Ind";
+    public static final String IndicatorBannedPrefix = "is";
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Apply initial lower case rule. Apply "Ind" suffix, prohibit initial "is"
+     */
+    @Override
+    public String fixName(String name) {
+        name = name.substring( 0, 1 ).toLowerCase() + name.substring( 1 );
+
+        if (name.startsWith( IndicatorBannedPrefix )) {
+            name = name.substring( IndicatorBannedPrefix.length() );
+            name = name.substring( 0, 1 ).toLowerCase() + name.substring( 1 );
+        }
+        return name.endsWith( IndicatorSuffix ) ? name : name.concat( IndicatorSuffix );
+    }
+
     @Override
     public String getName() {
         return getTL().getName();

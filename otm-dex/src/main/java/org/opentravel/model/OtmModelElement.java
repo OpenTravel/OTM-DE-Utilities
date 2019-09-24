@@ -120,6 +120,17 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         return descriptionProperty;
     }
 
+    /**
+     * {@inheritDoc} Unless overridden, apply the initial capital rule.
+     * 
+     * @see org.opentravel.model.OtmObject#fixName(java.lang.String)
+     */
+    @Override
+    public String fixName(String name) {
+        return name.substring( 0, 1 ).toUpperCase() + name.substring( 1 );
+
+    }
+
     @Override
     public DexActionManager getActionManager() {
         return getOwningMember().getActionManager();

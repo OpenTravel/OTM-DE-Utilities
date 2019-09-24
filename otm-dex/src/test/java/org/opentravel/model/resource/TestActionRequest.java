@@ -38,6 +38,8 @@ import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
 import org.opentravel.schemacompiler.model.TLReferenceType;
 
+import javafx.collections.ObservableList;
+
 /**
  * Test class for Action Request resource.
  * <p>
@@ -206,8 +208,11 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
         ar.getMethodCandidates().forEach( c -> assertTrue( ar.setMethodString( c ).toString().equals( c ) ) );
         ar.getParameterGroupCandidates()
             .forEach( c -> assertTrue( ar.setParamGroupString( c ).getName().equals( c ) ) );
-        ar.getPayloadCandidates()
-            .forEach( c -> assertTrue( ar.setPayloadActionFacetString( c ).getName().equals( c ) ) );
+        ObservableList<String> candidates = ar.getPayloadCandidates();
+        ar.getPayloadCandidates().forEach( c -> {
+            if (!c.equals( "NONE" ))
+                assertTrue( ar.setPayloadActionFacetString( c ).getName().equals( c ) );
+        } );
 
         final String path1 = "/Path1";
         final String path2 = "/Path2";

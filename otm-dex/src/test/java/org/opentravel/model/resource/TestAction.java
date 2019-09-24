@@ -143,7 +143,7 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
         TestResource.getResponses( baseResource ).forEach( r -> TestActionResponse.print( r ) );
         // TestResource.getResponses( resource ).forEach( r -> TestActionResponse.print( r ) );
 
-        // Make sure there are inherited children
+        // Make sure there are NO inherited children in base resource
         for (OtmAction a : baseResource.getActions()) {
             // log.debug( "Base action - Inherited children? " + a.getInheritedChildren() );
             assertTrue( "Then base resource actions have no inherited children.", a.getInheritedChildren().isEmpty() );
