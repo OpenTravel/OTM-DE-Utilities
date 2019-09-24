@@ -27,6 +27,10 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.schemacompiler.model.TLLibrary;
+import org.opentravel.schemacompiler.version.VersionSchemeException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -53,6 +57,28 @@ public class TestLibrary {
         // OtmLibrary lib2 = TestLibrary.buildOtm( mgr, "Namespace2", "p2", "Library2" );
     }
 
+    @Test
+    public void testVersionFromNS() throws VersionSchemeException {
+        List<String> namespaces = new ArrayList<>();
+        namespaces.add( "http://example.com/foo/v0" );
+        namespaces.add( "http://example.com/foo/v1" );
+        namespaces.add( "http://example.com/foo/v1_2" );
+        namespaces.add( "http://example.com/foo/v1_2_3" );
+        namespaces.add( "http://example.com/foo/v1_0_0" );
+        namespaces.add( "http://example.com/foo/v1_0_2" );
+
+        OtmModelManager mgr = new OtmModelManager( null, null );
+        OtmLibrary lib = TestLibrary.buildOtm( mgr );
+
+        for (String ns : namespaces) {
+            lib.getTL().setNamespace( ns );
+            int major = lib.getMajorVersion();
+            assertTrue( major < 2 );
+            int minor = lib.getMinorVersion();
+            // Can't test isMinor() because of library state
+            log.debug( "Testing: " + ns + " = " + major + " " + minor );
+        }
+    }
 
     /** ****************************************************** **/
 

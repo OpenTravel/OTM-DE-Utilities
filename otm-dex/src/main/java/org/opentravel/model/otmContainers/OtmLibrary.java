@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.action.manager.DexActionManager;
+import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryPermission;
@@ -33,6 +34,9 @@ import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.RepositoryItemState;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 import org.opentravel.schemacompiler.validate.compile.TLModelCompileValidator;
+import org.opentravel.schemacompiler.version.VersionScheme;
+import org.opentravel.schemacompiler.version.VersionSchemeException;
+import org.opentravel.schemacompiler.version.VersionSchemeFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -151,6 +155,8 @@ public class OtmLibrary {
      * @return readOnly or Full action manager based on library state and status (isEditable).
      */
     public DexActionManager getActionManager() {
+        if (isMinorVersion())
+            return new DexMinorVersionActionManager( null ); // FIXME
         return getModelManager().getActionManager( isEditable() );
     }
 
@@ -282,6 +288,39 @@ public class OtmLibrary {
 
     public AbstractLibrary getTL() {
         return tlLib;
+    }
+
+    /**
+     * @param namespace
+     * @return the major version number
+     * @throws VersionSchemeException
+     */
+    public int getMajorVersion() throws VersionSchemeException {
+        String versionScheme = getTL().getVersionScheme();
+        VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
+        String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
+        return Integer.valueOf( vScheme.getMajorVersion( versionId ) );
+    }
+
+    /**
+     * @param namespace
+     * @return the minor version number
+     * @throws VersionSchemeException
+     */
+    public int getMinorVersion() throws VersionSchemeException {
+        String versionScheme = getTL().getVersionScheme();
+        VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
+        String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
+        return Integer.valueOf( vScheme.getMinorVersion( versionId ) );
+    }
+
+    public boolean isMinorVersion() {
+        try {
+            return (getMinorVersion() > 0 && getState() != RepositoryItemState.UNMANAGED);
+        } catch (VersionSchemeException e) {
+            log.debug( "Error determining version." );
+            return false;
+        }
     }
 
     /**
