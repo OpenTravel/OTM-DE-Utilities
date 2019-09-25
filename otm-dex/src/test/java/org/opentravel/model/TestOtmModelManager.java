@@ -29,6 +29,7 @@ import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
 import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.model.TLModel;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -130,6 +131,17 @@ public class TestOtmModelManager extends AbstractFxTest {
 
         // Then - model manager contains both libraries and all their members
         checkContains( mgr.getProjectManager(), mgr );
+    }
+
+    @Test
+    public void testGetPredefinedTypes() {
+        // Given
+        OtmModelManager mgr = new OtmModelManager( null, null );
+        mgr.addBuiltInLibraries( new TLModel() );
+        OtmXsdSimple id = mgr.getIdType();
+        assertNotNull( id );
+        OtmXsdSimple empty = mgr.getEmptyType();
+        assertNotNull( empty );
     }
 
     @Test

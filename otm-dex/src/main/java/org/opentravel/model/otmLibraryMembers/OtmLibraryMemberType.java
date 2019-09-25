@@ -48,6 +48,12 @@ public enum OtmLibraryMemberType {
         this.memberClass = objectClass;
     }
 
+    public static String getLabel(OtmLibraryMember member) {
+        for (OtmLibraryMemberType type : values())
+            if (type.memberClass() == member.getClass())
+                return type.label();
+        return "";
+    }
 
     /**
      * Build a library member. Set its model manager, TL object and adds a listener.

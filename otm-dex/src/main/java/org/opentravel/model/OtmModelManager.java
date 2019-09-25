@@ -329,7 +329,7 @@ public class OtmModelManager implements TaskResultHandlerI {
     /**
      * Add the built in libraries to the libraries and member maps
      */
-    private void addBuiltInLibraries(TLModel tlModel) {
+    protected void addBuiltInLibraries(TLModel tlModel) {
         for (BuiltInLibrary tlLib : tlModel.getBuiltInLibraries()) {
             if (libraries.containsKey( tlLib )) {
                 log.warn( "Trying to add builtin library again." );
@@ -726,20 +726,21 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
 
-    // public static final String OTA_LIBRARY_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
-    // public static final String OTA_EMPTY_NAME = "Empty";
-    //
-    // /**
-    // * @return
-    // */
-    // public OtmTypeProvider getEmptyType() {
-    // LibraryMember tlId = null;
-    // for (OtmLibrary lib : getLibraries()) {
-    // if (lib.getTL() instanceof BuiltInLibrary && lib.getTL().getNamespace().equals( XSD_LIBRARY_NAMESPACE ))
-    // tlId = lib.getTL().getNamedMember( XSD_ID_NAME );
-    // }
-    // OtmObject id = OtmModelElement.get( (TLModelElement) tlId );
-    // return id instanceof OtmXsdSimple ? (OtmXsdSimple) id : null;
-    // }
+    public static final String OTA_LIBRARY_NAMESPACE = "http://www.opentravel.org/OTM/Common/v0";
+    public static final String OTA_EMPTY_NAME = "Empty";
+
+    /**
+     * @return
+     */
+    public OtmXsdSimple getEmptyType() {
+        LibraryMember tlId = null;
+        for (OtmLibrary lib : getLibraries()) {
+            if (lib.getTL() instanceof BuiltInLibrary && lib.getTL().getNamespace().equals( OTA_LIBRARY_NAMESPACE ))
+                tlId = lib.getTL().getNamedMember( OTA_EMPTY_NAME );
+            log.debug( "Library " + lib + " namespace = " + lib.getTL().getNamespace() );
+        }
+        OtmObject id = OtmModelElement.get( (TLModelElement) tlId );
+        return id instanceof OtmXsdSimple ? (OtmXsdSimple) id : null;
+    }
 
 }

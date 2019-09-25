@@ -9,7 +9,6 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.VBox?>
@@ -35,14 +34,24 @@
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit" />
-                <Menu mnemonicParsing="false" text="Help">
+                <Menu mnemonicParsing="false" text="Window">
                   <items>
-                    <MenuItem mnemonicParsing="false" onAction="#aboutApplication" text="About" />
+                    <MenuItem fx:id="resourcesMenuItem" onAction="#launchResourceWindow" mnemonicParsing="false" text="Resources" />
+                    <MenuItem fx:id="webMenuItem" onAction="#launchWebRepoWindow" mnemonicParsing="false" text="Repository Web View" />
                   </items>
                 </Menu>
+                  <Menu mnemonicParsing="false" text="Help">
+                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#aboutApplication" text="About" />
+                     </items>
+                  </Menu>
               </menus>
             </MenuBar>
-            <ToggleButton fx:id="launchResourceWindow" mnemonicParsing="false" onAction="#launchResourceWindow" text="Resource Window" />
+            <Separator layoutX="263.0" layoutY="10.0" orientation="VERTICAL">
+               <padding>
+                  <Insets left="25.0" />
+               </padding>
+            </Separator>
             <Label fx:id="projectLabel" text="Select Project">
                <padding>
                   <Insets left="50.0" right="5.0" />

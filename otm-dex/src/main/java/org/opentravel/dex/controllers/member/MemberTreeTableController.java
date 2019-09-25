@@ -367,6 +367,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     }
 
     public void select(OtmLibraryMember otm) {
+        memberTree.getSelectionModel().clearSelection();
         if (otm != null) {
             for (TreeItem<MemberAndProvidersDAO> item : memberTree.getRoot().getChildren()) {
                 if (item.getValue().getValue() == otm) {

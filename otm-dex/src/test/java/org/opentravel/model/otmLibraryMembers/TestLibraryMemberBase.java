@@ -83,4 +83,17 @@ public class TestLibraryMemberBase {
         }
     }
 
+    @Test
+    public void testGetLabel() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
+        NoSuchMethodException, InvocationTargetException {
+        for (OtmLibraryMemberType lmType : OtmLibraryMemberType.values()) {
+            OtmLibraryMember member = OtmLibraryMemberType.buildMember( lmType, "Hi", staticModelManager );
+            assertNotNull( member );
+
+            String label = OtmLibraryMemberType.getLabel( member );
+            assertTrue( !label.isEmpty() );
+            log.debug( "Label for " + member.getClass().getSimpleName() + " is " + label );
+        }
+
+    }
 }

@@ -24,15 +24,19 @@ import org.opentravel.common.DialogBox;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.controllers.popup.NewProjectDialogController;
+import org.opentravel.dex.controllers.popup.WebViewDialogController;
 import org.opentravel.dex.controllers.resources.ResourcesWindowController;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.dex.events.DexEventDispatcher;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.DexRepositorySelectionEvent;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.repository.OpenLibraryFileTask;
 import org.opentravel.dex.tasks.repository.OpenProjectFileTask;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
+import org.opentravel.schemacompiler.repository.Repository;
+import org.opentravel.schemacompiler.repository.impl.RemoteRepositoryClient;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,7 +55,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.stage.Stage;
 
@@ -82,6 +85,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     @FXML
     public MenuItem fileOpenItem;
     @FXML
+    public MenuItem resourcesMenuItem;
+    @FXML
     private Label actionCount;
     @FXML
     private Label lastAction;
@@ -98,8 +103,10 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     private UserSettings userSettings;
 
+    private Repository selectedRepository = null;
+
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents = {};
+    private static final EventType[] subscribedEvents = {DexRepositorySelectionEvent.REPOSITORY_SELECTED};
     private static final EventType[] publishedEvents = {DexModelChangeEvent.MODEL_CHANGED};
 
     public MenuBarWithProjectController() {
@@ -132,6 +139,13 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     @FXML
     public void aboutApplication(ActionEvent event) {
         AboutDialogController.createAboutDialog( stage ).showAndWait();
+    }
+
+    @Override
+    public void handleEvent(AbstractOtmEvent event) {
+        log.debug( event.getEventType() + " event received." );
+        if (event instanceof DexRepositorySelectionEvent)
+            selectedRepository = ((DexRepositorySelectionEvent) event).getRepository();
     }
 
     @FXML
@@ -341,14 +355,27 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     }
 
     @FXML
-    private ToggleButton launchResourceWindow;
+    private MenuItem launchResourceWindow;
 
     @FXML
     private void launchResourceWindow() {
-        if (launchResourceWindow.isSelected())
-            rwc.show( "" );
-        else
-            rwc.hide();
+        // if (resourcesMenuItem.isSelected())
+        rwc.show( "" );
+        // else
+        // rwc.hide();
+    }
+
+    @FXML
+    private MenuItem launchWebRepoWindow;
+
+    @FXML
+    private void launchWebRepoWindow() {
+        String repoUrl = null;
+        if (selectedRepository instanceof RemoteRepositoryClient)
+            repoUrl = ((RemoteRepositoryClient) selectedRepository).getEndpointUrl();
+        WebViewDialogController wvdc = WebViewDialogController.init();
+        wvdc.show( repoUrl );
+
     }
 
     public void setComboLabel(String text) {
