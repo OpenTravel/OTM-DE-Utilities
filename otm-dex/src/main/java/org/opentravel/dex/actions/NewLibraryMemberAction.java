@@ -144,7 +144,7 @@ public class NewLibraryMemberAction extends DexRunAction {
     @Override
     public String toString() {
         String name = "";
-        if (newMember.getName() != null)
+        if (newMember != null && newMember.getName() != null)
             name = newMember.getName();
         return "Created new library member: " + name;
     }

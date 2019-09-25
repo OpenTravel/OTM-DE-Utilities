@@ -119,15 +119,18 @@ public class OtmModelManager implements TaskResultHandlerI {
         this.repositoryManager = repositoryManager;
 
         // Main controller will pass one if enabled by settings
-        if (fullActionManager == null)
+        if (fullActionManager == null) {
             this.fullActionManager = new DexReadOnlyActionManager();
-        else
+            minorActionManager = new DexReadOnlyActionManager();
+        } else {
             this.fullActionManager = fullActionManager;
+            minorActionManager = new DexMinorVersionActionManager( fullActionManager );
+        }
         // Set main controller for warnings if one is provided.
         readOnlyActionManager.setMainController( this.fullActionManager.getMainController() );
-        minorActionManager = new DexMinorVersionActionManager( fullActionManager );
+        minorActionManager.setMainController( this.fullActionManager.getMainController() );
 
-        log.debug( "TL Model created and integrity checker added." );
+        log.debug( "Model Manager constructor complete." );
     }
 
 
@@ -721,5 +724,22 @@ public class OtmModelManager implements TaskResultHandlerI {
         OtmObject id = OtmModelElement.get( (TLModelElement) tlId );
         return id instanceof OtmXsdSimple ? (OtmXsdSimple) id : null;
     }
+
+
+    // public static final String OTA_LIBRARY_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
+    // public static final String OTA_EMPTY_NAME = "Empty";
+    //
+    // /**
+    // * @return
+    // */
+    // public OtmTypeProvider getEmptyType() {
+    // LibraryMember tlId = null;
+    // for (OtmLibrary lib : getLibraries()) {
+    // if (lib.getTL() instanceof BuiltInLibrary && lib.getTL().getNamespace().equals( XSD_LIBRARY_NAMESPACE ))
+    // tlId = lib.getTL().getNamedMember( XSD_ID_NAME );
+    // }
+    // OtmObject id = OtmModelElement.get( (TLModelElement) tlId );
+    // return id instanceof OtmXsdSimple ? (OtmXsdSimple) id : null;
+    // }
 
 }

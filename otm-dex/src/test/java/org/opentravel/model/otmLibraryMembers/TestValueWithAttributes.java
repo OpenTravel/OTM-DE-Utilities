@@ -23,6 +23,7 @@ import org.junit.BeforeClass;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.schemacompiler.model.TLAttribute;
+import org.opentravel.schemacompiler.model.TLAttributeType;
 import org.opentravel.schemacompiler.model.TLValueWithAttributes;
 
 /**
@@ -45,8 +46,10 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
     /** ****************************************************** **/
 
     public static OtmValueWithAttributes buildOtm(OtmModelManager mgr) {
-        OtmValueWithAttributes vwa = new OtmValueWithAttributes( buildTL(), mgr );
+        OtmTypeProvider simple = TestXsdSimple.buildOtm( mgr );
+        OtmValueWithAttributes vwa = new OtmValueWithAttributes( buildTL( (TLAttributeType) simple.getTL() ), mgr );
         assertNotNull( vwa );
+
 
         OtmTypeProvider p = vwa.getAssignedType();
         return vwa;
@@ -56,14 +59,34 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
     public static TLValueWithAttributes buildTL() {
         TLValueWithAttributes tlvwa = new TLValueWithAttributes();
         tlvwa.setName( NAME );
-        tlvwa.setParentType( TestXsdSimple.buildTL() );
+        // tlvwa.setParentType( TestXsdSimple.buildTL() );
 
         // add attributes
         int i = 1;
         while (i < 5) {
             TLAttribute tla = new TLAttribute();
             tla.setName( NAME + i );
-            tla.setType( TestXsdSimple.buildTL() );
+            // tla.setType( TestXsdSimple.buildTL() );
+            tlvwa.addAttribute( tla );
+            i++;
+        }
+
+        // assertNotNull( tlvwa.getParentType() );
+        assertTrue( tlvwa.getAttributes().size() == i - 1 );
+        return tlvwa;
+    }
+
+    public static TLValueWithAttributes buildTL(TLAttributeType type) {
+        TLValueWithAttributes tlvwa = new TLValueWithAttributes();
+        tlvwa.setName( NAME );
+        tlvwa.setParentType( type );
+
+        // add attributes
+        int i = 1;
+        while (i < 5) {
+            TLAttribute tla = new TLAttribute();
+            tla.setName( NAME + i );
+            tla.setType( type );
             tlvwa.addAttribute( tla );
             i++;
         }
