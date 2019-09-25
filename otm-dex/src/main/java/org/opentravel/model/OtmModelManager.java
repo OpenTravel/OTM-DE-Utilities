@@ -31,6 +31,7 @@ import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberFactory;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
 import org.opentravel.schemacompiler.ic.ModelIntegrityChecker;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.BuiltInLibrary;
@@ -703,6 +704,22 @@ public class OtmModelManager implements TaskResultHandlerI {
         return false;
     }
 
+    public static final String XSD_LIBRARY_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
+    public static final String XSD_ID_NAME = "ID";
 
+    /**
+     * Try to find the XSD ID type and return it
+     * 
+     * @return
+     */
+    public OtmXsdSimple getIdType() {
+        LibraryMember tlId = null;
+        for (OtmLibrary lib : getLibraries()) {
+            if (lib.getTL() instanceof BuiltInLibrary && lib.getTL().getNamespace().equals( XSD_LIBRARY_NAMESPACE ))
+                tlId = lib.getTL().getNamedMember( XSD_ID_NAME );
+        }
+        OtmObject id = OtmModelElement.get( (TLModelElement) tlId );
+        return id instanceof OtmXsdSimple ? (OtmXsdSimple) id : null;
+    }
 
 }

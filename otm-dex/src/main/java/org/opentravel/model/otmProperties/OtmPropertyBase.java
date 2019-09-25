@@ -44,9 +44,6 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
             parent.add( this );
     }
 
-    // @Override
-    // public abstract String getName();
-
     @Override
     public void clone(OtmProperty source) {
         setName( source.getName() );
@@ -74,27 +71,10 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
         return OtmPropertyType.getType( this );
     }
 
-    public String getRole() {
-        return getPropertyType().toString();
-    }
-
     @Override
     public boolean isEditable() {
         return getOwningMember() != null && getOwningMember().isEditable();
     }
-
-    // @Override
-    // public abstract boolean isInherited();
-
-    // /**
-    // * @return
-    // */
-    // public abstract boolean isManditory();
-
-    // /**
-    // * @param value
-    // */
-    // public abstract void setManditory(boolean value);
 
     @Override
     public String toString() {

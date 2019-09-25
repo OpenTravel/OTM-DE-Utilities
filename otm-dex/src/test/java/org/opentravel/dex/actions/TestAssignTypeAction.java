@@ -30,14 +30,20 @@ import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
+import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
+import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
+import org.opentravel.model.otmLibraryMembers.TestCore;
 import org.opentravel.model.otmLibraryMembers.TestEnumerationClosed;
 import org.opentravel.model.otmLibraryMembers.TestValueWithAttributes;
 import org.opentravel.model.otmLibraryMembers.TestXsdSimple;
+import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyType;
 import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.lang.reflect.InvocationTargetException;
@@ -127,6 +133,74 @@ public class TestAssignTypeAction {
     }
 
     @Test
+    public void testAssignToNewProperty() {
+        DexFullActionManager am = new DexFullActionManager( null );
+        OtmModelManager mgr = new OtmModelManager( am, null );
+        lib = TestLibrary.buildOtm( mgr );
+        OtmCore core = TestCore.buildOtm( mgr, "TestCore" );
+        OtmFacet facet = core.getSummary();
+        lib.add( core );
+        mgr.add( core );
+
+        // Given - objects to assign
+        OtmEnumeration<?> closedEnum = TestEnumerationClosed.buildOtm( mgr );
+        lib.add( closedEnum );
+        mgr.add( closedEnum );
+        OtmXsdSimple simple = TestXsdSimple.buildOtm( mgr );
+        lib.add( simple );
+        mgr.add( simple );
+
+        // Given - a newly created Attribute property
+        Object result = am.run( DexActions.NEWPROPERTY, facet, OtmPropertyType.ATTRIBUTE );
+        assertTrue( "Given - must be a property.", result instanceof OtmProperty );
+        assertTrue( "Given - must be a type user.", result instanceof OtmTypeUser );
+        OtmTypeUser property = (OtmTypeUser) result;
+        assertTrue( "Given - the property has no assigned type.", property.getAssignedTLType() == null );
+        assertTrue( "Given - the property has no assigned type.", property.getAssignedType() == null );
+
+
+        // When - changed
+        am.run( DexActions.TYPECHANGE, property, closedEnum );
+        assertTrue( "Then - the property has assigned type.", property.getAssignedType() == closedEnum );
+        assertTrue( "Then - vwa has property in where used list.", closedEnum.getWhereUsed().contains( core ) );
+        // When - undone
+        am.undo();
+        assertTrue( "Then - the property has no assigned type.", property.getAssignedType() == null );
+        assertTrue( "Then - enum does not have property in where used list.",
+            !closedEnum.getWhereUsed().contains( core ) );
+
+        // Given - a newly created Element property
+        result = am.run( DexActions.NEWPROPERTY, facet, OtmPropertyType.ELEMENT );
+        property = (OtmTypeUser) result;
+        am.run( DexActions.TYPECHANGE, property, closedEnum );
+        assertTrue( "Then - the property has assigned type.", property.getAssignedType() == closedEnum );
+        assertTrue( "Then - vwa has property in where used list.", closedEnum.getWhereUsed().contains( core ) );
+        // When - undone
+        am.undo();
+        assertTrue( "Then - the property has no assigned type.", property.getAssignedType() == null );
+        assertTrue( "Then - enum does not have property in where used list.",
+            !closedEnum.getWhereUsed().contains( core ) );
+
+
+        // Given - a newly created VWA
+        result = am.run( DexActions.NEWLIBRARYMEMBER, core, OtmLibraryMemberType.VWA );
+        assertTrue( "Given - must have created a vwa", result instanceof OtmValueWithAttributes );
+        OtmValueWithAttributes vwa = (OtmValueWithAttributes) result;
+        lib.add( vwa );
+        mgr.add( vwa );
+        OtmTypeProvider initialProvider = vwa.getAssignedType();
+        assertTrue( "Given - no initial assigned type.", initialProvider == null );
+
+        am.run( DexActions.TYPECHANGE, vwa, simple );
+        assertTrue( "Then - the vwa has assigned type.", vwa.getAssignedType() == simple );
+        assertTrue( "Then - simple has vwa in where used list.", simple.getWhereUsed().contains( vwa ) );
+        // When - undone
+        am.undo();
+        assertTrue( "Then - the vwa has no assigned type.", vwa.getAssignedType() == null );
+        assertTrue( "Then - simple does not have vwa in where used list.", !closedEnum.getWhereUsed().contains( vwa ) );
+    }
+
+    @Test
     public void testAssignTypeAction()
         throws ExceptionInInitializerError, InstantiationException, IllegalAccessException, NoSuchMethodException,
         SecurityException, IllegalArgumentException, InvocationTargetException {
@@ -166,7 +240,7 @@ public class TestAssignTypeAction {
         // Then
         assertTrue( "Undo must restore type.", vwa.getAssignedType() == originalType );
 
-        log.debug( "Name Change Test complete." );
+        log.debug( "Assigned Type Change Test complete." );
     }
 
 }

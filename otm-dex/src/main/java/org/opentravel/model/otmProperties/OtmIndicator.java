@@ -71,12 +71,6 @@ public class OtmIndicator<TL extends TLIndicator> extends OtmPropertyBase<TLIndi
     }
 
     @Override
-    public String getRole() {
-        return UserSelectablePropertyTypes.Attribute.toString();
-    }
-
-
-    @Override
     public boolean isInherited() {
         return getTL().getOwner() != getParent().getTL();
     }
@@ -101,10 +95,10 @@ public class OtmIndicator<TL extends TLIndicator> extends OtmPropertyBase<TLIndi
         return getName();
     }
 
-    @Override
-    public String toString() {
-        return getName();
-    }
+    // @Override
+    // public String toString() {
+    // return getName();
+    // }
 
     @Override
     public Icons getIconType() {

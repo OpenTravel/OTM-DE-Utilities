@@ -91,6 +91,7 @@ public class OtmLibrary {
         log.debug( "Added project item to " + this.getName() + ". Now has " + projectItems.size() + " items." );
     }
 
+
     /**
      * Simply add the TL member to the Tl library.
      * <p>
@@ -100,7 +101,6 @@ public class OtmLibrary {
      * @return the member if added OK
      */
     public OtmLibraryMember add(OtmLibraryMember member) {
-        // getTL().addNamedMember( member.getTlLM() );
         if (member.getTL() instanceof LibraryMember)
             try {
                 // make sure not already a member
@@ -308,15 +308,17 @@ public class OtmLibrary {
      */
     public int getMinorVersion() {
         int vn = 0;
-        try {
-            String versionScheme = getTL().getVersionScheme();
-            VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
-            String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
-            vn = Integer.valueOf( vScheme.getMinorVersion( versionId ) );
-        } catch (NumberFormatException e) {
-            log.debug( "Error converting version string." + e.getCause() );
-        } catch (VersionSchemeException e) {
-            log.debug( "Error determining version. " + e.getCause() );
+        if (getTL().getNamespace() != null) {
+            try {
+                String versionScheme = getTL().getVersionScheme();
+                VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
+                String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
+                vn = Integer.valueOf( vScheme.getMinorVersion( versionId ) );
+            } catch (NumberFormatException e) {
+                log.debug( "Error converting version string." + e.getCause() );
+            } catch (VersionSchemeException e) {
+                log.debug( "Error determining version. " + e.getCause() );
+            }
         }
         return vn;
     }
@@ -340,9 +342,6 @@ public class OtmLibrary {
      */
     public boolean isEditable() {
         // log.debug( "State of " + getName() + " is " + getState().toString() );
-        // Can only edit if there is an appropriate action manager
-        // if (getActionManager() instanceof DexReadOnlyActionManager)
-        // return false;
         // Can only edit Draft libraries
         if (getStatus() != TLLibraryStatus.DRAFT)
             return false;

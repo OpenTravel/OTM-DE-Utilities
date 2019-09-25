@@ -39,8 +39,8 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
     private DexActionManager actionManager = null;
 
     /**
-     * Creates an action manager for minor versions. Anything allowed in minor versions will be passed to the full
-     * action manager allowing the sharing of the queue.
+     * Creates an action manager for minor versions. Anything allowed in minor versions will be pushed
+     * {@link DexActionManager#push(DexAction)} to the full action manager allowing sharing the queue.
      * 
      * @param fullActionManager
      */
@@ -70,26 +70,11 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
         if (actionManager != null)
             return actionManager.isEnabled( action, subject );
         return false;
-
-        // boolean result = false;
-        // // The action manager is only available to editable objects.
-        // // if (subject.getOwningMember().isEditable())
-        // try {
-        // Method m = action.actionClass().getMethod( "isEnabled", OtmObject.class );
-        // result = (boolean) m.invoke( null, subject );
-        // // log.debug( "Method " + action.toString() + " isEnabled invoke result: " + result );
-        // } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-        // | InvocationTargetException e) {
-        // log.error( "Could not invoke action.isEnabled( ):" + e.getMessage() );
-        // }
-        // return result;
     }
 
     // Done - change description, deprecation, examples
     // Done - new property
-    //
-    // Done - TEST - New properties to this version have full permission
-    // --> is in editable minor && not inherited
+    // Done - New properties to this version have full permission
     //
     // add role to core
     // add enum value, , service operation

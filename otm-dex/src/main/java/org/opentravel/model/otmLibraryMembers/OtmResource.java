@@ -711,7 +711,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         OtmLibraryMember oldUser = getAssignedType() == null ? null : getAssignedType().getOwningMember();
         if (setAssignedTLType( (NamedEntity) type.getTL() ) != null)
             // add to type's typeUsers
-            type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
+            type.getOwningMember().changeWhereUsed( oldUser, getOwningMember() );
 
         return getAssignedType();
     }

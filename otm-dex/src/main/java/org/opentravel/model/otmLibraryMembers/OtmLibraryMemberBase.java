@@ -163,20 +163,6 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return owners;
     }
 
-    // @Override
-    // public Collection<OtmObject> getDescendants() {
-    // List<OtmObject> children = new ArrayList<>( getChildren() );
-    // List<OtmObject> descendants = new ArrayList<>( getChildren() );
-    // for (OtmObject child : children) {
-    // if (child instanceof OtmChildrenOwner) {
-    // descendants.add( child );
-    // // Recurse
-    // descendants.addAll( ((OtmChildrenOwner) child).getDescendantsChildrenOwners() );
-    // }
-    // }
-    // return descendants;
-    // }
-
     @Override
     public Collection<OtmTypeUser> getDescendantsTypeUsers() {
         memberTypeUsers.clear();
@@ -190,7 +176,6 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             Collection<OtmTypeUser> u = co.getDescendantsTypeUsers();
             memberTypeUsers.addAll( u );
         }
-        // getDescendantsChildrenOwners().forEach(d -> users.addAll(d.getDescendantsTypeUsers()));
         // log.debug("Users now has " + memberTypeUsers.size() + " items");
         return memberTypeUsers;
     }
@@ -343,13 +328,13 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     @Override
-    public void addWhereUsed(OtmLibraryMember oldUser, OtmLibraryMember newUser) {
-        if (whereUsed != null) {
-            if (oldUser != null)
-                whereUsed.remove( oldUser );
-            if (newUser != null)
-                whereUsed.add( newUser );
-        }
+    public void changeWhereUsed(OtmLibraryMember oldUser, OtmLibraryMember newUser) {
+        if (whereUsed == null)
+            whereUsed = new ArrayList<>();
+        if (oldUser != null)
+            whereUsed.remove( oldUser );
+        if (newUser != null)
+            whereUsed.add( newUser );
     }
 
     private void addProvider(OtmTypeUser user, List<OtmTypeProvider> list) {

@@ -59,18 +59,22 @@ import javafx.scene.image.ImageView;
 public class PropertiesDAO implements DexDAO<OtmObject> {
     private static Log log = LogFactory.getLog( PropertiesDAO.class );
 
+    protected OtmObject element;
+    protected DexIncludedController<?> controller;
+    // contextual facets will not know if they are inherited, only the contributed facet will know and it is not saved
+    // in the DAO.
+    protected boolean inherited;
+
     /**
      * 
      * @return an observable list of property roles
      */
     public static ObservableList<String> getRoleList() {
-        // return UserSelectablePropertyTypes.getObservableList();
         ObservableList<String> list = FXCollections.observableArrayList();
         for (OtmPropertyType value : OtmPropertyType.values()) {
             list.add( value.label() );
         }
         return list;
-
     }
 
     /**
@@ -84,12 +88,6 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
         return list;
     }
 
-    protected OtmObject element;
-
-    protected DexIncludedController<?> controller;
-
-    protected boolean inherited; // contextual facets will not know if they are inherited, only the contributed facet
-                                 // will know and it is not saved in the DAO.
 
     public PropertiesDAO(OtmFacet<?> property) {
         this.element = property;

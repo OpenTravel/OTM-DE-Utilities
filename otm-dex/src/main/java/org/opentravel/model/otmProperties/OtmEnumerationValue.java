@@ -72,9 +72,4 @@ public class OtmEnumerationValue extends OtmModelElement<TLEnumValue> {
     public String getName() {
         return tlObject.getLiteral();
     }
-
-    // @Override
-    // public TLEnumValue getTL() {
-    // return tlObject;
-    // }
 }

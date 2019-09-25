@@ -24,7 +24,6 @@ import org.opentravel.common.OtmTypeUserUtils;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeType;
@@ -95,12 +94,6 @@ public class OtmAttribute<T extends TLAttribute> extends OtmPropertyBase<TLAttri
         return getTL().getName();
     }
 
-
-    @Override
-    public String getRole() {
-        return UserSelectablePropertyTypes.Attribute.toString();
-    }
-
     @Override
     public TLAttribute getTL() {
         return (TLAttribute) tlObject;
@@ -124,11 +117,13 @@ public class OtmAttribute<T extends TLAttribute> extends OtmPropertyBase<TLAttri
     /**
      * Useful for types that are not in the model manager.
      */
-    // TESTME - FIXME - how to limit to acceptable attribute types? TLAttributeType MAY be too limiting
     @Override
     public TLPropertyType setAssignedTLType(NamedEntity type) {
-        if (type instanceof TLPropertyType)
+        if (type == null)
+            getTL().setType( null );
+        else if (type instanceof TLPropertyType)
             getTL().setType( (TLPropertyType) type );
+
         assignedTypeProperty = null;
         // log.debug("Set assigned TL type");
         return getTL().getType();
@@ -136,20 +131,16 @@ public class OtmAttribute<T extends TLAttribute> extends OtmPropertyBase<TLAttri
 
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
-        OtmLibraryMember oldUser = getAssignedType() == null ? null : getAssignedType().getOwningMember();
+        // Take this's owning member out of the current assigned type's where used list
+        if (getAssignedType() != null && getAssignedType().getOwningMember() != null)
+            getAssignedType().getOwningMember().changeWhereUsed( getOwningMember(), null );
 
-        if (type != null) {
-            if (type.getTL() instanceof TLAttributeType) {
-                setAssignedTLType( (TLAttributeType) type.getTL() );
-                type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
-            }
-        } else {
+        if (type == null)
             setAssignedTLType( null );
-            // remove from type's typeUsers
-            if (oldUser != null)
-                oldUser.addWhereUsed( oldUser, null );
+        else if (type.getTL() instanceof TLAttributeType) {
+            setAssignedTLType( (TLAttributeType) type.getTL() );
+            type.getOwningMember().changeWhereUsed( null, getOwningMember() );
         }
-        // FIXME - needs junit tests. Needs to clear assigned type. When proved, fix element.
         return getAssignedType();
     }
 
@@ -173,10 +164,4 @@ public class OtmAttribute<T extends TLAttribute> extends OtmPropertyBase<TLAttri
         getTL().setType( null );
         getTL().setTypeName( typeName );
     }
-
-    @Override
-    public String toString() {
-        return getName();
-    }
-
 }

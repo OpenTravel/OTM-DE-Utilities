@@ -19,6 +19,7 @@ package org.opentravel.model.otmProperties;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmPropertyOwner;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.schemacompiler.model.TLAttribute;
 
@@ -41,22 +42,13 @@ public class OtmIdAttribute<TL extends TLAttribute> extends OtmAttribute<TLAttri
         return ImageManager.Icons.IDATTR;
     }
 
-    // @Override
-    // public OtmPropertyType getPropertyType() {
-    // return OtmPropertyType.ID;
-    // }
-
-
-    // FIXME
-    // /**
-    // * {@inheritDoc}
-    // * <p>
-    // * Get the name from the compiler based on the assigned type. responsible for setting the name to *Ref
-    // *
-    // * @param name <b>ignored</b> unless compiler does not return a name
-    // */
-    // @Override
-    // public String setName(String name) {
-    // return getName();
-    // }
+    /**
+     * Even though it is a type user, type can not be changed.
+     * 
+     * @see org.opentravel.model.otmProperties.OtmAttribute#setAssignedType(org.opentravel.model.OtmTypeProvider)
+     */
+    @Override
+    public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
+        return null;
+    }
 }

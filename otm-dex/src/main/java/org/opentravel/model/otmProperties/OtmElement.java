@@ -24,8 +24,8 @@ import org.opentravel.common.OtmTypeUserUtils;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.NamedEntity;
+import org.opentravel.schemacompiler.model.TLAttributeType;
 import org.opentravel.schemacompiler.model.TLProperty;
 import org.opentravel.schemacompiler.model.TLPropertyType;
 
@@ -51,12 +51,6 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
      */
     public OtmElement(T tl, OtmPropertyOwner parent) {
         super( tl, parent );
-
-        // // Set the TL owner if not set.
-        // if (tl.getOwner() == null && parent != null && parent.getTL() instanceof TLPropertyOwner) {
-        // ((TLPropertyOwner) parent.getTL()).addElement( tl );
-        // parent.add( this );
-        // }
     }
 
     @Override
@@ -91,6 +85,10 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
         return getTL().getName();
     }
 
+    public int getRepeatCount() {
+        return getTL().getRepeat();
+    }
+
     @Override
     public TLProperty getTL() {
         return (TLProperty) tlObject;
@@ -102,22 +100,13 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
     }
 
     @Override
-    public boolean isManditory() {
-        return getTL().isMandatory();
-    }
-
-    public int getRepeatCount() {
-        return getTL().getRepeat();
-    }
-
-    public int setRepeatCount(int value) {
-        getTL().setRepeat( value );
-        return getRepeatCount();
+    public boolean isInherited() {
+        return getTL().getOwner() != getParent().getTL();
     }
 
     @Override
-    public boolean isInherited() {
-        return getTL().getOwner() != getParent().getTL();
+    public boolean isManditory() {
+        return getTL().isMandatory();
     }
 
     /**
@@ -127,8 +116,11 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
      */
     @Override
     public TLPropertyType setAssignedTLType(NamedEntity type) {
-        if (type instanceof TLPropertyType)
+        if (type == null)
+            getTL().setType( null );
+        else if (type instanceof TLPropertyType)
             getTL().setType( (TLPropertyType) type );
+
         assignedTypeProperty = null;
         log.debug( "Set assigned TL type" );
         return getTL().getType();
@@ -136,19 +128,18 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
 
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
+        // Take this's owning member out of the current assigned type's where used list
+        if (getAssignedType() != null && getAssignedType().getOwningMember() != null)
+            getAssignedType().getOwningMember().changeWhereUsed( getOwningMember(), null );
+
         if (type == null)
-            return null; // May not be a modeled type on undo
-
-        OtmLibraryMember oldUser = null;
-        if (getAssignedType() != null)
-            oldUser = getAssignedType().getOwningMember();
-        if (type.getTL() instanceof TLPropertyType)
-            setAssignedTLType( (TLPropertyType) type.getTL() );
-        if (type.isNameControlled())
-            setName( type.getName() );
-
-        // add to type's typeUsers
-        type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
+            setAssignedTLType( null );
+        else if (type.getTL() instanceof TLPropertyType) {
+            setAssignedTLType( (TLAttributeType) type.getTL() );
+            type.getOwningMember().changeWhereUsed( null, getOwningMember() );
+            if (type.isNameControlled())
+                setName( type.getName() );
+        }
         return getAssignedType();
     }
 
@@ -162,6 +153,11 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
         getTL().setName( name );
         isValid( true );
         return getName();
+    }
+
+    public int setRepeatCount(int value) {
+        getTL().setRepeat( value );
+        return getRepeatCount();
     }
 
     @Override

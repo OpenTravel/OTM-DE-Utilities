@@ -176,7 +176,7 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
             setAssignedTLType( (NamedEntity) type.getTL() );
 
         // add to type's typeUsers
-        type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
+        type.getOwningMember().changeWhereUsed( oldUser, getOwningMember() );
 
         return getAssignedType();
     }

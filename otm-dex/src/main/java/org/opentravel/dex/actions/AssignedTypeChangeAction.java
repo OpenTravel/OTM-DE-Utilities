@@ -29,6 +29,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.model.otmProperties.OtmIdAttribute;
 import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
@@ -42,6 +43,9 @@ public class AssignedTypeChangeAction extends DexRunAction {
     private static final String[] VETOKEYS = {VETO1, VETO2, VETO3};
 
     public static boolean isEnabled(OtmObject subject) {
+        // Id is a type user but can't be changed.
+        if (subject instanceof OtmIdAttribute)
+            return false;
         return (subject.isEditable() && subject instanceof OtmTypeUser);
     }
 
@@ -128,13 +132,10 @@ public class AssignedTypeChangeAction extends DexRunAction {
             // Set value into model
             OtmTypeProvider p = user.setAssignedType( newProvider );
 
-            if (p != newProvider)
-                log.error( "Could not set type to " + newProvider );
-
-            // // Record action to allow undo. Will validate results and warn user.
-            // actionManager.push( this );
-
-            log.debug( "Set type to " + get() );
+            // if (p != newProvider)
+            // log.error( "Could not set type to " + newProvider );
+            // else
+            // log.debug( "Set type to " + get() );
         }
         return get();
     }
@@ -146,7 +147,6 @@ public class AssignedTypeChangeAction extends DexRunAction {
 
     @Override
     public ValidationFindings getVetoFindings() {
-        // TODO create a finding if the outcome is false
         return ValidationUtils.getRelevantFindings( VETOKEYS, otm.getFindings() );
     }
 

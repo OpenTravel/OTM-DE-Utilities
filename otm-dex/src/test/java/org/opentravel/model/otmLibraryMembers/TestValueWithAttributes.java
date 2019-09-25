@@ -56,7 +56,7 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
     public static TLValueWithAttributes buildTL() {
         TLValueWithAttributes tlvwa = new TLValueWithAttributes();
         tlvwa.setName( NAME );
-        tlvwa.setParentType( TestXsdSimple.buildOtm( staticModelManager ).getTL() );
+        tlvwa.setParentType( TestXsdSimple.buildTL() );
 
         // add attributes
         int i = 1;

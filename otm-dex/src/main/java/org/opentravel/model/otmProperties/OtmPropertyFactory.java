@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmFacets.OtmAbstractFacet;
+import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeOwner;
 import org.opentravel.schemacompiler.model.TLIndicator;
@@ -90,8 +91,8 @@ public class OtmPropertyFactory {
      * @param tl
      * @param parent
      */
-    public static OtmPropertyBase<?> create(TLModelElement tl, OtmPropertyOwner parent) {
-        OtmPropertyBase<?> p = null;
+    public static OtmProperty create(TLModelElement tl, OtmPropertyOwner parent) {
+        OtmProperty p = null;
         if (tl instanceof TLIndicator)
             p = OtmPropertyFactory.create( (TLIndicator) tl, parent );
         else if (tl instanceof TLProperty)
@@ -105,25 +106,20 @@ public class OtmPropertyFactory {
         return p;
     }
 
-    public static OtmPropertyBase<?> createID(TLModelElement tl, OtmPropertyOwner parent) {
-        OtmPropertyBase<?> p = null;
-        if (parent.getTL() instanceof TLAttributeOwner) {
-            ((TLAttributeOwner) parent.getTL()).addAttribute( (TLAttribute) tl );
-            p = new OtmIdAttribute<>( (TLAttribute) tl, parent );
+    public static OtmProperty createID(TLModelElement tl, OtmPropertyOwner parent) {
+        OtmProperty p = null;
+        if (tl instanceof TLAttribute) {
+            OtmXsdSimple idType = null;
+            if (parent.getModelManager() != null)
+                idType = parent.getModelManager().getIdType();
+            if (idType != null)
+                ((TLAttribute) tl).setType( idType.getTL() );
+
+            if (parent.getTL() instanceof TLAttributeOwner) {
+                ((TLAttributeOwner) parent.getTL()).addAttribute( (TLAttribute) tl );
+                p = new OtmIdAttribute<>( (TLAttribute) tl, parent );
+            }
         }
         return p;
     }
-    // @Deprecated
-    // public static String getObjectName(OtmProperty property) {
-    // if (property instanceof OtmElement)
-    // return "Element";
-    // if (property instanceof OtmIdReferenceElement)
-    // return "Element Reference";
-    // if (property instanceof OtmAttribute)
-    // return "Attribute";
-    // if (property instanceof OtmIndicator)
-    // return "Indicator";
-    //
-    // return property.getClass().getSimpleName();
-    // }
 }

@@ -39,8 +39,6 @@ public interface OtmProperty extends OtmObject {
 
     public OtmPropertyType getPropertyType();
 
-    public String getRole();
-
     public boolean isEditable();
 
     public boolean isInherited();

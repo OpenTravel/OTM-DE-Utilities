@@ -109,12 +109,12 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     OtmModelManager getModelManager();
 
     /**
-     * Add the user library member to the where used list
+     * Add and remove the users library member to the where used list
      * 
-     * @param oldUser to remove from where used list
-     * @param newUser to add to the where used list
+     * @param userToRemove from where used list, can be null
+     * @param userToAdd to the where used list, can be null
      */
-    void addWhereUsed(OtmLibraryMember oldUser, OtmLibraryMember newUser);
+    void changeWhereUsed(OtmLibraryMember userToRemove, OtmLibraryMember userToAdd);
 
     /**
      * Set or clear action manager that overrides action manager from library. Will only be returned by

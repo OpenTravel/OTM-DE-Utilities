@@ -43,15 +43,18 @@ public class DexFullActionManager extends DexActionManagerBase {
     }
 
     /**
-     * Use reflection on the action to get the action handler's isEnabled method and return its result.
+     * Is the action enabled for the subject? Subject is assumed to be editable because this action manager must only
+     * available to editable objects.
      * <p>
-     * Note: this could be static but do NOT move to DexActions because there are multiple action managers.
+     * Uses reflection on the action to get the action handler's isEnabled method and returns its result. Failure to
+     * invoke returns a result of false.
+     * <p>
+     * Note: this could be static but is not to assure the action managed is retrieved from the appropriate object. Do
+     * NOT move to DexActions because there are multiple action managers.
      */
     @Override
     public boolean isEnabled(DexActions action, OtmObject subject) {
         boolean result = false;
-        // The action manager is only available to editable objects.
-        // if (subject.getOwningMember().isEditable())
         try {
             Method m = action.actionClass().getMethod( "isEnabled", OtmObject.class );
             result = (boolean) m.invoke( null, subject );

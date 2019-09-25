@@ -94,14 +94,11 @@ public enum OtmPropertyType {
         TLModelElement tl = null;
         switch (type) {
             case ATTRIBUTE:
+            case ID:
                 tl = new TLAttribute();
                 break;
             case ELEMENT:
                 tl = new TLProperty();
-                break;
-            case ID:
-                tl = new TLAttribute();
-                // TODO - how to set type to xml:id?
                 break;
             case IDREFATTRIBUTE:
                 tl = new TLAttribute();

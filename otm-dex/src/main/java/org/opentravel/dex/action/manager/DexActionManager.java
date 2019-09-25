@@ -79,6 +79,13 @@ public interface DexActionManager {
     public StringProperty add(DexActions action, String currentValue, OtmObject subject);
 
     /**
+     * Peek at the last action put onto the queue. See {@link #undo()}
+     * 
+     * @return
+     */
+    public DexAction getLastAction();
+
+    /**
      * Get the class name of the last action put onto the queue.
      * 
      * @return
@@ -169,12 +176,5 @@ public interface DexActionManager {
      * 
      */
     public void undo();
-
-    /**
-     * Peek at the last action put onto the queue. See {@link #undo()}
-     * 
-     * @return
-     */
-    public DexAction getLastAction();
 
 }

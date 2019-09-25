@@ -29,7 +29,6 @@ import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmProperties.OtmProperty;
-import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.model.otmProperties.OtmPropertyFactory;
 import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
@@ -64,8 +63,6 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
     implements OtmTypeProvider, OtmChildrenOwner, OtmTypeUser, OtmPropertyOwner {
     private static Log log = LogFactory.getLog( OtmValueWithAttributes.class );
 
-    // private StringProperty assignedTypeProperty;
-
     public OtmValueWithAttributes(String name, OtmModelManager mgr) {
         super( new TLValueWithAttributes(), mgr );
         setName( name );
@@ -76,45 +73,9 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
     }
 
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The base type is a parent that is a VWA. If the parent is not a VWA, the base type is empty/null.
-     */
     @Override
-    public StringProperty baseTypeProperty() {
-        if (getTL().getParentType() instanceof TLValueWithAttributes)
-            return new SimpleStringProperty( getTL().getParentTypeName() );
-        else
-            return new ReadOnlyStringWrapper( "" );
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Return TL-parentType if it is a value with attributes.
-     * 
-     */
-    @Override
-    public OtmValueWithAttributes getBaseType() {
-        return (OtmValueWithAttributes) super.getBaseType();
-    }
-
-    @Override
-    public OtmPropertyBase<?> add(TLModelElement tl) {
-        if (tl instanceof TLIndicator)
-            getTL().addIndicator( (TLIndicator) tl );
-        else if (tl instanceof TLAttribute)
-            getTL().addAttribute( (TLAttribute) tl );
-        else
-            log.debug( "unknown/not-implemented property type." );
-
-        return OtmPropertyFactory.create( tl, this );
-    }
-
-    @Override
-    public OtmPropertyBase<?> add(OtmObject child) {
-        if (child instanceof OtmPropertyBase) {
+    public OtmProperty add(OtmObject child) {
+        if (child instanceof OtmProperty) {
             // Make sure it has not already been added
             if (children == null)
                 children = new ArrayList<>();
@@ -130,11 +91,22 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
                 children.add( child );
             else
                 inheritedChildren.add( child );
-            return (OtmPropertyBase<?>) child;
+            return (OtmProperty) child;
         }
         return null;
     }
 
+    @Override
+    public OtmProperty add(TLModelElement tl) {
+        if (tl instanceof TLIndicator)
+            getTL().addIndicator( (TLIndicator) tl );
+        else if (tl instanceof TLAttribute)
+            getTL().addAttribute( (TLAttribute) tl );
+        else
+            log.debug( "unknown/not-implemented property type." );
+
+        return OtmPropertyFactory.create( tl, this );
+    }
 
     /**
      * {@inheritDoc}
@@ -166,6 +138,32 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * The base type is a parent that is a VWA. If the parent is not a VWA, the base type is empty/null.
+     */
+    @Override
+    public StringProperty baseTypeProperty() {
+        if (getTL().getParentType() instanceof TLValueWithAttributes)
+            return new SimpleStringProperty( getTL().getParentTypeName() );
+        else
+            return new ReadOnlyStringWrapper( "" );
+    }
+
+
+    /**
+     * @see org.opentravel.model.OtmPropertyOwner#delete(org.opentravel.model.otmProperties.OtmProperty)
+     */
+    @Override
+    public void delete(OtmProperty property) {
+        if (property.getTL() instanceof TLIndicator)
+            getTL().removeIndicator( (TLIndicator) property.getTL() );
+        else if (property.getTL() instanceof TLAttribute)
+            getTL().removeAttribute( (TLAttribute) property.getTL() );
+        remove( property );
+    }
+
+    /**
      * @return TL-parentType if it is not a Value with Attributes.
      */
     @Override
@@ -178,9 +176,6 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
         } else {
             return getTL().getParentType();
         }
-        // return getTL().getParentType() instanceof TLValueWithAttributes ?
-        // getBaseType().getAssignedTLType()
-        // : getTL().getParentType();
     }
 
     /**
@@ -190,14 +185,30 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
      */
     @Override
     public OtmTypeProvider getAssignedType() {
-        // TLPropertyType p = getAssignedTLType();
         OtmObject at = OtmModelElement.get( (TLModelElement) getAssignedTLType() );
         return at instanceof OtmTypeProvider ? (OtmTypeProvider) at : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Return TL-parentType if it is a value with attributes.
+     * 
+     */
+    @Override
+    public OtmValueWithAttributes getBaseType() {
+        return (OtmValueWithAttributes) super.getBaseType();
     }
 
     @Override
     public Icons getIconType() {
         return ImageManager.Icons.VWA;
+    }
+
+    @Override
+    public List<OtmObject> getInheritedChildren() {
+        modelInheritedChildren();
+        return inheritedChildren;
     }
 
     @Override
@@ -216,14 +227,14 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
     }
 
     @Override
-    public boolean isNameControlled() {
+    public boolean isInherited() {
         return false;
     }
 
-    // @Override
-    // public boolean isExpanded() {
-    // return true;
-    // }
+    @Override
+    public boolean isNameControlled() {
+        return false;
+    }
 
     /**
      * {@inheritDoc}
@@ -234,45 +245,6 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
     public void modelChildren() {
         getTL().getAttributes().forEach( tla -> OtmPropertyFactory.create( tla, this ) );
         getTL().getIndicators().forEach( tli -> OtmPropertyFactory.create( tli, this ) );
-    }
-
-    @Override
-    public TLPropertyType setAssignedTLType(NamedEntity type) {
-        if (type instanceof TLAttributeType)
-            getTL().setParentType( (TLAttributeType) type );
-        log.debug( "Set assigned TL type" );
-        return getAssignedTLType();
-    }
-
-    @Override
-    public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
-        OtmLibraryMember oldUser = getAssignedType().getOwningMember();
-        if (type != null && type.getTL() instanceof TLAttributeType)
-            setAssignedTLType( (TLAttributeType) type.getTL() );
-
-        // add to type's typeUsers
-        type.getOwningMember().addWhereUsed( oldUser, getOwningMember() );
-
-        return getAssignedType();
-    }
-
-    @Override
-    public String setName(String name) {
-        getTL().setName( name );
-        isValid( true );
-        return getName();
-    }
-
-    @Override
-    public void setTLTypeName(String name) {
-        getTL().setParentType( null );
-        getTL().setParentTypeName( name );
-    }
-
-    @Override
-    public List<OtmObject> getInheritedChildren() {
-        modelInheritedChildren();
-        return inheritedChildren;
     }
 
     @Override
@@ -295,23 +267,6 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
         }
     }
 
-    @Override
-    public boolean isInherited() {
-        return false;
-    }
-
-    /**
-     * @see org.opentravel.model.OtmPropertyOwner#delete(org.opentravel.model.otmProperties.OtmProperty)
-     */
-    @Override
-    public void delete(OtmProperty property) {
-        if (property.getTL() instanceof TLIndicator)
-            getTL().removeIndicator( (TLIndicator) property.getTL() );
-        else if (property.getTL() instanceof TLAttribute)
-            getTL().removeAttribute( (TLAttribute) property.getTL() );
-        remove( property );
-    }
-
     /**
      * @see org.opentravel.model.OtmPropertyOwner#remove(org.opentravel.model.otmProperties.OtmProperty)
      */
@@ -322,5 +277,44 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
         if (getInheritedChildren().contains( property ))
             getInheritedChildren().remove( property );
     }
+
+    @Override
+    public TLPropertyType setAssignedTLType(NamedEntity type) {
+        if (type == null)
+            getTL().setParentType( null );
+        else if (type instanceof TLAttributeType)
+            getTL().setParentType( (TLAttributeType) type );
+        log.debug( "Set assigned TL type" );
+        return getAssignedTLType();
+    }
+
+    @Override
+    public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
+        // Take this's owning member out of the current assigned type's where used list
+        if (getAssignedType() != null && getAssignedType().getOwningMember() != null)
+            getAssignedType().getOwningMember().changeWhereUsed( getOwningMember(), null );
+
+        if (type == null)
+            setAssignedTLType( null );
+        else if (type.getTL() instanceof TLAttributeType) {
+            setAssignedTLType( (TLAttributeType) type.getTL() );
+            type.getOwningMember().changeWhereUsed( null, getOwningMember() );
+        }
+        return getAssignedType();
+    }
+
+    @Override
+    public String setName(String name) {
+        getTL().setName( name );
+        isValid( true );
+        return getName();
+    }
+
+    @Override
+    public void setTLTypeName(String name) {
+        getTL().setParentType( null );
+        getTL().setParentTypeName( name );
+    }
+
 
 }
