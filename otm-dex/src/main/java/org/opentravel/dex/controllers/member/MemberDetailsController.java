@@ -219,7 +219,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         changeBaseButton.setDisable( true ); // TEMP
         baseTypeName.setText( member.baseTypeProperty().get() );
 
-        // Assigned type
+        // Assigned type label
         final String TYPELABEL = "Assigned Type";
         final String TYPELABELVWA = "Value Type";
         final String TYPELABELCORE = "Simple Type";
@@ -234,9 +234,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         else if (member instanceof OtmResource)
             typeLabel.setText( TYPELABELRESOURCE );
 
-        // icon?
-
-        // Assigned Type
+        // Assigned Type field
         if (member.getActionManager().isEnabled( DexActions.TYPECHANGE, member )) {
             changeTypeButton.setDisable( false );
             changeTypeButton.setOnAction( e -> setAssignedType() );
