@@ -112,6 +112,12 @@ public abstract class DexActionManagerBase implements DexActionManager {
         return property;
     }
 
+    //
+    // FIXME -
+    public void clearQueue() {
+    	// FIXME - implement
+    }
+    
     /**
      * Change Listener for actions on booleans.
      */
