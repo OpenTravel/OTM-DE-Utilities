@@ -127,6 +127,7 @@ public class NewLibraryMemberAction extends DexRunAction {
 
     @Override
     public ValidationFindings getVetoFindings() {
+    	// TODO - should no library be a veto?
         return null;
     }
 

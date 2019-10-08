@@ -76,6 +76,8 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
 
     private void setupAddMenu(Menu menu) {
         MenuItem item;
+        // FIXME - for business and choice objects, add items for facets and separator
+        // Consider - should the list of values be from the action?  The facets will not be propertyTypes!
         for (OtmPropertyType type : OtmPropertyType.values()) {
             item = new MenuItem( type.label() );
             item.setOnAction( e -> addProperty( type ) );
@@ -99,6 +101,7 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
 
     private void deleteProperty() {
         OtmProperty p = getProperty();
+        // FIXME - does not work!
         if (p != null) {
             p.getActionManager().run( DexActions.DELETEPROPERTY, p );
         }

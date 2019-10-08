@@ -60,9 +60,15 @@ public class DeleteLibraryMemberAction extends DexRunAction {
             deletedMember = (OtmLibraryMember) otm;
             memberLibrary = otm.getLibrary();
 
+            // FIXME - one of these should do the other
+            // Both of them are the simply remove (map, TLLibrary)
+            // *Remove* is the simple method
+            // *Delete* is the do-it-all action.
+            // Model Manager should be the controller
             otm.getModelManager().remove( deletedMember );
             memberLibrary.remove( deletedMember );
             log.debug( "Deleted library member: " + deletedMember );
+            // FIXME - validation status not changed on types this member was assigned to
         }
         return get(); // must return non-null to be put on queue
     }
@@ -110,6 +116,7 @@ public class DeleteLibraryMemberAction extends DexRunAction {
 
     @Override
     public OtmLibraryMember undoIt() {
+    	// FIXME - on undo, the types assigned to this member are no longer assigned
         memberLibrary.add( deletedMember );
         deletedMember.getModelManager().add( deletedMember );
 

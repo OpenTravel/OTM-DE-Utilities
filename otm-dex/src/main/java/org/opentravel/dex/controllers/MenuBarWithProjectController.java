@@ -69,8 +69,9 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     //
     // FIXME - need to add ability to unset user settings
-    //
-
+    // FIXME - need to fix the size of the region used for undo
+//
+    
     // FXML injected objects
     @FXML
     private ComboBox<String> projectCombo;

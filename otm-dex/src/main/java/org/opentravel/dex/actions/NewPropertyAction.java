@@ -39,7 +39,7 @@ public class NewPropertyAction extends DexRunAction {
     public static boolean isEnabled(OtmObject subject) {
         return subject instanceof OtmPropertyOwner && subject.isEditable();
     }
-
+        
     private OtmProperty newProperty = null;
 
     public NewPropertyAction() {

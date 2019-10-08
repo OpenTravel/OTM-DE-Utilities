@@ -34,18 +34,18 @@ import org.opentravel.model.OtmObject;
  */
 public enum DexActions {
 
-    NAMECHANGE(NameChangeAction.class, OtmObjectModifiedEvent.class),
     DESCRIPTIONCHANGE(DescriptionChangeAction.class, OtmObjectModifiedEvent.class),
-    TYPECHANGE(AssignedTypeChangeAction.class, OtmObjectModifiedEvent.class),
     DEPRECATIONCHANGE(DeprecationChangeAction.class, OtmObjectModifiedEvent.class),
     EXAMPLECHANGE(ExampleChangeAction.class, OtmObjectModifiedEvent.class),
     MANDITORYCHANGE(ManditoryChangeAction.class, OtmObjectModifiedEvent.class),
+    NAMECHANGE(NameChangeAction.class, OtmObjectModifiedEvent.class),
     PROPERTYROLECHANGE(PropertyRoleChangeAction.class, OtmObjectModifiedEvent.class),
-    //
+    TYPECHANGE(AssignedTypeChangeAction.class, OtmObjectModifiedEvent.class),
+    // Library members
     NEWLIBRARYMEMBER(NewLibraryMemberAction.class, DexModelChangeEvent.class),
     SETMEMBERLIBRARY(SetLibraryAction.class, DexModelChangeEvent.class),
     DELETELIBRARYMEMBER(DeleteLibraryMemberAction.class, DexModelChangeEvent.class),
-    //
+    // Properties
     NEWPROPERTY(NewPropertyAction.class, OtmObjectChangeEvent.class),
     DELETEPROPERTY(DeletePropertyAction.class, OtmObjectChangeEvent.class),
     SETREPEATCOUNT(SetRepeatCountAction.class, OtmObjectModifiedEvent.class),

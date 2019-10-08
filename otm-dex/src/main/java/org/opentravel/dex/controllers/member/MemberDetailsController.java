@@ -218,7 +218,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         // Base type
         changeBaseButton.setDisable( true ); // TEMP
         baseTypeName.setText( member.baseTypeProperty().get() );
-
+// FIXME - add action
+        
         // Assigned type label
         final String TYPELABEL = "Assigned Type";
         final String TYPELABELVWA = "Value Type";

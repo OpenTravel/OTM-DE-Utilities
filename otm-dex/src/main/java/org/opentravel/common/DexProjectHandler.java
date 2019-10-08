@@ -71,6 +71,7 @@ public class DexProjectHandler {
      * 
      * @param library
      */
+    // FIXME - doen't seem to do anything
     public void removeLibrary(OtmLibrary library) {
         // Select one project
         List<OtmProject> projects = library.getProjects();
