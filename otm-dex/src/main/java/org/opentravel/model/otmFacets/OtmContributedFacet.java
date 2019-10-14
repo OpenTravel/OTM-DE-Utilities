@@ -50,6 +50,12 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
     }
 
     @Override
+    public void clearNameProperty() {
+        nameProperty = null;
+        getContributor().clearNameProperty();
+    }
+
+    @Override
     public Icons getIconType() {
         return ImageManager.Icons.FACET_CONTRIBUTED;
     }
@@ -78,6 +84,11 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
     @Override
     public TLContextualFacet getTL() {
         return (TLContextualFacet) tlObject;
+    }
+
+    @Override
+    public boolean isRenameable() {
+        return true;
     }
 
     /**

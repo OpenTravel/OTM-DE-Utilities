@@ -105,8 +105,9 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
     @Override
     public String setName(String name) {
         getTL().setName( name );
-        isValid( true );
-        return getName();
+        return super.setName( name );
+        // isValid( true );
+        // return getName();
     }
 
     @Override

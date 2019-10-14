@@ -115,9 +115,9 @@ public abstract class DexActionManagerBase implements DexActionManager {
     //
     // FIXME -
     public void clearQueue() {
-    	// FIXME - implement
+        // FIXME - implement
     }
-    
+
     /**
      * Change Listener for actions on booleans.
      */
@@ -141,10 +141,10 @@ public abstract class DexActionManagerBase implements DexActionManager {
     protected void doString(DexStringAction action, ObservableValue<? extends String> o, String oldString,
         String newString) {
         if (!ignore) {
-            ignore = true;
+            // ignore = true;
             action.doIt( o, oldString, newString );
+            // ignore = false;
             push( action );
-            ignore = false;
         }
     }
 
@@ -181,6 +181,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
             log.debug( "Pushed a null action!" );
             return;
         }
+        log.debug( "Pushing action onto queue: " + ignore + " " + action.toString() );
         if (queue.contains( action )) {
             // Make sure not a duplicate
             log.debug( "Duplicate Action found!" );

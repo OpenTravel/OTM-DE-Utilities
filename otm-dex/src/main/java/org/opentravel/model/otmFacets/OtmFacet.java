@@ -54,7 +54,6 @@ public abstract class OtmFacet<T extends TLFacet> extends OtmAbstractFacet<TLFac
         return getParent();
     }
 
-
     // /**
     // * Create a facet for OtmOperations which are not library members
     // *

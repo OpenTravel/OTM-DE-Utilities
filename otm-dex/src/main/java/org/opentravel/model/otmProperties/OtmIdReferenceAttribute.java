@@ -20,7 +20,9 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.schemacompiler.codegen.util.XsdCodegenUtils;
 import org.opentravel.schemacompiler.model.TLAttribute;
+import org.opentravel.schemacompiler.model.TLProperty;
 
 /**
  * Abstract OTM Node for attribute properties.
@@ -39,5 +41,18 @@ public class OtmIdReferenceAttribute<TL extends TLAttribute> extends OtmAttribut
     @Override
     public Icons getIconType() {
         return ImageManager.Icons.IDREFATTR;
+    }
+
+    /**
+     * Name changes to references are not changed in the TL object when the name changes to the assigned type. Force
+     * that change and set the name property to null.
+     * 
+     * @see org.opentravel.model.OtmModelElement#clearNameProperty()
+     */
+    @Override
+    public void clearNameProperty() {
+        nameProperty = null;
+        String name = XsdCodegenUtils.getGlobalTypeName( getAssignedTLType(), new TLProperty() );
+        getTL().setName( name );
     }
 }

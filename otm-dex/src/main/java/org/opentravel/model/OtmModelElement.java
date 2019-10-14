@@ -352,13 +352,28 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     @Override
     public StringProperty nameProperty() {
         if (nameProperty == null) {
-            if (getActionManager() != null)
+            if (getActionManager() != null && isRenameable())
                 nameProperty = getActionManager().add( DexActions.NAMECHANGE, getName(), this );
             else
                 nameProperty = new ReadOnlyStringWrapper( getName() );
         }
-        nameProperty.set( getName() );
+        // nameProperty.set( getName() );
         return nameProperty;
+    }
+
+    @Override
+    public void clearNameProperty() {
+        nameProperty = null;
+    }
+
+    /**
+     * Override to make false.
+     * 
+     * @return
+     */
+    @Override
+    public boolean isRenameable() {
+        return true;
     }
 
     @Override

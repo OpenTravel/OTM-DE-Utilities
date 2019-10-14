@@ -22,6 +22,7 @@ import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmAbstractFacet;
 import org.opentravel.model.otmFacets.OtmDetailFacet;
 import org.opentravel.model.otmFacets.OtmSummaryFacet;
@@ -105,10 +106,20 @@ public abstract class OtmComplexObjects<T extends TLComplexTypeBase> extends Otm
         return true;
     }
 
-    // @Override
-    // public boolean isExpanded() {
-    // return true;
-    // }
+    @Override
+    public String setName(String name) {
+        // sub-type must first: getTL().setName( name );
+
+        // Clear the name property for all facets
+        for (OtmObject child : getChildren())
+            child.clearNameProperty();
+        // Clear the name property for all users of this object
+        for (OtmLibraryMember lm : getWhereUsed())
+            for (OtmTypeUser user : lm.getDescendantsTypeUsers())
+                user.clearNameProperty();
+        isValid( true );
+        return getName();
+    }
 
     /**
      * @return

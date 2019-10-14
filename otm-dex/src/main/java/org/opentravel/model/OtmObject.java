@@ -183,4 +183,14 @@ public interface OtmObject {
      * @return the example string.
      */
     public String setExample(String value);
+
+    /**
+     * @return
+     */
+    boolean isRenameable();
+
+    /**
+     * Simply set the name property to null.
+     */
+    void clearNameProperty();
 }

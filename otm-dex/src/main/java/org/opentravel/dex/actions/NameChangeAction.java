@@ -30,7 +30,8 @@ public class NameChangeAction extends DexStringAction {
     private static Log log = LogFactory.getLog( NameChangeAction.class );
 
     private static final String VETO1 = "org.opentravel.schemacompiler.TLProperty.name.ELEMENT_REF_NAME_MISMATCH";
-    private static final String VETO2 = "org.opentravel.schemacompiler.TLAttribute.name.INVALID_REFERENCE_NAME";
+    // private static final String VETO2 = "org.opentravel.schemacompiler.TLAttribute.name.INVALID_REFERENCE_NAME";
+    private static final String VETO2 = "";
     private static final String VETO3 = "org.opentravel.schemacompiler.TLProperty.name.PATTERN_MISMATCH";
     private static final String[] VETOKEYS = {VETO1, VETO2, VETO3};
 
@@ -75,9 +76,6 @@ public class NameChangeAction extends DexStringAction {
         super.doIt( o, oldName, modifiedName );
 
         // Status is quickly overriden, use warning when user settings created
-        // if (!name.equals( modifiedName ))
-        // otm.getActionManager()
-        // .postStatus( "Warning: Changed the value entered: " + name + " to valid name of " + modifiedName );
 
         return get();
     }

@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.schemacompiler.validate.FindingMessageFormat;
 import org.opentravel.schemacompiler.validate.FindingType;
+import org.opentravel.schemacompiler.validate.Validatable;
 import org.opentravel.schemacompiler.validate.ValidationFinding;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
@@ -70,6 +71,8 @@ public class ValidationUtils {
      * @return
      */
     private static String trim(String key) {
+        if (key.isEmpty())
+            return "";
         return key.substring( key.lastIndexOf( '.' ), key.length() );
     }
 
@@ -82,15 +85,15 @@ public class ValidationUtils {
         if (findings != null && !findings.isEmpty())
             for (ValidationFinding f : findings.getAllFindingsAsList()) {
                 String key = trim( f.getMessageKey() );
-                if (keys.contains( key ))
+                if (keys.contains( key )) {
                     relevant.addFinding( f );
-                else
+                    // String msg = f.getFormattedMessage(FindingMessageFormat.IDENTIFIED_FORMAT);
+                    String msg2 = f.getFormattedMessage( FindingMessageFormat.MESSAGE_ONLY_FORMAT );
+                    // FindingType type = f.getType();
+                    Validatable source = f.getSource();
+                    log.debug( "Relevant Finding: " + source.getValidationIdentity() + " : " + msg2 );
+                } else
                     log.debug( "Unrelevant Finding: " + key );
-                // String msg = f.getFormattedMessage(FindingMessageFormat.IDENTIFIED_FORMAT);
-                // String msg2 = f.getFormattedMessage(FindingMessageFormat.MESSAGE_ONLY_FORMAT);
-                // FindingType type = f.getType();
-                // Validatable source = f.getSource();
-                // log.debug("Finding: " + msg2);
             }
         return relevant;
     }

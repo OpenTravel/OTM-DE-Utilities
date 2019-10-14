@@ -62,6 +62,11 @@ public class OtmOperationFacet extends OtmAbstractFacet<TLFacet> {
     }
 
     @Override
+    public boolean isRenameable() {
+        return true;
+    }
+
+    @Override
     public OtmLibraryMember getOwningMember() {
         return getParent().getOwningMember();
     }

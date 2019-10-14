@@ -268,6 +268,11 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
     }
 
     @Override
+    public boolean isRenameable() {
+        return false;
+    }
+
+    @Override
     public void remove(OtmProperty property) {
         if (children.contains( property ))
             children.remove( property );

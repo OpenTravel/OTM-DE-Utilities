@@ -55,14 +55,15 @@ public class DexFullActionManager extends DexActionManagerBase {
     @Override
     public boolean isEnabled(DexActions action, OtmObject subject) {
         boolean result = false;
-        try {
-            Method m = action.actionClass().getMethod( "isEnabled", OtmObject.class );
-            result = (boolean) m.invoke( null, subject );
-            // log.debug( "Method " + action.toString() + " isEnabled invoke result: " + result );
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-            | InvocationTargetException e) {
-            log.error( "Could not invoke action.isEnabled( ):" + e.getMessage() );
-        }
+        if (subject != null)
+            try {
+                Method m = action.actionClass().getMethod( "isEnabled", OtmObject.class );
+                result = (boolean) m.invoke( null, subject );
+                // log.debug( "Method " + action.toString() + " isEnabled invoke result: " + result );
+            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+                log.error( "Could not invoke action.isEnabled( ):" + e.getMessage() );
+            }
         return result;
     }
 
