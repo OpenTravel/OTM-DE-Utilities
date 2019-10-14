@@ -25,7 +25,6 @@ import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.schemacompiler.model.NamedEntity;
-import org.opentravel.schemacompiler.model.TLAttributeType;
 import org.opentravel.schemacompiler.model.TLProperty;
 import org.opentravel.schemacompiler.model.TLPropertyType;
 
@@ -135,10 +134,11 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
         if (type == null)
             setAssignedTLType( null );
         else if (type.getTL() instanceof TLPropertyType) {
-            setAssignedTLType( (TLAttributeType) type.getTL() );
+            setAssignedTLType( (TLPropertyType) type.getTL() );
             type.getOwningMember().changeWhereUsed( null, getOwningMember() );
             if (type.isNameControlled())
                 setName( type.getName() );
+            clearNameProperty();
         }
         return getAssignedType();
     }

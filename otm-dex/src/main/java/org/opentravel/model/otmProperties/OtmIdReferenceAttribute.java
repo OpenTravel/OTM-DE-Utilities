@@ -20,9 +20,7 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.schemacompiler.codegen.util.XsdCodegenUtils;
 import org.opentravel.schemacompiler.model.TLAttribute;
-import org.opentravel.schemacompiler.model.TLProperty;
 
 /**
  * Abstract OTM Node for attribute properties.
@@ -52,7 +50,8 @@ public class OtmIdReferenceAttribute<TL extends TLAttribute> extends OtmAttribut
     @Override
     public void clearNameProperty() {
         nameProperty = null;
-        String name = XsdCodegenUtils.getGlobalTypeName( getAssignedTLType(), new TLProperty() );
-        getTL().setName( name );
+        // String name = XsdCodegenUtils.getGlobalTypeName( getAssignedTLType(), new TLProperty() );
+        if (getAssignedType() != null)
+            getTL().setName( getAssignedType().getName() + "Ref" );
     }
 }
