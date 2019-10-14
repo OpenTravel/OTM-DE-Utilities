@@ -93,6 +93,11 @@ public class OtmServiceObject extends OtmLibraryMemberBase<TLService> {
         return false;
     }
 
+    @Override
+    public OtmObject setBaseType(OtmObject baseObj) {
+        return null; // No-Op
+    }
+
     // @Override
     // public boolean isExpanded() {
     // return true;

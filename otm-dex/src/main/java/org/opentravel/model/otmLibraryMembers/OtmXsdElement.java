@@ -58,6 +58,11 @@ public class OtmXsdElement extends OtmLibraryMemberBase<XSDElement> implements O
         return super.getLibrary();
     }
 
+    @Override
+    public OtmObject setBaseType(OtmObject baseObj) {
+        return null; // No-Op
+    }
+
     // @Override
     // public StringProperty assignedTypeProperty() {
     // if (assignedTypeProperty == null) {

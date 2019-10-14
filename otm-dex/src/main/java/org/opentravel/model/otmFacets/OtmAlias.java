@@ -135,7 +135,7 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
 
     @Override
     public void modelInheritedChildren() {
-        // TODO Auto-generated method stub
+        // TODO - model child ?? do we need to?
     }
 
     /**

@@ -127,6 +127,29 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
     }
 
     @Test
+    public void testBaseType() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
+        NoSuchMethodException, InvocationTargetException {
+        testBaseType( subject );
+    }
+
+    public void testBaseType(OtmLibraryMember subject) throws ExceptionInInitializerError, InstantiationException,
+        IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        // Get another of the same type
+        OtmObject base =
+            OtmLibraryMemberType.buildMember( OtmLibraryMemberType.get( subject ), "Base", subject.getModelManager() );
+        // When - extension set
+        OtmObject result = subject.setBaseType( base );
+        if (subject.getTL() instanceof TLExtensionOwner) {
+            assertTrue( "Then", ((TLExtensionOwner) subject.getTL()).getExtension() != null );
+            assertTrue( "Then",
+                ((TLExtensionOwner) subject.getTL()).getExtension().getExtendsEntity() == base.getTL() );
+            assertTrue( "Then - must have returned base type.", result == base );
+            assertTrue( "Then - all extension owners must be extended", subject.getBaseType() == base );
+            log.debug( "Created base type for " + subject.getClass().getSimpleName() );
+        }
+    }
+
+    @Test
     public void testChildrenOwner() {
         if (subject instanceof OtmChildrenOwner)
             testChildrenOwner( (OtmChildrenOwner) subject );

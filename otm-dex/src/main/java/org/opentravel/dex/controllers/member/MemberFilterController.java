@@ -58,9 +58,9 @@ import javafx.scene.layout.HBox;
  *
  */
 public class MemberFilterController extends DexIncludedControllerBase<Void> {
-    public enum LibraryFilterNodes {
-        Library, Name, Type, State;
-    }
+    // public enum LibraryFilterNodes {
+    // Library, Name, Type, State;
+    // }
 
     private static Log log = LogFactory.getLog( MemberFilterController.class );
 
@@ -257,13 +257,10 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         memberTypeCombo.setPromptText( "Object Type" );
         memberTypeCombo.setOnAction( this::setTypeFilter );
         memberTypeCombo.setItems( data );
-        // errorsButton.setVisible(false); // hide for now
         errorsButton.setOnAction( e -> setErrorsOnly() );
-
         memberNameFilter.textProperty().addListener( (v, o, n) -> applyTextFilter() );
         // memberNameFilter.setOnKeyTyped(e -> applyTextFilter(e)); // Key event happens before the textField is updated
         // memberNameFilter.setOnAction(e -> applyTextFilter()); // Fires on CR only
-
         editableButton.setOnAction( e -> setEditableOnly() );
         latestButton.setOnAction( e -> setLatestOnly() );
         builtInsButton.setOnAction( e -> setBuiltIns() );
@@ -280,16 +277,8 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             log.warn( "Filter passed invalid member." );
             return true;
         }
-        // String n = member.getName();
-        // String v = member.getLibrary().getVersion();
-        // boolean valid = member.isValid();
-        // boolean editable = member.isEditable();
-        // boolean isLatest = member.getLibrary().isLatestVersion();
-        // if (member.getName().equals( "AcceptableGuarantee" )) {
-        // boolean lv = member.getLibrary().isLatestVersion();
-        // log.debug( "Is " + member.getName() + "version = " + member.getLibrary().getVersion() + " latest version? "
-        // + member.getLibrary().isLatestVersion() );
-        // }
+        // debugPrint( member );
+
         if (libraryFilter != null && !member.getLibrary().getName().startsWith( libraryFilter ))
             return false;
         if (textFilterValue != null && !member.getName().toLowerCase().startsWith( textFilterValue ))
@@ -309,6 +298,19 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         // No filters applied OR passed all filters
         return true;
     }
+
+    // private void debugPrint(OtmLibraryMember member) {
+    // String n = member.getName();
+    // String v = member.getLibrary().getVersion();
+    // boolean valid = member.isValid();
+    // boolean editable = member.isEditable();
+    // boolean isLatest = member.getLibrary().isLatestVersion();
+    // if (member.getName().equals( "AcceptableGuarantee" )) {
+    // boolean lv = member.getLibrary().isLatestVersion();
+    // log.debug( "Is " + member.getName() + "version = " + member.getLibrary().getVersion() + " latest version? "
+    // + member.getLibrary().isLatestVersion() );
+    // }
+    // }
 
     public void librarySelectionHandler(DexLibrarySelectionEvent event) {
         if (event != null && event.getLibrary() != null) {

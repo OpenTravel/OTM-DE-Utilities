@@ -42,6 +42,7 @@ public class OtmCustomFacet extends OtmContextualFacet {
                 "Tried to create detail facet from wrong facet type: " + tl.getFacetType() );
     }
 
+
     @Override
     public String setName(String text) {
         // TODO Auto-generated method stub

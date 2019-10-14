@@ -23,6 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.schemacompiler.model.TLAttribute;
@@ -30,6 +31,8 @@ import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLFacetType;
 import org.opentravel.schemacompiler.model.TLProperty;
+
+import java.util.List;
 
 /**
  * Verifies the functions of the <code>OtmCustomFacet</code> class. Very minimal testing without contributed facets or
@@ -46,6 +49,30 @@ public class TestCustomFacet extends TestOtmLibraryMemberBase<OtmContextualFacet
         subject = buildOtm( staticModelManager );
         baseObject = buildOtm( staticModelManager );
         // baseObject.setName( "BaseCF" );
+    }
+
+    @Test
+    public void testInheritance() {
+        OtmBusinessObject baseBo = TestBusiness.buildOtm( staticModelManager );
+        baseBo.setName( "BaseBO" );
+        OtmContextualFacet inheritedCf = buildOtm( staticModelManager, baseBo );
+        assertTrue( "Given", !inheritedCf.isInherited() );
+
+        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        OtmContextualFacet cf = buildOtm( staticModelManager, bo );
+        bo.setName( "SubType" );
+        assertTrue( "Given", !cf.isInherited() );
+
+        // When - bo extends baseBo
+        bo.setBaseType( baseBo );
+        assertTrue( "Given", bo.getBaseType() == baseBo );
+        assertTrue( "Given", bo.getTL().getExtension() != null );
+        assertTrue( "Given", bo.getTL().getExtension().getExtendsEntity() == baseBo.getTL() );
+
+        // Then
+        List<OtmObject> ic1 = bo.getInheritedChildren();
+        List<OtmObject> ic2 = baseBo.getInheritedChildren();
+        // assertTrue( "Extension must have inherited CF", bo.getInheritedChildren().contains( inheritedCf ) );
     }
 
     @Test
@@ -76,6 +103,19 @@ public class TestCustomFacet extends TestOtmLibraryMemberBase<OtmContextualFacet
     }
 
     /** ****************************************************** **/
+
+    /**
+     * Create custom facet and contribute it to the passed business object.
+     * 
+     * @param modelManager
+     * @param bo
+     * @return
+     */
+    private static OtmContextualFacet buildOtm(OtmModelManager modelManager, OtmBusinessObject bo) {
+        OtmContextualFacet cf = buildOtm( modelManager );
+        bo.add( cf );
+        return cf;
+    }
 
     /**
      * Build a custom facet. It will not have where contributed or children!

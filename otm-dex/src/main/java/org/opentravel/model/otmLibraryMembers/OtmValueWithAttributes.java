@@ -304,6 +304,11 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
     }
 
     @Override
+    public OtmObject setBaseType(OtmObject baseObj) {
+        return null; // No-Op
+    }
+
+    @Override
     public String setName(String name) {
         getTL().setName( name );
         isValid( true );

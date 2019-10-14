@@ -157,6 +157,11 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
     }
 
     @Override
+    public OtmObject setBaseType(OtmObject baseObj) {
+        return null; // No-Op
+    }
+
+    @Override
     public void modelInheritedChildren() {
         // TODO Auto-generated method stub
     }

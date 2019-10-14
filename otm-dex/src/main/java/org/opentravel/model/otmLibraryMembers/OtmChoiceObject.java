@@ -25,6 +25,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmFacets.OtmSharedFacet;
 import org.opentravel.schemacompiler.model.TLChoiceObject;
+import org.opentravel.schemacompiler.model.TLExtension;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,6 +57,19 @@ public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
     public Icons getIconType() {
         return ImageManager.Icons.CHOICE;
     }
+
+    @Override
+    public OtmObject setBaseType(OtmObject baseObj) {
+        if (baseObj instanceof OtmChoiceObject) {
+            TLExtension tlExt = getTL().getExtension();
+            if (tlExt == null)
+                tlExt = new TLExtension();
+            tlExt.setExtendsEntity( ((OtmChoiceObject) baseObj).getTL() );
+            getTL().setExtension( tlExt );
+        }
+        return getBaseType();
+    }
+
 
     @Override
     public String setName(String name) {

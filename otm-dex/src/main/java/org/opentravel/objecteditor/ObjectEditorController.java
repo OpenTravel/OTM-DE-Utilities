@@ -106,7 +106,7 @@ public class ObjectEditorController extends DexMainControllerBase {
 
         // log.debug( "Hide dialog setting: " + userSettings.getHideOpenProjectDialog() );
 
-        // TODO
+        // TODO - set initial position
         // Point position = userSettings.getWindowPosition();
 
         // Set up menu bar and show the project combo

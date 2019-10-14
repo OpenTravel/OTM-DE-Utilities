@@ -258,14 +258,6 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         return new Tooltip( TOOLTIP );
     }
 
-    // /**
-    // * @see org.opentravel.model.OtmChildrenOwner#isExpanded()
-    // */
-    // @Override
-    // public boolean isExpanded() {
-    // // TODO Auto-generated method stub
-    // return false;
-    // }
 
     public boolean isIdGroup() {
         return getTL().isIdGroup();
@@ -284,7 +276,7 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
      */
     @Override
     public void modelInheritedChildren() {
-        // TODO Auto-generated method stub
+        // TODO - model inherited children ??
     }
 
     public void setIdGroup(boolean value) {

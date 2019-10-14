@@ -716,6 +716,18 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return getAssignedType();
     }
 
+    @Override
+    public OtmObject setBaseType(OtmObject baseObj) {
+        if (baseObj instanceof OtmResource) {
+            TLExtension tlExt = getTL().getExtension();
+            if (tlExt == null)
+                tlExt = new TLExtension();
+            tlExt.setExtendsEntity( ((OtmResource) baseObj).getTL() );
+            getTL().setExtension( tlExt );
+        }
+        return getBaseType();
+    }
+
     /**
      * Set the base path on this resource. If override is true, do all the action resources also.
      * 

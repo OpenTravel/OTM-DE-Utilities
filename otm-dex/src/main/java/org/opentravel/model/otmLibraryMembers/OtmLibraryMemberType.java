@@ -55,6 +55,13 @@ public enum OtmLibraryMemberType {
         return "";
     }
 
+    public static OtmLibraryMemberType get(OtmLibraryMember member) {
+        for (OtmLibraryMemberType type : values())
+            if (type.memberClass() == member.getClass())
+                return type;
+        return null;
+    }
+
     /**
      * Build a library member. Set its model manager, TL object and adds a listener.
      * 

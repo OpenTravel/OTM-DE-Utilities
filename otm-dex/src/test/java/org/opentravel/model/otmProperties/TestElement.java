@@ -22,7 +22,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
-import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.schemacompiler.model.TLProperty;
 import org.opentravel.schemacompiler.model.TLPropertyOwner;
 
@@ -30,14 +29,14 @@ import org.opentravel.schemacompiler.model.TLPropertyOwner;
  * Test class for Property Type Enumeration
  * <p>
  */
-public class TestElement extends TestOtmPropertiesBase<OtmElement> {
+public class TestElement extends TestOtmPropertiesBase<OtmElement<?>> {
     private static Log log = LogFactory.getLog( TestElement.class );
 
     @BeforeClass
     public static void beforeClass() {
         staticModelManager = new OtmModelManager( null, null );
         baseObject = TestBusiness.buildOtm( staticModelManager );
-        testResource = TestResource.buildOtm( staticModelManager );
+        // testResource = TestResource.buildOtm( staticModelManager );
 
         log.debug( "Before class ran." );
     }
@@ -57,7 +56,7 @@ public class TestElement extends TestOtmPropertiesBase<OtmElement> {
      * @param resource
      * @return
      */
-    public static OtmElement buildOtm() {
+    public static OtmElement<?> buildOtm() {
         return null;
     }
 
@@ -70,7 +69,7 @@ public class TestElement extends TestOtmPropertiesBase<OtmElement> {
      * 
      * @param resource
      */
-    public static OtmElement buildFullOtm(TLPropertyOwner owner) {
+    public static OtmElement<?> buildFullOtm(TLPropertyOwner owner) {
         return null;
     }
 

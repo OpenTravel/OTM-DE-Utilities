@@ -188,6 +188,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return null;
     }
 
+
     @Override
     public boolean contains(OtmObject o) {
         return children.contains( o );
@@ -399,7 +400,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             inheritedChildren.forEach( i -> setContributor( i, baseType ) );
 
             // if (ghosts.size() > 0)
-            // log.debug("Found and modeled " + ghosts.size() + " ghost facets on " + this.getName());
+            log.debug( "Found and modeled " + ghosts.size() + " ghost facets on " + this.getName() );
         }
     }
 

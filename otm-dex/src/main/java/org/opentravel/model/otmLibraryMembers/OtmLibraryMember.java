@@ -117,6 +117,14 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     void changeWhereUsed(OtmLibraryMember userToRemove, OtmLibraryMember userToAdd);
 
     /**
+     * Set the base type if supported.
+     * 
+     * @param baseObject
+     * @return the object assigned as base type or null
+     */
+    public abstract OtmObject setBaseType(OtmObject baseObject);
+
+    /**
      * Set or clear action manager that overrides action manager from library. Will only be returned by
      * {@link #getActionManager()} when library is null. Should only be used when member is being worked on in a wizard
      * or task.

@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.schemacompiler.model.XSDSimpleType;
@@ -50,6 +51,11 @@ public class OtmXsdSimple extends OtmSimpleObjects<XSDSimpleType> implements Otm
     public OtmLibrary getLibrary() {
         // OtmLibrary l = super.getLibrary();
         return super.getLibrary();
+    }
+
+    @Override
+    public OtmObject setBaseType(OtmObject baseObj) {
+        return null; // No-Op
     }
 
     // @Override
