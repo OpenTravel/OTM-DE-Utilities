@@ -46,8 +46,9 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
 
     @Override
     public void clone(OtmProperty source) {
-        setName( source.getName() );
+        setName( fixName( source.getName() ) );
         setDescription( source.getDescription() );
+        setExample( source.getExample() );
         if (this instanceof OtmTypeUser && source instanceof OtmTypeUser)
             ((OtmTypeUser) this).setAssignedType( ((OtmTypeUser) source).getAssignedType() );
         setManditory( source.isManditory() );

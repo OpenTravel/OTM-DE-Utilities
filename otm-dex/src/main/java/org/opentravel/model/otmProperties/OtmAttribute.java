@@ -71,7 +71,7 @@ public class OtmAttribute<T extends TLAttribute> extends OtmPropertyBase<TLAttri
      */
     @Override
     public String fixName(String name) {
-        return name.substring( 0, 1 ).toLowerCase() + name.substring( 1 );
+        return name != null && !name.isEmpty() ? name.substring( 0, 1 ).toLowerCase() + name.substring( 1 ) : "";
     }
 
     @Override

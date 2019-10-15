@@ -19,8 +19,13 @@ package org.opentravel.model.otmProperties;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmPropertyOwner;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
+import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAttribute;
+
+import javax.xml.namespace.QName;
 
 /**
  * Abstract OTM Node for attribute properties.
@@ -50,8 +55,34 @@ public class OtmIdReferenceAttribute<TL extends TLAttribute> extends OtmAttribut
     @Override
     public void clearNameProperty() {
         nameProperty = null;
-        // String name = XsdCodegenUtils.getGlobalTypeName( getAssignedTLType(), new TLProperty() );
-        if (getAssignedType() != null)
-            getTL().setName( getAssignedType().getName() + "Ref" );
+        getTL().setName( getTypeBasedName() );
     }
+
+    @Override
+    public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
+        // Take this's owning member out of the current assigned type's where used list
+        if (getAssignedType() != null && getAssignedType().getOwningMember() != null)
+            getAssignedType().getOwningMember().changeWhereUsed( getOwningMember(), null );
+
+        if (type == null)
+            setAssignedTLType( null );
+        else if (type.getTL() instanceof NamedEntity) {
+            setAssignedTLType( (NamedEntity) type.getTL() );
+            type.getOwningMember().changeWhereUsed( null, getOwningMember() );
+        }
+        clearNameProperty();
+
+        return getAssignedType();
+    }
+
+    /**
+     * Let the compiler return the corrected name.
+     * 
+     * @return
+     */
+    protected String getTypeBasedName() {
+        QName qn = PropertyCodegenUtils.getDefaultSchemaElementName( getAssignedTLType(), true );
+        return qn != null ? fixName( qn.getLocalPart() ) : "";
+    }
+
 }

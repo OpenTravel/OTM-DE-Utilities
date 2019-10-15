@@ -59,9 +59,18 @@ public class OtmIdReferenceElement<TL extends TLProperty> extends OtmElement<TLP
     public void clearNameProperty() {
         nameProperty = null;
         if (getAssignedType() != null)
-            getTL().setName( getAssignedType().getName() + "Ref" );
+            getTL().setName( getTypeBasedName() );
+    }
 
-        // getTL().setName( XsdCodegenUtils.getGlobalTypeName( getAssignedTLType(), getTL() ) );
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Ignore the passed name and use the assigned type to get the name.
+     * 
+     */
+    @Override
+    public String fixName(String name) {
+        return getTypeBasedName();
     }
 
     /**
@@ -69,7 +78,7 @@ public class OtmIdReferenceElement<TL extends TLProperty> extends OtmElement<TLP
      * 
      * @return
      */
-    private String getTypeBasedName() {
+    protected String getTypeBasedName() {
         QName qn = PropertyCodegenUtils.getDefaultSchemaElementName( getAssignedTLType(), true );
         return qn != null ? qn.getLocalPart() : "";
     }

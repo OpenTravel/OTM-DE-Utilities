@@ -32,8 +32,8 @@ import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmFacet;
+import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
 import org.opentravel.model.otmLibraryMembers.TestChoice;
@@ -58,7 +58,7 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
     protected static OtmModelManager staticModelManager = null;
     protected static OtmResource testResource;
     protected static OtmResourceChild subject;
-    protected static OtmLibraryMember baseObject;
+    protected static OtmBusinessObject baseObject;
 
     // NOTE - does not run in abstract classes - must copy into test sub-types
     // @BeforeClass
