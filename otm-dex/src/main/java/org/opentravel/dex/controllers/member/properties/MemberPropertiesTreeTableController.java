@@ -188,7 +188,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         if (e instanceof DexMemberSelectionEvent)
             handleMemberSelection( (DexMemberSelectionEvent) e );
         if (e instanceof DexModelChangeEvent)
-            handleModelChange( (DexModelChangeEvent) e );
+            handleEvent( (DexModelChangeEvent) e );
         if (e instanceof OtmObjectChangeEvent)
             handleEvent( (OtmObjectChangeEvent) e );
         if (e instanceof OtmObjectModifiedEvent)
@@ -203,6 +203,10 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         refresh();
     }
 
+    public void handleEvent(DexModelChangeEvent event) {
+        clear();
+    }
+
     public void handleMaxEdit(TreeTableColumn.CellEditEvent<PropertiesDAO,String> event) {
         if (event != null && event.getTreeTablePosition() != null) {
             TreeItem<PropertiesDAO> currentItem = event.getRowValue();
@@ -210,10 +214,6 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
                 currentItem.getValue().setMax( event.getNewValue() );
         } else
             log.warn( "ERROR - cell max edit handler has null." );
-    }
-
-    public void handleModelChange(DexModelChangeEvent event) {
-        clear();
     }
 
     public void handleMemberSelection(DexMemberSelectionEvent event) {

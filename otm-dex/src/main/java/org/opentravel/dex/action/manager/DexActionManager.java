@@ -177,4 +177,9 @@ public interface DexActionManager {
      */
     public void undo();
 
+    /**
+     * Remove all entries from the queue
+     */
+    void clearQueue();
+
 }

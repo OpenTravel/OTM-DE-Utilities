@@ -105,7 +105,6 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
 
     private void newMember(OtmLibraryMemberType type) {
         OtmObject obj = getValue();
-        Object result = null;
         // If they didn't select anything
         if (obj == null && controller.getMainController() != null)
             // Use any member the model manager delivers
@@ -115,7 +114,7 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
             }
         // Run action
         if (obj != null)
-            result = obj.getModelManager().getActionManager( true ).run( DexActions.NEWLIBRARYMEMBER, obj, type );
+            obj.getModelManager().getActionManager( true ).run( DexActions.NEWLIBRARYMEMBER, obj, type );
         controller.refresh();
     }
 

@@ -112,10 +112,9 @@ public abstract class DexActionManagerBase implements DexActionManager {
         return property;
     }
 
-    //
-    // FIXME -
+    @Override
     public void clearQueue() {
-        // FIXME - implement
+        queue.clear();
     }
 
     /**

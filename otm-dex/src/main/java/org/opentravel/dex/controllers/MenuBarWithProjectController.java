@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.common.DialogBox;
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.controllers.popup.NewProjectDialogController;
@@ -70,8 +71,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     //
     // FIXME - need to add ability to unset user settings
     // FIXME - need to fix the size of the region used for undo
-//
-    
+    //
+
     // FXML injected objects
     @FXML
     private ComboBox<String> projectCombo;
@@ -221,6 +222,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         undoActionButton.setOnAction( handler );
     }
 
+    // TODO -- it should get its own size
     public void updateActionQueueSize(int size) {
         actionCount.setText( Integer.toString( size ) );
         undoActionButton.setDisable( size <= 0 );
@@ -336,12 +338,24 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         if (event.getTarget() instanceof MenuItem) {
             clear();
             if (modelMgr != null) {
+                // Clear the model
                 modelMgr.clear();
+
+                // Clear action queue
+                DexActionManager actionMgr = modelMgr.getActionManager( true );
+                if (actionMgr != null) {
+                    actionMgr.clearQueue();
+                    updateActionQueueSize( actionMgr.getQueueSize() );
+                }
+                // clear status line
+                mainController.getStatusController().postStatus( "" );
+
+                // clear the project combo
+                projectCombo.getSelectionModel().clearSelection();
+
                 // Let everyone know
                 fireEvent( new DexModelChangeEvent( modelMgr ) );
-                projectCombo.getSelectionModel().clearSelection();
             }
-            // FIXME - clear actionQueue
         }
     }
 
