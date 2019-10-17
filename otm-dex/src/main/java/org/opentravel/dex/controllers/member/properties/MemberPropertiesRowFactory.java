@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmChildrenOwner;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmProperties.OtmProperty;
@@ -49,6 +50,7 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
     private Menu addMenu;
     private MenuItem deleteProperty;
     private MenuItem changeType;
+    MenuItem validateItem = null;
 
     // Constructor does not have access to content, just the empty row
     public MemberPropertiesRowFactory(MemberPropertiesTreeTableController controller) {
@@ -59,16 +61,18 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
         setupAddMenu( addMenu );
         deleteProperty = new MenuItem( "Delete" );
         changeType = new MenuItem( "Change Assigned Type" );
+        validateItem = new MenuItem( "Validate" );
 
         // MenuItem upObject = new MenuItem( "Move Up (Future)" );
         // MenuItem downObject = new MenuItem( "Move Down (Future)" );
         // SeparatorMenuItem separator = new SeparatorMenuItem();
         // contextMenu.getItems().addAll( addMenu, deleteProperty, changeType, separator, upObject, downObject );
-        contextMenu.getItems().addAll( addMenu, deleteProperty, changeType );
+        contextMenu.getItems().addAll( addMenu, deleteProperty, changeType, validateItem );
         setContextMenu( contextMenu );
 
         changeType.setOnAction( e -> changeAssignedType() );
         deleteProperty.setOnAction( e -> deleteProperty() );
+        validateItem.setOnAction( e -> validateMember() );
 
         // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
@@ -77,7 +81,7 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
     private void setupAddMenu(Menu menu) {
         MenuItem item;
         // FIXME - for business and choice objects, add items for facets and separator
-        // Consider - should the list of values be from the action?  The facets will not be propertyTypes!
+        // Consider - should the list of values be from the action? The facets will not be propertyTypes!
         for (OtmPropertyType type : OtmPropertyType.values()) {
             item = new MenuItem( type.label() );
             item.setOnAction( e -> addProperty( type ) );
@@ -97,14 +101,27 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
             owner.getActionManager().run( DexActions.NEWPROPERTY, owner, type );
         }
         log.debug( "Test - add in Properties Row Factory." );
+        controller.refresh();
     }
 
     private void deleteProperty() {
         OtmProperty p = getProperty();
-        // FIXME - does not work!
         if (p != null) {
             p.getActionManager().run( DexActions.DELETEPROPERTY, p );
         }
+        controller.refresh();
+    }
+
+    private void validateMember() {
+        OtmObject obj = getProperty();
+        if (obj != null) {
+            obj.isValid( true );
+            if (obj.getOwningMember() != null)
+                obj.getOwningMember().isValid( true );
+            log.debug( "Validate " + obj + " finding count: " + obj.getFindings().count() );
+        }
+        controller.refresh();
+
     }
 
     private OtmProperty getProperty() {

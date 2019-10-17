@@ -47,6 +47,7 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
 
     Menu newMenu = null;
     MenuItem deleteItem = null;
+    MenuItem validateItem = null;
 
     public MemberRowFactory(DexIncludedController<?> controller) {
         this.controller = controller;
@@ -58,6 +59,7 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         for (OtmLibraryMemberType type : OtmLibraryMemberType.values())
             addItem( newMenu, type.label(), e -> newMember( type ) );
         memberMenu.getItems().add( newMenu );
+        validateItem = addItem( memberMenu, "Validate", e -> validateMember() );
         setContextMenu( memberMenu );
 
         // Set style listener (css class)
@@ -91,6 +93,16 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         super.updateTreeItem( getTreeItem().getParent() );
     }
 
+    private void validateMember() {
+        OtmObject obj = getValue();
+        if (obj instanceof OtmObject) {
+            obj.isValid( true );
+            if (obj.getFindings() != null)
+                log.debug( "Validate " + obj + " finding count: " + obj.getFindings().count() );
+        }
+        controller.refresh();
+    }
+
     private void newMember(OtmLibraryMemberType type) {
         OtmObject obj = getValue();
         Object result = null;
@@ -104,13 +116,7 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         // Run action
         if (obj != null)
             result = obj.getModelManager().getActionManager( true ).run( DexActions.NEWLIBRARYMEMBER, obj, type );
-
-        // // Update display
-        // if (result instanceof OtmObject) {
-        // TreeItem<MemberAndProvidersDAO> item =
-        // new MemberAndProvidersDAO( (OtmObject) result ).createTreeItem( getTreeItem().getParent() );
-        // super.updateTreeItem( item );
-        // }
+        controller.refresh();
     }
 
     /**

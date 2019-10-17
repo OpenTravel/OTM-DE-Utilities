@@ -39,7 +39,7 @@ public class NewPropertyAction extends DexRunAction {
     public static boolean isEnabled(OtmObject subject) {
         return subject instanceof OtmPropertyOwner && subject.isEditable();
     }
-        
+
     private OtmProperty newProperty = null;
 
     public NewPropertyAction() {
@@ -57,6 +57,7 @@ public class NewPropertyAction extends DexRunAction {
             // Build and hold onto for undo
             newProperty = OtmPropertyType.build( (OtmPropertyType) data, getSubject() );
 
+        isValid();
         log.debug( "Added new member " + get() );
         return get();
     }
@@ -83,6 +84,9 @@ public class NewPropertyAction extends DexRunAction {
 
     @Override
     public boolean isValid() {
+        // Validate the parent - adding a property could change validation status
+        if (newProperty != null && newProperty.getOwningMember() != null)
+            newProperty.getOwningMember().isValid( true );
         return newProperty != null ? newProperty.isValid() : false;
     }
 

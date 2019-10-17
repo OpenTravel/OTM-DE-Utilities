@@ -60,6 +60,7 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
     private static Log log = LogFactory.getLog( PropertiesDAO.class );
 
     protected OtmObject element;
+    // TODO - remove controller, it is no longer needed for images
     protected DexIncludedController<?> controller;
     // contextual facets will not know if they are inherited, only the contributed facet will know and it is not saved
     // in the DAO.

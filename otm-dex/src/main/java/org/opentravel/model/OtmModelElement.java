@@ -341,6 +341,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
                 if (validationImageProperty() != null)
                     validationImageProperty().setValue( validationImage() );
             } catch (Exception e) {
+                findings = null;
                 log.debug( "Validation threw error: " + e.getLocalizedMessage() );
             }
 

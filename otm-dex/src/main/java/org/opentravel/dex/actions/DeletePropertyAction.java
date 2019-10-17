@@ -54,6 +54,7 @@ public class DeletePropertyAction extends DexRunAction {
         Object parent = null;
         if (isEnabled( otm )) {
             deletedProperty = getSubject();
+            parent = getSubject().getParent();
             getSubject().getParent().delete( getSubject() );
         }
         return parent;

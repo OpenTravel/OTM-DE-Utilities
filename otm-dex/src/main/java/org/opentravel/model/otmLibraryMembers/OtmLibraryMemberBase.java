@@ -217,8 +217,11 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public List<OtmObject> getChildren() {
-        if (children != null && children.isEmpty())
-            modelChildren();
+        // Only let one thread model the children
+        synchronized (this) {
+            if (children != null && children.isEmpty())
+                modelChildren();
+        }
         return children;
     }
 
@@ -230,10 +233,20 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return getLibrary() != null && getLibrary().isEditable();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * When force is true, run validation on all descendant children owners and where used library members.
+     */
     @Override
     public boolean isValid(boolean force) {
-        if (force)
+        if (force) {
             getDescendantsChildrenOwners().forEach( c -> c.isValid( force ) );
+            getWhereUsed().forEach( m -> {
+                if (m != this)
+                    m.isValid( force );
+            } );
+        }
         return super.isValid( force );
     }
 
@@ -356,6 +369,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
      */
     @Override
     public void modelChildren() {
+        assert children.isEmpty();
         // Must do aliases first so facet aliases will have a parent
         // Aliases from contextual facets come from the member where injected (contributed)
         if (!(this instanceof OtmContextualFacet) && getTL() instanceof TLAliasOwner)
