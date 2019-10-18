@@ -21,7 +21,7 @@ import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 /**
- * Abstract base class for all OTM properties.
+ * Interface for all OTM properties.
  * 
  * @author Dave Hollander
  * 

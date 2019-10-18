@@ -29,7 +29,7 @@ import org.opentravel.schemacompiler.model.TLEnumValue;
  * @author dmh
  *
  */
-public class OtmEnumerationValue extends OtmModelElement<TLEnumValue> {
+public class OtmEnumerationValue extends OtmModelElement<TLEnumValue> implements OtmProperty {
     private static Log log = LogFactory.getLog( OtmEnumerationValue.class );
 
     private OtmEnumeration<TLAbstractEnumeration> parent;
@@ -37,6 +37,8 @@ public class OtmEnumerationValue extends OtmModelElement<TLEnumValue> {
     public OtmEnumerationValue(TLEnumValue value, OtmEnumeration<TLAbstractEnumeration> parent) {
         super( value );
         this.parent = parent;
+        if (parent != null)
+            parent.add( this );
     }
 
     /**
@@ -71,5 +73,32 @@ public class OtmEnumerationValue extends OtmModelElement<TLEnumValue> {
     @Override
     public String getName() {
         return tlObject.getLiteral();
+    }
+
+    @Override
+    public OtmEnumeration<TLAbstractEnumeration> getParent() {
+        return parent;
+    }
+
+    @Override
+    public OtmPropertyType getPropertyType() {
+        return OtmPropertyType.ENUMVALUE;
+    }
+
+    @Override
+    public boolean isManditory() {
+        return false;
+    }
+
+    @Override
+    public void setManditory(boolean value) {
+        // No-op
+    }
+
+    @Override
+    public void clone(OtmProperty property) {
+        TLEnumValue newTL = new TLEnumValue();
+        newTL.setLiteral( getTL().getLiteral() );
+        OtmEnumerationValue clone = new OtmEnumerationValue( newTL, getParent() );
     }
 }

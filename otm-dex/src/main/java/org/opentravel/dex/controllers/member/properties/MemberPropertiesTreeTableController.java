@@ -100,6 +100,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         setColumnProps( roleCol, true, true, false, 100 );
         roleCol.setCellValueFactory( new TreeItemPropertyValueFactory<PropertiesDAO,String>( "role" ) );
         roleCol.setCellFactory( ChoiceBoxTreeTableCell.forTreeTableColumn( PropertiesDAO.getRoleList() ) );
+        // TODO - create custom cell factory that enables/disables valid selections
 
         // Assigned type column
         typeCol = new TreeTableColumn<>( "Assigned Type" );
@@ -238,6 +239,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         buildColumns( table );
     }
 
+    @Override
     public void post(OtmLibraryMember member) {
         postedData = member;
         clear();

@@ -84,7 +84,7 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
             case DESCRIPTIONCHANGE:
             case DEPRECATIONCHANGE:
             case EXAMPLECHANGE:
-            case NEWPROPERTY:
+            case ADDPROPERTY:
                 return true;
             default:
                 return isNewProperty( subject );

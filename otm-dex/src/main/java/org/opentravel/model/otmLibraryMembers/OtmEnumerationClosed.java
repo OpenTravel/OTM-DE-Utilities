@@ -47,15 +47,4 @@ public class OtmEnumerationClosed extends OtmEnumeration<TLClosedEnumeration> {
         return ImageManager.Icons.ENUMERATION_CLOSED;
     }
 
-    // @Override
-    // public OtmObject setBaseType(OtmObject baseObj) {
-    // if (baseObj instanceof OtmEnumerationClosed) {
-    // TLExtension tlExt = getTL().getExtension();
-    // if (tlExt == null)
-    // tlExt = new TLExtension();
-    // tlExt.setExtendsEntity( ((OtmEnumerationClosed) baseObj).getTL() );
-    // getTL().setExtension( tlExt );
-    // }
-    // return getBaseType();
-    // }
 }

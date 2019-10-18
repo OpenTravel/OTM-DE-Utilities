@@ -35,5 +35,5 @@ public class OtmVWAAttributeFacet extends OtmAbstractDisplayFacet {
     public String getName() {
         return "Attributes";
     }
-
+    // Get children and children hierarchy from base display facet
 }

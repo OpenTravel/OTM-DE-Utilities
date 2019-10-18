@@ -46,7 +46,7 @@ public enum DexActions {
     SETMEMBERLIBRARY(SetLibraryAction.class, DexModelChangeEvent.class),
     DELETELIBRARYMEMBER(DeleteLibraryMemberAction.class, DexModelChangeEvent.class),
     // Properties
-    NEWPROPERTY(NewPropertyAction.class, OtmObjectChangeEvent.class),
+    ADDPROPERTY(AddPropertyAction.class, OtmObjectChangeEvent.class),
     DELETEPROPERTY(DeletePropertyAction.class, OtmObjectChangeEvent.class),
     SETREPEATCOUNT(SetRepeatCountAction.class, OtmObjectModifiedEvent.class),
     //

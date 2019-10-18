@@ -151,7 +151,7 @@ public class TestAssignTypeAction {
         mgr.add( simple );
 
         // Given - a newly created Attribute property
-        Object result = am.run( DexActions.NEWPROPERTY, facet, OtmPropertyType.ATTRIBUTE );
+        Object result = am.run( DexActions.ADDPROPERTY, facet, OtmPropertyType.ATTRIBUTE );
         assertTrue( "Given - must be a property.", result instanceof OtmProperty );
         assertTrue( "Given - must be a type user.", result instanceof OtmTypeUser );
         OtmTypeUser property = (OtmTypeUser) result;
@@ -170,7 +170,7 @@ public class TestAssignTypeAction {
             !closedEnum.getWhereUsed().contains( core ) );
 
         // Given - a newly created Element property
-        result = am.run( DexActions.NEWPROPERTY, facet, OtmPropertyType.ELEMENT );
+        result = am.run( DexActions.ADDPROPERTY, facet, OtmPropertyType.ELEMENT );
         property = (OtmTypeUser) result;
         am.run( DexActions.TYPECHANGE, property, closedEnum );
         assertTrue( "Then - the property has assigned type.", property.getAssignedType() == closedEnum );

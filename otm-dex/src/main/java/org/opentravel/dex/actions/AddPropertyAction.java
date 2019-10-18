@@ -27,8 +27,8 @@ import org.opentravel.schemacompiler.validate.ValidationFindings;
 /**
  * This action creates a new property in the subject property owner.
  */
-public class NewPropertyAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( NewPropertyAction.class );
+public class AddPropertyAction extends DexRunAction {
+    private static Log log = LogFactory.getLog( AddPropertyAction.class );
 
     /**
      * Any OTM object that uses the intended model manager.
@@ -42,7 +42,7 @@ public class NewPropertyAction extends DexRunAction {
 
     private OtmProperty newProperty = null;
 
-    public NewPropertyAction() {
+    public AddPropertyAction() {
         // Constructor for reflection
     }
 

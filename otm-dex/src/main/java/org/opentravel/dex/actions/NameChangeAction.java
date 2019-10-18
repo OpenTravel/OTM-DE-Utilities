@@ -104,6 +104,10 @@ public class NameChangeAction extends DexStringAction {
 
     @Override
     public boolean isValid() {
+        // Validate the parent - naming could change validation status
+        if (otm != null && otm.getOwningMember() != null)
+            otm.getOwningMember().isValid( true );
+
         return otm.isValid( true ) ? true
             : ValidationUtils.getRelevantFindings( VETOKEYS, otm.getFindings() ).isEmpty();
     }

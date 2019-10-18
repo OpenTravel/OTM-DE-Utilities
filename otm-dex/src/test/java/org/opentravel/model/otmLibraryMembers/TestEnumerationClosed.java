@@ -17,12 +17,20 @@
 package org.opentravel.model.otmLibraryMembers;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.BeforeClass;
+import org.junit.Test;
+import org.opentravel.dex.actions.AddPropertyAction;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.otmLibraryMembers.OtmEnumerationClosed;
+import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyType;
 import org.opentravel.schemacompiler.model.TLClosedEnumeration;
 import org.opentravel.schemacompiler.model.TLEnumValue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  */
@@ -35,6 +43,46 @@ public class TestEnumerationClosed extends TestOtmLibraryMemberBase<OtmEnumerati
         subject = buildOtm( staticModelManager );
         baseObject = buildOtm( staticModelManager );
         baseObject.setName( "BaseBO" );
+    }
+
+    // Tests both open and closed because add/delete are on abstract enumeration super-type
+    @Test
+    public void testAddingAndRemovingValues() {
+        // Given - an enumeration with children
+        OtmEnumerationClosed ec = buildOtm( staticModelManager );
+        List<OtmObject> kids = new ArrayList<>( ec.getChildren() );
+        assertTrue( "Must have children.", !kids.isEmpty() );
+
+        // Then - delete them all
+        for (OtmObject kid : kids)
+            ec.delete( (OtmProperty) kid );
+        assertTrue( "Must NOT have children.", ec.getChildren().isEmpty() );
+
+        // Then - add them back
+        for (OtmObject kid : kids)
+            ec.add( kid );
+        assertTrue( "Must have children.", !kids.isEmpty() );
+    }
+
+    @Test
+    public void testAddAction() {
+        // Given - an action with enumeration as subject
+        OtmEnumerationClosed oe = buildOtm( staticModelManager );
+        AddPropertyAction action = new AddPropertyAction();
+        action.setSubject( oe );
+        List<OtmObject> kids = new ArrayList<>( oe.getChildren() );
+        assertTrue( "Must have children.", !kids.isEmpty() );
+
+        // When action performed
+        action.doIt( OtmPropertyType.ENUMVALUE );
+
+        // Then - one more kid
+        assertTrue( oe.getChildren().size() == kids.size() + 1 );
+
+        action.doIt( OtmPropertyType.ENUMVALUE );
+        assertTrue( oe.getChildren().size() == kids.size() + 2 );
+        action.doIt( OtmPropertyType.ENUMVALUE );
+        assertTrue( oe.getChildren().size() == kids.size() + 3 );
     }
 
     /** ****************************************************** **/

@@ -17,6 +17,7 @@
 package org.opentravel.dex.actions;
 
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmProperties.OtmEnumerationValue;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 public class ManditoryChangeAction extends DexStringAction {
@@ -30,7 +31,9 @@ public class ManditoryChangeAction extends DexStringAction {
 
     public static String getCurrent(OtmObject obj) {
         String value = "";
-        if (obj instanceof OtmProperty) {
+        if (obj instanceof OtmEnumerationValue)
+            value = "";
+        else if (obj instanceof OtmProperty) {
             value = OPTIONAL;
             if (((OtmProperty) obj).isManditory())
                 value = REQUIRED;

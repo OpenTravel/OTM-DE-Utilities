@@ -24,6 +24,7 @@ import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyType;
 
@@ -79,12 +80,15 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
     }
 
     private void setupAddMenu(Menu menu) {
-        MenuItem item;
-        // FIXME - for business and choice objects, add items for facets and separator
-        // Consider - should the list of values be from the action? The facets will not be propertyTypes!
-        for (OtmPropertyType type : OtmPropertyType.values()) {
-            item = new MenuItem( type.label() );
-            item.setOnAction( e -> addProperty( type ) );
+        // MenuItem item;
+        // TODO - for business and choice objects, New in MemberRowFactory for facets
+        // FIXME - enable/disable
+        // For enum, add enum value (literal)
+        // For VWA, only enable simple properties
+        // For core roles only enum value
+        for (MenuItem item : OtmPropertyType.menuItems()) {
+            if (item.getUserData() instanceof OtmPropertyType)
+                item.setOnAction( e -> addProperty( (OtmPropertyType) item.getUserData() ) );
             menu.getItems().add( item );
         }
     }
@@ -95,12 +99,12 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
      * @param t
      */
     private void addProperty(OtmPropertyType type) {
+        // Get a valid owner as the subject
         OtmPropertyOwner owner = getPropertyOwner();
-        // Get a valid subject
         if (owner != null) {
-            owner.getActionManager().run( DexActions.NEWPROPERTY, owner, type );
+            owner.getActionManager().run( DexActions.ADDPROPERTY, owner, type );
         }
-        log.debug( "Test - add in Properties Row Factory." );
+        // log.debug( "add in Properties Row Factory." );
         controller.refresh();
     }
 
@@ -141,6 +145,8 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
             if (dao.getValue() instanceof OtmProperty)
                 return ((OtmProperty) dao.getValue()).getParent();
             if (dao.getValue() instanceof OtmPropertyOwner) {
+                if (dao.getValue() instanceof OtmAbstractDisplayFacet)
+                    return ((OtmAbstractDisplayFacet) dao.getValue()).getParent();
                 return (OtmPropertyOwner) dao.getValue();
             }
         }
@@ -169,10 +175,13 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
             OtmPropertyOwner propertyOwner = getPropertyOwner();
             if (propertyOwner != null && propertyOwner.getActionManager() != null) {
                 DexActionManager am = propertyOwner.getActionManager();
-                addMenu.setDisable( !am.isEnabled( DexActions.NEWPROPERTY, propertyOwner ) );
+                addMenu.setDisable( !am.isEnabled( DexActions.ADDPROPERTY, propertyOwner ) );
                 deleteProperty.setDisable( !am.isEnabled( DexActions.DELETEPROPERTY, property ) );
                 changeType.setDisable( !am.isEnabled( DexActions.TYPECHANGE, property ) );
+                // Go through all items and enable/disable
+                OtmPropertyType.enableMenuItems( addMenu, propertyOwner );
             }
+
             if (newTreeItem.getValue().getValue() instanceof OtmChildrenOwner) {
                 // Make facets dividers
                 tc.pseudoClassStateChanged( DIVIDER, true );

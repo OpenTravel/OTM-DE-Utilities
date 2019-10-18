@@ -18,15 +18,19 @@ package org.opentravel.model.otmLibraryMembers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.otmFacets.OtmEnumerationValueFacet;
 import org.opentravel.model.otmProperties.OtmEnumerationValue;
+import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.schemacompiler.model.TLAbstractEnumeration;
 import org.opentravel.schemacompiler.model.TLEnumValue;
+import org.opentravel.schemacompiler.model.TLModelElement;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,7 +43,7 @@ import java.util.List;
  */
 // NOTE - member filter depends on sub-types starting with this class name!
 public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
-    extends OtmLibraryMemberBase<TLAbstractEnumeration> implements OtmObject, OtmChildrenOwner {
+    extends OtmLibraryMemberBase<TLAbstractEnumeration> implements OtmObject, OtmPropertyOwner {
     private static Log log = LogFactory.getLog( OtmEnumeration.class );
 
     public OtmEnumeration(E tlo, OtmModelManager mgr) {
@@ -51,9 +55,6 @@ public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
         return (E) tlObject;
     }
 
-    /**
-     * @see org.opentravel.model.OtmChildrenOwner#add(org.opentravel.model.OtmObject)
-     */
     @Override
     public OtmEnumerationValue add(OtmObject child) {
         if (child instanceof OtmEnumerationValue && !children.contains( child )) {
@@ -139,16 +140,23 @@ public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
     @Override
     public void modelChildren() {
         for (TLEnumValue ev : getTL().getValues())
-            add( new OtmEnumerationValue( ev, (OtmEnumeration<TLAbstractEnumeration>) this ) );
+            new OtmEnumerationValue( ev, (OtmEnumeration<TLAbstractEnumeration>) this );
     }
 
-    // @Override
-    // public List<OtmObject> getInheritedChildren() {
-    // return Collections.emptyList(); // TODO
-    // }
+    @Override
+    public Collection<OtmObject> getChildrenHierarchy() {
+        Collection<OtmObject> hierarchy = new ArrayList<>();
+        hierarchy.add( new OtmEnumerationValueFacet( (OtmPropertyOwner) this ) );
+        return hierarchy;
+    }
 
     @Override
     public void modelInheritedChildren() {
+        if (inheritedChildren == null)
+            inheritedChildren = new ArrayList<>();
+        else
+            inheritedChildren.clear(); // force re-compute
+
         if (getTL().getExtension() != null) {
             OtmEnumeration<?> base = getBaseType();
             if (base instanceof OtmEnumeration)
@@ -159,6 +167,28 @@ public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
             // v -> addInherited(new OtmEnumerationValue(v, (OtmEnumeration<TLAbstractEnumeration>) this)));
             log.warn( "TEST - modeled inherited children" );
         }
+    }
+
+    @Override
+    public OtmProperty add(TLModelElement tlChild) {
+        OtmEnumerationValue newValue = null;
+        if (tlChild instanceof TLEnumValue) {
+            newValue = new OtmEnumerationValue( (TLEnumValue) tlChild, (OtmEnumeration<TLAbstractEnumeration>) this );
+            children.add( newValue );
+        }
+        return newValue;
+    }
+
+    @Override
+    public void delete(OtmProperty property) {
+        remove( property );
+        if (property.getTL() instanceof TLEnumValue)
+            getTL().removeValue( (TLEnumValue) property.getTL() );
+    }
+
+    @Override
+    public void remove(OtmProperty property) {
+        children.remove( property );
     }
 
 }

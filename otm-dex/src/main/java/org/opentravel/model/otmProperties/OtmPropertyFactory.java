@@ -20,9 +20,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmFacets.OtmAbstractFacet;
+import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
+import org.opentravel.schemacompiler.model.TLAbstractEnumeration;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeOwner;
+import org.opentravel.schemacompiler.model.TLEnumValue;
 import org.opentravel.schemacompiler.model.TLIndicator;
 import org.opentravel.schemacompiler.model.TLIndicatorOwner;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -82,6 +85,14 @@ public class OtmPropertyFactory {
         return indicator;
     }
 
+    public static OtmEnumerationValue create(TLEnumValue tlValue, OtmEnumeration<TLAbstractEnumeration> parent) {
+        // Set the TL owner if not set.
+        if (parent != null && parent.getTL() instanceof TLAbstractEnumeration)
+            ((TLAbstractEnumeration) parent.getTL()).addValue( tlValue );
+
+        return new OtmEnumerationValue( tlValue, parent );
+    }
+
     /**
      * Create a facade for the TL model element. Assure the model element is owned by the parent.
      * <p>
@@ -99,8 +110,12 @@ public class OtmPropertyFactory {
             p = OtmPropertyFactory.create( (TLProperty) tl, parent );
         else if (tl instanceof TLAttribute)
             p = OtmPropertyFactory.create( (TLAttribute) tl, parent );
-        else
+        else if (tl instanceof TLEnumValue && parent instanceof OtmEnumeration)
+            p = OtmPropertyFactory.create( (TLEnumValue) tl, (OtmEnumeration<TLAbstractEnumeration>) parent );
+        else {
             log.debug( "unknown/not-implemented property type." );
+            return null;
+        }
         log.debug( "Created property " + p.getName() + " of " + p.getOwningMember().getName() + "  inherited? "
             + p.isInherited() );
         return p;

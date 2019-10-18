@@ -14,37 +14,31 @@
  * limitations under the License.
  */
 
-package org.opentravel.model.otmLibraryMembers;
+package org.opentravel.model.otmFacets;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.common.ImageManager;
-import org.opentravel.common.ImageManager.Icons;
-import org.opentravel.model.OtmModelManager;
-import org.opentravel.schemacompiler.model.TLOpenEnumeration;
+import org.opentravel.model.OtmPropertyOwner;
 
 /**
- * OTM Object Node for Simple objects.
- * 
  * @author Dave Hollander
- * @param <T>
  * 
  */
-public class OtmEnumerationOpen extends OtmEnumeration<TLOpenEnumeration> {
-    private static Log log = LogFactory.getLog( OtmEnumerationOpen.class );
+public class OtmEnumerationValueFacet extends OtmAbstractDisplayFacet {
+    private static Log log = LogFactory.getLog( OtmEnumerationValueFacet.class );
 
-    public OtmEnumerationOpen(TLOpenEnumeration tlo, OtmModelManager mgr) {
-        super( tlo, mgr );
-    }
-
-    public OtmEnumerationOpen(String name, OtmModelManager mgr) {
-        super( new TLOpenEnumeration(), mgr );
-        setName( name );
+    public OtmEnumerationValueFacet(OtmPropertyOwner parent) {
+        super( parent );
     }
 
     @Override
-    public Icons getIconType() {
-        return ImageManager.Icons.ENUMERATION_OPEN;
+    public String getName() {
+        return "Values";
     }
+
+    // @Override
+    // public Collection<OtmObject> getChildrenHierarchy() {
+    // return Collections.emptyList();
+    // }
 
 }

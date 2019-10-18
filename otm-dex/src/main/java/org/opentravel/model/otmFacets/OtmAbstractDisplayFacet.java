@@ -58,8 +58,9 @@ import javafx.scene.image.ImageView;
 public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     private static Log log = LogFactory.getLog( OtmAbstractDisplayFacet.class );
 
+    // private OtmChildrenOwner parent;
     private OtmPropertyOwner parent;
-    private List<OtmProperty> children;
+    // private List<OtmProperty> children;
 
     public OtmAbstractDisplayFacet(OtmPropertyOwner parent) {
         this.parent = parent;
