@@ -31,7 +31,6 @@ import org.opentravel.model.otmFacets.OtmRoleEnumeration;
 import org.opentravel.model.otmFacets.OtmSummaryFacet;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLCoreObject;
-import org.opentravel.schemacompiler.model.TLExtension;
 import org.opentravel.schemacompiler.model.TLFacetType;
 import org.opentravel.schemacompiler.model.TLListFacet;
 
@@ -74,17 +73,17 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
         return (TLCoreObject) tlObject;
     }
 
-    @Override
-    public OtmObject setBaseType(OtmObject baseObj) {
-        if (baseObj instanceof OtmCore) {
-            TLExtension tlExt = getTL().getExtension();
-            if (tlExt == null)
-                tlExt = new TLExtension();
-            tlExt.setExtendsEntity( ((OtmCore) baseObj).getTL() );
-            getTL().setExtension( tlExt );
-        }
-        return getBaseType();
-    }
+    // @Override
+    // public OtmObject setBaseType(OtmObject baseObj) {
+    // if (baseObj instanceof OtmCore) {
+    // TLExtension tlExt = getTL().getExtension();
+    // if (tlExt == null)
+    // tlExt = new TLExtension();
+    // tlExt.setExtendsEntity( ((OtmCore) baseObj).getTL() );
+    // getTL().setExtension( tlExt );
+    // }
+    // return getBaseType();
+    // }
 
     @Override
     public String setName(String name) {

@@ -42,7 +42,7 @@ public class ValidationPropertiesTreeTableCellFactory extends TreeTableCell<Prop
             else
                 setGraphic( null );
             tip = getTreeTableRow().getItem().getValidationFindingsAsString();
-            if (!tip.isEmpty())
+            if (tip != null && !tip.isEmpty())
                 setTooltip( new Tooltip( tip ) );
         } else {
             setGraphic( null );

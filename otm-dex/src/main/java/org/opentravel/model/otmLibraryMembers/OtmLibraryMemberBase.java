@@ -32,9 +32,11 @@ import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmFacets.OtmFacetFactory;
 import org.opentravel.schemacompiler.codegen.util.FacetCodegenUtils;
 import org.opentravel.schemacompiler.model.LibraryMember;
+import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAlias;
 import org.opentravel.schemacompiler.model.TLAliasOwner;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
+import org.opentravel.schemacompiler.model.TLExtension;
 import org.opentravel.schemacompiler.model.TLExtensionOwner;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLFacetOwner;
@@ -188,6 +190,17 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return null;
     }
 
+    @Override
+    public OtmObject setBaseType(OtmObject baseObj) {
+        if (this.getClass() == baseObj.getClass() && getTL() instanceof TLExtensionOwner) {
+            TLExtension tlExt = ((TLExtensionOwner) getTL()).getExtension();
+            if (tlExt == null)
+                tlExt = new TLExtension();
+            tlExt.setExtendsEntity( (NamedEntity) baseObj.getTL() );
+            ((TLExtensionOwner) getTL()).setExtension( tlExt );
+        }
+        return getBaseType();
+    }
 
     @Override
     public boolean contains(OtmObject o) {

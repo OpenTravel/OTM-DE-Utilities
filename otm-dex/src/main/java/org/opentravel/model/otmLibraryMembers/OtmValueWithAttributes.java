@@ -28,6 +28,8 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmFacets.OtmVWAAttributeFacet;
+import org.opentravel.model.otmFacets.OtmVWAValueFacet;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyFactory;
 import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
@@ -40,6 +42,7 @@ import org.opentravel.schemacompiler.model.TLPropertyType;
 import org.opentravel.schemacompiler.model.TLValueWithAttributes;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -201,9 +204,28 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
     }
 
     @Override
+    public Collection<OtmObject> getChildrenHierarchy() {
+        Collection<OtmObject> hierarchy = new ArrayList<>();
+        // Value facet
+        hierarchy.add( new OtmVWAValueFacet( (OtmPropertyOwner) this ) );
+        // Attribute Facet
+        hierarchy.add( new OtmVWAAttributeFacet( (OtmPropertyOwner) this ) );
+
+        // if (getInheritedChildren() != null)
+        // getInheritedChildren().forEach( hierarchy::add );
+        // getChildren().forEach( hierarchy::add );
+        return hierarchy;
+    }
+
+    @Override
     public Icons getIconType() {
         return ImageManager.Icons.VWA;
     }
+
+    // @Override
+    // public boolean isRenameable() {
+    // return false;
+    // }
 
     @Override
     public List<OtmObject> getInheritedChildren() {
@@ -303,10 +325,10 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
         return getAssignedType();
     }
 
-    @Override
-    public OtmObject setBaseType(OtmObject baseObj) {
-        return null; // No-Op
-    }
+    // @Override
+    // public OtmObject setBaseType(OtmObject baseObj) {
+    // return null; // No-Op
+    // }
 
     @Override
     public String setName(String name) {

@@ -260,14 +260,25 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
             return;
         OtmObject obj = item.getValue().getValue();
         DexActionManager actionManager = obj.getActionManager();
-        nameCol.setEditable( actionManager.isEnabled( DexActions.NAMECHANGE, obj ) );
-        descCol.setEditable( actionManager.isEnabled( DexActions.DESCRIPTIONCHANGE, obj ) );
-        typeCol.setEditable( actionManager.isEnabled( DexActions.TYPECHANGE, obj ) );
-        roleCol.setEditable( actionManager.isEnabled( DexActions.PROPERTYROLECHANGE, obj ) );
-        minCol.setEditable( actionManager.isEnabled( DexActions.MANDITORYCHANGE, obj ) );
-        maxCol.setEditable( actionManager.isEnabled( DexActions.SETREPEATCOUNT, obj ) );
-        exampleCol.setEditable( actionManager.isEnabled( DexActions.EXAMPLECHANGE, obj ) );
-        deprecatedCol.setEditable( actionManager.isEnabled( DexActions.DEPRECATIONCHANGE, obj ) );
+        if (actionManager != null) {
+            nameCol.setEditable( actionManager.isEnabled( DexActions.NAMECHANGE, obj ) );
+            descCol.setEditable( actionManager.isEnabled( DexActions.DESCRIPTIONCHANGE, obj ) );
+            typeCol.setEditable( actionManager.isEnabled( DexActions.TYPECHANGE, obj ) );
+            roleCol.setEditable( actionManager.isEnabled( DexActions.PROPERTYROLECHANGE, obj ) );
+            minCol.setEditable( actionManager.isEnabled( DexActions.MANDITORYCHANGE, obj ) );
+            maxCol.setEditable( actionManager.isEnabled( DexActions.SETREPEATCOUNT, obj ) );
+            exampleCol.setEditable( actionManager.isEnabled( DexActions.EXAMPLECHANGE, obj ) );
+            deprecatedCol.setEditable( actionManager.isEnabled( DexActions.DEPRECATIONCHANGE, obj ) );
+        } else {
+            nameCol.setEditable( false );
+            descCol.setEditable( false );
+            typeCol.setEditable( false );
+            roleCol.setEditable( false );
+            minCol.setEditable( false );
+            maxCol.setEditable( false );
+            exampleCol.setEditable( false );
+            deprecatedCol.setEditable( false );
+        }
     }
 
     @Override

@@ -30,7 +30,6 @@ import org.opentravel.model.otmFacets.OtmIdFacet;
 import org.opentravel.model.otmFacets.OtmQueryFacet;
 import org.opentravel.model.otmFacets.OtmUpdateFacet;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
-import org.opentravel.schemacompiler.model.TLExtension;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -90,17 +89,17 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
         return null;
     }
 
-    @Override
-    public OtmObject setBaseType(OtmObject baseBo) {
-        if (baseBo instanceof OtmBusinessObject) {
-            TLExtension tlExt = getTL().getExtension();
-            if (tlExt == null)
-                tlExt = new TLExtension();
-            tlExt.setExtendsEntity( ((OtmBusinessObject) baseBo).getTL() );
-            getTL().setExtension( tlExt );
-        }
-        return getBaseType();
-    }
+    // @Override
+    // public OtmObject setBaseType(OtmObject baseBo) {
+    // if (baseBo instanceof OtmBusinessObject) {
+    // TLExtension tlExt = getTL().getExtension();
+    // if (tlExt == null)
+    // tlExt = new TLExtension();
+    // tlExt.setExtendsEntity( ((OtmBusinessObject) baseBo).getTL() );
+    // getTL().setExtension( tlExt );
+    // }
+    // return getBaseType();
+    // }
 
     @Override
     public String setName(String name) {

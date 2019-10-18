@@ -21,8 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.OtmObject;
-import org.opentravel.schemacompiler.model.TLExtension;
 import org.opentravel.schemacompiler.model.TLOpenEnumeration;
 
 /**
@@ -49,16 +47,17 @@ public class OtmEnumerationOpen extends OtmEnumeration<TLOpenEnumeration> {
         return ImageManager.Icons.ENUMERATION_OPEN;
     }
 
-    @Override
-    public OtmObject setBaseType(OtmObject baseObj) {
-        if (baseObj instanceof OtmEnumerationOpen) {
-            TLExtension tlExt = getTL().getExtension();
-            if (tlExt == null)
-                tlExt = new TLExtension();
-            tlExt.setExtendsEntity( ((OtmEnumerationOpen) baseObj).getTL() );
-            getTL().setExtension( tlExt );
-        }
-        return getBaseType();
-    }
+    // @Override
+    // public OtmObject setBaseType(OtmObject baseObj) {
+    // if (getTL() instanceof TLExtensionOwner) {
+    //// if (baseObj instanceof OtmEnumerationOpen) {
+    // TLExtension tlExt = getTL().getExtension();
+    // if (tlExt == null)
+    // tlExt = new TLExtension();
+    // tlExt.setExtendsEntity( ((OtmEnumerationOpen) baseObj).getTL() );
+    // getTL().setExtension( tlExt );
+    // }
+    // return getBaseType();
+    // }
 
 }

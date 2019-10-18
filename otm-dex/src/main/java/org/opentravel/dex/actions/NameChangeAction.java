@@ -36,6 +36,8 @@ public class NameChangeAction extends DexStringAction {
     private static final String[] VETOKEYS = {VETO1, VETO2, VETO3};
 
     public static boolean isEnabled(OtmObject subject) {
+        if (subject == null || !subject.isRenameable())
+            return false;
         if (subject instanceof OtmTypeUser && ((OtmTypeUser) subject).getAssignedType() != null
             && ((OtmTypeUser) subject).getAssignedType().isNameControlled())
             return false;
