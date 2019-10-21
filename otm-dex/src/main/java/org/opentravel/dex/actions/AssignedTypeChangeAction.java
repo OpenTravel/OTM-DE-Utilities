@@ -152,6 +152,8 @@ public class AssignedTypeChangeAction extends DexRunAction {
 
     @Override
     public boolean isValid() {
+        if (otm.getOwningMember() != null)
+            otm.getOwningMember().isValid( true ); // Update validation status
         return otm.isValid( true ) ? true
             : ValidationUtils.getRelevantFindings( VETOKEYS, otm.getFindings() ).isEmpty();
     }

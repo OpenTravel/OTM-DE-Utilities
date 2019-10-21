@@ -133,8 +133,10 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
      */
     @Override
     public List<OtmObject> getChildren() {
-        if (children != null && children.isEmpty())
-            modelChildren();
+        synchronized (this) {
+            if (children != null && children.isEmpty())
+                modelChildren();
+        }
         return children;
     }
 
@@ -214,6 +216,22 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
     @Override
     public boolean isExpanded() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * When force is true, run validation on all children.
+     */
+    @Override
+    public boolean isValid(boolean force) {
+        if (force) {
+            getChildren().forEach( c -> {
+                if (c != this)
+                    c.isValid( force );
+            } );
+        }
+        return super.isValid( force );
     }
 
     @Override

@@ -88,13 +88,13 @@ public class DeletePropertyAction extends DexRunAction {
         return null;
     }
 
-    /**
-     * @see org.opentravel.dex.actions.DexAction#isValid()
-     */
-    @Override
-    public boolean isValid() {
-        return true;
-    }
+    // /**
+    // * @see org.opentravel.dex.actions.DexAction#isValid()
+    // */
+    // @Override
+    // public boolean isValid() {
+    // return true;
+    // }
 
     /**
      * @see org.opentravel.dex.actions.DexAction#setSubject(org.opentravel.model.OtmObject)

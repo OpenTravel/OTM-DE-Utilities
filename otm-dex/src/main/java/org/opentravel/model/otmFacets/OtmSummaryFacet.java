@@ -49,11 +49,6 @@ public class OtmSummaryFacet extends OtmFacet<TLFacet> {
                 "Tried to create summary facet from wrong facet type: " + tl.getFacetType() );
     }
 
-    // @Override
-    // public TLFacet getTL() {
-    // return tlObject;
-    // }
-
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
         Collection<OtmObject> hierarchy = new ArrayList<>();
@@ -62,7 +57,7 @@ public class OtmSummaryFacet extends OtmFacet<TLFacet> {
             if (c instanceof OtmPropertyBase)
                 hierarchy.add( c );
         } );
-        children.forEach( c -> {
+        getChildren().forEach( c -> {
             if (c instanceof OtmPropertyBase)
                 hierarchy.add( c );
         } );

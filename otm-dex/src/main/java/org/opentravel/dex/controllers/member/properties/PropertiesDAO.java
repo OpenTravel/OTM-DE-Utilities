@@ -30,6 +30,7 @@ import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmFacets.OtmCoreValueFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmFacets.OtmVWAValueFacet;
 import org.opentravel.model.otmProperties.OtmElement;
@@ -131,6 +132,8 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
             ssp = ((OtmTypeUser) element).assignedTypeProperty();
         else if (element instanceof OtmVWAValueFacet)
             ssp = new ReadOnlyStringWrapper( ((OtmVWAValueFacet) element).getValueType() );
+        else if (element instanceof OtmCoreValueFacet)
+            ssp = new ReadOnlyStringWrapper( ((OtmCoreValueFacet) element).getValueType() );
         else
             ssp = new ReadOnlyStringWrapper( "" );
         return ssp;

@@ -26,6 +26,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmAlias;
+import org.opentravel.model.otmFacets.OtmCoreValueFacet;
 import org.opentravel.model.otmFacets.OtmListFacet;
 import org.opentravel.model.otmFacets.OtmRoleEnumeration;
 import org.opentravel.model.otmFacets.OtmSummaryFacet;
@@ -139,11 +140,15 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
         Collection<OtmObject> ch = new ArrayList<>();
+        ch.add( new OtmCoreValueFacet( this ) );
         children.forEach( c -> {
-            // TODO - shouldn't simple be here too?
             if (c instanceof OtmSummaryFacet)
                 ch.add( c );
             if (c instanceof OtmAlias)
+                ch.add( c );
+            if (c instanceof OtmRoleEnumeration)
+                ch.add( c );
+            if (c instanceof OtmListFacet)
                 ch.add( c );
         } );
 

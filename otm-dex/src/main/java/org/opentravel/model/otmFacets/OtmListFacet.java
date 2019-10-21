@@ -24,6 +24,8 @@ import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.schemacompiler.model.TLListFacet;
 import org.opentravel.schemacompiler.model.TLModelElement;
 
+import java.util.ArrayList;
+
 /**
  * @author Dave Hollander
  * 
@@ -60,20 +62,30 @@ public class OtmListFacet<T extends TLListFacet> extends OtmAbstractFacet<TLList
         return null;
     }
 
+    @Override
+    public boolean isNameControlled() {
+        return true;
+    }
+
     /**
      * @see org.opentravel.model.OtmChildrenOwner#modelChildren()
      */
     @Override
     public void modelChildren() {
-        // NO-OP
+        // Only model once
+        if (children == null)
+            children = new ArrayList<>();
+        else
+            children.clear();
     }
 
-    /**
-     * @see org.opentravel.model.OtmChildrenOwner#modelInheritedChildren()
-     */
     @Override
     public void modelInheritedChildren() {
-        // NO-OP
+        // Only model once
+        if (inheritedChildren == null)
+            inheritedChildren = new ArrayList<>();
+        else
+            inheritedChildren.clear();
     }
 
 }

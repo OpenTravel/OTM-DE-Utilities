@@ -54,78 +54,11 @@ public abstract class OtmFacet<T extends TLFacet> extends OtmAbstractFacet<TLFac
         return getParent();
     }
 
-    // /**
-    // * Create a facet for OtmOperations which are not library members
-    // *
-    // * @param tl
-    // * @param actionMgr
-    // */
-    // // The only time this is used is for operations - operationFacet/operations which are not library members
-    // public OtmFacet(T tl) {
-    // super( tl );
-    // }
-
     @Override
     public TLFacet getTL() {
         return (TLFacet) tlObject;
     }
 
 
-    // @Override
-    // public OtmProperty<?> add(TLModelElement tl) {
-    // if (getTL() instanceof TLAttributeOwner && tl instanceof TLAttribute)
-    // getTL().addAttribute( (TLAttribute) tl );
-    //
-    // if (getTL() instanceof TLIndicatorOwner && tl instanceof TLIndicator)
-    // getTL().addIndicator( (TLIndicator) tl );
-    //
-    // if (getTL() instanceof TLPropertyOwner && tl instanceof TLProperty)
-    // getTL().addElement( (TLProperty) tl );
-    //
-    //// if (tl instanceof TLProperty)
-    //// getTL().addElement( (TLProperty) tl );
-    //// else if (tl instanceof TLAttribute)
-    //// getTL().addAttribute( (TLAttribute) tl );
-    //// else
-    //// log.debug( "unknown/not-implemented property type." );
-    //
-    // return OtmPropertyFactory.create( tl, this );
-    // }
-
-    // /**
-    // * {@inheritDoc}
-    // * <p>
-    // * Creates properties to represent facet children.
-    // */
-    // @Override
-    // public void modelChildren() {
-    // getTL().getIndicators().forEach( p -> OtmPropertyFactory.create( p, this ) );
-    // getTL().getAttributes().forEach( p -> OtmPropertyFactory.create( p, this ) );
-    // getTL().getElements().forEach( p -> OtmPropertyFactory.create( p, this ) );
-    // }
-
-    // @Override
-    // public void modelInheritedChildren() {
-    // // Only model once
-    // if (inheritedChildren == null)
-    // inheritedChildren = new ArrayList<>();
-    // else
-    // inheritedChildren.clear(); // RE-model
-    // // return;
-    //
-    // // All properties, local and inherited
-    // // List<TLProperty> inheritedElements = PropertyCodegenUtils.getInheritedProperties(getTL());
-    //
-    // // Get only the directly inherited properties
-    // if (getOwningMember().getBaseType() != null) {
-    // PropertyCodegenUtils.getInheritedFacetProperties( getTL() )
-    // .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
-    // PropertyCodegenUtils.getInheritedFacetAttributes( getTL() )
-    // .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
-    // PropertyCodegenUtils.getInheritedFacetIndicators( getTL() )
-    // .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
-    //
-    // }
-    // }
 
 }

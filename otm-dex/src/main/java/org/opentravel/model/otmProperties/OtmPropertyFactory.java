@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmFacets.OtmAbstractFacet;
+import org.opentravel.model.otmFacets.OtmRoleEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
 import org.opentravel.schemacompiler.model.TLAbstractEnumeration;
@@ -31,6 +32,8 @@ import org.opentravel.schemacompiler.model.TLIndicatorOwner;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLProperty;
 import org.opentravel.schemacompiler.model.TLPropertyOwner;
+import org.opentravel.schemacompiler.model.TLRole;
+import org.opentravel.schemacompiler.model.TLRoleEnumeration;
 
 /**
  * Factory that resolves which type of property (indicator, element, attribute) to create.
@@ -93,6 +96,14 @@ public class OtmPropertyFactory {
         return new OtmEnumerationValue( tlValue, parent );
     }
 
+    public static OtmRoleValue create(TLRole tlValue, OtmRoleEnumeration parent) {
+        // Set the TL owner if not set.
+        if (parent != null && parent.getTL() instanceof TLRoleEnumeration)
+            parent.getTL().addRole( tlValue );
+
+        return new OtmRoleValue( tlValue, parent );
+    }
+
     /**
      * Create a facade for the TL model element. Assure the model element is owned by the parent.
      * <p>
@@ -112,6 +123,8 @@ public class OtmPropertyFactory {
             p = OtmPropertyFactory.create( (TLAttribute) tl, parent );
         else if (tl instanceof TLEnumValue && parent instanceof OtmEnumeration)
             p = OtmPropertyFactory.create( (TLEnumValue) tl, (OtmEnumeration<TLAbstractEnumeration>) parent );
+        else if (tl instanceof TLRole && parent instanceof OtmRoleEnumeration)
+            p = OtmPropertyFactory.create( (TLRole) tl, (OtmRoleEnumeration) parent );
         else {
             log.debug( "unknown/not-implemented property type." );
             return null;

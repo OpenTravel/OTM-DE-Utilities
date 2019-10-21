@@ -18,20 +18,19 @@ package org.opentravel.model.otmProperties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
-import org.opentravel.schemacompiler.model.TLAbstractEnumeration;
-import org.opentravel.schemacompiler.model.TLEnumValue;
+import org.opentravel.model.otmFacets.OtmRoleEnumeration;
+import org.opentravel.schemacompiler.model.TLRole;
 
 /**
  * @author dmh
  *
  */
-public class OtmEnumerationValue extends OtmValueProperty {
-    private static Log log = LogFactory.getLog( OtmEnumerationValue.class );
+public class OtmRoleValue extends OtmValueProperty implements OtmProperty {
+    private static Log log = LogFactory.getLog( OtmRoleValue.class );
 
-    private OtmEnumeration<TLAbstractEnumeration> parent;
+    private OtmRoleEnumeration parent;
 
-    public OtmEnumerationValue(TLEnumValue value, OtmEnumeration<TLAbstractEnumeration> parent) {
+    public OtmRoleValue(TLRole value, OtmRoleEnumeration parent) {
         super( value );
         this.parent = parent;
         if (parent != null)
@@ -47,20 +46,20 @@ public class OtmEnumerationValue extends OtmValueProperty {
     // public String fixName(String name) {
     // return name;
     // }
-
+    //
     // @Override
     // public Icons getIconType() {
     // return ImageManager.Icons.ENUMERATION_VALUE;
     // }
 
     @Override
-    public TLEnumValue getTL() {
-        return (TLEnumValue) tlObject;
+    public TLRole getTL() {
+        return (TLRole) tlObject;
     }
 
     @Override
     public String setName(String name) {
-        getTL().setLiteral( name );
+        getTL().setName( name );
         nameProperty().set( getName() ); // may not fire otm name change listener
         isValid( true );
         log.debug( "Set name to: " + getName() );
@@ -68,17 +67,17 @@ public class OtmEnumerationValue extends OtmValueProperty {
     }
 
     // @Override
-    // public OtmEnumeration<TLAbstractEnumeration> getOwningMember() {
-    // return getParent();
+    // public OtmCore getOwningMember() {
+    // return parent.getOwningMember();
     // }
 
     @Override
     public String getName() {
-        return getTL().getLiteral();
+        return getTL().getName();
     }
 
     @Override
-    public OtmEnumeration<TLAbstractEnumeration> getParent() {
+    public OtmRoleEnumeration getParent() {
         return parent;
     }
 
@@ -99,8 +98,8 @@ public class OtmEnumerationValue extends OtmValueProperty {
 
     @Override
     public void clone(OtmProperty property) {
-        TLEnumValue newTL = new TLEnumValue();
-        newTL.setLiteral( getTL().getLiteral() );
-        OtmEnumerationValue clone = new OtmEnumerationValue( newTL, getParent() );
+        TLRole newTL = new TLRole();
+        newTL.setName( getTL().getName() );
+        OtmRoleValue clone = new OtmRoleValue( newTL, getParent() );
     }
 }

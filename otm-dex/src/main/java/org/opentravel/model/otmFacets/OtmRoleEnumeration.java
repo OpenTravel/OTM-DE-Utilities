@@ -23,14 +23,18 @@ import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
-import org.opentravel.model.otmProperties.OtmEnumerationValue;
+import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmRoleValue;
+import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLRole;
 import org.opentravel.schemacompiler.model.TLRoleEnumeration;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +46,7 @@ import java.util.List;
  * 
  */
 public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
-    implements OtmTypeProvider, OtmChildrenOwner {
+    implements OtmPropertyOwner, OtmTypeProvider, OtmChildrenOwner {
     private static Log log = LogFactory.getLog( OtmRoleEnumeration.class );
 
     private OtmCore parent;
@@ -56,13 +60,21 @@ public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
      * @see org.opentravel.model.OtmChildrenOwner#add(org.opentravel.model.OtmObject)
      */
     @Override
-    public OtmEnumerationValue add(OtmObject child) {
-        if (child instanceof OtmEnumerationValue && !children.contains( child )) {
+    public OtmRoleValue add(OtmObject child) {
+        if (child instanceof OtmRoleValue && !children.contains( child )) {
             children.add( child );
-            return (OtmEnumerationValue) child;
+            return (OtmRoleValue) child;
         }
         return null;
     }
+
+    /**
+     * @param child
+     */
+    private OtmProperty add(TLRole child) {
+        return add( new OtmRoleValue( child, this ) );
+    }
+
 
     @Override
     public TLRoleEnumeration getTL() {
@@ -89,18 +101,15 @@ public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
         return getParent();
     }
 
-    /**
-     * @param child
-     */
-    private void add(TLRole child) {
-        // if (child != null)
-        // children.add(child);
-    }
 
     @Override
     public void modelChildren() {
+        if (children == null)
+            children = new ArrayList<>();
+        else
+            children.clear();
         for (TLRole role : getTL().getRoles())
-            add( role ); // TODO - model child ?? do we need to?
+            add( role );
     }
 
     @Override
@@ -109,23 +118,27 @@ public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
     }
 
     @Override
-    public void modelInheritedChildren() {}
+    public void modelInheritedChildren() {
+        if (inheritedChildren == null)
+            inheritedChildren = new ArrayList<>();
+    }
 
     @Override
     public List<OtmObject> getChildren() {
-        // TODO Auto-generated method stub
-        return null;
+        synchronized (this) {
+            if (children != null && children.isEmpty())
+                modelChildren();
+        }
+        return children;
     }
 
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
-        // TODO Auto-generated method stub
-        return null;
+        return getChildren();
     }
 
     @Override
     public Collection<OtmTypeProvider> getChildrenTypeProviders() {
-        // TODO Auto-generated method stub
         return Collections.emptyList();
     }
 
@@ -144,10 +157,10 @@ public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
         return Collections.emptyList();
     }
 
-    // @Override
-    // public boolean isExpanded() {
-    // return false;
-    // }
+    @Override
+    public boolean isExpanded() {
+        return true;
+    }
 
     @Override
     public Icons getIconType() {
@@ -158,6 +171,23 @@ public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
     @Override
     public boolean isNameControlled() {
         return true;
+    }
+
+    @Override
+    public OtmProperty add(TLModelElement tlChild) {
+        return tlChild instanceof TLRole ? add( (TLRole) tlChild ) : null;
+    }
+
+    @Override
+    public void delete(OtmProperty property) {
+        if (property.getTL() instanceof TLRole)
+            getTL().removeRole( (TLRole) property.getTL() );
+        remove( property );
+    }
+
+    @Override
+    public void remove(OtmProperty property) {
+        children.remove( property );
     }
 
 }

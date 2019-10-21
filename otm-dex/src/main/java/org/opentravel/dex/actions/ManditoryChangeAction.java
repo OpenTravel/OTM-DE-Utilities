@@ -17,8 +17,8 @@
 package org.opentravel.dex.actions;
 
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.otmProperties.OtmEnumerationValue;
 import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmValueProperty;
 
 public class ManditoryChangeAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
@@ -31,7 +31,7 @@ public class ManditoryChangeAction extends DexStringAction {
 
     public static String getCurrent(OtmObject obj) {
         String value = "";
-        if (obj instanceof OtmEnumerationValue)
+        if (obj instanceof OtmValueProperty)
             value = "";
         else if (obj instanceof OtmProperty) {
             value = OPTIONAL;
@@ -48,13 +48,6 @@ public class ManditoryChangeAction extends DexStringAction {
     @Override
     protected String get() {
         return getCurrent( otm );
-        // String value = "";
-        // if (otm instanceof OtmProperty) {
-        // value = OPTIONAL;
-        // if (((OtmProperty) otm).isManditory())
-        // value = REQUIRED;
-        // }
-        // return value;
     }
 
     @Override

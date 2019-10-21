@@ -367,11 +367,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         nameProperty = null;
     }
 
-    /**
-     * Override to make false.
-     * 
-     * @return
-     */
     @Override
     public boolean isRenameable() {
         return true;

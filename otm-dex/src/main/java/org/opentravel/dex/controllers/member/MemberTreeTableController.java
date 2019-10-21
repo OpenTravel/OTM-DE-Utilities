@@ -26,6 +26,8 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexFilterChangeEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.OtmObjectChangeEvent;
+import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
@@ -87,8 +89,10 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     private boolean treeEditingEnabled = true;
 
     // All event types listened to by this controller's handlers
+    // Object events may change validation state of members
     private static final EventType[] subscribedEvents = {DexFilterChangeEvent.FILTER_CHANGED,
-        DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+        DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED, OtmObjectChangeEvent.OBJECT_CHANGED,
+        OtmObjectModifiedEvent.OBJECT_MODIFIED};
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
 
     /**
@@ -279,7 +283,6 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
                 handleEvent( (DexFilterChangeEvent) event );
             else if (event instanceof DexModelChangeEvent)
                 refresh();
-            // post( ((DexModelChangeEvent) event).getModelManager() );
             else
                 refresh();
         }

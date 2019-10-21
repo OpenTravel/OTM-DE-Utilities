@@ -185,7 +185,9 @@ public interface OtmObject {
     public String setExample(String value);
 
     /**
-     * @return
+     * Is this object re-nameable and implement a setName() method that changes the underlying TL object?
+     * 
+     * @return True unless overridden.
      */
     boolean isRenameable();
 

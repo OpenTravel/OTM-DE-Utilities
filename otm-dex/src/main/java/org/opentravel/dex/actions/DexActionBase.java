@@ -45,6 +45,22 @@ public abstract class DexActionBase {
     }
 
     /**
+     * Validate the otm and its owning member.
+     * <p>
+     * Override if there are veto keys needed to select relevant findings. See {@link NameChangeAction#isValid()} for an
+     * selection example.
+     */
+    public boolean isValid() {
+        if (otm == null)
+            return false;
+
+        // Validate the parent - naming could change validation status
+        if (otm.getOwningMember() != null)
+            otm.getOwningMember().isValid( true );
+        return otm.isValid( true );
+    }
+
+    /**
      * Get the event and set its subject associated with this action's actionType.
      * 
      * @return

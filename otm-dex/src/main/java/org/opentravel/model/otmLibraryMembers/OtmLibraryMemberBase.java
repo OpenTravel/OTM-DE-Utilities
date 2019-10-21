@@ -249,12 +249,15 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     /**
      * {@inheritDoc}
      * <p>
-     * When force is true, run validation on all descendant children owners and where used library members.
+     * When force is true, run validation on all children and where used library members.
      */
     @Override
     public boolean isValid(boolean force) {
         if (force) {
-            getDescendantsChildrenOwners().forEach( c -> c.isValid( force ) );
+            getChildren().forEach( c -> {
+                if (c != this)
+                    c.isValid( force );
+            } );
             getWhereUsed().forEach( m -> {
                 if (m != this)
                     m.isValid( force );

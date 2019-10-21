@@ -18,6 +18,7 @@ package org.opentravel.model.otmProperties;
 
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
+import org.opentravel.model.otmFacets.OtmRoleEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLEnumValue;
@@ -25,6 +26,7 @@ import org.opentravel.schemacompiler.model.TLIndicator;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLProperty;
 import org.opentravel.schemacompiler.model.TLPropertyOwner;
+import org.opentravel.schemacompiler.model.TLRole;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +45,8 @@ public enum OtmPropertyType {
     INDICATORELEMENT("Indicator Element", OtmIndicatorElement.class),
     IDREFELEMENT("ID Reference Element", OtmIdReferenceElement.class),
 
-    ENUMVALUE("Enumeration Value", OtmEnumerationValue.class);
+    ENUMVALUE("Enumeration Value", OtmEnumerationValue.class),
+    ROLEVALUE("Role Value", OtmRoleValue.class);
 
     private final String label;
     private Class<? extends OtmProperty> propertyClass;
@@ -112,18 +115,23 @@ public enum OtmPropertyType {
                     case ENUMVALUE:
                         item.setDisable( !(owner instanceof OtmEnumeration) );
                         break;
+                    case ROLEVALUE:
+                        item.setDisable( !(owner instanceof OtmRoleEnumeration) );
+                        break;
 
                     case ATTRIBUTE:
                     case ID:
                     case IDREFATTRIBUTE:
                     case INDICATOR:
-                        item.setDisable( owner instanceof OtmEnumeration );
+                        item.setDisable( owner instanceof OtmEnumeration || owner instanceof OtmRoleEnumeration );
                         break;
 
                     case ELEMENT:
                     case IDREFELEMENT:
                     case INDICATORELEMENT:
                         item.setDisable( !(owner.getTL() instanceof TLPropertyOwner) );
+                        if (owner instanceof OtmEnumeration || owner instanceof OtmRoleEnumeration)
+                            item.setDisable( true );
                         break;
                     default:
                         item.setDisable( true );
@@ -182,6 +190,10 @@ public enum OtmPropertyType {
                 break;
             case ENUMVALUE:
                 tl = new TLEnumValue();
+                break;
+            case ROLEVALUE:
+                tl = new TLRole();
+                break;
             default:
         }
         return tl;
