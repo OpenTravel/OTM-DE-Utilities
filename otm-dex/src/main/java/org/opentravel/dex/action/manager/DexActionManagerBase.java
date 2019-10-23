@@ -186,9 +186,9 @@ public abstract class DexActionManagerBase implements DexActionManager {
             log.debug( "Duplicate Action found!" );
             return;
         }
-        if (action.getVetoFindings() != null && !action.getVetoFindings().isEmpty()) {
+        ValidationFindings findings = action.getVetoFindings();
+        if (findings != null && !findings.isEmpty()) {
             // Warn the user of the errors and back out the changes
-            ValidationFindings findings = action.getVetoFindings();
             String msg = "Can not make change.\n" + ValidationUtils.getMessagesAsString( findings );
             if (mainController != null)
                 mainController.postError( null, msg );
@@ -197,6 +197,9 @@ public abstract class DexActionManagerBase implements DexActionManager {
             ignore = false;
             log.debug( "Action vetoed!" );
             // Possible enhancement - if warnings, post them and allow undo option in dialog.
+
+            if (mainController != null)
+                action.getSubject().getModelManager().startValidatingAndResolvingTasks();
             return;
         }
 
@@ -224,6 +227,8 @@ public abstract class DexActionManagerBase implements DexActionManager {
         // action.getSubject().getOwningMember().isValid( true ); // Force the owner to refresh its findings.
         // action.getSubject().isValid( true ); // Force the subject to refresh its findings.
 
+        if (mainController != null)
+            action.getSubject().getModelManager().startValidatingAndResolvingTasks();
         log.debug( "Put action on queue: " + action.getClass().getSimpleName() );
     }
 
@@ -328,12 +333,17 @@ public abstract class DexActionManagerBase implements DexActionManager {
                 event.set( action.getSubject() );
                 mainController.publishEvent( event );
             }
-            if (mainController != null)
+            if (mainController != null) {
                 mainController.updateActionQueueSize( getQueueSize() );
-            if (mainController != null)
                 mainController.postStatus( "Undid action: " + action.toString() );
+                action.getSubject().getModelManager().startValidatingAndResolvingTasks();
+                // new ValidateModelManagerItemsTask( action.getSubject().getModelManager(),
+                // action.getSubject().getModelManager(), mainController.getStatusController() ).go();
+            }
         }
         ignore = false;
+
+
     }
 
 }

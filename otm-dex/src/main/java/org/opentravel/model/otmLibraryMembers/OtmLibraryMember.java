@@ -61,6 +61,12 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      */
     public OtmObject getBaseType();
 
+    /**
+     * 
+     * @return the name of the base type object ({@link #getBaseType()}) or empty string
+     */
+    String getBaseTypeName();
+
     public String getLibraryName();
 
     /**
@@ -132,6 +138,7 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      * @param actionManager
      */
     public void setNoLibraryActionManager(DexActionManager dexActionManager);
+
 
 
 }

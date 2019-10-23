@@ -575,6 +575,7 @@ public class OtmModelManager implements TaskResultHandlerI {
     @Override
     public void handleTaskComplete(WorkerStateEvent event) {
         // NO-OP
+        log.debug( "Task complete" );
     }
 
     /**

@@ -214,9 +214,14 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         memberDescription.setOnAction( e -> member.descriptionProperty().set( memberDescription.getText() ) );
 
         // Base type
-        changeBaseButton.setDisable( true ); // TEMP
+        changeBaseButton.setDisable( !member.isEditable() );
         baseTypeName.setText( member.baseTypeProperty().get() );
-        // FIXME - add action
+        changeBaseButton.setOnAction( e -> {
+            member.getActionManager().run( DexActions.BASETYPECHANGE, member );
+            member.baseTypeProperty().set( member.getBaseTypeName() );
+            baseTypeName.setText( member.getBaseTypeName() );
+        } );
+        // TESTME - add action
 
         // Assigned type label
         final String TYPELABEL = "Assigned Type";

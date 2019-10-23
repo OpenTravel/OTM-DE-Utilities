@@ -347,6 +347,10 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
             // log.debug(findings != null ? findings.count() + " findings found" : " null" + " findings found.");
         }
+        // log.debug( "Validated " + this + " resulted in " + findings.count() + " findings." );
+        if (findings != null && findings.count() > 0)
+            log.debug( this + "findings: " + findings.count() + " findings found" );
+        // FIXME - how to make the image and tool tip update?
         return findings == null || findings.isEmpty();
     }
 

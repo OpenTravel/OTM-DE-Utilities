@@ -191,13 +191,24 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     @Override
+    public String getBaseTypeName() {
+        return getBaseType() != null ? getBaseType().getName() : "";
+    }
+
+    @Override
     public OtmObject setBaseType(OtmObject baseObj) {
-        if (this.getClass() == baseObj.getClass() && getTL() instanceof TLExtensionOwner) {
-            TLExtension tlExt = ((TLExtensionOwner) getTL()).getExtension();
-            if (tlExt == null)
-                tlExt = new TLExtension();
-            tlExt.setExtendsEntity( (NamedEntity) baseObj.getTL() );
-            ((TLExtensionOwner) getTL()).setExtension( tlExt );
+        if (baseObj != null) {
+            if (this.getClass() == baseObj.getClass() && getTL() instanceof TLExtensionOwner) {
+                TLExtension tlExt = ((TLExtensionOwner) getTL()).getExtension();
+                if (tlExt == null)
+                    tlExt = new TLExtension();
+                tlExt.setExtendsEntity( (NamedEntity) baseObj.getTL() );
+                ((TLExtensionOwner) getTL()).setExtension( tlExt );
+            }
+        } else {
+            // Clear the extension
+            if (getTL() instanceof TLExtensionOwner)
+                ((TLExtensionOwner) getTL()).setExtension( null );
         }
         return getBaseType();
     }
@@ -258,10 +269,12 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
                 if (c != this)
                     c.isValid( force );
             } );
-            getWhereUsed().forEach( m -> {
-                if (m != this)
-                    m.isValid( force );
-            } );
+            // TODO - how to prevent loops?
+            // new ValidateModelManagerItemsTask( getModelManager(), null, null );
+            // getWhereUsed().forEach( m -> {
+            // if (m != this)
+            // m.isValid( force );
+            // } );
         }
         return super.isValid( force );
     }

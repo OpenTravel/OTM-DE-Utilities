@@ -26,12 +26,16 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.events.DexChangeEvent;
+import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.tasks.TaskResultHandlerI;
+import org.opentravel.dex.tasks.model.ValidateModelManagerItemsTask;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.stage.Stage;
@@ -42,7 +46,8 @@ import javafx.stage.Stage;
  * @author dmh
  *
  */
-public abstract class DexMainControllerBase extends AbstractMainWindowController implements DexMainController {
+public abstract class DexMainControllerBase extends AbstractMainWindowController
+    implements DexMainController, TaskResultHandlerI {
     private static Log log = LogFactory.getLog( DexMainControllerBase.class );
 
     protected DexMainController mainController;
@@ -225,6 +230,17 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     public void updateActionQueueSize(int size) {
         if (menuBarController != null)
             menuBarController.updateActionQueueSize( size );
+    }
+
+    public void updateValidation() {
+        new ValidateModelManagerItemsTask( getModelManager(), this, statusController ).go();
+    }
+
+    @Override
+    public void handleTaskComplete(WorkerStateEvent event) {
+        // NO-OP
+        log.debug( "Task complete" );
+        menuBarController.fireEvent( new DexModelChangeEvent() );
     }
 
     @Override

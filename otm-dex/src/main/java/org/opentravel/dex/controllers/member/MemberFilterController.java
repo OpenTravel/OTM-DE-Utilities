@@ -407,29 +407,48 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     }
 
     // TODO - use OtmLibraryMemberType enumeration
+    /**
+     * Set the type filter to the object type's class simple name
+     * 
+     * @param value
+     */
+    public void setTypeFilter(OtmLibraryMember member) {
+        if (member == null)
+            classNameFilter = null;
+        else if (member instanceof OtmLibraryMember)
+            setTypeFilterValue( member.getClass().getSimpleName() );
+    }
+
     public void setTypeFilter(String value) {
         if (value.isEmpty() || value.equals( ALL ))
             classNameFilter = null;
         else if (value.startsWith( RESOURCE ))
-            classNameFilter = OtmResource.class.getSimpleName();
+            setTypeFilterValue( OtmResource.class.getSimpleName() );
         else if (value.startsWith( SERVICE ))
-            classNameFilter = OtmServiceObject.class.getSimpleName();
+            setTypeFilterValue( OtmServiceObject.class.getSimpleName() );
         else if (value.startsWith( BUSINESS ))
-            classNameFilter = OtmBusinessObject.class.getSimpleName();
+            setTypeFilterValue( OtmBusinessObject.class.getSimpleName() );
         else if (value.startsWith( CHOICE ))
-            classNameFilter = OtmChoiceObject.class.getSimpleName();
+            setTypeFilterValue( OtmChoiceObject.class.getSimpleName() );
         else if (value.startsWith( CORE ))
-            classNameFilter = OtmCore.class.getSimpleName();
+            setTypeFilterValue( OtmCore.class.getSimpleName() );
         else if (value.startsWith( SIMPLE ))
-            classNameFilter = OtmSimpleObject.class.getSimpleName();
+            setTypeFilterValue( OtmSimpleObject.class.getSimpleName() );
         else if (value.startsWith( ENUMERATION ))
-            classNameFilter = OtmEnumeration.class.getSimpleName();
+            setTypeFilterValue( OtmEnumeration.class.getSimpleName() );
         else if (value.startsWith( VWA ))
-            classNameFilter = OtmValueWithAttributes.class.getSimpleName();
-
-        // log.debug("Set Type Filter: " + classNameFilter);
-        fireFilterChangeEvent();
+            setTypeFilterValue( OtmValueWithAttributes.class.getSimpleName() );
     }
 
+    /**
+     * Set the type filter value. Expected to be the object type's class simple name
+     * 
+     * @param value
+     */
+    public void setTypeFilterValue(String value) {
+        classNameFilter = value;
+        fireFilterChangeEvent();
+        // log.debug("Set Type Filter: " + classNameFilter);
+    }
 
 }
