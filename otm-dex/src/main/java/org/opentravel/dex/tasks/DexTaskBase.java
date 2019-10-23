@@ -19,6 +19,7 @@ package org.opentravel.dex.tasks;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexStatusController;
+import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
@@ -144,6 +145,7 @@ public abstract class DexTaskBase<T> extends Task<String> {
                 errorBuilder = new StringBuilder( getClass().getSimpleName() + " Error: " );
                 errorBuilder.append( e.getLocalizedMessage() );
                 result = errorBuilder.toString(); // Signal business error via result
+                updateMessage( errorBuilder.toString() );
                 failed();
                 log.warn( errorBuilder.toString() );
             }
@@ -176,6 +178,8 @@ public abstract class DexTaskBase<T> extends Task<String> {
         updateMessage( "Failed!" );
         if (statusController != null)
             statusController.finish( this );
+        DialogBoxContoller dbc = DialogBoxContoller.init();
+        dbc.show( "Failed", errorBuilder.toString() );
     }
 
     public String getErrorMsg() {

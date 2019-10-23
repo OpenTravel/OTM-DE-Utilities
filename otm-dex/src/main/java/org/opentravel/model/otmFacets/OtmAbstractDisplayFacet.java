@@ -182,7 +182,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
      */
     @Override
     public boolean isEditable() {
-        return getParent().isEditable();
+        return getParent() != null ? getParent().isEditable() : false;
     }
 
     @Override
@@ -202,7 +202,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public OtmModelManager getModelManager() {
-        return getParent().getModelManager();
+        return getParent() != null ? getParent().getModelManager() : null;
     }
 
     @Override
@@ -217,12 +217,13 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public String getValidationFindingsAsString() {
-        return getParent().getValidationFindingsAsString();
+        return getParent() != null ? getParent().getValidationFindingsAsString() : "";
     }
 
     @Override
     public void setExpanded(boolean flag) {
-        getParent().setExpanded( flag );
+        if (getParent() != null)
+            getParent().setExpanded( flag );
     }
 
     @Override
@@ -232,9 +233,8 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public boolean isValid(boolean refresh) {
-        return getParent().isValid( refresh );
+        return getParent() != null ? getParent().isValid( refresh ) : false;
     }
-
 
     @Override
     public void setDescription(String description) {
@@ -248,17 +248,17 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public ImageView validationImage() {
-        return getParent().validationImage();
+        return getParent() != null ? getParent().validationImage() : null;
     }
 
     @Override
     public ObjectProperty<ImageView> validationImageProperty() {
-        return getParent().validationImageProperty();
+        return getParent() != null ? getParent().validationImageProperty() : null;
     }
 
     @Override
     public StringProperty validationProperty() {
-        return getParent().validationProperty();
+        return getParent() != null ? getParent().validationProperty() : new ReadOnlyStringWrapper( "" );
     }
 
     @Override
@@ -278,7 +278,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public OtmLibraryMember getOwningMember() {
-        return getParent().getOwningMember();
+        return getParent() != null ? getParent().getOwningMember() : null;
     }
 
     @Override
@@ -363,17 +363,17 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public ValidationFindings getFindings() {
-        return parent.getFindings();
+        return getParent() != null ? getParent().getFindings() : null;
     }
 
     @Override
     public Image getIcon() {
-        return parent.getIcon();
+        return getParent() != null ? getParent().getIcon() : null;
     }
 
     @Override
     public OtmLibrary getLibrary() {
-        return parent.getLibrary();
+        return getParent() != null ? getParent().getLibrary() : null;
     }
 
     @Override
@@ -393,7 +393,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public TLModelElement getTL() {
-        return parent.getTL();
+        return getParent() != null ? getParent().getTL() : null;
     }
 
 }

@@ -24,6 +24,7 @@
               <menus>
                 <Menu mnemonicParsing="false" text="File">
                   <items>
+                    <MenuItem fx:id="doNewLibraryItem" mnemonicParsing="false" onAction="#doNewLibrary" text="New Library..." />
                     <MenuItem fx:id="doNewProjectItem" mnemonicParsing="false" onAction="#doNewProject" text="New Project..." />
                     <MenuItem fx:id="fileOpenItem" mnemonicParsing="false" onAction="#fileOpen" text="Open..." />
                     <SeparatorMenuItem mnemonicParsing="false" />

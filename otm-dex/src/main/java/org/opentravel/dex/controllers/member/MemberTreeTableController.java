@@ -30,7 +30,9 @@ import org.opentravel.dex.events.OtmObjectChangeEvent;
 import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmFacets.OtmEmptyTableFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
@@ -231,6 +233,10 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             createChildrenItems( member, item );
     }
 
+    public void createTreeItem(OtmAbstractDisplayFacet member, TreeItem<MemberAndProvidersDAO> parent) {
+        TreeItem<MemberAndProvidersDAO> item = new MemberAndProvidersDAO( member ).createTreeItem( parent );
+    }
+
     /**
      * Create tree items for the type provider children of this child owning member
      */
@@ -353,10 +359,13 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             // create cells for members
             // Collection<OtmLibraryMember> members = currentModelMgr.getMembers();
             currentModelMgr.getMembers().forEach( m -> createTreeItem( m, root ) );
+            if (root.getChildren().isEmpty()) {
+                log.debug( "POST dummy row" );
+                createTreeItem( new OtmEmptyTableFacet( currentModelMgr ), root );
+            }
             try {
                 memberTree.sort();
             } catch (Exception e) {
-                // why does first sort always throw exception?
                 log.warn( "Exception sorting: " + e.getLocalizedMessage() );
             }
         }

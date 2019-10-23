@@ -138,11 +138,15 @@ public class OtmPropertyFactory {
         OtmProperty p = null;
         if (tl instanceof TLAttribute) {
             OtmXsdSimple idType = null;
+            // Default name
+            if (((TLAttribute) tl).getName().isEmpty())
+                ((TLAttribute) tl).setName( "id" );
+            // ID type
             if (parent.getModelManager() != null)
                 idType = parent.getModelManager().getIdType();
             if (idType != null)
                 ((TLAttribute) tl).setType( idType.getTL() );
-
+            // Parent
             if (parent.getTL() instanceof TLAttributeOwner) {
                 ((TLAttributeOwner) parent.getTL()).addAttribute( (TLAttribute) tl );
                 p = new OtmIdAttribute<>( (TLAttribute) tl, parent );

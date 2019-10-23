@@ -19,13 +19,14 @@ package org.opentravel.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.popup.SelectProjectDialogController;
+import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
 
 import java.util.List;
 
 /**
- * Handle requests for project releated services.
+ * Handle requests for project related services.
  * 
  * @author dmh
  *
@@ -49,21 +50,23 @@ public class DexProjectHandler {
 
         OtmProject project = selectOneProject( projects );
 
-        // // Select one project
-        // if (projects.size() <= 1)
-        // for (OtmProject p : projects)
-        // project = p;
-        // else {
-        // // post a dialog to select the project
-        // SelectProjectDialogController spdc = SelectProjectDialogController.init();
-        // spdc.setManager( library.getModelManager() );
-        // spdc.showAndWait( "" );
-        // if (spdc.getSelection() != null)
-        // project = spdc.getSelection();
-        // }
         // Add the library to the selected project
         if (project != null)
             project.add( library );
+    }
+
+    /**
+     * Get a list of projects from the model manager and let the user select one.
+     * 
+     * @param modelManager
+     * @return user selected project or null
+     */
+    public OtmProject selectProject(OtmModelManager modelManager) {
+        List<OtmProject> projects = modelManager.getUserProjects();
+        SelectProjectDialogController spdc = SelectProjectDialogController.init();
+        spdc.setProjectList( projects );
+        spdc.showAndWait( "" );
+        return spdc.getSelection();
     }
 
     /**

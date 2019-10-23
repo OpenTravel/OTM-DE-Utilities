@@ -165,10 +165,14 @@ public class OtmModelManager implements TaskResultHandlerI {
      * @see #startValidatingAndResolvingTasks()
      * 
      * @param library to add
-     * @return
+     * @return newly created OtmLibrary
      */
     public OtmLibrary add(AbstractLibrary absLibrary) {
         return add( absLibrary, getVersionChainFactory() );
+    }
+
+    public OtmLibrary addUnmanaged(AbstractLibrary absLibrary) {
+        return add( absLibrary, null );
     }
 
     /**
@@ -523,6 +527,10 @@ public class OtmModelManager implements TaskResultHandlerI {
      */
     public Collection<OtmLibraryMember> getMembers() {
         return Collections.unmodifiableCollection( members.values() );
+    }
+
+    public boolean hasProjects() {
+        return !projects.isEmpty();
     }
 
     public Collection<OtmProject> getProjects() {

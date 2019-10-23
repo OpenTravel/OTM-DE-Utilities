@@ -38,7 +38,7 @@ import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.schemacompiler.model.BuiltInLibrary;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -111,7 +111,8 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     private String textFilterValue = null;
     private OtmModelManager modelMgr;
 
-    private HashMap<String,OtmLibrary> libraryMap = new HashMap<>();
+    // private HashMap<String,OtmLibrary> libraryMap = new HashMap<>();
+    private TreeMap<String,OtmLibrary> libraryMap2 = new TreeMap<>();
 
     private String libraryFilter = null;
 
@@ -200,16 +201,18 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             log.error( "Needed Model Manager is null." );
             return;
         }
-        libraryMap.clear();
-        libraryMap.put( ALLLIBS, null );
+        libraryMap2.clear();
+        // libraryMap2.put( ALLLIBS, null );
         for (OtmLibrary lib : modelMgr.getLibraries())
             if (lib.getName() != null && !lib.getName().isEmpty())
-                libraryMap.put( lib.getName(), lib );
+                libraryMap2.put( lib.getName(), lib );
 
-        ObservableList<String> libList = FXCollections.observableArrayList( libraryMap.keySet() );
-        libList.sort( null );
-        librarySelector.getSelectionModel().select( ALLLIBS );
+        ObservableList<String> libList = FXCollections.observableArrayList( libraryMap2.keySet() );
+        libList.add( 0, ALLLIBS );
+        // libList.sort( null );
         librarySelector.setItems( libList );
+        // librarySelector.getSelectionModel().select( ALLLIBS );
+        librarySelector.getSelectionModel().select( 0 );
         librarySelector.setOnAction( e -> setLibraryFilter() );
         // log.debug("Configured library selection combo control.");
     }
@@ -230,7 +233,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
 
     private OtmLibrary getSelectedLibrary() {
         String key = librarySelector.getSelectionModel().getSelectedItem();
-        return libraryMap.get( key );
+        return libraryMap2.get( key );
     }
 
     @Override
@@ -378,11 +381,11 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
                 clear();
                 fireFilterChangeEvent();
             } else {
-                setLibraryFilter( libraryMap.get( selection ) );
+                setLibraryFilter( libraryMap2.get( selection ) );
             }
         }
         librarySelector.setValue( selection );
-        memberFilter.fireEvent( new DexLibrarySelectionEvent( libraryMap.get( selection ) ) );
+        memberFilter.fireEvent( new DexLibrarySelectionEvent( libraryMap2.get( selection ) ) );
     }
 
     private void setLibraryFilter(OtmLibrary lib) {

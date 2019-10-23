@@ -100,6 +100,7 @@ public class SetLibraryAction extends DexRunAction {
             // Save the old library for Undo
             oldLibrary = member.getLibrary();
 
+            lib.getTL().addNamedMember( member.getTlLM() );
             member.getTlLM().setOwningLibrary( lib.getTL() );
             // If you add and remove from library instead of setting member, TL will not update all the dependent type
             // assignments.

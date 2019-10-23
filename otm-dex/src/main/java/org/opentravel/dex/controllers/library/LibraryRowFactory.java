@@ -25,7 +25,6 @@ import org.opentravel.dex.repository.RepositoryResultHandler;
 import org.opentravel.dex.tasks.repository.LockLibraryTask;
 import org.opentravel.dex.tasks.repository.UnlockLibraryTask;
 import org.opentravel.model.otmContainers.OtmLibrary;
-import org.opentravel.schemacompiler.repository.RepositoryItemState;
 
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
@@ -49,14 +48,14 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     private final ContextMenu contextMenu = new ContextMenu();
     private MenuItem lockLibrary;
     private MenuItem unlockLibrary;
-    private MenuItem whereUsed;
+    // private MenuItem whereUsed;
     private MenuItem projectAdd;
     private MenuItem projectRemove;
+    private MenuItem saveLibrary;
 
     // controller injected from FXML
     public LibraryRowFactory(LibrariesTreeTableController controller) {
         this();
-        // this.controller = controller;
         this.controller = controller;
         mainController = controller.getMainController();
     }
@@ -66,27 +65,34 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         // Create Context menu
         lockLibrary = new MenuItem( "Lock" );
         unlockLibrary = new MenuItem( "Unlock" );
-        whereUsed = new MenuItem( "Show Where Used (future)" );
+        // whereUsed = new MenuItem( "Show Where Used (future)" );
         projectAdd = new MenuItem( "Add to project" );
         projectRemove = new MenuItem( "Remove from project" );
+        saveLibrary = new MenuItem( "Save" );
 
         lockLibrary.setOnAction( e -> lockLibrary() );
         unlockLibrary.setOnAction( (e) -> unlockLibraryEventHandler() );
-        whereUsed.setOnAction( this::addMemberEvent );
+        // whereUsed.setOnAction( this::addMemberEvent );
         projectAdd.setOnAction( this::addToProject );
         projectRemove.setOnAction( this::removeLibrary );
+        saveLibrary.setOnAction( e -> saveLibrary() );
 
-        contextMenu.getItems().addAll( lockLibrary, unlockLibrary, whereUsed, projectAdd, projectRemove );
+        contextMenu.getItems().addAll( lockLibrary, unlockLibrary, projectAdd, projectRemove, saveLibrary );
         setContextMenu( contextMenu );
 
         // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
     }
 
+    private void saveLibrary() {
+        OtmLibrary library = getSelected();
+        if (library == null)
+            return;
+        library.save();
+    }
+
     private void removeLibrary(ActionEvent e) {
-        OtmLibrary library = null;
-        if (controller.getSelectedItem() != null && controller.getSelectedItem().getValue() != null)
-            library = controller.getSelectedItem().getValue();
+        OtmLibrary library = getSelected();
         if (library == null)
             return;
 
@@ -112,6 +118,13 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         // project.remove( library );
 
         controller.refresh();
+    }
+
+    private OtmLibrary getSelected() {
+        OtmLibrary library = null;
+        if (controller.getSelectedItem() != null && controller.getSelectedItem().getValue() != null)
+            library = controller.getSelectedItem().getValue();
+        return library;
     }
 
     private void addToProject(ActionEvent e) {
@@ -191,14 +204,19 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     private void setCSSClass(TreeTableRow<LibraryDAO> tc, TreeItem<LibraryDAO> newTreeItem) {
         if (newTreeItem != null && newTreeItem.getValue() != null) {
             OtmLibrary library = newTreeItem.getValue().getValue();
-            if (library != null) {
+            if (library != null && library.getModelManager() != null) {
                 lockLibrary.setDisable( !library.canBeLocked() );
                 unlockLibrary.setDisable( !library.canBeUnlocked() );
-                whereUsed.setDisable( true );
-                projectAdd.setDisable( library.getState() != RepositoryItemState.UNMANAGED );
+                // whereUsed.setDisable( true );
+                projectAdd.setDisable( !library.getModelManager().hasProjects() );
+                // !library.getModelManager().hasProjects() || library.getState() != RepositoryItemState.UNMANAGED );
                 projectRemove.setDisable( library.getProjects().isEmpty() );
+            } else {
+                lockLibrary.setDisable( true );
+                unlockLibrary.setDisable( true );
+                projectAdd.setDisable( true );
+                projectRemove.setDisable( true );
             }
-            // return n.getLibrary().getProjectItem().getState().equals(RepositoryItemState.MANAGED_WIP);
 
             tc.pseudoClassStateChanged( EDITABLE, newTreeItem.getValue().getValue().isEditable() );
         }

@@ -319,7 +319,8 @@ public abstract class DexActionManagerBase implements DexActionManager {
             DexAction<?> action = queue.pop();
             log.debug( "Undo action: " + action.getClass().getSimpleName() );
             action.undoIt();
-            action.getSubject().getOwningMember().isValid( true ); // Force the owner to refresh its findings.
+            if (action.getSubject() != null)
+                action.getSubject().getOwningMember().isValid( true ); // Force the owner to refresh its findings.
 
             // Throw an event if defined
             DexChangeEvent event = action.getEvent();

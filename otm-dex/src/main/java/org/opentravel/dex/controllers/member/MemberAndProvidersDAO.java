@@ -98,7 +98,8 @@ public class MemberAndProvidersDAO implements DexDAO<OtmObject> {
     public StringProperty libraryProperty() {
         if (otmObject instanceof OtmLibraryMember)
             return ((OtmLibraryMember) otmObject).libraryProperty();
-        return new ReadOnlyStringWrapper( otmObject.getLibrary().getName() );
+        String name = otmObject.getLibrary() != null ? otmObject.getLibrary().getName() : "";
+        return new ReadOnlyStringWrapper( name );
     }
 
     public StringProperty nameProperty() {

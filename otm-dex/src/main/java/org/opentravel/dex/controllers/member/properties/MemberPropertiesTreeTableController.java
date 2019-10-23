@@ -205,7 +205,10 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     }
 
     public void handleEvent(DexModelChangeEvent event) {
-        clear();
+        if (event.get() instanceof OtmLibraryMember)
+            post( (OtmLibraryMember) event.get() );
+        else
+            clear();
     }
 
     public void handleMaxEdit(TreeTableColumn.CellEditEvent<PropertiesDAO,String> event) {

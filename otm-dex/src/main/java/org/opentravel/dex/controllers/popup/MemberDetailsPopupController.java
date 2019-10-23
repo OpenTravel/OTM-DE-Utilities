@@ -87,18 +87,8 @@ public class MemberDetailsPopupController extends DexPopupControllerBase {
     private TextFlow dialogHelp;
     @FXML
     private MemberDetailsController memberDetailsController;
-    // @FXML
-    // private MemberFilterController memberFilterController;
 
     private OtmLibraryMember currentMember;
-
-    // public MemberFilterController getMemberFilterController() {
-    // return memberFilterController;
-    // }
-
-    // private OtmModelManager modelManager;
-
-    // private ImageManager imageMgr;
 
     @Override
     public void checkNodes() {
@@ -110,9 +100,11 @@ public class MemberDetailsPopupController extends DexPopupControllerBase {
             throw new IllegalStateException( "Null FXML injected member details controller." );
     }
 
-    // public MemberAndProvidersDAO getSelected() {
-    // return memberDetailsController.getSelected();
-    // }
+    @Override
+    public void doOK() {
+        memberDetailsController.commitChanges();
+        super.doOK();
+    }
 
     public void mouseClick(MouseEvent event) {
         // this fires after the member selection listener
@@ -131,16 +123,6 @@ public class MemberDetailsPopupController extends DexPopupControllerBase {
         this.currentMember = model;
     }
 
-    /**
-     * @see org.opentravel.dex.controllers.popup.DexPopupControllerBase#doOK()
-     */
-    @Override
-    public void doOK() {
-        // TODO Capture any uncommitted text changes
-        memberDetailsController.commitChanges();
-        super.doOK();
-    }
-
     @Override
     protected void setup(String message) {
         super.setStage( dialogTitle, dialogStage );
@@ -151,14 +133,8 @@ public class MemberDetailsPopupController extends DexPopupControllerBase {
         selectButton.setOnAction( e -> doOK() );
 
         memberDetailsController.configure( null );
-        // memberDetailsController.configure( modelManager, false );
-        // memberFilterController.configure( modelManager, this );
-        // memberFilterController.setBuiltIns( true ); // always start with built-ins showing
-        // memberDetailsController.setFilter( memberFilterController );
 
         memberDetailsController.post( currentMember );
-        // memberDetailsController.setOnMouseClicked( this::mouseClick );
-
     }
 
 }

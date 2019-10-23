@@ -63,10 +63,13 @@ public class OpenProjectFileTask extends DexTaskBase<File> {
     // Make sure only one thread is opening project at a time to prevent concurrency errors
     @Override
     public synchronized void doIT() {
-        // public void doIT() {
         log.debug( "Opening " + taskData.getName() );
-        new DexFileHandler().openProject( taskData, modelMgr, new OpenProjectProgressMonitor( status ) );
-        modelMgr.addProjects( modelMgr.getProjectManager() );
+        boolean result =
+            new DexFileHandler().openProject( taskData, modelMgr, new OpenProjectProgressMonitor( status ) );
+        if (result)
+            modelMgr.addProjects( modelMgr.getProjectManager() );
+        else
+            throw new IllegalStateException( "Error opening project." );
     }
 
 }

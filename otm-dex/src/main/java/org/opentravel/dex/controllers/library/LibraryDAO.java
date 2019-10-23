@@ -71,7 +71,9 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
     }
 
     public StringProperty nameProperty() {
-        return new SimpleStringProperty( library.getName() );
+        StringProperty np = new SimpleStringProperty( library.getName() );
+        np.addListener( (o, v, n) -> log.debug( "Name change request: " + n ) );
+        return np;
     }
 
     public StringProperty namespaceProperty() {

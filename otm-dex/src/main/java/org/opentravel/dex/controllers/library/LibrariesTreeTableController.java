@@ -78,9 +78,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         {DexLibrarySelectionEvent.LIBRARY_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
 
     // Editable Columns
-    // None
-
-    // private OtmModelManager modelMgr;
+    TreeTableColumn<LibraryDAO,String> nameColumn;
 
     public LibrariesTreeTableController() {
         super( subscribedEvents, publishedEvents );
@@ -118,26 +116,20 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         librariesTreeTable.setRoot( root );
         librariesTreeTable.setShowRoot( false );
         librariesTreeTable.setEditable( true );
-        // libraryTree.getSelectionModel().setCellSelectionEnabled(true); // allow individual cells to be edited
+        librariesTreeTable.getSelectionModel().setCellSelectionEnabled( true ); // allow individual cells to be edited
         librariesTreeTable.setTableMenuButtonVisible( true ); // allow users to select columns
 
         // add a listener for tree selections
         librariesTreeTable.getSelectionModel().selectedItemProperty()
             .addListener( (v, o, n) -> librarySelectionListener( n ) );
 
-        // Set up the TreeTable
-        buildColumns();
-
         // Enable context menus at the row level and add change listener for for applying style
         librariesTreeTable.setRowFactory( (TreeTableView<LibraryDAO> p) -> new LibraryRowFactory( this ) );
 
+        // Set up the TreeTable
+        buildColumns();
+
         refresh();
-        // // TODO - why is this here?
-        // // create cells for members
-        // if (postedData != null)
-        // for (OtmLibrary lib : postedData.getLibraries()) {
-        // createTreeItem( lib, root );
-        // }
         log.debug( "Configured Libraries Tree Table." );
     }
 
@@ -157,6 +149,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
      */
     @Override
     public void post(OtmModelManager modelMgr) {
+        log.debug( "Posting all libraries." );
         ignoreEvents = true;
         if (modelMgr != null) {
             postedData = modelMgr;
@@ -232,7 +225,8 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         if (item == null || item.getValue() == null || item.getValue().getValue() == null)
             return;
 
-        // log.debug("Selection Listener: " + item.getValue().getValue().getName());
+        // log.debug( "Selection Listener: " + item.getValue().getValue().getName() );
+        // nameColumn.setEditable( true );
 
         if (!ignore)
             libraries.fireEvent( new DexLibrarySelectionEvent( libraries, item ) );
@@ -244,9 +238,9 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     private void buildColumns() {
         TreeTableColumn<LibraryDAO,String> prefixColumn =
             createStringColumn( PREFIXCOLUMNLABEL, "prefix", true, false, true, 0 );
-        TreeTableColumn<LibraryDAO,String> nameColumn = createStringColumn( NAMELABEL, "name", true, false, true, 200 );
+        nameColumn = createStringColumn( NAMELABEL, "name", true, true, true, 200 );
         TreeTableColumn<LibraryDAO,String> namespaceColumn =
-            createStringColumn( NAMESPACELABEL, "namespace", true, false, true, 250 );
+            createStringColumn( NAMESPACELABEL, "namespace", true, true, true, 250 );
         TreeTableColumn<LibraryDAO,String> versionColumn =
             createStringColumn( VERSIONLABEL, "version", true, false, true, 0 );
         TreeTableColumn<LibraryDAO,String> statusColumn =
@@ -287,25 +281,26 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         return c;
     }
 
-    /**
-     * TreeItem class does not extend the Node class.
-     * 
-     * Therefore, you cannot apply any visual effects or add menus to the tree items. Use the cell factory mechanism to
-     * overcome this obstacle and define as much custom behavior for the tree items as your application requires.
-     * 
-     * @param item
-     * @return
-     */
-    private TreeItem<LibraryDAO> createTreeItem(OtmLibrary library, TreeItem<LibraryDAO> parent) {
-        log.debug( "Create tree item for: " + library );
-        if (parent != null && library != null) {
-            TreeItem<LibraryDAO> item = new TreeItem<>( new LibraryDAO( library ) );
-            item.setExpanded( false );
-            parent.getChildren().add( item );
-            return item;
-        }
-        return null;
-    }
+    // /**
+    // * TreeItem class does not extend the Node class.
+    // *
+    // * Therefore, you cannot apply any visual effects or add menus to the tree items. Use the cell factory mechanism
+    // to
+    // * overcome this obstacle and define as much custom behavior for the tree items as your application requires.
+    // *
+    // * @param item
+    // * @return
+    // */
+    // private TreeItem<LibraryDAO> createTreeItem(OtmLibrary library, TreeItem<LibraryDAO> parent) {
+    // log.debug( "Create tree item for: " + library );
+    // if (parent != null && library != null) {
+    // TreeItem<LibraryDAO> item = new TreeItem<>( new LibraryDAO( library ) );
+    // item.setExpanded( false );
+    // parent.getChildren().add( item );
+    // return item;
+    // }
+    // return null;
+    // }
 
     /**
      * {@inheritDoc} Remove all items from the member tree.

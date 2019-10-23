@@ -80,10 +80,6 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     @FXML
     private Button changeTypeButton;
     @FXML
-    private Button deleteButton;
-    @FXML
-    private Button addButton;
-    @FXML
     private TextField memberDescription;
 
     // private OtmModelManager modelMgr;
@@ -116,8 +112,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             throw new IllegalStateException( "memberName not injected by FXML." );
         if (!(typeLabel instanceof Label))
             throw new IllegalStateException( "label not injected by FXML." );
-        if (!(deleteButton instanceof Button))
-            throw new IllegalStateException( "delete button not injected by FXML." );
+        // if (!(deleteButton instanceof Button))
+        // throw new IllegalStateException( "delete button not injected by FXML." );
         if (!(memberDescription instanceof TextField))
             throw new IllegalStateException( "member description not injected by FXML." );
         if (!(assignedTypeName instanceof TextField))
@@ -136,11 +132,10 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         super.configure( mainController );
         eventPublisherNode = memberDetails;
 
-        // moveButton.setOnAction(e -> postNotImplemented());
-        changeBaseButton.setOnAction( e -> postNotImplemented() );
-        changeTypeButton.setOnAction( e -> postNotImplemented() );
-        addButton.setOnAction( e -> postNotImplemented() );
-        deleteButton.setOnAction( e -> postNotImplemented() );
+        // Button actions set in post() method
+        // // moveButton.setOnAction(e -> postNotImplemented());
+        // changeBaseButton.setOnAction( e -> postNotImplemented() );
+        // changeTypeButton.setOnAction( e -> postNotImplemented() );
     }
 
     @Override
@@ -149,7 +144,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         if (event instanceof DexMemberSelectionEvent)
             memberSelectionHandler( (DexMemberSelectionEvent) event );
         if (event instanceof DexModelChangeEvent)
-            modelChangeEvent( (DexModelChangeEvent) event );
+            handleEvent( (DexModelChangeEvent) event );
         else if (event instanceof OtmObjectChangeEvent)
             handleEvent( (OtmObjectChangeEvent) event );
         else if (event instanceof OtmObjectModifiedEvent)
@@ -166,8 +161,11 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             refresh();
     }
 
-    public void modelChangeEvent(DexModelChangeEvent event) {
-        clear();
+    public void handleEvent(DexModelChangeEvent event) {
+        if (event.get() instanceof OtmLibraryMember)
+            post( (OtmLibraryMember) event.get() );
+        else
+            clear();
     }
 
     public void memberSelectionHandler(DexMemberSelectionEvent event) {
@@ -218,8 +216,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         // Base type
         changeBaseButton.setDisable( true ); // TEMP
         baseTypeName.setText( member.baseTypeProperty().get() );
-// FIXME - add action
-        
+        // FIXME - add action
+
         // Assigned type label
         final String TYPELABEL = "Assigned Type";
         final String TYPELABELVWA = "Value Type";
@@ -254,8 +252,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         }
 
         // Action Buttons
-        deleteButton.setDisable( true );
-        addButton.setDisable( true );
+        // deleteButton.setDisable( true );
+        // addButton.setDisable( true );
         // This approach will work. Need to make sure not to re-add nodes
         // if (member instanceof OtmEnumeration) {
         // CheckBox openBox = new CheckBox( "Open" );
@@ -287,26 +285,10 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         refresh();
     }
 
-    // /**
-    // * Make and fire a filter event. Set ignore clear in case event handler tries to clear() this controller.
-    // */
-    // private void fireFilterChangeEvent() {
-    // if (eventPublisherNode != null) {
-    // ignoreClear = true; // Set just in case event handler does a clear
-    // log.debug("Ready to fire controller level Filter Change event.");
-    // eventPublisherNode.fireEvent(new DexFilterChangeEvent(this, memberDetails));
-    // ignoreClear = false;
-    // } else if (popupController != null) {
-    // popupController.refresh();
-    // }
-    // }
-
     @Override
     public void clear() {
         // When posting updated filter results, do not clear the filters.
         if (!ignoreClear) {
-            // if (mainController != null)
-            // modelMgr = mainController.getModelManager();
             selectedMember = null;
             assignedTypeName.setText( "" );
             memberName.setText( "" );
@@ -327,7 +309,10 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
      */
     public void commitChanges() {
         selectedMember.setName( memberName.getText() );
+        selectedMember.nameProperty().set( memberName.getText() );
+        //
         selectedMember.setDescription( memberDescription.getText() );
+        selectedMember.descriptionProperty().set( memberDescription.getText() );
     }
 
 }

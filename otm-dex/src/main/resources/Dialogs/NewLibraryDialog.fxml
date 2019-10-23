@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.TextFlow?>
+
+<BorderPane fx:id="newLibraryDialog" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.popup.NewLibraryDialogController">
+   <top>
+      <VBox prefHeight="58.0" prefWidth="600.0" styleClass="menu-bar" stylesheets="@../DavesViper.css" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="dialogTitleLabel" style="-fx-alignment: center;" styleClass="bold-label" stylesheets="@../DavesViper.css" text="">
+               <VBox.margin>
+                  <Insets left="20.0" top="10.0" />
+               </VBox.margin>
+            </Label>
+            <TextFlow fx:id="dialogHelp" prefHeight="45.0" prefWidth="600.0" styleClass="label" stylesheets="@../DavesViper.css">
+               <VBox.margin>
+                  <Insets left="20.0" />
+               </VBox.margin>
+            </TextFlow>
+            <Label fx:id="dialogTitleLabel2" style="-fx-alignment: center;" styleClass="bold-label" stylesheets="@../DavesViper.css" text="" />
+         </children>
+      </VBox>
+   </top>
+   <bottom>
+      <ButtonBar prefHeight="11.0" prefWidth="570.0" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="10.0" right="20.0" top="5.0" />
+         </BorderPane.margin>
+         <buttons>
+            <Button fx:id="dialogButtonOK" alignment="CENTER" contentDisplay="CENTER" layoutX="419.0" layoutY="10.0" mnemonicParsing="false" prefWidth="75.0" styleClass="button-blue" stylesheets="@../DavesViper.css" text="Create" textAlignment="CENTER">
+               <opaqueInsets>
+                  <Insets bottom="10.0" />
+               </opaqueInsets>
+            </Button>
+            <Separator orientation="VERTICAL" />
+            <Button fx:id="dialogButtonCancel" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-red" stylesheets="@../DavesViper.css" text="Cancel" textAlignment="CENTER">
+               <opaqueInsets>
+                  <Insets bottom="10.0" />
+               </opaqueInsets>
+            </Button>
+         </buttons>
+      </ButtonBar>
+   </bottom>
+   <center>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <GridPane>
+              <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.20001220703125" minWidth="0.0" prefWidth="0.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="400.0" minWidth="10.0" prefWidth="56.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="494.0" minWidth="10.0" prefWidth="494.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label text="Directory" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
+                     <tooltip>
+                        <Tooltip text="Directory location for the project file." />
+                     </tooltip>
+                  </Label>
+                  <Label layoutX="58.0" layoutY="44.0" text="File name" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                     <tooltip>
+                        <Tooltip text="Name of the library file." />
+                     </tooltip>
+                  </Label>
+                  <Label layoutX="10.0" layoutY="16.0" text="Name" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+                     <tooltip>
+                        <Tooltip text="Name of the project displyed to users." />
+                     </tooltip>
+                  </Label>
+                  <Label layoutX="10.0" layoutY="108.0" text="Namespace" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
+                     <tooltip>
+                        <Tooltip text="Unique ID of the project. Typically the URL of the primary libraries is used." />
+                     </tooltip>
+                  </Label>
+                  <Label layoutX="10.0" layoutY="47.0" text="Description" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+                     <tooltip>
+                        <Tooltip text="Description of the project" />
+                     </tooltip>
+                  </Label>
+                  <Label layoutX="10.0" layoutY="47.0" text="Project" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+                     <tooltip>
+                        <Tooltip text="Default context ID to use on examples." />
+                     </tooltip>
+                  </Label>
+                  <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2">
+                     <children>
+                        <TextField fx:id="directoryField" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="selectButton" mnemonicParsing="false" onAction="#selectFile" text="Select" />
+                     </children>
+                  </HBox>
+                  <TextField fx:id="fileNameField" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                     <tooltip>
+                        <Tooltip text="Name of the project file." />
+                     </tooltip>
+                  </TextField>
+                  <TextField fx:id="nameField" GridPane.columnIndex="2" GridPane.rowIndex="2">
+				     <tooltip>
+                        <Tooltip text="Name of the project displyed to users." />
+                     </tooltip>
+				  </TextField>
+                  <TextField fx:id="nsField" GridPane.columnIndex="2" GridPane.rowIndex="3">
+				     <tooltip>
+                        <Tooltip text="Unique ID of the project. Typically the URL of the primary libraries is used." />
+                     </tooltip>
+				  </TextField>
+                  <TextField fx:id="descriptionField" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                  <TextField fx:id="contextIdField" GridPane.columnIndex="2" GridPane.rowIndex="5">
+				     <tooltip>
+                        <Tooltip text="Default context ID to use on examples." />
+                     </tooltip>
+				  </TextField>
+                  <HBox GridPane.columnIndex="2" GridPane.rowIndex="5">
+                     <children>
+                        <TextField fx:id="projectField" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="openProjectButton" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#doOpenProject" text="Select" />
+                     </children>
+                  </HBox>
+               </children>
+            </GridPane>
+            <TextArea fx:id="resultsArea" editable="false" focusTraversable="false" prefHeight="75.0" prefWidth="600.0" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
+   </center>
+</BorderPane>

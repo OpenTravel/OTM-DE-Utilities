@@ -128,6 +128,11 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         return null;
     }
 
+    private OtmObject getSelectedObject(TreeItem<MemberAndProvidersDAO> item) {
+        if (item != null && item.getValue() != null && item.getValue().getValue() instanceof OtmObject)
+            return (item.getValue().getValue());
+        return null;
+    }
 
     /**
      * @param tc
@@ -135,16 +140,13 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
      * @return
      * @return
      */
-    // TODO - use style class for warning and error
     private void setCSSClass(TreeTableRow<MemberAndProvidersDAO> tc, TreeItem<MemberAndProvidersDAO> newTreeItem) {
-        if (newTreeItem != null && newTreeItem.getValue() instanceof MemberAndProvidersDAO) {
+        OtmObject obj = getSelectedObject( newTreeItem );
+        if (obj != null) {
             tc.pseudoClassStateChanged( EDITABLE, newTreeItem.getValue().isEditable() );
 
-            deleteItem.setDisable( !newTreeItem.getValue().isEditable() );
-            // newMenu.setDisable( !newTreeItem.getValue().isEditable() );
+            deleteItem.setDisable( !obj.isEditable() );
+            newMenu.setDisable( !obj.getModelManager().hasEditableLibraries() );
         }
     }
-    // TODO - investigate using ControlsFX for decoration
-    // TODO - Dragboard db = r.startDragAndDrop(TransferMode.MOVE);
-    // https://www.programcreek.com/java-api-examples/index.php?api=javafx.scene.control.TreeTableRow
 }

@@ -31,6 +31,8 @@ import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.RepositoryItemState;
+import org.opentravel.schemacompiler.saver.LibraryModelSaver;
+import org.opentravel.schemacompiler.saver.LibrarySaveException;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 import org.opentravel.schemacompiler.validate.compile.TLModelCompileValidator;
 import org.opentravel.schemacompiler.version.VersionScheme;
@@ -358,6 +360,45 @@ public class OtmLibrary {
 
     public void validate() {
         findings = TLModelCompileValidator.validateModelElement( getTL(), true );
+    }
+
+    /**
+     * 
+     */
+    public void save() {
+        save( new LibraryModelSaver() );
+    }
+
+    /**
+     * Use the passed saver. Intended for use in saving multiple libraries in one action.
+     * 
+     * @param lms
+     */
+    public void save(LibraryModelSaver lms) {
+        if (getTL() instanceof TLLibrary) {
+            // final StringBuilder successfulSaves = new StringBuilder();
+            // final StringBuilder errorSaves = new StringBuilder();
+            final ValidationFindings findings = new ValidationFindings();
+            // for (final TLLibrary library : toSave) {
+            // final String libraryName = library.getName();
+            // final URL libraryUrl = library.getLibraryUrl();
+            try {
+                // LOGGER.debug("Saving library: " + libraryName + " " + libraryUrl);
+                findings.addAll( lms.saveLibrary( (TLLibrary) getTL() ) );
+                // if (!quiet)
+                // successfulSaves.append("\n").append(libraryName).append(" (").append(libraryUrl).append(")");
+            } catch (final LibrarySaveException e) {
+                final Throwable t = e.getCause();
+                // errorSaves.append("\n").append(libraryName).append(" (").append(libraryUrl).append(")").append(" - ")
+                // .append(e.getMessage());
+                // if (t != null && t.getMessage() != null) {
+                // errorSaves.append(" (").append(t.getMessage()).append(")");
+                if (t != null && t.getMessage() != null)
+                    log.error( "Save error" + t.getMessage() );
+            }
+            // }
+        }
+
     }
 
 }

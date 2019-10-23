@@ -70,7 +70,7 @@ public class NewLibraryMemberAction extends DexRunAction {
                 member.setNoLibraryActionManager( new DexWizardActionManager( null ) );
 
                 // If the subject is editable, use it to set initial library - user may change it
-                if (otm.getLibrary().isEditable())
+                if (otm.getLibrary() != null && otm.getLibrary().isEditable())
                     otm.getLibrary().add( member );
 
                 // If in gui thread, Let user set library and other details
@@ -104,6 +104,8 @@ public class NewLibraryMemberAction extends DexRunAction {
     public OtmLibraryMember doIt(OtmLibraryMember member) {
         if (member != null) {
             newMember = member;
+            // Subject was only used to get a guess at library. Replace it so the event has useful subject.
+            setSubject( newMember );
             // Add member to model manager model and library
             otm.getModelManager().add( newMember );
 
@@ -113,7 +115,6 @@ public class NewLibraryMemberAction extends DexRunAction {
         return newMember;
     }
 
-    // private void runWizard(OtmLibraryMember member) {}
 
     /**
      * Return the new member or null if none created.
@@ -127,7 +128,7 @@ public class NewLibraryMemberAction extends DexRunAction {
 
     @Override
     public ValidationFindings getVetoFindings() {
-    	// TODO - should no library be a veto?
+        // TODO - should no library be a veto?
         return null;
     }
 
@@ -158,6 +159,7 @@ public class NewLibraryMemberAction extends DexRunAction {
             otm.getModelManager().remove( newMember );
 
         newMember = null;
+        setSubject( null );
         log.debug( "Undo new member." );
         return newMember;
     }

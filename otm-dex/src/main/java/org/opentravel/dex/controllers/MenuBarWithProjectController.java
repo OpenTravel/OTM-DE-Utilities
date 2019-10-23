@@ -23,7 +23,9 @@ import org.opentravel.common.DexFileHandler;
 import org.opentravel.common.DialogBox;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
+import org.opentravel.dex.controllers.popup.NewLibraryDialogController;
 import org.opentravel.dex.controllers.popup.NewProjectDialogController;
 import org.opentravel.dex.controllers.popup.WebViewDialogController;
 import org.opentravel.dex.controllers.resources.ResourcesWindowController;
@@ -82,6 +84,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     public MenuItem doCloseItem;
     @FXML
     public MenuItem doSaveAllItem;
+    @FXML
+    public MenuItem doNewLibraryItem;
     @FXML
     public MenuItem doNewProjectItem;
     @FXML
@@ -249,6 +253,16 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     public void doSaveAll(ActionEvent e) {
         // This is only run if the handler is not set.
         getDialogBox( null ).show( "Save All", "Not Implemented" );
+    }
+
+    @FXML
+    void doNewLibrary(ActionEvent e) {
+        NewLibraryDialogController nldc = NewLibraryDialogController.init();
+        nldc.configure( modelMgr, userSettings );
+        Results results = nldc.showAndWait( "" );
+        if (results == Results.OK) {
+            fireEvent( new DexModelChangeEvent( modelMgr ) );
+        }
     }
 
     @FXML

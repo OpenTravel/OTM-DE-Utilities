@@ -30,10 +30,12 @@ import org.opentravel.schemacompiler.loader.LibraryLoaderException;
 import org.opentravel.schemacompiler.loader.LibraryModelLoader;
 import org.opentravel.schemacompiler.loader.impl.LibraryStreamInputSource;
 import org.opentravel.schemacompiler.model.TLLibrary;
+import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.model.TLModel;
 import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.schemacompiler.saver.LibraryModelSaver;
 import org.opentravel.schemacompiler.saver.LibrarySaveException;
+import org.opentravel.schemacompiler.util.URLUtils;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.io.File;
@@ -51,7 +53,7 @@ public class DexFileHandler extends AbstractMainWindowController {
     private static Log log = LogFactory.getLog( DexFileHandler.class );
 
     public static final String PROJECT_FILE_EXTENSION = ".otp";
-    private static final String LIBRARY_FILE_EXTENSION = ".otm";
+    public static final String LIBRARY_FILE_EXTENSION = ".otm";
     public static final String FILE_SEPARATOR = "/";
 
     ValidationFindings findings = null;
@@ -165,7 +167,7 @@ public class DexFileHandler extends AbstractMainWindowController {
         return findings;
     }
 
-    public void openProject(File selectedProjectFile, OtmModelManager mgr, OpenProjectProgressMonitor monitor) {
+    public boolean openProject(File selectedProjectFile, OtmModelManager mgr, OpenProjectProgressMonitor monitor) {
         if (selectedProjectFile.getName().endsWith( PROJECT_FILE_EXTENSION )) {
             // Use project manager from TLModel
             ProjectManager manager = mgr.getProjectManager();
@@ -173,8 +175,10 @@ public class DexFileHandler extends AbstractMainWindowController {
                 manager.loadProject( selectedProjectFile, findings, monitor );
             } catch (Exception e) {
                 log.error( "Error Opening Project: " + e.getLocalizedMessage() );
+                return false;
             }
         }
+        return true;
     }
 
     @Deprecated
@@ -242,6 +246,22 @@ public class DexFileHandler extends AbstractMainWindowController {
                 .append( "You may need to use the .bak file to restore your work" );
 
         return userMessage.toString();
+    }
+
+    /**
+     * 
+     * @param libraryFile must be created and writable
+     * @return
+     */
+    public static TLLibrary createLibrary(File libraryFile) {
+        if (libraryFile == null || !libraryFile.canWrite())
+            return null;
+
+        final URL fileURL = URLUtils.toURL( libraryFile );
+        final TLLibrary tlLib = new TLLibrary();
+        tlLib.setStatus( TLLibraryStatus.DRAFT );
+        tlLib.setLibraryUrl( fileURL );
+        return tlLib;
     }
 
     @Override

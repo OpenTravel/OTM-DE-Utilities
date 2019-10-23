@@ -61,6 +61,7 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
 
     public OtmCore(String name, OtmModelManager mgr) {
         super( new TLCoreObject(), mgr );
+        setAssignedTLType( mgr.getEmptyType().getTL() );
         setName( name );
     }
 
