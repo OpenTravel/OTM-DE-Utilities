@@ -146,7 +146,7 @@ public enum OtmPropertyType {
      * 
      * @param propertyType
      * @param owner
-     * @return
+     * @return new property or null if incorrect parent for type
      */
     public static OtmProperty build(OtmPropertyType propertyType, OtmPropertyOwner owner) {
         OtmProperty property = null;

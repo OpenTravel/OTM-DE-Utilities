@@ -30,6 +30,7 @@ import org.opentravel.model.otmFacets.OtmIdFacet;
 import org.opentravel.model.otmFacets.OtmQueryFacet;
 import org.opentravel.model.otmFacets.OtmUpdateFacet;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
+import org.opentravel.schemacompiler.model.TLContextualFacet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -131,6 +132,20 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
         return ch;
     }
 
+    @Override
+    public void delete(OtmObject child) {
+        if (child instanceof OtmContextualFacet)
+            child = ((OtmContextualFacet) child).getWhereContributed();
+        if (child.getTL() instanceof TLContextualFacet) {
+            if (((OtmContributedFacet) child).getContributor() instanceof OtmCustomFacet)
+                getTL().removeCustomFacet( (TLContextualFacet) child.getTL() );
+            else if (((OtmContributedFacet) child).getContributor() instanceof OtmQueryFacet)
+                getTL().removeQueryFacet( (TLContextualFacet) child.getTL() );
+            else if (((OtmContributedFacet) child).getContributor() instanceof OtmUpdateFacet)
+                getTL().removeUpdateFacet( (TLContextualFacet) child.getTL() );
+        }
+        remove( child );
+    }
 
     // @Override
     // public ComponentNode createMinorVersionComponent() {

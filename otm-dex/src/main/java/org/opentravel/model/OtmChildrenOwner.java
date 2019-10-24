@@ -16,6 +16,8 @@
 
 package org.opentravel.model;
 
+import org.opentravel.model.otmProperties.OtmProperty;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -39,6 +41,20 @@ public interface OtmChildrenOwner extends OtmObject {
      * @return
      */
     public OtmObject add(OtmObject child);
+
+    /**
+     * Delete the child from facade and underlying TL object. See also: {@link #remove(OtmProperty)}
+     * 
+     * @param child
+     */
+    public void delete(OtmObject property);
+
+    /**
+     * Simply remove the child from the children or inherited children list. See also: {@link #delete(OtmProperty)}
+     * 
+     * @param child
+     */
+    public void remove(OtmObject property);
 
     /**
      * Get list of all the children of this object. To allow lazy evaluation, implementations are expected to attempt to

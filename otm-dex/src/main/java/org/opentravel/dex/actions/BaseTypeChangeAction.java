@@ -23,6 +23,12 @@ import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmFacets.OtmChoiceFacet;
+import org.opentravel.model.otmFacets.OtmCustomFacet;
+import org.opentravel.model.otmFacets.OtmQueryFacet;
+import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
+import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.TLExtensionOwner;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
@@ -43,7 +49,7 @@ public class BaseTypeChangeAction extends DexRunAction {
 
     public static boolean isEnabled(OtmObject subject) {
         if (subject != null && subject.isEditable()) {
-            return subject.getTL() instanceof TLExtensionOwner;
+            return subject instanceof OtmContextualFacet || subject.getTL() instanceof TLExtensionOwner;
         }
         return false;
     }
@@ -62,20 +68,24 @@ public class BaseTypeChangeAction extends DexRunAction {
         if (!isEnabled( getSubject() ) || ignore)
             return null;
 
-        // Get the user's selected new provider
+        // Get type selection controller for user to select new base type
         MemberAndProvidersDAO selected = null;
         TypeSelectionContoller controller = TypeSelectionContoller.init();
         controller.setManager( getSubject().getModelManager() );
-        controller.getMemberFilterController().setTypeFilter( (OtmLibraryMember) getSubject() );
+        if (getSubject() instanceof OtmChoiceFacet)
+            controller.getMemberFilterController().setTypeFilterValue( OtmChoiceObject.class.getSimpleName() );
+        else if (getSubject() instanceof OtmQueryFacet || getSubject() instanceof OtmCustomFacet)
+            controller.getMemberFilterController().setTypeFilterValue( OtmBusinessObject.class.getSimpleName() );
+        else
+            controller.getMemberFilterController().setTypeFilter( (OtmLibraryMember) getSubject() );
+
         // Run dialog to get user selection
         if (controller.showAndWait( "MSG" ) == Results.OK) {
             selected = controller.getSelected();
-            if (selected == null || selected.getValue() == null
-                || selected.getValue().getClass() != getSubject().getClass())
-                log.error( "Missing selection from Type Selection Controller" ); // cancels if get() returns null
-            else
+            if (selected != null && selected.getValue() != null)
                 doIt( selected.getValue() );
-        }
+        } else
+            return null; // User cancelled
         return get();
     }
 
@@ -87,12 +97,14 @@ public class BaseTypeChangeAction extends DexRunAction {
     @Override
     public Object doIt(Object data) {
         if (data == null)
-            doIt();
-        else if (data.getClass() == getSubject().getClass()) {
+            return doIt();
+
+        if (data.getClass() == getSubject().getClass() || getSubject() instanceof OtmContextualFacet) {
             oldBaseType = getSubject().getBaseType();
             getSubject().setBaseType( (OtmObject) data );
             // log.debug( "Set base type of " + getSubject() + " to " + get() );
-        }
+        } else
+            return null;
         return get();
     }
 

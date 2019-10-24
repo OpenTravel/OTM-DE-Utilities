@@ -67,7 +67,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     }
 
     @Override
-    public OtmProperty add(OtmObject child) {
+    public OtmObject add(OtmObject child) {
         return parent.add( child );
     }
 
@@ -87,7 +87,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     // }
 
     @Override
-    public void delete(OtmProperty property) {
+    public void delete(OtmObject property) {
         parent.delete( property );
     }
 
@@ -338,7 +338,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     }
 
     @Override
-    public void remove(OtmProperty property) {
+    public void remove(OtmObject property) {
         parent.remove( property );
         // if (children.contains( property ))
         // children.remove( property );

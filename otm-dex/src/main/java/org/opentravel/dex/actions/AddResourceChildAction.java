@@ -87,7 +87,7 @@ public class AddResourceChildAction extends DexRunAction {
 
     @Override
     public OtmResourceChild undoIt() {
-        getSubject().remove( newChild );
+        getSubject().delete( newChild );
         return null;
     }
 

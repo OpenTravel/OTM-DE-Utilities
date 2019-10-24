@@ -49,6 +49,15 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
         super( tl, parent );
     }
 
+    /**
+     * Simply set the parent field. When set to null, the facet is no longer contributed to an object.
+     */
+    public void setParent(OtmLibraryMember parent, OtmContextualFacet cf) {
+        this.parent = parent;
+        parent.add( this );
+        tlObject = cf.getTL();
+    }
+
     @Override
     public void clearNameProperty() {
         nameProperty = null;
@@ -110,5 +119,4 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
     public void setContributor(OtmContextualFacet contextualFacet) {
         contributor = contextualFacet;
     }
-
 }

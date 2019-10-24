@@ -179,6 +179,11 @@ public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
     }
 
     @Override
+    public void delete(OtmObject child) {
+        if (child instanceof OtmProperty)
+            delete( (OtmProperty) child );
+    }
+
     public void delete(OtmProperty property) {
         if (property.getTL() instanceof TLRole)
             getTL().removeRole( (TLRole) property.getTL() );
@@ -186,7 +191,7 @@ public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
     }
 
     @Override
-    public void remove(OtmProperty property) {
+    public void remove(OtmObject property) {
         children.remove( property );
     }
 

@@ -57,6 +57,16 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
     }
 
     @Override
+    public void delete(OtmObject property) {
+        // NO-OP - no delete-able children
+    }
+
+    @Override
+    public void remove(OtmObject property) {
+        // NO-OP - no delete-able children
+    }
+
+    @Override
     public Icons getIconType() {
         return ImageManager.Icons.ALIAS;
     }

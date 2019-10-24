@@ -448,6 +448,18 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     /**
+     * Sub-types MUST implement if any of their children are delete-able
+     */
+    @Override
+    public abstract void delete(OtmObject property);
+
+    @Override
+    public void remove(OtmObject property) {
+        children.remove( property );
+    }
+
+
+    /**
      * Used by actions to allow editing on incomplete members.
      */
     public void setNoLibraryActionManager(DexActionManager actionManager) {

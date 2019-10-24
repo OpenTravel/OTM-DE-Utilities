@@ -90,12 +90,15 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
 
         for (OtmPropertyType type : OtmPropertyType.values()) {
             OtmProperty p = OtmPropertyType.build( type, facet );
-            assertTrue( p.getClass() == type.propertyClass() );
-            assertTrue( OtmPropertyType.getType( p.getClass() ) == type );
-            assertTrue( OtmPropertyType.getType( p ) == type );
-            assertTrue( p.getPropertyType() == type );
-            test( p );
-            assertTrue( facet.getChildren().contains( p ) );
+            // Not all properties can be added to shared facet (e.g. enumValue)
+            if (p != null) {
+                assertTrue( p.getClass() == type.propertyClass() );
+                assertTrue( OtmPropertyType.getType( p.getClass() ) == type );
+                assertTrue( OtmPropertyType.getType( p ) == type );
+                assertTrue( p.getPropertyType() == type );
+                test( p );
+                assertTrue( facet.getChildren().contains( p ) );
+            }
         }
     }
 
@@ -166,9 +169,7 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
                     // Change it
                     OtmProperty newProperty = action.change( type.label() );
                     // Then - if not the same type, there should be a new property
-                    if (newProperty == null)
-                        assertTrue( oldType == type );
-                    else {
+                    if (newProperty != null) {
                         assertTrue( newProperty.getPropertyType() == type );
                         assertTrue( facet.getChildren().size() == kidCount );
                         assertTrue( facet.getChildren().contains( newProperty ) );

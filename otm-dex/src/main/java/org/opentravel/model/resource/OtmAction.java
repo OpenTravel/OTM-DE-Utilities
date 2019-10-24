@@ -291,8 +291,15 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
      * 
      * @param response
      */
-    public void remove(OtmActionResponse response) {
-        getTL().removeResponse( response.getTL() );
+    @Override
+    public void delete(OtmObject response) {
+        if (response.getTL() instanceof TLActionResponse)
+            getTL().removeResponse( (TLActionResponse) response.getTL() );
+        remove( response );
+    }
+
+    @Override
+    public void remove(OtmObject response) {
         children.remove( response );
     }
 }

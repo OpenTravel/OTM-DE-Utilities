@@ -116,7 +116,7 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
     }
 
     @Override
-    public void delete(OtmProperty property) {
+    public void delete(OtmObject property) {
         if (getTL() instanceof TLAttributeOwner && property.getTL() instanceof TLAttribute)
             ((TLAttributeOwner) getTL()).removeAttribute( ((TLAttribute) property.getTL()) );
         if (getTL() instanceof TLIndicatorOwner && property.getTL() instanceof TLIndicator)
@@ -291,7 +291,7 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
     }
 
     @Override
-    public void remove(OtmProperty property) {
+    public void remove(OtmObject property) {
         if (children.contains( property ))
             children.remove( property );
         if (inheritedChildren.contains( property ))

@@ -61,7 +61,8 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
 
     public OtmCore(String name, OtmModelManager mgr) {
         super( new TLCoreObject(), mgr );
-        setAssignedTLType( mgr.getEmptyType().getTL() );
+        if (mgr != null && mgr.getEmptyType() != null)
+            setAssignedTLType( mgr.getEmptyType().getTL() );
         setName( name );
     }
 
@@ -223,6 +224,11 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
     public void modelInheritedChildren() {
         if (getTL().getExtension() != null)
             log.warn( "TODO - model inherited children" );
+    }
+
+    @Override
+    public void delete(OtmObject property) {
+        // NO-OP - no delete-able children
     }
 
 

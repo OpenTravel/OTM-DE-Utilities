@@ -317,13 +317,15 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         return setReferenceFacet( f );
     }
 
-    /**
-     * Remove the parameter from the TL and Otm parent.
-     * 
-     * @param parameter
-     */
-    public void remove(OtmParameter param) {
-        getTL().removeParameter( param.getTL() );
+    @Override
+    public void delete(OtmObject param) {
+        if (param.getTL() instanceof TLParameter)
+            getTL().removeParameter( (TLParameter) param.getTL() );
+        remove( param );
+    }
+
+    @Override
+    public void remove(OtmObject param) {
         children.remove( param );
     }
 }

@@ -34,7 +34,7 @@ public abstract class OtmFacet<T extends TLFacet> extends OtmAbstractFacet<TLFac
     implements OtmPropertyOwner, OtmTypeProvider {
     private static Log log = LogFactory.getLog( OtmFacet.class );
 
-    private OtmLibraryMember parent;
+    protected OtmLibraryMember parent;
 
     public OtmFacet(T tl, OtmLibraryMember parent) {
         super( tl );

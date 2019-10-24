@@ -56,6 +56,17 @@ public class OtmServiceObject extends OtmLibraryMemberBase<TLService> {
     }
 
     @Override
+    public void delete(OtmObject property) {
+        // TODO - delete-able children
+    }
+
+    @Override
+    public void remove(OtmObject property) {
+        // TODO - delete-able children
+    }
+
+
+    @Override
     public String setName(String name) {
         getTL().setName( name );
         isValid( true );

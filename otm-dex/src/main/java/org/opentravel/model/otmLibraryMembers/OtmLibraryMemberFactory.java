@@ -19,7 +19,11 @@ package org.opentravel.model.otmLibraryMembers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmFacets.OtmChoiceFacet;
+import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmFacets.OtmFacetFactory;
+import org.opentravel.model.otmFacets.OtmQueryFacet;
+import org.opentravel.model.otmFacets.OtmUpdateFacet;
 import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLChoiceObject;
@@ -96,6 +100,14 @@ public class OtmLibraryMemberFactory {
 
 
     public static String getObjectName(OtmLibraryMember member) {
+        if (member instanceof OtmCustomFacet)
+            return "Custom Facet";
+        if (member instanceof OtmChoiceFacet)
+            return "Choice Facet";
+        if (member instanceof OtmQueryFacet)
+            return "Query Facet";
+        if (member instanceof OtmUpdateFacet)
+            return "Update Facet";
         return OtmLibraryMemberType.getLabel( member );
         // if (member instanceof OtmBusinessObject)
         // return "Business Object";

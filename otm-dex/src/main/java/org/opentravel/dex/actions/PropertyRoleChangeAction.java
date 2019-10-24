@@ -64,9 +64,11 @@ public class PropertyRoleChangeAction extends DexStringAction {
         if (type != null && getSubject() instanceof OtmProperty && getSubject().getPropertyType() != type) {
             oldProperty = getSubject();
             newProperty = OtmPropertyType.build( type, oldProperty.getParent() );
-            newProperty.clone( oldProperty );
-            oldProperty.getParent().delete( oldProperty );
-            otm = newProperty;
+            if (newProperty != null) {
+                newProperty.clone( oldProperty );
+                oldProperty.getParent().delete( oldProperty );
+                otm = newProperty;
+            }
         }
         return newProperty;
     }

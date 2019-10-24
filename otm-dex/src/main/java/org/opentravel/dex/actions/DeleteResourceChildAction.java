@@ -56,11 +56,11 @@ public class DeleteResourceChildAction extends DexRunAction {
             // Remove from TL and Otm parents
             parent = ((OtmResourceChild) otm).getParent();
             if (parent instanceof OtmResource)
-                ((OtmResource) parent).remove( (OtmResourceChild) otm );
+                ((OtmResource) parent).delete( otm );
             else if (parent instanceof OtmParameterGroup && otm instanceof OtmParameter)
-                ((OtmParameterGroup) parent).remove( (OtmParameter) otm );
+                ((OtmParameterGroup) parent).delete( otm );
             else if (parent instanceof OtmAction && otm instanceof OtmActionResponse)
-                ((OtmAction) parent).remove( (OtmActionResponse) otm );
+                ((OtmAction) parent).delete( otm );
 
             // // Record action to allow undo. Will validate results and warn user.
             // otm.getActionManager().push( this );

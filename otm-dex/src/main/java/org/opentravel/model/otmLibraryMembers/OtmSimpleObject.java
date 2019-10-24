@@ -55,6 +55,10 @@ public class OtmSimpleObject extends OtmSimpleObjects<TLSimple> implements OtmTy
         super( tlo, mgr );
     }
 
+    @Override
+    public void delete(OtmObject property) {
+        // NO-OP - no delete-able children
+    }
 
     @Override
     public StringProperty assignedTypeProperty() {

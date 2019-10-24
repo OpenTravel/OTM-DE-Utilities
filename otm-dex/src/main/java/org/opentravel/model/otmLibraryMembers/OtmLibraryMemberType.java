@@ -21,6 +21,7 @@ import org.opentravel.model.OtmModelManager;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+// TODO - contextual facets
 public enum OtmLibraryMemberType {
     BUSINESS("Business", OtmBusinessObject.class),
     CHOICE("Choice", OtmChoiceObject.class),

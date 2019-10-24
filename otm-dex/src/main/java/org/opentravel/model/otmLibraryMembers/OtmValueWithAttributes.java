@@ -75,6 +75,11 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
         super( tlo, mgr );
     }
 
+    @Override
+    public void delete(OtmObject property) {
+        if (property instanceof OtmProperty)
+            delete( (OtmProperty) property );
+    }
 
     @Override
     public OtmProperty add(OtmObject child) {
@@ -154,10 +159,6 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
     }
 
 
-    /**
-     * @see org.opentravel.model.OtmPropertyOwner#delete(org.opentravel.model.otmProperties.OtmProperty)
-     */
-    @Override
     public void delete(OtmProperty property) {
         if (property.getTL() instanceof TLIndicator)
             getTL().removeIndicator( (TLIndicator) property.getTL() );
@@ -289,10 +290,12 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
         }
     }
 
-    /**
-     * @see org.opentravel.model.OtmPropertyOwner#remove(org.opentravel.model.otmProperties.OtmProperty)
-     */
     @Override
+    public void remove(OtmObject property) {
+        if (property instanceof OtmProperty)
+            remove( (OtmProperty) property );
+    }
+
     public void remove(OtmProperty property) {
         if (getChildren().contains( property ))
             getChildren().remove( property );

@@ -661,8 +661,9 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      * 
      * @param child
      */
-    public void remove(OtmResourceChild child) {
-        if (child != null) {
+    @Override
+    public void delete(OtmObject child) {
+        if (child instanceof OtmResourceChild) {
             TLModelElement tlChild = child.getTL();
             // Remove from TL Resource
             if (tlChild instanceof TLResourceParentRef)
@@ -675,10 +676,13 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
                 getTL().removeActionFacet( (TLActionFacet) tlChild );
             else
                 log.debug( "Can't remove " + child + " from " + this );
-
-            if (contains( children, child ))
-                children.remove( child );
         }
+    }
+
+    @Override
+    public void remove(OtmObject child) {
+        if (contains( children, child ))
+            children.remove( child );
     }
 
     /**

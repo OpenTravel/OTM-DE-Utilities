@@ -25,6 +25,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmFacets.OtmSharedFacet;
 import org.opentravel.schemacompiler.model.TLChoiceObject;
+import org.opentravel.schemacompiler.model.TLContextualFacet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -75,6 +76,13 @@ public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
         getTL().setName( name );
         isValid( true );
         return getName();
+    }
+
+    @Override
+    public void delete(OtmObject child) {
+        if (child.getTL() instanceof TLContextualFacet)
+            getTL().removeChoiceFacet( (TLContextualFacet) child.getTL() );
+        remove( child );
     }
 
     @Override

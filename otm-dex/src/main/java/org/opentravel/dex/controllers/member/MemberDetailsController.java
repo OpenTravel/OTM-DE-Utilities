@@ -29,6 +29,7 @@ import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.OtmObjectChangeEvent;
 import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -71,6 +72,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     private Button changeLibraryButton;
     @FXML
     private Label typeLabel;
+    @FXML
+    private Label baseTypeLabel;
     @FXML
     private TextField baseTypeName;
     @FXML
@@ -185,7 +188,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             return;
         }
         selectedMember = member;
-
+        objectLabel.setText( member.getObjectTypeName() );
         objectLabel.setTooltip( new Tooltip( member.getObjectTypeName() ) );
         objectImageView.setImage( ImageManager.getImage( member.getIconType() ) );
 
@@ -214,7 +217,14 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         memberDescription.setOnAction( e -> member.descriptionProperty().set( memberDescription.getText() ) );
 
         // Base type
-        changeBaseButton.setDisable( !member.isEditable() );
+        final String BASETYPELABEL = "Base Type";
+        final String BASETYPELABELCF = "Contributed To";
+        if (member instanceof OtmContextualFacet)
+            baseTypeLabel.setText( BASETYPELABELCF );
+        else
+            baseTypeLabel.setText( BASETYPELABEL );
+
+        changeBaseButton.setDisable( !member.getActionManager().isEnabled( DexActions.BASETYPECHANGE, member ) );
         baseTypeName.setText( member.baseTypeProperty().get() );
         changeBaseButton.setOnAction( e -> {
             member.getActionManager().run( DexActions.BASETYPECHANGE, member );

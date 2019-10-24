@@ -48,6 +48,11 @@ public class OtmXsdElement extends OtmLibraryMemberBase<XSDElement> implements O
     }
 
     @Override
+    public void delete(OtmObject property) {
+        // NO-OP - no delete-able children
+    }
+
+    @Override
     public OtmObject add(OtmObject child) {
         return null; // has no children to add
     }

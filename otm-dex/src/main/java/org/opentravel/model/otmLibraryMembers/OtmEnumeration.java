@@ -180,14 +180,14 @@ public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
     }
 
     @Override
-    public void delete(OtmProperty property) {
+    public void delete(OtmObject property) {
         remove( property );
         if (property.getTL() instanceof TLEnumValue)
             getTL().removeValue( (TLEnumValue) property.getTL() );
     }
 
     @Override
-    public void remove(OtmProperty property) {
+    public void remove(OtmObject property) {
         children.remove( property );
     }
 

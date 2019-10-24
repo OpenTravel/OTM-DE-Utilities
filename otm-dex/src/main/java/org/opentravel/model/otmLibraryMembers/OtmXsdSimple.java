@@ -48,6 +48,11 @@ public class OtmXsdSimple extends OtmSimpleObjects<XSDSimpleType> implements Otm
     }
 
     @Override
+    public void delete(OtmObject property) {
+        // NO-OP - no delete-able children
+    }
+
+    @Override
     public OtmLibrary getLibrary() {
         // OtmLibrary l = super.getLibrary();
         return super.getLibrary();

@@ -60,6 +60,16 @@ public class OtmOperation extends OtmModelElement<TLOperation> implements OtmChi
         return null;
     }
 
+    @Override
+    public void delete(OtmObject property) {
+        // TODO - delete-able children
+    }
+
+    @Override
+    public void remove(OtmObject property) {
+        // TODO - delete-able children
+    }
+
     // public OtmOperation(String name, OtmLibraryMember parent) {
     // super(new TLOperation(), parent.getActionManager());
     // setName(name);

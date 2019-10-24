@@ -16,12 +16,14 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmChildrenOwner;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
@@ -30,6 +32,7 @@ import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLFacetType;
+import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLProperty;
 
 import java.util.List;
@@ -79,6 +82,29 @@ public class TestCustomFacet extends TestOtmLibraryMemberBase<OtmContextualFacet
     public void testFacets() {}
 
     @Test
+    public void testMovingFacet() {
+        // Given - a cf contributed to a bo
+        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        OtmBusinessObject bo2 = TestBusiness.buildOtm( staticModelManager );
+        bo2.setName( "TheOtherBO" );
+        OtmContextualFacet cf = buildOtm( staticModelManager );
+        assertTrue( "Has not been injected yet.", cf.getWhereContributed() == null );
+        OtmContributedFacet contrib = bo.add( cf );
+        testContributedFacet( contrib, cf, bo );
+
+        // When base type changed (moved)
+        cf.setBaseType( bo2 );
+        OtmContributedFacet newContrib = cf.getWhereContributed();
+        // Then
+        assertTrue( cf.getBaseType() == bo2 );
+        assertTrue( contrib.getParent() == bo2 );
+        assertTrue( newContrib == contrib );
+        assertTrue( cf.getWhereContributed() == newContrib );
+        assertTrue( contrib.getChildren().size() == newContrib.getChildren().size() );
+        testContributedFacet( cf.getWhereContributed(), cf, bo2 );
+    }
+
+    @Test
     public void testWhenContributed() {
         // Given - a business object and contextual facet
         OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
@@ -88,10 +114,85 @@ public class TestCustomFacet extends TestOtmLibraryMemberBase<OtmContextualFacet
         // When added
         OtmContributedFacet contrib = bo.add( cf );
         // Then (lazy evaluation)
+        testContributedFacet( contrib, cf, bo );
+    }
+
+
+    @Test
+    public void testDeleting() {
+        // Given - a business object and contextual facet
+        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        OtmContextualFacet cf = buildOtm( staticModelManager );
+        OtmContributedFacet contrib = bo.add( cf );
+        testContributedFacet( contrib, cf, bo );
+
+        OtmContextualFacet cf2 = buildOtm( staticModelManager );
+        testContributedFacet( contrib, cf, bo );
+
+        OtmContributedFacet contrib2 = bo.add( cf2 );
+        // testContributedFacet( contrib2, cf2, bo ); // Performs lazy-eval on contributor
+        // assertTrue( "Lazy-evaluation on contributor.", contrib2.getContributor() == cf2 );
+        assertTrue( "Contextual facet knows where it is contributed.", cf2.getWhereContributed() == contrib2 );
+        assertTrue( contrib.getContributor() == cf );
+
+        testContributedFacet( contrib, cf, bo );
+        assertTrue( bo.getChildren().contains( contrib ) );
+        assertTrue( bo.getChildren().contains( contrib2 ) );
+        assertTrue( bo.getTL().getCustomFacets().contains( cf.getTL() ) );
+        assertTrue( bo.getTL().getCustomFacets().contains( cf2.getTL() ) );
+
+        // When deleted
+        bo.delete( cf );
+        assertFalse( bo.getChildren().contains( contrib ) );
+        assertFalse( bo.getTL().getCustomFacets().contains( cf.getTL() ) );
+        bo.delete( cf2 );
+        assertFalse( bo.getChildren().contains( contrib2 ) );
+        assertFalse( bo.getTL().getCustomFacets().contains( cf2.getTL() ) );
+    }
+
+    @Test
+    public void testDeletingWithContributedFacet() {
+        // Given - a business object and contextual facet
+        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        OtmContextualFacet cf = buildOtm( staticModelManager );
+        OtmContributedFacet contrib = bo.add( cf );
+        testContributedFacet( contrib, cf, bo );
+
+        OtmContextualFacet cf2 = buildOtm( staticModelManager );
+        testContributedFacet( contrib, cf, bo );
+
+        OtmContributedFacet contrib2 = bo.add( cf2 );
+        // testContributedFacet( contrib2, cf2, bo ); // Performs lazy-eval on contributor
+        // assertTrue( "Lazy-evaluation on contributor.", contrib2.getContributor() == cf2 );
+        assertTrue( "Contextual facet knows where it is contributed.", cf2.getWhereContributed() == contrib2 );
+        assertTrue( contrib.getContributor() == cf );
+
+        testContributedFacet( contrib, cf, bo );
+        assertTrue( bo.getChildren().contains( contrib ) );
+        assertTrue( bo.getChildren().contains( contrib2 ) );
+        assertTrue( bo.getTL().getCustomFacets().contains( cf.getTL() ) );
+        assertTrue( bo.getTL().getCustomFacets().contains( cf2.getTL() ) );
+
+        // When deleted
+        bo.delete( contrib );
+        assertFalse( bo.getChildren().contains( contrib ) );
+        assertFalse( bo.getTL().getCustomFacets().contains( cf.getTL() ) );
+        bo.delete( contrib2 );
+        assertFalse( bo.getChildren().contains( contrib2 ) );
+        assertFalse( bo.getTL().getCustomFacets().contains( cf2.getTL() ) );
+    }
+
+    public void testContributedFacet(OtmContributedFacet contrib, OtmContextualFacet cf, OtmLibraryMember bo) {
         assertTrue( "Contributor must be owned by Business Object.", contrib.getOwningMember() == bo );
         assertTrue( "Business object has contributor child.", bo.getChildren().contains( contrib ) );
         assertTrue( "Contributor linked to contextual facet.", contrib.getContributor() == cf );
         assertTrue( "Contextual facet knows where it is contributed.", cf.getWhereContributed() == contrib );
+        // Verify the contributed owner is the same as the TL contextual facet's owner
+        if (cf.getTL().getOwningEntity() != null && cf.getWhereContributed() != null)
+            assertTrue( bo == OtmModelElement.get( (TLModelElement) cf.getTL().getOwningEntity() ) );
+        assertTrue( contrib.getParent() == bo );
+        assertTrue( contrib.getActionManager() != null );
+        assertTrue( contrib.getModelManager() != null );
     }
 
     /**
