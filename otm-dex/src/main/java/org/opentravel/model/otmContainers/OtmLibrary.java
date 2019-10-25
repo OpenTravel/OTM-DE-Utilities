@@ -260,6 +260,14 @@ public class OtmLibrary {
         return projects;
     }
 
+    public List<ProjectItem> getProjectItems() {
+        return projectItems;
+    }
+
+    public void remove(ProjectItem item) {
+        projectItems.remove( item );
+    }
+
     /**
      * Examine all project items and return the state that grants the user the most rights.
      * 

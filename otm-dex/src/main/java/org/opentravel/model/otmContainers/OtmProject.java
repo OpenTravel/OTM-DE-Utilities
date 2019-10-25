@@ -53,6 +53,11 @@ public class OtmProject {
     }
 
     public void remove(OtmLibrary library) {
+        // Remove this project from the library's list
+        ProjectItem pi = getProjectItem( library );
+        if (pi == null)
+            log.warn( "Missing PI for this library " + library );
+
         getTL().remove( library.getTL() );
         log.debug( "Removed " + library.getName() + " from " + getName() + "  Library now is in "
             + library.getProjects().size() + " projects." );
@@ -64,9 +69,19 @@ public class OtmProject {
             log.error( "Error saving project: " + e.getLocalizedMessage() );
         }
 
+        library.remove( pi );
+        // Note - no check to see if there are any projects that own this library.
+
         // // Test only safety check
         // for (ProjectItem pi : getTL().getProjectItems())
         // assert pi.getContent() != library.getTL();
+    }
+
+    public ProjectItem getProjectItem(OtmLibrary lib) {
+        for (ProjectItem pi : lib.getProjectItems())
+            if (getTL().getProjectItems().contains( pi ))
+                return pi;
+        return null;
     }
 
     public void add(OtmLibrary library) {
