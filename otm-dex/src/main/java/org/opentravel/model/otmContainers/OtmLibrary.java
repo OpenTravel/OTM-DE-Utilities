@@ -22,6 +22,7 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryPermission;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
@@ -95,9 +96,9 @@ public class OtmLibrary {
 
 
     /**
-     * Simply add the TL member to the Tl library.
+     * Add the TL member to the Tl library and model manager.
      * <p>
-     * <b>Note:</b> does not add member to the model manager!
+     * <b>Note:</b> adds member to the model manager. See {@link OtmModelManager#add(OtmLibraryMember)}
      * 
      * @param a library member
      * @return the member if added OK
@@ -110,6 +111,8 @@ public class OtmLibrary {
                     getTL().addNamedMember( (LibraryMember) member.getTL() );
                 else
                     log.warn( "Did not add member to library because it was already a member." );
+                if (getModelManager() != null)
+                    getModelManager().add( member );
                 return member;
             } catch (IllegalArgumentException e) {
                 log.warn( "Exception: " + e.getLocalizedMessage() );
@@ -120,12 +123,33 @@ public class OtmLibrary {
     }
 
     /**
-     * Simply remove the TL member from the Tl library
+     * No-operation. (see {@link #delete(OtmLibraryMember)}
+     * <p>
+     * Note: This is not implemented because OtmLibrary does not maintain children list. Method is here just to make
+     * finding the right delete method easier
      * 
      * @param a library member
      */
     public void remove(OtmLibraryMember member) {
-        getTL().removeNamedMember( member.getTlLM() );
+        // No-op
+    }
+
+    /**
+     * Delete member. Remove from this library and underlying TL library and from the model manager.
+     */
+    public void delete(OtmLibraryMember member) {
+        if (member != null) {
+            if (getTL() != null)
+                getTL().removeNamedMember( member.getTlLM() );
+            if (member.getModelManager() != null)
+                member.getModelManager().remove( member );
+            // Contextual facets are the only library members that also are children of other members via the
+            // contributed facet.
+            if (member instanceof OtmContextualFacet && ((OtmContextualFacet) member).getContributedObject() != null)
+                ((OtmContextualFacet) member).getContributedObject().delete( member );
+            // TODO - what about base types?
+            // TODO - what about where used?
+        }
     }
 
     /**
@@ -400,5 +424,6 @@ public class OtmLibrary {
         }
 
     }
+
 
 }

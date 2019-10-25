@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 
@@ -88,6 +89,8 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
 
     private void deleteMember() {
         OtmObject obj = getValue();
+        if (obj instanceof OtmContributedFacet)
+            obj = ((OtmContributedFacet) obj).getContributor();
         if (obj instanceof OtmLibraryMember)
             obj.getActionManager().run( DexActions.DELETELIBRARYMEMBER, (OtmLibraryMember) obj );
         super.updateTreeItem( getTreeItem().getParent() );

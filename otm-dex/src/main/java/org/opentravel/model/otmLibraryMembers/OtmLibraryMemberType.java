@@ -64,7 +64,8 @@ public enum OtmLibraryMemberType {
     }
 
     /**
-     * Build a library member. Set its model manager, TL object and adds a listener.
+     * Build a library member. Set its model manager, TL object and adds a listener. Does <b>not</b> set library or add
+     * to model manager.
      * 
      * @param memberType
      * @param name

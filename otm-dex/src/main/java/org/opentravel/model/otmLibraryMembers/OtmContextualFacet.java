@@ -170,6 +170,13 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         return ImageManager.Icons.FACET_CONTEXTUAL;
     }
 
+    /**
+     * This is a library member so it returns itself. See {@link #getBaseType()} which returns object where contributed
+     * 
+     * @return this contextual facet
+     * @see OtmContextualFacet#getBaseType()
+     * @see OtmContextualFacet#getContributedObject()
+     */
     @Override
     public OtmContextualFacet getOwningMember() {
         return this;
@@ -201,6 +208,13 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         return getBaseType();
     }
 
+    /**
+     * Get the owning entity of this contextual facet. This is where the facet is contributed.
+     * 
+     * @return library member where contributed or null
+     * @see OtmContextualFacet#getContributedObject()
+     * @see OtmContextualFacet#getOwningMember()
+     */
     @Override
     public OtmObject getBaseType() {
         if (getTL().getOwningEntity() != null)
@@ -208,6 +222,17 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
 
         // if (getWhereContributed() != null)
         // return getWhereContributed().getOwningMember();
+        return null;
+    }
+
+    /**
+     * @see OtmContextualFacet#getBaseType()
+     * @see OtmContextualFacet#getOwningMember()
+     * @return the object where this facet is contributed.
+     */
+    public OtmLibraryMember getContributedObject() {
+        if (getBaseType() instanceof OtmLibraryMember)
+            return (OtmLibraryMember) getBaseType();
         return null;
     }
 

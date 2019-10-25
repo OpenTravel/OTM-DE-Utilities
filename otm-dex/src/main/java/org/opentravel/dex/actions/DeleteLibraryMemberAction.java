@@ -20,6 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
@@ -41,6 +43,8 @@ public class DeleteLibraryMemberAction extends DexRunAction {
     }
 
     private OtmLibraryMember deletedMember = null;
+    // Contextual facets need the name of the contributed owner
+    private String deletedMemberName = "";
     private OtmLibrary memberLibrary = null;
 
 
@@ -55,21 +59,17 @@ public class DeleteLibraryMemberAction extends DexRunAction {
         if (ignore)
             return null;
 
-        if (isEnabled( otm )) {
+        if (isEnabled( otm ) && (otm.getLibrary() != null && otm instanceof OtmLibraryMember)) {
             // Hold onto member for undo
             deletedMember = (OtmLibraryMember) otm;
+            deletedMemberName = otm.getName();
             memberLibrary = otm.getLibrary();
-
-            // FIXME - one of these should do the other
-            // Both of them are the simply remove (map, TLLibrary)
-            // *Remove* is the simple method
-            // *Delete* is the do-it-all action.
-            // Model Manager should be the controller
-            otm.getModelManager().remove( deletedMember );
-            memberLibrary.remove( deletedMember );
+            // Delete from TL library and model manager
+            memberLibrary.delete( (OtmLibraryMember) otm );
             log.debug( "Deleted library member: " + deletedMember );
-            // FIXME - validation status not changed on types this member was assigned to
-        }
+        } else
+            return null;
+
         return get(); // must return non-null to be put on queue
     }
 
@@ -111,15 +111,25 @@ public class DeleteLibraryMemberAction extends DexRunAction {
 
     @Override
     public String toString() {
-        return "Deleted library member: " + deletedMember;
+        return "Deleted library member: " + deletedMemberName;
     }
 
     @Override
     public OtmLibraryMember undoIt() {
-    	// FIXME - on undo, the types assigned to this member are no longer assigned
+        // FIXME - on undo, the types assigned to this member are no longer assigned
         memberLibrary.add( deletedMember );
-        deletedMember.getModelManager().add( deletedMember );
+        // Contextual facets are the only library members that also are children of other members via the
+        // contributed facet.
+        if (deletedMember instanceof OtmContextualFacet) {
+            OtmContributedFacet contrib = ((OtmContextualFacet) deletedMember).getWhereContributed();
+            if (contrib != null && contrib.getOwningMember() != null)
+                contrib.getOwningMember().add( contrib );
+        }
+        // && ((OtmContextualFacet) deletedMember).getContributedObject() != null)
+        // ((OtmContextualFacet) deletedMember).getContributedObject().add( deletedMember );
 
+        // emberLibrary.add( deletedMember );
+        // contributed facet knows who the old object is
         log.debug( "Undo delete of " + get() );
         return get();
     }

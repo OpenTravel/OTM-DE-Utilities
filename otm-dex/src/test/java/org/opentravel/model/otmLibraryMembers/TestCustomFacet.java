@@ -26,10 +26,14 @@ import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
+import org.opentravel.model.otmFacets.OtmChoiceFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
+import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLFacetType;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -182,15 +186,54 @@ public class TestCustomFacet extends TestOtmLibraryMemberBase<OtmContextualFacet
         assertFalse( bo.getTL().getCustomFacets().contains( cf2.getTL() ) );
     }
 
-    public void testContributedFacet(OtmContributedFacet contrib, OtmContextualFacet cf, OtmLibraryMember bo) {
-        assertTrue( "Contributor must be owned by Business Object.", contrib.getOwningMember() == bo );
-        assertTrue( "Business object has contributor child.", bo.getChildren().contains( contrib ) );
+    @Test
+    public void testDeletingAsLibraryMember() {
+        // Given - a business object and contextual facet
+        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        OtmContextualFacet cf = buildOtm( staticModelManager );
+        OtmContributedFacet contrib = bo.add( cf );
+        // Given - a choice object and contextual facet
+        OtmChoiceObject co = TestChoice.buildOtm( staticModelManager );
+        OtmChoiceFacet cf2 = buildOtmChoice( staticModelManager );
+        OtmContributedFacet contrib2 = co.add( cf2 );
+
+        // Given - a library for the objects
+        OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
+        lib.add( bo );
+        lib.add( co );
+        lib.add( cf );
+        lib.add( cf2 );
+        assertTrue( cf.getLibrary() != null );
+        assertTrue( cf.getModelManager().contains( cf ) );
+        //
+        testContributedFacet( contrib, cf, bo );
+        testContributedFacet( contrib2, cf2, co );
+
+        // When deleted
+        lib.delete( cf );
+        assertFalse( cf.getModelManager().contains( cf ) );
+        assertFalse( bo.getChildren().contains( contrib ) );
+        assertFalse( bo.getTL().getCustomFacets().contains( cf.getTL() ) );
+        //
+        lib.delete( cf2 );
+        assertFalse( co.getChildren().contains( contrib2 ) );
+        assertFalse( co.getTL().getChoiceFacets().contains( cf2.getTL() ) );
+    }
+
+
+    public void testContributedFacet(OtmContributedFacet contrib, OtmContextualFacet cf, OtmLibraryMember lm) {
+        assertTrue( "Contributor must be owned by Library member.", contrib.getOwningMember() == lm );
+        assertTrue( " Contextual facet must have contributed owner.", cf.getContributedObject() == lm );
+        assertTrue( "Library member has contributor child.", lm.getChildren().contains( contrib ) );
         assertTrue( "Contributor linked to contextual facet.", contrib.getContributor() == cf );
         assertTrue( "Contextual facet knows where it is contributed.", cf.getWhereContributed() == contrib );
+        assertTrue( "Both facets have same TL facet", cf.getTL() == contrib.getTL() );
+        assertTrue( "TL is a TLContextual facet", cf.getTL() instanceof TLContextualFacet );
+
         // Verify the contributed owner is the same as the TL contextual facet's owner
         if (cf.getTL().getOwningEntity() != null && cf.getWhereContributed() != null)
-            assertTrue( bo == OtmModelElement.get( (TLModelElement) cf.getTL().getOwningEntity() ) );
-        assertTrue( contrib.getParent() == bo );
+            assertTrue( lm == OtmModelElement.get( (TLModelElement) cf.getTL().getOwningEntity() ) );
+        assertTrue( contrib.getParent() == lm );
         assertTrue( contrib.getActionManager() != null );
         assertTrue( contrib.getModelManager() != null );
     }
@@ -234,6 +277,22 @@ public class TestCustomFacet extends TestOtmLibraryMemberBase<OtmContextualFacet
         return custom;
     }
 
+    /**
+     * Build a choice facet. It will not have where contributed or children!
+     * 
+     * @param mgr
+     * @return
+     */
+    public static OtmChoiceFacet buildOtmChoice(OtmModelManager mgr) {
+        OtmChoiceFacet choice = new OtmChoiceFacet( buildTLChoice(), mgr );
+        assertNotNull( choice );
+        // choice.getTL().addAttribute( new TLAttribute() );
+        // choice.getTL().addElement( new TLProperty() );
+
+        // Will only have children when contributed is modeled.
+        return choice;
+    }
+
     public static TLContextualFacet buildTL() {
         TLContextualFacet tlcf = new TLContextualFacet();
         tlcf.setName( CF_NAME );
@@ -244,6 +303,19 @@ public class TestCustomFacet extends TestOtmLibraryMemberBase<OtmContextualFacet
         TLBusinessObject tlbo = TestBusiness.buildTL();
         // does NOT tell BO that it has custom facet - tlcf.setOwningEntity( tlbo );
         tlbo.addCustomFacet( tlcf );
+        return tlcf;
+    }
+
+    public static TLContextualFacet buildTLChoice() {
+        TLContextualFacet tlcf = new TLContextualFacet();
+        tlcf.setName( CF_NAME );
+        tlcf.setFacetType( TLFacetType.CHOICE );
+        tlcf.addAttribute( new TLAttribute() );
+        tlcf.addElement( new TLProperty() );
+
+        TLChoiceObject tlbo = TestChoice.buildTL();
+        // does NOT tell BO that it has custom facet - tlcf.setOwningEntity( tlbo );
+        tlbo.addChoiceFacet( tlcf );
         return tlcf;
     }
 }

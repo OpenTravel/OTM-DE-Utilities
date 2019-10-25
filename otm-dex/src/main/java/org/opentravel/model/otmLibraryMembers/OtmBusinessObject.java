@@ -23,6 +23,7 @@ import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmFacets.OtmAbstractFacet;
 import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
@@ -59,6 +60,25 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
         setName( name );
     }
 
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * <b>Does</b> add contextual facets to the TL object
+     * 
+     * @see org.opentravel.model.OtmChildrenOwner#add(org.opentravel.model.OtmObject)
+     */
+    @Override
+    public OtmAbstractFacet<?> add(OtmObject child) {
+        OtmAbstractFacet<?> result = null;
+        result = super.add( child );
+        if (child instanceof OtmContextualFacet)
+            child = ((OtmContextualFacet) child).getWhereContributed();
+        if (child instanceof OtmContributedFacet) {
+            ((OtmContributedFacet) child).getTL().setOwningEntity( getTL() );
+        }
+        return result;
+    }
 
     /**
      * Add the contextual facet library member to this business object. A contributed facet is created and added to the
@@ -134,14 +154,16 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
 
     @Override
     public void delete(OtmObject child) {
-        if (child instanceof OtmContextualFacet)
-            child = ((OtmContextualFacet) child).getWhereContributed();
+        if (child instanceof OtmContributedFacet)
+            child = ((OtmContributedFacet) child).getContributor();
+        if (child == null)
+            return;
         if (child.getTL() instanceof TLContextualFacet) {
-            if (((OtmContributedFacet) child).getContributor() instanceof OtmCustomFacet)
+            if (child instanceof OtmCustomFacet)
                 getTL().removeCustomFacet( (TLContextualFacet) child.getTL() );
-            else if (((OtmContributedFacet) child).getContributor() instanceof OtmQueryFacet)
+            else if (child instanceof OtmQueryFacet)
                 getTL().removeQueryFacet( (TLContextualFacet) child.getTL() );
-            else if (((OtmContributedFacet) child).getContributor() instanceof OtmUpdateFacet)
+            else if (child instanceof OtmUpdateFacet)
                 getTL().removeUpdateFacet( (TLContextualFacet) child.getTL() );
         }
         remove( child );

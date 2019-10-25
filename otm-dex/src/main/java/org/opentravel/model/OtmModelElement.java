@@ -416,10 +416,12 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
             return null;
 
         isValid();
-        if (findings.hasFinding( FindingType.ERROR ))
-            return ImageManager.get( ImageManager.Icons.V_ERROR );
-        if (findings.hasFinding( FindingType.WARNING ))
-            return ImageManager.get( ImageManager.Icons.V_WARN );
+        if (findings != null) {
+            if (findings.hasFinding( FindingType.ERROR ))
+                return ImageManager.get( ImageManager.Icons.V_ERROR );
+            if (findings.hasFinding( FindingType.WARNING ))
+                return ImageManager.get( ImageManager.Icons.V_WARN );
+        }
         return ImageManager.get( ImageManager.Icons.V_OK );
     }
 

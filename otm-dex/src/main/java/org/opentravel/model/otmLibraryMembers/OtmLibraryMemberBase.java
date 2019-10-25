@@ -454,8 +454,10 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     public abstract void delete(OtmObject property);
 
     @Override
-    public void remove(OtmObject property) {
-        children.remove( property );
+    public void remove(OtmObject child) {
+        if (child instanceof OtmContextualFacet)
+            child = ((OtmContextualFacet) child).getWhereContributed();
+        children.remove( child );
     }
 
 

@@ -25,10 +25,13 @@ import org.junit.Test;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +59,26 @@ public class TestLibrary {
 
         // OtmLibrary lib2 = TestLibrary.buildOtm( mgr, "Namespace2", "p2", "Library2" );
     }
+
+    @Test
+    public void testAddandDeleteAllMembers() {
+        // Given - a library
+        DexFullActionManager fullMgr = new DexFullActionManager( null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, null );
+        OtmLibrary lib = TestLibrary.buildOtm( mgr, "Namespace1", "p1", "Library1" );
+        int startMemberCount = mgr.getMembers().size();
+
+        addOneOfEach( lib );
+        assertTrue( "Model must have more members.", mgr.getMembers().size() > startMemberCount );
+        ArrayList<OtmLibraryMember> members = new ArrayList<>( mgr.getMembers() );
+        for (OtmLibraryMember member : members) {
+            // log.debug( "Deleting member " + member );
+            lib.delete( member );
+        }
+
+        assertTrue( "Model must have original count of members.", mgr.getMembers().size() == startMemberCount );
+    }
+
 
     @Test
     public void testVersionFromNS() throws VersionSchemeException {
@@ -100,5 +123,31 @@ public class TestLibrary {
 
     public static TLLibrary buildTL() {
         return new TLLibrary();
+    }
+
+    public static void addOneOfEach(OtmLibrary lib) {
+        int i = 1;
+        for (OtmLibraryMemberType value : OtmLibraryMemberType.values()) {
+            try {
+                OtmLibraryMember member =
+                    OtmLibraryMemberType.buildMember( value, "TestObj" + i++, lib.getModelManager() );
+                lib.add( member );
+            } catch (ExceptionInInitializerError e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 }

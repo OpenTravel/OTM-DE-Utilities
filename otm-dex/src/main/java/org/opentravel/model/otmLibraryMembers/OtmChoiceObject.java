@@ -22,7 +22,10 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmFacets.OtmAbstractFacet;
 import org.opentravel.model.otmFacets.OtmAlias;
+import org.opentravel.model.otmFacets.OtmChoiceFacet;
+import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmSharedFacet;
 import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
@@ -58,6 +61,44 @@ public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
         return ImageManager.Icons.CHOICE;
     }
 
+    /**
+     * Add the contextual facet library member to this business object. A contributed facet is created and added to the
+     * children.
+     * 
+     * @param cf contextual facet that is a library member
+     * @return new contributed facet
+     */
+    public OtmContributedFacet add(OtmContextualFacet cf) {
+        if (cf instanceof OtmChoiceFacet)
+            getTL().addChoiceFacet( cf.getTL() );
+        else
+            return null;
+
+        // Creating the contributed facet will link the contributed and contributor via the TL facet.
+        OtmContributedFacet contrib = new OtmContributedFacet( cf.getTL(), this );
+        super.add( contrib );
+        return contrib;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * <b>Does</b> add contextual facets to the TL object
+     * 
+     * @see org.opentravel.model.OtmChildrenOwner#add(org.opentravel.model.OtmObject)
+     */
+    @Override
+    public OtmAbstractFacet<?> add(OtmObject child) {
+        OtmAbstractFacet<?> result = null;
+        result = super.add( child );
+        if (child instanceof OtmContextualFacet)
+            child = ((OtmContextualFacet) child).getWhereContributed();
+        if (child instanceof OtmContributedFacet) {
+            ((OtmContributedFacet) child).getTL().setOwningEntity( getTL() );
+        }
+        return result;
+    }
+
     // @Override
     // public OtmObject setBaseType(OtmObject baseObj) {
     // if (baseObj instanceof OtmChoiceObject) {
@@ -80,6 +121,10 @@ public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
 
     @Override
     public void delete(OtmObject child) {
+        if (child instanceof OtmContributedFacet)
+            child = ((OtmContributedFacet) child).getContributor();
+        if (child == null)
+            return;
         if (child.getTL() instanceof TLContextualFacet)
             getTL().removeChoiceFacet( (TLContextualFacet) child.getTL() );
         remove( child );

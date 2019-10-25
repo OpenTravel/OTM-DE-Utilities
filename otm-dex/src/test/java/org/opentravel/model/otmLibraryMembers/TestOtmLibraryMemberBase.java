@@ -108,8 +108,7 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
             assertTrue( mgr.contains( member.getTlLM() ) );
 
             // When deleted
-            lib.remove( member );
-            mgr.remove( member );
+            lib.delete( member );
             assertFalse( mgr.contains( member.getTlLM() ) );
             assertFalse( mgr.getMembers().contains( member ) );
 

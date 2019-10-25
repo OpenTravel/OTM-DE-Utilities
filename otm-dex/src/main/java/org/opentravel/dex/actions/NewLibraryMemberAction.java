@@ -154,9 +154,7 @@ public class NewLibraryMemberAction extends DexRunAction {
     @Override
     public OtmLibraryMember undoIt() {
         if (newMember != null && newMember.getLibrary() != null)
-            newMember.getLibrary().remove( newMember );
-        if (otm != null)
-            otm.getModelManager().remove( newMember );
+            newMember.getLibrary().delete( newMember );
 
         newMember = null;
         setSubject( null );

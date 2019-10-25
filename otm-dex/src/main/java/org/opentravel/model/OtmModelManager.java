@@ -135,7 +135,8 @@ public class OtmModelManager implements TaskResultHandlerI {
 
 
     /**
-     * Simply add the member to the maps if it is not already in the map.
+     * Simply add the member to the maps if it is not already in the map. See {@link OtmLibrary#add(OtmLibraryMember)}
+     * to add to both TL library and manager.
      * 
      * @param member
      */
@@ -145,7 +146,7 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
     /**
-     * Simply remove the member from the map.
+     * Simply remove the member from the map. To delete a member use {@link OtmLibrary#delete(OtmLibraryMember)}
      * 
      * @param member
      */
@@ -154,6 +155,15 @@ public class OtmModelManager implements TaskResultHandlerI {
             members.remove( member.getTlLM(), member );
     }
 
+    // /**
+    // * Delete this member. Remove from the maps, children lists and TL library.
+    // *
+    // * @param member
+    // */
+    // public void delete(OtmLibraryMember member) {
+    // member.getLibrary().delete( member );
+    // remove( member );
+    // }
 
     /**
      * Add the TL library to the model if it is not already in the model. Adds all the members.
