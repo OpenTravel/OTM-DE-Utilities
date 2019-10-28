@@ -250,7 +250,17 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
     }
 
     /**
-     * @deprecated - use OtmPropertyType.buildTL() Add one of each type of property to the passed property owner
+     * Add one of each compatible property type to the owner
+     * 
+     * @param owner
+     */
+    public static void buildOneOfEach2(OtmPropertyOwner owner) {
+        for (OtmPropertyType type : OtmPropertyType.values())
+            OtmPropertyType.build( type, owner );
+    }
+
+    /**
+     * @deprecated - use buildOneOfEach2 Add one of each type of property to the passed property owner
      */
     public static void buildOneOfEach(OtmPropertyOwner owner) {
         TLModelElement tl = null;

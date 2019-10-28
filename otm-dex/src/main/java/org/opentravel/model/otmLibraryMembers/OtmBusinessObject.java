@@ -70,14 +70,16 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
      */
     @Override
     public OtmAbstractFacet<?> add(OtmObject child) {
-        OtmAbstractFacet<?> result = null;
-        result = super.add( child );
         if (child instanceof OtmContextualFacet)
-            child = ((OtmContextualFacet) child).getWhereContributed();
-        if (child instanceof OtmContributedFacet) {
-            ((OtmContributedFacet) child).getTL().setOwningEntity( getTL() );
+            return add( (OtmContextualFacet) child );
+        else {
+            OtmAbstractFacet<?> result = null;
+            result = super.add( child );
+            if (child instanceof OtmContributedFacet) {
+                ((OtmContributedFacet) child).getTL().setOwningEntity( getTL() );
+            }
+            return result;
         }
-        return result;
     }
 
     /**

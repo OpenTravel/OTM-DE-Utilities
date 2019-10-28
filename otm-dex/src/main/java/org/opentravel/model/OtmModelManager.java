@@ -533,6 +533,19 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
     /**
+     * Get the member with matching prefix and name
+     * 
+     * @param nameWithPrefix
+     * @return member if found or null
+     */
+    public OtmLibraryMember getMember(String nameWithPrefix) {
+        for (OtmLibraryMember candidate : getMembers())
+            if (candidate.getNameWithPrefix().equals( nameWithPrefix ))
+                return candidate;
+        return null;
+    }
+
+    /**
      * @return all the library members being managed in a unmodifiableCollection
      */
     public Collection<OtmLibraryMember> getMembers() {

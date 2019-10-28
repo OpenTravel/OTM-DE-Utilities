@@ -18,7 +18,9 @@ package org.opentravel.model.otmLibraryMembers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmChoiceFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmFacets.OtmFacetFactory;
@@ -30,6 +32,7 @@ import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLClosedEnumeration;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLCoreObject;
+import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLOpenEnumeration;
 import org.opentravel.schemacompiler.model.TLResource;
 import org.opentravel.schemacompiler.model.TLService;
@@ -62,6 +65,14 @@ public class OtmLibraryMemberFactory {
             throw new IllegalArgumentException( "Member factory must be passed a non-null manager." );
         // log.debug("Ready to create member for: " + tlMember.getLocalName() + " of type "
         // + tlMember.getClass().getSimpleName());
+
+        OtmObject otm = OtmModelElement.get( (TLModelElement) tlMember );
+        if (otm instanceof OtmLibraryMember)
+            return (OtmLibraryMember) otm;
+        else if (otm != null)
+            throw new IllegalArgumentException(
+                "Member factory was passed a TL Library member modeled to a non Otm Library member." );
+
 
         OtmLibraryMember otmMember = null;
         if (tlMember instanceof TLBusinessObject)

@@ -22,14 +22,17 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Abstract OTM Node for Custom Facets (not library members) with a parent.
@@ -50,18 +53,63 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
     }
 
     /**
-     * Simply set the parent field. When set to null, the facet is no longer contributed to an object.
+     * Create contributed facet with injection point (parent) and contributor set. Does <b>not</b> add this to the
+     * parent. (it can't because it thinks it is inherited until CF where contributed is set.)
+     * 
+     * @param parent object where contributed (injection point)
+     * @param contributor OTM with TL facet that is contributed
+     */
+    public OtmContributedFacet(OtmLibraryMember parent, OtmContextualFacet contributor) {
+        super( contributor.getTL(), parent );
+        setContributor( contributor );
+    }
+
+    /**
+     * Set the parent, contributor and tlObject fields. Add this to parent. When set to null, the facet is no longer
+     * contributed to an object.
+     * 
+     * @param parent is the object where the contextual facet is contributed (injected)
+     * @param cf provides the TLContextualFacet to set into the TL Object
      */
     public void setParent(OtmLibraryMember parent, OtmContextualFacet cf) {
         this.parent = parent;
         parent.add( this );
         tlObject = cf.getTL();
+        setContributor( cf );
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * <b>Note: </b> Contextual facets can <b>not</b> be added to the contributed facet. They must be directly added to
+     * the contextual facet.
+     * 
+     * @param child the OtmProperty to be added to the contextual facet.
+     * @see org.opentravel.model.otmFacets.OtmAbstractFacet#add(org.opentravel.model.OtmObject)
+     */
+    @Override
+    public OtmProperty add(OtmObject child) {
+        if (getContributor() != null && child instanceof OtmProperty)
+            return (OtmProperty) getContributor().add( child );
+        return null;
     }
 
     @Override
     public void clearNameProperty() {
         nameProperty = null;
         getContributor().clearNameProperty();
+    }
+
+    /**
+     * Children are maintained on the contextual facet not the contributed. Children must be maintained even when a
+     * contextual facet is not injected into an object.
+     * 
+     */
+    @Override
+    public List<OtmObject> getChildren() {
+        if (getContributor() != null)
+            return getContributor().getChildren();
+        return Collections.emptyList();
     }
 
     @Override
@@ -114,6 +162,8 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
     }
 
     /**
+     * Simply set the contributor field.
+     * 
      * @param otmContextualFacet
      */
     public void setContributor(OtmContextualFacet contextualFacet) {

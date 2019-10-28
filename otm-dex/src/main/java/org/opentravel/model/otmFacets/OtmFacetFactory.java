@@ -88,11 +88,11 @@ public class OtmFacetFactory {
      * @return
      */
     public static OtmFacet<?> create(TLFacet tlFacet, OtmLibraryMember parent) {
-        return create( tlFacet, parent, null );
-    }
-
-    // Use the base as the source of the contributed facet
-    public static OtmFacet<?> create(TLFacet tlFacet, OtmLibraryMember parent, OtmLibraryMember base) {
+        // return create( tlFacet, parent, null );
+        // }
+        //
+        // // Use the base as the source of the contributed facet
+        // public static OtmFacet<?> create(TLFacet tlFacet, OtmLibraryMember parent, OtmLibraryMember base) {
         OtmFacet<?> facet = null;
         switch (tlFacet.getFacetType()) {
             case SUMMARY:

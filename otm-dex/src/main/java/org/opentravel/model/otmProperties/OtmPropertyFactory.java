@@ -18,6 +18,8 @@ package org.opentravel.model.otmProperties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.model.OtmModelElement;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmFacets.OtmAbstractFacet;
 import org.opentravel.model.otmFacets.OtmRoleEnumeration;
@@ -55,10 +57,17 @@ public class OtmPropertyFactory {
         if (tlAttribute.getOwner() == null && parent != null && parent.getTL() instanceof TLAttributeOwner)
             ((TLAttributeOwner) parent.getTL()).addAttribute( tlAttribute );
 
-        if (tlAttribute.isReference())
-            attribute = new OtmIdReferenceAttribute<>( tlAttribute, parent );
-        else
-            attribute = new OtmAttribute<>( tlAttribute, parent );
+        OtmObject otm = OtmModelElement.get( tlAttribute );
+        if (otm instanceof OtmAttribute) {
+            attribute = (OtmAttribute) otm;
+            if (parent != null)
+                parent.add( otm );
+        } else {
+            if (tlAttribute.isReference())
+                attribute = new OtmIdReferenceAttribute<>( tlAttribute, parent );
+            else
+                attribute = new OtmAttribute<>( tlAttribute, parent );
+        }
         return attribute;
     }
 
@@ -67,11 +76,18 @@ public class OtmPropertyFactory {
         if (tlProperty.getOwner() == null && parent != null && parent.getTL() instanceof TLPropertyOwner)
             ((TLPropertyOwner) parent.getTL()).addElement( tlProperty );
 
-        OtmElement<TLProperty> property;
-        if (tlProperty.isReference())
-            property = new OtmIdReferenceElement<>( tlProperty, parent );
-        else
-            property = new OtmElement<>( tlProperty, parent );
+        OtmElement<TLProperty> property = null;
+        OtmObject otm = OtmModelElement.get( tlProperty );
+        if (otm instanceof OtmProperty) {
+            property = (OtmElement<TLProperty>) otm;
+            if (parent != null)
+                parent.add( otm );
+        } else {
+            if (tlProperty.isReference())
+                property = new OtmIdReferenceElement<>( tlProperty, parent );
+            else
+                property = new OtmElement<>( tlProperty, parent );
+        }
         return property;
     }
 
@@ -80,11 +96,18 @@ public class OtmPropertyFactory {
         if (tlIndicator.getOwner() == null && parent != null && parent.getTL() instanceof TLIndicatorOwner)
             ((TLIndicatorOwner) parent.getTL()).addIndicator( tlIndicator );
 
-        OtmIndicator<TLIndicator> indicator;
-        if (tlIndicator.isPublishAsElement())
-            indicator = new OtmIndicatorElement<>( tlIndicator, parent );
-        else
-            indicator = new OtmIndicator<>( tlIndicator, parent );
+        OtmIndicator<TLIndicator> indicator = null;
+        OtmObject otm = OtmModelElement.get( tlIndicator );
+        if (otm instanceof OtmIndicator) {
+            indicator = (OtmIndicator<TLIndicator>) otm;
+            if (parent != null)
+                parent.add( otm );
+        } else {
+            if (tlIndicator.isPublishAsElement())
+                indicator = new OtmIndicatorElement<>( tlIndicator, parent );
+            else
+                indicator = new OtmIndicator<>( tlIndicator, parent );
+        }
         return indicator;
     }
 
@@ -126,10 +149,10 @@ public class OtmPropertyFactory {
         else if (tl instanceof TLRole && parent instanceof OtmRoleEnumeration)
             p = OtmPropertyFactory.create( (TLRole) tl, (OtmRoleEnumeration) parent );
         else {
-            log.debug( "unknown/not-implemented property type." );
+            log.debug( "unknown/not-implemented property type: " + tl.getClass().getSimpleName() );
             return null;
         }
-        log.debug( "Created property " + p.getName() + " of " + p.getOwningMember().getName() + "  inherited? "
+        log.debug( "Created property " + p.getName() + " of owner " + p.getOwningMember().getName() + "  inherited? "
             + p.isInherited() );
         return p;
     }

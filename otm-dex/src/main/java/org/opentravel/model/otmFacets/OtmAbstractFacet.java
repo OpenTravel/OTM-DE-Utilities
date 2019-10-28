@@ -86,23 +86,39 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
 
     @Override
     public OtmProperty add(TLModelElement tl) {
-        // Add the TL object to the TL owner
-        if (getTL() instanceof TLAttributeOwner && tl instanceof TLAttribute)
-            ((TLAttributeOwner) getTL()).addAttribute( (TLAttribute) tl );
-
-        if (getTL() instanceof TLIndicatorOwner && tl instanceof TLIndicator)
-            ((TLIndicatorOwner) getTL()).addIndicator( (TLIndicator) tl );
-
-        if (getTL() instanceof TLPropertyOwner && tl instanceof TLProperty)
-            ((TLPropertyOwner) getTL()).addElement( (TLProperty) tl );
-
-        // Add the facade to this
         OtmObject otm = OtmModelElement.get( tl );
-        if (otm instanceof OtmProperty)
-            add( otm );
-        else
-            otm = OtmPropertyFactory.create( tl, this );
+        if (addTL( tl, getTL() )) {
+            // Add the facade to this
+            if (otm instanceof OtmProperty)
+                add( otm );
+            else
+                otm = OtmPropertyFactory.create( tl, this );
+        }
         return (OtmProperty) otm;
+    }
+
+    /**
+     * Static add of TL property to TL owner.
+     * <p>
+     * Use the type of the property and owner to determine how to add the property to the owner.
+     * 
+     * @param tlProperty
+     * @param tlOwner
+     * @return true if successful, false otherwise
+     */
+    public static boolean addTL(TLModelElement tlProperty, TLModelElement tlOwner) {
+        // Add the TL object to the TL owner
+        if (tlOwner instanceof TLAttributeOwner && tlProperty instanceof TLAttribute)
+            ((TLAttributeOwner) tlOwner).addAttribute( (TLAttribute) tlProperty );
+
+        else if (tlOwner instanceof TLIndicatorOwner && tlProperty instanceof TLIndicator)
+            ((TLIndicatorOwner) tlOwner).addIndicator( (TLIndicator) tlProperty );
+
+        else if (tlOwner instanceof TLPropertyOwner && tlProperty instanceof TLProperty)
+            ((TLPropertyOwner) tlOwner).addElement( (TLProperty) tlProperty );
+        else
+            return false;
+        return true;
     }
 
     private boolean contains(List<OtmObject> list, OtmObject child) {

@@ -16,9 +16,11 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmChildrenOwner;
@@ -35,7 +37,7 @@ import org.opentravel.schemacompiler.model.TLProperty;
  * Verifies the functions of the <code>OtmCustomFacet</code> class. Very minimal testing without contributed facets or
  * owning object.
  */
-public class TestQueryFacet extends TestOtmLibraryMemberBase<OtmContextualFacet> {
+public class TestQueryFacet extends TestContextualFacet {
     // private static Log log = LogFactory.getLog( TestContextualFacet.class );
     private static final String CF_NAME = "TestCQF";
 
@@ -48,6 +50,14 @@ public class TestQueryFacet extends TestOtmLibraryMemberBase<OtmContextualFacet>
         // baseObject.setName( "BaseCF" );
     }
 
+    @Before
+    public void beforeTest() {
+        member = TestBusiness.buildOtm( staticModelManager );
+        cf = buildOtm( staticModelManager );
+        contrib = (OtmContributedFacet) member.add( cf );
+        testContributedFacet( contrib, cf, member );
+    }
+
     @Test
     public void testFacets() {}
 
@@ -56,7 +66,6 @@ public class TestQueryFacet extends TestOtmLibraryMemberBase<OtmContextualFacet>
         // Given - a business object and contextual facet
         OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
         OtmContextualFacet cf = buildOtm( staticModelManager );
-        assertTrue( "Has not been injected yet.", cf.getWhereContributed() == null );
 
         // When added
         OtmContributedFacet contrib = bo.add( cf );
@@ -72,7 +81,20 @@ public class TestQueryFacet extends TestOtmLibraryMemberBase<OtmContextualFacet>
      */
     @Override
     public void testChildrenOwner(OtmChildrenOwner otm) {
-        // NO-OP - not contributed yet so it can't have children.
+        if (member == null)
+            beforeTest(); // may be invoked from test library member
+        super.testAdd();
+    }
+
+    @Test
+    public void testDeletingChildren() {
+        super.testDeletingChildren();
+    }
+
+    @Test
+    public void testDeleting() {
+        super.testDeleteFromMember();
+        assertFalse( ((TLBusinessObject) member.getTL()).getCustomFacets().contains( cf.getTL() ) );
     }
 
     /** ****************************************************** **/

@@ -222,7 +222,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         if (filter != null && !filter.isSelected( member ))
             return;
         // Skip over contextual facets that have been injected into an object. Their contributed facets will be modeled.
-        if ((member instanceof OtmContextualFacet && ((OtmContextualFacet) member).getWhereContributed() != null))
+        if (member instanceof OtmContextualFacet && ((OtmContextualFacet) member).getWhereContributed() != null)
             return;
 
         // Create item for the library member
@@ -234,7 +234,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     }
 
     public void createTreeItem(OtmAbstractDisplayFacet member, TreeItem<MemberAndProvidersDAO> parent) {
-        TreeItem<MemberAndProvidersDAO> item = new MemberAndProvidersDAO( member ).createTreeItem( parent );
+        new MemberAndProvidersDAO( member ).createTreeItem( parent );
     }
 
     /**
@@ -360,7 +360,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             // Collection<OtmLibraryMember> members = currentModelMgr.getMembers();
             currentModelMgr.getMembers().forEach( m -> createTreeItem( m, root ) );
             if (root.getChildren().isEmpty()) {
-                log.debug( "POST dummy row" );
+                // Post an empty row to allow row factory to add menu items
                 createTreeItem( new OtmEmptyTableFacet( currentModelMgr ), root );
             }
             try {

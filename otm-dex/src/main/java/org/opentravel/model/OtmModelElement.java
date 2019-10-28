@@ -109,7 +109,18 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
             throw new IllegalArgumentException( "Must have a tl element to create facade." );
         tlObject = tl;
         tl.addListener( new OtmModelElementListener( this ) );
-        // checkListener();
+        checkListener( tl );
+    }
+
+    public static void checkListener(TLModelElement tl) {
+        int listenerCount = 0;
+        for (ModelElementListener l : tl.getListeners())
+            if (l instanceof OtmModelElementListener)
+                if (!(((OtmModelElementListener) l).get() instanceof OtmContributedFacet))
+                    listenerCount++;
+        if (listenerCount > 1)
+            log.warn( "Too Many Listeners." );
+        // assert listenerCount == 1;
     }
 
     @Override

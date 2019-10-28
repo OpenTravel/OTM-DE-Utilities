@@ -57,6 +57,8 @@ public enum OtmLibraryMemberType {
     }
 
     public static OtmLibraryMemberType get(OtmLibraryMember member) {
+        if (member == null)
+            return null;
         for (OtmLibraryMemberType type : values())
             if (type.memberClass() == member.getClass())
                 return type;
