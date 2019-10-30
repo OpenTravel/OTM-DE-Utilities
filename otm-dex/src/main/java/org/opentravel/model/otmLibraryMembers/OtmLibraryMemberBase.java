@@ -388,6 +388,19 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             list.add( p );
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public OtmFacet<TLFacet> getFacet(OtmFacet<TLFacet> facet) {
+        if (facet != null) {
+            TLFacetType type = facet.getTL().getFacetType();
+            for (OtmObject kid : getChildren())
+                if (kid instanceof OtmFacet && kid.getTL() instanceof TLFacet
+                    && ((TLFacet) kid.getTL()).getFacetType() == type)
+                    return (OtmFacet<TLFacet>) kid;
+        }
+        return null;
+    }
+
     @Override
     public LibraryMember getTlLM() {
         return (LibraryMember) getTL();

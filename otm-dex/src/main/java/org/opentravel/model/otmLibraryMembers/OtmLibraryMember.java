@@ -21,8 +21,10 @@ import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLAlias;
+import org.opentravel.schemacompiler.model.TLFacet;
 
 import java.util.List;
 
@@ -138,6 +140,16 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      * @param actionManager
      */
     public void setNoLibraryActionManager(DexActionManager dexActionManager);
+
+    /**
+     * Get the facet of the specified type.
+     * <p>
+     * 
+     * @param facet is the type of facet to match. Can't be contextual because members can have multiple contextual
+     *        facets;
+     * @return facet or null
+     */
+    OtmFacet<TLFacet> getFacet(OtmFacet<TLFacet> facet);
 
 
 

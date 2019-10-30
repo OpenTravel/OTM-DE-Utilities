@@ -30,7 +30,6 @@ import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyFactory;
-import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
 import org.opentravel.schemacompiler.model.TLAbstractFacet;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeOwner;
@@ -142,6 +141,14 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
         remove( property );
     }
 
+    /**
+     * Delete all children. For each child, invoke {@link OtmAbstractFacet#delete(OtmObject)}
+     */
+    public void deleteAll() {
+        List<OtmObject> kids = new ArrayList<>( getChildren() );
+        kids.forEach( this::delete );
+    }
+
     public abstract DexActionManager getActionManger();
 
     /**
@@ -163,6 +170,22 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
         getInheritedChildren().forEach( hierarchy::add );
         getChildren().forEach( hierarchy::add );
         return hierarchy;
+    }
+
+    /**
+     * Get children attributes, indicators and elements(properties). Does not return facets.
+     * 
+     * @return new list of tl model elements
+     */
+    public List<TLModelElement> getTLChildren() {
+        List<TLModelElement> tlProperties = new ArrayList<>();
+        if (getTL() instanceof TLAttributeOwner)
+            tlProperties.addAll( ((TLAttributeOwner) getTL()).getAttributes() );
+        if (getTL() instanceof TLPropertyOwner)
+            tlProperties.addAll( ((TLPropertyOwner) getTL()).getElements() );
+        if (getTL() instanceof TLIndicatorOwner)
+            tlProperties.addAll( ((TLIndicatorOwner) getTL()).getIndicators() );
+        return tlProperties;
     }
 
     @Override
@@ -266,7 +289,8 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
     /**
      * {@inheritDoc}
      * <p>
-     * Creates properties to represent facet children.
+     * Find all properties (elements, indicators, attributes) and create OtmProperties for all their children and add to
+     * Children list.
      */
     @Override
     public void modelChildren() {
@@ -278,27 +302,72 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
             ((TLPropertyOwner) getTL()).getElements().forEach( p -> OtmPropertyFactory.create( p, this ) );
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Find all inheritance ancestors and create OtmProperties for all their children and add to inheritedChildren list.
+     */
     @Override
     public void modelInheritedChildren() {
-        // Only model once
+        if (getOwningMember().getBaseType() == null)
+            return;
+        // This should be overrides on the sub-types.
+        if (this instanceof OtmContributedFacet || this instanceof OtmListFacet)
+            return;
+
         if (inheritedChildren == null)
             inheritedChildren = new ArrayList<>();
         else
             inheritedChildren.clear(); // RE-model
-        // return;
 
-        // All properties, local and inherited
-        // List<TLProperty> inheritedElements = PropertyCodegenUtils.getInheritedProperties(getTL());
+        List<OtmFacet<TLFacet>> ancestors = getAncestors();
 
-        // Get only the directly inherited properties
-        if (getOwningMember().getBaseType() != null && getTL() instanceof TLFacet) {
-            PropertyCodegenUtils.getInheritedFacetProperties( (TLFacet) getTL() )
-                .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
-            PropertyCodegenUtils.getInheritedFacetAttributes( (TLFacet) getTL() )
-                .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
-            PropertyCodegenUtils.getInheritedFacetIndicators( (TLFacet) getTL() )
-                .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
+        List<TLModelElement> tlKids = new ArrayList<>();
+        for (OtmFacet<TLFacet> a : ancestors)
+            tlKids.addAll( a.getTLChildren() );
+
+        for (TLModelElement k : tlKids) {
+            OtmProperty p = OtmPropertyFactory.create( k, null );
+            p.setParent( this );
+            // assert (p.isInherited());
+            add( p );
+            // assert inheritedChildren.contains( p );
         }
+
+        // The preferred approach would be to use the codeGenUtils, but they fail. See TestInheritance for test case.
+        // All properties, local and inherited
+        // List<TLProperty> inheritedElements = PropertyCodegenUtils.getInheritedProperties((TLFacet) getTL());
+        // Get only the directly inherited properties
+        // if (getOwningMember().getBaseType() != null && getTL() instanceof TLFacet) {
+        // PropertyCodegenUtils.getInheritedFacetProperties( (TLFacet) getTL() )
+        // .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
+        // PropertyCodegenUtils.getInheritedFacetAttributes( (TLFacet) getTL() )
+        // .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
+        // PropertyCodegenUtils.getInheritedFacetIndicators( (TLFacet) getTL() )
+        // .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
+        // }
+    }
+
+    private List<OtmFacet<TLFacet>> getAncestors() {
+        if (!(this instanceof OtmFacet))
+            return Collections.emptyList();
+
+        List<OtmFacet<TLFacet>> ancestors = new ArrayList<>();
+        OtmObject obj = getOwningMember().getBaseType();
+        while (obj != null) {
+            if (obj instanceof OtmLibraryMember) {
+                OtmFacet<TLFacet> a = ((OtmLibraryMember) obj).getFacet( (OtmFacet<TLFacet>) this );
+                if (a == null || ancestors.contains( a )) {
+                    // No ancestor or Loop detected - exit
+                    obj = null;
+                } else {
+                    ancestors.add( a );
+                    obj = ((OtmLibraryMember) obj).getBaseType();
+                }
+            } else
+                obj = null;
+        }
+        return ancestors;
     }
 
     @Override

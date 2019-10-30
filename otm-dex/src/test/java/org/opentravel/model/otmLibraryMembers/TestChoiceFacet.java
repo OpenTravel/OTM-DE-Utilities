@@ -25,7 +25,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmChoiceFacet;
@@ -35,8 +34,6 @@ import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLFacetType;
 import org.opentravel.schemacompiler.model.TLProperty;
-
-import java.util.List;
 
 /**
  * Verifies the functions of the <code>OtmChoiceFacet</code> class. Very minimal testing without contributed facets or
@@ -65,26 +62,28 @@ public class TestChoiceFacet extends TestContextualFacet {
 
     @Test
     public void testInheritance() {
-        OtmChoiceObject baseBo = TestChoice.buildOtm( staticModelManager );
-        baseBo.setName( "BaseBO" );
-        OtmContextualFacet inheritedCf = buildOtm( staticModelManager, baseBo );
-        assertTrue( "Given", !inheritedCf.isInherited() );
+        // OtmChoiceObject baseBo = TestChoice.buildOtm( staticModelManager );
+        // baseBo.setName( "BaseBO" );
+        // OtmContextualFacet inheritedCf = buildOtm( staticModelManager, baseBo );
+        // assertTrue( "Given", !inheritedCf.isInherited() );
+        //
+        // OtmChoiceObject bo = TestChoice.buildOtm( staticModelManager );
+        // OtmContextualFacet cf = buildOtm( staticModelManager, bo );
+        // bo.setName( "SubType" );
+        // assertTrue( "Given", !cf.isInherited() );
 
-        OtmChoiceObject bo = TestChoice.buildOtm( staticModelManager );
-        OtmContextualFacet cf = buildOtm( staticModelManager, bo );
-        bo.setName( "SubType" );
-        assertTrue( "Given", !cf.isInherited() );
-
-        // When - bo extends baseBo
-        bo.setBaseType( baseBo );
-        assertTrue( "Given", bo.getBaseType() == baseBo );
-        assertTrue( "Given", bo.getTL().getExtension() != null );
-        assertTrue( "Given", bo.getTL().getExtension().getExtendsEntity() == baseBo.getTL() );
-
-        // Then
-        List<OtmObject> ic1 = bo.getInheritedChildren();
-        List<OtmObject> ic2 = baseBo.getInheritedChildren();
-        // assertTrue( "Extension must have inherited CF", bo.getInheritedChildren().contains( inheritedCf ) );
+        OtmChoiceObject extension = TestChoice.buildOtm( staticModelManager );
+        super.testCFInheritance( extension );
+        // // When - bo extends baseBo
+        // bo.setBaseType( baseBo );
+        // assertTrue( "Given", bo.getBaseType() == baseBo );
+        // assertTrue( "Given", bo.getTL().getExtension() != null );
+        // assertTrue( "Given", bo.getTL().getExtension().getExtendsEntity() == baseBo.getTL() );
+        //
+        // // Then
+        // List<OtmObject> ic1 = bo.getInheritedChildren();
+        // List<OtmObject> ic2 = baseBo.getInheritedChildren();
+        // // assertTrue( "Extension must have inherited CF", bo.getInheritedChildren().contains( inheritedCf ) );
     }
 
     @Test

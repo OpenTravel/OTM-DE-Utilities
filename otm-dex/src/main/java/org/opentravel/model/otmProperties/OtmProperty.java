@@ -37,6 +37,8 @@ public interface OtmProperty extends OtmObject {
 
     public OtmPropertyOwner getParent();
 
+    public OtmPropertyOwner setParent(OtmPropertyOwner parent);
+
     public OtmPropertyType getPropertyType();
 
     public boolean isEditable();

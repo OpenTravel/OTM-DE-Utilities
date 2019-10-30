@@ -19,6 +19,7 @@ package org.opentravel.model.otmProperties;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelElement;
+import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.TLModelElement;
 
@@ -82,6 +83,11 @@ public abstract class OtmValueProperty extends OtmModelElement<TLModelElement> i
         // No-op
     }
 
+    @Override
+    public OtmPropertyOwner setParent(OtmPropertyOwner parent) {
+        // NO-OP
+        return null;
+    }
     // @Override
     // public void clone(OtmProperty property) {
     // TLRole newTL = new TLRole();

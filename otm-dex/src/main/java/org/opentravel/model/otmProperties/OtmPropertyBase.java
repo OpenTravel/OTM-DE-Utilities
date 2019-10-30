@@ -68,6 +68,11 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
         return parent;
     }
 
+    public OtmPropertyOwner setParent(OtmPropertyOwner parent) {
+        this.parent = parent;
+        return parent;
+    }
+
     public OtmPropertyType getPropertyType() {
         return OtmPropertyType.getType( this );
     }
