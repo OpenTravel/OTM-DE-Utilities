@@ -26,17 +26,20 @@ import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
+import org.opentravel.schemacompiler.model.TLLibraryStatus;
+import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
+import org.opentravel.schemacompiler.repository.RepositoryItemState;
 
 /**
- * A JavaFX task for locking Otm Libraries
+ * A JavaFX task for Promoting Otm Libraries (Under Review, Final, Obsolete)
  * 
  * @author dmh
  *
  */
-public class LockLibraryTask extends DexTaskBase<OtmLibrary> {
-    private static Log log = LogFactory.getLog( LockLibraryTask.class );
+public class PromoteLibraryTask extends DexTaskBase<OtmLibrary> {
+    private static Log log = LogFactory.getLog( PromoteLibraryTask.class );
 
     // private DexStatusController statusController;
     private DexIncludedController<?> eventController;
@@ -53,15 +56,15 @@ public class LockLibraryTask extends DexTaskBase<OtmLibrary> {
      * @param eventController - controller to publish repository item replaced event
      * @param modelManager - model manager that holds projects that could contain the library in this repository item
      */
-    public LockLibraryTask(OtmLibrary taskData, TaskResultHandlerI handler, DexStatusController statusController,
+    public PromoteLibraryTask(OtmLibrary taskData, TaskResultHandlerI handler, DexStatusController statusController,
         DexIncludedController<?> eventController, OtmModelManager modelManager) {
         super( taskData, handler, statusController );
         if (taskData == null)
             return;
 
         this.library = taskData;
-        // this.statusController = statusController;
         this.eventController = eventController;
+        // this.statusController = statusController;
         // this.modelManager = modelManager;
 
         // Try to find the actual modeled library. A modeled library will be created by opening a project.
@@ -77,27 +80,40 @@ public class LockLibraryTask extends DexTaskBase<OtmLibrary> {
         updateMessage( msgBuilder.toString() );
     }
 
+    public static boolean isEnabled(OtmLibrary lib, TLLibraryStatus targetStatus) {
+        // if (lib.isEditable())
+        // return false;
+
+        // Check state and status
+        if (targetStatus == TLLibraryStatus.OBSOLETE) {
+            if (lib.getState() != RepositoryItemState.MANAGED_WIP || lib.getStatus() != TLLibraryStatus.DRAFT)
+                return false;
+        } else if (lib.getState() != RepositoryItemState.MANAGED_UNLOCKED)
+            return false;
+
+        ProjectItem pi = null;
+        OtmProject project = lib.getManagingProject();
+        for (ProjectItem candidate : project.getTL().getProjectItems())
+            if (lib.getProjectItems().contains( candidate ))
+                pi = candidate;
+        if (!(pi instanceof RepositoryItem))
+            return false;
+
+        if (pi.getStatus().nextStatus() != targetStatus)
+            return false;
+
+        return true;
+    }
+
     @Override
     public void doIT() throws RepositoryException {
-        log.debug( "Lock library task: " + library.hashCode() );
-        // if (mgr == null)
-        // return;
+        log.debug( "Promote library task: " + library );
 
         if (proj != null) {
-            log.debug( "Locking with project item: " + proj.getProjectItem( library.getTL() ).hashCode() );
-
-            proj.getTL().getProjectManager().lock( proj.getProjectItem( library.getTL() ) );
-
-            // RepositoryItem newRI = taskData.getRepository().getRepositoryItem(taskData.getBaseNamespace(),
-            // taskData.getFilename(), taskData.getVersion());
-            // if (newRI != null && repoItem != newRI) {
-            // // repoItem is now stale--and held in a list by the NamespacesDAO
-            // // throw event so ns-library view is rebuilt on task complete.
-            // log.debug("Ready to replace" + repoItem.hashCode() + " with " + newRI.hashCode());
-            // throwRepoItemReplacedEvent(repoItem, newRI);
-            // log.debug(newRI.getLibraryName() + " locked by " + newRI.getLockedByUser());
-            // }
+            log.debug( "Promote with project item: " + proj.getProjectItem( library.getTL() ).hashCode() );
+            proj.getTL().getProjectManager().promote( proj.getProjectItem( library.getTL() ) );
         }
+        // throwRepoItemReplacedEvent( oldItem, newItem );
     }
 
     /**
