@@ -175,6 +175,7 @@ public class DexFileHandler extends AbstractMainWindowController {
                 manager.loadProject( selectedProjectFile, findings, monitor );
             } catch (Exception e) {
                 log.error( "Error Opening Project: " + e.getLocalizedMessage() );
+                manager.closeAll();
                 return false;
             }
         }

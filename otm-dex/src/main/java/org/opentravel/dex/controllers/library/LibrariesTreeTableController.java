@@ -130,7 +130,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         buildColumns();
 
         refresh();
-        log.debug( "Configured Libraries Tree Table." );
+        // log.debug( "Configured Libraries Tree Table." );
     }
 
     public void setSelectionListener(ChangeListener<TreeItem<LibraryDAO>> listener) {
@@ -149,7 +149,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
      */
     @Override
     public void post(OtmModelManager modelMgr) {
-        log.debug( "Posting all libraries." );
+        // log.debug( "Posting all libraries." );
         ignoreEvents = true;
         if (modelMgr != null) {
             postedData = modelMgr;
@@ -161,7 +161,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
 
             // create cells for libraries in a namespace. Latest at top, older ones under it.
             for (String baseNS : modelMgr.getBaseNamespaces()) {
-                log.debug( "Posting base namespace: " + baseNS );
+                // log.debug( "Posting base namespace: " + baseNS );
                 TreeItem<LibraryDAO> latestItem = null;
                 OtmLibrary latest = null;
                 Set<OtmLibrary> libs = modelMgr.getLibraryChain( baseNS );
@@ -180,7 +180,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
             }
         }
         ignoreEvents = false;
-        log.debug( "Posted library tree." );
+        // log.debug( "Posted library tree." );
     }
 
     @Override

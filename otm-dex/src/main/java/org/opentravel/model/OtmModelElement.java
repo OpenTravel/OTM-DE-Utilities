@@ -341,27 +341,32 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
             return true;
 
         if (findings == null || refresh) {
-            boolean deep = false;
-            try {
-                // Get new findings
-                findings = TLModelCompileValidator.validateModelElement( getTL(), deep );
-                // Update the validation properties
-                if (validationProperty != null)
-                    validationProperty.setValue( ValidationUtils.getCountsString( findings ) );
-                if (validationImageProperty() != null)
-                    validationImageProperty().setValue( validationImage() );
-            } catch (Exception e) {
-                findings = null;
-                log.debug( "Validation threw error: " + e.getLocalizedMessage() );
-            }
-
-            // log.debug(findings != null ? findings.count() + " findings found" : " null" + " findings found.");
+            findings = isValid( getTL() );
+            if (validationProperty != null)
+                validationProperty.setValue( ValidationUtils.getCountsString( findings ) );
+            if (validationImageProperty() != null)
+                validationImageProperty().setValue( validationImage() );
         }
         // log.debug( "Validated " + this + " resulted in " + findings.count() + " findings." );
-        if (findings != null && findings.count() > 0)
-            log.debug( this + "findings: " + findings.count() + " findings found" );
-        // FIXME - how to make the image and tool tip update?
+        // if (findings != null && findings.count() > 0)
+        // log.debug( this + "findings: " + findings.count() + " findings found" );
+        // Model change events make the image and tool tip update
         return findings == null || findings.isEmpty();
+    }
+
+    public static ValidationFindings isValid(TLModelElement tl) {
+        if (tl == null)
+            throw new IllegalStateException( "Tried to validation with null TL object." );
+        ValidationFindings sFindings = null;
+        boolean deep = false;
+        try {
+            sFindings = TLModelCompileValidator.validateModelElement( tl, deep );
+        } catch (Exception e) {
+            sFindings = null;
+            log.debug( "Validation threw error: " + e.getLocalizedMessage() );
+        }
+        // log.debug(sFindings != null ? sFindings.count() + " sFindings found" : " null" + " findings found.");
+        return sFindings;
     }
 
     @Override

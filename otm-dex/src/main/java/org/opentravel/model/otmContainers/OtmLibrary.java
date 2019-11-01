@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.action.manager.DexActionManager;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -264,6 +265,19 @@ public class OtmLibrary {
         return projectItems;
     }
 
+    /**
+     * @see #getManagingProject()
+     * @return the project item for this library in the managing project
+     */
+    public ProjectItem getProjectItem() {
+        ProjectItem pi = null;
+        OtmProject project = getManagingProject();
+        for (ProjectItem candidate : project.getTL().getProjectItems())
+            if (getProjectItems().contains( candidate ))
+                pi = candidate;
+        return pi;
+    }
+
     public void remove(ProjectItem item) {
         projectItems.remove( item );
     }
@@ -359,6 +373,11 @@ public class OtmLibrary {
 
     public boolean isMinorVersion() {
         return (getMinorVersion() > 0 && getState() != RepositoryItemState.UNMANAGED);
+    }
+
+    public boolean isValid() {
+        findings = OtmModelElement.isValid( getTL() );
+        return findings == null || findings.isEmpty();
     }
 
     /**

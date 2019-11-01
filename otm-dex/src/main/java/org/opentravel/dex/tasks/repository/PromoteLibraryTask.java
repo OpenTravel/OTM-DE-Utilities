@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.controllers.DexStatusController;
-import org.opentravel.dex.events.DexRepositoryItemReplacedEvent;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.OtmModelManager;
@@ -41,11 +40,9 @@ import org.opentravel.schemacompiler.repository.RepositoryItemState;
 public class PromoteLibraryTask extends DexTaskBase<OtmLibrary> {
     private static Log log = LogFactory.getLog( PromoteLibraryTask.class );
 
-    // private DexStatusController statusController;
     private DexIncludedController<?> eventController;
     private OtmProject proj = null;
     private OtmLibrary library = null;
-    // private OtmModelManager modelManager;
 
     /**
      * Create a lock library task.
@@ -64,25 +61,17 @@ public class PromoteLibraryTask extends DexTaskBase<OtmLibrary> {
 
         this.library = taskData;
         this.eventController = eventController;
-        // this.statusController = statusController;
-        // this.modelManager = modelManager;
-
-        // Try to find the actual modeled library. A modeled library will be created by opening a project.
-        // library = modelManager.get(taskData.getNamespace() + "/" + taskData.getLibraryName());
-        // See if there is an open project to manage this item and use it
-        // if (library != null) {
         proj = modelManager.getManagingProject( library );
-        // }
 
         // Replace start message from super-type.
-        msgBuilder = new StringBuilder( "Locking: " );
+        msgBuilder = new StringBuilder( "Promoting: " );
         msgBuilder.append( library.getName() );
         updateMessage( msgBuilder.toString() );
     }
 
     public static boolean isEnabled(OtmLibrary lib, TLLibraryStatus targetStatus) {
-        // if (lib.isEditable())
-        // return false;
+        if (lib == null)
+            return false;
 
         // Check state and status
         if (targetStatus == TLLibraryStatus.OBSOLETE) {
@@ -91,11 +80,7 @@ public class PromoteLibraryTask extends DexTaskBase<OtmLibrary> {
         } else if (lib.getState() != RepositoryItemState.MANAGED_UNLOCKED)
             return false;
 
-        ProjectItem pi = null;
-        OtmProject project = lib.getManagingProject();
-        for (ProjectItem candidate : project.getTL().getProjectItems())
-            if (lib.getProjectItems().contains( candidate ))
-                pi = candidate;
+        ProjectItem pi = lib.getProjectItem();
         if (!(pi instanceof RepositoryItem))
             return false;
 
@@ -113,18 +98,6 @@ public class PromoteLibraryTask extends DexTaskBase<OtmLibrary> {
             log.debug( "Promote with project item: " + proj.getProjectItem( library.getTL() ).hashCode() );
             proj.getTL().getProjectManager().promote( proj.getProjectItem( library.getTL() ) );
         }
-        // throwRepoItemReplacedEvent( oldItem, newItem );
-    }
-
-    /**
-     * Inform application that a repository item has changed. May be needed when locking an item since the items are
-     * held in other controller's DAOs.
-     * 
-     * @param oldItem
-     * @param newItem
-     */
-    private void throwRepoItemReplacedEvent(RepositoryItem oldItem, RepositoryItem newItem) {
-        eventController.publishEvent( new DexRepositoryItemReplacedEvent( this, oldItem, newItem ) );
     }
 
 }

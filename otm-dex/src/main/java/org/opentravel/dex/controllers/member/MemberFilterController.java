@@ -321,7 +321,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             ignoreClear = true;
             librarySelector.getSelectionModel().select( event.getLibrary().getName() );
             fireFilterChangeEvent();
-            log.debug( "Set Library Filter to: " + libraryFilter );
+            // log.debug( "Set Library Filter to: " + libraryFilter );
             ignoreClear = false;
         }
     }

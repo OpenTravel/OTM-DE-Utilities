@@ -48,7 +48,6 @@ import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
@@ -281,7 +280,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
+        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
@@ -339,8 +338,8 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
 
     public void mouseClick(MouseEvent event) {
         // this fires after the member selection listener
-        if (event.getButton().equals( MouseButton.PRIMARY ) && event.getClickCount() == 2)
-            log.debug( "Double click selection: " );
+        // if (event.getButton().equals( MouseButton.PRIMARY ) && event.getClickCount() == 2)
+        // log.debug( "Double click selection: " );
         // + memberTree.getSelectionModel().getSelectedItem().getValue().nameProperty().toString());
     }
 
@@ -370,7 +369,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             }
         }
         ignoreEvents = false;
-        log.debug( "Posted member tree." );
+        // log.debug( "Posted member tree." );
     }
 
     @Override

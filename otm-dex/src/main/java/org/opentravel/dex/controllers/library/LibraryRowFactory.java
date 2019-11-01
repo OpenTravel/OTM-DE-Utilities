@@ -21,14 +21,19 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexProjectHandler;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexStatusController;
+import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.controllers.popup.UnlockLibraryDialogContoller;
 import org.opentravel.dex.repository.RepositoryResultHandler;
 import org.opentravel.dex.tasks.repository.LockLibraryTask;
+import org.opentravel.dex.tasks.repository.ManageLibraryTask;
 import org.opentravel.dex.tasks.repository.PromoteLibraryTask;
 import org.opentravel.dex.tasks.repository.UnlockLibraryTask;
+import org.opentravel.dex.tasks.repository.VersionLibraryTask;
+import org.opentravel.dex.tasks.repository.VersionLibraryTask.VersionType;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
+import org.opentravel.schemacompiler.repository.RepositoryManager;
 
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
@@ -59,7 +64,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     private MenuItem projectAdd;
     private MenuItem projectRemove;
     private MenuItem saveLibrary;
-    private MenuItem manage;
+    private Menu manage;
 
     private Menu versionMenu;
     private MenuItem major = new MenuItem( "Major" );
@@ -79,7 +84,8 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         projectRemove = new MenuItem( "Remove from project" );
         saveLibrary = new MenuItem( "Save" );
 
-        manage = new MenuItem( "Manage - future" );
+        manage = new Menu( "Manage - future" );
+
         promote = new Menu( "Promote" );
         promote.getItems().addAll( underReview, finalState, obsolete );
 
@@ -92,6 +98,8 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         projectRemove.setOnAction( this::removeLibrary );
         saveLibrary.setOnAction( e -> saveLibrary() );
         promote.setOnAction( this::promoteLibrary );
+        manage.setOnAction( this::manageLibrary );
+        versionMenu.setOnAction( this::versionLibrary );
 
         contextMenu.getItems().addAll( saveLibrary, new SeparatorMenuItem(), lockLibrary, unlockLibrary );
         contextMenu.getItems().addAll( new SeparatorMenuItem(), projectAdd, projectRemove );
@@ -110,7 +118,13 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         if (mainController != null) {
             statusController = mainController.getStatusController();
             modelManager = mainController.getModelManager();
+            configureManageMenu( mainController.getRepositoryManager() );
         }
+    }
+
+    private void configureManageMenu(RepositoryManager repoMgr) {
+        manage.getItems().add( new MenuItem( ManageLibraryTask.LOCAL_REPO ) );
+        repoMgr.listRemoteRepositories().forEach( r -> manage.getItems().add( new MenuItem( r.getId() ) ) );
     }
 
     private void addToProject(ActionEvent e) {
@@ -131,19 +145,18 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     }
 
     /**
-     * Add a new member to the tree
-     * 
+     * Lock a library
      */
     private void lockLibrary() {
         log.debug( "Lock in Row Factory.  " + controller.getSelectedItem().getValue().hashCode() );
-        if (controller.getSelectedItem() != null && controller.getSelectedItem().getValue() != null)
-            new LockLibraryTask( controller.getSelectedItem().getValue(), new RepositoryResultHandler( mainController ),
-                statusController, controller, modelManager ).go();
+        OtmLibrary lib = getSelected();
+        if (lib != null)
+            new LockLibraryTask( lib, new RepositoryResultHandler( mainController ), statusController, controller,
+                modelManager ).go();
     }
 
     /**
-     * Add a new member to the tree
-     * 
+     * Promote a library state
      */
     private void promoteLibrary(ActionEvent e) {
         OtmLibrary lib = getSelected();
@@ -156,9 +169,50 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
             new PromoteLibraryTask( lib, new RepositoryResultHandler( mainController ), statusController, controller,
                 modelManager ).go();
         }
-        // new LockLibraryTask( controller.getSelectedItem().getValue(),
-        // new RepositoryResultHandler( mainController ),
-        // mainController.getStatusController(), controller, mainController.getModelManager() ).go();
+    }
+
+    /**
+     * Promote a library state
+     */
+    private void manageLibrary(ActionEvent e) {
+        OtmLibrary lib = getSelected();
+        log.debug( "manage " + lib + " in Row Factory.  " + controller.getSelectedItem().getValue().hashCode() );
+
+        e.getSource();
+        if (e.getTarget() instanceof MenuItem) {
+            String repoId = ((MenuItem) e.getTarget()).getText();
+            new ManageLibraryTask( repoId, lib, new RepositoryResultHandler( mainController ), mainController ).go();
+        }
+
+        // TODO - include namespace compatibility in isEnabled and present reason if appropriate
+    }
+
+    /**
+     * Create new version of a library
+     */
+    private void versionLibrary(ActionEvent e) {
+        OtmLibrary lib = getSelected();
+        log.debug( "Version " + lib + " in Row Factory.  " + controller.getSelectedItem().getValue().hashCode() );
+        VersionLibraryTask.VersionType type = null;
+        if (e.getTarget() == major)
+            type = VersionType.MAJOR;
+        else if (e.getTarget() == minor)
+            type = VersionType.MINOR;
+        else if (e.getTarget() == patch)
+            type = VersionType.PATCH;
+
+        if (VersionLibraryTask.isEnabled( lib )) {
+            if (type != null)
+                new VersionLibraryTask( type, lib, new RepositoryResultHandler( mainController ), statusController,
+                    controller, modelManager ).go();
+        } else {
+            // POST Warning on why
+            log.debug( "TODO" );
+            DialogBoxContoller dbc = DialogBoxContoller.init();
+            if (dbc != null)
+                dbc.show( "Can not version library.", VersionLibraryTask.getReason( lib ) );
+
+        }
     }
 
     private void removeLibrary(ActionEvent e) {
@@ -192,6 +246,10 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
                 projectAdd.setDisable( !library.getModelManager().hasProjects() );
                 projectRemove.setDisable( library.getProjects().isEmpty() );
                 //
+                patch.setDisable( !VersionLibraryTask.isEnabled( library ) );
+                minor.setDisable( !VersionLibraryTask.isEnabled( library ) );
+                major.setDisable( !VersionLibraryTask.isEnabled( library ) );
+                //
                 finalState.setDisable( !PromoteLibraryTask.isEnabled( library, TLLibraryStatus.FINAL ) );
                 underReview.setDisable( !PromoteLibraryTask.isEnabled( library, TLLibraryStatus.UNDER_REVIEW ) );
                 obsolete.setDisable( !PromoteLibraryTask.isEnabled( library, TLLibraryStatus.OBSOLETE ) );
@@ -206,6 +264,8 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
                 obsolete.setDisable( true );
             }
             promote.setDisable( finalState.isDisable() && underReview.isDisable() && obsolete.isDisable() );
+            // versionMenu.setDisable( patch.isDisable() && minor.isDisable() && major.isDisable() );
+            manage.setDisable( !ManageLibraryTask.isEnabled( library ) );
 
             tc.pseudoClassStateChanged( EDITABLE, newTreeItem.getValue().getValue().isEditable() );
         }
