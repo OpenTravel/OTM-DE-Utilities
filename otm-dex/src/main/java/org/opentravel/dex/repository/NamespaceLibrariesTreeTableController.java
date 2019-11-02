@@ -38,7 +38,7 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 
 /**
- * Controller for a libraries in a namespace tree table view. Creates table containing repository item properties.
+ * Tree table controller for all libraries in a namespace view. Creates table containing repository item properties.
  * <p>
  * This class is designed to be injected into a parent controller by FXML loader. It has a VBOX containing the label
  * header and a tree table view.
@@ -178,14 +178,16 @@ public class NamespaceLibrariesTreeTableController extends DexIncludedController
     @Override
     public void post(NamespacesDAO nsNode) throws Exception {
         super.post( nsNode );
-        // log.debug("Posting new namespace node.");
+        log.debug( "Posting new namespace node: " + nsNode );
         currentNamespaceDAO = nsNode;
-        if (nsNode == null || nsNode.getFullPath() == null || nsNode.getFullPath().isEmpty())
-            throw new IllegalArgumentException( "Missing repository and namespace." );
-
         // Clear the table
         clear();
 
+        if (nsNode == null || nsNode.getFullPath() == null || nsNode.getFullPath().isEmpty()) {
+            // throw new IllegalArgumentException( "Missing repository and namespace." );
+            log.debug( "Skipping post - nsNode or full path is missing." );
+            return;
+        }
         // Display the namespace and permission
         namespaceLabel.textProperty().bind( nsNode.fullPathProperty() );
         permissionLabel.textProperty().bind( nsNode.permissionProperty() );
@@ -216,10 +218,13 @@ public class NamespaceLibrariesTreeTableController extends DexIncludedController
 
     @Override
     public void refresh() {
-        try {
-            post( currentNamespaceDAO );
-        } catch (Exception e) {
-            log.error( "Error refreshing namespace libraries tree table: " + e.getLocalizedMessage() );
+        if (currentNamespaceDAO != null) {
+            currentNamespaceDAO.refresh( this );
+            try {
+                post( currentNamespaceDAO );
+            } catch (Exception e) {
+                log.error( "Error refreshing namespace libraries tree table: " + e.getLocalizedMessage() );
+            }
         }
     }
 

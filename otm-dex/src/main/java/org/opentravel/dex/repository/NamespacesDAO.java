@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexDAO;
+import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.repository.GetRepositoryItemsTask;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
@@ -60,12 +61,20 @@ public class NamespacesDAO implements DexDAO<String>, TaskResultHandlerI {
     private List<RepositoryItem> allItems = null;
     private List<RepositoryItem> latestItems = null;
 
+    // If the controller is set, refresh it when get repo items task is done.
+    private DexIncludedController<NamespacesDAO> controller = null;
+
     public NamespacesDAO(String ns, String basePath, Repository repo) {
         this.ns = ns;
         this.basePath = basePath;
         this.setRepository( repo );
 
         // task to retrieve items to allow filter by item type (Draft, etc) or Locked
+        new GetRepositoryItemsTask( this, this::handleTaskComplete, null ).go();
+    }
+
+    public void refresh(DexIncludedController<NamespacesDAO> controller) {
+        this.controller = controller;
         new GetRepositoryItemsTask( this, this::handleTaskComplete, null ).go();
     }
 
@@ -157,6 +166,12 @@ public class NamespacesDAO implements DexDAO<String>, TaskResultHandlerI {
                 decoration = "   ( " + allItems.size() + "/" + locked + " )";
             }
         }
+        if (controller != null)
+            try {
+                controller.post( this );
+            } catch (Exception e) {
+                // No-op
+            }
     }
 
     public StringProperty nsProperty() {

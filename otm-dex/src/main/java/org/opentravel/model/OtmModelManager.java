@@ -22,6 +22,7 @@ import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.dex.controllers.DexStatusController;
+import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.model.TypeResolverTask;
 import org.opentravel.dex.tasks.model.ValidateModelManagerItemsTask;
@@ -59,6 +60,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javafx.application.Platform;
 import javafx.concurrent.WorkerStateEvent;
 
 /**
@@ -198,22 +200,27 @@ public class OtmModelManager implements TaskResultHandlerI {
 
     // Fixme - should be ok. fixed OtmLibrary to return baseNamespace without PI.
     // Todo - refactor add(*) to simplify
+    // Not used on open project task
     protected OtmLibrary add(AbstractLibrary absLibrary, VersionChainFactory versionChainFactory) {
         if (absLibrary == null)
             return null;
         if (contains( absLibrary ))
             return libraries.get( absLibrary );
+
         OtmLibrary otmLibrary = new OtmLibrary( absLibrary, this );
+
         libraries.put( absLibrary, otmLibrary );
         // Map of base namespaces with all libraries in that namespace
         if (absLibrary instanceof TLLibrary)
             if (versionChainFactory != null) {
                 baseNSManaged.put( otmLibrary.getNameWithBasenamespace(),
                     versionChainFactory.getVersionChain( (TLLibrary) absLibrary ) );
-                log.debug( "Added chain for manged base namespace: " + otmLibrary.getNameWithBasenamespace() );
+                log.debug( "Added " + otmLibrary.getNameWithBasenamespace() + otmLibrary.getVersion()
+                    + " to base NS managed." );
             } else {
                 baseNSUnmanaged.put( otmLibrary.getNameWithBasenamespace(), otmLibrary );
-                log.debug( "Added unmanged base namespace: " + otmLibrary.getNameWithBasenamespace() );
+                log.debug( "Added " + otmLibrary.getNameWithBasenamespace() + otmLibrary.getVersion()
+                    + " to base NS UN-managed." );
             }
 
         // For each named member use the factory to create and add OtmObject
@@ -286,9 +293,24 @@ public class OtmModelManager implements TaskResultHandlerI {
         try {
             versionChainFactory = new VersionChainFactory( tlModel );
         } catch (Exception e) {
+            if (!showingError) {
+                showingError = true;
+                Platform.runLater( this::chainError );
+            }
             log.debug( "Exception trying to construct version chain factory: " + e.getLocalizedMessage() );
         }
         return versionChainFactory;
+    }
+
+    private static String CHAINERRORMESSAGE =
+        "Serious error - a library has an invalid namespace. \nThis will prevent properly presenting libraries in version chains. Examine the library namespaces and either fix the or remove from project.";
+
+    private void chainError() {
+        if (dialogBox == null)
+            dialogBox = DialogBoxContoller.init();
+        dialogBox.show( CHAINERRORMESSAGE );
+        dialogBox = null;
+        showingError = false;
     }
 
     /**
@@ -301,9 +323,12 @@ public class OtmModelManager implements TaskResultHandlerI {
         addProjects();
     }
 
+    /**
+     * Get all the projects from the project manager. Create libraries for all project items if they have not already be
+     * modeled. Start validation and type resolution task.
+     */
     public void addProjects() {
-        // ProjectManager pm = projectManager;
-        log.debug( "New project with " + getTlModel().getAllLibraries().size() + " libraries" );
+        log.debug( "AddProjects() with " + getTlModel().getAllLibraries().size() + " libraries" );
 
         // Add projects to project map
         for (Project project : projectManager.getAllProjects())
@@ -311,10 +336,6 @@ public class OtmModelManager implements TaskResultHandlerI {
 
         // Get the built in libraries, will do nothing if already added
         addBuiltInLibraries( getTlModel() );
-
-        // // Get VersionChainFactory that provides a versionChain for each project item that lists the base namespace,
-        // // name and sorted set of version libraries
-        // VersionChainFactory versionChainFactory = getVersionChainFactory();
 
         // Get Libraries - Libraries can belong to multiple projects.
         // Map will de-dup the entries based on baseNS and name.
@@ -373,7 +394,7 @@ public class OtmModelManager implements TaskResultHandlerI {
         AbstractLibrary absLibrary = pi.getContent();
         if (absLibrary == null)
             return;
-
+        log.debug( "Adding project item: " + absLibrary.getName() + " in " + absLibrary.getNamespace() );
         if (contains( absLibrary )) {
             // let the library track project as needed to know if the library is editable
             libraries.get( absLibrary ).add( pi );
@@ -760,6 +781,9 @@ public class OtmModelManager implements TaskResultHandlerI {
 
     public static final String OTA_LIBRARY_NAMESPACE = "http://www.opentravel.org/OTM/Common/v0";
     public static final String OTA_EMPTY_NAME = "Empty";
+
+    private DialogBoxContoller dialogBox = null;
+    private boolean showingError = false;
 
     /**
      * @return

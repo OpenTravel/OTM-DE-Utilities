@@ -25,6 +25,7 @@ import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
+import org.opentravel.schemacompiler.loader.LibraryLoaderException;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.repository.ProjectItem;
@@ -37,6 +38,7 @@ import org.opentravel.schemacompiler.repository.RepositoryItemState;
 import org.opentravel.schemacompiler.saver.LibrarySaveException;
 import org.opentravel.schemacompiler.validate.ValidationException;
 import org.opentravel.schemacompiler.version.MajorVersionHelper;
+import org.opentravel.schemacompiler.version.MinorVersionHelper;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
 
 /**
@@ -120,25 +122,42 @@ public class VersionLibraryTask extends DexTaskBase<OtmLibrary> {
 
     @Override
     public void doIT() throws RepositoryException, VersionSchemeException, ValidationException, LibrarySaveException,
-        PublishWithLocalDependenciesException {
-        log.debug( "Version library task: " + library );
+        PublishWithLocalDependenciesException, LibraryLoaderException {
 
-        if (proj != null && type != null) {
+        if (isEnabled( library ) && proj != null && type != null) {
             log.debug( type + "Version with project item: " + proj.getProjectItem( library.getTL() ) );
-            // proj.getTL().getProjectManager().promote( proj.getProjectItem( library.getTL() ) );
 
-            MajorVersionHelper vh = new MajorVersionHelper( proj.getTL() );
-            // Create a major version in local files
+            // Create a version in local files
+            TLLibrary tlNewLibrary = null;
+            switch (type) {
+                case MAJOR:
+                    MajorVersionHelper vh = new MajorVersionHelper( proj.getTL() );
+                    tlNewLibrary = vh.createNewMajorVersion( (TLLibrary) library.getTL() );
+                    break;
+                case MINOR:
+                    // Minor - must create from latest minor not the patch.
+                    MinorVersionHelper minorVH = new MinorVersionHelper( proj.getTL() );
+                    tlNewLibrary = minorVH.createNewMinorVersion( (TLLibrary) library.getTL() );
+                    break;
+                case PATCH:
+                    // UNTESTED
+                    // PatchVersionHelper patchVH = new PatchVersionHelper( proj.getTL() );
+                    // tlNewLibrary = patchVH.createNewPatchVersion( (TLLibrary) library.getTL() );
+                    break;
+            }
 
-            TLLibrary tlMajor = vh.createNewMajorVersion( (TLLibrary) library.getTL() );
+            if (tlNewLibrary != null) {
+                // Manage the library in the repository
+                ProjectManager pm = proj.getTL().getProjectManager();
+                Repository repo = library.getProjectItem().getRepository();
+                ProjectItem item = proj.getProjectItem( tlNewLibrary );
+                pm.publish( item, repo );
 
-            // Manage the library in the repository
-            ProjectManager pm = proj.getTL().getProjectManager();
-            Repository repo = library.getProjectItem().getRepository();
-            ProjectItem item = proj.getProjectItem( tlMajor );
-            pm.publish( item, repo );
-
-
+                // Add to project and model
+                proj.getTL().getProjectManager().addManagedProjectItem( item, proj.getTL() );
+                library.getModelManager().addProjects();
+            }
+            log.debug( "Version library task complete. " );
         }
     }
 

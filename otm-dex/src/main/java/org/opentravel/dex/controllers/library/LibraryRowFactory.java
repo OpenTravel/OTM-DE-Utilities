@@ -75,6 +75,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     private MenuItem underReview = new MenuItem( "Under Review" );
     private MenuItem finalState = new MenuItem( "Final" );
     private MenuItem obsolete = new MenuItem( "Make Obsolete" );;
+    private MenuItem refresh = new MenuItem( "Refresh" );
 
     public LibraryRowFactory() {
         // Create Context menu
@@ -84,13 +85,14 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         projectRemove = new MenuItem( "Remove from project" );
         saveLibrary = new MenuItem( "Save" );
 
-        manage = new Menu( "Manage - future" );
+        manage = new Menu( "Manage" );
 
         promote = new Menu( "Promote" );
         promote.getItems().addAll( underReview, finalState, obsolete );
 
-        versionMenu = new Menu( "Version - future" );
-        versionMenu.getItems().addAll( major, minor, patch );
+        versionMenu = new Menu( "Version" );
+        versionMenu.getItems().addAll( major, minor );
+        // versionMenu.getItems().addAll( major, minor, patch );
 
         lockLibrary.setOnAction( e -> lockLibrary() );
         unlockLibrary.setOnAction( e -> unlockLibrary() );
@@ -100,10 +102,12 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         promote.setOnAction( this::promoteLibrary );
         manage.setOnAction( this::manageLibrary );
         versionMenu.setOnAction( this::versionLibrary );
+        refresh.setOnAction( e -> refreshView() );
 
         contextMenu.getItems().addAll( saveLibrary, new SeparatorMenuItem(), lockLibrary, unlockLibrary );
         contextMenu.getItems().addAll( new SeparatorMenuItem(), projectAdd, projectRemove );
         contextMenu.getItems().addAll( new SeparatorMenuItem(), manage, promote, versionMenu );
+        contextMenu.getItems().addAll( new SeparatorMenuItem(), refresh );
         setContextMenu( contextMenu );
 
         // Set style listener (css class)
@@ -125,6 +129,10 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     private void configureManageMenu(RepositoryManager repoMgr) {
         manage.getItems().add( new MenuItem( ManageLibraryTask.LOCAL_REPO ) );
         repoMgr.listRemoteRepositories().forEach( r -> manage.getItems().add( new MenuItem( r.getId() ) ) );
+    }
+
+    private void refreshView() {
+        controller.refresh();
     }
 
     private void addToProject(ActionEvent e) {
@@ -184,6 +192,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
             new ManageLibraryTask( repoId, lib, new RepositoryResultHandler( mainController ), mainController ).go();
         }
 
+        // FIXME - repository view does not show the new library
         // TODO - include namespace compatibility in isEnabled and present reason if appropriate
     }
 

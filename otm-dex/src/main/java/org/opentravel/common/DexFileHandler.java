@@ -67,7 +67,7 @@ public class DexFileHandler extends AbstractMainWindowController {
         File initialDirectory = settings.getLastProjectFolder();
 
         // Let user choose a file
-        FileChooserDelegate chooser = newFileChooser( "Import from OTP", initialDirectory, OTP_EXTENSION_FILTER,
+        FileChooserDelegate chooser = newFileChooser( "Open", initialDirectory, OTP_EXTENSION_FILTER,
             OTR_EXTENSION_FILTER, OTM_EXTENSION_FILTER, ALL_EXTENSION_FILTER );
         File selectedFile = chooser.showOpenDialog( stage );
 

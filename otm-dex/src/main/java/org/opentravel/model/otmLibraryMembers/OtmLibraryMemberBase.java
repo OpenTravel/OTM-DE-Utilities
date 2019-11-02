@@ -121,7 +121,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     /**
      */
     @Override
-    public Collection<OtmTypeProvider> getChildrenTypeProviders() {
+    public synchronized Collection<OtmTypeProvider> getChildrenTypeProviders() {
         List<OtmObject> kids = new ArrayList<>( getChildren() );
         if (!kids.isEmpty()) {
             List<OtmTypeProvider> pChildren = new ArrayList<>();
@@ -137,7 +137,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     /**
      */
     @Override
-    public Collection<OtmTypeProvider> getDescendantsTypeProviders() {
+    public synchronized Collection<OtmTypeProvider> getDescendantsTypeProviders() {
         if (membersProviders == null)
             if (getChildrenTypeProviders() != null) {
                 membersProviders = new ArrayList<>();
@@ -152,7 +152,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     @Override
-    public Collection<OtmChildrenOwner> getDescendantsChildrenOwners() {
+    public synchronized Collection<OtmChildrenOwner> getDescendantsChildrenOwners() {
         List<OtmObject> children = new ArrayList<>( getChildren() );
         List<OtmChildrenOwner> owners = new ArrayList<>();
         for (OtmObject child : children) {
@@ -166,7 +166,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     @Override
-    public Collection<OtmTypeUser> getDescendantsTypeUsers() {
+    public synchronized Collection<OtmTypeUser> getDescendantsTypeUsers() {
         memberTypeUsers.clear();
         List<OtmObject> children = new ArrayList<>( getChildren() );
         for (OtmObject child : children) {

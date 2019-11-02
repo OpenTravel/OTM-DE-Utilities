@@ -161,7 +161,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
 
             // create cells for libraries in a namespace. Latest at top, older ones under it.
             for (String baseNS : modelMgr.getBaseNamespaces()) {
-                // log.debug( "Posting base namespace: " + baseNS );
+                log.debug( "Posting base namespace: " + baseNS );
                 TreeItem<LibraryDAO> latestItem = null;
                 OtmLibrary latest = null;
                 Set<OtmLibrary> libs = modelMgr.getLibraryChain( baseNS );

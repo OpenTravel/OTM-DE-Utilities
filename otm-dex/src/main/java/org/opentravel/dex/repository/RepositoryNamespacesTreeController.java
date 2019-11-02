@@ -209,7 +209,7 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
         if (repository == null)
             return;
         if (postedData == repository) {
-            log.debug( "Just apply filters." );
+            log.debug( "Skipping posting repository namespaces - Just apply filters." );
             updateTree();
             return;
         }

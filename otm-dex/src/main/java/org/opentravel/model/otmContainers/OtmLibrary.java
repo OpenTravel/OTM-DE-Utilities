@@ -272,9 +272,10 @@ public class OtmLibrary {
     public ProjectItem getProjectItem() {
         ProjectItem pi = null;
         OtmProject project = getManagingProject();
-        for (ProjectItem candidate : project.getTL().getProjectItems())
-            if (getProjectItems().contains( candidate ))
-                pi = candidate;
+        if (project != null)
+            for (ProjectItem candidate : project.getTL().getProjectItems())
+                if (getProjectItems().contains( candidate ))
+                    pi = candidate;
         return pi;
     }
 

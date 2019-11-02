@@ -65,6 +65,7 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
     MenuItem promoteLibrary;
     MenuItem addToProject;
     MenuItem browser;
+    MenuItem refresh = new MenuItem( "Refresh" );
 
     private DexMainController mainController;
 
@@ -78,7 +79,7 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
         promoteLibrary = new MenuItem( "Promote (Future)" );
         addToProject = new MenuItem( "Add To Project" );
         browser = new MenuItem( "Preview in Browser" );
-        contextMenu.getItems().addAll( unlockLibrary, promoteLibrary, addToProject, browser );
+        contextMenu.getItems().addAll( unlockLibrary, promoteLibrary, addToProject, browser, refresh );
         // contextMenu.getItems().addAll(lockLibrary, unlockLibrary, promoteLibrary);
         setContextMenu( contextMenu );
 
@@ -88,6 +89,7 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
         promoteLibrary.setOnAction( this::promoteLibraryEventHandler );
         addToProject.setOnAction( this::addToProject );
         browser.setOnAction( this::previewInBrowser );
+        refresh.setOnAction( e -> refreshView() );
 
         // // Set editable style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
@@ -98,6 +100,10 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
             WebViewDialogController wvdc = WebViewDialogController.init();
             wvdc.show( controller.getSelectedItem().getRepositoryURL() );
         }
+    }
+
+    private void refreshView() {
+        controller.refresh();
     }
 
     private void addToProject(ActionEvent e) {

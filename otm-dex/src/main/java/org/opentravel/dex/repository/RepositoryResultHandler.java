@@ -35,7 +35,7 @@ import javafx.concurrent.WorkerStateEvent;
 public class RepositoryResultHandler implements TaskResultHandlerI {
     private static Log log = LogFactory.getLog( RepositoryResultHandler.class );
     private static final String TITLE = "Repository Error";
-    private DexMainController parentController;
+    private DexMainController mainController;
 
     /**
      * When task is complete, post dialog box with any warnings or errors and refresh parent controller.
@@ -43,19 +43,19 @@ public class RepositoryResultHandler implements TaskResultHandlerI {
      * @param parentController
      */
     public RepositoryResultHandler(DexMainController parentController) {
-        this.parentController = parentController;
+        this.mainController = parentController;
     }
 
     @Override
     public void handleTaskComplete(WorkerStateEvent event) {
-        DialogBoxContoller dbc = DialogBoxContoller.init();
         if (event != null && event.getTarget() instanceof Task) {
             Object data = ((Task<?>) event.getTarget()).getValue();
             if (data instanceof String && (!((String) data).isEmpty())) {
+                DialogBoxContoller dbc = DialogBoxContoller.init();
                 if (dbc != null)
                     dbc.show( TITLE, (String) data );
             }
-            parentController.refresh();
+            mainController.refresh();
         } else {
             log.warn( "Invalid event in result handler." );
         }
