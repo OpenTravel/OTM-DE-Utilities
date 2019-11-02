@@ -168,14 +168,21 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
      */
     private void promoteLibrary(ActionEvent e) {
         OtmLibrary lib = getSelected();
-        log.debug( "Promote " + lib + " in Row Factory.  " + controller.getSelectedItem().getValue().hashCode() );
+        if (lib != null) {
+            log.debug( "Promote " + lib + " in Row Factory.  " + controller.getSelectedItem().getValue().hashCode() );
+            TLLibraryStatus targetStatus = null;
+            if (e.getTarget() == finalState)
+                targetStatus = TLLibraryStatus.FINAL;
+            else if (e.getTarget() == obsolete)
+                targetStatus = TLLibraryStatus.OBSOLETE;
+            else if (e.getTarget() == underReview)
+                targetStatus = TLLibraryStatus.UNDER_REVIEW;
 
-        e.getSource();
-        if (e.getTarget() == finalState || e.getTarget() == obsolete || e.getTarget() == underReview) {
-            if (lib != null)
-                log.debug( "Set to final" );
-            new PromoteLibraryTask( lib, new RepositoryResultHandler( mainController ), statusController, controller,
-                modelManager ).go();
+            if (PromoteLibraryTask.isEnabled( lib, targetStatus ))
+                new PromoteLibraryTask( lib, new RepositoryResultHandler( mainController ), statusController,
+                    controller, modelManager ).go();
+            else
+                postReason( "Can not promote library.", PromoteLibraryTask.getReason( lib, targetStatus ) );
         }
     }
 
@@ -184,16 +191,28 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
      */
     private void manageLibrary(ActionEvent e) {
         OtmLibrary lib = getSelected();
-        log.debug( "manage " + lib + " in Row Factory.  " + controller.getSelectedItem().getValue().hashCode() );
+        if (lib != null) {
+            log.debug( "manage " + lib + " in Row Factory.  " + controller.getSelectedItem().getValue() );
 
-        e.getSource();
-        if (e.getTarget() instanceof MenuItem) {
-            String repoId = ((MenuItem) e.getTarget()).getText();
-            new ManageLibraryTask( repoId, lib, new RepositoryResultHandler( mainController ), mainController ).go();
+            if (ManageLibraryTask.isEnabled( lib )) {
+                e.getSource();
+                if (e.getTarget() instanceof MenuItem) {
+                    String repoId = ((MenuItem) e.getTarget()).getText();
+                    new ManageLibraryTask( repoId, lib, new RepositoryResultHandler( mainController ), mainController )
+                        .go();
+                }
+            } else {
+                postReason( "Can not manage library.", ManageLibraryTask.getReason( lib ) );
+            }
         }
-
         // FIXME - repository view does not show the new library
         // TODO - include namespace compatibility in isEnabled and present reason if appropriate
+    }
+
+    private void postReason(String action, String reason) {
+        DialogBoxContoller dbc = DialogBoxContoller.init();
+        if (dbc != null)
+            dbc.show( action, reason );
     }
 
     /**
@@ -215,12 +234,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
                 new VersionLibraryTask( type, lib, new RepositoryResultHandler( mainController ), statusController,
                     controller, modelManager ).go();
         } else {
-            // POST Warning on why
-            log.debug( "TODO" );
-            DialogBoxContoller dbc = DialogBoxContoller.init();
-            if (dbc != null)
-                dbc.show( "Can not version library.", VersionLibraryTask.getReason( lib ) );
-
+            postReason( "Can not version library.", VersionLibraryTask.getReason( lib ) );
         }
     }
 

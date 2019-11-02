@@ -87,6 +87,8 @@ public class ManageLibraryTask extends DexTaskBase<OtmLibrary> {
             errorMsg = "This type of library can't be versioned.";
         else if (lib.getState() != RepositoryItemState.UNMANAGED)
             errorMsg = "State is already managed. " + lib;
+        else if (lib.getModelManager().getManagingProject( lib ) == null)
+            errorMsg = "Managing project for the library is missing.";
 
         // else if (lib.getStatus() != TLLibraryStatus.FINAL)
         // errorMsg = "Status is not final. " + lib;
@@ -131,7 +133,8 @@ public class ManageLibraryTask extends DexTaskBase<OtmLibrary> {
             ProjectManager pm = proj.getTL().getProjectManager();
             ProjectItem item = library.getProjectItem();
             pm.publish( item, repository );
-        }
+        } else
+            throw new RepositoryException( "Missing project, repository or library information." );
     }
 
 }

@@ -43,6 +43,7 @@ public class PromoteLibraryTask extends DexTaskBase<OtmLibrary> {
     private DexIncludedController<?> eventController;
     private OtmProject proj = null;
     private OtmLibrary library = null;
+    private static String errorMsg;
 
     /**
      * Create a lock library task.
@@ -70,24 +71,30 @@ public class PromoteLibraryTask extends DexTaskBase<OtmLibrary> {
     }
 
     public static boolean isEnabled(OtmLibrary lib, TLLibraryStatus targetStatus) {
+        errorMsg = null;
         if (lib == null)
-            return false;
+            errorMsg = "Library is missing.";
+        else {
+            // Check state and status
+            if (targetStatus == TLLibraryStatus.OBSOLETE) {
+                if (lib.getState() != RepositoryItemState.MANAGED_WIP || lib.getStatus() != TLLibraryStatus.DRAFT)
+                    errorMsg = "Library is obsolete.";
+            } else if (lib.getState() != RepositoryItemState.MANAGED_UNLOCKED)
+                errorMsg = "Library is not managed and unlocked.";
 
-        // Check state and status
-        if (targetStatus == TLLibraryStatus.OBSOLETE) {
-            if (lib.getState() != RepositoryItemState.MANAGED_WIP || lib.getStatus() != TLLibraryStatus.DRAFT)
-                return false;
-        } else if (lib.getState() != RepositoryItemState.MANAGED_UNLOCKED)
-            return false;
+            ProjectItem pi = lib.getProjectItem();
+            if (!(pi instanceof RepositoryItem))
+                errorMsg = "Project item is not a repository item.";
+            if (pi != null && pi.getStatus().nextStatus() != targetStatus)
+                errorMsg = "Library is not ready to promote to " + targetStatus.toString();
+        }
+        return errorMsg == null;
+    }
 
-        ProjectItem pi = lib.getProjectItem();
-        if (!(pi instanceof RepositoryItem))
-            return false;
-
-        if (pi.getStatus().nextStatus() != targetStatus)
-            return false;
-
-        return true;
+    public static String getReason(OtmLibrary library, TLLibraryStatus targetStatus) {
+        if (errorMsg == null)
+            isEnabled( library, targetStatus );
+        return errorMsg;
     }
 
     @Override
