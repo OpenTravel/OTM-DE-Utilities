@@ -263,8 +263,12 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     private void propertySelectionListener(TreeItem<PropertiesDAO> item) {
         if (item == null || item.getValue() == null || item.getValue().getValue() == null)
             return;
-        OtmObject obj = item.getValue().getValue();
-        DexActionManager actionManager = obj.getActionManager();
+        OtmObject obj = null;
+        DexActionManager actionManager = null;
+        if (item.getValue().getValue() instanceof OtmObject) {
+            obj = item.getValue().getValue();
+            actionManager = obj.getActionManager();
+        }
         if (actionManager != null) {
             nameCol.setEditable( actionManager.isEnabled( DexActions.NAMECHANGE, obj ) );
             descCol.setEditable( actionManager.isEnabled( DexActions.DESCRIPTIONCHANGE, obj ) );
@@ -275,15 +279,19 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
             exampleCol.setEditable( actionManager.isEnabled( DexActions.EXAMPLECHANGE, obj ) );
             deprecatedCol.setEditable( actionManager.isEnabled( DexActions.DEPRECATIONCHANGE, obj ) );
         } else {
-            nameCol.setEditable( false );
-            descCol.setEditable( false );
-            typeCol.setEditable( false );
-            roleCol.setEditable( false );
-            minCol.setEditable( false );
-            maxCol.setEditable( false );
-            exampleCol.setEditable( false );
-            deprecatedCol.setEditable( false );
+            disableEditing();
         }
+    }
+
+    private void disableEditing() {
+        nameCol.setEditable( false );
+        descCol.setEditable( false );
+        typeCol.setEditable( false );
+        roleCol.setEditable( false );
+        minCol.setEditable( false );
+        maxCol.setEditable( false );
+        exampleCol.setEditable( false );
+        deprecatedCol.setEditable( false );
     }
 
     @Override

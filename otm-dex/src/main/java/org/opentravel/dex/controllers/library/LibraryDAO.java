@@ -24,6 +24,7 @@ import org.opentravel.model.otmContainers.OtmLibrary;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -72,12 +73,24 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
 
     public StringProperty nameProperty() {
         StringProperty np = new SimpleStringProperty( library.getName() );
-        np.addListener( (o, v, n) -> log.debug( "Name change request: " + n ) );
+        np.addListener( (o, v, n) -> {
+            log.debug( "Name change request: " + n );
+            library.getTL().setName( n );
+        } );
         return np;
     }
 
     public StringProperty namespaceProperty() {
-        return new SimpleStringProperty( library.getTL().getNamespace() );
+        StringProperty sp;
+        if (library.isEditable())
+            sp = new SimpleStringProperty( library.getTL().getNamespace() );
+        else
+            sp = new ReadOnlyStringWrapper( library.getTL().getNamespace() );
+        sp.addListener( (o, v, n) -> {
+            log.debug( "Namespace change request: " + n );
+            library.getTL().setNamespace( n );
+        } );
+        return sp;
     }
 
     public StringProperty prefixProperty() {

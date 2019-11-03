@@ -453,6 +453,13 @@ public class OtmLibrary {
 
     }
 
+    /**
+     * @return
+     */
+    public boolean isUnmanaged() {
+        return getState() == RepositoryItemState.UNMANAGED;
+    }
+
 
 
 }

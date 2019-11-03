@@ -36,6 +36,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.SortType;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -61,33 +62,85 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     private static final String READONLYLABEL = "Read-only";
     private static final String PROJECTSLABEL = "Projects";
 
-    @FXML
-    private TreeTableView<LibraryDAO> librariesTreeTable;
-    @FXML
-    private VBox libraries;
-
-    private TreeItem<LibraryDAO> root; // Root of the tree.
-    private boolean ignoreEvents = false;
-    private boolean editableOnlyFilter = false;
-
     // All event types fired by this controller.
     private static final EventType[] publishedEvents = {DexLibrarySelectionEvent.LIBRARY_SELECTED};
-
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
         {DexLibrarySelectionEvent.LIBRARY_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
 
+    @FXML
+    private TreeTableView<LibraryDAO> librariesTreeTable;
+    @FXML
+    private VBox libraries;
+    private TreeItem<LibraryDAO> root; // Root of the tree.
+
+    private boolean ignoreEvents = false;
+
+    private boolean editableOnlyFilter = false;
+
     // Editable Columns
     TreeTableColumn<LibraryDAO,String> nameColumn;
 
+    private boolean ignore = false;
+
+    private TreeTableColumn<LibraryDAO,String> namespaceColumn;
+
     public LibrariesTreeTableController() {
         super( subscribedEvents, publishedEvents );
+    }
+
+    //
+    // Create columns
+    //
+    private void buildColumns() {
+        TreeTableColumn<LibraryDAO,String> prefixColumn =
+            createStringColumn( PREFIXCOLUMNLABEL, "prefix", true, false, true, 0 );
+        nameColumn = createStringColumn( NAMELABEL, "name", true, true, true, 200 );
+        namespaceColumn = createStringColumn( NAMESPACELABEL, "namespace", true, true, true, 250 );
+
+        TreeTableColumn<LibraryDAO,String> versionColumn =
+            createStringColumn( VERSIONLABEL, "version", true, false, true, 0 );
+        TreeTableColumn<LibraryDAO,String> statusColumn =
+            createStringColumn( STATUSLABEL, "status", true, false, true, 0 );
+        TreeTableColumn<LibraryDAO,String> stateColumn =
+            createStringColumn( STATELABEL, "state", true, false, true, 150 );
+        TreeTableColumn<LibraryDAO,String> editColumn =
+            createStringColumn( EDITABLELABEL, "edit", true, false, true, 0 );
+        TreeTableColumn<LibraryDAO,String> lockedColumn =
+            createStringColumn( LOCKEDLABEL, "locked", true, false, true, 0 );
+        TreeTableColumn<LibraryDAO,String> projectsColumn =
+            createStringColumn( PROJECTSLABEL, "projects", true, false, true, 0 );
+        TreeTableColumn<LibraryDAO,Boolean> readonlyColumn = new TreeTableColumn<>( READONLYLABEL );
+        readonlyColumn.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,Boolean>( "readonly" ) );
+
+        TreeTableColumn<LibraryDAO,Integer> refColumn = new TreeTableColumn<>( REFERENCELABEL );
+        refColumn.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,Integer>( "reference" ) );
+        refColumn.setPrefWidth( 100 );
+
+        librariesTreeTable.getColumns().addAll( nameColumn, prefixColumn, namespaceColumn, versionColumn, statusColumn,
+            stateColumn, lockedColumn, projectsColumn, refColumn, readonlyColumn, editColumn );
+
+        // Start out sorted on names
+        nameColumn.setSortType( SortType.ASCENDING );
+        librariesTreeTable.getSortOrder().add( nameColumn );
     }
 
     @Override
     public void checkNodes() {
         if (!(librariesTreeTable instanceof TreeTableView))
             throw new IllegalStateException( "Library tree table controller not injected by FXML." );
+    }
+
+    /**
+     * {@inheritDoc} Remove all items from the member tree.
+     */
+    @Override
+    public void clear() {
+        if (librariesTreeTable.getSelectionModel() != null)
+            librariesTreeTable.getSelectionModel().clearSelection();
+
+        if (librariesTreeTable.getRoot() != null)
+            librariesTreeTable.getRoot().getChildren().clear();
     }
 
     @Override
@@ -99,11 +152,12 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         configure( postedData, false );
     }
 
+
     /**
      * Configuration for non-main controllers. Call after init() and before posting content.
      * 
      * @param parent
-     * @param editableOnly
+     * @param editableOnly filter setting
      */
     public void configure(OtmModelManager modelManager, boolean editableOnly) {
         if (modelManager != null)
@@ -133,14 +187,81 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         // log.debug( "Configured Libraries Tree Table." );
     }
 
-    public void setSelectionListener(ChangeListener<TreeItem<LibraryDAO>> listener) {
-        librariesTreeTable.getSelectionModel().selectedItemProperty().addListener( listener );
+    /**
+     * Create a treeTableColumn for a String and set properties.
+     * 
+     * @return
+     */
+    private TreeTableColumn<LibraryDAO,String> createStringColumn(String label, String propertyName, boolean visable,
+        boolean editable, boolean sortable, int width) {
+        TreeTableColumn<LibraryDAO,String> c = new TreeTableColumn<>( label );
+        c.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,String>( propertyName ) );
+        setColumnProps( c, visable, editable, sortable, width );
+        if (editable)
+            c.setCellFactory( TextFieldTreeTableCell.forTreeTableColumn() );
+        return c;
     }
 
-    public void setOnMouseClicked(EventHandler<? super MouseEvent> handler) {
-        librariesTreeTable.setOnMouseClicked( handler );
+    /**
+     * @return
+     */
+    public LibraryDAO getSelectedItem() {
+        return librariesTreeTable.getSelectionModel().getSelectedItem() != null
+            ? librariesTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
     }
 
+    @Override
+    public void handleEvent(AbstractOtmEvent event) {
+        if (event instanceof DexLibrarySelectionEvent)
+            handleLibrarySelection( ((DexLibrarySelectionEvent) event) );
+        if (event instanceof DexModelChangeEvent)
+            post( ((DexModelChangeEvent) event).getModelManager() );
+    }
+
+    public void handleLibrarySelection(DexLibrarySelectionEvent event) {
+        // Do NOT respond to filter or other library selection.
+        // If this is enabled, guard against indexOutOfBounds exceptions
+        //
+        // OtmLibrary selectedLib = event.getLibrary();
+        // if (selectedLib != null) {
+        // // log.debug("Library selection Listener: " + selectedLib.getName());
+        // for (TreeItem<LibraryDAO> item : librariesTreeTable.getRoot().getChildren())
+        // if (item.getValue().getValue() == selectedLib) {
+        // ignore = true;
+        // librariesTreeTable.getSelectionModel().select( item );
+        // ignore = false;
+        // }
+        // } else {
+        // librariesTreeTable.getSelectionModel().clearSelection();
+        // }
+    }
+
+    /**
+     * Listener for selected library members.
+     *
+     * @param item
+     */
+    private void librarySelectionListener(TreeItem<LibraryDAO> item) {
+        if (item == null || item.getValue() == null || item.getValue().getValue() == null)
+            return;
+
+        OtmLibrary lib = null;
+        if (item.getValue().getValue() instanceof OtmLibrary) {
+            lib = item.getValue().getValue();
+        }
+        setEditing( lib != null && lib.isEditable() && lib.isUnmanaged() );
+        String cd = namespaceColumn.getCellData( item );
+
+        if (!ignore)
+            libraries.fireEvent( new DexLibrarySelectionEvent( libraries, item ) );
+    }
+
+    private void setEditing(boolean editable) {
+        nameColumn.setEditable( editable );
+        namespaceColumn.setEditable( editable );
+        log.debug( "Namespace column editability: " + namespaceColumn.isEditable() );
+        log.debug( "Set editing to: " + editable + " at table is editable?" + librariesTreeTable.isEditable() );
+    }
 
     /**
      * Get the library members from the model manager and put them into a cleared tree.
@@ -188,99 +309,6 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         post( postedData );
     }
 
-    private boolean ignore = false;
-
-    @Override
-    public void handleEvent(AbstractOtmEvent event) {
-        if (event instanceof DexLibrarySelectionEvent)
-            handleLibrarySelection( ((DexLibrarySelectionEvent) event) );
-        if (event instanceof DexModelChangeEvent)
-            post( ((DexModelChangeEvent) event).getModelManager() );
-    }
-
-    public void handleLibrarySelection(DexLibrarySelectionEvent event) {
-        // Do NOT respond to filter or other library selection.
-        // If this is enabled, guard against indexOutOfBounds exceptions
-        //
-        // OtmLibrary selectedLib = event.getLibrary();
-        // if (selectedLib != null) {
-        // // log.debug("Library selection Listener: " + selectedLib.getName());
-        // for (TreeItem<LibraryDAO> item : librariesTreeTable.getRoot().getChildren())
-        // if (item.getValue().getValue() == selectedLib) {
-        // ignore = true;
-        // librariesTreeTable.getSelectionModel().select( item );
-        // ignore = false;
-        // }
-        // } else {
-        // librariesTreeTable.getSelectionModel().clearSelection();
-        // }
-    }
-
-    /**
-     * Listener for selected library members.
-     *
-     * @param item
-     */
-    private void librarySelectionListener(TreeItem<LibraryDAO> item) {
-        if (item == null || item.getValue() == null || item.getValue().getValue() == null)
-            return;
-
-        // log.debug( "Selection Listener: " + item.getValue().getValue().getName() );
-        // nameColumn.setEditable( true );
-
-        if (!ignore)
-            libraries.fireEvent( new DexLibrarySelectionEvent( libraries, item ) );
-    }
-
-    //
-    // Create columns
-    //
-    private void buildColumns() {
-        TreeTableColumn<LibraryDAO,String> prefixColumn =
-            createStringColumn( PREFIXCOLUMNLABEL, "prefix", true, false, true, 0 );
-        nameColumn = createStringColumn( NAMELABEL, "name", true, true, true, 200 );
-        TreeTableColumn<LibraryDAO,String> namespaceColumn =
-            createStringColumn( NAMESPACELABEL, "namespace", true, true, true, 250 );
-        TreeTableColumn<LibraryDAO,String> versionColumn =
-            createStringColumn( VERSIONLABEL, "version", true, false, true, 0 );
-        TreeTableColumn<LibraryDAO,String> statusColumn =
-            createStringColumn( STATUSLABEL, "status", true, false, true, 0 );
-        TreeTableColumn<LibraryDAO,String> stateColumn =
-            createStringColumn( STATELABEL, "state", true, false, true, 150 );
-        TreeTableColumn<LibraryDAO,String> editColumn =
-            createStringColumn( EDITABLELABEL, "edit", true, false, true, 0 );
-        TreeTableColumn<LibraryDAO,String> lockedColumn =
-            createStringColumn( LOCKEDLABEL, "locked", true, false, true, 0 );
-        TreeTableColumn<LibraryDAO,String> projectsColumn =
-            createStringColumn( PROJECTSLABEL, "projects", true, false, true, 0 );
-        TreeTableColumn<LibraryDAO,Boolean> readonlyColumn = new TreeTableColumn<>( READONLYLABEL );
-        readonlyColumn.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,Boolean>( "readonly" ) );
-
-        TreeTableColumn<LibraryDAO,Integer> refColumn = new TreeTableColumn<>( REFERENCELABEL );
-        refColumn.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,Integer>( "reference" ) );
-        refColumn.setPrefWidth( 100 );
-
-        librariesTreeTable.getColumns().addAll( nameColumn, prefixColumn, namespaceColumn, versionColumn, statusColumn,
-            stateColumn, lockedColumn, projectsColumn, refColumn, readonlyColumn, editColumn );
-
-        // Start out sorted on names
-        nameColumn.setSortType( SortType.ASCENDING );
-        librariesTreeTable.getSortOrder().add( nameColumn );
-    }
-
-    /**
-     * Create a treeTableColumn for a String and set properties.
-     * 
-     * @return
-     */
-    private TreeTableColumn<LibraryDAO,String> createStringColumn(String label, String propertyName, boolean visable,
-        boolean editable, boolean sortable, int width) {
-        TreeTableColumn<LibraryDAO,String> c = new TreeTableColumn<>( label );
-        c.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,String>( propertyName ) );
-        setColumnProps( c, visable, editable, sortable, width );
-        return c;
-    }
-
     // /**
     // * TreeItem class does not extend the Node class.
     // *
@@ -302,24 +330,12 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     // return null;
     // }
 
-    /**
-     * {@inheritDoc} Remove all items from the member tree.
-     */
-    @Override
-    public void clear() {
-        if (librariesTreeTable.getSelectionModel() != null)
-            librariesTreeTable.getSelectionModel().clearSelection();
-
-        if (librariesTreeTable.getRoot() != null)
-            librariesTreeTable.getRoot().getChildren().clear();
+    public void setOnMouseClicked(EventHandler<? super MouseEvent> handler) {
+        librariesTreeTable.setOnMouseClicked( handler );
     }
 
-    /**
-     * @return
-     */
-    public LibraryDAO getSelectedItem() {
-        return librariesTreeTable.getSelectionModel().getSelectedItem() != null
-            ? librariesTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
+    public void setSelectionListener(ChangeListener<TreeItem<LibraryDAO>> listener) {
+        librariesTreeTable.getSelectionModel().selectedItemProperty().addListener( listener );
     }
 
 }
