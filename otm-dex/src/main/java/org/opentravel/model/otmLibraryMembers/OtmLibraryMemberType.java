@@ -17,6 +17,9 @@
 package org.opentravel.model.otmLibraryMembers;
 
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmFacets.OtmChoiceFacet;
+import org.opentravel.model.otmFacets.OtmCustomFacet;
+import org.opentravel.model.otmFacets.OtmQueryFacet;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -31,6 +34,9 @@ public enum OtmLibraryMemberType {
     ENUMERATIONOPEN("Open Enumeration", OtmEnumerationOpen.class),
     ENUMERATIONCLOSED("Closed Enumeration", OtmEnumerationClosed.class),
     RESOURCE("Resource", OtmResource.class),
+    CHOICEFACET("Choice Facet", OtmChoiceFacet.class),
+    CUSTOM("Custom Facet", OtmCustomFacet.class),
+    QUERY("Query Facet", OtmQueryFacet.class),
     SERVICE("Service", OtmServiceObject.class);
 
     private final String label;

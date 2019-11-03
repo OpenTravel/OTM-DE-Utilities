@@ -246,11 +246,9 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
             return;
 
         OtmLibrary lib = null;
-        if (item.getValue().getValue() instanceof OtmLibrary) {
+        if (item.getValue().getValue() instanceof OtmLibrary)
             lib = item.getValue().getValue();
-        }
         setEditing( lib != null && lib.isEditable() && lib.isUnmanaged() );
-        String cd = namespaceColumn.getCellData( item );
 
         if (!ignore)
             libraries.fireEvent( new DexLibrarySelectionEvent( libraries, item ) );

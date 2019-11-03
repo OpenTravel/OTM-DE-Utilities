@@ -22,6 +22,7 @@ import org.opentravel.dex.action.manager.DexWizardActionManager;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.MemberDetailsPopupController;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
@@ -72,6 +73,10 @@ public class NewLibraryMemberAction extends DexRunAction {
                 // If the subject is editable, use it to set initial library - user may change it
                 if (otm.getLibrary() != null && otm.getLibrary().isEditable())
                     otm.getLibrary().add( member );
+
+                // If it is a contextual facet, try to set the base type
+                if (member instanceof OtmContextualFacet)
+                    ((OtmContextualFacet) member).setBaseType( otm );
 
                 // If in gui thread, Let user set library and other details
                 if (Platform.isFxApplicationThread()) {

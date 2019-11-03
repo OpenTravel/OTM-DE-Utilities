@@ -265,10 +265,13 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     @Override
     public boolean isValid(boolean force) {
         if (force) {
-            getChildren().forEach( c -> {
-                if (c != this)
-                    c.isValid( force );
-            } );
+            synchronized (this) {
+                getChildren().forEach( c -> {
+                    if (c != this)
+                        c.isValid( force );
+                } );
+
+            }
             // TODO - how to prevent loops?
             // new ValidateModelManagerItemsTask( getModelManager(), null, null );
             // getWhereUsed().forEach( m -> {

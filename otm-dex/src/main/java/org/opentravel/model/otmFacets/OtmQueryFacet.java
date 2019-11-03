@@ -16,8 +16,6 @@
 
 package org.opentravel.model.otmFacets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
@@ -30,7 +28,7 @@ import org.opentravel.schemacompiler.model.TLFacetType;
  * 
  */
 public class OtmQueryFacet extends OtmContextualFacet {
-    private static Log log = LogFactory.getLog( OtmQueryFacet.class );
+    // private static Log log = LogFactory.getLog( OtmQueryFacet.class );
 
     /**
      */
@@ -42,10 +40,10 @@ public class OtmQueryFacet extends OtmContextualFacet {
                 "Tried to create query facet from wrong facet type: " + tl.getFacetType() );
     }
 
-    @Override
-    public String setName(String text) {
-        // TODO Auto-generated method stub
-        return null;
+    public OtmQueryFacet(String name, OtmModelManager manager) {
+        super( new TLContextualFacet(), manager );
+        setName( name );
+        getTL().setFacetType( TLFacetType.QUERY );
     }
 
 }

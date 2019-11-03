@@ -80,9 +80,11 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
         return np;
     }
 
+    // Question - Why use ReadOnly when it doesn't seem to matter if the property is readonly or not.
+    // Must be tested in controller.
     public StringProperty namespaceProperty() {
         StringProperty sp;
-        if (library.isEditable())
+        if (library.isEditable() && library.isUnmanaged())
             sp = new SimpleStringProperty( library.getTL().getNamespace() );
         else
             sp = new ReadOnlyStringWrapper( library.getTL().getNamespace() );

@@ -363,7 +363,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
             sFindings = TLModelCompileValidator.validateModelElement( tl, deep );
         } catch (Exception e) {
             sFindings = null;
-            log.debug( "Validation threw error: " + e.getLocalizedMessage() );
+            log.debug( "Validation on " + tl.getValidationIdentity() + " threw error: " + e.getLocalizedMessage() );
         }
         // log.debug(sFindings != null ? sFindings.count() + " sFindings found" : " null" + " findings found.");
         return sFindings;
@@ -429,7 +429,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         if (isInherited())
             return null;
 
-        isValid();
+        // isValid();
         if (findings != null) {
             if (findings.hasFinding( FindingType.ERROR ))
                 return ImageManager.get( ImageManager.Icons.V_ERROR );

@@ -292,6 +292,8 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
      * See if the model manager has the owning entity by name. If so, create and set contributed facet.
      */
     private void findWhereContributed() {
+        if (getTL().getOwningEntityName() == null)
+            return;
         if (!getTL().getOwningEntityName().isEmpty()) {
             OtmLibraryMember candidate = mgr.getMember( getTL().getOwningEntityName() );
             if (candidate != null && candidate.getTL() instanceof TLFacetOwner) {
@@ -346,6 +348,12 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         }
         // Where used
         return getBaseType();
+    }
+
+    @Override
+    public String setName(String name) {
+        getTL().setName( name );
+        return getTL().getName();
     }
 
 }
