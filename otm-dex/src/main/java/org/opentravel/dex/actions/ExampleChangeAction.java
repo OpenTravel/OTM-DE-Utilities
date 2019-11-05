@@ -24,7 +24,8 @@ public class ExampleChangeAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
-        if (subject.isEditable() && subject.getTL() instanceof TLExampleOwner && subject instanceof OtmTypeUser)
+        if (subject instanceof OtmTypeUser && subject.isEditable() && subject.getTL() instanceof TLExampleOwner
+            && ((OtmTypeUser) subject).getAssignedType() != null)
             return !((OtmTypeUser) subject).getAssignedType().isNameControlled();
         return false;
     }

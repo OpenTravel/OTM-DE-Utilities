@@ -100,7 +100,7 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
     }
 
     public StringProperty stateProperty() {
-        return new SimpleStringProperty( library.getStateName() );
+        return new SimpleStringProperty( library.getState().toString() );
     }
 
     public IntegerProperty referenceProperty() {
@@ -108,7 +108,7 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
     }
 
     public StringProperty statusProperty() {
-        return new SimpleStringProperty( library.getStatus().name() );
+        return new SimpleStringProperty( library.getStatus().toString() );
     }
 
     public StringProperty lockedProperty() {

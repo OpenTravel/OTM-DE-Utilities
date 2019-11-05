@@ -16,6 +16,7 @@
 
 package org.opentravel.dex.actions;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
@@ -23,19 +24,27 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.action.manager.DexFullActionManager;
+import org.opentravel.dex.tasks.model.TypeResolverTask;
+import org.opentravel.dex.tasks.model.ValidateModelManagerItemsTask;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
+import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
+import org.opentravel.model.otmLibraryMembers.TestCore;
+import org.opentravel.model.otmLibraryMembers.TestLibraryMemberBase;
 import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Verifies the functions of the <code>delete library member action</code> class.
@@ -65,6 +74,117 @@ public class TestDeleteLibraryMemberAction {
 
     }
 
+    // TODO Re-factor this to have the action take place on a passed in type provider, then use library members and
+    // descendant
+    // type providers
+    @Test
+    public void testWhereUsed() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
+        NoSuchMethodException, InvocationTargetException {
+        // Givens
+        DexFullActionManager fullMgr = new DexFullActionManager( null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, null );
+        OtmLibrary lib = TestLibrary.buildOtm( mgr );
+        assertTrue( "Given", lib.isEditable() );
+
+        // Given a simple type
+        // OtmSimpleObject simple = TestOtmSimple.buildOtm( lib );
+        OtmCore simple = TestCore.buildOtm( lib );
+        // assertTrue( "Given", simple.isValid() );
+        assertTrue( simple.getWhereUsed().isEmpty() );
+        assertTrue( simple.getActionManager() instanceof DexFullActionManager );
+
+        // Given one of each library member type in the library
+        TestLibraryMemberBase.buildOneOfEachWithProperties( mgr, lib );
+
+        // Assign everything to simple
+        List<OtmTypeUser> users = new ArrayList<>();
+        for (OtmLibraryMember lm : mgr.getMembers())
+            for (OtmTypeUser user : lm.getDescendantsTypeUsers()) {
+                OtmTypeProvider u = user.setAssignedType( simple );
+                if (u == simple)
+                    users.add( user );
+            }
+        assertFalse( simple.getWhereUsed().isEmpty() );
+        List<OtmLibraryMember> userOwners = simple.getWhereUsed();
+        assertFalse( users.isEmpty() );
+        // FIXME - many, many duplicates in whereUsed list
+
+        // When - run create action to delete simple.
+        int queueSize = fullMgr.getQueueSize();
+        simple.getActionManager().run( DexActions.DELETELIBRARYMEMBER, simple );
+        assertTrue( "Then - queue size increased.", ++queueSize == fullMgr.getQueueSize() );
+        assertTrue( simple.getLibrary() == null );
+        assertTrue( !mgr.contains( simple ) );
+
+        // OtmTypeProvider type = null;
+        // boolean valid;
+        // Then - check type users and make sure they are invalid and the type has no library
+        for (OtmTypeUser user : users) {
+            // type = user.getAssignedType();
+            assertTrue( user.getAssignedType() != null );
+            assertTrue( user.getAssignedType().getLibrary() == null );
+
+            // assertFalse( user.isValid() );
+            // log.debug( "Type user " + user + " is valid? " + user.isValid() );
+        }
+
+        userOwners = simple.getWhereUsed();
+        assertTrue( "Can no longer get the full manager from object.", simple.getActionManager() != fullMgr );
+
+        // Then - make sure where used is the same and type resolver did not change it
+        assertTrue( simple.getWhereUsed() == userOwners );
+        TypeResolverTask.runResolver( mgr );
+        assertTrue( simple.getWhereUsed() == userOwners );
+
+        //
+        // When - undo action
+        //
+        fullMgr.undo();
+        assertTrue( "Then - queue size dicreased.", --queueSize == fullMgr.getQueueSize() );
+
+        // Then - type resolver will force change in whereUsed list
+        assertTrue( simple.getWhereUsed() == userOwners );
+        TypeResolverTask.runResolver( mgr );
+        ValidateModelManagerItemsTask.runValidator( mgr );
+        assertFalse( simple.getWhereUsed() == userOwners );
+        // Then - Check list contents to verify resolver restored the contents correctly
+        for (OtmLibraryMember owner : userOwners)
+            assertTrue( simple.getWhereUsed().contains( owner ) );
+        for (OtmLibraryMember owner : simple.getWhereUsed())
+            assertTrue( userOwners.contains( owner ) );
+
+        // Then - check type users and make sure they are valid and the type has library
+        for (OtmTypeUser user : users) {
+            // type = user.getAssignedType();
+            assertTrue( user.getAssignedType() == simple );
+            assertTrue( user.getAssignedType().getLibrary() != null );
+
+            // log.debug( "Findings on " + user + " = " + ValidationUtils.getMessagesAsString( user.getFindings() ) );
+            // valid = user.isValid();
+            // log.debug( "Findings on " + user + " = "
+            // + ValidationUtils.getMessagesAsString( OtmModelElement.isValid( user.getTL() ) ) );
+            // assertTrue( user.isValid() );
+            // log.debug( "Type user " + user + " is valid? " + user.isValid() );
+        }
+
+
+        log.debug( "Test delete and undelete done." );
+    }
+
+    @Test
+    public void testWhereExtended() {
+        // Givens
+        DexFullActionManager fullMgr = new DexFullActionManager( null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, null );
+        OtmLibrary lib = TestLibrary.buildOtm( mgr );
+        assertTrue( "Given", lib.isEditable() );
+
+        // Given one of each library member type in the library
+        TestLibrary.addOneOfEach( lib );
+
+        boolean valid = lib.isValid();
+        assertTrue( valid );
+    }
 
     @Test
     public void testMultipleMembers() {
@@ -113,7 +233,7 @@ public class TestDeleteLibraryMemberAction {
         for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
             OtmLibraryMember member = OtmLibraryMemberType.buildMember( type, "Object" + i++, mgr );
             lib.add( member );
-            mgr.add( member );
+            // mgr.add( member );
         }
 
         i = fullMgr.getQueueSize();

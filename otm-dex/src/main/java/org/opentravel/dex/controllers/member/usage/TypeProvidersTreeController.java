@@ -202,7 +202,7 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
+        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
@@ -272,7 +272,7 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
         if (member == null)
             return;
 
-        log.debug( "Posting type providers to: " + member );
+        // log.debug( "Posting type providers to: " + member );
         // TODO - organize by namespace then object
         member.getUsedTypes().forEach( u -> {
             TreeItem<MemberAndProvidersDAO> item = new TreeItem<>( new MemberAndProvidersDAO( u ) );

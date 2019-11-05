@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package org.opentravel.common;
+package org.opentravel.model;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.model.OtmModelElement;
-import org.opentravel.model.OtmObject;
-import org.opentravel.model.OtmTypeProvider;
-import org.opentravel.model.OtmTypeUser;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLModelElement;

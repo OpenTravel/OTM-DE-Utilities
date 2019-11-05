@@ -24,11 +24,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmPropertyOwner;
+import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
+import org.opentravel.model.otmFacets.OtmListFacet;
+import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
 import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 /**
  * test class the otm library member base class.
@@ -55,7 +64,7 @@ public class TestLibraryMemberBase {
         OtmLibrary lib = mgr.add( new TLLibrary() );
 
         for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
-            OtmLibraryMember member = OtmLibraryMemberType.buildMember( type, "Test", mgr );
+            OtmLibraryMember member = OtmLibraryMemberType.buildMember( type, "Test" + type.toString(), mgr );
 
             // When added
             lib.add( member );
@@ -64,15 +73,43 @@ public class TestLibraryMemberBase {
             // assertTrue(lib.contains( member ));
             assertTrue( mgr.contains( member.getTlLM() ) );
 
-            // When deleted
-            lib.remove( member );
-            mgr.remove( member );
+            // When removed -- NO ACTION
+            lib.remove( member ); // No-op
+            mgr.remove( member ); // Removes from map not TL
             assertFalse( mgr.contains( member.getTlLM() ) );
             assertFalse( mgr.getMembers().contains( member ) );
 
             log.debug( "Added and removed: " + member );
         }
     }
+
+    // @Test
+    // public void testAddAndDelete() throws ExceptionInInitializerError, InstantiationException,
+    // IllegalAccessException,
+    // NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
+    // OtmModelManager mgr = new OtmModelManager( null, null );
+    // OtmLibrary lib = mgr.add( new TLLibrary() );
+    //
+    // for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
+    // OtmLibraryMember member = OtmLibraryMemberType.buildMember( type, "Test" + type.toString(), mgr );
+    //
+    // // When added
+    // lib.add( member );
+    // // Then - add works
+    // // assertTrue(lib.contains( member ));
+    // assertTrue( mgr.contains( member.getTlLM() ) );
+    // assertTrue( mgr.getMembers().contains( member ) );
+    // assertTrue( lib.getTL().getNamedMembers().contains( member.getTL() ) );
+    //
+    // // When deleted
+    // lib.delete( member );
+    // assertFalse( mgr.contains( member.getTlLM() ) );
+    // assertFalse( mgr.getMembers().contains( member ) );
+    // assertFalse( lib.getTL().getNamedMembers().contains( member.getTL() ) );
+    //
+    // log.debug( "Added and removed: " + member );
+    // }
+    // }
 
     @Test
     public void testEnumFactory() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
@@ -94,6 +131,89 @@ public class TestLibraryMemberBase {
             assertTrue( !label.isEmpty() );
             log.debug( "Label for " + member.getClass().getSimpleName() + " is " + label );
         }
-
     }
+
+    @Test
+    public void getPropertiesWhereUsed() {
+        DexFullActionManager fullMgr = new DexFullActionManager( null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, null );
+        OtmLibrary lib = TestLibrary.buildOtm( mgr );
+        // buildOneOfEachWithProperties( mgr, lib );
+        assertTrue( "Given", lib.isEditable() );
+
+        // Create a core and assign to elements in a BO
+        OtmCore core = TestCore.buildOtm( mgr, "TestCore" );
+        OtmBusinessObject bo = TestBusiness.buildOtm( mgr, "TestBo" );
+        lib.add( core );
+        lib.add( bo );
+
+        for (OtmTypeUser user : bo.getDescendantsTypeUsers())
+            user.setAssignedType( core );
+        assertTrue( "Given", core.getWhereUsed().contains( bo ) );
+
+        Map<OtmTypeUser,OtmTypeProvider> properties = core.getPropertiesWhereUsed();
+        assertTrue( "Must have type user properties.", !properties.isEmpty() );
+    }
+
+    @Test
+    public void testOneOfEachWithProperties() {
+        // Givens
+        DexFullActionManager fullMgr = new DexFullActionManager( null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, null );
+        OtmLibrary lib = TestLibrary.buildOtm( mgr );
+        assertTrue( "Given", lib.isEditable() );
+
+        buildOneOfEachWithProperties( mgr, lib );
+
+        for (OtmLibraryMember lm : mgr.getMembers()) {
+            if (lm instanceof OtmResource)
+                continue;
+            if (lm instanceof OtmServiceObject)
+                continue;
+            if (lm instanceof OtmValueWithAttributes)
+                continue; // Should the facets be children?
+            if (lm instanceof OtmContextualFacet)
+                continue;
+            if (lm instanceof OtmSimpleObjects)
+                continue;
+
+            assertTrue( "Must have children", !lm.getChildren().isEmpty() );
+            for (OtmObject child : lm.getChildren()) {
+                if (child instanceof OtmListFacet)
+                    continue;
+                if (child instanceof OtmPropertyOwner)
+                    assertTrue( "Property owers must have children.",
+                        !((OtmPropertyOwner) child).getChildren().isEmpty() );
+            }
+        }
+    }
+
+    /**
+     * Create one of each library member and give each property owner one of each property.
+     * 
+     * @param mgr
+     * @param lib
+     */
+    public static void buildOneOfEachWithProperties(OtmModelManager mgr, OtmLibrary lib) {
+        // Givens
+        assertTrue( "Given", lib.isEditable() );
+        assertTrue( "Given", mgr != null );
+
+        // Build one of each library member type
+        TestLibrary.addOneOfEach( lib );
+        // assertTrue( "Given", lib.isValid() );
+        assertTrue( "Given", !mgr.getMembers().isEmpty() );
+
+        // Given all property owners have children
+        for (OtmLibraryMember lm : mgr.getMembers()) {
+            if (lm instanceof OtmPropertyOwner)
+                TestOtmPropertiesBase.buildOneOfEach2( (OtmPropertyOwner) lm );
+
+            for (OtmObject child : lm.getChildren())
+                if (child instanceof OtmPropertyOwner)
+                    TestOtmPropertiesBase.buildOneOfEach2( (OtmPropertyOwner) child );
+        }
+        // assertTrue( "Given", lib.isValid() );
+    }
+
 }

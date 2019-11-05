@@ -46,7 +46,9 @@ import org.opentravel.schemacompiler.model.TLModelElement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -137,7 +139,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     /**
      */
     @Override
-    public synchronized Collection<OtmTypeProvider> getDescendantsTypeProviders() {
+    public synchronized List<OtmTypeProvider> getDescendantsTypeProviders() {
         if (membersProviders == null)
             if (getChildrenTypeProviders() != null) {
                 membersProviders = new ArrayList<>();
@@ -286,13 +288,14 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     public OtmLibrary getLibrary() {
         if (mgr == null)
             return null;
-        // AbstractLibrary absLib = getTlLM().getOwningLibrary();
-        return getTlLM() != null ? mgr.get( getTlLM().getOwningLibrary() ) : null;
+        // Deleted members will have the tl library removed
+        return getTlLM() != null && getTlLM().getOwningLibrary() != null ? mgr.get( getTlLM().getOwningLibrary() )
+            : null;
     }
 
     @Override
     public String getLibraryName() {
-        return getTlLM().getOwningLibrary() != null ? getTlLM().getOwningLibrary().getName() : "";
+        return getTlLM() != null && getTlLM().getOwningLibrary() != null ? getTlLM().getOwningLibrary().getName() : "";
     }
 
     @Override
@@ -374,12 +377,24 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     @Override
+    public Map<OtmTypeUser,OtmTypeProvider> getPropertiesWhereUsed() {
+        Map<OtmTypeUser,OtmTypeProvider> users = new HashMap<>();
+        List<OtmTypeProvider> thisProviders = getDescendantsTypeProviders();
+        // List<OtmTypeUser> users = new ArrayList<>();
+        for (OtmLibraryMember owner : getWhereUsed())
+            for (OtmTypeUser user : owner.getDescendantsTypeUsers())
+                if (user.getAssignedType() == this || thisProviders.contains( user.getAssignedType() ))
+                    users.put( user, user.getAssignedType() );
+        return users;
+    }
+
+    @Override
     public void changeWhereUsed(OtmLibraryMember oldUser, OtmLibraryMember newUser) {
         if (whereUsed == null)
             whereUsed = new ArrayList<>();
         if (oldUser != null)
             whereUsed.remove( oldUser );
-        if (newUser != null)
+        if (newUser != null && !whereUsed.contains( newUser ))
             whereUsed.add( newUser );
     }
 

@@ -17,10 +17,12 @@
 package org.opentravel.model.otmLibraryMembers;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.otmLibraryMembers.OtmEnumerationOpen;
+import org.opentravel.model.otmProperties.OtmPropertyFactory;
 import org.opentravel.schemacompiler.model.TLEnumValue;
 import org.opentravel.schemacompiler.model.TLOpenEnumeration;
 
@@ -43,6 +45,15 @@ public class TestEnumerationOpen extends TestOtmLibraryMemberBase<OtmEnumeration
         OtmEnumerationOpen oto = new OtmEnumerationOpen( buildTL(), mgr );
         assertNotNull( oto );
         return oto;
+    }
+
+    @Test
+    public void testAddingValues() {
+        OtmPropertyFactory.create( getTLEnumValue( "oe1" ), (OtmEnumerationOpen) subject );
+        OtmPropertyFactory.create( getTLEnumValue( "oe2" ), (OtmEnumerationOpen) subject );
+        OtmPropertyFactory.create( getTLEnumValue( "oe3" ), (OtmEnumerationOpen) subject );
+
+        assertTrue( !subject.getChildren().isEmpty() );
     }
 
     public static TLOpenEnumeration buildTL() {

@@ -16,6 +16,7 @@
 
 package org.opentravel.model.otmContainers;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
@@ -24,10 +25,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
+import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
+import org.opentravel.model.otmLibraryMembers.TestCore;
+import org.opentravel.model.otmProperties.OtmElement;
+import org.opentravel.model.otmProperties.TestElement;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
 
@@ -60,25 +66,65 @@ public class TestLibrary {
         // OtmLibrary lib2 = TestLibrary.buildOtm( mgr, "Namespace2", "p2", "Library2" );
     }
 
+    // TODO - test facet set/un-set as assigned type
     @Test
-    public void testAddandDeleteAllMembers() {
+    public void testWhereUsedWhenDeleted() {
         // Given - a library
         DexFullActionManager fullMgr = new DexFullActionManager( null );
         OtmModelManager mgr = new OtmModelManager( fullMgr, null );
         OtmLibrary lib = TestLibrary.buildOtm( mgr, "Namespace1", "p1", "Library1" );
-        int startMemberCount = mgr.getMembers().size();
-
         addOneOfEach( lib );
-        assertTrue( "Model must have more members.", mgr.getMembers().size() > startMemberCount );
-        ArrayList<OtmLibraryMember> members = new ArrayList<>( mgr.getMembers() );
-        for (OtmLibraryMember member : members) {
-            // log.debug( "Deleting member " + member );
-            lib.delete( member );
-        }
 
-        assertTrue( "Model must have original count of members.", mgr.getMembers().size() == startMemberCount );
+        // Given an element to set and un-set assigned type
+        OtmCore core = TestCore.buildOtm( mgr, "TestCore" );
+        OtmElement<?> element = TestElement.buildOtm( core.getSummary() );
+
+        ArrayList<OtmLibraryMember> members = new ArrayList<>( mgr.getMembers() );
+        OtmTypeProvider a;
+        for (OtmLibraryMember member : members) {
+            assertTrue( member.getWhereUsed().isEmpty() );
+            if (member instanceof OtmTypeProvider) {
+
+                // When assigned as type
+                a = element.setAssignedType( (OtmTypeProvider) member );
+                // Not all members can be assigned
+                if (a == member)
+                    assertTrue( member.getWhereUsed().contains( core ) );
+
+            }
+            lib.delete( member );
+            // This is OK. Needed for un-delete
+            if (!member.getWhereUsed().isEmpty())
+                log.debug( "Where used lists deleted member " + member );
+        }
     }
 
+    @Test
+    public void testAddAndDelete() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
+        NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
+        OtmModelManager mgr = new OtmModelManager( null, null );
+        OtmLibrary lib = mgr.add( new TLLibrary() );
+
+        for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
+            OtmLibraryMember member = OtmLibraryMemberType.buildMember( type, "Test" + type.toString(), mgr );
+
+            // When added
+            lib.add( member );
+            // Then - add works
+            // assertTrue(lib.contains( member ));
+            assertTrue( mgr.contains( member.getTlLM() ) );
+            assertTrue( mgr.getMembers().contains( member ) );
+            assertTrue( lib.getTL().getNamedMembers().contains( member.getTL() ) );
+
+            // When deleted
+            lib.delete( member );
+            assertFalse( mgr.contains( member.getTlLM() ) );
+            assertFalse( mgr.getMembers().contains( member ) );
+            assertFalse( lib.getTL().getNamedMembers().contains( member.getTL() ) );
+
+            log.debug( "Added and removed: " + member );
+        }
+    }
 
     @Test
     public void testVersionFromNS() throws VersionSchemeException {

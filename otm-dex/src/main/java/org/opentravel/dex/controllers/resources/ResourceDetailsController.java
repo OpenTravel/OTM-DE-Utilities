@@ -118,7 +118,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        log.debug( "Event received: " + event.getClass().getSimpleName() );
+        // log.debug( "Event received: " + event.getClass().getSimpleName() );
         if (event instanceof DexMemberSelectionEvent)
             handleEvent( (DexMemberSelectionEvent) event );
         else if (event instanceof DexResourceChildSelectionEvent)
@@ -167,7 +167,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     }
 
     public void post(OtmResource resource) {
-        log.debug( "Posting " + resource );
+        // log.debug( "Posting " + resource );
         if (resource == null) {
             clear();
             return;

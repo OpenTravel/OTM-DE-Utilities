@@ -143,7 +143,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        log.debug( "Received event: " + event.getClass().getSimpleName() );
+        // log.debug( "Received event: " + event.getClass().getSimpleName() );
         if (event instanceof DexMemberSelectionEvent)
             memberSelectionHandler( (DexMemberSelectionEvent) event );
         if (event instanceof DexModelChangeEvent)

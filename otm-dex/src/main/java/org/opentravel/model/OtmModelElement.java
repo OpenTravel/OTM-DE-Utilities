@@ -227,8 +227,9 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     @Override
     public ValidationFindings getFindings() {
-        if (findings == null)
-            isValid( true );
+        // return isValid( getTL() );
+        // if (findings == null)
+        isValid( true );
         return findings;
     }
 

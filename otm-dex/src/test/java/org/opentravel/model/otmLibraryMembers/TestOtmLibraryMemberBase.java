@@ -16,7 +16,6 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -39,8 +38,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
- * Base test class for all otm objects. Implementations must provide their own static, type specific, buildOtm() and
- * buildTL() methods.
+ * Abstract base test class for all otm objects. Implementations must provide their own static, type specific,
+ * buildOtm() and buildTL() methods.
  * <p>
  * If <i>subject</i> is set in the before class, the following will be automatically run:
  * <ul>
@@ -53,6 +52,8 @@ import java.util.List;
  * Sub-types that do not conform to the tests, should override the test method.
  * <p>
  * Sub-types should test their own facets.
+ * 
+ * @see TestLibraryMemberBase - actual tests on the base classs
  */
 public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
 
@@ -91,39 +92,6 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
         log.debug( "Constuctor OK." );
     }
 
-    @Test
-    public void testAddAndRemove() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
-        NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
-        OtmModelManager mgr = new OtmModelManager( null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
-
-        for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
-            OtmLibraryMember member = OtmLibraryMemberType.buildMember( type, "Test", mgr );
-
-            // When added
-            lib.add( member );
-            mgr.add( member );
-            // Then - add works
-            // assertTrue(lib.contains( member ));
-            assertTrue( mgr.contains( member.getTlLM() ) );
-
-            // When deleted
-            lib.delete( member );
-            assertFalse( mgr.contains( member.getTlLM() ) );
-            assertFalse( mgr.getMembers().contains( member ) );
-
-            log.debug( "Added and removed: " + member );
-        }
-    }
-
-    @Test
-    public void testEnumFactory() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
-        NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
-        for (OtmLibraryMemberType lmType : OtmLibraryMemberType.values()) {
-            OtmLibraryMember member = OtmLibraryMemberType.buildMember( lmType, "Hi", staticModelManager );
-            assertNotNull( member );
-        }
-    }
 
     @Test
     public void testBaseType() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,

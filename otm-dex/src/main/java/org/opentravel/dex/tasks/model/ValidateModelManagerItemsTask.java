@@ -63,4 +63,13 @@ public class ValidateModelManagerItemsTask extends DexTaskBase<OtmModelManager> 
         members.forEach( m -> m.isValid( true ) );
     }
 
+    /**
+     * Static version of validation logic
+     * 
+     * @param manager
+     */
+    public static void runValidator(OtmModelManager manager) {
+        Collection<OtmLibraryMember> members = new ArrayList<>( manager.getMembers() );
+        members.forEach( m -> m.isValid( true ) );
+    }
 }

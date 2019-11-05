@@ -98,7 +98,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         TLLibrary tlLib = new TLLibrary();
         OtmLibrary lib = modelMgr.add( tlLib );
         // OtmLibrary lib = new OtmLibrary( tlLib, modelMgr );
-        log.debug( "Status = " + lib.getStatus() + "  State = " + lib.getStateName() );
+        log.debug( "Status = " + lib.getStatus() + "  State = " + lib.getState() );
         // Need to add to an editable library
         assertTrue( lib.getStatus() == TLLibraryStatus.DRAFT && lib.getState() == RepositoryItemState.MANAGED_WIP
             || lib.getState() == RepositoryItemState.UNMANAGED );

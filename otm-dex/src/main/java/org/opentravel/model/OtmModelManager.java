@@ -420,11 +420,18 @@ public class OtmModelManager implements TaskResultHandlerI {
         // log.debug( "Cleared model. " + tlModel.getAllLibraries().size() );
     }
 
-    public List<OtmLibraryMember> findUsersOf(OtmTypeProvider p) {
-        List<OtmLibraryMember> values = new ArrayList<>( members.values() );
+    /**
+     * Examine all members. Return list of owners that have a of a descendant type user that is assigned to provider.
+     * 
+     * @param provider
+     * @return
+     */
+    public List<OtmLibraryMember> findUsersOf(OtmTypeProvider provider) {
+        // Changed 11/5/2019 - why copy list? The list is not changing.
+        // List<OtmLibraryMember> values = new ArrayList<>( members.values() );
         List<OtmLibraryMember> users = new ArrayList<>();
-        for (OtmLibraryMember m : values) {
-            if (m.getUsedTypes().contains( p ))
+        for (OtmLibraryMember m : members.values()) {
+            if (m.getUsedTypes().contains( provider ))
                 users.add( m );
         }
         // if (!users.isEmpty())
@@ -619,7 +626,13 @@ public class OtmModelManager implements TaskResultHandlerI {
     @Override
     public void handleTaskComplete(WorkerStateEvent event) {
         // NO-OP
-        log.debug( "Task complete" );
+        if (event != null && event.getTarget() != null) {
+            if (event.getTarget() instanceof TypeResolverTask)
+                log.debug( "Type Resolver Task complete" );
+            else if (event.getTarget() instanceof ValidateModelManagerItemsTask)
+                log.debug( "Validation Task complete" );
+        } else
+            log.debug( "Task complete" );
     }
 
     /**

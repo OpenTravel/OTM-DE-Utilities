@@ -21,12 +21,14 @@ import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLAlias;
 import org.opentravel.schemacompiler.model.TLFacet;
 
 import java.util.List;
+import java.util.Map;
 
 import javafx.beans.property.StringProperty;
 
@@ -150,6 +152,13 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      * @return facet or null
      */
     OtmFacet<TLFacet> getFacet(OtmFacet<TLFacet> facet);
+
+    /**
+     * Get the actual type users that use this library member or descendants as assigned type.
+     * 
+     * @return new map of user -> provider
+     */
+    Map<OtmTypeUser,OtmTypeProvider> getPropertiesWhereUsed();
 
 
 

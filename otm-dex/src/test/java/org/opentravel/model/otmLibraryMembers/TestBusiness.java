@@ -58,6 +58,13 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
     }
 
     /** ****************************************************** **/
+    /**
+     * Build business object with attribute and element in ID and Summary facets.
+     * 
+     * @param mgr
+     * @param name
+     * @return
+     */
     public static OtmBusinessObject buildOtm(OtmModelManager mgr, String name) {
         BoName = name;
         return buildOtm( mgr );

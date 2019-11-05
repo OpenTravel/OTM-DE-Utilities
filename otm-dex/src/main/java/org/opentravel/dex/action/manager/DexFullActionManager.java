@@ -62,7 +62,7 @@ public class DexFullActionManager extends DexActionManagerBase {
                 // log.debug( "Method " + action.toString() + " isEnabled invoke result: " + result );
             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException e) {
-                log.error( "Could not invoke action.isEnabled( ):" + e.getMessage() );
+                log.error( "Could not invoke " + action.actionClass() + ".isEnabled( ): " + e.getMessage() );
             }
         return result;
     }

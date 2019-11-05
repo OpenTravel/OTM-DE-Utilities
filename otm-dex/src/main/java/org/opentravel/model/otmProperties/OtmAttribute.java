@@ -20,10 +20,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
-import org.opentravel.common.OtmTypeUserUtils;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.OtmTypeUserUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeType;
@@ -141,6 +141,7 @@ public class OtmAttribute<T extends TLAttribute> extends OtmPropertyBase<TLAttri
             setAssignedTLType( (TLAttributeType) type.getTL() );
             type.getOwningMember().changeWhereUsed( null, getOwningMember() );
         }
+        log.debug( "Set assigned type " + getAssignedType() + " to " + this );
         return getAssignedType();
     }
 

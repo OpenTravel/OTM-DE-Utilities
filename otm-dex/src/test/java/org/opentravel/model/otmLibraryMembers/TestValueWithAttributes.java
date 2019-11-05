@@ -20,6 +20,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.schemacompiler.model.TLAttribute;
@@ -42,6 +43,10 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
         baseObject.setName( "BaseVWA" );
     }
 
+    @Test
+    public void testDescendentsTypeUsers() {
+
+    }
 
     /** ****************************************************** **/
 

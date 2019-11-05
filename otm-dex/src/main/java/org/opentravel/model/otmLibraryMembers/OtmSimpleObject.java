@@ -20,11 +20,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
-import org.opentravel.common.OtmTypeUserUtils;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.OtmTypeUserUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAttributeType;
 import org.opentravel.schemacompiler.model.TLPropertyType;
@@ -116,13 +116,15 @@ public class OtmSimpleObject extends OtmSimpleObjects<TLSimple> implements OtmTy
 
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
-        OtmLibraryMember oldUser = getAssignedType().getOwningMember();
-        if (type != null && type.getTL() instanceof TLAttributeType)
+        OtmLibraryMember oldUser = null;
+        if (getAssignedType() != null)
+            oldUser = getAssignedType().getOwningMember();
+        if (type != null && type.getTL() instanceof TLAttributeType) {
             setAssignedTLType( (TLAttributeType) type.getTL() );
 
-        // add to type's typeUsers
-        type.getOwningMember().changeWhereUsed( oldUser, getOwningMember() );
-
+            // add to type's typeUsers
+            type.getOwningMember().changeWhereUsed( oldUser, getOwningMember() );
+        }
         return getAssignedType();
     }
 

@@ -123,7 +123,7 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        log.debug( "event handler" );
+        // log.debug( "event handler" );
         if (event instanceof DexRepositorySelectionEvent)
             handleEvent( (DexRepositorySelectionEvent) event );
         if (event instanceof DexRepositoryItemReplacedEvent)
@@ -132,7 +132,7 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
 
     private void handleEvent(DexRepositorySelectionEvent event) {
         event.getRepository();
-        log.debug( "Repository selection changed." );
+        // log.debug( "Repository selection changed." );
         clear();
         try {
             post( event.getRepository() );
@@ -143,41 +143,12 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
     }
 
     private void handleEvent(DexRepositoryItemReplacedEvent event) {
-        log.debug( "Repository item replaced handler" );
+        // log.debug( "Repository item replaced handler" );
         RepositoryItem oldItem = event.getOldItem();
         RepositoryItem newItem = event.getNewItem();
         if (oldItem == null || newItem == null || oldItem == newItem)
             return;
 
-        // // Get a list of all the DAOs
-        // if (namespaceList == null)
-        // namespaceList = new ArrayList<>();
-        // else
-        // namespaceList.clear();
-        // getNamespaces(null);
-        //
-        // // Find the DAO for the oldItem
-        // if (!namespaceList.isEmpty())
-        // for (NamespacesDAO ns : namespaceList) {
-        // if (ns.contains(oldItem)) {
-        // ns.replace(oldItem, newItem);
-        // log.debug("Replaced repository item." + oldItem.hashCode() + " " + newItem.hashCode());
-        // // Sleep for a second to let other controller respond then update the ns selection
-        // Task<Void> task = new Task<Void>() {
-        // @Override
-        // public Void call() throws Exception {
-        // Thread.sleep(3000);
-        // Platform.runLater(() -> tree.fireEvent(new DexRepositoryNamespaceSelectionEvent(this, ns)));
-        // return null;
-        // }
-        // };
-        // Thread th = new Thread(task);
-        // th.setDaemon(true);
-        // th.start();
-        //
-        // // tree.fireEvent(new DexRepositoryNamespaceSelectionEvent(this, ns));
-        // }
-        // }
         repositoryNamespacesTree.getRoot().getChildren().clear(); // protected on refresh, force re-read of repo
         refresh();
     }
@@ -199,22 +170,17 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
         }
     }
 
-    // /**
-    // * Post the contents from the repository into the tree.
-    // *
-    // * @param repository
-    // */
     @Override
     public void post(Repository repository) throws Exception {
         if (repository == null)
             return;
         if (postedData == repository) {
-            log.debug( "Skipping posting repository namespaces - Just apply filters." );
+            // log.debug( "Skipping posting repository namespaces - Just apply filters." );
             updateTree();
             return;
         }
         super.post( repository ); // clear view and hold onto repo
-        log.debug( "Post namespaces in the repository: " + repository.getDisplayName() );
+        // log.debug( "Post namespaces in the repository: " + repository.getDisplayName() );
         root = repositoryNamespacesTree.getRoot();
 
         mainController.postStatus( "Loading root namespaces" );

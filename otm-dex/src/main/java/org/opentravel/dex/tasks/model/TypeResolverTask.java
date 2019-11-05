@@ -24,7 +24,6 @@ import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberBase;
-import org.opentravel.schemacompiler.repository.RepositoryException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,8 +34,6 @@ import java.util.Collection;
  * @author dmh
  *
  */
-// FIXME - will get concurrent modification error if the model is closed before validation is finsihed
-//
 public class TypeResolverTask extends DexTaskBase<OtmModelManager> {
     private static Log log = LogFactory.getLog( TypeResolverTask.class );
 
@@ -59,11 +56,21 @@ public class TypeResolverTask extends DexTaskBase<OtmModelManager> {
     // Make sure only one thread is resolving types at a time
     // To Do - create dispatcher that eliminates multiple simultaneous requests
     @Override
-    public synchronized void doIT() throws RepositoryException {
+    public synchronized void doIT() {
         // Create local copy because other tasks may update
         Collection<OtmLibraryMember> members = new ArrayList<>( taskData.getMembers() );
         // For each member in the model, force a computation of where used.
         members.forEach( m -> ((OtmLibraryMemberBase<?>) m).getWhereUsed( true ) );
     }
 
+    /**
+     * A static version of the task.
+     * 
+     * @param mgr
+     */
+    public static void runResolver(OtmModelManager mgr) {
+        Collection<OtmLibraryMember> members = new ArrayList<>( mgr.getMembers() );
+        // For each member in the model, force a computation of where used.
+        members.forEach( m -> ((OtmLibraryMemberBase<?>) m).getWhereUsed( true ) );
+    }
 }

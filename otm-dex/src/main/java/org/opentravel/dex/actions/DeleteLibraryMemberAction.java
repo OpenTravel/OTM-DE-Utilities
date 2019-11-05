@@ -19,11 +19,16 @@ package org.opentravel.dex.actions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
+
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * This action deletes a library member.
@@ -46,7 +51,7 @@ public class DeleteLibraryMemberAction extends DexRunAction {
     // Contextual facets need the name of the contributed owner
     private String deletedMemberName = "";
     private OtmLibrary memberLibrary = null;
-
+    private Map<OtmTypeUser,OtmTypeProvider> typeUsers = null;
 
     public DeleteLibraryMemberAction() {
         // Constructor for reflection
@@ -64,6 +69,8 @@ public class DeleteLibraryMemberAction extends DexRunAction {
             deletedMember = (OtmLibraryMember) otm;
             deletedMemberName = otm.getName();
             memberLibrary = otm.getLibrary();
+            typeUsers = ((OtmLibraryMember) otm).getPropertiesWhereUsed();
+
             // Delete from TL library and model manager
             memberLibrary.delete( (OtmLibraryMember) otm );
             log.debug( "Deleted library member: " + deletedMember );
@@ -116,7 +123,7 @@ public class DeleteLibraryMemberAction extends DexRunAction {
 
     @Override
     public OtmLibraryMember undoIt() {
-        // FIXME - on undo, the types assigned to this member are no longer assigned
+        // TESTME - on undo, the types assigned to this member are no longer assigned
         memberLibrary.add( deletedMember );
         // Contextual facets are the only library members that also are children of other members via the
         // contributed facet.
@@ -125,11 +132,11 @@ public class DeleteLibraryMemberAction extends DexRunAction {
             if (contrib != null && contrib.getOwningMember() != null)
                 contrib.getOwningMember().add( contrib );
         }
-        // && ((OtmContextualFacet) deletedMember).getContributedObject() != null)
-        // ((OtmContextualFacet) deletedMember).getContributedObject().add( deletedMember );
 
-        // emberLibrary.add( deletedMember );
-        // contributed facet knows who the old object is
+        // TESTME - assigns to LM even if a descendant was assigned
+        for (Entry<OtmTypeUser,OtmTypeProvider> entry : typeUsers.entrySet())
+            entry.getKey().setAssignedType( entry.getValue() );
+
         log.debug( "Undo delete of " + get() );
         return get();
     }

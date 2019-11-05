@@ -81,22 +81,6 @@ public class OtmLibrary {
     }
 
     /**
-     * Add the project item to the list maintained by the library. Libraries can be members of multiple, open projects.
-     * 
-     * @param pi
-     */
-    public void add(ProjectItem pi) {
-        if (pi.getContent() == null
-            || (!(pi.getNamespace().equals( getTL().getNamespace() ) && pi.getContent().getName().equals( getName() ))))
-
-            // if (pi.getContent() != tlLib)
-            throw new IllegalArgumentException( "Can not add project item with wrong library." );
-        projectItems.add( pi );
-        log.debug( "Added project item to " + this.getName() + ". Now has " + projectItems.size() + " items." );
-    }
-
-
-    /**
      * Add the TL member to the Tl library and model manager.
      * <p>
      * <b>Note:</b> adds member to the model manager. See {@link OtmModelManager#add(OtmLibraryMember)}
@@ -123,34 +107,20 @@ public class OtmLibrary {
         return null;
     }
 
-    /**
-     * No-operation. (see {@link #delete(OtmLibraryMember)}
-     * <p>
-     * Note: This is not implemented because OtmLibrary does not maintain children list. Method is here just to make
-     * finding the right delete method easier
-     * 
-     * @param a library member
-     */
-    public void remove(OtmLibraryMember member) {
-        // No-op
-    }
 
     /**
-     * Delete member. Remove from this library and underlying TL library and from the model manager.
+     * Add the project item to the list maintained by the library. Libraries can be members of multiple, open projects.
+     * 
+     * @param pi
      */
-    public void delete(OtmLibraryMember member) {
-        if (member != null) {
-            if (getTL() != null)
-                getTL().removeNamedMember( member.getTlLM() );
-            if (member.getModelManager() != null)
-                member.getModelManager().remove( member );
-            // Contextual facets are the only library members that also are children of other members via the
-            // contributed facet.
-            if (member instanceof OtmContextualFacet && ((OtmContextualFacet) member).getContributedObject() != null)
-                ((OtmContextualFacet) member).getContributedObject().delete( member );
-            // TODO - what about base types?
-            // TODO - what about where used?
-        }
+    public void add(ProjectItem pi) {
+        if (pi.getContent() == null
+            || (!(pi.getNamespace().equals( getTL().getNamespace() ) && pi.getContent().getName().equals( getName() ))))
+
+            // if (pi.getContent() != tlLib)
+            throw new IllegalArgumentException( "Can not add project item with wrong library." );
+        projectItems.add( pi );
+        log.debug( "Added project item to " + this.getName() + ". Now has " + projectItems.size() + " items." );
     }
 
     /**
@@ -175,6 +145,25 @@ public class OtmLibrary {
             if (pi.getContent() == aLib)
                 return true;
         return false;
+    }
+
+    /**
+     * Delete member. Remove from this library and underlying TL library and from the model manager.
+     */
+    public void delete(OtmLibraryMember member) {
+        if (member != null) {
+            if (member.getModelManager() != null)
+                member.getModelManager().remove( member );
+            // assert (member.getModelManager().getMember( member.getTL() ) == null);
+            if (getTL() != null)
+                getTL().removeNamedMember( member.getTlLM() );
+            // Contextual facets are the only library members that also are children of other members via the
+            // contributed facet.
+            if (member instanceof OtmContextualFacet && ((OtmContextualFacet) member).getContributedObject() != null)
+                ((OtmContextualFacet) member).getContributedObject().delete( member );
+            // TODO - what about base types?
+            // Leave where used. It is needed for un-delete.
+        }
     }
 
     /**
@@ -222,8 +211,42 @@ public class OtmLibrary {
         return "";
     }
 
+    /**
+     * @param namespace
+     * @return the major version number
+     * @throws VersionSchemeException
+     */
+    public int getMajorVersion() throws VersionSchemeException {
+        String versionScheme = getTL().getVersionScheme();
+        VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
+        String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
+        return Integer.valueOf( vScheme.getMajorVersion( versionId ) );
+    }
+
     public OtmProject getManagingProject() {
         return mgr.getManagingProject( this );
+    }
+
+    /**
+     * @param namespace
+     * @return the minor version number
+     * @throws VersionSchemeException
+     */
+    public int getMinorVersion() {
+        int vn = 0;
+        if (getTL().getNamespace() != null) {
+            try {
+                String versionScheme = getTL().getVersionScheme();
+                VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
+                String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
+                vn = Integer.valueOf( vScheme.getMinorVersion( versionId ) );
+            } catch (NumberFormatException e) {
+                log.debug( "Error converting version string." + e.getCause() );
+            } catch (VersionSchemeException e) {
+                log.debug( "Error determining version. " + e.getCause() );
+            }
+        }
+        return vn;
     }
 
     public OtmModelManager getModelManager() {
@@ -243,6 +266,24 @@ public class OtmLibrary {
     }
 
     /**
+     * @see #getManagingProject()
+     * @return the project item for this library in the managing project
+     */
+    public ProjectItem getProjectItem() {
+        ProjectItem pi = null;
+        OtmProject project = getManagingProject();
+        if (project != null)
+            for (ProjectItem candidate : project.getTL().getProjectItems())
+                if (getProjectItems().contains( candidate ))
+                    pi = candidate;
+        return pi;
+    }
+
+    public List<ProjectItem> getProjectItems() {
+        return projectItems;
+    }
+
+    /**
      * Get the name(s) of the project(s) that contain this library.
      * 
      * @return new array of string containing the project names
@@ -259,28 +300,6 @@ public class OtmLibrary {
         if (projectItems != null)
             getProjectNames().forEach( pn -> projects.add( getModelManager().getProject( pn ) ) );
         return projects;
-    }
-
-    public List<ProjectItem> getProjectItems() {
-        return projectItems;
-    }
-
-    /**
-     * @see #getManagingProject()
-     * @return the project item for this library in the managing project
-     */
-    public ProjectItem getProjectItem() {
-        ProjectItem pi = null;
-        OtmProject project = getManagingProject();
-        if (project != null)
-            for (ProjectItem candidate : project.getTL().getProjectItems())
-                if (getProjectItems().contains( candidate ))
-                    pi = candidate;
-        return pi;
-    }
-
-    public void remove(ProjectItem item) {
-        projectItems.remove( item );
     }
 
     /**
@@ -319,11 +338,6 @@ public class OtmLibrary {
         return state;
     }
 
-    public String getStateName() {
-        return getState().toString();
-        // return projectItems.isEmpty() ? "" : getState().toString();
-    }
-
     /**
      * @return actual status of TL Libraries otherwise DRAFT
      */
@@ -336,49 +350,6 @@ public class OtmLibrary {
 
     public AbstractLibrary getTL() {
         return tlLib;
-    }
-
-    /**
-     * @param namespace
-     * @return the major version number
-     * @throws VersionSchemeException
-     */
-    public int getMajorVersion() throws VersionSchemeException {
-        String versionScheme = getTL().getVersionScheme();
-        VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
-        String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
-        return Integer.valueOf( vScheme.getMajorVersion( versionId ) );
-    }
-
-    /**
-     * @param namespace
-     * @return the minor version number
-     * @throws VersionSchemeException
-     */
-    public int getMinorVersion() {
-        int vn = 0;
-        if (getTL().getNamespace() != null) {
-            try {
-                String versionScheme = getTL().getVersionScheme();
-                VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
-                String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
-                vn = Integer.valueOf( vScheme.getMinorVersion( versionId ) );
-            } catch (NumberFormatException e) {
-                log.debug( "Error converting version string." + e.getCause() );
-            } catch (VersionSchemeException e) {
-                log.debug( "Error determining version. " + e.getCause() );
-            }
-        }
-        return vn;
-    }
-
-    public boolean isMinorVersion() {
-        return (getMinorVersion() > 0 && getState() != RepositoryItemState.UNMANAGED);
-    }
-
-    public boolean isValid() {
-        findings = OtmModelElement.isValid( getTL() );
-        return findings == null || findings.isEmpty();
     }
 
     /**
@@ -406,12 +377,36 @@ public class OtmLibrary {
         return mgr.isLatest( this );
     }
 
-    public String toString() {
-        return getNameWithBasenamespace();
+    public boolean isMinorVersion() {
+        return (getMinorVersion() > 0 && getState() != RepositoryItemState.UNMANAGED);
     }
 
-    public void validate() {
-        findings = TLModelCompileValidator.validateModelElement( getTL(), true );
+    /**
+     * @return
+     */
+    public boolean isUnmanaged() {
+        return getState() == RepositoryItemState.UNMANAGED;
+    }
+
+    public boolean isValid() {
+        findings = OtmModelElement.isValid( getTL() );
+        return findings == null || findings.isEmpty();
+    }
+
+    /**
+     * No-operation. (see {@link #delete(OtmLibraryMember)}
+     * <p>
+     * Note: This is not implemented because OtmLibrary does not maintain children list. Method is here just to make
+     * finding the right delete method easier
+     * 
+     * @param a library member
+     */
+    public void remove(OtmLibraryMember member) {
+        // No-op
+    }
+
+    public void remove(ProjectItem item) {
+        projectItems.remove( item );
     }
 
     /**
@@ -428,38 +423,24 @@ public class OtmLibrary {
      */
     public void save(LibraryModelSaver lms) {
         if (getTL() instanceof TLLibrary) {
-            // final StringBuilder successfulSaves = new StringBuilder();
-            // final StringBuilder errorSaves = new StringBuilder();
-            final ValidationFindings findings = new ValidationFindings();
-            // for (final TLLibrary library : toSave) {
-            // final String libraryName = library.getName();
-            // final URL libraryUrl = library.getLibraryUrl();
+            // final ValidationFindings findings = new ValidationFindings();
             try {
-                // LOGGER.debug("Saving library: " + libraryName + " " + libraryUrl);
+                // log.debug("Saving library: " + libraryName + " " + libraryUrl);
                 findings.addAll( lms.saveLibrary( (TLLibrary) getTL() ) );
-                // if (!quiet)
-                // successfulSaves.append("\n").append(libraryName).append(" (").append(libraryUrl).append(")");
             } catch (final LibrarySaveException e) {
                 final Throwable t = e.getCause();
-                // errorSaves.append("\n").append(libraryName).append(" (").append(libraryUrl).append(")").append(" - ")
-                // .append(e.getMessage());
-                // if (t != null && t.getMessage() != null) {
-                // errorSaves.append(" (").append(t.getMessage()).append(")");
                 if (t != null && t.getMessage() != null)
                     log.error( "Save error" + t.getMessage() );
             }
-            // }
         }
-
     }
 
-    /**
-     * @return
-     */
-    public boolean isUnmanaged() {
-        return getState() == RepositoryItemState.UNMANAGED;
+    public String toString() {
+        return getNameWithBasenamespace();
     }
 
-
+    public void validate() {
+        findings = TLModelCompileValidator.validateModelElement( getTL(), true );
+    }
 
 }

@@ -185,7 +185,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
     @Override
     public void handleEvent(AbstractOtmEvent e) {
-        log.debug( "event handler: " + e.getClass().getSimpleName() );
+        // log.debug( "event handler: " + e.getClass().getSimpleName() );
         if (e instanceof DexMemberSelectionEvent)
             handleMemberSelection( (DexMemberSelectionEvent) e );
         if (e instanceof DexModelChangeEvent)

@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.library;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -48,7 +46,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmModelManager> {
-    private static Log log = LogFactory.getLog( LibrariesTreeTableController.class );
+    // private static Log log = LogFactory.getLog( LibrariesTreeTableController.class );
 
     public static final String PREFIXCOLUMNLABEL = "Prefix";
     private static final String NAMELABEL = "Name";
@@ -257,8 +255,8 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     private void setEditing(boolean editable) {
         nameColumn.setEditable( editable );
         namespaceColumn.setEditable( editable );
-        log.debug( "Namespace column editability: " + namespaceColumn.isEditable() );
-        log.debug( "Set editing to: " + editable + " at table is editable?" + librariesTreeTable.isEditable() );
+        // log.debug( "Namespace column editability: " + namespaceColumn.isEditable() );
+        // log.debug( "Set editing to: " + editable + " at table is editable?" + librariesTreeTable.isEditable() );
     }
 
     /**
@@ -280,7 +278,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
 
             // create cells for libraries in a namespace. Latest at top, older ones under it.
             for (String baseNS : modelMgr.getBaseNamespaces()) {
-                log.debug( "Posting base namespace: " + baseNS );
+                // log.debug( "Posting base namespace: " + baseNS );
                 TreeItem<LibraryDAO> latestItem = null;
                 OtmLibrary latest = null;
                 Set<OtmLibrary> libs = modelMgr.getLibraryChain( baseNS );

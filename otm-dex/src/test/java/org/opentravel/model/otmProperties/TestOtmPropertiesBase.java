@@ -255,8 +255,13 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
      * @param owner
      */
     public static void buildOneOfEach2(OtmPropertyOwner owner) {
-        for (OtmPropertyType type : OtmPropertyType.values())
-            OtmPropertyType.build( type, owner );
+        for (OtmPropertyType type : OtmPropertyType.values()) {
+            OtmProperty p = OtmPropertyType.build( type, owner );
+            if (p != null) {
+                p.setName( owner + type.toString() );
+                log.debug( "Created property " + p + " of type " + type.toString() );
+            }
+        }
     }
 
     /**

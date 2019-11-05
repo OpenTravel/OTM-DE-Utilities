@@ -204,7 +204,7 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
      * 
      * @param modelMgr
      */
-    // @Override
+    @Override
     public void post(OtmLibraryMember member) {
         clear();
         if (member != null) {

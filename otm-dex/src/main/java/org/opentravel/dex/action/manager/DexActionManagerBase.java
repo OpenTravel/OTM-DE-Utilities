@@ -342,8 +342,6 @@ public abstract class DexActionManagerBase implements DexActionManager {
             }
         }
         ignore = false;
-
-
     }
 
 }

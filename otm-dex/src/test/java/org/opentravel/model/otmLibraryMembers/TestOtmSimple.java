@@ -21,14 +21,14 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.schemacompiler.model.XSDSimpleType;
-import org.w3._2001.xmlschema.TopLevelSimpleType;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.schemacompiler.model.TLSimple;
 
 /**
  * Verifies the functions of the <code>UserSettings</code> class.
  */
-public class TestXsdSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
-    private static Log log = LogFactory.getLog( TestXsdSimple.class );
+public class TestOtmSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
+    private static Log log = LogFactory.getLog( TestOtmSimple.class );
 
     @BeforeClass
     public static void beforeClass() {
@@ -54,20 +54,33 @@ public class TestXsdSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
 
     /** ****************************************************** **/
 
-    public static OtmXsdSimple buildOtm(OtmModelManager mgr) {
-        OtmXsdSimple simple = new OtmXsdSimple( buildTL(), mgr );
+    public static OtmSimpleObject buildOtm(OtmModelManager mgr) {
+        OtmSimpleObject simple = new OtmSimpleObject( buildTL(), mgr );
+        simple.setAssignedType( TestXsdSimple.buildOtm( mgr ) );
+        return simple;
+    }
+
+    /**
+     * Create a simple object using library's model manager and add to the library.
+     * 
+     * @param lib
+     * @return
+     */
+    public static OtmSimpleObject buildOtm(OtmLibrary lib) {
+        OtmSimpleObject simple = buildOtm( lib.getModelManager() );
+        lib.add( simple );
         return simple;
     }
 
 
     /**
-     * Build an TL xsd simple type named "simpleString".
+     * Build an TL simple type named "Simple".
      * 
      * @return
      */
-    public static XSDSimpleType buildTL() {
-        TopLevelSimpleType jaxbType = null;
-        XSDSimpleType xsdSimple = new XSDSimpleType( "simpleString", jaxbType );
-        return xsdSimple;
+    public static TLSimple buildTL() {
+        TLSimple simple = new TLSimple();
+        simple.setName( "Simple" );
+        return simple;
     }
 }

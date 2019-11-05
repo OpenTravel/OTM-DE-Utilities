@@ -71,10 +71,10 @@ public class OtmBuiltInLibrary extends OtmLibrary {
         return TLLibraryStatus.FINAL;
     }
 
-    @Override
-    public String getStateName() {
-        return "Built in library.";
-    }
+    // @Override
+    // public String getStateName() {
+    // return "Built in library.";
+    // }
 
     @Override
     public String getNameWithBasenamespace() {
