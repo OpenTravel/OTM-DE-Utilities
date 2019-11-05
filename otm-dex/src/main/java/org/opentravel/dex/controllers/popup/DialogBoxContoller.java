@@ -124,6 +124,8 @@ public class DialogBoxContoller extends DexPopupControllerBase {
             log.error( "Error loading dialog box: " + e1.getLocalizedMessage() );
             throw new IllegalStateException( "Error creating dialog box controller." );
         }
+
+        positionStage( dialogStage );
         return controller;
     }
 

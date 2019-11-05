@@ -76,6 +76,18 @@ public class MemberDetailsPopupController extends DexPopupControllerBase {
             throw new IllegalStateException(
                 "Error loading dialog box. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
         }
+
+        positionStage( dialogStage );
+        // // Put the new stage on top of the primary stage
+        // Stage primaryStage = DexMainControllerBase.getStageStatic();
+        // if (primaryStage != null) {
+        // // // Calculate the center position of the parent Stage
+        // double centerXPosition = primaryStage.getX() + primaryStage.getWidth() / 2d;
+        // double centerYPosition = primaryStage.getY() + primaryStage.getHeight() / 2d;
+        // dialogStage.setX( centerXPosition - 400 );
+        // dialogStage.setY( centerYPosition - 150 );
+        // }
+
         return controller;
     }
 

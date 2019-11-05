@@ -62,7 +62,6 @@ public class WebViewDialogController extends DexPopupControllerBase {
             // Create scene and stage
             dialogStage = new Stage();
             dialogStage.setScene( new Scene( pane ) );
-            // dialogStage.initModality( Modality.APPLICATION_MODAL );
             dialogStage.initModality( Modality.NONE );
 
             // get the controller from it.
@@ -73,19 +72,10 @@ public class WebViewDialogController extends DexPopupControllerBase {
             throw new IllegalStateException(
                 "Error loading dialog box. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
         }
+        positionStage( dialogStage );
         return controller;
     }
 
-    // @FXML
-    // BorderPane newProjectDialog;
-    // @FXML
-    // Label dialogTitleLabel;
-    // @FXML
-    // TextFlow dialogHelp;
-    // @FXML
-    // Button dialogButtonCancel;
-    // @FXML
-    // Button dialogButtonOK;
     @FXML
     WebView webView;
 

@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.popup;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.controllers.DexMainControllerBase;
 
 import javafx.fxml.FXML;
 import javafx.scene.text.Text;
@@ -52,6 +53,23 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         // Only implement if needed for this controller
     }
 
+
+    /**
+     * Set the passed stage x and y position over the primary stage
+     * 
+     * @param dialogStage
+     */
+    public static void positionStage(Stage dialogStage) {
+        // Put the new stage on top of the primary stage
+        Stage primaryStage = DexMainControllerBase.getStageStatic();
+        if (primaryStage != null) {
+            // // Calculate the center position of the parent Stage
+            double centerXPosition = primaryStage.getX() + primaryStage.getWidth() / 2d;
+            double centerYPosition = primaryStage.getY() + primaryStage.getHeight() / 2d;
+            dialogStage.setX( centerXPosition - 400 );
+            dialogStage.setY( centerYPosition - 150 );
+        }
+    }
 
     public void doCancel() {
         clear();

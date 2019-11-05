@@ -94,7 +94,8 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
                 "Error loading dialog box. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
         }
         controller.setRepositoryManager( repositoryManager );
-        log.debug( "Repo Login Dialog controller initialized. " + repositoryManager );
+        positionStage( dialogStage );
+        // log.debug( "Repo Login Dialog controller initialized. " + repositoryManager );
         return controller;
     }
 
