@@ -953,15 +953,31 @@ public class UpversionHelperController extends AbstractMainWindowController {
         latestVersionsCheckbox.setSelected( true );
         candidateLibrariesTable.setItems( FXCollections.emptyObservableList() );
         selectedLibrariesTable.setItems( FXCollections.emptyObservableList() );
+
         updateControlStates();
+        initRepositoryChoice();
+    }
 
-        primaryStage.showingProperty().addListener( (observable, oldValue, newValue) -> {
-            ObservableList<String> repositoryIds = FXCollections.observableArrayList();
+    /**
+     * Initializes the list of repositories that are selectable by the user.
+     */
+    private void initRepositoryChoice() {
+        Runnable r = new BackgroundTask( "Initializing from remote repositories...", StatusType.INFO ) {
+            public void execute() throws OtmApplicationException {
+                try {
+                    ObservableList<String> repositoryIds = FXCollections.observableArrayList();
 
-            getRepositoryManager().listRemoteRepositories().forEach( r -> repositoryIds.add( r.getId() ) );
-            repositoryChoice.setItems( repositoryIds );
-            repositoryChoice.getSelectionModel().select( 0 );
-        } );
+                    getRepositoryManager().listRemoteRepositories().forEach( r -> repositoryIds.add( r.getId() ) );
+                    repositoryChoice.setItems( repositoryIds );
+                    repositoryChoice.getSelectionModel().select( 0 );
+
+                } catch (Exception e) {
+                    throw new OtmApplicationException( e );
+                }
+            }
+        };
+
+        new Thread( r ).start();
     }
 
     /**
