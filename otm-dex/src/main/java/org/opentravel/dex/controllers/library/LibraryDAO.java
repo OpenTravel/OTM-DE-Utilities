@@ -96,7 +96,16 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
     }
 
     public StringProperty prefixProperty() {
-        return new SimpleStringProperty( library.getPrefix() );
+        StringProperty sp = null;
+        if (library.isEditable() && library.isUnmanaged()) {
+            sp = new SimpleStringProperty( library.getPrefix() );
+            sp.addListener( (o, v, n) -> {
+                log.debug( "Prefix change request: " + n );
+                library.getTL().setPrefix( n );
+            } );
+        } else
+            sp = new ReadOnlyStringWrapper( library.getPrefix() );
+        return sp;
     }
 
     public StringProperty stateProperty() {

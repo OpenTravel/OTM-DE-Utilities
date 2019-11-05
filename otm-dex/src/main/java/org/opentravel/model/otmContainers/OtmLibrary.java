@@ -426,7 +426,8 @@ public class OtmLibrary {
             // final ValidationFindings findings = new ValidationFindings();
             try {
                 // log.debug("Saving library: " + libraryName + " " + libraryUrl);
-                findings.addAll( lms.saveLibrary( (TLLibrary) getTL() ) );
+                // findings.addAll( lms.saveLibrary( (TLLibrary) getTL() ) );
+                lms.saveLibrary( (TLLibrary) getTL() );
             } catch (final LibrarySaveException e) {
                 final Throwable t = e.getCause();
                 if (t != null && t.getMessage() != null)

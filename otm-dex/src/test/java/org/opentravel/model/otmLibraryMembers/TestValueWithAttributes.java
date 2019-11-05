@@ -23,9 +23,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeType;
 import org.opentravel.schemacompiler.model.TLValueWithAttributes;
+
+import java.util.Collection;
 
 /**
  * Verifies the functions of the <code>UserSettings</code> class.
@@ -45,7 +48,9 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
 
     @Test
     public void testDescendentsTypeUsers() {
-
+        OtmValueWithAttributes vwa = buildOtm( staticModelManager, "TestVwa" );
+        Collection<OtmTypeUser> d = vwa.getDescendantsTypeUsers();
+        assertTrue( !d.isEmpty() );
     }
 
     /** ****************************************************** **/

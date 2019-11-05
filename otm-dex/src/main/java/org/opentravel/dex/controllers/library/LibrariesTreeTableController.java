@@ -72,16 +72,17 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     private VBox libraries;
     private TreeItem<LibraryDAO> root; // Root of the tree.
 
-    private boolean ignoreEvents = false;
+    // private boolean ignoreEvents = false;
 
     private boolean editableOnlyFilter = false;
 
-    // Editable Columns
-    TreeTableColumn<LibraryDAO,String> nameColumn;
 
     private boolean ignore = false;
 
+    // Editable Columns
+    private TreeTableColumn<LibraryDAO,String> nameColumn;
     private TreeTableColumn<LibraryDAO,String> namespaceColumn;
+    private TreeTableColumn<LibraryDAO,String> prefixColumn;
 
     public LibrariesTreeTableController() {
         super( subscribedEvents, publishedEvents );
@@ -91,8 +92,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     // Create columns
     //
     private void buildColumns() {
-        TreeTableColumn<LibraryDAO,String> prefixColumn =
-            createStringColumn( PREFIXCOLUMNLABEL, "prefix", true, false, true, 0 );
+        prefixColumn = createStringColumn( PREFIXCOLUMNLABEL, "prefix", true, true, true, 0 );
         nameColumn = createStringColumn( NAMELABEL, "name", true, true, true, 200 );
         namespaceColumn = createStringColumn( NAMESPACELABEL, "namespace", true, true, true, 250 );
 
@@ -255,8 +255,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     private void setEditing(boolean editable) {
         nameColumn.setEditable( editable );
         namespaceColumn.setEditable( editable );
-        // log.debug( "Namespace column editability: " + namespaceColumn.isEditable() );
-        // log.debug( "Set editing to: " + editable + " at table is editable?" + librariesTreeTable.isEditable() );
+        prefixColumn.setEditable( editable );
     }
 
     /**
@@ -267,14 +266,10 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     @Override
     public void post(OtmModelManager modelMgr) {
         // log.debug( "Posting all libraries." );
-        ignoreEvents = true;
+        // ignoreEvents = true;
         if (modelMgr != null) {
             postedData = modelMgr;
             clear();
-
-            // log.debug( "Posting library tree table. Ready to post " + modelMgr.getBaseNamespaces().size()
-            // + " base namespaces." );
-            // modelMgr.printLibraries();
 
             // create cells for libraries in a namespace. Latest at top, older ones under it.
             for (String baseNS : modelMgr.getBaseNamespaces()) {
@@ -296,7 +291,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
                                 new LibraryDAO( lib ).createTreeItem( latestItem );
             }
         }
-        ignoreEvents = false;
+        // ignoreEvents = false;
         // log.debug( "Posted library tree." );
     }
 
@@ -304,27 +299,6 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     public void refresh() {
         post( postedData );
     }
-
-    // /**
-    // * TreeItem class does not extend the Node class.
-    // *
-    // * Therefore, you cannot apply any visual effects or add menus to the tree items. Use the cell factory mechanism
-    // to
-    // * overcome this obstacle and define as much custom behavior for the tree items as your application requires.
-    // *
-    // * @param item
-    // * @return
-    // */
-    // private TreeItem<LibraryDAO> createTreeItem(OtmLibrary library, TreeItem<LibraryDAO> parent) {
-    // log.debug( "Create tree item for: " + library );
-    // if (parent != null && library != null) {
-    // TreeItem<LibraryDAO> item = new TreeItem<>( new LibraryDAO( library ) );
-    // item.setExpanded( false );
-    // parent.getChildren().add( item );
-    // return item;
-    // }
-    // return null;
-    // }
 
     public void setOnMouseClicked(EventHandler<? super MouseEvent> handler) {
         librariesTreeTable.setOnMouseClicked( handler );
