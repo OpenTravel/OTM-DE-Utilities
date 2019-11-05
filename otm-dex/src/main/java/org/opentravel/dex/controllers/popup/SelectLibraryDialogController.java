@@ -84,6 +84,7 @@ public class SelectLibraryDialogController extends DexPopupControllerBase {
             throw new IllegalStateException(
                 "Error loading dialog box. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
         }
+        positionStage( dialogStage );
         return controller;
     }
 

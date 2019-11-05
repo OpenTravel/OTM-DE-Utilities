@@ -160,7 +160,7 @@ public class TestDeleteLibraryMemberAction {
             assertTrue( user.getAssignedType().getLibrary() != null );
 
             // log.debug( "Findings on " + user + " = " + ValidationUtils.getMessagesAsString( user.getFindings() ) );
-            // valid = user.isValid();
+            boolean valid = user.isValid();
             // log.debug( "Findings on " + user + " = "
             // + ValidationUtils.getMessagesAsString( OtmModelElement.isValid( user.getTL() ) ) );
             // assertTrue( user.isValid() );

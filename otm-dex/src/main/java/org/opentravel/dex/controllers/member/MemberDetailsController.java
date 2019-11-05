@@ -127,7 +127,6 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     public void initialize() {
         log.debug( "Member Filter Controller - Initialize" );
         checkNodes();
-
     }
 
     @Override

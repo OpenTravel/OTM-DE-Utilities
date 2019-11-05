@@ -152,7 +152,11 @@ public class TestLibrary {
     /** ****************************************************** **/
 
     public static OtmLibrary buildOtm(OtmModelManager mgr) {
-        return mgr.add( buildTL() );
+        TLLibrary tlLib = buildTL();
+        tlLib.setName( "LibraryName" );
+        tlLib.setPrefix( "pre" );
+        tlLib.setNamespace( "http://example.com/ns/v0" );
+        return mgr.add( tlLib );
     }
 
     public static OtmLibrary buildOtm(OtmModelManager mgr, String namespace, String prefix, String name) {

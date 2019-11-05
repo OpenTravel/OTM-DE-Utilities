@@ -92,6 +92,9 @@ public class ObjectEditorController extends DexMainControllerBase {
         Dimension size = userSettings.getWindowSize();
         stage.setHeight( size.height );
         stage.setWidth( size.width );
+        // userSettings.windowPosition
+        // double x = stage.getX();
+        // double y = stage.getY();
 
         stage.widthProperty().addListener( (observable, oldValue, newValue) -> {
             // log.debug("Width changed!! - new = " + newValue);

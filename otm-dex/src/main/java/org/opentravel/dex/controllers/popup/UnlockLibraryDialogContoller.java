@@ -100,8 +100,8 @@ public class UnlockLibraryDialogContoller extends DexPopupControllerBase {
         } catch (IOException e1) {
             throw new IllegalStateException(
                 "Error loading dialog box. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
-
         }
+        positionStage( dialogStage );
         return controller;
     }
 

@@ -66,7 +66,12 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
 
     protected OtmEventSubscriptionManager eventManager = new OtmEventSubscriptionManager();
 
-    protected Stage stage;
+    // protected Stage stage;
+    protected static Stage stage;
+
+    public void setStageStatic(Stage stage) {
+        DexMainControllerBase.stage = stage;
+    }
 
     public DexMainControllerBase() {
         log.debug( "Constructing controller." );
@@ -114,6 +119,10 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
 
     @Override
     public Stage getStage() {
+        return stage;
+    }
+
+    public static Stage getStageStatic() {
         return stage;
     }
 

@@ -92,7 +92,7 @@ public class RepositoryViewerController extends DexMainControllerBase implements
     @Override
     public void setStage(Stage primaryStage) {
         // These may be needed by sub-controllers
-        this.stage = primaryStage;
+        DexMainControllerBase.stage = primaryStage;
         imageMgr = new ImageManager( primaryStage );
         checkNodes();
 
