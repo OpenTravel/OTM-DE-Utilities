@@ -242,7 +242,7 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
+        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );

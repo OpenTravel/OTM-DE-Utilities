@@ -114,6 +114,11 @@ public class DexStatusController extends DexIncludedControllerBase<String> {
      * @param dexTaskBase
      */
     public void start(DexTaskBase<?> task) {
+        for (DexTaskBase<?> t : runningTasks)
+            if (t.getClass() == task.getClass()) {
+                // log.debug( "Already running. Cancelling old task." );
+                t.cancel();
+            }
         runningTasks.add( task );
         update();
         postStatus( runningTasks.size(), "Running: " + task.getMessage() );

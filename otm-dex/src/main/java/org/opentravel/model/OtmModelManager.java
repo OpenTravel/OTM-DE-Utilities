@@ -428,9 +428,9 @@ public class OtmModelManager implements TaskResultHandlerI {
      */
     public List<OtmLibraryMember> findUsersOf(OtmTypeProvider provider) {
         // Changed 11/5/2019 - why copy list? The list is not changing.
-        // List<OtmLibraryMember> values = new ArrayList<>( members.values() );
+        List<OtmLibraryMember> values = new ArrayList<>( members.values() );
         List<OtmLibraryMember> users = new ArrayList<>();
-        for (OtmLibraryMember m : members.values()) {
+        for (OtmLibraryMember m : values) {
             if (m.getUsedTypes().contains( provider ))
                 users.add( m );
         }
