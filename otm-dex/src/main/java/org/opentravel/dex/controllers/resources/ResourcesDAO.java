@@ -170,7 +170,7 @@ public class ResourcesDAO implements DexDAO<OtmObject> {
             obj = ((ResourcesDAO) object).getValue();
         if (obj instanceof OtmObject) {
             obj.setExpanded( e.wasExpanded() );
-            log.debug( "Set " + obj + " is expanded to " + obj.isExpanded() + " " + e.wasExpanded() );
+            // log.debug( "Set " + obj + " is expanded to " + obj.isExpanded() + " " + e.wasExpanded() );
         }
     }
 

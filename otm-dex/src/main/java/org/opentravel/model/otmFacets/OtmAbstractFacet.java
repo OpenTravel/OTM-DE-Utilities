@@ -59,6 +59,7 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
 
     public OtmAbstractFacet(T tl) {
         super( tl );
+        setExpanded( true ); // Start out expanded
     }
 
     @Override
@@ -252,10 +253,10 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
         return getOwningMember().isEditable();
     }
 
-    @Override
-    public boolean isExpanded() {
-        return true;
-    }
+    // @Override
+    // public boolean isExpanded() {
+    // return true;
+    // }
 
     /**
      * {@inheritDoc}
