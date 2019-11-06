@@ -124,8 +124,8 @@ public class TestDeleteLibraryMemberAction {
             assertTrue( user.getAssignedType() != null );
             assertTrue( user.getAssignedType().getLibrary() == null );
 
-            // assertFalse( user.isValid() );
-            // log.debug( "Type user " + user + " is valid? " + user.isValid() );
+            assertFalse( user.isValid() );
+            log.debug( "Type user " + user + " is valid? " + user.isValid() );
         }
 
         userOwners = simple.getWhereUsed();
@@ -163,8 +163,8 @@ public class TestDeleteLibraryMemberAction {
             boolean valid = user.isValid();
             // log.debug( "Findings on " + user + " = "
             // + ValidationUtils.getMessagesAsString( OtmModelElement.isValid( user.getTL() ) ) );
-            // assertTrue( user.isValid() );
-            // log.debug( "Type user " + user + " is valid? " + user.isValid() );
+            assertTrue( user.isValid() );
+            log.debug( "Type user " + user + " is valid? " + user.isValid() );
         }
 
 
