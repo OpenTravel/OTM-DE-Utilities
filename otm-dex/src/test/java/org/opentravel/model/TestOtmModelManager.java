@@ -26,6 +26,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractOTMApplication;
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
@@ -41,7 +42,9 @@ import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Verifies the functions of the <code>Otm Model Manager</code>.
@@ -63,6 +66,39 @@ public class TestOtmModelManager extends AbstractFxTest {
         repoManager = repositoryManager.get();
     }
 
+    /**
+     * Build a model manager with built in libraries and repository manager.
+     * 
+     * @param actionManager action manager to assign as full action manager. can be null.
+     * @return
+     */
+    public static OtmModelManager buildModelManager(DexActionManager actionManager) {
+        OtmModelManager mgr = new OtmModelManager( actionManager, repoManager );
+        mgr.addBuiltInLibraries( new TLModel() );
+        return mgr;
+    }
+
+    /**
+     * Assign type to ALL type users in the model. Note, this will likely make them invalid due to UPA and name
+     * collisions.
+     * 
+     * @param assignedType
+     * @param mgr
+     * @return users that were successfully set are returned
+     */
+    public static List<OtmTypeUser> assignTypeToEveryUser(OtmTypeProvider assignedType, OtmModelManager mgr) {
+        // Assign everything to assignedType
+        List<OtmTypeUser> users = new ArrayList<>();
+        for (OtmLibraryMember lm : mgr.getMembers())
+            for (OtmTypeUser user : lm.getDescendantsTypeUsers()) {
+                OtmTypeProvider u = user.setAssignedType( assignedType );
+                if (u == assignedType)
+                    users.add( user );
+            }
+        return users;
+    }
+
+    /** ******************************************************************* **/
     @Test
     public void testAddingManagedProject() throws Exception {
 

@@ -29,4 +29,6 @@ public interface OtmTypeProvider extends OtmObject {
      * @return
      */
     boolean isNameControlled();
+
+
 }

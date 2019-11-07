@@ -89,7 +89,7 @@ public class OtmLibrary {
      * @return the member if added OK
      */
     public OtmLibraryMember add(OtmLibraryMember member) {
-        if (member.getTL() instanceof LibraryMember)
+        if (member != null && member.getTL() instanceof LibraryMember)
             try {
                 // make sure not already a member
                 if (getTL().getNamedMember( ((LibraryMember) member.getTL()).getLocalName() ) == null)
@@ -386,6 +386,12 @@ public class OtmLibrary {
      */
     public boolean isUnmanaged() {
         return getState() == RepositoryItemState.UNMANAGED;
+    }
+
+    public ValidationFindings getFindings() {
+        if (findings == null)
+            isValid();
+        return findings;
     }
 
     public boolean isValid() {

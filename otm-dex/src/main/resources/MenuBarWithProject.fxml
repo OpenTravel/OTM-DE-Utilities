@@ -22,14 +22,17 @@
          <items>
             <MenuBar>
               <menus>
-                <Menu mnemonicParsing="false" text="File">
+                <Menu fx:id="fileMenu" mnemonicParsing="false" text="File">
                   <items>
                     <MenuItem fx:id="doNewLibraryItem" mnemonicParsing="false" onAction="#doNewLibrary" text="New Library..." />
                     <MenuItem fx:id="doNewProjectItem" mnemonicParsing="false" onAction="#doNewProject" text="New Project..." />
+                    <SeparatorMenuItem mnemonicParsing="false" />
                     <MenuItem fx:id="fileOpenItem" mnemonicParsing="false" onAction="#fileOpen" text="Open..." />
                     <SeparatorMenuItem mnemonicParsing="false" />
-                    <MenuItem fx:id="doCloseItem" mnemonicParsing="false" onAction="#doClose" text="Close" />
-                        <MenuItem fx:id="doSaveAllItem" mnemonicParsing="false" onAction="#doSaveAll" text="Save All" />
+                    <MenuItem fx:id="doCloseItem" mnemonicParsing="false" onAction="#doClose" text="Close All" />
+                    <MenuItem fx:id="doSaveAllItem" mnemonicParsing="false" onAction="#doSaveAll" text="Save All" />
+                    <SeparatorMenuItem mnemonicParsing="false" />
+                    <MenuItem fx:id="doCompileMenuItem" mnemonicParsing="false" onAction="#doCompile"  text="Compile" />
                     <SeparatorMenuItem mnemonicParsing="false" />
                     <MenuItem fx:id="appExitItem" mnemonicParsing="false" onAction="#appExit" text="Exit" />
                   </items>

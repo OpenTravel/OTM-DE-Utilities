@@ -32,9 +32,12 @@ import org.opentravel.schemacompiler.model.TLAttribute;
 public class OtmIdAttribute<TL extends TLAttribute> extends OtmAttribute<TLAttribute> implements OtmTypeUser {
 
     /**
+     * Create an Id attribute. If type is not set, set it to the ID type from parent's model manager.
      */
-    protected OtmIdAttribute(TL tl, OtmPropertyOwner parent) {
+    public OtmIdAttribute(TL tl, OtmPropertyOwner parent) {
         super( tl, parent );
+        if (tl.getType() == null && parent.getModelManager() != null && parent.getModelManager().getIdType() != null)
+            tl.setType( parent.getModelManager().getIdType().getTL() );
     }
 
     @Override

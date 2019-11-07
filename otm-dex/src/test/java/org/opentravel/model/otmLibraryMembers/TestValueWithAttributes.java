@@ -46,14 +46,6 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
         baseObject.setName( "BaseVWA" );
     }
 
-    @Test
-    public void testDescendentsTypeUsers() {
-        OtmValueWithAttributes vwa = buildOtm( staticModelManager, "TestVwa" );
-        Collection<OtmTypeUser> d = vwa.getDescendantsTypeUsers();
-        assertTrue( !d.isEmpty() );
-    }
-
-    /** ****************************************************** **/
 
     public static OtmValueWithAttributes buildOtm(OtmModelManager mgr) {
         OtmTypeProvider simple = TestXsdSimple.buildOtm( mgr );
@@ -62,6 +54,17 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
 
 
         OtmTypeProvider p = vwa.getAssignedType();
+        return vwa;
+    }
+
+    /**
+     * @param mgr
+     * @param string
+     * @return
+     */
+    public static OtmValueWithAttributes buildOtm(OtmModelManager mgr, String string) {
+        OtmValueWithAttributes vwa = buildOtm( mgr );
+        vwa.setName( string );
         return vwa;
     }
 
@@ -106,15 +109,12 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
         return tlvwa;
     }
 
+    /** ****************************************************** **/
 
-    /**
-     * @param mgr
-     * @param string
-     * @return
-     */
-    public static OtmValueWithAttributes buildOtm(OtmModelManager mgr, String string) {
-        OtmValueWithAttributes vwa = buildOtm( mgr );
-        vwa.setName( string );
-        return vwa;
+    @Test
+    public void testDescendentsTypeUsers() {
+        OtmValueWithAttributes vwa = buildOtm( staticModelManager, "TestVwa" );
+        Collection<OtmTypeUser> d = vwa.getDescendantsTypeUsers();
+        assertTrue( !d.isEmpty() );
     }
 }

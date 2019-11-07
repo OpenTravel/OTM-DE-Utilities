@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.repository.SearchRepositoryTask;
+import org.opentravel.schemacompiler.repository.RemoteRepository;
 import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
@@ -39,6 +40,8 @@ import javafx.scene.control.TextField;
 /**
  * Manage the repository search panel
  * 
+ * {@link RemoteRepository#getEntityWhereUsed(org.opentravel.schemacompiler.model.NamedEntity, boolean)}
+ *
  * @author dmh
  *
  */

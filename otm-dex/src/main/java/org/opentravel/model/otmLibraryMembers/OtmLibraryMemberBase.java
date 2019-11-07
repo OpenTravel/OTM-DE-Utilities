@@ -199,6 +199,9 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public OtmObject setBaseType(OtmObject baseObj) {
+        OtmLibraryMember oldBaseOwner = null;
+        if (getBaseType() != null)
+            oldBaseOwner = getBaseType().getOwningMember();
         if (baseObj != null) {
             if (this.getClass() == baseObj.getClass() && getTL() instanceof TLExtensionOwner) {
                 TLExtension tlExt = ((TLExtensionOwner) getTL()).getExtension();
@@ -212,6 +215,12 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             if (getTL() instanceof TLExtensionOwner)
                 ((TLExtensionOwner) getTL()).setExtension( null );
         }
+        // Set the where used in case resolver is not run afterwards
+        OtmLibraryMember newBaseOwner = null;
+        if (getBaseType() != null)
+            newBaseOwner = getBaseType().getOwningMember();
+        if (newBaseOwner != null)
+            newBaseOwner.changeWhereUsed( oldBaseOwner, getOwningMember() );
         return getBaseType();
     }
 
@@ -356,9 +365,10 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     /**
-     * Get the where used list after the action manager recomputes it.
+     * Get the where used list. If <i>forced</i> or null list it will get users of the library member and all its type
+     * provider descendants.
      * 
-     * @param force
+     * @param force will clear list and recompute
      * @return
      */
     public List<OtmLibraryMember> getWhereUsed(boolean force) {
@@ -366,12 +376,16 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             whereUsed = null;
         if (whereUsed == null) {
             whereUsed = new ArrayList<>();
+
             whereUsed.addAll( mgr.findUsersOf( this ) );
+            whereUsed.addAll( mgr.findSubtypesOf( this ) );
+            //
             getDescendantsTypeProviders().forEach( p -> {
                 whereUsed.addAll( mgr.findUsersOf( p ) );
             } );
-            // log.debug("Creating Where Used List " + whereUsed.size() + " for : " + this.getNameWithPrefix());
+            log.debug( "Created Where Used List " + whereUsed.size() + " for : " + this.getNameWithPrefix() );
         }
+        // FIXME - base types
         // FIXME - get resources when they expose this library member
         return whereUsed;
     }

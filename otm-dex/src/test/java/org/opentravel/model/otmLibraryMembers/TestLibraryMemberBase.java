@@ -34,10 +34,16 @@ import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmListFacet;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
+import org.opentravel.schemacompiler.model.TLExtensionOwner;
 import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * test class the otm library member base class.
@@ -82,34 +88,6 @@ public class TestLibraryMemberBase {
             log.debug( "Added and removed: " + member );
         }
     }
-
-    // @Test
-    // public void testAddAndDelete() throws ExceptionInInitializerError, InstantiationException,
-    // IllegalAccessException,
-    // NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
-    // OtmModelManager mgr = new OtmModelManager( null, null );
-    // OtmLibrary lib = mgr.add( new TLLibrary() );
-    //
-    // for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
-    // OtmLibraryMember member = OtmLibraryMemberType.buildMember( type, "Test" + type.toString(), mgr );
-    //
-    // // When added
-    // lib.add( member );
-    // // Then - add works
-    // // assertTrue(lib.contains( member ));
-    // assertTrue( mgr.contains( member.getTlLM() ) );
-    // assertTrue( mgr.getMembers().contains( member ) );
-    // assertTrue( lib.getTL().getNamedMembers().contains( member.getTL() ) );
-    //
-    // // When deleted
-    // lib.delete( member );
-    // assertFalse( mgr.contains( member.getTlLM() ) );
-    // assertFalse( mgr.getMembers().contains( member ) );
-    // assertFalse( lib.getTL().getNamedMembers().contains( member.getTL() ) );
-    //
-    // log.debug( "Added and removed: " + member );
-    // }
-    // }
 
     @Test
     public void testEnumFactory() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
@@ -187,6 +165,73 @@ public class TestLibraryMemberBase {
             }
         }
     }
+
+    /**
+     * Create a new member of the type of subject, set as the base type, then test.
+     * 
+     * @param subject
+     * @return the new member set as base type
+     * @throws ExceptionInInitializerError
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     */
+    public static OtmLibraryMember testBaseType(OtmLibraryMember subject) throws ExceptionInInitializerError,
+        InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        // Get another of the same type
+        OtmLibraryMember base = OtmLibraryMemberType.buildMember( OtmLibraryMemberType.get( subject ),
+            "Base" + subject.getName(), subject.getModelManager() );
+        // When - extension set
+        if (subject.getLibrary() != null)
+            subject.getLibrary().add( base );
+        OtmObject result = subject.setBaseType( base );
+        // Then
+        if (subject.getTL() instanceof TLExtensionOwner) {
+            assertTrue( "Then", ((TLExtensionOwner) subject.getTL()).getExtension() != null );
+            assertTrue( "Then",
+                ((TLExtensionOwner) subject.getTL()).getExtension().getExtendsEntity() == base.getTL() );
+            assertTrue( "Then - must have returned base type.", result == base );
+            assertTrue( "Then - all extension owners must be extended", subject.getBaseType() == base );
+            log.debug( "Created base type for " + subject.getClass().getSimpleName() );
+        }
+        return base;
+    }
+
+
+    // Confirm map
+    public static void confirmMap(Map<OtmLibraryMember,OtmLibraryMember> baseObjects) {
+        for (Entry<OtmLibraryMember,OtmLibraryMember> entry : baseObjects.entrySet()) {
+            assertTrue( entry.getValue().getBaseType() == entry.getKey() );
+            assertTrue( entry.getKey().getWhereUsed().contains( entry.getValue() ) );
+        }
+    }
+
+
+    public static Map<OtmLibraryMember,OtmLibraryMember> buildBaseObjectsForAll(OtmModelManager mgr)
+        throws ExceptionInInitializerError, InstantiationException, IllegalAccessException, NoSuchMethodException,
+        InvocationTargetException {
+        Map<OtmLibraryMember,OtmLibraryMember> baseObjects = new HashMap<>();
+        Collection<OtmLibraryMember> members = new ArrayList<>( mgr.getMembers() );
+        for (OtmLibraryMember member : members) {
+            OtmLibraryMember base = testBaseType( member );
+            if (member instanceof OtmSimpleObject)
+                continue; // FIXME
+            if (member instanceof OtmValueWithAttributes)
+                continue; // FIXME
+            // Not all members can be extended. Contextual facets use base type for where contribted.
+            if (base != null && !(base instanceof OtmServiceObject) && !(base instanceof OtmContextualFacet)) {
+                List<OtmLibraryMember> bwu = base.getWhereUsed();
+                assertTrue( bwu.contains( member ) );
+                baseObjects.put( base, member );
+            }
+            // else
+            // log.debug( "Could not create base for " + member.getClass().getSimpleName() + " " + member );
+        }
+        confirmMap( baseObjects );
+        return baseObjects;
+    }
+
 
     /**
      * Create one of each library member and give each property owner one of each property.

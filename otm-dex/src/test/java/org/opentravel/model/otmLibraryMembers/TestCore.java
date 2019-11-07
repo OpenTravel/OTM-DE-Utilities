@@ -25,6 +25,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmProperties.OtmIdAttribute;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLCoreObject;
 import org.opentravel.schemacompiler.model.TLProperty;
@@ -61,12 +62,22 @@ public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
 
     /** ****************************************************** **/
 
+    /**
+     * Create a core object with an ID attribute and element in the summary facet.
+     * 
+     * @param mgr
+     * @return
+     */
     public static OtmCore buildOtm(OtmModelManager mgr) {
         OtmCore core = new OtmCore( buildTL(), mgr );
         assertNotNull( core );
         core.setAssignedType( TestXsdSimple.buildOtm( mgr ) );
-        core.getTL().getSummaryFacet().addAttribute( new TLAttribute() );
+        // core.getTL().getSummaryFacet().addAttribute( new TLAttribute() );
         core.getTL().getSummaryFacet().addElement( new TLProperty() );
+        TLAttribute tlId = new TLAttribute();
+        core.getTL().getSummaryFacet().addAttribute( tlId );
+        OtmIdAttribute<TLAttribute> id = new OtmIdAttribute<TLAttribute>( tlId, core.getSummary() );
+        core.getSummary().add( id );
 
         assertTrue( core.getChildren().size() > 3 );
         assertTrue( core.getSummary().getChildren().size() == 2 );

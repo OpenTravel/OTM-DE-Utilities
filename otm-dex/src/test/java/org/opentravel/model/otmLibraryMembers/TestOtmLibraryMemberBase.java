@@ -39,7 +39,8 @@ import java.util.List;
 
 /**
  * Abstract base test class for all otm objects. Implementations must provide their own static, type specific,
- * buildOtm() and buildTL() methods.
+ * buildOtm() and buildTL() methods. See {@link TestLibraryMemberBase} for static utilities and actual tests on the base
+ * class
  * <p>
  * If <i>subject</i> is set in the before class, the following will be automatically run:
  * <ul>
@@ -53,11 +54,11 @@ import java.util.List;
  * <p>
  * Sub-types should test their own facets.
  * 
- * @see TestLibraryMemberBase - actual tests on the base classs
+ * @see TestLibraryMemberBase - static utilities and actual tests on the base classs
  */
 public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
 
-    private static Log log = LogFactory.getLog( TestOtmLibraryMemberBase.class );
+    static Log log = LogFactory.getLog( TestOtmLibraryMemberBase.class );
 
     protected static OtmModelManager staticModelManager = null;
     protected static OtmLibraryMember subject;
@@ -96,24 +97,7 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
     @Test
     public void testBaseType() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
         NoSuchMethodException, InvocationTargetException {
-        testBaseType( subject );
-    }
-
-    public void testBaseType(OtmLibraryMember subject) throws ExceptionInInitializerError, InstantiationException,
-        IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        // Get another of the same type
-        OtmObject base =
-            OtmLibraryMemberType.buildMember( OtmLibraryMemberType.get( subject ), "Base", subject.getModelManager() );
-        // When - extension set
-        OtmObject result = subject.setBaseType( base );
-        if (subject.getTL() instanceof TLExtensionOwner) {
-            assertTrue( "Then", ((TLExtensionOwner) subject.getTL()).getExtension() != null );
-            assertTrue( "Then",
-                ((TLExtensionOwner) subject.getTL()).getExtension().getExtendsEntity() == base.getTL() );
-            assertTrue( "Then - must have returned base type.", result == base );
-            assertTrue( "Then - all extension owners must be extended", subject.getBaseType() == base );
-            log.debug( "Created base type for " + subject.getClass().getSimpleName() );
-        }
+        TestLibraryMemberBase.testBaseType( subject );
     }
 
     @Test

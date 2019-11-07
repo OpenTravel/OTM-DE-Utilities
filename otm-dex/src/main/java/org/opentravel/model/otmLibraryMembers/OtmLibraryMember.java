@@ -96,7 +96,7 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
 
     /**
      * Get all members that contain type users that use this member or any of its descendants as assigned types.
-     * 
+     *
      * @return list of where used or empty list
      */
     public List<OtmLibraryMember> getWhereUsed();

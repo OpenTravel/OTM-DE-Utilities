@@ -29,6 +29,7 @@ import org.opentravel.dex.tasks.model.ValidateModelManagerItemsTask;
 import org.opentravel.model.otmContainers.OtmBuiltInLibrary;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberFactory;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -440,6 +441,26 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
     /**
+     * Examine all members. Return list of members that use the passed member as a base type.
+     * 
+     * @param member
+     * @return
+     */
+    public List<OtmLibraryMember> findSubtypesOf(OtmLibraryMember member) {
+        // Changed 11/5/2019 - why copy list? The list is not changing.
+        List<OtmLibraryMember> values = new ArrayList<>( members.values() );
+        List<OtmLibraryMember> subTypes = new ArrayList<>();
+        // Contextual facets use base type to define injection point
+        for (OtmLibraryMember m : values) {
+            if (m.getBaseType() == member && !(m instanceof OtmContextualFacet))
+                subTypes.add( m );
+        }
+        // if (!users.isEmpty())
+        // log.debug("Found " + users.size() + " users of " + p.getNameWithPrefix());
+        return subTypes;
+    }
+
+    /**
      * @param TL Abstract Library
      * @return OtmLibrary associated with the abstract library
      */
@@ -788,6 +809,8 @@ public class OtmModelManager implements TaskResultHandlerI {
                 tlId = lib.getTL().getNamedMember( XSD_ID_NAME );
         }
         OtmObject id = OtmModelElement.get( (TLModelElement) tlId );
+        if (id == null)
+            log.debug( "Missing ID type to return." );
         return id instanceof OtmXsdSimple ? (OtmXsdSimple) id : null;
     }
 

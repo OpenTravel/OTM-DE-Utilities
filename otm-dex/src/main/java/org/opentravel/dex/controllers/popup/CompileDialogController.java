@@ -1,0 +1,398 @@
+/**
+ * Copyright (C) 2014 OpenTravel Alliance (info@opentravel.org)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.opentravel.dex.controllers.popup;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.tasks.model.CompileProjectTask;
+import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmContainers.OtmProject;
+import org.opentravel.objecteditor.UserSettings;
+import org.opentravel.schemacompiler.ioc.CompilerExtensionRegistry;
+
+import java.io.File;
+import java.io.IOException;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
+/**
+ * Dialog controller for creating a library.
+ * <p>
+ * Create the controller using the static {@link CompileDialogController#init() } method. If the model manager is set
+ * before showing, the library will be created.
+ * 
+ * @author dmh
+ *
+ */
+public class CompileDialogController extends DexPopupControllerBase {
+    private static Log log = LogFactory.getLog( CompileDialogController.class );
+
+    public static final String LAYOUT_FILE = "/Dialogs/CompileDialog.fxml";
+
+    protected static Stage dialogStage;
+    private static String helpText = "Compile Project.";
+    private static String dialogTitle = "Compile Project";
+    @FXML
+    private TextField targetDirectoryField;
+    @FXML
+    private Button targetDirectoryButton;
+
+    /**
+     * Initialize this controller using the passed FXML loader.
+     * <p>
+     * Note: This approach using a static stage and main controller hides the complexity from calling controller.
+     * Otherwise, this code must migrate into the calling controller.
+     * 
+     * @return dialog box controller or null
+     */
+    public static CompileDialogController init() {
+        FXMLLoader loader = new FXMLLoader( CompileDialogController.class.getResource( LAYOUT_FILE ) );
+        CompileDialogController controller = null;
+        try {
+            // Load the fxml file initialize controller it declares.
+            Pane pane = loader.load();
+            // Create scene and stage
+            dialogStage = new Stage();
+            dialogStage.setScene( new Scene( pane ) );
+            // dialogStage.initModality( Modality.APPLICATION_MODAL );
+            dialogStage.initModality( Modality.NONE );
+
+            // get the controller from it.
+            controller = loader.getController();
+            if (!(controller instanceof CompileDialogController))
+                throw new IllegalStateException( "Error creating controller." );
+        } catch (IOException e1) {
+            throw new IllegalStateException(
+                "Error loading dialog box. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
+        }
+        positionStage( dialogStage );
+
+        return controller;
+    }
+
+    // @FXML
+    // BorderPane newLibraryDialog;
+    // @FXML
+    // Label dialogTitleLabel;
+    // @FXML
+    // TextFlow dialogHelp;
+    @FXML
+    Button cancelButton;
+    @FXML
+    Button compileButton;
+    @FXML
+    Button validateButton;
+    // @FXML
+    // TextField nameField;
+    // @FXML
+    // TextField nsField;
+    // @FXML
+    // TextField projectField;
+    @FXML
+    TextArea descriptionField;
+    @FXML
+    ChoiceBox<OtmProject> projectChoiceBox;
+    @FXML
+    private ChoiceBox<String> bindingStyleChoice;
+    @FXML
+    private CheckBox compileXmlSchemasCheckbox;
+    @FXML
+    private CheckBox compileServicesCheckbox;
+    @FXML
+    private CheckBox compileJsonSchemasCheckbox;
+    @FXML
+    private CheckBox compileSwaggerCheckbox;
+    @FXML
+    private CheckBox compileDocumentationCheckbox;
+    @FXML
+    private TextField serviceEndpointUrl;
+    @FXML
+    private TextField baseResourceUrl;
+    @FXML
+    private CheckBox suppressExtensionsCheckbox;
+    @FXML
+    private CheckBox generateExamplesCheckbox;
+    @FXML
+    private CheckBox exampleMaxDetailCheckbox;
+    @FXML
+    private Spinner<Integer> maxRepeatSpinner;
+    @FXML
+    private Spinner<Integer> maxRecursionDepthSpinner;
+    @FXML
+    private CheckBox suppressOptionalFieldsCheckbox;
+    // @FXML
+    // TextField contextIdField;
+    // @FXML
+    // TextField fileNameField;
+    // @FXML
+    // TextField directoryField;
+    // @FXML
+    // TextArea resultsArea;
+    // @FXML
+    // private Button openProjectButton;
+
+    private File libraryFile = null;
+    private OtmModelManager modelMgr;
+    // private OtmLibrary otmLibrary = null;
+    private OtmProject selectedProject = null;
+
+    private String resultText;
+
+    private UserSettings userSettings;
+
+    public String getResultText() {
+        return resultText;
+    }
+
+    @Override
+    public void checkNodes() {
+        if (projectChoiceBox == null || targetDirectoryField == null || compileButton == null || cancelButton == null)
+            // || dialogButtonOK == null || resultsArea == null)
+            throw new IllegalStateException( "Missing injected field." );
+    }
+
+    @Override
+    public void clear() {
+        // dialogHelp.getChildren().clear();
+    }
+
+    public void disableControls() {
+        // newMenu.setDisable( true );
+        // openMenu.setDisable( true );
+        // saveMenu.setDisable( true );
+        // saveAsMenu.setDisable( true );
+        // compileMenu.setDisable( true );
+        // closeMenu.setDisable( true );
+        // exitMenu.setDisable( true );
+        // undoMenu.setDisable( true );
+        // redoMenu.setDisable( true );
+        // addLibraryMenu.setDisable( true );
+        // reloadModelMenu.setDisable( true );
+        // openManagedMenu.setDisable( true );
+        // publishReleaseMenu.setDisable( true );
+        // newReleaseVersionMenu.setDisable( true );
+        // unpublishReleaseMenu.setDisable( true );
+        // aboutMenu.setDisable( true );
+        // releaseFileButton.setDisable( true );
+        // releaseFilename.setDisable( true );
+        // releaseName.setDisable( true );
+        // releaseBaseNamespace.setDisable( true );
+        // releaseStatus.setDisable( true );
+        // releaseVersion.setDisable( true );
+        // defaultEffectiveDate.setDisable( true );
+        // timeZoneLabel.setDisable( true );
+        // applyToAllButton.setDisable( true );
+        // releaseDescription.setDisable( true );
+        // addLibraryButton.setDisable( true );
+        // removeLibraryButton.setDisable( true );
+        // reloadModelButton.setDisable( true );
+        // principalTableView.setDisable( true );
+        // referencedTableView.setDisable( true );
+        bindingStyleChoice.setDisable( true );
+        compileXmlSchemasCheckbox.setDisable( true );
+        compileServicesCheckbox.setDisable( true );
+        compileJsonSchemasCheckbox.setDisable( true );
+        compileSwaggerCheckbox.setDisable( true );
+        compileDocumentationCheckbox.setDisable( true );
+        serviceEndpointUrl.setDisable( true );
+        baseResourceUrl.setDisable( true );
+        suppressExtensionsCheckbox.setDisable( true );
+        generateExamplesCheckbox.setDisable( true );
+        exampleMaxDetailCheckbox.setDisable( true );
+        maxRepeatSpinner.setDisable( true );
+        maxRecursionDepthSpinner.setDisable( true );
+        suppressExtensionsCheckbox.setDisable( true );
+        // facetSelectionTableView.setDisable( true );
+        // validationTableView.setDisable( true );
+        // libraryTreeView.setDisable( true );
+    }
+
+
+    @FXML
+    public void doCompile(ActionEvent e) {
+        log.debug( "TODO - Do compile." );
+        if (selectedProject == null)
+            return;
+
+        // Get the target folder as a file
+        String folderName = targetDirectoryField.getText();
+        if (folderName == null)
+            return;
+        File targetFile = new File( folderName );
+        CompileProjectTask.createCompileDirectory( targetFile );
+        // FIXME - error handling
+
+        //
+        updateCompileOptions();
+
+        // Run the compile
+        CompileProjectTask.compile( targetFile, selectedProject, userSettings );
+    }
+
+    public void updateCompileOptions() {
+        // FIXME
+        // options.setBindingStyle( bindingStyleChoice.getValue() );
+        CompilerExtensionRegistry.getActiveExtension();
+        CompilerExtensionRegistry.getAvailableExtensionIds();
+        CompilerExtensionRegistry.setActiveExtension( bindingStyleChoice.getValue() );
+
+        userSettings.setCompileSchemas( compileXmlSchemasCheckbox.isSelected() );
+        userSettings.setCompileServices( compileServicesCheckbox.isSelected() );
+        userSettings.setCompileJsonSchemas( compileJsonSchemasCheckbox.isSelected() );
+        userSettings.setCompileSwagger( compileSwaggerCheckbox.isSelected() );
+        userSettings.setCompileHtml( compileDocumentationCheckbox.isSelected() );
+        userSettings.setServiceEndpointUrl( serviceEndpointUrl.textProperty().getValue() );
+        userSettings.setResourceBaseUrl( baseResourceUrl.textProperty().getValue() );
+        userSettings.setSuppressOtmExtensions( suppressExtensionsCheckbox.isSelected() );
+        userSettings.setGenerateExamples( generateExamplesCheckbox.isSelected() );
+        userSettings.setGenerateMaxDetailsForExamples( exampleMaxDetailCheckbox.isSelected() );
+        userSettings.setExampleMaxRepeat( maxRepeatSpinner.getValue() );
+        userSettings.setExampleMaxDepth( maxRecursionDepthSpinner.getValue() );
+        userSettings.setSuppressOptionalFields( suppressOptionalFieldsCheckbox.isSelected() );
+    }
+
+    public void post(UserSettings userSettings) {
+        // FIXME
+        // options.setBindingStyle( bindingStyleChoice.getValue() );
+        CompilerExtensionRegistry.getActiveExtension();
+        CompilerExtensionRegistry.getAvailableExtensionIds();
+        CompilerExtensionRegistry.setActiveExtension( bindingStyleChoice.getValue() );
+        compileXmlSchemasCheckbox.setSelected( userSettings.isCompileSchemas() );
+        compileServicesCheckbox.setSelected( userSettings.isCompileServices() );
+        compileJsonSchemasCheckbox.setSelected( userSettings.isCompileJsonSchemas() );
+        compileSwaggerCheckbox.setSelected( userSettings.isCompileSwagger() );
+        compileDocumentationCheckbox.setSelected( userSettings.isCompileHtml() );
+
+        serviceEndpointUrl.textProperty().setValue( userSettings.getServiceEndpointUrl() );
+        baseResourceUrl.textProperty().setValue( userSettings.getResourceBaseUrl() );
+        suppressExtensionsCheckbox.setSelected( userSettings.isSuppressOtmExtensions() );
+        generateExamplesCheckbox.setSelected( userSettings.isGenerateExamples() );
+        exampleMaxDetailCheckbox.setSelected( userSettings.isGenerateMaxDetailsForExamples() );
+        // FIXME
+        // maxRepeatSpinner.setValue(userSettings.getExampleMaxRepeat( ) );
+        // maxRecursionDepthSpinner.setValue(userSettings.getExampleMaxDepth( ) );
+        suppressOptionalFieldsCheckbox.setSelected( userSettings.isSuppressOptionalFields() );
+    }
+
+    @FXML
+    public void doValidation(ActionEvent e) {
+        log.debug( "TODO - Do validate." );
+    }
+
+    @FXML
+    public void selectTargetDirectory(ActionEvent e) {
+        log.debug( "TODO - File selection dialog." );
+    }
+
+    @FXML
+    public void selectProject(ActionEvent e) {
+        log.debug( "TODO - project selection." );
+        if (e != null && e.getTarget() instanceof ChoiceBox) {
+            selectedProject = ((ChoiceBox<OtmProject>) e.getTarget()).getValue();
+            post( selectedProject );
+        }
+    }
+
+    /**
+     * @see org.opentravel.dex.controllers.popup.DexPopupControllerBase#doOK()
+     */
+    @Override
+    public void doOK() {
+
+        super.doOK(); // all OK - close window
+    }
+
+
+
+    /**
+     * 
+     * @param manager used to create project
+     * @param initialProjectFolder used in user file selection dialog
+     */
+    public void configure(OtmModelManager manager, UserSettings settings) {
+        // TODO - the settings should be abstracted for Dex applications
+        this.modelMgr = manager;
+        this.userSettings = settings;
+
+    }
+
+    private void post(File targetDirectory) {
+        if (targetDirectory != null)
+            targetDirectoryField.setText( targetDirectory.getPath() );
+        else
+            targetDirectoryField.setText( "" );
+        targetDirectoryButton.setDisable( true ); // TODO
+    }
+
+    private void post(OtmModelManager mgr) {
+        if (mgr != null) {
+            ObservableList<OtmProject> projList = FXCollections.observableList( mgr.getUserProjects() );
+            projectChoiceBox.setItems( projList );
+            if (!projList.isEmpty())
+                projectChoiceBox.getSelectionModel().select( 0 );
+            selectedProject = projectChoiceBox.getSelectionModel().getSelectedItem();
+            post( CompileProjectTask.getCompileDirectory( selectedProject ) );
+        }
+    }
+
+    private void post(OtmProject project) {
+        post( CompileProjectTask.getCompileDirectory( project ) );
+        // TODO - post description;
+    }
+
+    @Override
+    protected void setup(String message) {
+        super.setStage( dialogTitle, dialogStage );
+        checkNodes();
+
+        // Get the projects from project manager
+        post( modelMgr );
+        post( userSettings );
+
+        // cancelButton.setOnAction( e -> doCancel() );
+        // okButton.setOnAction( e -> doOK() );
+        // postHelp( helpText, dialogHelp );
+
+        // Initial settings
+        //
+        // projectField.setEditable( false );
+        // projectField.setDisable( true ); // Grey it out
+        // if (!modelMgr.hasProjects()) {
+        // postResults( "Must have a project for the new library." );
+        // dialogButtonOK.setDisable( true );
+        // }
+        // if (userSettings != null)
+        // directoryField.setText( userSettings.getLastProjectFolder().getPath() );
+        // else
+        // directoryField.setText( DexFileHandler.getUserHome() );
+
+    }
+}

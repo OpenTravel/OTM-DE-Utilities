@@ -46,7 +46,7 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
     private OtmLibraryMember parent = null;
 
     /**
-     * @param tlBusinessObject
+     * @param tlAlias
      */
     public OtmAlias(TLAlias tl, OtmLibraryMember parent) {
         super( tl );

@@ -23,6 +23,7 @@ import org.opentravel.common.DexFileHandler;
 import org.opentravel.common.DialogBox;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.controllers.popup.CompileDialogController;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.controllers.popup.NewLibraryDialogController;
@@ -57,6 +58,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToolBar;
 import javafx.stage.Stage;
@@ -78,6 +80,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     // FXML injected objects
     @FXML
     private ComboBox<String> projectCombo;
+    @FXML
+    private Menu doCompileMenu;
     @FXML
     private Label projectLabel;
     @FXML
@@ -191,7 +195,17 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         rwc.setup( "" );
         rwc.configure( mainController );
 
+        // // Set up Compile Menu
+        // configureCompileMenu();
+        // doCompileMenu.setOnAction( this::doCompile );
     }
+
+    // private void configureCompileMenu() {
+    // // FIXME - don't show built-in project
+    // doCompileMenu.getItems().clear();
+    // doCompileMenu.setDisable( modelMgr.getProjects().isEmpty() );
+    // modelMgr.getProjects().forEach( p -> doCompileMenu.getItems().add( new MenuItem( p.getName() ) ) );
+    // }
 
     private DialogBoxContoller getDialogBox(UserSettings settings) {
         dialogBox = DialogBoxContoller.init();
@@ -240,6 +254,19 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     public void undoAction() {
         modelMgr.getActionManager( true ).undo();
         // mainController.refresh();
+    }
+
+    @FXML
+    public void doCompile(ActionEvent e) {
+        CompileDialogController cdc = CompileDialogController.init();
+        cdc.configure( modelMgr, userSettings );
+        cdc.show( "" );
+        // String projectName = null;
+        // if (e.getTarget() instanceof MenuItem)
+        // projectName = ((MenuItem) e.getTarget()).getText();
+        // OtmProject project = modelMgr.getProject( projectName );
+        // if (project != null)
+        // new CompileProjectTask( project, this::handleTaskComplete, mainController.getStatusController() ).go();
     }
 
     @FXML
@@ -380,6 +407,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
                 dialogBox.close();
             fireEvent( new DexModelChangeEvent( modelMgr ) );
             mainController.refresh();
+
+            // configureCompileMenu();
         }
     }
 
