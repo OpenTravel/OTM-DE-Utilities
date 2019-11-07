@@ -381,10 +381,10 @@
 																				</Label>
 																				<CheckBox fx:id="exampleMaxDetailCheckbox"
 																					mnemonicParsing="false" GridPane.columnIndex="1" />
-																				<Spinner fx:id="maxRepeatSpinner" prefWidth="50.0"
+																				<Spinner fx:id="maxRepeatSpinner" prefWidth="100.0"
 																					GridPane.columnIndex="1" GridPane.rowIndex="1" />
 																				<Spinner fx:id="maxRecursionDepthSpinner"
-																					prefWidth="50.0" GridPane.columnIndex="1"
+																					prefWidth="100.0" GridPane.columnIndex="1"
 																					GridPane.rowIndex="2" />
 																				<CheckBox fx:id="suppressOptionalFieldsCheckbox"
 																					mnemonicParsing="false" GridPane.columnIndex="1"
