@@ -18,15 +18,22 @@ package org.opentravel.dex.controllers.popup;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.StatusType;
 import org.opentravel.dex.tasks.model.CompileProjectTask;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.ioc.CompilerExtensionRegistry;
+import org.opentravel.schemacompiler.validate.FindingMessageFormat;
+import org.opentravel.schemacompiler.validate.FindingType;
+import org.opentravel.schemacompiler.validate.ValidationFinding;
+import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.io.File;
 import java.io.IOException;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -37,8 +44,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -105,11 +116,11 @@ public class CompileDialogController extends DexPopupControllerBase {
     // @FXML
     // TextFlow dialogHelp;
     @FXML
-    Button cancelButton;
+    Button closeButton;
     @FXML
     Button compileButton;
-    @FXML
-    Button validateButton;
+    // @FXML
+    // Button validateButton;
     // @FXML
     // TextField nameField;
     // @FXML
@@ -117,7 +128,7 @@ public class CompileDialogController extends DexPopupControllerBase {
     // @FXML
     // TextField projectField;
     @FXML
-    TextArea descriptionField;
+    TextField descriptionField;
     @FXML
     ChoiceBox<OtmProject> projectChoiceBox;
     @FXML
@@ -148,6 +159,17 @@ public class CompileDialogController extends DexPopupControllerBase {
     private Spinner<Integer> maxRecursionDepthSpinner;
     @FXML
     private CheckBox suppressOptionalFieldsCheckbox;
+    @FXML
+    private TitledPane resultsPane;
+    //
+    @FXML
+    private TableView<ValidationFinding> resultsTableView;
+    @FXML
+    private TableColumn<ValidationFinding,ImageView> validationLevelColumn;
+    @FXML
+    private TableColumn<ValidationFinding,String> validationComponentColumn;
+    @FXML
+    private TableColumn<ValidationFinding,String> validationDescriptionColumn;
     // @FXML
     // TextField contextIdField;
     // @FXML
@@ -174,7 +196,7 @@ public class CompileDialogController extends DexPopupControllerBase {
 
     @Override
     public void checkNodes() {
-        if (projectChoiceBox == null || targetDirectoryField == null || compileButton == null || cancelButton == null)
+        if (projectChoiceBox == null || targetDirectoryField == null || compileButton == null)
             // || dialogButtonOK == null || resultsArea == null)
             throw new IllegalStateException( "Missing injected field." );
     }
@@ -254,7 +276,9 @@ public class CompileDialogController extends DexPopupControllerBase {
         updateCompileOptions();
 
         // Run the compile
-        CompileProjectTask.compile( targetFile, selectedProject, userSettings );
+        ValidationFindings findings = CompileProjectTask.compile( targetFile, selectedProject, userSettings );
+
+        post( findings );
     }
 
     public void updateCompileOptions() {
@@ -363,9 +387,25 @@ public class CompileDialogController extends DexPopupControllerBase {
         }
     }
 
+    private void post(ValidationFindings findings) {
+        resultsPane.setExpanded( true );
+        resultsTableView.setItems( FXCollections.observableList( findings.getAllFindingsAsList() ) );
+        // resultsTableView
+        // for (ValidationFinding f : findings.getAllFindingsAsList()) {
+        // // Type == source.getName == MessageOnly
+        // Validatable source = f.getSource();
+        // String key = f.getMessageKey();
+        // String type = f.getType().getDisplayName();
+        // String bare = f.getFormattedMessage( FindingMessageFormat.BARE_FORMAT );
+        // String m = f.getFormattedMessage( FindingMessageFormat.MESSAGE_ONLY_FORMAT );
+        // String d = f.getFormattedMessage( FindingMessageFormat.DEFAULT );
+        // log.debug( "Do do do" );
+        // }
+    }
+
     private void post(OtmProject project) {
         post( CompileProjectTask.getCompileDirectory( project ) );
-        // TODO - post description;
+        // TODO - descriptionField.setText( project.getDescription() );
     }
 
     @Override
@@ -377,22 +417,65 @@ public class CompileDialogController extends DexPopupControllerBase {
         post( modelMgr );
         post( userSettings );
 
-        // cancelButton.setOnAction( e -> doCancel() );
-        // okButton.setOnAction( e -> doOK() );
-        // postHelp( helpText, dialogHelp );
+        validationLevelColumn.setCellValueFactory( nodeFeatures -> {
+            FindingType findingType = nodeFeatures.getValue().getType();
+            Image image =
+                (findingType == FindingType.WARNING) ? StatusType.WARNING.getIcon() : StatusType.ERROR.getIcon();
 
-        // Initial settings
-        //
-        // projectField.setEditable( false );
-        // projectField.setDisable( true ); // Grey it out
-        // if (!modelMgr.hasProjects()) {
-        // postResults( "Must have a project for the new library." );
-        // dialogButtonOK.setDisable( true );
-        // }
-        // if (userSettings != null)
-        // directoryField.setText( userSettings.getLastProjectFolder().getPath() );
-        // else
-        // directoryField.setText( DexFileHandler.getUserHome() );
-
+            return new SimpleObjectProperty<ImageView>( new ImageView( image ) );
+        } );
+        validationComponentColumn.setCellValueFactory(
+            nodeFeatures -> new ReadOnlyStringWrapper( nodeFeatures.getValue().getSource().getValidationIdentity() ) );
+        validationDescriptionColumn.setCellValueFactory( nodeFeatures -> new ReadOnlyStringWrapper(
+            nodeFeatures.getValue().getFormattedMessage( FindingMessageFormat.BARE_FORMAT ) ) );
     }
+
+    // compileXmlSchemasCheckbox.selectedProperty()
+    // .addListener( (observable, oldValue,
+    // newValue) -> new WritableValueUndoableAction<>( compileXmlSchemasCheckbox.selectedProperty(), oldValue,
+    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
+    // compileServicesCheckbox.selectedProperty()
+    // .addListener( (observable, oldValue,
+    // newValue) -> new WritableValueUndoableAction<>( compileServicesCheckbox.selectedProperty(), oldValue,
+    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
+    // compileJsonSchemasCheckbox.selectedProperty()
+    // .addListener( (observable, oldValue,
+    // newValue) -> new WritableValueUndoableAction<>( compileJsonSchemasCheckbox.selectedProperty(), oldValue,
+    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
+    // compileSwaggerCheckbox.selectedProperty()
+    // .addListener( (observable, oldValue,
+    // newValue) -> new WritableValueUndoableAction<>( compileSwaggerCheckbox.selectedProperty(), oldValue,
+    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
+    // compileDocumentationCheckbox.selectedProperty()
+    // .addListener( (observable, oldValue,
+    // newValue) -> new WritableValueUndoableAction<>( compileDocumentationCheckbox.selectedProperty(),
+    // oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
+    // serviceEndpointUrl.textProperty().addListener(
+    // (observable, oldValue, newValue) -> new WritableValueUndoableAction<>( serviceEndpointUrl.textProperty(),
+    // oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
+    // baseResourceUrl.textProperty().addListener(
+    // (observable, oldValue, newValue) -> new WritableValueUndoableAction<>( baseResourceUrl.textProperty(),
+    // oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
+    // suppressExtensionsCheckbox.selectedProperty()
+    // .addListener( (observable, oldValue,
+    // newValue) -> new WritableValueUndoableAction<>( suppressExtensionsCheckbox.selectedProperty(), oldValue,
+    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
+    // generateExamplesCheckbox.selectedProperty()
+    // .addListener( (observable, oldValue,
+    // newValue) -> new WritableValueUndoableAction<>( generateExamplesCheckbox.selectedProperty(), oldValue,
+    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
+    // exampleMaxDetailCheckbox.selectedProperty()
+    // .addListener( (observable, oldValue,
+    // newValue) -> new WritableValueUndoableAction<>( exampleMaxDetailCheckbox.selectedProperty(), oldValue,
+    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
+    // maxRepeatSpinner.valueProperty()
+    // .addListener( (observable, oldValue, newValue) -> new SpinnerUndoableAction<>( maxRepeatSpinner, oldValue,
+    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
+    // maxRecursionDepthSpinner.valueProperty()
+    // .addListener( (observable, oldValue, newValue) -> new SpinnerUndoableAction<>( maxRecursionDepthSpinner,
+    // oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
+    // suppressOptionalFieldsCheckbox.selectedProperty()
+    // .addListener( (observable, oldValue,
+    // newValue) -> new WritableValueUndoableAction<>( suppressOptionalFieldsCheckbox.selectedProperty(),
+    // oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
 }
