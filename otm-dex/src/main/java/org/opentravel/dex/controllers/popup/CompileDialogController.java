@@ -44,6 +44,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -278,16 +279,12 @@ public class CompileDialogController extends DexPopupControllerBase {
         // Run the compile
         ValidationFindings findings = CompileProjectTask.compile( targetFile, selectedProject, userSettings );
 
+        resultsTableView.getItems().clear();
         post( findings );
     }
 
     public void updateCompileOptions() {
-        // FIXME
-        // options.setBindingStyle( bindingStyleChoice.getValue() );
-        CompilerExtensionRegistry.getActiveExtension();
-        CompilerExtensionRegistry.getAvailableExtensionIds();
         CompilerExtensionRegistry.setActiveExtension( bindingStyleChoice.getValue() );
-
         userSettings.setCompileSchemas( compileXmlSchemasCheckbox.isSelected() );
         userSettings.setCompileServices( compileServicesCheckbox.isSelected() );
         userSettings.setCompileJsonSchemas( compileJsonSchemasCheckbox.isSelected() );
@@ -306,9 +303,13 @@ public class CompileDialogController extends DexPopupControllerBase {
     public void post(UserSettings userSettings) {
         // FIXME
         // options.setBindingStyle( bindingStyleChoice.getValue() );
-        CompilerExtensionRegistry.getActiveExtension();
-        CompilerExtensionRegistry.getAvailableExtensionIds();
-        CompilerExtensionRegistry.setActiveExtension( bindingStyleChoice.getValue() );
+        // CompilerExtensionRegistry.getActiveExtension();
+        // CompilerExtensionRegistry.getAvailableExtensionIds();
+        // CompilerExtensionRegistry.setActiveExtension( bindingStyleChoice.getValue() );
+        ObservableList<String> exIds =
+            FXCollections.observableList( CompilerExtensionRegistry.getAvailableExtensionIds() );
+        bindingStyleChoice.setItems( exIds );
+
         compileXmlSchemasCheckbox.setSelected( userSettings.isCompileSchemas() );
         compileServicesCheckbox.setSelected( userSettings.isCompileServices() );
         compileJsonSchemasCheckbox.setSelected( userSettings.isCompileJsonSchemas() );
@@ -320,9 +321,16 @@ public class CompileDialogController extends DexPopupControllerBase {
         suppressExtensionsCheckbox.setSelected( userSettings.isSuppressOtmExtensions() );
         generateExamplesCheckbox.setSelected( userSettings.isGenerateExamples() );
         exampleMaxDetailCheckbox.setSelected( userSettings.isGenerateMaxDetailsForExamples() );
-        // FIXME
-        // maxRepeatSpinner.setValue(userSettings.getExampleMaxRepeat( ) );
-        // maxRecursionDepthSpinner.setValue(userSettings.getExampleMaxDepth( ) );
+
+        Integer maxRepeat = userSettings.getExampleMaxRepeat();
+        if (maxRepeatSpinner.getValueFactory() != null)
+            maxRepeatSpinner.getValueFactory().setValue( (maxRepeat == null) ? 3 : maxRepeat );
+        Integer maxDepth = userSettings.getExampleMaxDepth();
+        if (maxRecursionDepthSpinner.getValueFactory() != null)
+            maxRecursionDepthSpinner.getValueFactory().setValue( maxDepth == null ? 3 : maxDepth );
+        log.debug( " value factory: " + maxRepeatSpinner.getValueFactory() + " Tried to post " + maxRepeat + " got "
+            + maxRepeatSpinner.getValue() );
+
         suppressOptionalFieldsCheckbox.setSelected( userSettings.isSuppressOptionalFields() );
     }
 
@@ -415,6 +423,11 @@ public class CompileDialogController extends DexPopupControllerBase {
 
         // Get the projects from project manager
         post( modelMgr );
+
+        maxRepeatSpinner.setValueFactory( new IntegerSpinnerValueFactory( 1, 3, 3, 1 ) );
+        maxRecursionDepthSpinner.setValueFactory( new IntegerSpinnerValueFactory( 1, 3, 3, 1 ) );
+        maxRepeatSpinner.setEditable( true );
+        maxRepeatSpinner.setDisable( false );
         post( userSettings );
 
         validationLevelColumn.setCellValueFactory( nodeFeatures -> {

@@ -137,19 +137,19 @@ public class UserSettings extends AbstractUserSettings {
         this.exampleContext = exampleContext;
     }
 
-    public Integer getExampleMaxRepeat() {
+    public int getExampleMaxRepeat() {
         return exampleMaxRepeat;
     }
 
-    public void setExampleMaxRepeat(Integer exampleMaxRepeat) {
+    public void setExampleMaxRepeat(int exampleMaxRepeat) {
         this.exampleMaxRepeat = exampleMaxRepeat;
     }
 
-    public Integer getExampleMaxDepth() {
+    public int getExampleMaxDepth() {
         return exampleMaxDepth;
     }
 
-    public void setExampleMaxDepth(Integer exampleMaxDepth) {
+    public void setExampleMaxDepth(int exampleMaxDepth) {
         this.exampleMaxDepth = exampleMaxDepth;
     }
 
@@ -177,8 +177,8 @@ public class UserSettings extends AbstractUserSettings {
     private boolean generateExamples = true;
     private boolean generateMaxDetailsForExamples = true;
     private String exampleContext;
-    private Integer exampleMaxRepeat;
-    private Integer exampleMaxDepth;
+    private int exampleMaxRepeat;
+    private int exampleMaxDepth;
     private boolean suppressOptionalFields = false;
 
 
