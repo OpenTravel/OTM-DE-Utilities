@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Library xmlns="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06 OTA2_LibraryModel_v1.6.0.xsd">
+    
+    <VersionScheme>OTA2</VersionScheme>
+    <Status>Final</Status>
+    <Namespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/orchestrator-test-a/v01_00</Namespace>
+    <Prefix>a-0100</Prefix>
+    <Name>LibA</Name>
+    <Import namespace="http://www.w3.org/2001/XMLSchema" prefix="xsd"/>
+    <Import namespace="http://www.opentravel.org/OTM/Common/v0" prefix="ota"/>
+    <Context applicationContext="http://appcontext/context100" context="context100"/>
+    <Comments>Upversion Registry Test Library A</Comments>
+    
+    <CoreObject name="TargetCore" notExtendable="true">
+        <Aliases/>
+        <Simple type="ota:Empty"/>
+        <Summary>
+            <Indicator name="testInd" publishAsElement="false"/>
+        </Summary>
+        <Detail/>
+    </CoreObject>
+    
+    <ChoiceObject name="TargetChoice" notExtendable="false">
+        <Aliases/>
+        <Shared>
+            <Indicator name="testInd" publishAsElement="false"/>
+        </Shared>
+    </ChoiceObject>
+    
+	<ContextualFacet name="A" type="Choice" facetOwner="TargetChoice">
+        <Indicator name="indicatorA" publishAsElement="false"/>
+	</ContextualFacet>
+	
+	<ContextualFacet name="B" type="Choice" facetOwner="TargetChoice">
+        <Indicator name="indicatorB" publishAsElement="false"/>
+	</ContextualFacet>
+	
+    <BusinessObject name="TargetBO" notExtendable="true">
+        <Aliases/>
+        <ID>
+            <Element name="object_id" repeat="0" type="xsd:int"/>
+        </ID>
+        <Summary>
+            <Indicator name="testInd" publishAsElement="false"/>
+        </Summary>
+        <Detail/>
+    </BusinessObject>
+
+    <CoreObject name="InternalRefs" notExtendable="true">
+        <Aliases/>
+        <Simple type="ota:Empty"/>
+        <Summary>
+            <Element name="TargetCore" repeat="0" type="TargetCore"/>
+            <Element name="TargetChoice" repeat="0" type="TargetChoice"/>
+            <Element name="TargetBO" repeat="0" type="TargetBO"/>
+        </Summary>
+        <Detail/>
+    </CoreObject>
+    
+</Library>

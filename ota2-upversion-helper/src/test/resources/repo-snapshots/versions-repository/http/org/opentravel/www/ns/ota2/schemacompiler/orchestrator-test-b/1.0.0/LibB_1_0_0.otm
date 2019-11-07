@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Library xmlns="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06 OTA2_LibraryModel_v1.6.0.xsd">
+    
+    <VersionScheme>OTA2</VersionScheme>
+    <Status>Final</Status>
+    <Namespace>http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/orchestrator-test-b/v01_00</Namespace>
+    <Prefix>b-0100</Prefix>
+    <Name>LibB</Name>
+    <Import namespace="http://www.w3.org/2001/XMLSchema" prefix="xsd"/>
+    <Import namespace="http://www.opentravel.org/OTM/Common/v0" prefix="ota"/>
+    <Import
+        fileHints="LibA_1_0_0.otm"
+        namespace="http://www.OpenTravel.org/ns/OTA2/SchemaCompiler/orchestrator-test-a/v01_00" prefix="a-0100"/>
+    <Context applicationContext="http://appcontext/context100" context="context100"/>
+    <Comments>Upversion Registry Test Library B</Comments>
+    
+    <CoreObject name="ExternalRefs" notExtendable="true">
+        <Aliases/>
+        <Simple type="ota:Empty"/>
+        <Summary>
+            <Element name="TargetCore" repeat="0" type="a-0100:TargetCore"/>
+            <Element name="TargetChoice" repeat="0" type="a-0100:TargetChoice"/>
+            <Element name="TargetBO" repeat="0" type="a-0100:TargetBO"/>
+        </Summary>
+        <Detail/>
+    </CoreObject>
+    
+</Library>
