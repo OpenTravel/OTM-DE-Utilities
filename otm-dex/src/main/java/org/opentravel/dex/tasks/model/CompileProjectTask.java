@@ -62,15 +62,20 @@ public class CompileProjectTask extends DexTaskBase<OtmProject> {
         // compile( createCompileDirectory( getCompileDirectory( taskData ) ), taskData );
     }
 
-    public static File getCompileDirectory(OtmProject project) {
-        File targetFolder = null;
+    public static String getCompileDirectoryPath(OtmProject project) {
+        String directoryName = "";
         if (project != null) {
-            String directoryName = project.getTL().getProjectFile().getAbsolutePath();
+            directoryName = project.getTL().getProjectFile().getAbsolutePath();
             // strip .otp
             directoryName = directoryName.substring( 0, directoryName.length() - 4 );
             directoryName += "_" + COMPILER_SUFFIX;
-            targetFolder = new File( directoryName );
         }
+        return directoryName;
+    }
+
+    public static File getCompileDirectory(OtmProject project) {
+        File targetFolder = null;
+        targetFolder = new File( getCompileDirectoryPath( project ) );
         return targetFolder;
     }
 

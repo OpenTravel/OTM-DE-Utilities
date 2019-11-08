@@ -36,9 +36,9 @@ public abstract class AbstractMainWindowController {
     protected static final ExtensionFilter OTM_EXTENSION_FILTER =
         new ExtensionFilter( "OTM Library Files (*.otm)", "*.otm" );
     protected static final ExtensionFilter OTP_EXTENSION_FILTER =
-        new ExtensionFilter( "OTM Project Files (*.otp)", "*.otp" );
+        new ExtensionFilter( "Project Files (*.otp)", "*.otp" );
     protected static final ExtensionFilter OTR_EXTENSION_FILTER =
-        new ExtensionFilter( "OTM Release Files (*.otr)", "*.otr" );
+        new ExtensionFilter( "Release Files (*.otr)", "*.otr" );
     protected static final ExtensionFilter XML_EXTENSION_FILTER = new ExtensionFilter( "XML Files (*.xml)", "*.xml" );
     protected static final ExtensionFilter JSON_EXTENSION_FILTER =
         new ExtensionFilter( "JSON Files (*.json)", "*.json" );

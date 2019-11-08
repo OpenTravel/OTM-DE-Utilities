@@ -102,6 +102,20 @@ public class DexFileHandler extends AbstractMainWindowController {
     }
 
     /**
+     * Let user choose a directory
+     * 
+     * @param stage
+     * @param title
+     * @param initialDirectory
+     * @return
+     */
+    public File directoryChooser(Stage stage, String title, String initialDirectory) {
+        File initialFile = new File( initialDirectory );
+        DirectoryChooserDelegate chooser = newDirectoryChooser( title, initialFile );
+        return chooser.showDialog( stage );
+    }
+
+    /**
      * @return a list of OTM Project files
      */
     public File[] getProjectList(File directory) {

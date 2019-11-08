@@ -52,6 +52,10 @@ public class OtmProject {
         return getName();
     }
 
+    public String getDescription() {
+        return getTL().getDescription();
+    }
+
     public void remove(OtmLibrary library) {
         // Remove this project from the library's list
         ProjectItem pi = getProjectItem( library );

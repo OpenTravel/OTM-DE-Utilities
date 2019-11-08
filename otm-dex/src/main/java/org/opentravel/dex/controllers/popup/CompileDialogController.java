@@ -19,6 +19,7 @@ package org.opentravel.dex.controllers.popup;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.StatusType;
+import org.opentravel.common.DexFileHandler;
 import org.opentravel.dex.tasks.model.CompileProjectTask;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmProject;
@@ -328,20 +329,19 @@ public class CompileDialogController extends DexPopupControllerBase {
         Integer maxDepth = userSettings.getExampleMaxDepth();
         if (maxRecursionDepthSpinner.getValueFactory() != null)
             maxRecursionDepthSpinner.getValueFactory().setValue( maxDepth == null ? 3 : maxDepth );
-        log.debug( " value factory: " + maxRepeatSpinner.getValueFactory() + " Tried to post " + maxRepeat + " got "
-            + maxRepeatSpinner.getValue() );
 
         suppressOptionalFieldsCheckbox.setSelected( userSettings.isSuppressOptionalFields() );
     }
 
-    @FXML
-    public void doValidation(ActionEvent e) {
-        log.debug( "TODO - Do validate." );
-    }
 
     @FXML
     public void selectTargetDirectory(ActionEvent e) {
-        log.debug( "TODO - File selection dialog." );
+        log.debug( "File selection dialog." );
+        // Let user choose
+        String initialDir = CompileProjectTask.getCompileDirectoryPath( selectedProject );
+        DexFileHandler fh = new DexFileHandler();
+        File selectedFile = fh.directoryChooser( popupStage, title, initialDir );
+        post( selectedFile );
     }
 
     @FXML
@@ -370,7 +370,6 @@ public class CompileDialogController extends DexPopupControllerBase {
      * @param initialProjectFolder used in user file selection dialog
      */
     public void configure(OtmModelManager manager, UserSettings settings) {
-        // TODO - the settings should be abstracted for Dex applications
         this.modelMgr = manager;
         this.userSettings = settings;
 
@@ -381,7 +380,7 @@ public class CompileDialogController extends DexPopupControllerBase {
             targetDirectoryField.setText( targetDirectory.getPath() );
         else
             targetDirectoryField.setText( "" );
-        targetDirectoryButton.setDisable( true ); // TODO
+        targetDirectoryButton.setDisable( false );
     }
 
     private void post(OtmModelManager mgr) {
@@ -398,22 +397,11 @@ public class CompileDialogController extends DexPopupControllerBase {
     private void post(ValidationFindings findings) {
         resultsPane.setExpanded( true );
         resultsTableView.setItems( FXCollections.observableList( findings.getAllFindingsAsList() ) );
-        // resultsTableView
-        // for (ValidationFinding f : findings.getAllFindingsAsList()) {
-        // // Type == source.getName == MessageOnly
-        // Validatable source = f.getSource();
-        // String key = f.getMessageKey();
-        // String type = f.getType().getDisplayName();
-        // String bare = f.getFormattedMessage( FindingMessageFormat.BARE_FORMAT );
-        // String m = f.getFormattedMessage( FindingMessageFormat.MESSAGE_ONLY_FORMAT );
-        // String d = f.getFormattedMessage( FindingMessageFormat.DEFAULT );
-        // log.debug( "Do do do" );
-        // }
     }
 
     private void post(OtmProject project) {
         post( CompileProjectTask.getCompileDirectory( project ) );
-        // TODO - descriptionField.setText( project.getDescription() );
+        descriptionField.setText( project.getDescription() );
     }
 
     @Override

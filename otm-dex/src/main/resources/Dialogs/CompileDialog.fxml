@@ -57,18 +57,9 @@
 				<Insets bottom="5.0" left="10.0" right="20.0" top="5.0" />
 			</BorderPane.margin>
 			<buttons>
-				<!--  Button fx:id="validateButton" onAction="#doValidation"
-					alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0"
-					mnemonicParsing="false" prefWidth="75.0" styleClass="button-blue"
-					stylesheets="@../DavesViper.css" text="Valldate" textAlignment="CENTER">
-					<opaqueInsets>
-						<Insets bottom="10.0" />
-					</opaqueInsets>
-				</Button>
-				<Separator orientation="VERTICAL" / -->
 				<Button fx:id="compileButton" onAction="#doCompile"
 					alignment="CENTER" contentDisplay="CENTER" layoutX="419.0" layoutY="10.0"
-					mnemonicParsing="false" prefWidth="75.0" styleClass="button-blue"
+					mnemonicParsing="false" prefWidth="140.0" styleClass="button-blue"
 					stylesheets="@../DavesViper.css" text="Compile" textAlignment="CENTER">
 					<opaqueInsets>
 						<Insets bottom="10.0" />
@@ -76,7 +67,7 @@
 				</Button>
 				<Separator orientation="VERTICAL" />
 				<Button fx:id="closeButton" onAction="#doOK" alignment="CENTER"
-					contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0"
+					contentDisplay="CENTER" mnemonicParsing="false" prefWidth="140.0"
 					styleClass="button-red" stylesheets="@../DavesViper.css" text="Close"
 					textAlignment="CENTER">
 					<opaqueInsets>
@@ -136,13 +127,9 @@
 												<Insets left="5.0" />
 											</GridPane.margin>
 										</Button>
-										<ChoiceBox fx:id="projectChoiceBox" prefHeight="26.0"
-											prefWidth="462.0" onAction="#selectProject"
-											GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"
-											GridPane.rowIndex="1" />
-										<TextField fx:id="descriptionField" 
-											GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"
-											GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
+										<ChoiceBox fx:id="projectChoiceBox" prefHeight="26.0" onAction="#selectProject"
+											GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" GridPane.rowIndex="1" />
+										<TextField fx:id="descriptionField" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
 										</TextField>
 										<Label text="Description" GridPane.halignment="RIGHT"
 											GridPane.rowIndex="2" GridPane.valignment="TOP">

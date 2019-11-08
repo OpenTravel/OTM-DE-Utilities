@@ -16,8 +16,6 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
@@ -64,7 +62,7 @@ import javafx.beans.property.StringProperty;
  */
 public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends OtmModelElement<TLModelElement>
     implements OtmLibraryMember, OtmTypeProvider, OtmChildrenOwner {
-    private static Log log = LogFactory.getLog( OtmLibraryMemberBase.class );
+    // private static Log log = LogFactory.getLog( OtmLibraryMemberBase.class );
 
     protected OtmModelManager mgr = null;
 
@@ -383,7 +381,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             getDescendantsTypeProviders().forEach( p -> {
                 whereUsed.addAll( mgr.findUsersOf( p ) );
             } );
-            log.debug( "Created Where Used List " + whereUsed.size() + " for : " + this.getNameWithPrefix() );
+            // log.debug( "Created Where Used List " + whereUsed.size() + " for : " + this.getNameWithPrefix() );
         }
         // FIXME - base types
         // FIXME - get resources when they expose this library member
@@ -488,7 +486,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             inheritedChildren.forEach( i -> setContributor( i, baseType ) );
 
             // if (ghosts.size() > 0)
-            log.debug( "Found and modeled " + ghosts.size() + " ghost facets on " + this.getName() );
+            // log.debug( "Found and modeled " + ghosts.size() + " ghost facets on " + this.getName() );
         }
     }
 
