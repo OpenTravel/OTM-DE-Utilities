@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTaskBase;
+import org.opentravel.dex.tasks.DexTaskSingleton;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.objecteditor.UserSettings;
@@ -36,7 +37,7 @@ import java.io.File;
  * @author dmh
  *
  */
-public class CompileProjectTask extends DexTaskBase<OtmProject> {
+public class CompileProjectTask extends DexTaskBase<OtmProject> implements DexTaskSingleton {
     private static Log log = LogFactory.getLog( CompileProjectTask.class );
     private static final String COMPILER_SUFFIX = "CompilerOutput";
 

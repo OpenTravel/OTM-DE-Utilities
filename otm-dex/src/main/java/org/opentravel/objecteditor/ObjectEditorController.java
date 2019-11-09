@@ -27,6 +27,7 @@ import org.opentravel.dex.controllers.member.MemberTreeTableController;
 import org.opentravel.dex.controllers.member.properties.MemberPropertiesTabController;
 import org.opentravel.dex.controllers.member.usage.WhereUsedTabController;
 import org.opentravel.dex.controllers.resources.ResourcesTabController;
+import org.opentravel.dex.controllers.search.SearchTabController;
 import org.opentravel.dex.repository.RepositoryTabController;
 
 import java.awt.Dimension;
@@ -61,6 +62,10 @@ public class ObjectEditorController extends DexMainControllerBase {
     private RepositoryTabController repositoryTabController;
     @FXML
     private ResourcesTabController resourcesTabController;
+    // @FXML
+    // private SearchWindowController searchWindowController;
+    @FXML
+    private SearchTabController searchTabController;
 
     @Override
     public void checkNodes() {
@@ -107,10 +112,9 @@ public class ObjectEditorController extends DexMainControllerBase {
             userSettings.save();
         } );
 
-        // log.debug( "Hide dialog setting: " + userSettings.getHideOpenProjectDialog() );
-
-        // TODO - set initial position
-        // Point position = userSettings.getWindowPosition();
+        // TEST - set initial position
+        stage.setX( userSettings.getWindowPosition().getX() );
+        stage.setY( userSettings.getWindowPosition().getY() );
 
         // Set up menu bar and show the project combo
         addIncludedController( menuBarWithProjectController, eventManager );
@@ -121,10 +125,14 @@ public class ObjectEditorController extends DexMainControllerBase {
         addIncludedController( dexStatusController, eventManager );
         statusController = dexStatusController; // Make available to base class
 
+        // Tab controllers are not in the included controllers list
         repositoryTabController.configure( this ); // TODO - this is slow!
         resourcesTabController.configure( this );
         librariesTabController.configure( this );
         whereUsedTabController.configure( this );
+        // searchTabController.configure( this );
+        // Add menu items for tab controllers that can be non-modal windows
+        // menuBarWithProjectController.addViewItem( searchTabController );
 
         // Include controllers that are not in tabs
         addIncludedController( memberFilterController, eventManager );
@@ -132,6 +140,7 @@ public class ObjectEditorController extends DexMainControllerBase {
         memberTreeTableController.setFilter( memberFilterController );
 
         memberPropertiesTabController.configure( this );
+
 
         // Now that all controller's event requirements are known
         eventManager.configureEventHandlers();

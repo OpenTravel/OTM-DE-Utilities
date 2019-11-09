@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTaskBase;
+import org.opentravel.dex.tasks.DexTaskSingleton;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -34,7 +35,7 @@ import java.util.Collection;
  * @author dmh
  *
  */
-public class TypeResolverTask extends DexTaskBase<OtmModelManager> {
+public class TypeResolverTask extends DexTaskBase<OtmModelManager> implements DexTaskSingleton {
     private static Log log = LogFactory.getLog( TypeResolverTask.class );
 
     /**

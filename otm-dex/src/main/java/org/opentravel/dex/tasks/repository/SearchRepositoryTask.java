@@ -18,16 +18,18 @@ package org.opentravel.dex.tasks.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.repository.RepositorySearchCriteria;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
-import org.opentravel.schemacompiler.repository.LibrarySearchResult;
+import org.opentravel.schemacompiler.model.NamedEntity;
+import org.opentravel.schemacompiler.repository.EntitySearchResult;
+import org.opentravel.schemacompiler.repository.RemoteRepository;
 import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositorySearchResult;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,17 +45,32 @@ import javafx.beans.property.StringProperty;
 public class SearchRepositoryTask extends DexTaskBase<RepositorySearchCriteria> {
     private static Log log = LogFactory.getLog( SearchRepositoryTask.class );
 
-    // private List<RepositorySearchResult> found;
-    private Map<String,RepositoryItem> filterMap;
+    private List<RepositorySearchResult> fullTextResults = null;
+    private List<EntitySearchResult> entityResults = null;
+    // private Map<String,RepositoryItem> filterMap;
+
+    public List<EntitySearchResult> getEntityResults() {
+        return entityResults;
+    }
 
     /**
      * Create a lock repository item task.
      * 
      * @param taskData
-     * @param progressProperty
-     * @param statusProperty
-     * @param handler
+     * @param handler - results handler
+     * @param status - a status controller that can post message and progress indicator
      */
+    public SearchRepositoryTask(RepositorySearchCriteria taskData, TaskResultHandlerI handler,
+        DexStatusController statusController) {
+        super( taskData, handler, statusController );
+
+        // Replace start message from super-type.
+        msgBuilder = new StringBuilder( "Searching repository: " );
+        msgBuilder.append( taskData.getQuery() );
+        updateMessage( msgBuilder.toString() );
+    }
+
+    @Deprecated
     public SearchRepositoryTask(RepositorySearchCriteria taskData, TaskResultHandlerI handler,
         DoubleProperty progressProperty, StringProperty statusProperty) {
         super( taskData, handler, progressProperty, statusProperty );
@@ -74,17 +91,29 @@ public class SearchRepositoryTask extends DexTaskBase<RepositorySearchCriteria> 
      */
     @Override
     public void doIT() throws RepositoryException {
-        Repository repo = taskData.getRepository();
-
         // // TLLibraryStatus includeStatus = null; // Draft, Review, Final, Obsolete
         // TLLibraryStatus includeStatus = TLLibraryStatus.DRAFT; // Draft, Review, Final, Obsolete
         // // RepositoryItemType itemType = null; // .otm or .otr
         // RepositoryItemType itemType = RepositoryItemType.LIBRARY; // .otm or .otr
 
-        // Run search
-        List<RepositorySearchResult> found = repo.search( taskData.getQuery(), taskData.getIncludeStatus(),
-            taskData.isLatestVersionsOnly(), taskData.getItemType() );
+        Repository repo = taskData.getRepository();
+        List<RepositorySearchResult> found;
 
+        if (repo instanceof RemoteRepository && taskData.getSubject() != null) {
+            RemoteRepository rr = (RemoteRepository) repo;
+            NamedEntity entity = (NamedEntity) taskData.getSubject().getTL();
+            boolean includeIndirect = true;
+            // RepositoryItem item = null;
+            entityResults = rr.getEntityWhereExtended( entity );
+            entityResults.addAll( rr.getEntityWhereUsed( entity, includeIndirect ) );
+            // rr.getItemWhereUsed( item, includeIndirect );
+            log.debug( "Found " + entityResults.size() + " entities." );
+        } else {
+            // Run full-text search
+            fullTextResults = repo.search( taskData.getQuery(), taskData.getIncludeStatus(),
+                taskData.isLatestVersionsOnly(), taskData.getItemType() );
+            log.debug( "Found " + fullTextResults.size() + " items in repo." );
+        }
         // Without itemType set, list contains EntitySearchResult(s) and LibrarySearchResult(s)
         // Library results contain a repositoryItem
         // Entity contains: object (bo, core, choice...), object type, repositoryItem
@@ -94,14 +123,14 @@ public class SearchRepositoryTask extends DexTaskBase<RepositorySearchCriteria> 
         // Use keys in namespace tree
         // use entryset for repo items in ns-libraries tree
         // Throw away entity entries
-        filterMap = new HashMap<>();
-        for (RepositorySearchResult result : found) {
-            if (result instanceof LibrarySearchResult) {
-                RepositoryItem ri = ((LibrarySearchResult) result).getRepositoryItem();
-                if (ri != null)
-                    filterMap.put( ri.getBaseNamespace(), ri );
-            }
-        }
+        // filterMap = new HashMap<>();
+        // for (RepositorySearchResult result : found) {
+        // if (result instanceof LibrarySearchResult) {
+        // RepositoryItem ri = ((LibrarySearchResult) result).getRepositoryItem();
+        // if (ri != null)
+        // filterMap.put( ri.getBaseNamespace(), ri );
+        // }
+        // }
 
         // TODO -
         // Merge into repositorySelectionController???
@@ -112,12 +141,16 @@ public class SearchRepositoryTask extends DexTaskBase<RepositorySearchCriteria> 
         // Clear search
     }
 
+    public List<RepositorySearchResult> getFullTextResults() {
+        return fullTextResults;
+    }
+
     /**
      * Get the map of namespaces and repository items that should be included in displayed trees.
      * 
      * @return
      */
     public Map<String,RepositoryItem> getFilterMap() {
-        return filterMap;
+        return null;
     }
 }

@@ -110,6 +110,8 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
 
 
     /**
+     * Get the selected repository or default repository if none selected.
+     * 
      * @throws RepositoryException
      */
     public Repository getSelectedRepository() throws RepositoryException {

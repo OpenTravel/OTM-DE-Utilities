@@ -19,6 +19,7 @@ package org.opentravel.dex.controllers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.tasks.DexTaskBase;
+import org.opentravel.dex.tasks.DexTaskSingleton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,6 @@ public class DexStatusController extends DexIncludedControllerBase<String> {
     private static Log log = LogFactory.getLog( DexStatusController.class );
 
     List<DexTaskBase<?>> runningTasks;
-    // SimpleDoubleProperty taskProgress = new SimpleDoubleProperty();
 
     // FXML inject
     @FXML
@@ -56,7 +56,6 @@ public class DexStatusController extends DexIncludedControllerBase<String> {
             throw new IllegalStateException( "Status label not injected by FXML." );
         if (!(taskCount instanceof Label))
             throw new IllegalStateException( "Task count not injected by FXML." );
-
         log.debug( "FXML Nodes checked OK." );
     }
 
@@ -72,21 +71,6 @@ public class DexStatusController extends DexIncludedControllerBase<String> {
         if (runningTasks == null)
             runningTasks = new ArrayList<>();
     }
-
-    // If it turns out binding to the local taskProgress is needed,
-    // put the binding in an overridden configure method.
-    //
-    // /**
-    // * @param primaryStage
-    // */
-    // // @SuppressWarnings("squid:S1172")
-    // public void setStage(Stage primaryStage) {
-    // checkNodes();
-    // // statusProgress.progressProperty().bind(taskProgress);
-    // // taskProgress.set(1.0);
-    // statusProgress.progressProperty().set(1.0);
-    // log.debug("Stage set.");
-    // }
 
     public void postProgress(double percent) {
         if (statusProgress != null)
@@ -114,15 +98,26 @@ public class DexStatusController extends DexIncludedControllerBase<String> {
      * @param dexTaskBase
      */
     public void start(DexTaskBase<?> task) {
-        for (DexTaskBase<?> t : runningTasks)
-            if (t.getClass() == task.getClass()) {
-                // log.debug( "Already running. Cancelling old task." );
-                t.cancel();
-            }
+        if (task instanceof DexTaskSingleton)
+            cancelIfRunning( task );
+
         runningTasks.add( task );
         update();
         postStatus( runningTasks.size(), "Running: " + task.getMessage() );
         // postStatus("Running " + runningTasks.size() + " tasks. Current task: " + task.getMessage());
+    }
+
+    private void cancelIfRunning(DexTaskBase<?> task) {
+        List<DexTaskBase<?>> toCancel = new ArrayList<>();
+        for (DexTaskBase<?> t : runningTasks)
+            if (t.getClass() == task.getClass()) {
+                log.debug( "Already running. Canceling old task: " + task.getClass().getSimpleName() );
+                toCancel.add( t );
+            }
+        for (DexTaskBase<?> t : toCancel) {
+            t.cancel();
+            finish( t );
+        }
     }
 
     /**
@@ -163,8 +158,7 @@ public class DexStatusController extends DexIncludedControllerBase<String> {
     }
 
     /**
-     * @return
-     * 
+     * @return the number of running tasks \
      */
     public int getQueueSize() {
         return runningTasks.size();

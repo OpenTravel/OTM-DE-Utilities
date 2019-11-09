@@ -31,7 +31,7 @@ import javafx.concurrent.Task;
  * @author dmh
  *
  */
-public abstract class DexTaskBase<T> extends Task<String> {
+public abstract class DexTaskBase<T> extends Task<String> implements DexTask {
     private static Log log = LogFactory.getLog( DexTaskBase.class );
 
     protected T taskData;
@@ -43,7 +43,7 @@ public abstract class DexTaskBase<T> extends Task<String> {
     protected StringBuilder msgBuilder = null;
     private DexStatusController statusController = null;
 
-    private Exception errorException;
+    private Exception errorException = null;
 
     public DexTaskBase(T taskData, TaskResultHandlerI handler, DoubleProperty progressProperty,
         StringProperty statusProperty) {
@@ -179,12 +179,13 @@ public abstract class DexTaskBase<T> extends Task<String> {
         if (statusController != null)
             statusController.finish( this );
         DialogBoxContoller dbc = DialogBoxContoller.init();
-        dbc.show( "Failed", errorBuilder.toString() );
+        dbc.show( "Failed", errorBuilder != null ? errorBuilder.toString() : "" );
     }
 
     public String getErrorMsg() {
         return errorBuilder != null ? errorBuilder.toString() : null;
     }
+
 
     public Exception getErrorException() {
         return errorException;

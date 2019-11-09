@@ -16,6 +16,7 @@
 
 package org.opentravel.dex.controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 /**
@@ -27,6 +28,18 @@ import javafx.fxml.FXML;
  *
  */
 public interface DexTabController {
+
+    /**
+     * Check FXML injected fields and throw illegal state exceptions if not found.
+     */
+    public void checkNodes();
+
+    /**
+     * Does this tab have a stand alone dialog defined? If so, return its title. If not, return null.
+     */
+    public String getDialogTitle();
+
+    public void launchWindow(ActionEvent e);
 
     /**
      * Used by FXML when controller is loaded.

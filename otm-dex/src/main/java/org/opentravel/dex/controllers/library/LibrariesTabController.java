@@ -23,6 +23,7 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabController;
 import org.opentravel.model.OtmModelManager;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 /**
@@ -42,6 +43,12 @@ public class LibrariesTabController implements DexTabController {
 
     public LibrariesTabController() {
         log.debug( "Library Tab Controller constructed." );
+    }
+
+    @Override
+    public void checkNodes() {
+        if (!(librariesTreeTableController instanceof LibrariesTreeTableController))
+            throw new IllegalStateException( "Search controller not injected by FXML." );
     }
 
     @Override
@@ -65,4 +72,14 @@ public class LibrariesTabController implements DexTabController {
     public void post(OtmModelManager modelMgr) {
         librariesTreeTableController.post( modelMgr );
     }
+
+    @Override
+    public String getDialogTitle() {
+        return null;
+    }
+
+    public void launchWindow(ActionEvent e) {
+        // No-op
+    }
+
 }

@@ -23,6 +23,7 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabController;
 import org.opentravel.dex.controllers.member.MemberDetailsController;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 /**
@@ -46,6 +47,9 @@ public class MemberPropertiesTabController implements DexTabController {
         log.debug( "Repository Tab Controller constructed." );
     }
 
+    @Override
+    public void checkNodes() {}
+
     @FXML
     @Override
     public void initialize() {
@@ -58,6 +62,15 @@ public class MemberPropertiesTabController implements DexTabController {
 
         parent.addIncludedController( memberPropertiesTreeTableController, eventManager );
         parent.addIncludedController( memberDetailsController, eventManager );
+    }
+
+    @Override
+    public String getDialogTitle() {
+        return null;
+    }
+
+    public void launchWindow(ActionEvent e) {
+        // No-op
     }
 
 }

@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.repository.NamespacesDAO;
+import org.opentravel.dex.tasks.DexTask;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
@@ -34,7 +35,7 @@ import java.util.List;
  * @author dmh
  *
  */
-public class GetRepositoryItemsTask extends DexTaskBase<NamespacesDAO> {
+public class GetRepositoryItemsTask extends DexTaskBase<NamespacesDAO> implements DexTask {
     private static Log log = LogFactory.getLog( GetRepositoryItemsTask.class );
 
     private List<RepositoryItem> allItems = null;

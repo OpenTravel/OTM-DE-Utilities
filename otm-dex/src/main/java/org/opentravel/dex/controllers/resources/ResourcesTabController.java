@@ -22,6 +22,7 @@ import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabController;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 /**
@@ -83,4 +84,15 @@ public class ResourcesTabController implements DexTabController {
         parent.addIncludedController( resourceErrorsTreeTableController, eventManager );
         log.debug( "Repository Tab configured." );
     }
+
+    // FIXME - this should be true when updated like search
+    @Override
+    public String getDialogTitle() {
+        return null;
+    }
+
+    public void launchWindow(ActionEvent e) {
+        // No-op
+    }
+
 }

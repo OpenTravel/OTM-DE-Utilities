@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.events.DexRepositoryItemReplacedEvent;
+import org.opentravel.dex.tasks.DexTask;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.OtmModelManager;
@@ -36,7 +37,7 @@ import org.opentravel.schemacompiler.repository.RepositoryItem;
  * @author dmh
  *
  */
-public class LockItemTask extends DexTaskBase<RepositoryItem> {
+public class LockItemTask extends DexTaskBase<RepositoryItem> implements DexTask {
     private static Log log = LogFactory.getLog( LockItemTask.class );
 
     private DexStatusController statusController;

@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTaskBase;
+import org.opentravel.dex.tasks.DexTaskSingleton;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.schemacompiler.repository.RepositoryException;
@@ -30,7 +31,7 @@ import org.opentravel.schemacompiler.repository.RepositoryException;
  * @author dmh
  *
  */
-public class ValidateOtmLibraryMemberTask extends DexTaskBase<OtmLibrary> {
+public class ValidateOtmLibraryMemberTask extends DexTaskBase<OtmLibrary> implements DexTaskSingleton {
     private static Log log = LogFactory.getLog( ValidateOtmLibraryMemberTask.class );
 
     /**

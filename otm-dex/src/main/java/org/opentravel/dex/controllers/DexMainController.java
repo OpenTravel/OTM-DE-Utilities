@@ -20,6 +20,7 @@ import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
+import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
 
 import javafx.stage.Stage;
@@ -49,14 +50,6 @@ public interface DexMainController extends DexController {
     void addIncludedController(DexIncludedController<?> controller, OtmEventSubscriptionManager eventManager);
 
     /**
-     * Inform application that a model change event has occurred. Limited to model change events. Other events should be
-     * thrown by their included controller.
-     * 
-     * @param event DexChangeEvent to publish
-     */
-    public void publishEvent(DexChangeEvent event);
-
-    /**
      * @return
      */
     public OtmEventSubscriptionManager getEventSubscriptionManager();
@@ -70,6 +63,13 @@ public interface DexMainController extends DexController {
      * @return repository manager or null
      */
     public RepositoryManager getRepositoryManager();
+
+    /**
+     * Attempt to get the selected repository from the RepositorySelectionController
+     * 
+     * @return repository or null
+     */
+    public Repository getSelectedRepository();
 
     /**
      * 
@@ -107,6 +107,14 @@ public interface DexMainController extends DexController {
      * @param string
      */
     public void postStatus(String string);
+
+    /**
+     * Inform application that a model change event has occurred. Limited to model change events. Other events should be
+     * thrown by their included controller.
+     * 
+     * @param event DexChangeEvent to publish
+     */
+    public void publishEvent(DexChangeEvent event);
 
     /**
      * @param queueSize

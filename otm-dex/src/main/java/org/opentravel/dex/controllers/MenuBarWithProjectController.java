@@ -83,6 +83,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     @FXML
     private Menu doCompileMenu;
     @FXML
+    private Menu viewsMenu;
+    @FXML
     private Label projectLabel;
     @FXML
     public MenuItem doCloseItem;
@@ -359,6 +361,24 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
             configureComboBox( projectList, this::projectComboSelectionListener );
         }
     }
+    // FUTURE
+    // public void addViewItems(List<DexIncludedController<?>> controllers) {
+    // for (DexIncludedController<?> c : controllers) {
+    // if (c instanceof DexTabController)
+    // addViewItem( (DexTabController) c );
+    // }
+    // }
+
+    public void addViewItem(DexTabController tc) {
+        if (tc.getDialogTitle() != null) {
+            log.debug( "Add controller" );
+            MenuItem item = new MenuItem( tc.getDialogTitle() );
+            item.setOnAction( tc::launchWindow );
+            viewsMenu.getItems().add( item );
+        }
+    }
+
+
 
     public void projectComboSelectionListener(Event e) {
         log.debug( "project selection event" );

@@ -16,6 +16,7 @@
 
 package org.opentravel.dex.repository;
 
+import org.opentravel.model.OtmObject;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryItemType;
@@ -33,6 +34,15 @@ public class RepositorySearchCriteria {
 
     private String query;
     private Repository repository;
+    private OtmObject subject;
+
+    public OtmObject getSubject() {
+        return subject;
+    }
+
+    public void setSubject(OtmObject subject) {
+        this.subject = subject;
+    }
 
     private boolean latestVersionsOnly = false;
     private boolean lockedOnly = false;
@@ -43,9 +53,15 @@ public class RepositorySearchCriteria {
     // RepositoryItemType itemType = null; // .otm or .otr
     private RepositoryItemType itemType = RepositoryItemType.LIBRARY; // .otm or .otr
 
+
     public RepositorySearchCriteria(Repository repository, String query) {
         this.repository = repository;
         this.query = query;
+    }
+
+    public RepositorySearchCriteria(Repository repository, OtmObject subject) {
+        this.repository = repository;
+        this.subject = subject;
     }
 
     public String getQuery() {

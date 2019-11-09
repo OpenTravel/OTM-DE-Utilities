@@ -22,6 +22,7 @@ import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabController;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 /**
@@ -53,6 +54,10 @@ public class WhereUsedTabController implements DexTabController {
         log.debug( "Where Used Controller constructed." );
     }
 
+    @Override
+    public void checkNodes() {}
+
+
     @FXML
     @Override
     public void initialize() {
@@ -65,6 +70,15 @@ public class WhereUsedTabController implements DexTabController {
         parent.addIncludedController( typeUsersTreeController, eventManager );
         parent.addIncludedController( usersTreeController, eventManager );
         parent.addIncludedController( typeProvidersTreeController, eventManager );
+    }
+
+    @Override
+    public String getDialogTitle() {
+        return null;
+    }
+
+    public void launchWindow(ActionEvent e) {
+        // No-op
     }
 
 }

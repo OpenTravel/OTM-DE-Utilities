@@ -27,10 +27,13 @@ import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.repository.RepositorySelectionController;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.model.ValidateModelManagerItemsTask;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
+import org.opentravel.schemacompiler.repository.Repository;
+import org.opentravel.schemacompiler.repository.RepositoryException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,6 +118,24 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         if (modelMgr != null)
             return modelMgr;
         return mainController != null ? mainController.getModelManager() : null;
+    }
+
+    @Override
+    public Repository getSelectedRepository() {
+        Repository selected = null;
+        RepositorySelectionController rController = null;
+        for (DexIncludedController<?> c : includedControllers)
+            if (c instanceof RepositorySelectionController)
+                rController = (RepositorySelectionController) c;
+        if (rController != null) {
+            try {
+                selected = rController.getSelectedRepository();
+            } catch (RepositoryException e) {
+                // // TODO Auto-generated catch block
+                // e.printStackTrace();
+            }
+        }
+        return selected;
     }
 
     @Override

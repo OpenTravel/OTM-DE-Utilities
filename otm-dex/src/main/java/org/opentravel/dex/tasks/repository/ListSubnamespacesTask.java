@@ -16,10 +16,9 @@
 
 package org.opentravel.dex.tasks.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.repository.NamespacesDAO;
+import org.opentravel.dex.tasks.DexTask;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.schemacompiler.repository.RepositoryException;
@@ -33,8 +32,8 @@ import java.util.TreeMap;
  * @author dmh
  *
  */
-public class ListSubnamespacesTask extends DexTaskBase<NamespacesDAO> {
-    private static Log log = LogFactory.getLog( ListSubnamespacesTask.class );
+public class ListSubnamespacesTask extends DexTaskBase<NamespacesDAO> implements DexTask {
+    // private static Log log = LogFactory.getLog( ListSubnamespacesTask.class );
 
     // Map indexed by the full path of each namespace found
     // Must be sorted to assure parent can be found when processed.

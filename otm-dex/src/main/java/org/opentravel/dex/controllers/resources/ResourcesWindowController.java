@@ -91,6 +91,7 @@ public class ResourcesWindowController extends DexPopupControllerBase {
         log.debug( "Resource Tab Controller constructed." );
     }
 
+    @Override
     public void checkNodes() {
         if (!(resourcesTreeTableController instanceof ResourcesTreeTableController))
             throw new IllegalStateException( "Resource tree table controller not injected by FXML." );

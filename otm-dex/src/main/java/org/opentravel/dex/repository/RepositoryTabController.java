@@ -22,6 +22,7 @@ import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabController;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 /**
@@ -52,6 +53,9 @@ public class RepositoryTabController implements DexTabController {
     }
 
     @Override
+    public void checkNodes() {}
+
+    @Override
     @FXML
     public void initialize() {
         // no-op
@@ -80,4 +84,15 @@ public class RepositoryTabController implements DexTabController {
 
         log.debug( "Repository Tab Stage set." );
     }
+
+    // FIXME - this should be true when updated like search
+    @Override
+    public String getDialogTitle() {
+        return null;
+    }
+
+    public void launchWindow(ActionEvent e) {
+        // No-op
+    }
+
 }
