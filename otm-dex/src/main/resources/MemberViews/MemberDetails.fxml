@@ -14,7 +14,7 @@
 
 <VBox fx:id="memberDetails" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.member.MemberDetailsController">
    <children>
-      <GridPane hgap="9.0" styleClass="tab-menu-bar" stylesheets="@DavesViper.css" vgap="9.0" GridPane.columnSpan="2147483647">
+      <GridPane hgap="9.0" styleClass="tab-menu-bar" stylesheets="../@DavesViper.css" vgap="9.0" GridPane.columnSpan="2147483647">
         <columnConstraints>
             <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="10.0" />
           <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />

@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.search;
+package org.opentravel.dex.controllers.member.properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.OtmEventSubscriptionManager;
+import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.controllers.member.MemberDetailsController;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase;
-import org.opentravel.dex.repository.RepositorySearchController;
-import org.opentravel.dex.repository.RepositorySelectionController;
 
 import java.io.IOException;
 
@@ -37,12 +38,12 @@ import javafx.stage.Stage;
  * @author dmh
  *
  */
-public class SearchWindowController extends DexPopupControllerBase {
-    private static Log log = LogFactory.getLog( SearchWindowController.class );
+public class MemberPropertiesWindowController extends DexPopupControllerBase {
+    private static Log log = LogFactory.getLog( MemberPropertiesWindowController.class );
 
-    public static final String LAYOUT_FILE = "/SearchViews/SearchWindow.fxml";
+    public static final String LAYOUT_FILE = "/MemberViews/MemberPropertiesWindow.fxml";
 
-    private static String dialogTitle = "Search";
+    private static String dialogTitle = "Member Properties";
 
     protected static Stage dialogStage;
 
@@ -53,9 +54,9 @@ public class SearchWindowController extends DexPopupControllerBase {
      * Otherwise, this code must migrate into the calling controller.
      * 
      */
-    protected static SearchWindowController init() {
-        FXMLLoader loader = new FXMLLoader( SearchWindowController.class.getResource( LAYOUT_FILE ) );
-        SearchWindowController controller = null;
+    protected static MemberPropertiesWindowController init() {
+        FXMLLoader loader = new FXMLLoader( MemberPropertiesWindowController.class.getResource( LAYOUT_FILE ) );
+        MemberPropertiesWindowController controller = null;
         try {
             // Load the fxml file initialize controller it declares.
             Pane pane = loader.load();
@@ -63,10 +64,11 @@ public class SearchWindowController extends DexPopupControllerBase {
             dialogStage = new Stage();
             dialogStage.setScene( new Scene( pane ) );
             dialogStage.initModality( Modality.NONE );
+            dialogStage.getScene().getStylesheets().add( "DavesViper.css" );
 
             // get the controller from loader.
             controller = loader.getController();
-            if (!(controller instanceof SearchWindowController))
+            if (!(controller instanceof MemberPropertiesWindowController))
                 throw new IllegalStateException( "Error creating resources window controller." );
         } catch (IOException e1) {
             throw new IllegalStateException(
@@ -81,25 +83,39 @@ public class SearchWindowController extends DexPopupControllerBase {
      * ********************************************************* FXML Java FX Nodes this controller is dependent upon
      */
     @FXML
-    private RepositorySearchController repositorySearchController;
+    private MemberDetailsController memberDetailsController;
     @FXML
-    private RepositorySelectionController repositorySelectionController;
+    private MemberPropertiesTreeTableController memberPropertiesTreeTableController;
 
 
-    public SearchWindowController() {
+    public MemberPropertiesWindowController() {
         log.debug( "Search Window Controller constructed." );
     }
 
     @Override
     public void checkNodes() {
-        if (!(repositorySearchController instanceof RepositorySearchController))
-            throw new IllegalStateException( "Search controller not injected by FXML." );
+        if (!(memberDetailsController instanceof MemberDetailsController))
+            throw new IllegalStateException( "Member details controller not injected by FXML." );
 
-        if (!(repositorySelectionController instanceof RepositorySelectionController))
-            throw new IllegalStateException( "Selection controller not injected by FXML." );
+        if (!(memberPropertiesTreeTableController instanceof MemberPropertiesTreeTableController))
+            throw new IllegalStateException( "Member properties controller not injected by FXML." );
 
-        // FUTURE - could configure here since the controllers are instantiated
     }
+
+    public void configure(DexMainController parent) {
+        if (parent == null) {
+            log.debug( "Null main controller when configuring resources window" );
+            return;
+        }
+
+        OtmEventSubscriptionManager eventManager = parent.getEventSubscriptionManager();
+        parent.addIncludedController( memberDetailsController, eventManager );
+        parent.addIncludedController( memberPropertiesTreeTableController, eventManager );
+
+        eventManager.configureEventHandlers();
+        log.debug( "Member Details window configured." );
+    }
+
 
     @Override
     @FXML
@@ -107,6 +123,7 @@ public class SearchWindowController extends DexPopupControllerBase {
         // no-op
         checkNodes();
     }
+
 
 
     /**

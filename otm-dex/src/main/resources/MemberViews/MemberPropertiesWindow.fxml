@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="memberPropertiesWindow" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" prefHeight="800.0" prefWidth="1280.0" fx:controller="org.opentravel.dex.controllers.member.properties.MemberPropertiesWindowController">
+	<center>
+	   <VBox>
+		   <children>
+              <fx:include fx:id="memberDetails" source="MemberDetails.fxml" />
+              <fx:include fx:id="memberPropertiesTreeTable" source="MemberPropertiesTreeTable.fxml" VBox.vgrow="ALWAYS" />
+		   </children>
+		</VBox>
+   </center>
+	 <bottom>
+                  <!-- fx:include fx:id="resourceErrorsTreeTable" source="ResourceErrorsTreeTable.fxml" /-->
+	 </bottom>
+</BorderPane>

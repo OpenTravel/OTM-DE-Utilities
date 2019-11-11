@@ -134,6 +134,7 @@ public class ObjectEditorController extends DexMainControllerBase {
         searchTabController.configure( this );
         // Add menu items for tab controllers that can be non-modal windows
         menuBarWithProjectController.addViewItem( searchTabController );
+        menuBarWithProjectController.addViewItem( memberPropertiesTabController );
 
         // Include controllers that are not in tabs
         addIncludedController( memberFilterController, eventManager );
@@ -141,7 +142,6 @@ public class ObjectEditorController extends DexMainControllerBase {
         memberTreeTableController.setFilter( memberFilterController );
 
         memberPropertiesTabController.configure( this );
-
 
         // Now that all controller's event requirements are known
         eventManager.configureEventHandlers();

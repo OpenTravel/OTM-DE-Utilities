@@ -43,9 +43,13 @@ public class MemberPropertiesTabController implements DexTabController {
     @FXML
     private MemberDetailsController memberDetailsController;
 
+    private DexMainController mainController;
+
     public MemberPropertiesTabController() {
-        log.debug( "Repository Tab Controller constructed." );
+        log.debug( "Member Properties Tab Controller constructed." );
     }
+
+    private static final String dialogTitle = "Member Properties";
 
     @Override
     public void checkNodes() {}
@@ -58,6 +62,7 @@ public class MemberPropertiesTabController implements DexTabController {
 
     @Override
     public void configure(DexMainController parent) {
+        this.mainController = parent;
         OtmEventSubscriptionManager eventManager = parent.getEventSubscriptionManager();
 
         parent.addIncludedController( memberPropertiesTreeTableController, eventManager );
@@ -66,11 +71,13 @@ public class MemberPropertiesTabController implements DexTabController {
 
     @Override
     public String getDialogTitle() {
-        return null;
+        return dialogTitle;
     }
 
     public void launchWindow(ActionEvent e) {
-        // No-op
+        MemberPropertiesWindowController w = MemberPropertiesWindowController.init();
+        w.configure( mainController );
+        w.show( dialogTitle );
     }
 
 }

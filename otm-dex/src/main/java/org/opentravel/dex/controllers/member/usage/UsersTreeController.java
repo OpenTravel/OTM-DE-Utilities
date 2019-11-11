@@ -100,7 +100,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
     public void configure(DexMainController parent) {
         super.configure( parent );
         // log.debug("Configuring Member Tree Table.");
-        eventPublisherNode = memberWhereUsed;
+        eventPublisherNode = usersTree;
         configure( parent.getModelManager() );
     }
 
@@ -127,8 +127,8 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
 
         // Add listeners and event handlers
         usersTree.getSelectionModel().select( 0 );
-        // usersTree.getSelectionModel().selectedItemProperty()
-        // .addListener((v, old, newValue) -> memberSelectionListener(newValue));
+        usersTree.getSelectionModel().selectedItemProperty()
+            .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
         // log.debug("Where used table configured.");
         refresh();
@@ -213,20 +213,23 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
     // }
     // }
 
-    // /**
-    // * Listener for selected library members in the tree table.
-    // *
-    // * @param item
-    // */
-    // private void memberSelectionListener(TreeItem<MemberAndUsersDAO> item) {
-    // if (item == null)
-    // return;
-    // log.debug("Selection Listener: " + item.getValue());
-    // ignoreEvents = true;
-    // if (eventPublisherNode != null)
-    // eventPublisherNode.fireEvent(new DexMemberSelectionEvent(this, item));
-    // ignoreEvents = false;
-    // }
+    /**
+     * Listener for selected library members in the tree table.
+     *
+     * @param item
+     */
+    private void memberSelectionListener(TreeItem<MemberAndUsersDAO> item) {
+        if (item == null)
+            return;
+        log.debug( "Selection Listener: " + item.getValue() );
+        ignoreEvents = true;
+        OtmLibraryMember member = null;
+        if (item.getValue() != null && item.getValue().getValue() instanceof OtmLibraryMember)
+            member = (OtmLibraryMember) item.getValue().getValue();
+        if (eventPublisherNode != null && member != null)
+            eventPublisherNode.fireEvent( new DexMemberSelectionEvent( member ) );
+        ignoreEvents = false;
+    }
 
     // public void mouseClick(MouseEvent event) {
     // // this fires after the member selection listener

@@ -50,7 +50,7 @@
             </VBox>
             <TabPane tabClosingPolicy="UNAVAILABLE">
               <tabs>
-                <fx:include fx:id="memberPropertiesTab" source="MemberPropertiesTab.fxml" />
+                <fx:include fx:id="memberPropertiesTab" source="MemberViews/MemberPropertiesTab.fxml" />
 				  <fx:include fx:id="resourcesTab" source="ResourceViews/ResourcesTab.fxml" />
 				<fx:include fx:id="whereUsedTab" source="WhereUsedTab.fxml" />
 				<fx:include fx:id="librariesTab" source="LibrariesTab.fxml" />
