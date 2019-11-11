@@ -23,18 +23,13 @@ import org.opentravel.dex.repository.RepositorySearchCriteria;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.schemacompiler.model.NamedEntity;
-import org.opentravel.schemacompiler.repository.EntitySearchResult;
 import org.opentravel.schemacompiler.repository.RemoteRepository;
 import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryException;
-import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositorySearchResult;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.StringProperty;
 
 /**
  * A JavaFX task for searching for repository items
@@ -45,13 +40,16 @@ import javafx.beans.property.StringProperty;
 public class SearchRepositoryTask extends DexTaskBase<RepositorySearchCriteria> {
     private static Log log = LogFactory.getLog( SearchRepositoryTask.class );
 
-    private List<RepositorySearchResult> fullTextResults = null;
-    private List<EntitySearchResult> entityResults = null;
-    // private Map<String,RepositoryItem> filterMap;
+    private List<RepositorySearchResult> repoResults = null;
 
-    public List<EntitySearchResult> getEntityResults() {
-        return entityResults;
+    public List<RepositorySearchResult> getResults() {
+        return repoResults;
     }
+
+    public RepositorySearchCriteria getCriteria() {
+        return taskData;
+    }
+
 
     /**
      * Create a lock repository item task.
@@ -70,16 +68,6 @@ public class SearchRepositoryTask extends DexTaskBase<RepositorySearchCriteria> 
         updateMessage( msgBuilder.toString() );
     }
 
-    @Deprecated
-    public SearchRepositoryTask(RepositorySearchCriteria taskData, TaskResultHandlerI handler,
-        DoubleProperty progressProperty, StringProperty statusProperty) {
-        super( taskData, handler, progressProperty, statusProperty );
-
-        // Replace start message from super-type.
-        // msgBuilder = new StringBuilder("Locking: ");
-        // msgBuilder.append(taskData.getLibraryName());
-        // updateMessage(msgBuilder.toString());
-    }
 
     /**
      * Searches the contents of the repository using the free-text keywords.
@@ -91,66 +79,26 @@ public class SearchRepositoryTask extends DexTaskBase<RepositorySearchCriteria> 
      */
     @Override
     public void doIT() throws RepositoryException {
-        // // TLLibraryStatus includeStatus = null; // Draft, Review, Final, Obsolete
-        // TLLibraryStatus includeStatus = TLLibraryStatus.DRAFT; // Draft, Review, Final, Obsolete
-        // // RepositoryItemType itemType = null; // .otm or .otr
-        // RepositoryItemType itemType = RepositoryItemType.LIBRARY; // .otm or .otr
-
         Repository repo = taskData.getRepository();
-        List<RepositorySearchResult> found;
 
         if (repo instanceof RemoteRepository && taskData.getSubject() != null) {
             RemoteRepository rr = (RemoteRepository) repo;
             NamedEntity entity = (NamedEntity) taskData.getSubject().getTL();
             boolean includeIndirect = true;
+
+            repoResults = new ArrayList<>();
+            rr.getEntityWhereExtended( entity ).forEach( e -> repoResults.add( e ) );
+            repoResults.addAll( rr.getEntityWhereUsed( entity, includeIndirect ) );
+            // Returns list of repo items
             // RepositoryItem item = null;
-            entityResults = rr.getEntityWhereExtended( entity );
-            entityResults.addAll( rr.getEntityWhereUsed( entity, includeIndirect ) );
             // rr.getItemWhereUsed( item, includeIndirect );
-            log.debug( "Found " + entityResults.size() + " entities." );
+            log.debug( "Found " + repoResults.size() + " entities." );
         } else {
             // Run full-text search
-            fullTextResults = repo.search( taskData.getQuery(), taskData.getIncludeStatus(),
+            // Result list contains both entity and library result items
+            repoResults = repo.search( taskData.getQuery(), taskData.getIncludeStatus(),
                 taskData.isLatestVersionsOnly(), taskData.getItemType() );
-            log.debug( "Found " + fullTextResults.size() + " items in repo." );
+            log.debug( "Found " + repoResults.size() + " items in repo." );
         }
-        // Without itemType set, list contains EntitySearchResult(s) and LibrarySearchResult(s)
-        // Library results contain a repositoryItem
-        // Entity contains: object (bo, core, choice...), object type, repositoryItem
-
-        //
-        // Package up a map of namespaces (repoItem.baseNamespace() : repoItem) as filter selector
-        // Use keys in namespace tree
-        // use entryset for repo items in ns-libraries tree
-        // Throw away entity entries
-        // filterMap = new HashMap<>();
-        // for (RepositorySearchResult result : found) {
-        // if (result instanceof LibrarySearchResult) {
-        // RepositoryItem ri = ((LibrarySearchResult) result).getRepositoryItem();
-        // if (ri != null)
-        // filterMap.put( ri.getBaseNamespace(), ri );
-        // }
-        // }
-
-        // TODO -
-        // Merge into repositorySelectionController???
-        // Add filter for object names
-
-        // TODO
-        // List<RepositoryItem> locked = taskData.getLockedItems();
-        // Clear search
-    }
-
-    public List<RepositorySearchResult> getFullTextResults() {
-        return fullTextResults;
-    }
-
-    /**
-     * Get the map of namespaces and repository items that should be included in displayed trees.
-     * 
-     * @return
-     */
-    public Map<String,RepositoryItem> getFilterMap() {
-        return null;
     }
 }

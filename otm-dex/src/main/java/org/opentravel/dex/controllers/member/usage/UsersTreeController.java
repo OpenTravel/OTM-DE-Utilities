@@ -24,8 +24,6 @@ import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
-import org.opentravel.dex.repository.RepositorySearchCriteria;
-import org.opentravel.dex.tasks.repository.SearchRepositoryTask;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
@@ -33,15 +31,12 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.repository.EntitySearchResult;
-import org.opentravel.schemacompiler.repository.RemoteRepository;
-import org.opentravel.schemacompiler.repository.Repository;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javafx.application.Platform;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
@@ -249,33 +244,33 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
         clear();
         postedMember = member;
         createTreeItems( postedMember );
-        launchSearch();
+        // launchSearch();
     }
 
-    public void launchSearch() {
-        Repository repo = mainController.getSelectedRepository();
-        // if (repo instanceof RemoteRepositoryClient) {
-        if (postedData != null && repo instanceof RemoteRepository) {
-            RepositorySearchCriteria criteria = new RepositorySearchCriteria( repo, postedData );
-            SearchRepositoryTask t =
-                new SearchRepositoryTask( criteria, this::handleSearchResults, mainController.getStatusController() );
-            t.go();
-            log.debug( "Started search" );
-        }
-    }
+    // public void launchSearch() {
+    // Repository repo = mainController.getSelectedRepository();
+    // // if (repo instanceof RemoteRepositoryClient) {
+    // if (postedData != null && repo instanceof RemoteRepository) {
+    // RepositorySearchCriteria criteria = new RepositorySearchCriteria( repo, postedData );
+    // SearchRepositoryTask t =
+    // new SearchRepositoryTask( criteria, this::handleSearchResults, mainController.getStatusController() );
+    // t.go();
+    // log.debug( "Started search" );
+    // }
+    // }
 
-    public void handleSearchResults(WorkerStateEvent event) {
-        log.debug( " search result handler" );
-        if (event.getTarget() instanceof SearchRepositoryTask) {
-            SearchRepositoryTask task = (SearchRepositoryTask) event.getTarget();
-            String error = task.getErrorMsg();
-            List<EntitySearchResult> results = task.getEntityResults();
-            // See how validation finding list was posted so easily
-            log.debug( " post results" );
-            createTreeItems( results );
-        }
-
-    }
+    // public void handleSearchResults(WorkerStateEvent event) {
+    // log.debug( " search result handler" );
+    // if (event.getTarget() instanceof SearchRepositoryTask) {
+    // SearchRepositoryTask task = (SearchRepositoryTask) event.getTarget();
+    // String error = task.getErrorMsg();
+    // List<EntitySearchResult> results = task.getEntityResults();
+    // // See how validation finding list was posted so easily
+    // log.debug( " post results" );
+    // createTreeItems( results );
+    // }
+    //
+    // }
 
     @Override
     public void refresh() {

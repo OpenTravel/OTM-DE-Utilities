@@ -28,6 +28,7 @@ import org.opentravel.dex.controllers.member.properties.MemberPropertiesTabContr
 import org.opentravel.dex.controllers.member.usage.WhereUsedTabController;
 import org.opentravel.dex.controllers.resources.ResourcesTabController;
 import org.opentravel.dex.controllers.search.SearchTabController;
+import org.opentravel.dex.controllers.search.SearchWindowController;
 import org.opentravel.dex.repository.RepositoryTabController;
 
 import java.awt.Dimension;
@@ -62,8 +63,8 @@ public class ObjectEditorController extends DexMainControllerBase {
     private RepositoryTabController repositoryTabController;
     @FXML
     private ResourcesTabController resourcesTabController;
-    // @FXML
-    // private SearchWindowController searchWindowController;
+    @FXML
+    private SearchWindowController searchWindowController;
     @FXML
     private SearchTabController searchTabController;
 
@@ -130,9 +131,9 @@ public class ObjectEditorController extends DexMainControllerBase {
         resourcesTabController.configure( this );
         librariesTabController.configure( this );
         whereUsedTabController.configure( this );
-        // searchTabController.configure( this );
+        searchTabController.configure( this );
         // Add menu items for tab controllers that can be non-modal windows
-        // menuBarWithProjectController.addViewItem( searchTabController );
+        menuBarWithProjectController.addViewItem( searchTabController );
 
         // Include controllers that are not in tabs
         addIncludedController( memberFilterController, eventManager );

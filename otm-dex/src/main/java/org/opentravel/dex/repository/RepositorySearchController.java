@@ -45,6 +45,8 @@ import javafx.scene.control.TextField;
  * @author dmh
  *
  */
+// TODO - remove its FXML file
+@Deprecated
 public class RepositorySearchController extends DexIncludedControllerBase<RepositoryManager>
     implements TaskResultHandlerI {
     private static Log log = LogFactory.getLog( RepositorySearchController.class );
@@ -116,8 +118,8 @@ public class RepositorySearchController extends DexIncludedControllerBase<Reposi
     private void runSearch(ActionEvent event) {
         RepositorySearchCriteria criteria = new RepositorySearchCriteria( currentRepository, searchTerm.getText() );
         mainController.postStatus( "Searching for: " + criteria.getQuery() );
-        if (currentRepository != null)
-            new SearchRepositoryTask( criteria, this::handleTaskComplete, null, null ).go();
+        // if (currentRepository != null)
+        // todo new SearchRepositoryTask( criteria, this::handleTaskComplete, null, null ).go();
     }
 
     private void setLockedFilter(ActionEvent event) {
@@ -129,7 +131,7 @@ public class RepositorySearchController extends DexIncludedControllerBase<Reposi
         log.debug( "Search returned." );
         if (event.getTarget() instanceof SearchRepositoryTask) {
             SearchRepositoryTask task = ((SearchRepositoryTask) event.getTarget());
-            currentFilterMap = task.getFilterMap();
+            // currentFilterMap = task.getFilterMap();
         }
 
         refreshParent();

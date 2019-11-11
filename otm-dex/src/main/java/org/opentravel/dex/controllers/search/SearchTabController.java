@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabController;
-import org.opentravel.dex.repository.RepositorySearchController;
 import org.opentravel.dex.repository.RepositorySelectionController;
 
 import javafx.event.ActionEvent;
@@ -42,11 +41,12 @@ public class SearchTabController implements DexTabController {
      * ********************************************************* FXML Java FX Nodes this controller is dependent upon
      */
     @FXML
-    private RepositorySearchController repositorySearchController;
-    @FXML
     private RepositorySelectionController repositorySelectionController;
-    // @FXML
-    // private TypeProvidersTreeController typeProvidersTreeController;
+    @FXML
+    private SearchQueryController searchQueryController;
+    @FXML
+    private SearchResultsController searchResultsController;
+
 
     // Available but not used
     @FXML
@@ -60,9 +60,6 @@ public class SearchTabController implements DexTabController {
 
     @Override
     public void checkNodes() {
-        if (!(repositorySearchController instanceof RepositorySearchController))
-            throw new IllegalStateException( "Search controller not injected by FXML." );
-
         if (!(repositorySelectionController instanceof RepositorySelectionController))
             throw new IllegalStateException( "Selection controller not injected by FXML." );
     }
@@ -76,9 +73,9 @@ public class SearchTabController implements DexTabController {
     @Override
     public void configure(DexMainController parent) {
         OtmEventSubscriptionManager eventManager = parent.getEventSubscriptionManager();
-        parent.addIncludedController( repositorySearchController, eventManager );
         parent.addIncludedController( repositorySelectionController, eventManager );
-        // parent.addIncludedController( typeProvidersTreeController, eventManager );
+        parent.addIncludedController( searchQueryController, eventManager );
+        parent.addIncludedController( searchResultsController, eventManager );
     }
 
     @Override

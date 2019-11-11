@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="searchQueryVBox" spacing="5.0" stylesheets="@DavesViper.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.search.SearchQueryController">
+   <children>
+      <HBox spacing="5.0">
+         <children>
+            <Label text="Library Status:" textAlignment="RIGHT" />
+            <ChoiceBox fx:id="statusChoice" prefWidth="150.0" />
+         </children>
+      </HBox>
+      <HBox spacing="10.0">
+         <children>
+            <RadioButton fx:id="latestOnlyRadio" mnemonicParsing="false" text="Latest Only" />
+            <Separator orientation="VERTICAL" HBox.hgrow="ALWAYS" />
+            <RadioButton fx:id="lockedRadio" mnemonicParsing="false" stylesheets="@DavesViper.css" text="Locked" />
+         </children>
+      </HBox>
+      <Separator prefWidth="200.0" />
+      <HBox>
+         <children>
+            <TextField fx:id="searchTerm" promptText="Query" text="Query">
+               <HBox.margin>
+                  <Insets top="5.0" />
+               </HBox.margin>
+            </TextField>
+          <Button fx:id="doSearch" onAction="#doSearch" prefWidth="100.0" mnemonicParsing="false" styleClass="button-blue" stylesheets="@DavesViper.css" text="Search" textAlignment="CENTER"/>
+          <Button fx:id="clearSearch" onAction="#clearSearch" prefWidth="100.0" mnemonicParsing="false" styleClass="button-blue" stylesheets="@DavesViper.css" text="Clear" textAlignment="CENTER">
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</VBox>

@@ -138,13 +138,22 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
         return eventPublisherNode;
     }
 
+    /**
+     * If event is not fired, check:
+     * <ul>
+     * <li>Constructor invokes super constructor with subscribed and published events
+     * <li>eventPublisherNode is set
+     * </ul>
+     * 
+     * @see org.opentravel.dex.controllers.DexIncludedController#fireEvent(org.opentravel.dex.events.DexEvent)
+     */
     @Override
     public void fireEvent(DexEvent event) {
         if (eventPublisherNode != null && publishedEventTypes != null
             && publishedEventTypes.contains( event.getEventType() ))
             eventPublisherNode.fireEvent( event );
         else
-            log.warn( event.getEventType() + "event not fired." );
+            log.warn( event.getEventType() + " event not fired." );
     }
 
     @FXML
