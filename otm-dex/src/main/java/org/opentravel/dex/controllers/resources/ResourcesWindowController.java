@@ -41,9 +41,7 @@ public class ResourcesWindowController extends DexPopupControllerBase {
     private static Log log = LogFactory.getLog( ResourcesWindowController.class );
 
     public static final String LAYOUT_FILE = "/ResourceViews/ResourcesWindow.fxml";
-
-    private static String dialogTitle = "Resources";
-
+    protected static String dialogTitle = "Resources";
     protected static Stage dialogStage;
 
     /**
@@ -72,6 +70,7 @@ public class ResourcesWindowController extends DexPopupControllerBase {
             throw new IllegalStateException(
                 "Error loading resources window. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
         }
+        positionStage( dialogStage );
         return controller;
     }
 
@@ -104,26 +103,19 @@ public class ResourcesWindowController extends DexPopupControllerBase {
 
         if (!(resourceErrorsTreeTableController instanceof ResourceErrorsTreeTableController))
             throw new IllegalStateException( "Resource Errors controller not injected by FXML." );
-
     }
 
     @Override
     @FXML
     public void initialize() {
-        // no-op
         checkNodes();
     }
 
-    /**
-     * @param primaryStage
-     */
-    // @Override
     public void configure(DexMainController parent) {
         if (parent == null) {
             log.debug( "Null main controller when configuring resources window" );
             return;
         }
-
         OtmEventSubscriptionManager eventManager = parent.getEventSubscriptionManager();
         parent.addIncludedController( resourcesTreeTableController, eventManager );
         parent.addIncludedController( resourceDetailsController, eventManager );
@@ -134,12 +126,8 @@ public class ResourcesWindowController extends DexPopupControllerBase {
         log.debug( "Repository window configured." );
     }
 
-    /**
-     * @see org.opentravel.dex.controllers.popup.DexPopupControllerBase#setup(java.lang.String)
-     */
     @Override
     public void setup(String message) {
         super.setStage( dialogTitle, dialogStage );
-        // log.debug( "MUST configure with DexMainController" );
     }
 }

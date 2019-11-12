@@ -42,9 +42,7 @@ public class MemberPropertiesWindowController extends DexPopupControllerBase {
     private static Log log = LogFactory.getLog( MemberPropertiesWindowController.class );
 
     public static final String LAYOUT_FILE = "/MemberViews/MemberPropertiesWindow.fxml";
-
-    private static String dialogTitle = "Member Properties";
-
+    protected static String dialogTitle = "Member Properties";
     protected static Stage dialogStage;
 
     /**
@@ -89,7 +87,7 @@ public class MemberPropertiesWindowController extends DexPopupControllerBase {
 
 
     public MemberPropertiesWindowController() {
-        log.debug( "Search Window Controller constructed." );
+        log.debug( "Member Properties Window Controller constructed." );
     }
 
     @Override
@@ -99,7 +97,6 @@ public class MemberPropertiesWindowController extends DexPopupControllerBase {
 
         if (!(memberPropertiesTreeTableController instanceof MemberPropertiesTreeTableController))
             throw new IllegalStateException( "Member properties controller not injected by FXML." );
-
     }
 
     public void configure(DexMainController parent) {
@@ -107,7 +104,6 @@ public class MemberPropertiesWindowController extends DexPopupControllerBase {
             log.debug( "Null main controller when configuring resources window" );
             return;
         }
-
         OtmEventSubscriptionManager eventManager = parent.getEventSubscriptionManager();
         parent.addIncludedController( memberDetailsController, eventManager );
         parent.addIncludedController( memberPropertiesTreeTableController, eventManager );
@@ -116,22 +112,14 @@ public class MemberPropertiesWindowController extends DexPopupControllerBase {
         log.debug( "Member Details window configured." );
     }
 
-
     @Override
     @FXML
     public void initialize() {
-        // no-op
         checkNodes();
     }
 
-
-
-    /**
-     * @see org.opentravel.dex.controllers.popup.DexPopupControllerBase#setup(java.lang.String)
-     */
     @Override
     public void setup(String message) {
         super.setStage( dialogTitle, dialogStage );
-        // log.debug( "MUST configure with DexMainController" );
     }
 }

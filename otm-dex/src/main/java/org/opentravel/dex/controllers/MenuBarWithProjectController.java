@@ -96,8 +96,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     public MenuItem doNewProjectItem;
     @FXML
     public MenuItem fileOpenItem;
-    @FXML
-    public MenuItem resourcesMenuItem;
+    // @FXML
+    // public MenuItem resourcesMenuItem;
     @FXML
     private Label actionCount;
     @FXML
@@ -432,16 +432,16 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         }
     }
 
-    @FXML
-    private MenuItem launchResourceWindow;
-
-    @FXML
-    private void launchResourceWindow() {
-        // if (resourcesMenuItem.isSelected())
-        rwc.show( "" );
-        // else
-        // rwc.hide();
-    }
+    // @FXML
+    // private MenuItem launchResourceWindow;
+    //
+    // @FXML
+    // private void launchResourceWindow() {
+    // // if (resourcesMenuItem.isSelected())
+    // rwc.show( "" );
+    // // else
+    // // rwc.hide();
+    // }
 
     @FXML
     private MenuItem launchWebRepoWindow;
@@ -453,7 +453,6 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
             repoUrl = ((RemoteRepositoryClient) selectedRepository).getEndpointUrl();
         WebViewDialogController wvdc = WebViewDialogController.init();
         wvdc.show( repoUrl );
-
     }
 
     public void setComboLabel(String text) {

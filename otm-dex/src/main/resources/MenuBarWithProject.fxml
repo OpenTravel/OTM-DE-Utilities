@@ -40,7 +40,6 @@
                 <Menu mnemonicParsing="false" text="Edit" />
                 <Menu fx:id="viewsMenu" mnemonicParsing="false" text="Views">
                   <items>
-                    <MenuItem fx:id="resourcesMenuItem" onAction="#launchResourceWindow" mnemonicParsing="false" text="Resources" />
                     <MenuItem fx:id="webMenuItem" onAction="#launchWebRepoWindow" mnemonicParsing="false" text="Repository Web View" />
                   </items>
                 </Menu>

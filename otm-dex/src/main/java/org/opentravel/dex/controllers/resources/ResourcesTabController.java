@@ -46,6 +46,9 @@ public class ResourcesTabController implements DexTabController {
     @FXML
     private ResourceErrorsTreeTableController resourceErrorsTreeTableController;
 
+    private DexMainController mainController;
+    // private static final String dialogTitle = "Resources";
+
     public ResourcesTabController() {
         log.debug( "Resource Tab Controller constructed." );
     }
@@ -77,6 +80,7 @@ public class ResourcesTabController implements DexTabController {
      */
     @Override
     public void configure(DexMainController parent) {
+        this.mainController = parent;
         OtmEventSubscriptionManager eventManager = parent.getEventSubscriptionManager();
         parent.addIncludedController( resourcesTreeTableController, eventManager );
         parent.addIncludedController( resourceDetailsController, eventManager );
@@ -85,14 +89,15 @@ public class ResourcesTabController implements DexTabController {
         log.debug( "Repository Tab configured." );
     }
 
-    // FIXME - this should be true when updated like search
     @Override
     public String getDialogTitle() {
-        return null;
+        return ResourcesWindowController.dialogTitle;
     }
 
     public void launchWindow(ActionEvent e) {
-        // No-op
+        ResourcesWindowController w = ResourcesWindowController.init();
+        w.configure( mainController );
+        w.show( ResourcesWindowController.dialogTitle );
     }
 
 }

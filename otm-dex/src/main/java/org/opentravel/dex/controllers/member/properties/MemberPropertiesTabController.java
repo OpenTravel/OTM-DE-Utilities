@@ -49,10 +49,12 @@ public class MemberPropertiesTabController implements DexTabController {
         log.debug( "Member Properties Tab Controller constructed." );
     }
 
-    private static final String dialogTitle = "Member Properties";
 
     @Override
-    public void checkNodes() {}
+    public void checkNodes() {
+        if (!(memberPropertiesTreeTableController instanceof MemberPropertiesTreeTableController))
+            throw new IllegalStateException( "Member Properties tree table controller not injected by FXML." );
+    }
 
     @FXML
     @Override
@@ -71,13 +73,13 @@ public class MemberPropertiesTabController implements DexTabController {
 
     @Override
     public String getDialogTitle() {
-        return dialogTitle;
+        return MemberPropertiesWindowController.dialogTitle;
     }
 
     public void launchWindow(ActionEvent e) {
         MemberPropertiesWindowController w = MemberPropertiesWindowController.init();
         w.configure( mainController );
-        w.show( dialogTitle );
+        w.show( MemberPropertiesWindowController.dialogTitle );
     }
 
 }
