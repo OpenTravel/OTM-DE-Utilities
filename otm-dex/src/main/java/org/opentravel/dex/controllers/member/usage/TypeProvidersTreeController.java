@@ -30,8 +30,12 @@ import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmFacets.OtmNamespaceFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.event.EventType;
 import javafx.fxml.FXML;
@@ -272,11 +276,26 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
         if (member == null)
             return;
 
+        // Create map of namespace prefixes and tree items
+        Map<String,TreeItem<MemberAndProvidersDAO>> usedPrefixes = new HashMap<>();
+        member.getUsedTypes().forEach( u -> {
+            if (!usedPrefixes.containsKey( u.getPrefix() )) {
+                TreeItem<MemberAndProvidersDAO> nsItem =
+                    new TreeItem<>( new MemberAndProvidersDAO( new OtmNamespaceFacet( u ) ) );
+                usedPrefixes.put( u.getPrefix(), nsItem );
+                root.getChildren().add( nsItem );
+                nsItem.setExpanded( true );
+            }
+        } );
+
         // log.debug( "Posting type providers to: " + member );
         // TODO - organize by namespace then object
         member.getUsedTypes().forEach( u -> {
             TreeItem<MemberAndProvidersDAO> item = new TreeItem<>( new MemberAndProvidersDAO( u ) );
-            root.getChildren().add( item );
+            if (usedPrefixes.get( u.getPrefix() ) != null)
+                usedPrefixes.get( u.getPrefix() ).getChildren().add( item );
+            else
+                root.getChildren().add( item );
         } );
         // typeProvidersTree.sort();
     }

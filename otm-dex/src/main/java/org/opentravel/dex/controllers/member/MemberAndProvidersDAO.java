@@ -22,6 +22,7 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import java.util.List;
@@ -118,6 +119,8 @@ public class MemberAndProvidersDAO implements DexDAO<OtmObject> {
 
     @Override
     public String toString() {
+        if (otmObject instanceof OtmAbstractDisplayFacet)
+            return otmObject.getName();
         return otmObject != null ? otmObject.getPrefix() + ":" + otmObject.toString() : "";
     }
 

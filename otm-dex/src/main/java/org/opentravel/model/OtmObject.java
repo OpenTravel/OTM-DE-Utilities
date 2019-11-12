@@ -38,6 +38,11 @@ import javafx.scene.image.ImageView;
 public interface OtmObject {
 
     /**
+     * Simply set the name property to null.
+     */
+    void clearNameProperty();
+
+    /**
      * @return fx property for description
      */
     public StringProperty descriptionProperty();
@@ -51,8 +56,6 @@ public interface OtmObject {
     public String fixName(String candidateName);
 
     public DexActionManager getActionManager();
-
-    public OtmModelManager getModelManager();
 
     public String getDeprecation();
 
@@ -70,6 +73,8 @@ public interface OtmObject {
      * @return this member's, or owning object's library from the TLLibrary or null
      */
     public OtmLibrary getLibrary();
+
+    public OtmModelManager getModelManager();
 
     /**
      * @return the named entity's local name
@@ -107,13 +112,6 @@ public interface OtmObject {
     /**
      * Used by any view to remember if the object has been expanded.
      * 
-     * @param expanded will be set to flag.
-     */
-    public void setExpanded(boolean flag);
-
-    /**
-     * Used by any view to remember if the object has been expanded.
-     * 
      * @return
      */
     public boolean isExpanded();
@@ -125,6 +123,13 @@ public interface OtmObject {
      * @return true if inherited as indicated by different owners
      */
     public boolean isInherited();
+
+    /**
+     * Is this object re-nameable and implement a setName() method that changes the underlying TL object?
+     * 
+     * @return True unless overridden.
+     */
+    boolean isRenameable();
 
     /**
      * Are there any warnings or errors in the findings?
@@ -148,7 +153,31 @@ public interface OtmObject {
      */
     public StringProperty nameProperty();
 
+    /**
+     * Set the deprecation documentation value. Even though the TL maintains a list, the facades only use the first
+     * item.
+     * 
+     * @param deprecation set to this string. Remove deprecation if string is null or empty.
+     * @return the deprecation string.
+     */
+    public String setDeprecation(String deprecation);
+
     public void setDescription(String description);
+
+    /**
+     * Set the example value. Even though the TL maintains a list, the facades only use the first item.
+     * 
+     * @param value to set the example. Remove example if string is null or empty.
+     * @return the example string.
+     */
+    public String setExample(String value);
+
+    /**
+     * Used by any view to remember if the object has been expanded.
+     * 
+     * @param expanded will be set to flag.
+     */
+    public void setExpanded(boolean flag);
 
     /**
      * Set the name if possible.
@@ -166,33 +195,4 @@ public interface OtmObject {
     public ObjectProperty<ImageView> validationImageProperty();
 
     public StringProperty validationProperty();
-
-    /**
-     * Set the deprecation documentation value. Even though the TL maintains a list, the facades only use the first
-     * item.
-     * 
-     * @param deprecation set to this string. Remove deprecation if string is null or empty.
-     * @return the deprecation string.
-     */
-    public String setDeprecation(String deprecation);
-
-    /**
-     * Set the example value. Even though the TL maintains a list, the facades only use the first item.
-     * 
-     * @param value to set the example. Remove example if string is null or empty.
-     * @return the example string.
-     */
-    public String setExample(String value);
-
-    /**
-     * Is this object re-nameable and implement a setName() method that changes the underlying TL object?
-     * 
-     * @return True unless overridden.
-     */
-    boolean isRenameable();
-
-    /**
-     * Simply set the name property to null.
-     */
-    void clearNameProperty();
 }
