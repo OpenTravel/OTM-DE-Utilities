@@ -52,7 +52,7 @@
               <tabs>
                 <fx:include fx:id="memberPropertiesTab" source="MemberViews/MemberPropertiesTab.fxml" />
 				  <fx:include fx:id="resourcesTab" source="ResourceViews/ResourcesTab.fxml" />
-				<fx:include fx:id="whereUsedTab" source="WhereUsedTab.fxml" />
+				<fx:include fx:id="whereUsedTab" source="WhereUsedViews/WhereUsedTab.fxml" />
 				<fx:include fx:id="librariesTab" source="LibrariesTab.fxml" />
 				  <fx:include fx:id="repositoryTab" source="RepositoryTab.fxml" />
 				  <fx:include fx:id="searchTab" source="SearchViews/SearchTab.fxml" />

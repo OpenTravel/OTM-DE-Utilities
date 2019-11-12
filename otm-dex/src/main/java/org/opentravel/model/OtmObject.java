@@ -105,7 +105,7 @@ public interface OtmObject {
     public String getValidationFindingsAsString();
 
     /**
-     * @return
+     * @return true if this object is editable
      */
     public boolean isEditable();
 

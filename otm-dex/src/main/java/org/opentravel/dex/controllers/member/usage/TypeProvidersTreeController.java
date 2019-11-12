@@ -275,6 +275,7 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
         postedMember = member;
         if (member == null)
             return;
+        // log.debug( "Posting type providers to: " + member );
 
         // Create map of namespace prefixes and tree items
         Map<String,TreeItem<MemberAndProvidersDAO>> usedPrefixes = new HashMap<>();
@@ -288,8 +289,6 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
             }
         } );
 
-        // log.debug( "Posting type providers to: " + member );
-        // TODO - organize by namespace then object
         member.getUsedTypes().forEach( u -> {
             TreeItem<MemberAndProvidersDAO> item = new TreeItem<>( new MemberAndProvidersDAO( u ) );
             if (usedPrefixes.get( u.getPrefix() ) != null)

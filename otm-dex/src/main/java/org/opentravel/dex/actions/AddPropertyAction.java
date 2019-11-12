@@ -37,6 +37,7 @@ public class AddPropertyAction extends DexRunAction {
      * @return
      */
     public static boolean isEnabled(OtmObject subject) {
+        boolean isEditable = subject.isEditable();
         return subject instanceof OtmPropertyOwner && subject.isEditable();
     }
 

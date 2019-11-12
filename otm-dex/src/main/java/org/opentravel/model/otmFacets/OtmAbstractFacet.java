@@ -243,15 +243,15 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
         return tlObject.getFacetType().getIdentityName();
     }
 
-    /**
-     * Facet edit-ability is the ability to add/remove properties.
-     * 
-     * @see org.opentravel.model.OtmModelElement#isEditable()
-     */
-    @Override
-    public boolean isEditable() {
-        return getOwningMember().isEditable();
-    }
+    // /**
+    // * Facet edit-ability is the ability to add/remove properties.
+    // *
+    // * @see org.opentravel.model.OtmModelElement#isEditable()
+    // */
+    // @Override
+    // public boolean isEditable() {
+    // return getOwningMember().isEditable();
+    // }
 
     // @Override
     // public boolean isExpanded() {

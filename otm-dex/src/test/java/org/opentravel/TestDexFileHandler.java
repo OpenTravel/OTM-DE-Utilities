@@ -44,6 +44,7 @@ public class TestDexFileHandler extends AbstractFxTest {
 
     public final static String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector
     public final static String FILE_TESTOPENTRAVELREPO = "TestOpenTravelRepo.otp";
+    public final static String FILE_TESTVERSIONS_REPO = "TestVersionsFromOpenTravelRepo.otp";
     public final static String FILE_TESTLOCAL = "TestLocalFiles.otp";
     public final static String FILE_TESTLOCALLIBRARY = "StandAloneLibrary.otm";
     public final static String FILE_TESTLOCALLIBRARYBASE = "base_library.otm";
@@ -148,6 +149,18 @@ public class TestDexFileHandler extends AbstractFxTest {
      */
     public static void loadManagedProject(OtmModelManager modelManager) {
         File repoProject = new File( wipFolder.get(), "/" + FILE_TESTOPENTRAVELREPO );
+        assertNotNull( repoProject );
+        new DexFileHandler().openProject( repoProject, modelManager, null );
+        assertTrue( "Must have project items.", !modelManager.getProjectManager().getAllProjectItems().isEmpty() );
+        assertTrue( "Must have project items.", modelManager.getProjectManager().getAllProjectItems().size() > 1 );
+        log.debug( "Model now has " + modelManager.getTlModel().getAllLibraries().size() + " libraries." );
+    }
+
+    /**
+     * load project that uses the OpenTravel repository
+     */
+    public static void loadVersionProject(OtmModelManager modelManager) {
+        File repoProject = new File( wipFolder.get(), "/" + FILE_TESTVERSIONS_REPO );
         assertNotNull( repoProject );
         new DexFileHandler().openProject( repoProject, modelManager, null );
         assertTrue( "Must have project items.", !modelManager.getProjectManager().getAllProjectItems().isEmpty() );

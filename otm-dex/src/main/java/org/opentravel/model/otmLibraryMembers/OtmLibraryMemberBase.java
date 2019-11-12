@@ -259,7 +259,9 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     /**
-     * @see org.opentravel.model.OtmModelElement#isEditable()
+     * {@inheritDoc}
+     * 
+     * @return true if member has editable library
      */
     @Override
     public boolean isEditable() {

@@ -314,6 +314,11 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         return false; // Override for classes that can be inherited (facets, properties)
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @return true if owning member is editable
+     */
     @Override
     public boolean isEditable() {
         return getOwningMember() != null && getOwningMember().isEditable();

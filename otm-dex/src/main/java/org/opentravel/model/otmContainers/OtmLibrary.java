@@ -27,6 +27,7 @@ import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryPermission;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
+import org.opentravel.schemacompiler.model.BuiltInLibrary;
 import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLInclude;
 import org.opentravel.schemacompiler.model.TLLibrary;
@@ -357,6 +358,10 @@ public class OtmLibrary {
      */
     public String getVersion() {
         return getTL().getVersion();
+    }
+
+    public boolean isBuiltIn() {
+        return getTL() instanceof BuiltInLibrary;
     }
 
     /**

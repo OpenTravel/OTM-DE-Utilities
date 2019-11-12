@@ -77,10 +77,10 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
         return OtmPropertyType.getType( this );
     }
 
-    @Override
-    public boolean isEditable() {
-        return getOwningMember() != null && getOwningMember().isEditable();
-    }
+    // @Override
+    // public boolean isEditable() {
+    // return getOwningMember() != null && getOwningMember().isEditable();
+    // }
 
     @Override
     public String toString() {

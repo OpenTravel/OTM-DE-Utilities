@@ -100,6 +100,36 @@ public class TestOtmModelManager extends AbstractFxTest {
 
     /** ******************************************************************* **/
     @Test
+    public void testAddingVersionedProject() throws Exception {
+
+        // Given a project that uses the OpenTravel repository
+        OtmModelManager mgr = new OtmModelManager( null, repoManager );
+        TestDexFileHandler.loadVersionProject( mgr );
+
+        // When the project is added to the model manager
+        mgr.addProjects();
+
+        String BASENS0 = "http://www.opentravel.org/Sandbox/Test/VersionTest_Unmanaged";
+        // String BASENS1 = "http://www.opentravel.org/Sandbox/Test/v1";
+        //
+        for (OtmLibrary lib : mgr.getLibraries()) {
+            if (lib.isBuiltIn())
+                continue;
+            log.debug( "Library " + lib + " opened." );
+            log.debug( "Is latest? " + lib.isLatestVersion() );
+            log.debug( "Is minor? " + lib.isMinorVersion() );
+            log.debug( " Version number " + lib.getMajorVersion() + " " + lib.getMinorVersion() );
+            log.debug( "Is latest? " + lib.isLatestVersion() );
+        }
+        for (OtmLibrary lib : mgr.getLibraryChain( BASENS0 )) {
+            log.debug( "Library " + lib + " " + lib.getMajorVersion() + " " + lib.getMinorVersion() );
+        }
+        // for (OtmLibrary lib : mgr.getLibraryChain( BASENS0 )) {
+        // log.debug( "Library " + lib + " opened." );
+        // }
+    }
+
+    @Test
     public void testAddingManagedProject() throws Exception {
 
         // Given a project that uses the OpenTravel repository
