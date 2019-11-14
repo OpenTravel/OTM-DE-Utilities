@@ -125,4 +125,15 @@ public class OtmVersionChain {
     public boolean contains(OtmLibrary lib) {
         return libraries.contains( lib );
     }
+
+    /**
+     * @param member
+     * @return
+     */
+    public boolean isNewToChain(OtmLibraryMember member) {
+        for (OtmLibrary lib : libraries)
+            if (lib != member.getLibrary() && lib.contains( member ))
+                return false;
+        return true;
+    }
 }

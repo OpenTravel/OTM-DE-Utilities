@@ -20,6 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.ImageManager;
+import org.opentravel.dex.action.manager.DexFullActionManager;
+import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -41,6 +43,7 @@ import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
@@ -84,6 +87,13 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     private Button changeTypeButton;
     @FXML
     private TextField memberDescription;
+    @FXML
+    private RadioButton editreadonly;
+    @FXML
+    private RadioButton editminor;
+    @FXML
+    private RadioButton editfull;
+
 
     // private OtmModelManager modelMgr;
     private OtmLibraryMember selectedMember;
@@ -134,10 +144,6 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         super.configure( mainController );
         eventPublisherNode = memberDetails;
 
-        // Button actions set in post() method
-        // // moveButton.setOnAction(e -> postNotImplemented());
-        // changeBaseButton.setOnAction( e -> postNotImplemented() );
-        // changeTypeButton.setOnAction( e -> postNotImplemented() );
     }
 
     @Override
@@ -265,6 +271,16 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             assignedTypeName.setText( "" );
         }
 
+        editfull.setDisable( true );
+        editreadonly.setDisable( true );
+        editminor.setDisable( true );
+        if (member.getActionManager() instanceof DexFullActionManager)
+            post( editfull );
+        else if (member.getActionManager() instanceof DexMinorVersionActionManager)
+            post( editminor );
+        else
+            post( editreadonly );
+
         // Action Buttons
         // deleteButton.setDisable( true );
         // addButton.setDisable( true );
@@ -289,6 +305,11 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         // addButton.setVisible( true );
         // deleteButton.setVisible( true );
         // }
+    }
+
+    private void post(RadioButton button) {
+        button.setSelected( true );
+        button.setDisable( false );
     }
 
     // Called when button is pressed

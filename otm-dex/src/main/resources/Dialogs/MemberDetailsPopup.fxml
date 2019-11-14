@@ -50,7 +50,7 @@
    <center>
       <VBox BorderPane.alignment="CENTER">
          <children>
-		    <fx:include fx:id="memberDetails" source="../MemberDetails.fxml" VBox.vgrow="ALWAYS" />
+		    <fx:include fx:id="memberDetails" source="../MemberViews/MemberDetails.fxml" VBox.vgrow="ALWAYS" />
          </children>
       </VBox>
    </center>

@@ -67,6 +67,7 @@ public class MemberDetailsPopupController extends DexPopupControllerBase {
             dialogStage = new Stage();
             dialogStage.setScene( new Scene( pane ) );
             dialogStage.initModality( Modality.APPLICATION_MODAL );
+            dialogStage.getScene().getStylesheets().add( "DavesViper.css" );
 
             // get the controller from loader.
             controller = loader.getController();

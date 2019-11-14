@@ -149,6 +149,16 @@ public class OtmLibrary {
     }
 
     /**
+     * Test the TL library to see if it has a named member with the same name.
+     * 
+     * @param member
+     * @return
+     */
+    public boolean contains(OtmLibraryMember member) {
+        return getTL().getNamedMember( member.getName() ) != null;
+    }
+
+    /**
      * Delete member. Remove from this library and underlying TL library and from the model manager.
      */
     public void delete(OtmLibraryMember member) {
@@ -190,6 +200,7 @@ public class OtmLibrary {
      * <ul>
      * <li>library version
      * <li>library status
+     * <li>if the member is new to the chain and editable library
      * <li>if the member is the latest in the version chain.
      * </ul>
      *
@@ -198,8 +209,11 @@ public class OtmLibrary {
     public DexActionManager getActionManager(OtmLibraryMember member) {
         if (isMajorVersion() && isEditable())
             return getModelManager().getActionManager( true );
-        if (isChainEditable())
+        if (isChainEditable()) {
+            if (isEditable() && getVersionChain().isNewToChain( member ))
+                return getModelManager().getActionManager( true );
             return getModelManager().getMinorActionManager( getVersionChain().isLatestVersion( member ) );
+        }
         return getModelManager().getActionManager( false );
     }
 
