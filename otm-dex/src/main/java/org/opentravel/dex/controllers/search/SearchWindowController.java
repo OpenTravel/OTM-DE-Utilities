@@ -19,8 +19,8 @@ package org.opentravel.dex.controllers.search;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase;
-import org.opentravel.dex.repository.RepositorySearchController;
-import org.opentravel.dex.repository.RepositorySelectionController;
+import org.opentravel.dex.controllers.repository.RepositorySearchController;
+import org.opentravel.dex.controllers.repository.RepositorySelectionController;
 
 import java.io.IOException;
 

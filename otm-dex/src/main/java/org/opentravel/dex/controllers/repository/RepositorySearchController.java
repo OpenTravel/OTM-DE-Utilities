@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.repository;
+package org.opentravel.dex.controllers.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

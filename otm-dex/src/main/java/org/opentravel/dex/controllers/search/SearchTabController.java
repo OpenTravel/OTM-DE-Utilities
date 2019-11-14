@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabController;
-import org.opentravel.dex.repository.RepositorySelectionController;
+import org.opentravel.dex.controllers.repository.RepositorySelectionController;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

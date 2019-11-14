@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.repository;
+package org.opentravel.dex.controllers.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,8 +53,8 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
     private Label repositoryUser;
     @FXML
     private Button addRepository;
-    @FXML
-    private RepositoryLoginDialogContoller loginDialogController;
+    // @FXML
+    // private RepositoryLoginDialogContoller loginDialogController;
 
     private RepositoryManager repositoryManager;
 
@@ -70,6 +70,8 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
     }
 
     private void addRepository() {
+        // initialize login Dialog Box using a new dynamic loader
+        RepositoryLoginDialogContoller loginDialogController = RepositoryLoginDialogContoller.init( repositoryManager );
 
         if (loginDialogController.showAndWait( "" ) == Results.OK) {
             repositorySelectionChanged(); // update user field
@@ -177,8 +179,8 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
         repositoryManager = parent.getRepositoryManager();
         configureRepositoryChoice();
 
-        // initialize login Dialog Box using a new dynamic loader
-        loginDialogController = RepositoryLoginDialogContoller.init( repositoryManager );
+        // // initialize login Dialog Box using a new dynamic loader
+        // loginDialogController = RepositoryLoginDialogContoller.init( repositoryManager );
         addRepository.setOnAction( e -> addRepository() );
 
         log.debug( "Repository Selection configured." );

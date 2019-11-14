@@ -23,7 +23,7 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.controllers.popup.UnlockLibraryDialogContoller;
-import org.opentravel.dex.repository.RepositoryResultHandler;
+import org.opentravel.dex.controllers.repository.RepositoryResultHandler;
 import org.opentravel.dex.tasks.repository.LockLibraryTask;
 import org.opentravel.dex.tasks.repository.ManageLibraryTask;
 import org.opentravel.dex.tasks.repository.PromoteLibraryTask;

@@ -19,7 +19,7 @@ package org.opentravel.dex.tasks.repository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexStatusController;
-import org.opentravel.dex.repository.NamespacesDAO;
+import org.opentravel.dex.controllers.repository.NamespacesDAO;
 import org.opentravel.dex.tasks.DexTask;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;

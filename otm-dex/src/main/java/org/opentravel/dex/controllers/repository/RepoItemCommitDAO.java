@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.repository;
+package org.opentravel.dex.controllers.repository;
 
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexDAO;

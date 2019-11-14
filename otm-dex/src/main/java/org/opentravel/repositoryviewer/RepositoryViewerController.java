@@ -23,10 +23,10 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexMainControllerBase;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.controllers.MenuBarWithProjectController;
-import org.opentravel.dex.repository.NamespaceLibrariesTreeTableController;
-import org.opentravel.dex.repository.RepositoryItemCommitHistoriesController;
-import org.opentravel.dex.repository.RepositoryNamespacesTreeController;
-import org.opentravel.dex.repository.RepositorySelectionController;
+import org.opentravel.dex.controllers.repository.NamespaceLibrariesTreeTableController;
+import org.opentravel.dex.controllers.repository.RepositoryItemCommitHistoriesController;
+import org.opentravel.dex.controllers.repository.RepositoryNamespacesTreeController;
+import org.opentravel.dex.controllers.repository.RepositorySelectionController;
 
 import javafx.fxml.FXML;
 import javafx.stage.Stage;

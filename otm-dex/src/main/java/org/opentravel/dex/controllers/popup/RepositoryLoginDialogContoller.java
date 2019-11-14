@@ -46,7 +46,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
- * Controller for unlock library dialog box pop-up menu.
+ * Controller for ??? dialog box pop-up menu.
  * <p>
  * This MUST be constructed by passing an FXMLLoader instance which needs access to default constructor.
  * 
@@ -56,7 +56,7 @@ import javafx.stage.Stage;
 public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
     private static Log log = LogFactory.getLog( RepositoryLoginDialogContoller.class );
 
-    public static final String LAYOUT_FILE = "/RepositoryLoginDialog.fxml";
+    public static final String LAYOUT_FILE = "/RepositoryViews/RepositoryLoginDialog.fxml";
 
     // Stage create by FXML loader
     protected static Stage dialogStage;
@@ -84,6 +84,7 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
             dialogStage = new Stage();
             dialogStage.setScene( new Scene( pane ) );
             dialogStage.initModality( Modality.APPLICATION_MODAL );
+            dialogStage.getScene().getStylesheets().add( "DavesViper.css" );
 
             // get the controller from loader.
             controller = loader.getController();
@@ -93,6 +94,7 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
             throw new IllegalStateException(
                 "Error loading dialog box. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
         }
+
         controller.setRepositoryManager( repositoryManager );
         positionStage( dialogStage );
         // log.debug( "Repo Login Dialog controller initialized. " + repositoryManager );

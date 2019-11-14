@@ -19,7 +19,7 @@
                     <Button layoutX="86.0" layoutY="10.0" mnemonicParsing="false" prefWidth="55.0" styleClass="button-red" text="Delete" />
                 </items>
               </ToolBar -->
-              <fx:include fx:id="repositorySelection" source="../RepositorySelection.fxml" />
+              <fx:include fx:id="repositorySelection" source="../RepositoryViews/RepositorySelection.fxml" />
               <fx:include fx:id="searchQuery" source="SearchQuery.fxml" />
               <fx:include fx:id="searchResults" source="SearchResults.fxml" />
               

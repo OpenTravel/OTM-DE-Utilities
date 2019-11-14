@@ -19,7 +19,7 @@ package org.opentravel.dex.tasks.repository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexStatusController;
-import org.opentravel.dex.repository.RepositorySearchCriteria;
+import org.opentravel.dex.controllers.repository.RepositorySearchCriteria;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.schemacompiler.model.NamedEntity;

@@ -26,10 +26,10 @@ import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.controllers.member.MemberTreeTableController;
 import org.opentravel.dex.controllers.member.properties.MemberPropertiesTabController;
 import org.opentravel.dex.controllers.member.usage.WhereUsedTabController;
+import org.opentravel.dex.controllers.repository.RepositoryTabController;
 import org.opentravel.dex.controllers.resources.ResourcesTabController;
 import org.opentravel.dex.controllers.search.SearchTabController;
 import org.opentravel.dex.controllers.search.SearchWindowController;
-import org.opentravel.dex.repository.RepositoryTabController;
 
 import java.awt.Dimension;
 

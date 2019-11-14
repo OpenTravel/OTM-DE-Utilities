@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.repository;
+package org.opentravel.dex.controllers.repository;
 
 import org.opentravel.model.OtmObject;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;

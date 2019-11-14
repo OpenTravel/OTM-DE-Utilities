@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<Tab fx:id="repoTab" text="Repository" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.repository.RepositoryTabController">
+<Tab fx:id="repoTab" text="Repository" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.repository.RepositoryTabController">
             <BorderPane VBox.vgrow="ALWAYS">
                <center>
                   <SplitPane dividerPositions="0.3" VBox.vgrow="ALWAYS">

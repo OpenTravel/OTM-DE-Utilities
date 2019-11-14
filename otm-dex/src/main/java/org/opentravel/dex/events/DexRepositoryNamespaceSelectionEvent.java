@@ -18,7 +18,7 @@ package org.opentravel.dex.events;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.dex.repository.NamespacesDAO;
+import org.opentravel.dex.controllers.repository.NamespacesDAO;
 
 import javafx.event.EventType;
 
