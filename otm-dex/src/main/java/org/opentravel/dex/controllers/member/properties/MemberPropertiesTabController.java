@@ -25,6 +25,7 @@ import org.opentravel.dex.controllers.member.MemberDetailsController;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.MenuItem;
 
 /**
  * Manage the properties tab.
@@ -78,7 +79,11 @@ public class MemberPropertiesTabController implements DexTabController {
 
     public void launchWindow(ActionEvent e) {
         MemberPropertiesWindowController w = MemberPropertiesWindowController.init();
-        w.configure( mainController );
+        if (e.getSource() instanceof MenuItem) {
+            ((MenuItem) e.getSource()).setDisable( true );
+            w.configure( mainController, (MenuItem) e.getSource() );
+        } else
+            w.configure( mainController );
         w.show( MemberPropertiesWindowController.dialogTitle );
     }
 

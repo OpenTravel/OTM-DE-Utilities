@@ -28,6 +28,7 @@ import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -97,6 +98,11 @@ public class MemberPropertiesWindowController extends DexPopupControllerBase {
 
         if (!(memberPropertiesTreeTableController instanceof MemberPropertiesTreeTableController))
             throw new IllegalStateException( "Member properties controller not injected by FXML." );
+    }
+
+    public void configure(DexMainController parent, MenuItem menuItem) {
+        configure( parent );
+        launchedFromMenuItem = menuItem; // Remember so it can be enabled on close
     }
 
     public void configure(DexMainController parent) {

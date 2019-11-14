@@ -21,9 +21,11 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexMainControllerBase;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.MenuItem;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /**
  * Controller base class for dialog pop-up menus.
@@ -44,6 +46,7 @@ public abstract class DexPopupControllerBase implements DexPopupController {
     protected Results result = Results.OK;
     // Each sub-type must define its own stage and pass it in setStage().
     protected Stage popupStage;
+    protected MenuItem launchedFromMenuItem = null;
 
     @Override
     public void checkNodes() {}
@@ -81,6 +84,14 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         clear();
         popupStage.close();
         result = Results.OK;
+    }
+
+    /**
+     * Un-select the menu item if known
+     */
+    public void doClose(WindowEvent e) {
+        if (launchedFromMenuItem != null)
+            launchedFromMenuItem.setDisable( false );
     }
 
     /**
@@ -156,6 +167,8 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         setTitle( title );
         popupStage.setTitle( title );
         this.popupStage = popupStage;
+
+        popupStage.setOnHidden( this::doClose );
     }
 
     @Override

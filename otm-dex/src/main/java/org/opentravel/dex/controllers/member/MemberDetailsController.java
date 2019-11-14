@@ -58,6 +58,13 @@ import javafx.scene.layout.VBox;
 public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     private static Log log = LogFactory.getLog( MemberDetailsController.class );
 
+    public static final String TIP_FULLEDIT = "Full editing enabled for new objects in a library.";
+    public static final String TIP_MINOREDIT =
+        "Minor editing enabled for objects from previous versions of the object from libraries with the same major version number. Minor editing allows objects and optional properties to be added.";
+    public static final String TIP_READONLYEDIT =
+        "Read-only because repository managed library is not locked by the user.";
+
+
     /**
      * FXML Java FX Nodes this controller is dependent upon
      */
@@ -144,6 +151,9 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         super.configure( mainController );
         eventPublisherNode = memberDetails;
 
+        editfull.setTooltip( new Tooltip( TIP_FULLEDIT ) );
+        editminor.setTooltip( new Tooltip( TIP_MINOREDIT ) );
+        editreadonly.setTooltip( new Tooltip( TIP_READONLYEDIT ) );
     }
 
     @Override

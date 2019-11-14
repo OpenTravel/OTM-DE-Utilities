@@ -60,6 +60,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     private static final EventType[] subscribedEvents =
         {OtmObjectChangeEvent.OBJECT_CHANGED, OtmObjectModifiedEvent.OBJECT_MODIFIED,
             DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+
     @FXML
     protected TreeTableView<PropertiesDAO> propertiesTable;
     @FXML

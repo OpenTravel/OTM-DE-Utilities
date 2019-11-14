@@ -29,7 +29,6 @@ import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.controllers.popup.NewLibraryDialogController;
 import org.opentravel.dex.controllers.popup.NewProjectDialogController;
 import org.opentravel.dex.controllers.popup.WebViewDialogController;
-import org.opentravel.dex.controllers.resources.ResourcesWindowController;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.dex.events.DexEventDispatcher;
 import org.opentravel.dex.events.DexModelChangeEvent;
@@ -111,7 +110,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     private OtmModelManager modelMgr;
 
     private DialogBoxContoller dialogBox;
-    private ResourcesWindowController rwc;
+    // private ResourcesWindowController rwc;
 
     private UserSettings userSettings;
 
@@ -193,9 +192,9 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         setdoSaveAllHandler( this::handleSaveAllMenu );
         setUndoAction( e -> undoAction() );
 
-        rwc = ResourcesWindowController.init();
-        rwc.setup( "" );
-        rwc.configure( mainController );
+        // rwc = ResourcesWindowController.init();
+        // rwc.setup( "" );
+        // rwc.configure( mainController );
 
         // // Set up Compile Menu
         // configureCompileMenu();
@@ -223,7 +222,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
      * @param projectList
      * @param listener
      */
-    public void configureComboBox(ObservableList<String> projectList, EventHandler<ActionEvent> listener) {
+    private void configureProjectComboBox(ObservableList<String> projectList, EventHandler<ActionEvent> listener) {
         // log.debug("Setting combo.");
         projectList.sort( null );
         projectCombo.setItems( projectList );
@@ -358,7 +357,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
                 projectMap.put( file.getName(), file );
             }
             ObservableList<String> projectList = FXCollections.observableArrayList( projectMap.keySet() );
-            configureComboBox( projectList, this::projectComboSelectionListener );
+            configureProjectComboBox( projectList, this::projectComboSelectionListener );
         }
     }
     // FUTURE
