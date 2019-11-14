@@ -105,6 +105,8 @@ public interface OtmObject {
     public String getValidationFindingsAsString();
 
     /**
+     * Is this object fully editable? Also see {@link OtmLibraryMember#isEditableMinor()}
+     * 
      * @return true if this object is editable
      */
     public boolean isEditable();

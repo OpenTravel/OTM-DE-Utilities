@@ -124,7 +124,8 @@ public class ImageManager {
      * @return new imageView containing the image associated with the icon or null if no icon image is found
      */
     public static ImageView get(OtmObject otm) {
-        return getImage( otm.getIconType() ) != null ? new ImageView( getImage( otm.getIconType() ) ) : null;
+        return otm != null && getImage( otm.getIconType() ) != null ? new ImageView( getImage( otm.getIconType() ) )
+            : null;
     }
 
     /**

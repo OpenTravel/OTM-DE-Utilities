@@ -143,6 +143,11 @@ public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
     }
 
     @Override
+    public Collection<OtmPropertyOwner> getDescendantsPropertyOwners() {
+        return Collections.emptyList();
+    }
+
+    @Override
     public Collection<OtmChildrenOwner> getDescendantsChildrenOwners() {
         return Collections.emptyList();
     }

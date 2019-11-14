@@ -86,7 +86,10 @@ public class PromoteLibraryTask extends DexTaskBase<OtmLibrary> {
             if (!(pi instanceof RepositoryItem))
                 errorMsg = "Project item is not a repository item.";
             if (pi != null && pi.getStatus().nextStatus() != targetStatus)
-                errorMsg = "Library is not ready to promote to " + targetStatus.toString();
+                if (targetStatus == null)
+                    errorMsg = "Library is not ready to promote. Missing target status. ";
+                else
+                    errorMsg = "Library is not ready to promote to " + targetStatus.toString();
         }
         return errorMsg == null;
     }

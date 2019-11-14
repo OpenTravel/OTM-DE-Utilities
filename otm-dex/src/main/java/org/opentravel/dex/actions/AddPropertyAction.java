@@ -20,6 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
@@ -37,11 +39,13 @@ public class AddPropertyAction extends DexRunAction {
      * @return
      */
     public static boolean isEnabled(OtmObject subject) {
-        boolean isEditable = subject.isEditable();
-        return subject instanceof OtmPropertyOwner && subject.isEditable();
+        // boolean isEditable = subject.getLibrary().isChainEditable();
+        return subject instanceof OtmPropertyOwner && subject.getLibrary().isChainEditable();
     }
 
     private OtmProperty newProperty = null;
+    private OtmLibraryMember newMinorLibraryMember = null;
+    private OtmPropertyOwner newPropertyOwner = null;
 
     public AddPropertyAction() {
         // Constructor for reflection
@@ -54,12 +58,38 @@ public class AddPropertyAction extends DexRunAction {
      */
     @Override
     public Object doIt(Object data) {
-        if (otm != null && otm.getModelManager() != null && data instanceof OtmPropertyType)
-            // Build and hold onto for undo
-            newProperty = OtmPropertyType.build( (OtmPropertyType) data, getSubject() );
+        if (otm != null && otm.getModelManager() != null && data instanceof OtmPropertyType) {
 
-        isValid();
-        log.debug( "Added new member " + get() );
+            // Create a minor version if the subject is in an older library in editable chain
+            //
+            OtmLibrary subjectLibrary = getSubject().getLibrary();
+            if (!subjectLibrary.isEditable() && subjectLibrary.isChainEditable()) {
+                // Get the latest library in the chain that is editable
+                OtmLibrary minorLibrary = subjectLibrary.getVersionChain().getEditable();
+                // Get the latest version of this member
+                OtmLibraryMember latestMember =
+                    subjectLibrary.getVersionChain().getLatestVersion( getSubject().getOwningMember() );
+                // If the latest member is in the target minor library us it
+                if (latestMember.getLibrary() == minorLibrary)
+                    newMinorLibraryMember = latestMember;
+                else
+                    // Create new minor version of this member
+                    newMinorLibraryMember = latestMember.createMinorVersion( minorLibrary );
+                if (newMinorLibraryMember == null)
+                    return null; // how to inform user of error?
+                // Find matching propertyOwner
+                for (OtmPropertyOwner p : newMinorLibraryMember.getDescendantsPropertyOwners())
+                    if (p.getName().equals( getSubject().getName() ))
+                        newPropertyOwner = p;
+            }
+
+            // Build and hold onto for undo
+            OtmPropertyOwner pOwner = newPropertyOwner == null ? getSubject() : newPropertyOwner;
+            newProperty = OtmPropertyType.build( (OtmPropertyType) data, pOwner );
+
+            isValid();
+        }
+        log.debug( "Added new property " + get() );
         return get();
     }
 

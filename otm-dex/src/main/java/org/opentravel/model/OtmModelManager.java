@@ -48,6 +48,7 @@ import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.schemacompiler.repository.impl.BuiltInProject;
 import org.opentravel.schemacompiler.version.VersionChain;
 import org.opentravel.schemacompiler.version.VersionChainFactory;
+import org.opentravel.schemacompiler.version.VersionSchemeException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -100,9 +101,9 @@ public class OtmModelManager implements TaskResultHandlerI {
     /**
      * Create a model manager.
      * 
-     * @param controller
      * @param fullActionManager edit-enabled action manager to assign to all members. If null, read-only action manager
      *        will be used.
+     * @param controller
      */
     public OtmModelManager(DexActionManager fullActionManager, RepositoryManager repositoryManager) {
         // Create a TL Model to manager
@@ -557,6 +558,46 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
     /**
+     * Get all libraries in the base namespace with the same major version
+     * 
+     * @param baseNamespace
+     * @return
+     */
+    public List<OtmLibrary> getVersionChain(OtmLibrary library) {
+        List<OtmLibrary> versionChain = new ArrayList<>();
+        String baseNS = library.getNameWithBasenamespace();
+        // Null means unmanaged libraries without a chain
+        VersionChain<TLLibrary> chain = baseNSManaged.get( baseNS );
+        if (chain != null) {
+            OtmLibrary otmLib;
+            for (TLLibrary tlLib : chain.getVersions()) {
+                otmLib = libraries.get( tlLib );
+                try {
+                    if (otmLib != null && otmLib.getMajorVersion() == library.getMajorVersion())
+                        versionChain.add( otmLib );
+                } catch (VersionSchemeException e) {
+                    // if version error, ignore the library
+                }
+            }
+        }
+        return versionChain;
+
+        // Set<OtmLibrary> libs = new LinkedHashSet<>();
+        // VersionChain<TLLibrary> chain = baseNSManaged.get( baseNamespace );
+        // if (chain != null) {
+        // // Null means unmanaged libraries without a chain
+        // for (TLLibrary tlLib : chain.getVersions())
+        // if (libraries.get( tlLib ) != null)
+        // libs.add( libraries.get( tlLib ) );
+        // else
+        // log.debug( "OOPS - library in chain is null." );
+        // } else {
+        // libs.add( baseNSUnmanaged.get( baseNamespace ) );
+        // }
+        // return libs;
+    }
+
+    /**
      * Get a project that contains this library.
      * <p>
      * Note: OTM-DE used projects to manage write access to libraries. DEX does not.
@@ -599,6 +640,18 @@ public class OtmModelManager implements TaskResultHandlerI {
      */
     public Collection<OtmLibraryMember> getMembers() {
         return Collections.unmodifiableCollection( members.values() );
+    }
+
+    /**
+     * @return new list with all the library members in that library
+     */
+    public List<OtmLibraryMember> getMembers(OtmLibrary library) {
+        List<OtmLibraryMember> libraryMembers = new ArrayList<>();
+        members.values().forEach( m -> {
+            if (m.getLibrary() == library)
+                libraryMembers.add( m );
+        } );
+        return libraryMembers;
     }
 
     public boolean hasProjects() {

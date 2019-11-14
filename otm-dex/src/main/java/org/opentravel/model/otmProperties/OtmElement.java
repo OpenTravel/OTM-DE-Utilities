@@ -20,11 +20,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.model.OtmModelElement;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.OtmTypeUserUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
+import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLProperty;
 import org.opentravel.schemacompiler.model.TLPropertyType;
 
@@ -101,6 +104,15 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
     @Override
     public boolean isInherited() {
         return getTL().getOwner() != getParent().getTL();
+    }
+
+    @Override
+    public boolean isEditable() {
+        if (!isInherited())
+            return super.isEditable();
+        // If inherited, find out from the actual owner
+        OtmObject owner = OtmModelElement.get( (TLModelElement) getTL().getOwner() );
+        return owner != null && owner.isEditable();
     }
 
     @Override

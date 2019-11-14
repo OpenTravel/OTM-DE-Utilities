@@ -62,7 +62,7 @@ import javafx.scene.image.ImageView;
 public class PropertiesDAO implements DexDAO<OtmObject> {
     private static Log log = LogFactory.getLog( PropertiesDAO.class );
 
-    protected OtmObject element;
+    protected final OtmObject element;
     // TODO - remove controller, it is no longer needed for images
     protected DexIncludedController<?> controller;
     // contextual facets will not know if they are inherited, only the contributed facet will know and it is not saved
@@ -95,17 +95,24 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
 
     public PropertiesDAO(OtmFacet<?> property) {
         this.element = property;
+        if (this.element == null)
+            log.error( "NULL object in properties DAO1." );
         // log.debug( "Created DAO for " + element + " Inherited? " + inherited );
     }
 
-    public PropertiesDAO(OtmObject element, DexIncludedController<?> controller) {
-        this.inherited = element.isInherited();
-        this.element = element;
-        // Save the contributor since the Contributed's children does not contain properties and contextual facets
-        if (element instanceof OtmContributedFacet)
-            this.element = ((OtmContributedFacet) element).getContributor();
+    public PropertiesDAO(OtmObject object, DexIncludedController<?> controller) {
+        this.inherited = object.isInherited();
         this.controller = controller;
+
+        // Save the contributor since the Contributed's children does not contain properties and contextual facets
+        if (object instanceof OtmContributedFacet && ((OtmContributedFacet) object).getContributor() != null)
+            this.element = ((OtmContributedFacet) object).getContributor();
+        else
+            this.element = object;
         // log.debug( "Created1 DAO for " + element + " Inherited? " + inherited );
+
+        if (this.element == null)
+            log.error( "NULL object in properties DAO2." );
     }
 
     /**
@@ -118,7 +125,9 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
         this( element, controller );
         if (!inherited && parent != null && parent.getValue() != null)
             this.inherited = parent.getValue().inherited;
-        // log.debug( "Created2 DAO for " + element + " Inherited? " + inherited );
+
+        if (this.element == null)
+            log.error( "NULL object in properties DAO3." );
     }
 
     /**
@@ -158,6 +167,7 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
             // Create a local copy to prevent concurrent modification
             Collection<OtmObject> kids = new ArrayList<>( member.getChildrenHierarchy() );
             for (OtmObject child : kids) {
+                assert child != null;
                 // Create item and add to tree at parent
                 TreeItem<PropertiesDAO> item =
                     new PropertiesDAO( child, getController(), parent ).createTreeItem( parent, filter );
@@ -183,6 +193,7 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
      */
     public TreeItem<PropertiesDAO> createTreeItem(TreeItem<PropertiesDAO> parent, DexFilter<OtmObject> filter) {
         // Apply Filter (if any)
+        assert this.element != null;
         if (filter != null && !filter.isSelected( element ))
             return null;
 
@@ -247,6 +258,8 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
 
     protected Tooltip getTooltip() {
         Tooltip tip = null;
+        if (element == null)
+            return new Tooltip( "" );
         if (isInherited()) {
             if (getBaseTypeName().isEmpty())
                 tip = new Tooltip( element.getObjectTypeName() + " inherited" );

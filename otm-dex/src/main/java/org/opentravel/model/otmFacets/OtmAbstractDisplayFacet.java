@@ -123,6 +123,11 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     }
 
     @Override
+    public Collection<OtmPropertyOwner> getDescendantsPropertyOwners() {
+        return Collections.emptyList();
+    }
+
+    @Override
     public Collection<OtmTypeProvider> getDescendantsTypeProviders() {
         return Collections.emptyList();
     }

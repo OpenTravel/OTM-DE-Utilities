@@ -57,7 +57,7 @@ public class OtmLibrary {
     protected OtmModelManager mgr;
     protected List<ProjectItem> projectItems = new ArrayList<>();
     protected AbstractLibrary tlLib;
-
+    protected OtmVersionChain versionChain = null;
     protected ValidationFindings findings;
 
     /**
@@ -168,12 +168,39 @@ public class OtmLibrary {
     }
 
     /**
-     * @return readOnly or Full action manager based on library state and status (isEditable).
+     * Get Read-only, Minor or Full action manager. To determine which manager to return, consider
+     * <ul>
+     * <li>library version
+     * <li>library status
+     * </ul>
+     * See also {@link #getActionManager(OtmLibraryMember)}
+     * 
+     * @return action manager
      */
     public DexActionManager getActionManager() {
         if (isMinorVersion())
             return getModelManager().getMinorActionManager( isEditable() );
+        if (isChainEditable())
+            return getModelManager().getMinorActionManager( isLatestVersion() );
         return getModelManager().getActionManager( isEditable() );
+    }
+
+    /**
+     * Get Read-only, Minor or Full action manager. To determine which manager to return, consider
+     * <ul>
+     * <li>library version
+     * <li>library status
+     * <li>if the member is the latest in the version chain.
+     * </ul>
+     *
+     * @return action manager
+     */
+    public DexActionManager getActionManager(OtmLibraryMember member) {
+        if (isMajorVersion() && isEditable())
+            return getModelManager().getActionManager( true );
+        if (isChainEditable())
+            return getModelManager().getMinorActionManager( getVersionChain().isLatestVersion( member ) );
+        return getModelManager().getActionManager( false );
     }
 
     /**
@@ -218,10 +245,20 @@ public class OtmLibrary {
      * @throws VersionSchemeException
      */
     public int getMajorVersion() throws VersionSchemeException {
-        String versionScheme = getTL().getVersionScheme();
-        VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
-        String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
-        return Integer.valueOf( vScheme.getMajorVersion( versionId ) );
+        int vn = 0;
+        if (!isBuiltIn() && getTL().getNamespace() != null) {
+            try {
+                String versionScheme = getTL().getVersionScheme();
+                VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
+                String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
+                vn = Integer.valueOf( vScheme.getMajorVersion( versionId ) );
+            } catch (NumberFormatException e) {
+                log.debug( "Error converting version string." + e.getCause() );
+            } catch (VersionSchemeException e) {
+                log.debug( "Error determining version. " + e.getCause() );
+            }
+        }
+        return vn;
     }
 
     public OtmProject getManagingProject() {
@@ -229,18 +266,38 @@ public class OtmLibrary {
     }
 
     /**
-     * @param namespace
      * @return the minor version number
      * @throws VersionSchemeException
      */
     public int getMinorVersion() {
         int vn = 0;
-        if (getTL().getNamespace() != null) {
+        if (!isBuiltIn() && getTL().getNamespace() != null) {
             try {
                 String versionScheme = getTL().getVersionScheme();
                 VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
                 String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
                 vn = Integer.valueOf( vScheme.getMinorVersion( versionId ) );
+            } catch (NumberFormatException e) {
+                log.debug( "Error converting version string." + e.getCause() );
+            } catch (VersionSchemeException e) {
+                log.debug( "Error determining version. " + e.getCause() );
+            }
+        }
+        return vn;
+    }
+
+    /**
+     * @return the minor version number
+     * @throws VersionSchemeException
+     */
+    public int getPatchVersion() {
+        int vn = 0;
+        if (!isBuiltIn() && getTL().getNamespace() != null) {
+            try {
+                String versionScheme = getTL().getVersionScheme();
+                VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
+                String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
+                vn = Integer.valueOf( vScheme.getPatchLevel( versionId ) );
             } catch (NumberFormatException e) {
                 log.debug( "Error converting version string." + e.getCause() );
             } catch (VersionSchemeException e) {
@@ -365,6 +422,7 @@ public class OtmLibrary {
     }
 
     /**
+     * 
      * A library is editable if any associated project item state is Managed_WIP -OR- unmanaged. Regardless of action
      * manager.
      * 
@@ -378,12 +436,51 @@ public class OtmLibrary {
         return getState() == RepositoryItemState.MANAGED_WIP || getState() == RepositoryItemState.UNMANAGED;
     }
 
+    /**
+     * Are any of the libraries in the version chain (same major version number) editable? Always true if this library
+     * is editable.
+     * 
+     * @return
+     */
+    public boolean isChainEditable() {
+        if (isEditable())
+            return true;
+        return getVersionChain().isChainEditable();
+        // boolean editableLibFound = false;
+        // for (OtmLibrary lib : mgr.getVersionChain( this ))
+        // if (lib.isEditable())
+        // editableLibFound = true;
+        // return editableLibFound;
+    }
+
+    // FIXME - clear version chain when new library added
+    public OtmVersionChain getVersionChain() {
+        if (versionChain == null)
+            versionChain = new OtmVersionChain( this );
+        return versionChain;
+    }
+
+    /**
+     * Ask the model manager if this is the latest version of the library
+     * 
+     * @return
+     */
     public boolean isLatestVersion() {
         return mgr.isLatest( this );
     }
 
+    /**
+     * @return true if minor version number is > 0 and managed in repository
+     */
     public boolean isMinorVersion() {
         return (getMinorVersion() > 0 && getState() != RepositoryItemState.UNMANAGED);
+    }
+
+    /**
+     * @return true if minor version number is = 0 and managed in repository
+     */
+    public boolean isMajorVersion() {
+        return (getMinorVersion() == 0 && getState() != RepositoryItemState.UNMANAGED);
     }
 
     /**
@@ -448,7 +545,7 @@ public class OtmLibrary {
     }
 
     public String toString() {
-        return getNameWithBasenamespace();
+        return getNameWithBasenamespace() + " " + getVersion();
     }
 
     public void validate() {

@@ -102,6 +102,8 @@ public class OtmLibraryMemberFactory {
         else if (tlMember instanceof XSDComplexType)
             // Skip Complex Types: for the built-ins they will have an associated element
             otmMember = null; // NO-OP
+        else if (tlMember == null)
+            log.debug( "Called library member factory create() with null tlMember." );
         else
             log.debug( "TODO - model " + tlMember.getClass().getSimpleName() );
 

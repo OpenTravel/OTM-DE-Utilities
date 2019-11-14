@@ -91,6 +91,7 @@
 .tree-table-row-cell:inherited {
     -fx-background-color: #f0f0f0;
 	-fx-font-style: italic ;
+	-fx-font-weight: normal ;
 }
 .tree-table-row-cell:divider {
     -fx-background-color: #9ccfe2;

@@ -16,14 +16,18 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.OtmVersionChain;
 import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
@@ -39,7 +43,12 @@ import org.opentravel.schemacompiler.model.TLExtensionOwner;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLFacetOwner;
 import org.opentravel.schemacompiler.model.TLFacetType;
+import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLModelElement;
+import org.opentravel.schemacompiler.validate.ValidationException;
+import org.opentravel.schemacompiler.version.MinorVersionHelper;
+import org.opentravel.schemacompiler.version.VersionSchemeException;
+import org.opentravel.schemacompiler.version.Versioned;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,7 +71,7 @@ import javafx.beans.property.StringProperty;
  */
 public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends OtmModelElement<TLModelElement>
     implements OtmLibraryMember, OtmTypeProvider, OtmChildrenOwner {
-    // private static Log log = LogFactory.getLog( OtmLibraryMemberBase.class );
+    private static Log log = LogFactory.getLog( OtmLibraryMemberBase.class );
 
     protected OtmModelManager mgr = null;
 
@@ -110,7 +119,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public DexActionManager getActionManager() {
-        return getLibrary() != null ? getLibrary().getActionManager() : noLibraryActionManager;
+        return getLibrary() != null ? getLibrary().getActionManager( this ) : noLibraryActionManager;
     }
 
     @Override
@@ -160,6 +169,20 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
                 owners.add( (OtmChildrenOwner) child );
                 // Recurse
                 owners.addAll( ((OtmChildrenOwner) child).getDescendantsChildrenOwners() );
+            }
+        }
+        return owners;
+    }
+
+    @Override
+    public synchronized Collection<OtmPropertyOwner> getDescendantsPropertyOwners() {
+        List<OtmObject> children = new ArrayList<>( getChildren() );
+        List<OtmPropertyOwner> owners = new ArrayList<>();
+        for (OtmObject child : children) {
+            if (child instanceof OtmPropertyOwner) {
+                owners.add( (OtmPropertyOwner) child );
+                // Recurse
+                owners.addAll( ((OtmChildrenOwner) child).getDescendantsPropertyOwners() );
             }
         }
         return owners;
@@ -266,6 +289,19 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     @Override
     public boolean isEditable() {
         return getLibrary() != null && getLibrary().isEditable();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @return true if member is fully editable or is latest in an editable chain
+     */
+    @Override
+    public boolean isEditableMinor() {
+        if (isEditable())
+            return true;
+        OtmVersionChain chain = getLibrary().getVersionChain();
+        return (chain.isChainEditable() && chain.isLatestChain() && chain.isLatestVersion( this ));
     }
 
     /**
@@ -491,6 +527,67 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             // log.debug( "Found and modeled " + ghosts.size() + " ghost facets on " + this.getName() );
         }
     }
+
+    @Override
+    public boolean isLatestVersion() {
+        // if (getLibrary().isMajorVersion())
+        // return getLibrary().isLatestVersion();
+        if (getLibrary().getVersionChain().isLatestChain())
+            return getLibrary().getVersionChain().isLatestVersion( this );
+        else
+            return false;
+    }
+
+    @Override
+    public OtmLibraryMember createMinorVersion(OtmLibrary minorLibrary) {
+        OtmLibraryMember lm = null;
+        Versioned v = null;
+
+        if (getLibrary() != minorLibrary && minorLibrary.isMinorVersion() && getTL() instanceof Versioned
+            && minorLibrary.getTL() instanceof TLLibrary) {
+            TLLibrary targetTLLib = (TLLibrary) minorLibrary.getTL();
+            try {
+                MinorVersionHelper helper = new MinorVersionHelper();
+                v = helper.createNewMinorVersion( (Versioned) getTL(), targetTLLib );
+                lm = OtmLibraryMemberFactory.create( (LibraryMember) v, getModelManager() );
+            } catch (VersionSchemeException | ValidationException e) {
+                log.debug( "Exception creating minor TL version in: " + targetTLLib.getPrefix() + ":"
+                    + targetTLLib.getName() + " " + e.getLocalizedMessage() );
+                return null;
+            }
+        } else {
+            if (getLibrary() == minorLibrary)
+                log.debug( "Same library." );
+            if (!(minorLibrary.isMinorVersion()))
+                log.debug( "Not a minor verion." );
+            if (!(getTL() instanceof Versioned))
+                log.debug( "Not a versioned object type." );
+            if (!(minorLibrary.getTL() instanceof TLLibrary))
+                log.debug( "Not a TL library." );
+        }
+        // // Post Checks
+        // assert v != null;
+        // assert lm != null;
+        // if (!(lm instanceof OtmValueWithAttributes) && !(lm instanceof OtmSimpleObject)) // FIXME
+        // assert lm.getBaseType() == this;
+        // assert lm.getName().equals( this.getName() );
+        // assert v.getOwningLibrary() == minorLibrary.getTL();
+        // assert lm.getLibrary() == minorLibrary;
+
+        return lm;
+    }
+
+    // protected LibraryMember createMinorTLVersion(TLLibrary targetTLLib) {
+    // if (getTL() instanceof Versioned) {
+    // try {
+    // } catch (VersionSchemeException | ValidationException e) {
+    // log.debug( "Exception creating minor TL version in: " + targetTLLib.getPrefix() + ":"
+    // + targetTLLib.getName() + " " + e.getLocalizedMessage() );
+    // return null;
+    // }
+    // }
+    // return (LibraryMember) v;
+    // }
 
     /**
      * Sub-types MUST implement if any of their children are delete-able

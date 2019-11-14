@@ -23,6 +23,8 @@ import org.opentravel.common.DexRepeatMaxConverter;
 import org.opentravel.common.cellfactories.AssignedTypePropertiesTreeTableCellFactory;
 import org.opentravel.common.cellfactories.ValidationPropertiesTreeTableCellFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
+import org.opentravel.dex.action.manager.DexFullActionManager;
+import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -248,6 +250,8 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         clear();
         if (member != null)
             new PropertiesDAO( member, this ).createChildrenItems( root, null );
+
+        postObjectStatus( member );
     }
 
     /**
@@ -280,6 +284,18 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
             deprecatedCol.setEditable( actionManager.isEnabled( DexActions.DEPRECATIONCHANGE, obj ) );
         } else {
             disableEditing();
+        }
+        postObjectStatus( obj );
+    }
+
+    protected void postObjectStatus(OtmObject object) {
+        if (object != null) {
+            if (object.getActionManager() instanceof DexFullActionManager)
+                getMainController().postStatus( object + " - All editing actions allowed" );
+            else if (object.getActionManager() instanceof DexMinorVersionActionManager)
+                getMainController().postStatus( object + " - Only minor editing actions allowed" );
+            else
+                getMainController().postStatus( object + " - Read-only" );
         }
     }
 

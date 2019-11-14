@@ -22,6 +22,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLAlias;
@@ -160,6 +161,26 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      */
     Map<OtmTypeUser,OtmTypeProvider> getPropertiesWhereUsed();
 
+    /**
+     * Create a minor version of this library member.
+     * 
+     * @param minorLibrary
+     * @return new library member or null
+     */
+    OtmLibraryMember createMinorVersion(OtmLibrary minorLibrary);
 
+    /**
+     * Is this member the latest in the version chain of its library?
+     * 
+     * @return
+     */
+    boolean isLatestVersion();
+
+    /**
+     * Is this member editable as a minor version See {@link #isEditable()}
+     * 
+     * @return true if member is in editable library or is latest in an editable chain
+     */
+    boolean isEditableMinor();
 
 }

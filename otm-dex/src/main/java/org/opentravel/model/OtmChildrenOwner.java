@@ -125,4 +125,12 @@ public interface OtmChildrenOwner extends OtmObject {
      * @return true if children should be visible.
      */
     public boolean isExpanded();
+
+    /**
+     * Get a list of descendants that are property owners.
+     * 
+     * @return new list of property owners or empty list.
+     */
+    public Collection<? extends OtmPropertyOwner> getDescendantsPropertyOwners();
+
 }

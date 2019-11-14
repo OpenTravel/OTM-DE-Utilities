@@ -23,6 +23,7 @@ import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmOperationFacet;
@@ -128,6 +129,11 @@ public class OtmOperation extends OtmModelElement<TLOperation> implements OtmChi
 
     @Override
     public Collection<OtmChildrenOwner> getDescendantsChildrenOwners() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<OtmPropertyOwner> getDescendantsPropertyOwners() {
         return Collections.emptyList();
     }
 

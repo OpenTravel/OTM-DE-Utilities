@@ -429,7 +429,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     @Override
     public String toString() {
-        return getName();
+        return getNameWithPrefix();
     }
 
     @Override

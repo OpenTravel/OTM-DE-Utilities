@@ -100,7 +100,7 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
      */
     private void addProperty(OtmPropertyType type) {
         // Get a valid owner as the subject
-        OtmPropertyOwner owner = getPropertyOwner();
+        OtmPropertyOwner owner = getPropertyOwner( getObject() );
         if (owner != null) {
             owner.getActionManager().run( DexActions.ADDPROPERTY, owner, type );
         }
@@ -109,7 +109,7 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
     }
 
     private void deleteProperty() {
-        OtmProperty p = getProperty();
+        OtmProperty p = getProperty( getObject() );
         if (p != null) {
             p.getActionManager().run( DexActions.DELETEPROPERTY, p );
         }
@@ -117,7 +117,7 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
     }
 
     private void validateMember() {
-        OtmObject obj = getProperty();
+        OtmObject obj = getProperty( getObject() );
         if (obj != null) {
             obj.isValid( true );
             if (obj.getOwningMember() != null)
@@ -128,30 +128,53 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
 
     }
 
-    private OtmProperty getProperty() {
+    /**
+     * @return treeItem.getValue().getValue() or null
+     */
+    private OtmObject getObject() {
         PropertiesDAO dao = null;
         if (getTreeItem() != null)
             dao = getTreeItem().getValue();
-        if (dao != null && dao.getValue() != null && dao.getValue() instanceof OtmProperty)
-            return ((OtmProperty) dao.getValue());
+        if (dao != null && dao.getValue() instanceof OtmObject)
+            return dao.getValue();
         return null;
     }
 
-    private OtmPropertyOwner getPropertyOwner() {
-        PropertiesDAO dao = null;
-        if (getTreeItem() != null)
-            dao = getTreeItem().getValue();
-        if (dao != null && dao.getValue() != null) {
-            if (dao.getValue() instanceof OtmProperty)
-                return ((OtmProperty) dao.getValue()).getParent();
-            if (dao.getValue() instanceof OtmPropertyOwner) {
-                if (dao.getValue() instanceof OtmAbstractDisplayFacet)
-                    return ((OtmAbstractDisplayFacet) dao.getValue()).getParent();
-                return (OtmPropertyOwner) dao.getValue();
-            }
-        }
+    /**
+     * @return treeItem.getValue().getValue() or null
+     */
+    private OtmProperty getProperty(OtmObject object) {
+        if (object instanceof OtmProperty)
+            return ((OtmProperty) object);
         return null;
     }
+
+    private OtmPropertyOwner getPropertyOwner(OtmObject object) {
+        if (object instanceof OtmProperty)
+            return ((OtmProperty) object).getParent();
+        if (object instanceof OtmAbstractDisplayFacet)
+            return ((OtmAbstractDisplayFacet) object).getParent();
+        if (object instanceof OtmPropertyOwner)
+            return (OtmPropertyOwner) object;
+        return null;
+
+    }
+
+    // private OtmPropertyOwner getPropertyOwner2() {
+    // PropertiesDAO dao = null;
+    // if (getTreeItem() != null)
+    // dao = getTreeItem().getValue();
+    // if (dao != null && dao.getValue() != null) {
+    // if (dao.getValue() instanceof OtmProperty)
+    // return ((OtmProperty) dao.getValue()).getParent();
+    // if (dao.getValue() instanceof OtmPropertyOwner) {
+    // if (dao.getValue() instanceof OtmAbstractDisplayFacet)
+    // return ((OtmAbstractDisplayFacet) dao.getValue()).getParent();
+    // return (OtmPropertyOwner) dao.getValue();
+    // }
+    // }
+    // return null;
+    // }
 
     // Runs if menu item on a row is selected
     private void changeAssignedType() {
@@ -169,30 +192,44 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
      * @return
      */
     private void setCSSClass(TreeTableRow<PropertiesDAO> tc, TreeItem<PropertiesDAO> newTreeItem) {
-        if (newTreeItem != null && newTreeItem.getValue() != null) {
+        OtmObject object = getObject();
+        if (object == null)
+            return;
 
-            OtmProperty property = getProperty();
-            OtmPropertyOwner propertyOwner = getPropertyOwner();
-            if (propertyOwner != null && propertyOwner.getActionManager() != null) {
-                DexActionManager am = propertyOwner.getActionManager();
-                addMenu.setDisable( !am.isEnabled( DexActions.ADDPROPERTY, propertyOwner ) );
-                deleteProperty.setDisable( !am.isEnabled( DexActions.DELETEPROPERTY, property ) );
-                changeType.setDisable( !am.isEnabled( DexActions.TYPECHANGE, property ) );
-                // Go through all items and enable/disable
-                OtmPropertyType.enableMenuItems( addMenu, propertyOwner );
-            }
+        OtmProperty property = getProperty( object );
+        OtmPropertyOwner propertyOwner = getPropertyOwner( object );
+        DexActionManager am = propertyOwner != null ? propertyOwner.getActionManager() : null;
 
-            if (newTreeItem.getValue().getValue() instanceof OtmChildrenOwner) {
-                // Make facets dividers
-                tc.pseudoClassStateChanged( DIVIDER, true );
-                tc.setEditable( false );
-            } else {
-                // Set Editable style and state
-                tc.pseudoClassStateChanged( DIVIDER, false );
-                tc.pseudoClassStateChanged( INHERITED, newTreeItem.getValue().isInherited() );
-                tc.pseudoClassStateChanged( EDITABLE, newTreeItem.getValue().isEditable() );
-                tc.setEditable( newTreeItem.getValue().isEditable() );
-            }
+        if (am != null) {
+            addMenu.setDisable( !am.isEnabled( DexActions.ADDPROPERTY, propertyOwner ) );
+            deleteProperty.setDisable( !am.isEnabled( DexActions.DELETEPROPERTY, property ) );
+            changeType.setDisable( !am.isEnabled( DexActions.TYPECHANGE, property ) );
+            // Go through all items and enable/disable
+            OtmPropertyType.enableMenuItems( addMenu, propertyOwner );
         }
+        if (object instanceof OtmChildrenOwner) {
+            // Make facets dividers
+            tc.pseudoClassStateChanged( DIVIDER, true );
+            tc.setEditable( false );
+        } else {
+            // Set Editable style and state
+            tc.pseudoClassStateChanged( DIVIDER, false );
+            tc.pseudoClassStateChanged( INHERITED, newTreeItem.getValue().isInherited() );
+            // tc.pseudoClassStateChanged( EDITABLE, !(am instanceof DexReadOnlyActionManager) );
+            tc.pseudoClassStateChanged( EDITABLE, object.isEditable() );
+            tc.setEditable( object.isEditable() );
+        }
+        // controller.postObjectStatus( object.getOwningMember() );
+        // if (object.getOwningMember() != null) {
+        // if (object.getOwningMember().getActionManager() instanceof DexFullActionManager)
+        // controller.getMainController()
+        // .postStatus( object.getOwningMember() + " Full editing allowed on this object." );
+        // else if (object.getOwningMember().getActionManager() instanceof DexMinorVersionActionManager)
+        // controller.getMainController()
+        // .postStatus( object.getOwningMember() + " Editing limited to minor version editing." );
+        // else
+        // controller.getMainController().postStatus( object.getOwningMember() + " Not editable." );
+        // }
     }
+
 }

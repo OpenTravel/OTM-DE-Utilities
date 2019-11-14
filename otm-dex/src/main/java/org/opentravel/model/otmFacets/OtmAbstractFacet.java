@@ -200,6 +200,11 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
     }
 
     @Override
+    public Collection<OtmPropertyOwner> getDescendantsPropertyOwners() {
+        return Collections.emptyList();
+    }
+
+    @Override
     public Collection<OtmTypeProvider> getDescendantsTypeProviders() {
         return Collections.emptyList();
     }
@@ -384,9 +389,9 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
             inheritedChildren.remove( property );
     }
 
-    @Override
-    public String toString() {
-        return getName();
-    }
+    // @Override
+    // public String toString() {
+    // return getNameWithPrefix();
+    // }
 
 }

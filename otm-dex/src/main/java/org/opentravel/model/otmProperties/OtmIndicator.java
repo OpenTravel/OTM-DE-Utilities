@@ -20,8 +20,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.model.OtmModelElement;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.schemacompiler.model.TLIndicator;
+import org.opentravel.schemacompiler.model.TLModelElement;
 
 /**
  * Abstract OTM Node for indicator attribute properties.
@@ -68,6 +71,15 @@ public class OtmIndicator<TL extends TLIndicator> extends OtmPropertyBase<TLIndi
     @Override
     public String getName() {
         return getTL().getName();
+    }
+
+    @Override
+    public boolean isEditable() {
+        if (!isInherited())
+            return super.isEditable();
+        // If inherited, find out from the actual owner
+        OtmObject owner = OtmModelElement.get( (TLModelElement) getTL().getOwner() );
+        return owner != null && owner.isEditable();
     }
 
     @Override

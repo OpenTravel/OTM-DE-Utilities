@@ -25,6 +25,7 @@ import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
@@ -118,6 +119,11 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
     private Node getCommonNode() {
         BooleanProperty commonProperty = getActionManager().add( DexActions.SETCOMMONACTION, isCommon(), this );
         return DexEditField.makeCheckBox( commonProperty, COMMON_LABEL );
+    }
+
+    @Override
+    public Collection<OtmPropertyOwner> getDescendantsPropertyOwners() {
+        return Collections.emptyList();
     }
 
     @Override

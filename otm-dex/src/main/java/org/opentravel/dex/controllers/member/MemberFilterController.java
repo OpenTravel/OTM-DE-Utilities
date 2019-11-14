@@ -286,9 +286,9 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             return false;
         if (textFilterValue != null && !member.getName().toLowerCase().startsWith( textFilterValue ))
             return false;
-        if (latestVersionOnly && !member.getLibrary().isLatestVersion())
+        if (latestVersionOnly && !member.isLatestVersion())
             return false;
-        if (editableOnly && !member.isEditable())
+        if (editableOnly && !member.isEditableMinor())
             return false;
         if (classNameFilter != null && !member.getClass().getSimpleName().startsWith( classNameFilter ))
             return false;
