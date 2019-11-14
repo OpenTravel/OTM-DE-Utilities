@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.search;
+package org.opentravel.dex.controllers.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.OtmEventSubscriptionManager;
+import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase;
-import org.opentravel.dex.controllers.repository.RepositorySelectionController;
 
 import java.io.IOException;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -36,12 +38,23 @@ import javafx.stage.Stage;
  * @author dmh
  *
  */
-public class SearchWindowController extends DexPopupControllerBase {
-    private static Log log = LogFactory.getLog( SearchWindowController.class );
+public class RepositoryWindowController extends DexPopupControllerBase {
+    private static Log log = LogFactory.getLog( RepositoryWindowController.class );
 
-    public static final String LAYOUT_FILE = "/SearchViews/SearchWindow.fxml";
-    private static String dialogTitle = "Search";
+    public static final String LAYOUT_FILE = "/RepositoryViews/RepositoryWindow.fxml";
+    protected static String dialogTitle = "Repository";
     protected static Stage dialogStage;
+
+    @FXML
+    private RepositoryNamespacesTreeController repositoryNamespacesTreeController;
+    @FXML
+    private NamespaceLibrariesTreeTableController namespaceLibrariesTreeTableController;
+    @FXML
+    private RepositoryItemCommitHistoriesController repositoryItemCommitHistoriesController;
+    @FXML
+    private RepositorySelectionController repositorySelectionController;
+    @FXML
+    private RepositoryItemWebViewController repositoryItemWebViewController;
 
     /**
      * Initialize this controller using the passed FXML loader.
@@ -50,9 +63,9 @@ public class SearchWindowController extends DexPopupControllerBase {
      * Otherwise, this code must migrate into the calling controller.
      * 
      */
-    protected static SearchWindowController init() {
-        FXMLLoader loader = new FXMLLoader( SearchWindowController.class.getResource( LAYOUT_FILE ) );
-        SearchWindowController controller = null;
+    protected static RepositoryWindowController init() {
+        FXMLLoader loader = new FXMLLoader( RepositoryWindowController.class.getResource( LAYOUT_FILE ) );
+        RepositoryWindowController controller = null;
         try {
             // Load the fxml file initialize controller it declares.
             Pane pane = loader.load();
@@ -60,16 +73,17 @@ public class SearchWindowController extends DexPopupControllerBase {
             dialogStage = new Stage();
             dialogStage.setScene( new Scene( pane ) );
             dialogStage.initModality( Modality.NONE );
+            dialogStage.getScene().getStylesheets().add( "DavesViper.css" );
 
             // get the controller from loader.
             controller = loader.getController();
-            if (!(controller instanceof SearchWindowController))
+            if (!(controller instanceof RepositoryWindowController))
                 throw new IllegalStateException( "Error creating resources window controller." );
         } catch (IOException e1) {
             throw new IllegalStateException(
                 "Error loading search window. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
         }
-        // FUTURE - could configure here since the controllers are instantiated
+
         positionStage( dialogStage );
         return controller;
     }
@@ -79,12 +93,12 @@ public class SearchWindowController extends DexPopupControllerBase {
      */
     // @FXML
     // private RepositorySearchController repositorySearchController;
-    @FXML
-    private RepositorySelectionController repositorySelectionController;
+    // @FXML
+    // private RepositorySelectionController repositorySelectionController;
 
 
-    public SearchWindowController() {
-        log.debug( "Search Window Controller constructed." );
+    public RepositoryWindowController() {
+        log.debug( "Repository Window Controller constructed." );
     }
 
     @Override
@@ -92,11 +106,40 @@ public class SearchWindowController extends DexPopupControllerBase {
         // if (!(repositorySearchController instanceof RepositorySearchController))
         // throw new IllegalStateException( "Search controller not injected by FXML." );
         //
-        if (!(repositorySelectionController instanceof RepositorySelectionController))
-            throw new IllegalStateException( "Selection controller not injected by FXML." );
+        // if (!(repositorySelectionController instanceof RepositorySelectionController))
+        // throw new IllegalStateException( "Selection controller not injected by FXML." );
 
-        // FUTURE - could configure here since the controllers are instantiated
     }
+
+    public void configure(DexMainController parent, MenuItem menuItem) {
+        configure( parent );
+        launchedFromMenuItem = menuItem; // Remember so it can be enabled on close
+    }
+
+    public void configure(DexMainController mc) {
+        if (mc == null) {
+            log.debug( "Null main controller when configuring resources window" );
+            return;
+        }
+        OtmEventSubscriptionManager eventManager = mc.getEventSubscriptionManager();
+        // Set up the repository selection
+        mc.addIncludedController( repositorySelectionController, eventManager );
+
+        // Set up repository namespaces tree
+        mc.addIncludedController( repositoryNamespacesTreeController, eventManager );
+
+        // Set up the libraries in a namespace table
+        mc.addIncludedController( namespaceLibrariesTreeTableController, eventManager );
+
+        // No set up needed, but add to list
+        mc.addIncludedController( repositoryItemCommitHistoriesController, eventManager );
+
+        mc.addIncludedController( repositoryItemWebViewController, eventManager );
+
+        eventManager.configureEventHandlers();
+        log.debug( "Member Details window configured." );
+    }
+
 
     @Override
     @FXML

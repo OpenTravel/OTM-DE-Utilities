@@ -134,9 +134,10 @@ public class ObjectEditorController extends DexMainControllerBase {
         searchTabController.configure( this );
 
         // Add menu items for tab controllers that can be non-modal windows
-        menuBarWithProjectController.addViewItem( searchTabController );
         menuBarWithProjectController.addViewItem( memberPropertiesTabController );
+        menuBarWithProjectController.addViewItem( repositoryTabController );
         menuBarWithProjectController.addViewItem( resourcesTabController );
+        menuBarWithProjectController.addViewItem( searchTabController );
 
         // Include controllers that are not in tabs
         addIncludedController( memberFilterController, eventManager );

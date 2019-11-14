@@ -24,6 +24,7 @@ import org.opentravel.dex.controllers.DexTabController;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.MenuItem;
 
 /**
  * Manage the repository tab.
@@ -48,6 +49,8 @@ public class RepositoryTabController implements DexTabController {
     @FXML
     private RepositoryItemWebViewController repositoryItemWebViewController;
 
+    private DexMainController mainController;
+
     public RepositoryTabController() {
         log.debug( "Repository Tab Controller constructed." );
     }
@@ -65,34 +68,42 @@ public class RepositoryTabController implements DexTabController {
      * @param primaryStage
      */
     @Override
-    public void configure(DexMainController parent) {
-        OtmEventSubscriptionManager eventManager = parent.getEventSubscriptionManager();
+    public void configure(DexMainController mc) {
+        OtmEventSubscriptionManager eventManager = mc.getEventSubscriptionManager();
+        this.mainController = mc;
 
         // Set up the repository selection
-        parent.addIncludedController( repositorySelectionController, eventManager );
+        mc.addIncludedController( repositorySelectionController, eventManager );
 
         // Set up repository namespaces tree
-        parent.addIncludedController( repositoryNamespacesTreeController, eventManager );
+        mc.addIncludedController( repositoryNamespacesTreeController, eventManager );
 
         // Set up the libraries in a namespace table
-        parent.addIncludedController( namespaceLibrariesTreeTableController, eventManager );
+        mc.addIncludedController( namespaceLibrariesTreeTableController, eventManager );
 
         // No set up needed, but add to list
-        parent.addIncludedController( repositoryItemCommitHistoriesController, eventManager );
+        mc.addIncludedController( repositoryItemCommitHistoriesController, eventManager );
 
-        parent.addIncludedController( repositoryItemWebViewController, eventManager );
+        mc.addIncludedController( repositoryItemWebViewController, eventManager );
 
         log.debug( "Repository Tab Stage set." );
     }
 
-    // FIXME - this should be true when updated like search
+
+
     @Override
     public String getDialogTitle() {
-        return null;
+        return RepositoryWindowController.dialogTitle;
     }
 
     public void launchWindow(ActionEvent e) {
-        // No-op
+        RepositoryWindowController w = RepositoryWindowController.init();
+        if (e.getSource() instanceof MenuItem) {
+            ((MenuItem) e.getSource()).setDisable( true );
+            w.configure( mainController, (MenuItem) e.getSource() );
+        } else
+            w.configure( mainController );
+        w.show( RepositoryWindowController.dialogTitle );
     }
 
 }
