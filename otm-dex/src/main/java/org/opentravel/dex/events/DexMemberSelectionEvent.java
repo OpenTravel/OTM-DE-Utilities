@@ -33,7 +33,7 @@ import javafx.scene.control.TreeItem;
  * @author dmh
  *
  */
-public class DexMemberSelectionEvent extends DexEvent {
+public class DexMemberSelectionEvent extends DexNavigationEvent {
     private static Log log = LogFactory.getLog( DexMemberSelectionEvent.class );
     private static final long serialVersionUID = 20190409L;
 

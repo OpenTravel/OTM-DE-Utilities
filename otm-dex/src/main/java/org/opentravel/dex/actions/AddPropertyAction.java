@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
@@ -148,13 +149,20 @@ public class AddPropertyAction extends DexRunAction {
 
     @Override
     public OtmProperty undoIt() {
-        // TEST - undo when minor version created
-        if (newPropertyOwner != null) {
-            newPropertyOwner.getOwningMember().getLibrary().delete( newPropertyOwner.getOwningMember() );
-            newPropertyOwner = null;
-            newProperty = null;
-        } else if (newProperty != null) {
+        if (newProperty != null) {
             newProperty.getParent().delete( newProperty );
+            newProperty = null;
+        }
+        if (newPropertyOwner != null) {
+            // TODO - what if they have added more stuff to this member?
+            // if (member.hasNonInheritedDescendants())
+            // Just remove the new property.
+
+            OtmLibraryMember member = newPropertyOwner.getOwningMember();
+            if (member != null && member.getLibrary() != null)
+                // undo when minor version created
+                member.getLibrary().delete( newPropertyOwner.getOwningMember() );
+            newPropertyOwner = null;
             newProperty = null;
         }
         log.debug( "Undo new property." );

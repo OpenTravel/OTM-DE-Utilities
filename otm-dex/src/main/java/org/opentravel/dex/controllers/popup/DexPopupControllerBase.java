@@ -34,28 +34,12 @@ import javafx.stage.WindowEvent;
  *
  */
 public abstract class DexPopupControllerBase implements DexPopupController {
-    private static Log log = LogFactory.getLog( DexPopupControllerBase.class );
-
     public enum Results {
         OK, CANCEL, ERROR;
     }
 
+    private static Log log = LogFactory.getLog( DexPopupControllerBase.class );
     protected static String helpText = "";
-    protected String title = "";
-
-    protected Results result = Results.OK;
-    // Each sub-type must define its own stage and pass it in setStage().
-    protected Stage popupStage;
-    protected MenuItem launchedFromMenuItem = null;
-
-    @Override
-    public void checkNodes() {}
-
-    @Override
-    public void clear() {
-        // Only implement if needed for this controller
-    }
-
 
     /**
      * Set the passed stage x and y position over the primary stage
@@ -74,16 +58,25 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         }
     }
 
+    // Each sub-type must define its own stage and pass it in setStage().
+    protected Stage popupStage;
+    protected String title = "";
+    protected Results result = Results.OK;
+    protected MenuItem launchedFromMenuItem = null;
+
+    @Override
+    public void checkNodes() {}
+
+
+    @Override
+    public void clear() {
+        // Only implement if needed for this controller
+    }
+
     public void doCancel() {
         clear();
         popupStage.close();
         result = Results.CANCEL;
-    }
-
-    public void doOK() {
-        clear();
-        popupStage.close();
-        result = Results.OK;
     }
 
     /**
@@ -94,12 +87,10 @@ public abstract class DexPopupControllerBase implements DexPopupController {
             launchedFromMenuItem.setDisable( false );
     }
 
-    /**
-     * 
-     * @return true if and only if the doOK() method was used to close the dialog.
-     */
-    public boolean okResult() {
-        return result.equals( Results.OK );
+    public void doOK() {
+        clear();
+        popupStage.close();
+        result = Results.OK;
     }
 
     /**
@@ -108,6 +99,14 @@ public abstract class DexPopupControllerBase implements DexPopupController {
      */
     public Results getResult() {
         return result;
+    }
+
+    protected String getTitle() {
+        return title;
+    }
+
+    public void hide() {
+        popupStage.hide();
     }
 
     /**
@@ -119,18 +118,39 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         log.debug( "Initialize injection point." );
     }
 
-    @Override
-    public void refresh() {
-        // NO-OP
-    }
-
-    protected String getTitle() {
-        return title;
+    /**
+     * 
+     * @return true if and only if the doOK() method was used to close the dialog.
+     */
+    public boolean okResult() {
+        return result.equals( Results.OK );
     }
 
     protected void postHelp(String helpText, TextFlow helpControl) {
         if (helpControl != null)
             helpControl.getChildren().add( new Text( helpText ) );
+    }
+
+    @Override
+    public void refresh() {
+        // NO-OP
+    }
+
+    /**
+     * Provides the base class access to the controller's stage. Sets stage, stage title and Checks the fx nodes.
+     * 
+     * @param title
+     * @param popupStage
+     */
+    protected void setStage(String title, Stage popupStage) {
+        if (popupStage == null)
+            throw new IllegalStateException( "Missing stage." );
+        checkNodes();
+        setTitle( title );
+        popupStage.setTitle( title );
+        this.popupStage = popupStage;
+
+        popupStage.setOnHidden( this::doClose );
     }
 
     @Override
@@ -154,31 +174,10 @@ public abstract class DexPopupControllerBase implements DexPopupController {
      */
     protected abstract void setup(String message);
 
-    /**
-     * Provides the base class access to the controller's stage. Sets stage, stage title and Checks the fx nodes.
-     * 
-     * @param title
-     * @param popupStage
-     */
-    protected void setStage(String title, Stage popupStage) {
-        if (popupStage == null)
-            throw new IllegalStateException( "Missing stage." );
-        checkNodes();
-        setTitle( title );
-        popupStage.setTitle( title );
-        this.popupStage = popupStage;
-
-        popupStage.setOnHidden( this::doClose );
-    }
-
     @Override
     public void show(String message) {
         setup( message );
         popupStage.show();
-    }
-
-    public void hide() {
-        popupStage.hide();
     }
 
     @Override

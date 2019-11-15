@@ -16,54 +16,40 @@
 
 package org.opentravel.dex.events;
 
-import org.opentravel.model.OtmObject;
+import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 
-import javafx.event.EventTarget;
 import javafx.event.EventType;
+import javafx.scene.control.TreeItem;
 
 /**
- * DEX Change Event extends DexEvent and Abstract OTM event.
+ * DEX Navigation Event extends DexEvent and Abstract OTM event.
  * <p>
- * Change events occur when the OTM/TL model has been modified.
+ * Navigation events occur when the user makes a selection that changes other controllers.
  * 
  * @author dmh
  *
  */
-public abstract class DexChangeEvent extends DexEvent {
+public abstract class DexNavigationEvent extends DexEvent {
     // private static Log log = LogFactory.getLog( DexChangeEvent.class );
     private static final long serialVersionUID = 20190826L;
-
-    protected transient OtmObject otmObject = null;
 
     /**
      * Filter change event with no subject.
      */
-    public DexChangeEvent() {
+    public DexNavigationEvent() {
         super( DEX_ALL );
+    }
+
+    public DexNavigationEvent(Object source, TreeItem<MemberAndProvidersDAO> target,
+        EventType<? extends DexEvent> eventType) {
+        super( source, target, eventType );
     }
 
     /**
      * @param eventType
      */
-    public DexChangeEvent(EventType<? extends DexChangeEvent> eventType) {
+    public DexNavigationEvent(EventType<? extends DexNavigationEvent> eventType) {
         super( eventType );
-    }
-
-    public DexChangeEvent(EventType<? extends DexChangeEvent> eventType, OtmObject otm) {
-        super( eventType );
-        otmObject = otm;
-    }
-
-    public DexChangeEvent(Object source, EventTarget target) {
-        super( source, target, DEX_ALL );
-    }
-
-    public void set(OtmObject otm) {
-        otmObject = otm;
-    }
-
-    public OtmObject get() {
-        return otmObject;
     }
 
 }

@@ -18,6 +18,10 @@ package org.opentravel.dex.events;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.controllers.DexIncludedController;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import javafx.event.Event;
 import javafx.event.EventDispatchChain;
@@ -38,15 +42,46 @@ import javafx.event.EventDispatcher;
 public class DexEventDispatcher implements EventDispatcher {
     private static Log log = LogFactory.getLog( DexEventDispatcher.class );
     private final EventDispatcher originalDispatcher;
-    // private final Deque<DexEventBase<?>> queue = new ArrayDeque<>();
+    private final Deque<DexNavigationEvent> navQueue = new ArrayDeque<>();
+    private final Deque<DexNavigationEvent> navUndoneQueue = new ArrayDeque<>();
+    private boolean ignoreNext = false;
 
     public DexEventDispatcher(EventDispatcher originalDispatcher) {
         this.originalDispatcher = originalDispatcher;
     }
 
+    public boolean canGoBack() {
+        return !navQueue.isEmpty();
+    }
+
+    public void goBack(DexIncludedController<?> eventNode) {
+        if (navQueue.isEmpty())
+            return;
+        DexNavigationEvent event = navQueue.pop();
+        navUndoneQueue.add( event );
+        ignoreNext = true;
+        eventNode.fireEvent( event );
+    }
+
+    public boolean canGoForward() {
+        return !navUndoneQueue.isEmpty();
+    }
+
+    public void goForward(DexIncludedController<?> eventNode) {
+        if (navUndoneQueue.isEmpty())
+            return;
+        DexNavigationEvent event = navUndoneQueue.pop();
+        navQueue.add( event );
+        ignoreNext = true;
+        eventNode.fireEvent( event );
+    }
+
     @Override
     public Event dispatchEvent(Event event, EventDispatchChain tail) {
         if (event instanceof DexEvent) {
+            if (event instanceof DexNavigationEvent && !ignoreNext)
+                navQueue.add( (DexNavigationEvent) event );
+            ignoreNext = false;
             log.debug( "Using my dispatcher on my event: " + event.getClass().getSimpleName() );
             // Add code here if the event is to be handled outside of the dispatch chain
             // event.consume();

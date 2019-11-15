@@ -25,6 +25,7 @@ import org.opentravel.dex.controllers.repository.RepositorySelectionController;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 
 /**
@@ -46,9 +47,6 @@ public class SearchTabController implements DexTabController {
     private SearchQueryController searchQueryController;
     @FXML
     private SearchResultsController searchResultsController;
-
-
-    // Available but not used
     @FXML
     private Tab searchTab;
     // @FXML
@@ -76,6 +74,8 @@ public class SearchTabController implements DexTabController {
         parent.addIncludedController( repositorySelectionController, eventManager );
         parent.addIncludedController( searchQueryController, eventManager );
         parent.addIncludedController( searchResultsController, eventManager );
+
+        // searchTab.setClosable( false );
     }
 
     @Override
@@ -85,7 +85,13 @@ public class SearchTabController implements DexTabController {
 
     public void launchWindow(ActionEvent e) {
         SearchWindowController w = SearchWindowController.init();
-        w.show( dialogTitle );
+        // searchTab.setClosable( true );
+        // log.debug( "Is table closeable? " + searchTab.isClosable() );
+        if (e.getSource() instanceof MenuItem) {
+            ((MenuItem) e.getSource()).setDisable( true );
+            w.configure( (MenuItem) e.getSource() );
+        }
+        w.show( SearchWindowController.dialogTitle );
         // return w;
     }
 }

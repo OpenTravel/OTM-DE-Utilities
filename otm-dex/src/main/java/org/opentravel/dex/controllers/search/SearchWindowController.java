@@ -26,6 +26,7 @@ import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -40,7 +41,7 @@ public class SearchWindowController extends DexPopupControllerBase {
     private static Log log = LogFactory.getLog( SearchWindowController.class );
 
     public static final String LAYOUT_FILE = "/SearchViews/SearchWindow.fxml";
-    private static String dialogTitle = "Search";
+    protected static String dialogTitle = "Search";
     protected static Stage dialogStage;
 
     /**
@@ -60,6 +61,7 @@ public class SearchWindowController extends DexPopupControllerBase {
             dialogStage = new Stage();
             dialogStage.setScene( new Scene( pane ) );
             dialogStage.initModality( Modality.NONE );
+            dialogStage.getScene().getStylesheets().add( "DavesViper.css" );
 
             // get the controller from loader.
             controller = loader.getController();
@@ -96,6 +98,11 @@ public class SearchWindowController extends DexPopupControllerBase {
             throw new IllegalStateException( "Selection controller not injected by FXML." );
 
         // FUTURE - could configure here since the controllers are instantiated
+    }
+
+    public void configure(MenuItem menuItem) {
+        // configure( parent );
+        launchedFromMenuItem = menuItem; // Remember so it can be enabled on close
     }
 
     @Override

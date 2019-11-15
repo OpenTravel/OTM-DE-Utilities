@@ -48,7 +48,7 @@
                   <fx:include fx:id="memberTreeTable" source="MemberTreeTable.fxml" VBox.vgrow="ALWAYS" />
                </children>
             </VBox>
-            <TabPane tabClosingPolicy="UNAVAILABLE">
+            <TabPane tabClosingPolicy="ALL_TABS">
               <tabs>
                 <fx:include fx:id="memberPropertiesTab" source="MemberViews/MemberPropertiesTab.fxml" />
 				  <fx:include fx:id="resourcesTab" source="ResourceViews/ResourcesTab.fxml" />

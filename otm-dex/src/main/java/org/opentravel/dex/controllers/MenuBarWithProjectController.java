@@ -30,7 +30,9 @@ import org.opentravel.dex.controllers.popup.NewLibraryDialogController;
 import org.opentravel.dex.controllers.popup.NewProjectDialogController;
 import org.opentravel.dex.controllers.popup.WebViewDialogController;
 import org.opentravel.dex.events.DexChangeEvent;
+import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexEventDispatcher;
+import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.DexRepositorySelectionEvent;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
@@ -104,6 +106,10 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     @FXML
     private Button undoActionButton;
     @FXML
+    private Button navForwardButton;
+    @FXML
+    private Button navBackButton;
+    @FXML
     private ToolBar menuToolBar;
 
     private Stage stage;
@@ -116,9 +122,13 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     private Repository selectedRepository = null;
 
+    private DexEventDispatcher eventDispatcher;
+
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents = {DexRepositorySelectionEvent.REPOSITORY_SELECTED};
-    private static final EventType[] publishedEvents = {DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] subscribedEvents =
+        {DexRepositorySelectionEvent.REPOSITORY_SELECTED, DexMemberSelectionEvent.MEMBER_SELECTED};
+    private static final EventType[] publishedEvents =
+        {DexModelChangeEvent.MODEL_CHANGED, DexMemberSelectionEvent.MEMBER_SELECTED};
 
     public MenuBarWithProjectController() {
         super( subscribedEvents, publishedEvents );
@@ -135,6 +145,9 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         // publishedEventTypes = Collections.unmodifiableList( Arrays.asList( publishedEvents ) );
         publishedEventTypes = new ArrayList<>();
         publishedEventTypes.add( DexModelChangeEvent.MODEL_CHANGED );
+        for (EventType<? extends DexEvent> et : publishedEvents) {
+            publishedEventTypes.add( et );
+        }
         for (DexActions action : DexActions.values()) {
             DexChangeEvent event = null;
             try {
@@ -148,12 +161,33 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     }
 
     @FXML
+    public void goBack() {
+        eventDispatcher.goBack( this );
+    }
+
+    @FXML
+    public void goForward() {
+        eventDispatcher.goForward( this );
+    }
+
+    public void updateNavigationButtons() {
+        if (eventDispatcher != null) {
+            navBackButton.setDisable( !eventDispatcher.canGoBack() );
+            navForwardButton.setDisable( !eventDispatcher.canGoForward() );
+        } else {
+            navBackButton.setDisable( true );
+            navForwardButton.setDisable( true );
+        }
+    }
+
+    @FXML
     public void aboutApplication(ActionEvent event) {
         AboutDialogController.createAboutDialog( stage ).showAndWait();
     }
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
+        updateNavigationButtons();
         log.debug( event.getEventType() + " event received." );
         if (event instanceof DexRepositorySelectionEvent)
             selectedRepository = ((DexRepositorySelectionEvent) event).getRepository();
@@ -184,7 +218,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         stage = mainController.getStage();
 
         // For debugging, intercept and log DexEvents
-        stage.setEventDispatcher( new DexEventDispatcher( stage.getEventDispatcher() ) );
+        eventDispatcher = new DexEventDispatcher( stage.getEventDispatcher() );
+        stage.setEventDispatcher( eventDispatcher );
 
         // Set up to handle opening and closing files
         setFileOpenHandler( this::handleOpenMenu );

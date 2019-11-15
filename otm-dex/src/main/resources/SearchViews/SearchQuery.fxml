@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="searchQueryVBox" spacing="5.0" stylesheets="@DavesViper.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.search.SearchQueryController">
+<VBox fx:id="searchQueryVBox" spacing="5.0" stylesheets="../@DavesViper.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.search.SearchQueryController">
    <children>
       <HBox spacing="5.0">
          <children>
@@ -23,7 +23,7 @@
          <children>
             <RadioButton fx:id="latestOnlyRadio" mnemonicParsing="false" text="Latest Only" />
             <Separator orientation="VERTICAL" HBox.hgrow="ALWAYS" />
-            <RadioButton fx:id="lockedRadio" mnemonicParsing="false" stylesheets="@DavesViper.css" text="Locked" />
+            <RadioButton fx:id="lockedRadio" mnemonicParsing="false" stylesheets="../@DavesViper.css" text="Locked" />
          </children>
       </HBox>
       <Separator prefWidth="200.0" />
