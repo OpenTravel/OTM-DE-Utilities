@@ -148,7 +148,12 @@ public class AddPropertyAction extends DexRunAction {
 
     @Override
     public OtmProperty undoIt() {
-        if (newProperty != null) {
+        // TEST - undo when minor version created
+        if (newPropertyOwner != null) {
+            newPropertyOwner.getOwningMember().getLibrary().delete( newPropertyOwner.getOwningMember() );
+            newPropertyOwner = null;
+            newProperty = null;
+        } else if (newProperty != null) {
             newProperty.getParent().delete( newProperty );
             newProperty = null;
         }
