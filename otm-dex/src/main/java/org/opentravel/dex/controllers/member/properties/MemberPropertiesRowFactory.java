@@ -68,6 +68,7 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
         // MenuItem downObject = new MenuItem( "Move Down (Future)" );
         // SeparatorMenuItem separator = new SeparatorMenuItem();
         // contextMenu.getItems().addAll( addMenu, deleteProperty, changeType, separator, upObject, downObject );
+
         contextMenu.getItems().addAll( addMenu, deleteProperty, changeType, validateItem );
         setContextMenu( contextMenu );
 

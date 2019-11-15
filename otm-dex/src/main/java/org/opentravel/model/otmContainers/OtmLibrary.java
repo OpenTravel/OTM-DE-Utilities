@@ -190,8 +190,8 @@ public class OtmLibrary {
     public DexActionManager getActionManager() {
         if (isMinorVersion())
             return getModelManager().getMinorActionManager( isEditable() );
-        if (isChainEditable())
-            return getModelManager().getMinorActionManager( isLatestVersion() );
+        // if (isChainEditable())
+        // return getModelManager().getMinorActionManager( isLatestVersion() );
         return getModelManager().getActionManager( isEditable() );
     }
 

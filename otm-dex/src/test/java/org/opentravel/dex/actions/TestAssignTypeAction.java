@@ -64,6 +64,7 @@ public class TestAssignTypeAction {
         staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
         lib = staticModelManager.add( new TLLibrary() );
         assertTrue( lib.isEditable() );
+        // DexActionManager am = lib.getActionManager();
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 
         globalBO = (OtmBusinessObject) lib.add( TestBusiness.buildOtm( staticModelManager, "GlobalBO" ) );

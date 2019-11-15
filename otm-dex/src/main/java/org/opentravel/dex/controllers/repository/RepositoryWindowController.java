@@ -33,7 +33,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
- * Manage the stand-alone resource window.
+ * Manage the stand-alone repository window.
  * 
  * @author dmh
  *
@@ -88,28 +88,13 @@ public class RepositoryWindowController extends DexPopupControllerBase {
         return controller;
     }
 
-    /**
-     * ********************************************************* FXML Java FX Nodes this controller is dependent upon
-     */
-    // @FXML
-    // private RepositorySearchController repositorySearchController;
-    // @FXML
-    // private RepositorySelectionController repositorySelectionController;
-
 
     public RepositoryWindowController() {
         log.debug( "Repository Window Controller constructed." );
     }
 
     @Override
-    public void checkNodes() {
-        // if (!(repositorySearchController instanceof RepositorySearchController))
-        // throw new IllegalStateException( "Search controller not injected by FXML." );
-        //
-        // if (!(repositorySelectionController instanceof RepositorySelectionController))
-        // throw new IllegalStateException( "Selection controller not injected by FXML." );
-
-    }
+    public void checkNodes() {}
 
     public void configure(DexMainController parent, MenuItem menuItem) {
         configure( parent );
@@ -145,7 +130,7 @@ public class RepositoryWindowController extends DexPopupControllerBase {
     @FXML
     public void initialize() {
         // no-op
-        checkNodes();
+        // checkNodes();
     }
 
 
@@ -155,6 +140,5 @@ public class RepositoryWindowController extends DexPopupControllerBase {
     @Override
     public void setup(String message) {
         super.setStage( dialogTitle, dialogStage );
-        // log.debug( "MUST configure with DexMainController" );
     }
 }

@@ -21,7 +21,7 @@ import javafx.event.EventTarget;
 import javafx.event.EventType;
 
 /**
- * Abstract OTM event.
+ * Abstract OTM event. For DEX specific events, see {@link DexEvent}
  * <p>
  * OtmEvents leverage and extend JavaFX event architecture to provide the ability to loosely couple the interaction
  * between two or more controllers. Controllers can declare on initialization the events they throw and listen to.
@@ -63,7 +63,7 @@ public abstract class AbstractOtmEvent extends Event {
     }
 
     /**
-     * Filter change event with no subject.
+     * Event with no subject
      */
     public AbstractOtmEvent() {
         super( OTM_ALL );

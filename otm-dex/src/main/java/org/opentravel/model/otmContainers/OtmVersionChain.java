@@ -19,6 +19,7 @@ package org.opentravel.model.otmContainers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmModelElement;
+import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -135,5 +136,44 @@ public class OtmVersionChain {
             if (lib != member.getLibrary() && lib.contains( member ))
                 return false;
         return true;
+    }
+
+    /**
+     * Create a copy of the subject's owning member in an minor library. Minor library must be in the chain as the
+     * subject and editable. The latest version of the subject's owning member will be used to make the minor version.
+     * 
+     * @param subject
+     * @return a property owner in the new object with the matching name or null
+     */
+    public OtmPropertyOwner getNewMinor(OtmPropertyOwner subject) {
+        OtmLibrary subjectLibrary = subject.getLibrary();
+        if (subjectLibrary == null)
+            return null;
+        OtmLibrary minorLibrary = subjectLibrary.getVersionChain().getEditable();
+        if (minorLibrary == null)
+            return null;
+        // Get the latest version of this member
+        OtmLibraryMember latestMember = subjectLibrary.getVersionChain().getLatestVersion( subject.getOwningMember() );
+        if (latestMember == null)
+            return null;
+        OtmLibraryMember newMinorLibraryMember = null;
+        OtmPropertyOwner newPropertyOwner = null;
+
+        // If the latest member is in the target minor library us it
+        if (latestMember.getLibrary() == minorLibrary)
+            newMinorLibraryMember = latestMember;
+        else
+            // Create new minor version of this member
+            newMinorLibraryMember = latestMember.createMinorVersion( minorLibrary );
+
+        if (newMinorLibraryMember == null)
+            return null; // how to inform user of error?
+
+        // Find matching propertyOwner
+        for (OtmPropertyOwner p : newMinorLibraryMember.getDescendantsPropertyOwners())
+            if (p.getName().equals( subject.getName() ))
+                newPropertyOwner = p;
+
+        return newPropertyOwner;
     }
 }

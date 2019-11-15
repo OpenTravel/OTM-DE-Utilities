@@ -24,6 +24,8 @@ import org.junit.Test;
 import org.opentravel.dex.actions.AddPropertyAction;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyType;
 import org.opentravel.schemacompiler.model.TLClosedEnumeration;
@@ -67,11 +69,16 @@ public class TestEnumerationClosed extends TestOtmLibraryMemberBase<OtmEnumerati
     @Test
     public void testAddAction() {
         // Given - an action with enumeration as subject
-        OtmEnumerationClosed oe = buildOtm( staticModelManager );
+        OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
+        OtmEnumerationClosed oe = buildOtm( lib );
         AddPropertyAction action = new AddPropertyAction();
         action.setSubject( oe );
         List<OtmObject> kids = new ArrayList<>( oe.getChildren() );
         assertTrue( "Must have children.", !kids.isEmpty() );
+        assertTrue( "Given: subject must have library.", oe.getLibrary() != null );
+        // Action manager not needed because action is run directly.
+        // assertTrue( "Given: subject must have full action manager.",
+        // oe.getActionManager() instanceof DexFullActionManager );
 
         // When action performed
         action.doIt( OtmPropertyType.ENUMVALUE );
@@ -86,6 +93,11 @@ public class TestEnumerationClosed extends TestOtmLibraryMemberBase<OtmEnumerati
     }
 
     /** ****************************************************** **/
+    public static OtmEnumerationClosed buildOtm(OtmLibrary lib) {
+        OtmEnumerationClosed otc = buildOtm( lib.getModelManager() );
+        lib.add( otc );
+        return otc;
+    }
 
     public static OtmEnumerationClosed buildOtm(OtmModelManager mgr) {
         OtmEnumerationClosed otc = new OtmEnumerationClosed( buildTL(), mgr );

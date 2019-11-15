@@ -23,8 +23,6 @@ import org.opentravel.common.DexRepeatMaxConverter;
 import org.opentravel.common.cellfactories.AssignedTypePropertiesTreeTableCellFactory;
 import org.opentravel.common.cellfactories.ValidationPropertiesTreeTableCellFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
-import org.opentravel.dex.action.manager.DexFullActionManager;
-import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -65,10 +63,10 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     protected TreeTableView<PropertiesDAO> propertiesTable;
     @FXML
     private VBox memberProperties;
-    protected TreeItem<PropertiesDAO> root;
+
     // Table Columns
+    protected TreeItem<PropertiesDAO> root;
     protected TreeTableColumn<PropertiesDAO,String> nameCol;
-    // protected TreeTableColumn<PropertyNode, ImageView> iconCol;
     protected TreeTableColumn<PropertiesDAO,String> roleCol;
     protected TreeTableColumn<PropertiesDAO,String> typeCol;
     protected TreeTableColumn<PropertiesDAO,String> minCol;
@@ -103,7 +101,6 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         setColumnProps( roleCol, true, true, false, 100 );
         roleCol.setCellValueFactory( new TreeItemPropertyValueFactory<PropertiesDAO,String>( "role" ) );
         roleCol.setCellFactory( ChoiceBoxTreeTableCell.forTreeTableColumn( PropertiesDAO.getRoleList() ) );
-        // TODO - create custom cell factory that enables/disables valid selections
 
         // Assigned type column
         typeCol = new TreeTableColumn<>( "Assigned Type" );
@@ -252,7 +249,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         if (member != null)
             new PropertiesDAO( member, this ).createChildrenItems( root, null );
 
-        postObjectStatus( member );
+        // postObjectStatus( member );
     }
 
     /**
@@ -286,19 +283,19 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         } else {
             disableEditing();
         }
-        postObjectStatus( obj );
+        // postObjectStatus( obj );
     }
 
-    protected void postObjectStatus(OtmObject object) {
-        if (object != null) {
-            if (object.getActionManager() instanceof DexFullActionManager)
-                getMainController().postStatus( object + " - All editing actions allowed" );
-            else if (object.getActionManager() instanceof DexMinorVersionActionManager)
-                getMainController().postStatus( object + " - Only minor editing actions allowed" );
-            else
-                getMainController().postStatus( object + " - Read-only" );
-        }
-    }
+    // protected void postObjectStatus(OtmObject object) {
+    // if (object != null) {
+    // if (object.getActionManager() instanceof DexFullActionManager)
+    // getMainController().postStatus( object + " - All editing actions allowed" );
+    // else if (object.getActionManager() instanceof DexMinorVersionActionManager)
+    // getMainController().postStatus( object + " - Only minor editing actions allowed" );
+    // else
+    // getMainController().postStatus( object + " - Read-only" );
+    // }
+    // }
 
     private void disableEditing() {
         nameCol.setEditable( false );

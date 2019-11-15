@@ -38,6 +38,7 @@ import javafx.event.EventDispatcher;
 public class DexEventDispatcher implements EventDispatcher {
     private static Log log = LogFactory.getLog( DexEventDispatcher.class );
     private final EventDispatcher originalDispatcher;
+    // private final Deque<DexEventBase<?>> queue = new ArrayDeque<>();
 
     public DexEventDispatcher(EventDispatcher originalDispatcher) {
         this.originalDispatcher = originalDispatcher;
