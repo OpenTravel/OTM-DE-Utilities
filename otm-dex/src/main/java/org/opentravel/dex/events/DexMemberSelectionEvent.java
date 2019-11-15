@@ -42,11 +42,11 @@ public class DexMemberSelectionEvent extends DexNavigationEvent {
     public static final EventType<DexMemberSelectionEvent> RESOURCE_SELECTED =
         new EventType<>( DEX_ALL, "RESOURCE_SELECTED" );
 
-    private final OtmLibraryMember member;
-
-    public OtmLibraryMember getMember() {
-        return member;
-    }
+    // private final OtmLibraryMember member;
+    //
+    // public OtmLibraryMember getMember() {
+    // return member;
+    // }
 
     /**
      * Filter change event with no subject.

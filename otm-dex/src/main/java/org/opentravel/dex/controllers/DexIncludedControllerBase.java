@@ -149,11 +149,13 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
      */
     @Override
     public void fireEvent(DexEvent event) {
-        if (eventPublisherNode != null && publishedEventTypes != null
-            && publishedEventTypes.contains( event.getEventType() ))
-            eventPublisherNode.fireEvent( event );
-        else
-            log.warn( event.getEventType() + " event not fired." );
+        if (event != null) {
+            if (eventPublisherNode != null && publishedEventTypes != null
+                && publishedEventTypes.contains( event.getEventType() ))
+                eventPublisherNode.fireEvent( event );
+            else
+                log.warn( event.getEventType() + " event not fired." );
+        }
     }
 
     @FXML

@@ -181,6 +181,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
         // Layout the table
         initializeTable( propertiesTable );
+
     }
 
     @Override
@@ -286,6 +287,9 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         // postObjectStatus( obj );
     }
 
+    // public void assignedTypeSelectionListener() {
+    //
+    // }
     // protected void postObjectStatus(OtmObject object) {
     // if (object != null) {
     // if (object.getActionManager() instanceof DexFullActionManager)

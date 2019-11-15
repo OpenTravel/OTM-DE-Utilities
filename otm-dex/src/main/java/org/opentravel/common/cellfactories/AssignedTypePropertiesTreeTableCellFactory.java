@@ -94,6 +94,7 @@ public class AssignedTypePropertiesTreeTableCellFactory extends TreeTableCell<Pr
         if (controller != null && event.getButton().equals( MouseButton.PRIMARY ) && event.getClickCount() == 2) {
             log.debug( "Double click selection: " );
             if (lm != null)
+                // controller.assignedTypeSelectionListener(lm);
                 controller.fireEvent( new DexMemberSelectionEvent( lm ) );
             else
                 controller.getMainController().postStatus( "Assigned type could not be found." );

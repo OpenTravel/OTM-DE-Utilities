@@ -152,8 +152,8 @@ public class OtmPropertyFactory {
             log.debug( "unknown/not-implemented property type: " + tl.getClass().getSimpleName() );
             return null;
         }
-        log.debug( "Created property " + p.getName() + " of owner " + p.getOwningMember().getName() + "  inherited? "
-            + p.isInherited() );
+        // log.debug( "Created property " + p.getName() + " of owner " + p.getOwningMember().getName() + " inherited? "
+        // + p.isInherited() );
         return p;
     }
 

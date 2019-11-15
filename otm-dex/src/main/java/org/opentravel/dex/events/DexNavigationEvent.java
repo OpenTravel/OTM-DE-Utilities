@@ -17,6 +17,7 @@
 package org.opentravel.dex.events;
 
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.event.EventType;
 import javafx.scene.control.TreeItem;
@@ -32,6 +33,12 @@ import javafx.scene.control.TreeItem;
 public abstract class DexNavigationEvent extends DexEvent {
     // private static Log log = LogFactory.getLog( DexChangeEvent.class );
     private static final long serialVersionUID = 20190826L;
+
+    protected OtmLibraryMember member = null;
+
+    public OtmLibraryMember getMember() {
+        return member;
+    }
 
     /**
      * Filter change event with no subject.
@@ -52,4 +59,8 @@ public abstract class DexNavigationEvent extends DexEvent {
         super( eventType );
     }
 
+    @Override
+    public String toString() {
+        return "Navigation Event: " + getMember();
+    }
 }

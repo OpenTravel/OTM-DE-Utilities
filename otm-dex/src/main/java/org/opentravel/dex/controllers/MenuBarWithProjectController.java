@@ -163,11 +163,13 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     @FXML
     public void goBack() {
         eventDispatcher.goBack( this );
+        updateNavigationButtons();
     }
 
     @FXML
     public void goForward() {
         eventDispatcher.goForward( this );
+        updateNavigationButtons();
     }
 
     public void updateNavigationButtons() {
@@ -188,7 +190,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     @Override
     public void handleEvent(AbstractOtmEvent event) {
         updateNavigationButtons();
-        log.debug( event.getEventType() + " event received." );
+        // log.debug( event.getEventType() + " event received." );
         if (event instanceof DexRepositorySelectionEvent)
             selectedRepository = ((DexRepositorySelectionEvent) event).getRepository();
     }
@@ -227,6 +229,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         setdoSaveAllHandler( this::handleSaveAllMenu );
         setUndoAction( e -> undoAction() );
 
+        updateNavigationButtons();
         // rwc = ResourcesWindowController.init();
         // rwc.setup( "" );
         // rwc.configure( mainController );

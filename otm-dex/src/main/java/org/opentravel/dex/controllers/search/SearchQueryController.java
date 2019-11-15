@@ -158,7 +158,7 @@ public class SearchQueryController extends DexIncludedControllerBase<OtmLibraryM
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        log.debug( event.getEventType() + " event received." );
+        // log.debug( event.getEventType() + " event received." );
         if (event instanceof DexRepositorySelectionEvent)
             handleEvent( (DexRepositorySelectionEvent) event );
         else if (event instanceof DexMemberSelectionEvent)

@@ -57,10 +57,17 @@ public class DexEventDispatcher implements EventDispatcher {
     public void goBack(DexIncludedController<?> eventNode) {
         if (navQueue.isEmpty())
             return;
-        DexNavigationEvent event = navQueue.pop();
-        navUndoneQueue.add( event );
-        ignoreNext = true;
-        eventNode.fireEvent( event );
+        // DexNavigationEvent oldEvent = navQueue.pop();
+        DexNavigationEvent oldEvent = navQueue.removeLast();
+        if (oldEvent != null)
+            navUndoneQueue.addLast( oldEvent );
+        DexNavigationEvent event = navQueue.peekLast();
+        if (event != null) {
+            ignoreNext = true;
+            eventNode.fireEvent( event );
+            log.debug(
+                "Fired " + event.getMember() + " from nav queue. Popped " + oldEvent.getMember() + " from queue." );
+        }
     }
 
     public boolean canGoForward() {
@@ -70,7 +77,7 @@ public class DexEventDispatcher implements EventDispatcher {
     public void goForward(DexIncludedController<?> eventNode) {
         if (navUndoneQueue.isEmpty())
             return;
-        DexNavigationEvent event = navUndoneQueue.pop();
+        DexNavigationEvent event = navUndoneQueue.removeLast();
         navQueue.add( event );
         ignoreNext = true;
         eventNode.fireEvent( event );
@@ -79,10 +86,13 @@ public class DexEventDispatcher implements EventDispatcher {
     @Override
     public Event dispatchEvent(Event event, EventDispatchChain tail) {
         if (event instanceof DexEvent) {
-            if (event instanceof DexNavigationEvent && !ignoreNext)
+            if (event instanceof DexNavigationEvent && !ignoreNext) {
                 navQueue.add( (DexNavigationEvent) event );
+                navUndoneQueue.clear();
+                log.debug( "Pushed " + ((DexNavigationEvent) event).getMember() + " onto nav queue." );
+            } else
+                log.debug( "Using my dispatcher on my event: " + event.getClass().getSimpleName() );
             ignoreNext = false;
-            log.debug( "Using my dispatcher on my event: " + event.getClass().getSimpleName() );
             // Add code here if the event is to be handled outside of the dispatch chain
             // event.consume();
             // some event filter and business logic ...
