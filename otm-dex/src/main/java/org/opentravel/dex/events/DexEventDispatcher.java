@@ -65,8 +65,8 @@ public class DexEventDispatcher implements EventDispatcher {
         if (event != null) {
             ignoreNext = true;
             eventNode.fireEvent( event );
-            log.debug(
-                "Fired " + event.getMember() + " from nav queue. Popped " + oldEvent.getMember() + " from queue." );
+            // log.debug(
+            // "Fired " + event.getMember() + " from nav queue. Popped " + oldEvent.getMember() + " from queue." );
         }
     }
 
@@ -89,7 +89,7 @@ public class DexEventDispatcher implements EventDispatcher {
             if (event instanceof DexNavigationEvent && !ignoreNext) {
                 navQueue.add( (DexNavigationEvent) event );
                 navUndoneQueue.clear();
-                log.debug( "Pushed " + ((DexNavigationEvent) event).getMember() + " onto nav queue." );
+                // log.debug( "Pushed " + ((DexNavigationEvent) event).getMember() + " onto nav queue." );
             } else
                 log.debug( "Using my dispatcher on my event: " + event.getClass().getSimpleName() );
             ignoreNext = false;

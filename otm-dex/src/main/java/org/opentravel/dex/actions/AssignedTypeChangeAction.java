@@ -73,15 +73,21 @@ public class AssignedTypeChangeAction extends DexRunAction {
             return null;
         if (user == null || otm == null)
             return null;
-
         if (actionManager == null)
             return null;
-
         if (otm.getOwningMember() == null)
+            return null;
+        if (otm.getLibrary() == null)
             return null;
         OtmModelManager modelMgr = otm.getOwningMember().getModelManager();
         if (modelMgr == null)
             return null;
+
+        // Find out if this typeUser is in a minor and not new to chain
+        boolean isEditable = otm.getOwningMember().isEditableMinor();
+        boolean isLatestMember = otm.getLibrary().getVersionChain().isLatestVersion( otm.getOwningMember() );
+        boolean isInEditableMinor = otm.getLibrary().isMinorVersion() && otm.isEditable();
+        // TODO - set filter
 
         // Get the user's selected new provider
         MemberAndProvidersDAO selected = null;

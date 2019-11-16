@@ -161,22 +161,6 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
 
     }
 
-    // private OtmPropertyOwner getPropertyOwner2() {
-    // PropertiesDAO dao = null;
-    // if (getTreeItem() != null)
-    // dao = getTreeItem().getValue();
-    // if (dao != null && dao.getValue() != null) {
-    // if (dao.getValue() instanceof OtmProperty)
-    // return ((OtmProperty) dao.getValue()).getParent();
-    // if (dao.getValue() instanceof OtmPropertyOwner) {
-    // if (dao.getValue() instanceof OtmAbstractDisplayFacet)
-    // return ((OtmAbstractDisplayFacet) dao.getValue()).getParent();
-    // return (OtmPropertyOwner) dao.getValue();
-    // }
-    // }
-    // return null;
-    // }
-
     // Runs if menu item on a row is selected
     private void changeAssignedType() {
         TreeItem<PropertiesDAO> treeItem = getTreeItem();
@@ -216,21 +200,9 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
             // Set Editable style and state
             tc.pseudoClassStateChanged( DIVIDER, false );
             tc.pseudoClassStateChanged( INHERITED, newTreeItem.getValue().isInherited() );
-            // tc.pseudoClassStateChanged( EDITABLE, !(am instanceof DexReadOnlyActionManager) );
             tc.pseudoClassStateChanged( EDITABLE, object.isEditable() );
             tc.setEditable( object.isEditable() );
         }
-        // controller.postObjectStatus( object.getOwningMember() );
-        // if (object.getOwningMember() != null) {
-        // if (object.getOwningMember().getActionManager() instanceof DexFullActionManager)
-        // controller.getMainController()
-        // .postStatus( object.getOwningMember() + " Full editing allowed on this object." );
-        // else if (object.getOwningMember().getActionManager() instanceof DexMinorVersionActionManager)
-        // controller.getMainController()
-        // .postStatus( object.getOwningMember() + " Editing limited to minor version editing." );
-        // else
-        // controller.getMainController().postStatus( object.getOwningMember() + " Not editable." );
-        // }
     }
 
 }
