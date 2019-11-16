@@ -16,10 +16,8 @@
 
 package org.opentravel.dex.controllers.library;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.DexTabController;
+import org.opentravel.dex.controllers.DexTabControllerBase;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -30,41 +28,20 @@ import javafx.fxml.FXML;
  * @author dmh
  *
  */
-public class LibrariesTabController implements DexTabController {
-    private static Log log = LogFactory.getLog( LibrariesTabController.class );
+public class LibrariesTabController extends DexTabControllerBase {
 
-    /**
-     * FXML Java FX Nodes this controller is dependent upon
-     */
+    /** FXML Java FX Nodes this controller is dependent upon */
     @FXML
     private LibrariesTreeTableController librariesTreeTableController;
 
-    private Object mainController;
-
     public LibrariesTabController() {
-        log.debug( "Library Tab Controller constructed." );
+        // No-op
     }
 
-    @Override
-    public void checkNodes() {
-        if (!(librariesTreeTableController instanceof LibrariesTreeTableController))
-            throw new IllegalStateException( "Search controller not injected by FXML." );
-    }
-
-    @Override
-    @FXML
-    public void initialize() {
-        // no-op
-    }
-
-    /**
-     */
     @Override
     public void configure(DexMainController mainController) {
-        this.mainController = mainController;
-        mainController.addIncludedController( librariesTreeTableController );
-        // mainController.getEventSubscriptionManager().configureEventHandlers();
-        // log.debug( "Library Tab configured." );
+        includedControllers.add( librariesTreeTableController );
+        super.configure( mainController );
     }
 
     @Override
@@ -75,5 +52,4 @@ public class LibrariesTabController implements DexTabController {
     public void launchWindow(ActionEvent e) {
         // No-op
     }
-
 }

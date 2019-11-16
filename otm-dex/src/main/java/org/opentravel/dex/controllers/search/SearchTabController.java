@@ -16,15 +16,12 @@
 
 package org.opentravel.dex.controllers.search;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.DexTabController;
+import org.opentravel.dex.controllers.DexTabControllerBase;
 import org.opentravel.dex.controllers.repository.RepositorySelectionController;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 
 /**
@@ -33,9 +30,7 @@ import javafx.scene.control.Tab;
  * @author dmh
  *
  */
-public class SearchTabController implements DexTabController {
-    private static Log log = LogFactory.getLog( SearchTabController.class );
-    // private static String dialogTitle = "Search";
+public class SearchTabController extends DexTabControllerBase {
 
     /** *********** FXML Java FX Nodes this controller is dependent upon */
     @FXML
@@ -48,33 +43,17 @@ public class SearchTabController implements DexTabController {
     private Tab searchTab;
     // @FXML
     // private VBox whereUsedTabVbox;
-    private DexMainController mainController;
 
     public SearchTabController() {
-        log.debug( "Search Tab Controller constructed." );
-    }
-
-    @Override
-    public void checkNodes() {
-        if (!(repositorySelectionController instanceof RepositorySelectionController))
-            throw new IllegalStateException( "Selection controller not injected by FXML." );
-    }
-
-    @FXML
-    @Override
-    public void initialize() {
-        // no-op
+        // No-op
     }
 
     @Override
     public void configure(DexMainController mainController) {
-        this.mainController = mainController;
-        mainController.addIncludedController( repositorySelectionController );
-        mainController.addIncludedController( searchQueryController );
-        mainController.addIncludedController( searchResultsController );
-
-        mainController.getEventSubscriptionManager().configureEventHandlers();
-        // searchTab.setClosable( false );
+        includedControllers.add( repositorySelectionController );
+        includedControllers.add( searchQueryController );
+        includedControllers.add( searchResultsController );
+        super.configure( mainController );
     }
 
     @Override
@@ -84,12 +63,6 @@ public class SearchTabController implements DexTabController {
 
     public void launchWindow(ActionEvent e) {
         SearchWindowController w = SearchWindowController.init();
-        // searchTab.setClosable( true );
-        // log.debug( "Is table closeable? " + searchTab.isClosable() );
-        if (e.getSource() instanceof MenuItem) {
-            ((MenuItem) e.getSource()).setDisable( true );
-            w.configure( mainController, (MenuItem) e.getSource() );
-        }
-        w.show( SearchWindowController.DIALOG_TITLE );
+        super.launchWindow( e, w );
     }
 }

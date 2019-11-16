@@ -101,7 +101,7 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         return result;
     }
 
-    protected String getTitle() {
+    public String getTitle() {
         return title;
     }
 

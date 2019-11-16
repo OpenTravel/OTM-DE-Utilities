@@ -16,15 +16,12 @@
 
 package org.opentravel.dex.controllers.member.properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.DexTabController;
+import org.opentravel.dex.controllers.DexTabControllerBase;
 import org.opentravel.dex.controllers.member.MemberDetailsController;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.MenuItem;
 
 /**
  * Manage the properties tab.
@@ -32,8 +29,7 @@ import javafx.scene.control.MenuItem;
  * @author dmh
  *
  */
-public class MemberPropertiesTabController implements DexTabController {
-    private static Log log = LogFactory.getLog( MemberPropertiesTabController.class );
+public class MemberPropertiesTabController extends DexTabControllerBase {
 
     /** FXML Java FX Nodes this controller is dependent upon */
     @FXML
@@ -41,31 +37,15 @@ public class MemberPropertiesTabController implements DexTabController {
     @FXML
     private MemberDetailsController memberDetailsController;
 
-    private DexMainController mainController;
-
     public MemberPropertiesTabController() {
-        log.debug( "Member Properties Tab Controller constructed." );
-    }
-
-    @Override
-    public void checkNodes() {
-        if (!(memberPropertiesTreeTableController instanceof MemberPropertiesTreeTableController))
-            throw new IllegalStateException( "Member Properties tree table controller not injected by FXML." );
-        if (!(memberDetailsController instanceof MemberDetailsController))
-            throw new IllegalStateException( "Member details controller not injected by FXML." );
-    }
-
-    @FXML
-    @Override
-    public void initialize() {
-        // no-op
+        // No-op
     }
 
     @Override
     public void configure(DexMainController mainController) {
-        this.mainController = mainController;
-        mainController.addIncludedController( memberPropertiesTreeTableController );
-        mainController.addIncludedController( memberDetailsController );
+        includedControllers.add( memberPropertiesTreeTableController );
+        includedControllers.add( memberDetailsController );
+        super.configure( mainController );
     }
 
     @Override
@@ -76,11 +56,7 @@ public class MemberPropertiesTabController implements DexTabController {
     @Override
     public void launchWindow(ActionEvent e) {
         MemberPropertiesWindowController w = MemberPropertiesWindowController.init();
-        if (e.getSource() instanceof MenuItem) {
-            ((MenuItem) e.getSource()).setDisable( true );
-            w.configure( mainController, (MenuItem) e.getSource() );
-        }
-        w.show( MemberPropertiesWindowController.DIALOG_TITLE );
+        super.launchWindow( e, w );
     }
 
 }

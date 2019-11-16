@@ -16,14 +16,11 @@
 
 package org.opentravel.dex.controllers.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.DexTabController;
+import org.opentravel.dex.controllers.DexTabControllerBase;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.MenuItem;
 
 /**
  * Manage the repository tab.
@@ -31,8 +28,7 @@ import javafx.scene.control.MenuItem;
  * @author dmh
  *
  */
-public class RepositoryTabController implements DexTabController {
-    private static Log log = LogFactory.getLog( RepositoryTabController.class );
+public class RepositoryTabController extends DexTabControllerBase {
 
     /**
      * FXML Java FX Nodes this controller is dependent upon
@@ -48,18 +44,7 @@ public class RepositoryTabController implements DexTabController {
     @FXML
     private RepositoryItemWebViewController repositoryItemWebViewController;
 
-    private DexMainController mainController;
-
     public RepositoryTabController() {
-        log.debug( "Repository Tab Controller constructed." );
-    }
-
-    @Override
-    public void checkNodes() {}
-
-    @Override
-    @FXML
-    public void initialize() {
         // no-op
     }
 
@@ -68,19 +53,13 @@ public class RepositoryTabController implements DexTabController {
      */
     @Override
     public void configure(DexMainController mc) {
-        this.mainController = mc;
-
-        mc.addIncludedController( repositorySelectionController );
-        mc.addIncludedController( repositoryNamespacesTreeController );
-        mc.addIncludedController( namespaceLibrariesTreeTableController );
-        mc.addIncludedController( repositoryItemCommitHistoriesController );
-        mc.addIncludedController( repositoryItemWebViewController );
-        // mainController.getEventSubscriptionManager().configureEventHandlers();
-
-        // log.debug( "Repository Tab Stage set." );
+        includedControllers.add( repositorySelectionController );
+        includedControllers.add( repositoryNamespacesTreeController );
+        includedControllers.add( namespaceLibrariesTreeTableController );
+        includedControllers.add( repositoryItemCommitHistoriesController );
+        includedControllers.add( repositoryItemWebViewController );
+        super.configure( mc );
     }
-
-
 
     @Override
     public String getDialogTitle() {
@@ -89,13 +68,7 @@ public class RepositoryTabController implements DexTabController {
 
     public void launchWindow(ActionEvent e) {
         RepositoryWindowController w = RepositoryWindowController.init();
-        if (e.getSource() instanceof MenuItem) {
-            ((MenuItem) e.getSource()).setDisable( true );
-            w.configure( mainController, (MenuItem) e.getSource() );
-        }
-        // else
-        // w.configure( mainController );
-        w.show( RepositoryWindowController.DIALOG_TITLE );
+        super.launchWindow( e, w );
     }
 
 }

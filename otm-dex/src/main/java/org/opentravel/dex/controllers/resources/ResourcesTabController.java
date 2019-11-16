@@ -16,14 +16,11 @@
 
 package org.opentravel.dex.controllers.resources;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.DexTabController;
+import org.opentravel.dex.controllers.DexTabControllerBase;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.MenuItem;
 
 /**
  * Manage the resource tab.
@@ -31,12 +28,9 @@ import javafx.scene.control.MenuItem;
  * @author dmh
  *
  */
-public class ResourcesTabController implements DexTabController {
-    private static Log log = LogFactory.getLog( ResourcesTabController.class );
+public class ResourcesTabController extends DexTabControllerBase {
 
-    /**
-     * FXML Java FX Nodes this controller is dependent upon
-     */
+    /** FXML Java FX Nodes this controller is dependent upon */
     @FXML
     private ResourcesTreeTableController resourcesTreeTableController;
     @FXML
@@ -46,43 +40,19 @@ public class ResourcesTabController implements DexTabController {
     @FXML
     private ResourceErrorsTreeTableController resourceErrorsTreeTableController;
 
-    private DexMainController mainController;
 
     public ResourcesTabController() {
-        // log.debug( "Resource Tab Controller constructed." );
+        // No-op
     }
 
-    public void checkNodes() {
-        if (!(resourcesTreeTableController instanceof ResourcesTreeTableController))
-            throw new IllegalStateException( "Resource tree table controller not injected by FXML." );
-        if (!(resourceDetailsController instanceof ResourceDetailsController))
-            throw new IllegalStateException( "Resource child details controller not injected by FXML." );
-        if (!(resourceActionsTreeTableController instanceof ResourceActionsTreeTableController))
-            throw new IllegalStateException( "Resource Actions controller not injected by FXML." );
-        if (!(resourceErrorsTreeTableController instanceof ResourceErrorsTreeTableController))
-            throw new IllegalStateException( "Resource Errors controller not injected by FXML." );
-
-    }
-
-    @Override
-    @FXML
-    public void initialize() {
-        // no-op
-    }
-
-    /**
-     * @param primaryStage
-     */
     @Override
     public void configure(DexMainController mainController) {
         this.mainController = mainController;
-        mainController.addIncludedController( resourcesTreeTableController );
-        mainController.addIncludedController( resourceDetailsController );
-        mainController.addIncludedController( resourceActionsTreeTableController );
-        mainController.addIncludedController( resourceErrorsTreeTableController );
-
-        // mainController.getEventSubscriptionManager().configureEventHandlers();
-        // log.debug( "Repository Tab configured." );
+        includedControllers.add( resourcesTreeTableController );
+        includedControllers.add( resourceDetailsController );
+        includedControllers.add( resourceActionsTreeTableController );
+        includedControllers.add( resourceErrorsTreeTableController );
+        super.configure( mainController );
     }
 
     @Override
@@ -92,12 +62,7 @@ public class ResourcesTabController implements DexTabController {
 
     public void launchWindow(ActionEvent e) {
         ResourcesWindowController w = ResourcesWindowController.init();
-        if (e.getSource() instanceof MenuItem) {
-            ((MenuItem) e.getSource()).setDisable( true );
-            w.configure( mainController, (MenuItem) e.getSource() );
-        } else
-            w.configure( mainController, null );
-        w.show( ResourcesWindowController.DIALOG_TITLE );
+        super.launchWindow( e, w );
     }
 
 }
