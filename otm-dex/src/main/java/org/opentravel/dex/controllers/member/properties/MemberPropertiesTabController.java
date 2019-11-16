@@ -18,7 +18,6 @@ package org.opentravel.dex.controllers.member.properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabController;
 import org.opentravel.dex.controllers.member.MemberDetailsController;
@@ -36,9 +35,7 @@ import javafx.scene.control.MenuItem;
 public class MemberPropertiesTabController implements DexTabController {
     private static Log log = LogFactory.getLog( MemberPropertiesTabController.class );
 
-    /**
-     * FXML Java FX Nodes this controller is dependent upon
-     */
+    /** FXML Java FX Nodes this controller is dependent upon */
     @FXML
     private MemberPropertiesTreeTableController memberPropertiesTreeTableController;
     @FXML
@@ -50,11 +47,12 @@ public class MemberPropertiesTabController implements DexTabController {
         log.debug( "Member Properties Tab Controller constructed." );
     }
 
-
     @Override
     public void checkNodes() {
         if (!(memberPropertiesTreeTableController instanceof MemberPropertiesTreeTableController))
             throw new IllegalStateException( "Member Properties tree table controller not injected by FXML." );
+        if (!(memberDetailsController instanceof MemberDetailsController))
+            throw new IllegalStateException( "Member details controller not injected by FXML." );
     }
 
     @FXML
@@ -64,27 +62,25 @@ public class MemberPropertiesTabController implements DexTabController {
     }
 
     @Override
-    public void configure(DexMainController parent) {
-        this.mainController = parent;
-        OtmEventSubscriptionManager eventManager = parent.getEventSubscriptionManager();
-
-        parent.addIncludedController( memberPropertiesTreeTableController, eventManager );
-        parent.addIncludedController( memberDetailsController, eventManager );
+    public void configure(DexMainController mainController) {
+        this.mainController = mainController;
+        mainController.addIncludedController( memberPropertiesTreeTableController );
+        mainController.addIncludedController( memberDetailsController );
     }
 
     @Override
     public String getDialogTitle() {
-        return MemberPropertiesWindowController.dialogTitle;
+        return MemberPropertiesWindowController.DIALOG_TITLE;
     }
 
+    @Override
     public void launchWindow(ActionEvent e) {
         MemberPropertiesWindowController w = MemberPropertiesWindowController.init();
         if (e.getSource() instanceof MenuItem) {
             ((MenuItem) e.getSource()).setDisable( true );
             w.configure( mainController, (MenuItem) e.getSource() );
-        } else
-            w.configure( mainController );
-        w.show( MemberPropertiesWindowController.dialogTitle );
+        }
+        w.show( MemberPropertiesWindowController.DIALOG_TITLE );
     }
 
 }

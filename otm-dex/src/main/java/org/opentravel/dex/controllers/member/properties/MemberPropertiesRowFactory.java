@@ -80,20 +80,6 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
     }
 
-    private void setupAddMenu(Menu menu) {
-        // MenuItem item;
-        // TODO - for business and choice objects, New in MemberRowFactory for facets
-        // FIXME - enable/disable
-        // For enum, add enum value (literal)
-        // For VWA, only enable simple properties
-        // For core roles only enum value
-        for (MenuItem item : OtmPropertyType.menuItems()) {
-            if (item.getUserData() instanceof OtmPropertyType)
-                item.setOnAction( e -> addProperty( (OtmPropertyType) item.getUserData() ) );
-            menu.getItems().add( item );
-        }
-    }
-
     /**
      * Add a new member to the tree
      * 
@@ -104,29 +90,25 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
         OtmPropertyOwner owner = getPropertyOwner( getObject() );
         if (owner != null) {
             owner.getActionManager().run( DexActions.ADDPROPERTY, owner, type );
+            controller.refresh();
         }
         // log.debug( "add in Properties Row Factory." );
-        controller.refresh();
+    }
+
+    private void changeAssignedType() {
+        OtmObject obj = getObject();
+        if (obj instanceof OtmTypeUser) {
+            obj.getActionManager().run( DexActions.TYPECHANGE, (OtmTypeUser) obj );
+            controller.getMainController().refresh();
+        }
     }
 
     private void deleteProperty() {
         OtmProperty p = getProperty( getObject() );
         if (p != null) {
             p.getActionManager().run( DexActions.DELETEPROPERTY, p );
+            controller.refresh();
         }
-        controller.refresh();
-    }
-
-    private void validateMember() {
-        OtmObject obj = getProperty( getObject() );
-        if (obj != null) {
-            obj.isValid( true );
-            if (obj.getOwningMember() != null)
-                obj.getOwningMember().isValid( true );
-            log.debug( "Validate " + obj + " finding count: " + obj.getFindings().count() );
-        }
-        controller.refresh();
-
     }
 
     /**
@@ -161,16 +143,6 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
 
     }
 
-    // Runs if menu item on a row is selected
-    private void changeAssignedType() {
-        TreeItem<PropertiesDAO> treeItem = getTreeItem();
-        if (treeItem != null && treeItem.getValue() != null && treeItem.getValue().getValue() instanceof OtmTypeUser) {
-            OtmTypeUser user = (OtmTypeUser) treeItem.getValue().getValue();
-            user.getActionManager().run( DexActions.TYPECHANGE, user );
-        }
-        controller.getMainController().refresh();
-    }
-
     /**
      * @param tc
      * @param newTreeItem
@@ -189,19 +161,39 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
             addMenu.setDisable( !am.isEnabled( DexActions.ADDPROPERTY, propertyOwner ) );
             deleteProperty.setDisable( !am.isEnabled( DexActions.DELETEPROPERTY, property ) );
             changeType.setDisable( !am.isEnabled( DexActions.TYPECHANGE, property ) );
-            // Go through all items and enable/disable
+            // enable/disable each property type menu item
             OtmPropertyType.enableMenuItems( addMenu, propertyOwner );
         }
+
+        // Set style
         if (object instanceof OtmChildrenOwner) {
             // Make facets dividers
             tc.pseudoClassStateChanged( DIVIDER, true );
             tc.setEditable( false );
         } else {
-            // Set Editable style and state
             tc.pseudoClassStateChanged( DIVIDER, false );
             tc.pseudoClassStateChanged( INHERITED, newTreeItem.getValue().isInherited() );
             tc.pseudoClassStateChanged( EDITABLE, object.isEditable() );
             tc.setEditable( object.isEditable() );
+        }
+    }
+
+    private void setupAddMenu(Menu menu) {
+        for (MenuItem item : OtmPropertyType.menuItems()) {
+            if (item.getUserData() instanceof OtmPropertyType)
+                item.setOnAction( e -> addProperty( (OtmPropertyType) item.getUserData() ) );
+            menu.getItems().add( item );
+        }
+    }
+
+    private void validateMember() {
+        OtmObject obj = getProperty( getObject() );
+        if (obj != null) {
+            obj.isValid( true );
+            if (obj.getOwningMember() != null)
+                obj.getOwningMember().isValid( true );
+            controller.refresh();
+            // log.debug( "Validate " + obj + " finding count: " + obj.getFindings().count() );
         }
     }
 

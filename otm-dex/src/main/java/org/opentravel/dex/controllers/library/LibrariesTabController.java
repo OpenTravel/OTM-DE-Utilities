@@ -18,10 +18,8 @@ package org.opentravel.dex.controllers.library;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabController;
-import org.opentravel.model.OtmModelManager;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,6 +39,8 @@ public class LibrariesTabController implements DexTabController {
     @FXML
     private LibrariesTreeTableController librariesTreeTableController;
 
+    private Object mainController;
+
     public LibrariesTabController() {
         log.debug( "Library Tab Controller constructed." );
     }
@@ -54,23 +54,17 @@ public class LibrariesTabController implements DexTabController {
     @Override
     @FXML
     public void initialize() {
-        log.debug( "Library Tab Controller constructed." );
-        // do nothing
+        // no-op
     }
 
     /**
      */
     @Override
-    public void configure(DexMainController parent) {
-        OtmEventSubscriptionManager eventManager = parent.getEventSubscriptionManager();
-        // Add included controllers to parent.
-        parent.addIncludedController( librariesTreeTableController, eventManager );
-        log.debug( "Library Tab configured." );
-    }
-
-    @Deprecated
-    public void post(OtmModelManager modelMgr) {
-        librariesTreeTableController.post( modelMgr );
+    public void configure(DexMainController mainController) {
+        this.mainController = mainController;
+        mainController.addIncludedController( librariesTreeTableController );
+        // mainController.getEventSubscriptionManager().configureEventHandlers();
+        // log.debug( "Library Tab configured." );
     }
 
     @Override

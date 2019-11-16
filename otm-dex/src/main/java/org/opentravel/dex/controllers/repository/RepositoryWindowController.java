@@ -16,21 +16,12 @@
 
 package org.opentravel.dex.controllers.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.popup.DexPopupControllerBase;
-
-import java.io.IOException;
+import org.opentravel.dex.controllers.popup.StandaloneWindowControllerBase;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
-import javafx.scene.layout.Pane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 /**
  * Manage the stand-alone repository window.
@@ -38,13 +29,12 @@ import javafx.stage.Stage;
  * @author dmh
  *
  */
-public class RepositoryWindowController extends DexPopupControllerBase {
-    private static Log log = LogFactory.getLog( RepositoryWindowController.class );
+public class RepositoryWindowController extends StandaloneWindowControllerBase {
 
     public static final String LAYOUT_FILE = "/RepositoryViews/RepositoryWindow.fxml";
-    protected static String dialogTitle = "Repository";
-    protected static Stage dialogStage;
+    public static final String DIALOG_TITLE = "Repository";
 
+    /** ********* FXML Java FX Nodes this controller is dependent upon */
     @FXML
     private RepositoryNamespacesTreeController repositoryNamespacesTreeController;
     @FXML
@@ -57,88 +47,30 @@ public class RepositoryWindowController extends DexPopupControllerBase {
     private RepositoryItemWebViewController repositoryItemWebViewController;
 
     /**
-     * Initialize this controller using the passed FXML loader.
-     * <p>
-     * Note: This approach using a static stage and main controller hides the complexity from calling controller.
-     * Otherwise, this code must migrate into the calling controller.
-     * 
+     * Initialize this controller using FXML loader.
      */
     protected static RepositoryWindowController init() {
         FXMLLoader loader = new FXMLLoader( RepositoryWindowController.class.getResource( LAYOUT_FILE ) );
-        RepositoryWindowController controller = null;
-        try {
-            // Load the fxml file initialize controller it declares.
-            Pane pane = loader.load();
-            // Create scene and stage
-            dialogStage = new Stage();
-            dialogStage.setScene( new Scene( pane ) );
-            dialogStage.initModality( Modality.NONE );
-            dialogStage.getScene().getStylesheets().add( "DavesViper.css" );
-
-            // get the controller from loader.
-            controller = loader.getController();
-            if (!(controller instanceof RepositoryWindowController))
-                throw new IllegalStateException( "Error creating resources window controller." );
-        } catch (IOException e1) {
-            throw new IllegalStateException(
-                "Error loading search window. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
-        }
-
-        positionStage( dialogStage );
-        return controller;
+        return (RepositoryWindowController) StandaloneWindowControllerBase.init( loader );
     }
-
 
     public RepositoryWindowController() {
-        log.debug( "Repository Window Controller constructed." );
+        // No-op
     }
 
     @Override
-    public void checkNodes() {}
-
-    public void configure(DexMainController parent, MenuItem menuItem) {
-        configure( parent );
-        launchedFromMenuItem = menuItem; // Remember so it can be enabled on close
+    public void configure(DexMainController mc, MenuItem menuItem) {
+        includedControllers.add( repositorySelectionController );
+        includedControllers.add( repositoryNamespacesTreeController );
+        includedControllers.add( namespaceLibrariesTreeTableController );
+        includedControllers.add( repositoryItemCommitHistoriesController );
+        includedControllers.add( repositoryItemWebViewController );
+        super.configure( mc, menuItem );
     }
-
-    public void configure(DexMainController mc) {
-        if (mc == null) {
-            log.debug( "Null main controller when configuring resources window" );
-            return;
-        }
-        OtmEventSubscriptionManager eventManager = mc.getEventSubscriptionManager();
-        // Set up the repository selection
-        mc.addIncludedController( repositorySelectionController, eventManager );
-
-        // Set up repository namespaces tree
-        mc.addIncludedController( repositoryNamespacesTreeController, eventManager );
-
-        // Set up the libraries in a namespace table
-        mc.addIncludedController( namespaceLibrariesTreeTableController, eventManager );
-
-        // No set up needed, but add to list
-        mc.addIncludedController( repositoryItemCommitHistoriesController, eventManager );
-
-        mc.addIncludedController( repositoryItemWebViewController, eventManager );
-
-        eventManager.configureEventHandlers();
-        log.debug( "Member Details window configured." );
-    }
-
 
     @Override
-    @FXML
-    public void initialize() {
-        // no-op
-        // checkNodes();
+    public String getTitle() {
+        return DIALOG_TITLE;
     }
 
-
-    /**
-     * @see org.opentravel.dex.controllers.popup.DexPopupControllerBase#setup(java.lang.String)
-     */
-    @Override
-    public void setup(String message) {
-        super.setStage( dialogTitle, dialogStage );
-    }
 }

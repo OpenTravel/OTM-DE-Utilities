@@ -18,12 +18,12 @@ package org.opentravel.dex.controllers.resources;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabController;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.MenuItem;
 
 /**
  * Manage the resource tab.
@@ -47,22 +47,18 @@ public class ResourcesTabController implements DexTabController {
     private ResourceErrorsTreeTableController resourceErrorsTreeTableController;
 
     private DexMainController mainController;
-    // private static final String dialogTitle = "Resources";
 
     public ResourcesTabController() {
-        log.debug( "Resource Tab Controller constructed." );
+        // log.debug( "Resource Tab Controller constructed." );
     }
 
     public void checkNodes() {
         if (!(resourcesTreeTableController instanceof ResourcesTreeTableController))
             throw new IllegalStateException( "Resource tree table controller not injected by FXML." );
-
         if (!(resourceDetailsController instanceof ResourceDetailsController))
             throw new IllegalStateException( "Resource child details controller not injected by FXML." );
-
         if (!(resourceActionsTreeTableController instanceof ResourceActionsTreeTableController))
             throw new IllegalStateException( "Resource Actions controller not injected by FXML." );
-
         if (!(resourceErrorsTreeTableController instanceof ResourceErrorsTreeTableController))
             throw new IllegalStateException( "Resource Errors controller not injected by FXML." );
 
@@ -72,32 +68,36 @@ public class ResourcesTabController implements DexTabController {
     @FXML
     public void initialize() {
         // no-op
-        checkNodes();
     }
 
     /**
      * @param primaryStage
      */
     @Override
-    public void configure(DexMainController parent) {
-        this.mainController = parent;
-        OtmEventSubscriptionManager eventManager = parent.getEventSubscriptionManager();
-        parent.addIncludedController( resourcesTreeTableController, eventManager );
-        parent.addIncludedController( resourceDetailsController, eventManager );
-        parent.addIncludedController( resourceActionsTreeTableController, eventManager );
-        parent.addIncludedController( resourceErrorsTreeTableController, eventManager );
-        log.debug( "Repository Tab configured." );
+    public void configure(DexMainController mainController) {
+        this.mainController = mainController;
+        mainController.addIncludedController( resourcesTreeTableController );
+        mainController.addIncludedController( resourceDetailsController );
+        mainController.addIncludedController( resourceActionsTreeTableController );
+        mainController.addIncludedController( resourceErrorsTreeTableController );
+
+        // mainController.getEventSubscriptionManager().configureEventHandlers();
+        // log.debug( "Repository Tab configured." );
     }
 
     @Override
     public String getDialogTitle() {
-        return ResourcesWindowController.dialogTitle;
+        return ResourcesWindowController.DIALOG_TITLE;
     }
 
     public void launchWindow(ActionEvent e) {
         ResourcesWindowController w = ResourcesWindowController.init();
-        w.configure( mainController );
-        w.show( ResourcesWindowController.dialogTitle );
+        if (e.getSource() instanceof MenuItem) {
+            ((MenuItem) e.getSource()).setDisable( true );
+            w.configure( mainController, (MenuItem) e.getSource() );
+        } else
+            w.configure( mainController, null );
+        w.show( ResourcesWindowController.DIALOG_TITLE );
     }
 
 }

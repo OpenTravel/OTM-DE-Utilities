@@ -81,9 +81,16 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     }
 
     @Override
+    public void addIncludedController(DexIncludedController<?> controller) {
+        addIncludedController( controller, getEventSubscriptionManager() );
+    }
+
+    @Override
     public void addIncludedController(DexIncludedController<?> controller, OtmEventSubscriptionManager eventManager) {
         if (controller == null)
             throw new IllegalStateException( "Tried to add null Included controller" );
+        if (eventManager == null)
+            eventManager = getEventSubscriptionManager();
 
         controller.checkNodes();
         includedControllers.add( controller );

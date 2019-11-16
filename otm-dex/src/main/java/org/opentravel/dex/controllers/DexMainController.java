@@ -47,6 +47,12 @@ public interface DexMainController extends DexController {
      * 
      * @param controller
      */
+    void addIncludedController(DexIncludedController<?> controller);
+
+    /**
+     * @deprecated Use method with just the controller
+     */
+    @Deprecated
     void addIncludedController(DexIncludedController<?> controller, OtmEventSubscriptionManager eventManager);
 
     /**

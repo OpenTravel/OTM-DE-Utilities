@@ -18,7 +18,6 @@ package org.opentravel.dex.controllers.member.usage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabController;
 
@@ -44,6 +43,8 @@ public class WhereUsedTabController implements DexTabController {
     @FXML
     private TypeProvidersTreeController typeProvidersTreeController;
 
+    private DexMainController mainController;
+
     // Available but not used
     // @FXML
     // private Tab whereUsedTab;
@@ -65,11 +66,12 @@ public class WhereUsedTabController implements DexTabController {
     }
 
     @Override
-    public void configure(DexMainController parent) {
-        OtmEventSubscriptionManager eventManager = parent.getEventSubscriptionManager();
-        parent.addIncludedController( typeUsersTreeController, eventManager );
-        parent.addIncludedController( usersTreeController, eventManager );
-        parent.addIncludedController( typeProvidersTreeController, eventManager );
+    public void configure(DexMainController mainController) {
+        this.mainController = mainController;
+        mainController.addIncludedController( typeUsersTreeController );
+        mainController.addIncludedController( usersTreeController );
+        mainController.addIncludedController( typeProvidersTreeController );
+        // mainController.getEventSubscriptionManager().configureEventHandlers();
     }
 
     @Override

@@ -35,11 +35,14 @@ public interface DexTabController {
     public void checkNodes();
 
     /**
+     * Add included controllers to main controller.
+     */
+    public void configure(DexMainController mainController);
+
+    /**
      * Does this tab have a stand alone dialog defined? If so, return its title. If not, return null.
      */
     public String getDialogTitle();
-
-    public void launchWindow(ActionEvent e);
 
     /**
      * Used by FXML when controller is loaded.
@@ -48,8 +51,10 @@ public interface DexTabController {
     public void initialize();
 
     /**
-     * Add included controllers to parent.
+     * Launch the stand-alone window that matches this tab's contents. If not supported, no-op.
+     * 
+     * @param e action event whose source is the menu item to be disabled and enabled on window close
      */
-    public void configure(DexMainController parent);
+    public void launchWindow(ActionEvent e);
 
 }

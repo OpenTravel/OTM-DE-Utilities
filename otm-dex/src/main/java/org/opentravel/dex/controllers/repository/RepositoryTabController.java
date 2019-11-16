@@ -18,7 +18,6 @@ package org.opentravel.dex.controllers.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabController;
 
@@ -69,31 +68,23 @@ public class RepositoryTabController implements DexTabController {
      */
     @Override
     public void configure(DexMainController mc) {
-        OtmEventSubscriptionManager eventManager = mc.getEventSubscriptionManager();
         this.mainController = mc;
 
-        // Set up the repository selection
-        mc.addIncludedController( repositorySelectionController, eventManager );
+        mc.addIncludedController( repositorySelectionController );
+        mc.addIncludedController( repositoryNamespacesTreeController );
+        mc.addIncludedController( namespaceLibrariesTreeTableController );
+        mc.addIncludedController( repositoryItemCommitHistoriesController );
+        mc.addIncludedController( repositoryItemWebViewController );
+        // mainController.getEventSubscriptionManager().configureEventHandlers();
 
-        // Set up repository namespaces tree
-        mc.addIncludedController( repositoryNamespacesTreeController, eventManager );
-
-        // Set up the libraries in a namespace table
-        mc.addIncludedController( namespaceLibrariesTreeTableController, eventManager );
-
-        // No set up needed, but add to list
-        mc.addIncludedController( repositoryItemCommitHistoriesController, eventManager );
-
-        mc.addIncludedController( repositoryItemWebViewController, eventManager );
-
-        log.debug( "Repository Tab Stage set." );
+        // log.debug( "Repository Tab Stage set." );
     }
 
 
 
     @Override
     public String getDialogTitle() {
-        return RepositoryWindowController.dialogTitle;
+        return RepositoryWindowController.DIALOG_TITLE;
     }
 
     public void launchWindow(ActionEvent e) {
@@ -101,9 +92,10 @@ public class RepositoryTabController implements DexTabController {
         if (e.getSource() instanceof MenuItem) {
             ((MenuItem) e.getSource()).setDisable( true );
             w.configure( mainController, (MenuItem) e.getSource() );
-        } else
-            w.configure( mainController );
-        w.show( RepositoryWindowController.dialogTitle );
+        }
+        // else
+        // w.configure( mainController );
+        w.show( RepositoryWindowController.DIALOG_TITLE );
     }
 
 }
