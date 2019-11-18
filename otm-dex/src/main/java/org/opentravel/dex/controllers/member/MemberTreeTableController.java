@@ -277,6 +277,8 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         if (!ignoreEvents)
             select( event.getMember() );
     }
+    // private void handleEvent(OtmObjectChangeEvent event) {
+    // }
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
@@ -286,6 +288,8 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
                 handleEvent( (DexMemberSelectionEvent) event );
             else if (event instanceof DexFilterChangeEvent)
                 handleEvent( (DexFilterChangeEvent) event );
+            else if (event instanceof OtmObjectChangeEvent)
+                refresh();
             else if (event instanceof DexModelChangeEvent)
                 refresh();
             else

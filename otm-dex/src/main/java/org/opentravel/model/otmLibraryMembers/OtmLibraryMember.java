@@ -23,11 +23,13 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLAlias;
 import org.opentravel.schemacompiler.model.TLFacet;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -182,5 +184,10 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      * @return true if member is in editable library or is latest in an editable chain
      */
     boolean isEditableMinor();
+
+    /**
+     * @return new list of contributed facets or empty list
+     */
+    public Collection<OtmContributedFacet> getChildrenContributedFacets();
 
 }

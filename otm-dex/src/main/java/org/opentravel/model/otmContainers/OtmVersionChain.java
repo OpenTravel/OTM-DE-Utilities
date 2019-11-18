@@ -19,8 +19,14 @@ package org.opentravel.model.otmContainers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmModelElement;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
+import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyFactory;
+import org.opentravel.schemacompiler.model.LibraryElement;
 import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
@@ -81,11 +87,20 @@ public class OtmVersionChain {
         return false;
     }
 
+    /**
+     * Is there a minor version with a larger version number. Must have same name and be the same object type.
+     * 
+     * @param member
+     * @return true if this member's library version is greater than all other members in the chain with the same name.
+     */
     public boolean isLatestVersion(OtmLibraryMember member) {
         int vn = member.getLibrary().getMinorVersion();
         for (OtmLibrary lib : libraries) {
-            if (lib.getMinorVersion() > vn && lib.getTL().getNamedMember( member.getName() ) != null)
-                return false;
+            if (lib.getMinorVersion() > vn) {
+                LibraryMember tl = lib.getTL().getNamedMember( member.getName() );
+                if (tl != null && tl.getClass() == member.getTL().getClass())
+                    return false;
+            }
         }
         return true;
     }
@@ -145,7 +160,7 @@ public class OtmVersionChain {
      * @param subject
      * @return a property owner in the new object with the matching name or null
      */
-    public OtmPropertyOwner getNewMinor(OtmPropertyOwner subject) {
+    public OtmLibraryMember getNewMinorLibraryMember(OtmLibraryMember subject) {
         OtmLibrary subjectLibrary = subject.getLibrary();
         if (subjectLibrary == null)
             return null;
@@ -153,11 +168,10 @@ public class OtmVersionChain {
         if (minorLibrary == null)
             return null;
         // Get the latest version of this member
-        OtmLibraryMember latestMember = subjectLibrary.getVersionChain().getLatestVersion( subject.getOwningMember() );
+        OtmLibraryMember latestMember = subjectLibrary.getVersionChain().getLatestVersion( subject );
         if (latestMember == null)
             return null;
         OtmLibraryMember newMinorLibraryMember = null;
-        OtmPropertyOwner newPropertyOwner = null;
 
         // If the latest member is in the target minor library us it
         if (latestMember.getLibrary() == minorLibrary)
@@ -169,11 +183,91 @@ public class OtmVersionChain {
         if (newMinorLibraryMember == null)
             return null; // how to inform user of error?
 
+        // Contextual facets?
+        for (OtmContributedFacet cf : newMinorLibraryMember.getChildrenContributedFacets())
+            log.debug( "What to do here? " );
+
+        return newMinorLibraryMember;
+    }
+
+    public OtmPropertyOwner getNewMinorPropertyOwner(OtmPropertyOwner subject) {
+        OtmLibraryMember newMinorLibraryMember = getNewMinorLibraryMember( subject.getOwningMember() );
+        OtmPropertyOwner newPropertyOwner = null;
+
         // Find matching propertyOwner
         for (OtmPropertyOwner p : newMinorLibraryMember.getDescendantsPropertyOwners())
             if (p.getName().equals( subject.getName() ))
                 newPropertyOwner = p;
 
         return newPropertyOwner;
+    }
+
+    public OtmTypeUser getNewMinorTypeUser(OtmTypeUser subject) {
+        OtmPropertyOwner np = getNewMinorPropertyOwner( ((OtmProperty) subject).getParent() );
+
+        // OtmLibraryMember newMinorLibraryMember = getNewMinorLibraryMember( subject.getOwningMember() );
+        OtmTypeUser newTypeUser = null;
+        OtmProperty newProperty = null;
+        // New objects will NOT have any type users!
+        LibraryElement newTL = subject.getTL().cloneElement( np.getLibrary().getTL() );
+        if (newTL instanceof TLModelElement)
+            newProperty = OtmPropertyFactory.create( (TLModelElement) newTL, np );
+        if (newProperty instanceof OtmTypeUser)
+            newTypeUser = (OtmTypeUser) newProperty;
+
+        // // Find matching type user
+        // for (OtmTypeUser u : newMinorLibraryMember.getDescendantsTypeUsers())
+        // if (u.getName().equals( subject.getName() ))
+        // newTypeUser = u;
+
+        return newTypeUser;
+    }
+
+    // From language specification document:
+    // . For one term to be considered a later minor version of another term, all of the following conditions MUST be
+    // met:
+    // 1. The terms must be of the same type (business object, core, etc.) and have the same name
+    // 2. The terms MUST be declared in different libraries, and both libraries must have the same name, version scheme,
+    // and base namespace URI
+    // 3. The version of the extended term’s library MUST be lower than that of the extending term’s library version,
+    // but both libraries MUST belong to the same major version chain
+    // Is there a newer minor version of this type provider?
+    public boolean canAssignLaterVersion(OtmTypeUser subject) {
+        return !isLatestVersion( subject.getAssignedType().getOwningMember() );
+    }
+
+    /**
+     * Can the candidate be assigned as type in a minor version for users are currently assigned to the member? To do
+     * so, the candidate must be a later version in the same version chain of the member.
+     * 
+     * @param member
+     * @param candidate
+     * @return
+     */
+    public boolean isLaterVersion(OtmObject member, OtmObject candidate) {
+        if (member == null || candidate == null)
+            return false;
+        if (member.getLibrary() == null || candidate.getLibrary() == null)
+            return false;
+        if (member == candidate)
+            return false;
+        if (member.getClass() != candidate.getClass())
+            return false;
+        if (!member.getName().equals( candidate.getName() ))
+            return false;
+        if (member.getLibrary() == candidate.getLibrary())
+            return false;
+        if (!member.getLibrary().getNameWithBasenamespace().equals( candidate.getLibrary().getNameWithBasenamespace() ))
+            return false;
+        try {
+            if (member.getLibrary().getMajorVersion() != candidate.getLibrary().getMajorVersion())
+                return false;
+            if (member.getLibrary().getMinorVersion() >= candidate.getLibrary().getMinorVersion())
+                return false;
+        } catch (VersionSchemeException e) {
+            return false;
+        }
+
+        return true;
     }
 }

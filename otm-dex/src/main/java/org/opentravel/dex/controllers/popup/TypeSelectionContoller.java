@@ -22,6 +22,7 @@ import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.controllers.member.MemberTreeTableController;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmTypeProvider;
 
 import java.io.IOException;
 
@@ -111,6 +112,17 @@ public class TypeSelectionContoller extends DexPopupControllerBase {
 
     public MemberAndProvidersDAO getSelected() {
         return memberTreeTableController.getSelected();
+    }
+
+    /**
+     * @return selection if type provider, otherwise null
+     */
+    public OtmTypeProvider getSelectedProvider() {
+        if (memberTreeTableController.getSelected() != null
+            && memberTreeTableController.getSelected().getValue() != null
+            && memberTreeTableController.getSelected().getValue() instanceof OtmTypeProvider)
+            return (OtmTypeProvider) memberTreeTableController.getSelected().getValue();
+        return null;
     }
 
     public void mouseClick(MouseEvent event) {

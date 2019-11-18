@@ -26,6 +26,7 @@ import org.opentravel.dex.events.DexFilterChangeEvent;
 import org.opentravel.dex.events.DexLibrarySelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
@@ -126,6 +127,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     private DexPopupController popupController = null;
     private boolean errorsOnly = false;
     private boolean builtIns = false;
+    private OtmTypeProvider minorVersionMatch = null;
 
     public MemberFilterController() {
         super( subscribedEvents, publishedEvents );
@@ -281,7 +283,9 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             return true;
         }
         // debugPrint( member );
-
+        if (minorVersionMatch != null
+            && !minorVersionMatch.getLibrary().getVersionChain().isLaterVersion( minorVersionMatch, member ))
+            return false;
         if (libraryFilter != null && !member.getLibrary().getName().startsWith( libraryFilter ))
             return false;
         if (textFilterValue != null && !member.getName().toLowerCase().startsWith( textFilterValue ))
@@ -366,6 +370,15 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         // log.debug("Latest only set to: " + latestButton.isSelected());
         latestVersionOnly = latestButton.isSelected();
         fireFilterChangeEvent();
+    }
+
+    /**
+     * Only select the same type of object with same name and in the same version chain.
+     * 
+     * @param type
+     */
+    public void setMinorVersionFilter(OtmTypeProvider type) {
+        minorVersionMatch = type;
     }
 
     // Future - use fxControls or other package to get a multiple check box or even check tree to select versions.

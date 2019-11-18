@@ -170,7 +170,9 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     }
 
     public void handleEvent(OtmObjectChangeEvent event) {
-        if (event != null && event.get() == selectedMember)
+        if (event != null && event.get() instanceof OtmLibraryMember)
+            post( (OtmLibraryMember) event.get() );
+        else
             refresh();
     }
 

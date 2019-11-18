@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.action.manager.DexActionManagerBase;
-import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
@@ -46,19 +45,24 @@ public class AssignedTypeChangeAction extends DexRunAction {
         // Id is a type user but can't be changed.
         if (subject instanceof OtmIdAttribute)
             return false;
-        return (subject.isEditable() && subject instanceof OtmTypeUser);
+        if (!(subject instanceof OtmTypeUser))
+            return false;
+        if (subject.isEditable())
+            return true;
+        if (subject.getLibrary() != null && subject.getLibrary().isChainEditable())
+            return subject.getLibrary().getVersionChain().canAssignLaterVersion( (OtmTypeUser) subject );
+        return false;
     }
 
     private OtmTypeUser user = null;
+    private OtmTypeUser newUser = null;
 
     private OtmTypeProvider oldProvider;
     private NamedEntity oldTLType;
     private String oldName;
     private String oldTLTypeName;
     private OtmTypeProvider newProvider;
-
     private DexActionManagerBase actionManager = null;
-
 
     public AssignedTypeChangeAction() {
         // Constructor for reflection
@@ -71,7 +75,7 @@ public class AssignedTypeChangeAction extends DexRunAction {
         log.debug( "Ready to set assigned type to " + otm + " " + ignore );
         if (ignore)
             return null;
-        if (user == null || otm == null)
+        if (user == null || !(otm instanceof OtmTypeUser))
             return null;
         if (actionManager == null)
             return null;
@@ -83,15 +87,23 @@ public class AssignedTypeChangeAction extends DexRunAction {
         if (modelMgr == null)
             return null;
 
-        // Find out if this typeUser is in a minor and not new to chain
-        boolean isEditable = otm.getOwningMember().isEditableMinor();
-        boolean isLatestMember = otm.getLibrary().getVersionChain().isLatestVersion( otm.getOwningMember() );
-        boolean isInEditableMinor = otm.getLibrary().isMinorVersion() && otm.isEditable();
-        // TODO - set filter
-
-        // Get the user's selected new provider
-        MemberAndProvidersDAO selected = null;
+        // Setup controller to get the users selection
         TypeSelectionContoller controller = TypeSelectionContoller.init();
+        controller.setManager( modelMgr );
+
+        // Find out if this typeUser is in a minor and not new to chain
+        user = (OtmTypeUser) otm;
+        if (!user.isEditable() && user.getLibrary().isChainEditable()) {
+            // Create a new property in a new minor version of the owning member
+            newUser = user.getLibrary().getVersionChain().getNewMinorTypeUser( user );
+            // set filter
+            controller.getMemberFilterController().setMinorVersionFilter( user.getAssignedType() );
+
+            if (newUser == null) {
+                otm.getActionManager().postWarning( "Error creating minor version of " + otm.getOwningMember() );
+                return null;
+            }
+        }
 
         // Set applicable filters
         if (otm instanceof OtmResource)
@@ -99,13 +111,17 @@ public class AssignedTypeChangeAction extends DexRunAction {
         if (otm instanceof OtmActionFacet)
             controller.getMemberFilterController().setTypeFilter( MemberFilterController.CORE );
 
-        controller.setManager( modelMgr );
-        if (controller.showAndWait( "MSG" ) == Results.OK) {
-            selected = controller.getSelected();
-            if (selected == null || !(selected.getValue() instanceof OtmTypeProvider))
-                log.error( "Missing selection from Type Selection Controller" ); // cancel?
-            else
-                doIt( selected.getValue() );
+        // Get the user's selected new provider
+        controller.showAndWait( "MSG" );
+        OtmTypeProvider selected = controller.getSelectedProvider();
+        if (selected != null && controller.getResult() == Results.OK) {
+            doIt( selected );
+        } else {
+            // handle cancel and bad selection when newUser created
+            log.error( "Canceled or missing selection from Type Selection Controller" );
+            if (newUser != null && newUser.getLibrary() != null)
+                newUser.getLibrary().delete( newUser.getOwningMember() );
+            return null;
         }
 
         return get();
@@ -136,12 +152,11 @@ public class AssignedTypeChangeAction extends DexRunAction {
 
             newProvider = (OtmTypeProvider) data;
             // Set value into model
-            OtmTypeProvider p = user.setAssignedType( newProvider );
+            if (newUser != null)
+                newUser.setAssignedType( newProvider );
+            else
+                user.setAssignedType( newProvider );
 
-            // if (p != newProvider)
-            // log.error( "Could not set type to " + newProvider );
-            // else
-            // log.debug( "Set type to " + get() );
         }
         return get();
     }
@@ -176,28 +191,38 @@ public class AssignedTypeChangeAction extends DexRunAction {
     }
 
     @Override
+    public OtmTypeUser getSubject() {
+        return newUser == null ? (OtmTypeUser) otm : newUser;
+    }
+
+    @Override
     public String toString() {
         return "Assigned Type: " + newProvider;
     }
 
     @Override
     public OtmTypeProvider undoIt() {
-        if (oldProvider != null) {
-            if (oldProvider != user.setAssignedType( oldProvider ))
-                actionManager.postWarning( "Error undoing change." );
-        } else if (oldTLType != null) {
-            // If provider was not in model manager
-            if (oldTLType != user.setAssignedTLType( oldTLType ))
-                actionManager.postWarning( "Error undoing change." );
-        } else if (oldTLTypeName != null && !oldTLTypeName.isEmpty()) {
-            // Sometimes, only the name is known because the tl model does not have the type loaded.
-            user.setTLTypeName( oldTLTypeName );
-            otm.setName( oldName );
-        } else
-            // No clues about what to set it to, so clear it.
-            user.setAssignedType( null );
-
-        otm.setName( oldName ); // May have been changed by assignment
+        if (newUser != null) {
+            // simply delete the newly created minor version
+            newUser.getLibrary().delete( newUser.getOwningMember() );
+            newUser = null;
+        } else {
+            if (oldProvider != null) {
+                if (oldProvider != user.setAssignedType( oldProvider ))
+                    actionManager.postWarning( "Error undoing change." );
+            } else if (oldTLType != null) {
+                // If provider was not in model manager
+                if (oldTLType != user.setAssignedTLType( oldTLType ))
+                    actionManager.postWarning( "Error undoing change." );
+            } else if (oldTLTypeName != null && !oldTLTypeName.isEmpty()) {
+                // Sometimes, only the name is known because the tl model does not have the type loaded.
+                user.setTLTypeName( oldTLTypeName );
+                otm.setName( oldName );
+            } else
+                // No clues about what to set it to, so clear it.
+                user.setAssignedType( null );
+            otm.setName( oldName ); // May have been changed by assignment
+        }
         log.debug( "Undo type assignment. Set to " + get() );
         return oldProvider;
     }

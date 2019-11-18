@@ -324,6 +324,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
             DexAction<?> action = queue.pop();
             log.debug( "Undo action: " + action.getClass().getSimpleName() );
             action.undoIt();
+
             if (action.getSubject() != null)
                 action.getSubject().getOwningMember().isValid( true ); // Force the owner to refresh its findings.
 
@@ -333,6 +334,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
                 event.set( action.getSubject() );
                 mainController.publishEvent( event );
             }
+
             if (mainController != null) {
                 mainController.updateActionQueueSize( getQueueSize() );
                 mainController.postStatus( "Undid action: " + action.toString() );

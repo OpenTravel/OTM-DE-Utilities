@@ -72,6 +72,13 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
         return false;
     }
 
+    // From language specification document
+    // 1. Any new term can be defined
+    // 2. Existing versioned terms (see section 11.3) can only be modified by adding indicators, optional attributes, or
+    // optional element declarations
+    // 3. New enumerated values can be added to both open and closed enumerations
+    // 4. Extension point facets cannot be modified in a minor version library
+
     // Done - change description, deprecation, examples
     // Done - new property
     // Done - New properties to this version have full permission

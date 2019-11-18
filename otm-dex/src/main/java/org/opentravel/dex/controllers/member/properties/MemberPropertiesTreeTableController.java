@@ -53,7 +53,8 @@ import javafx.scene.layout.VBox;
 public class MemberPropertiesTreeTableController extends DexIncludedControllerBase<OtmLibraryMember> {
     private static Log log = LogFactory.getLog( MemberPropertiesTreeTableController.class );
 
-    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
+    private static final EventType[] publishedEvents =
+        {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
 
     private static final EventType[] subscribedEvents =
         {OtmObjectChangeEvent.OBJECT_CHANGED, OtmObjectModifiedEvent.OBJECT_MODIFIED,
@@ -198,7 +199,10 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     }
 
     private void handleEvent(OtmObjectChangeEvent e) {
-        refresh();
+        if (e.get() instanceof OtmLibraryMember)
+            post( (OtmLibraryMember) e.get() );
+        else
+            refresh();
     }
 
     private void handleEvent(OtmObjectModifiedEvent e) {

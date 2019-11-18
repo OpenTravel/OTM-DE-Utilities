@@ -143,6 +143,20 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         }
     }
 
+    @Override
+    public synchronized Collection<OtmContributedFacet> getChildrenContributedFacets() {
+        List<OtmObject> kids = new ArrayList<>( getChildren() );
+        if (!kids.isEmpty()) {
+            List<OtmContributedFacet> pChildren = new ArrayList<>();
+            for (OtmObject child : kids)
+                if (child instanceof OtmContributedFacet)
+                    pChildren.add( (OtmContributedFacet) child );
+            return pChildren;
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
     /**
      */
     @Override
@@ -346,9 +360,9 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     @Override
     public StringProperty libraryProperty() {
         if (isEditable())
-            return new SimpleStringProperty( getLibraryName() );
+            return new SimpleStringProperty( getLibrary().getVersion() + "  " + getLibraryName() );
         else
-            return new ReadOnlyStringWrapper( getLibraryName() );
+            return new ReadOnlyStringWrapper( getLibrary().getVersion() + "  " + getLibraryName() );
     }
 
     @Override

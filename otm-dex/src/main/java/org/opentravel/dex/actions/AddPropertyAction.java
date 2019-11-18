@@ -70,25 +70,9 @@ public class AddPropertyAction extends DexRunAction {
             //
             if (!subjectLibrary.isEditable() && subjectLibrary.isChainEditable()) {
                 // Get the latest library in the chain that is editable
-                newPropertyOwner = subjectLibrary.getVersionChain().getNewMinor( getSubject() );
+                newPropertyOwner = subjectLibrary.getVersionChain().getNewMinorPropertyOwner( getSubject() );
                 if (newPropertyOwner == null)
                     return null;
-                // OtmLibrary minorLibrary = subjectLibrary.getVersionChain().getEditable();
-                // // Get the latest version of this member
-                // OtmLibraryMember latestMember =
-                // subjectLibrary.getVersionChain().getLatestVersion( getSubject().getOwningMember() );
-                // // If the latest member is in the target minor library us it
-                // if (latestMember.getLibrary() == minorLibrary)
-                // newMinorLibraryMember = latestMember;
-                // else
-                // // Create new minor version of this member
-                // newMinorLibraryMember = latestMember.createMinorVersion( minorLibrary );
-                // if (newMinorLibraryMember == null)
-                // return null; // how to inform user of error?
-                // // Find matching propertyOwner
-                // for (OtmPropertyOwner p : newMinorLibraryMember.getDescendantsPropertyOwners())
-                // if (p.getName().equals( getSubject().getName() ))
-                // newPropertyOwner = p;
             }
 
             // Build and hold onto for undo

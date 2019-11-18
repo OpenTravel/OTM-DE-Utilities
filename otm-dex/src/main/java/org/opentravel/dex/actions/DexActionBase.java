@@ -19,6 +19,7 @@ package org.opentravel.dex.actions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.events.DexChangeEvent;
+import org.opentravel.dex.events.DexEvent;
 import org.opentravel.model.OtmObject;
 
 public abstract class DexActionBase {

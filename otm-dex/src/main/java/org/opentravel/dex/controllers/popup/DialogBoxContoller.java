@@ -95,7 +95,7 @@ public class DialogBoxContoller extends DexPopupControllerBase {
     }
 
     /**
-     * Initialize this controller using the passed FXML loader.
+     * Initialize this MODAL controller using FXML loader.
      * <p>
      * Note: This approach using a static stage and main controller hides the complexity from calling controller.
      * Otherwise, this code must migrate into the calling controller.
