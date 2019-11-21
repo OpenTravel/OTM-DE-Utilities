@@ -28,7 +28,12 @@ import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.TestOtmModelManager;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestVersionChain;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
+import org.opentravel.model.otmFacets.OtmFacet;
+import org.opentravel.model.otmFacets.TestFacet;
+import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
 import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
@@ -37,6 +42,7 @@ import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLIndicator;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLProperty;
+import org.opentravel.schemacompiler.version.VersionSchemeException;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
 
@@ -44,7 +50,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Verifies the functions of the <code>OtmBusinessObject</code> class.
+ * Verifies the functions related to inheritance.
+ * <p>
+ * {@link TestFacet#testModelInheritedChildren()}
  */
 public class TestInheritance extends AbstractFxTest {
     private static Log log = LogFactory.getLog( TestInheritance.class );
@@ -190,6 +198,81 @@ public class TestInheritance extends AbstractFxTest {
 
     }
 
+    @Test
+    public void testInheritanceInMinorVersion() throws VersionSchemeException {
+        TestDexFileHandler.loadVersionProject( mgr );
+
+        OtmLibrary minorLibrary = TestVersionChain.getMinorInChain( mgr );
+        assertTrue( "Given", minorLibrary != null );
+        assertTrue( "Given", minorLibrary.isEditable() );
+        assertTrue( "Given - minor is empty.", mgr.getMembers( minorLibrary ).isEmpty() );
+
+        for (OtmLibraryMember member : mgr.getMembers( minorLibrary.getVersionChain().getMajor() )) {
+            List<OtmObject> kids = member.getChildren();
+            List<OtmObject> iKids = member.getInheritedChildren();
+
+            if (member instanceof OtmComplexObjects) {
+                // Business, choice and core object tests
+                log.debug( "Testing " + member );
+
+                // Create a minor version
+                OtmLibraryMember minor = member.createMinorVersion( minorLibrary );
+                assertTrue( "Must have created a minor object.", minor != null );
+
+                // Get a representative facet
+                OtmFacet<?> memberSummary = ((OtmComplexObjects<?>) member).getSummary();
+                assertTrue( "Given.", !memberSummary.isInherited() );
+                kids = memberSummary.getChildren();
+                TestFacet.checkFacetChildren( memberSummary );
+                OtmProperty memberProperty = (OtmProperty) kids.get( 0 );
+                assertTrue( !memberProperty.isInherited() );
+                assertTrue( memberProperty.getParent() == memberSummary );
+
+                OtmFacet<?> minorSummary = ((OtmComplexObjects<?>) minor).getSummary();
+                iKids = minorSummary.getInheritedChildren();
+
+                // Assure all properties are inherited
+                for (OtmObject p : ((OtmComplexObjects<?>) member).getSummary().getChildren())
+                    assertTrue( "Given", TestFacet.getInheritedProperty( minorSummary, p.getTL() ) != null );
+
+                // When - Adding properties to minor
+                //
+                TLProperty tlProp = new TLProperty();
+                tlProp.setName( "NewInMinor" );
+                tlProp.setType( mgr.getIdType().getTL() );
+                tlProp.setOwner( minorSummary.getTL() );
+                // Add one property
+                OtmProperty newProperty = minorSummary.add( tlProp );
+                assertTrue( "New property must not be inherited.", !newProperty.isInherited() );
+                // get() will model the inherited children
+                assertTrue( "Must have same number of inherited properties.",
+                    minorSummary.getInheritedChildren().size() == iKids.size() );
+                assertTrue( "Must not change base facet.", !memberSummary.isInherited() );
+                assertTrue( "Must not change base property.", !memberProperty.isInherited() );
+                assertTrue( "Must not change base property.", memberProperty.getParent() == memberSummary );
+
+                // Add all property types
+                TestOtmPropertiesBase.buildOneOfEach2( minorSummary );
+                for (OtmObject c : minorSummary.getChildren())
+                    assertTrue( "Children must not be inherited.", !c.isInherited() );
+                assertTrue( "Must have same number of inherited properties.",
+                    minorSummary.getInheritedChildren().size() == iKids.size() );
+
+                //
+                // Delete the new minor so it will not interfere with further tests
+                minorLibrary.delete( minor );
+                // Assure member kids are unchanged
+                assertTrue( "Must have removed all kids from list.",
+                    kids.size() == memberSummary.getChildren().size() );
+                TestFacet.checkFacetChildren( memberSummary );
+            }
+
+            // change type ???
+            // assure the new property with changed type is not inherited
+            // assure the property in the major that had type change is still has same parent as before
+        }
+    }
+
     public void getUnmanagedProject() {
         TestDexFileHandler.loadUnmanagedProject( mgr );
         int initialMemberCount = mgr.getMembers().size();
@@ -204,73 +287,7 @@ public class TestInheritance extends AbstractFxTest {
         assertTrue( mgr.getMembers().size() > initialMemberCount );
     }
 
-    // @Test
-    // public void testFacets() {
-    // OtmBusinessObject bo = buildOtm( staticModelManager );
-    //
-    // assertNotNull( bo.getSummary() );
-    // assertNotNull( bo.getDetail() );
-    // }
-    //
-    // /** ****************************************************** **/
-    // public static OtmBusinessObject buildOtm(OtmModelManager mgr, String name) {
-    // BoName = name;
-    // return buildOtm( mgr );
-    // }
-    //
-    // /**
-    // * Get an element from the summary facet
-    // *
-    // * @param member
-    // * @return
-    // */
-    // public static OtmElement<?> getElement(OtmBusinessObject member) {
-    // for (OtmObject child : member.getSummary().getChildren())
-    // if (child instanceof OtmElement)
-    // return (OtmElement<?>) child;
-    // return null;
-    // }
-    //
-    // public static OtmBusinessObject buildOtm(OtmModelManager mgr) {
-    // OtmBusinessObject bo = new OtmBusinessObject( buildTL(), mgr );
-    // assertNotNull( bo );
-    // mgr.add( bo );
-    //
-    // // TestCustomFacet.buildOtm( staticModelManager );
-    // assertTrue( bo.getChildren().size() > 2 );
-    // assertTrue( bo.getSummary().getChildren().size() == 2 );
-    // assertTrue( "Must have identity listener.", OtmModelElement.get( bo.getTL() ) == bo );
-    // return bo;
-    // }
-    //
-    // public static TLBusinessObject buildTL() {
-    // TLBusinessObject tlbo = new TLBusinessObject();
-    // tlbo.setName( BoName );
-    // TLAttribute tla = new TLAttribute();
-    // tla.setName( "idAttr_" + BoName );
-    // buildExample( tla );
-    // tlbo.getIdFacet().addAttribute( tla );
-    //
-    // TLProperty tlp = new TLProperty();
-    // tlp.setName( "idProp_" + BoName );
-    // buildExample( tlp );
-    // tlbo.getIdFacet().addElement( tlp );
-    //
-    // tla = new TLAttribute();
-    // tla.setName( "sumAttr_" + BoName );
-    // tlbo.getSummaryFacet().addAttribute( tla );
-    // tlp = new TLProperty();
-    // tlp.setName( "sumProp_" + BoName );
-    // tlbo.getSummaryFacet().addElement( tlp );
-    // return tlbo;
-    // }
-    //
-    // public static void buildExample(TLExampleOwner tleo) {
-    // TLExample tle = new TLExample();
-    // tle.setValue( "ExampleValue123" );
-    // tleo.addExample( tle );
-    // assertTrue( tleo.getExamples().size() >= 1 );
-    // }
+
     /**
      * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
      */

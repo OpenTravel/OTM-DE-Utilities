@@ -23,6 +23,9 @@ import org.opentravel.dex.action.manager.DexActionManagerBase;
 import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
+import org.opentravel.dex.events.DexChangeEvent;
+import org.opentravel.dex.events.DexMemberDeleteEvent;
+import org.opentravel.dex.events.OtmObjectReplacedEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
@@ -64,8 +67,20 @@ public class AssignedTypeChangeAction extends DexRunAction {
     private OtmTypeProvider newProvider;
     private DexActionManagerBase actionManager = null;
 
+    private DexChangeEvent event = null;
+
     public AssignedTypeChangeAction() {
         // Constructor for reflection
+    }
+
+    /**
+     * {@inheritDoc} Override with the Delete member event constructed by undo when a minor version change that creates
+     * new library member
+     * 
+     */
+    @Override
+    public DexChangeEvent getEvent() {
+        return event == null ? super.getEvent() : event;
     }
 
     /**
@@ -92,17 +107,18 @@ public class AssignedTypeChangeAction extends DexRunAction {
         controller.setManager( modelMgr );
 
         // Find out if this typeUser is in a minor and not new to chain
-        user = (OtmTypeUser) otm;
+        // user = (OtmTypeUser) otm;
         if (!user.isEditable() && user.getLibrary().isChainEditable()) {
             // Create a new property in a new minor version of the owning member
             newUser = user.getLibrary().getVersionChain().getNewMinorTypeUser( user );
-            // set filter
-            controller.getMemberFilterController().setMinorVersionFilter( user.getAssignedType() );
-
             if (newUser == null) {
                 otm.getActionManager().postWarning( "Error creating minor version of " + otm.getOwningMember() );
                 return null;
             }
+            // set filter and event
+            controller.getMemberFilterController().setMinorVersionFilter( user.getAssignedType() );
+            event = new OtmObjectReplacedEvent( newUser, user );
+            log.debug( "Created new user in new minor version of " + newUser.getOwningMember() );
         }
 
         // Set applicable filters
@@ -143,7 +159,7 @@ public class AssignedTypeChangeAction extends DexRunAction {
         if (data instanceof OtmTypeProvider) {
 
             // Hold onto old values
-            user = (OtmTypeUser) otm;
+            // user = (OtmTypeUser) otm;
             oldProvider = user.getAssignedType();
             oldTLType = user.getAssignedTLType();
             oldName = otm.getName();
@@ -152,27 +168,25 @@ public class AssignedTypeChangeAction extends DexRunAction {
 
             newProvider = (OtmTypeProvider) data;
             // Set value into model
-            if (newUser != null)
-                newUser.setAssignedType( newProvider );
-            else
-                user.setAssignedType( newProvider );
-
+            getSubject().setAssignedType( newProvider );
         }
         return get();
     }
 
     @Override
     public OtmTypeProvider get() {
-        return user.getAssignedType();
+        return getSubject().getAssignedType();
     }
 
     @Override
     public ValidationFindings getVetoFindings() {
+        // checkNewUser();
         return ValidationUtils.getRelevantFindings( VETOKEYS, otm.getFindings() );
     }
 
     @Override
     public boolean isValid() {
+        // checkNewUser();
         if (otm.getOwningMember() != null)
             otm.getOwningMember().isValid( true ); // Update validation status
         return otm.isValid( true ) ? true
@@ -200,10 +214,12 @@ public class AssignedTypeChangeAction extends DexRunAction {
         return "Assigned Type: " + newProvider;
     }
 
+
     @Override
     public OtmTypeProvider undoIt() {
         if (newUser != null) {
             // simply delete the newly created minor version
+            event = new DexMemberDeleteEvent( newUser.getOwningMember(), user.getOwningMember() );
             newUser.getLibrary().delete( newUser.getOwningMember() );
             newUser = null;
         } else {

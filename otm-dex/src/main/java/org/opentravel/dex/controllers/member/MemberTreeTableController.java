@@ -24,10 +24,12 @@ import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexFilterChangeEvent;
+import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.OtmObjectChangeEvent;
 import org.opentravel.dex.events.OtmObjectModifiedEvent;
+import org.opentravel.dex.events.OtmObjectReplacedEvent;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
@@ -92,6 +94,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     // All event types listened to by this controller's handlers
     // Object events may change validation state of members
     private static final EventType[] subscribedEvents = {DexFilterChangeEvent.FILTER_CHANGED,
+        DexMemberDeleteEvent.MEMBER_DELETED, OtmObjectReplacedEvent.OBJECT_REPLACED,
         DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED, OtmObjectChangeEvent.OBJECT_CHANGED,
         OtmObjectModifiedEvent.OBJECT_MODIFIED};
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
@@ -271,14 +274,6 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             refresh();
     }
 
-    private void handleEvent(DexMemberSelectionEvent event) {
-        if (event.getEventType().equals( DexMemberSelectionEvent.RESOURCE_SELECTED ))
-            return;
-        if (!ignoreEvents)
-            select( event.getMember() );
-    }
-    // private void handleEvent(OtmObjectChangeEvent event) {
-    // }
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
@@ -290,11 +285,30 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
                 handleEvent( (DexFilterChangeEvent) event );
             else if (event instanceof OtmObjectChangeEvent)
                 refresh();
+            else if (event instanceof OtmObjectReplacedEvent)
+                handleEvent( (OtmObjectReplacedEvent) event );
+            else if (event instanceof DexMemberDeleteEvent)
+                refresh();
             else if (event instanceof DexModelChangeEvent)
                 refresh();
             else
                 refresh();
         }
+    }
+
+    private void handleEvent(OtmObjectReplacedEvent event) {
+        if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
+            log.error( "BAD HERE" );
+        refresh();
+        if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
+            log.error( "BAD HERE" );
+    }
+
+    private void handleEvent(DexMemberSelectionEvent event) {
+        if (event.getEventType().equals( DexMemberSelectionEvent.RESOURCE_SELECTED ))
+            return;
+        if (!ignoreEvents)
+            select( event.getMember() );
     }
 
     public void keyReleased(KeyEvent event) {
@@ -376,6 +390,12 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         // log.debug( "Posted member tree." );
     }
 
+    /**
+     * {@inheritDoc} Clear the tree and post the model.
+     * 
+     * @see #post(OtmModelManager)
+     * @see org.opentravel.dex.controllers.DexIncludedControllerBase#refresh()
+     */
     @Override
     public void refresh() {
         post( currentModelMgr );

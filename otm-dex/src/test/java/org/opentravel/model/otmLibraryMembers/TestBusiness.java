@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
@@ -58,6 +59,20 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
     }
 
     /** ****************************************************** **/
+    /**
+     * Build business object with attribute and element in ID and Summary facets.
+     * 
+     * @param mgr
+     * @param name
+     * @return
+     */
+    public static OtmBusinessObject buildOtm(OtmLibrary lib, String name) {
+        BoName = name; // set global static
+        OtmBusinessObject bo = buildOtm( lib.getModelManager() );
+        lib.add( bo );
+        return bo;
+    }
+
     /**
      * Build business object with attribute and element in ID and Summary facets.
      * 

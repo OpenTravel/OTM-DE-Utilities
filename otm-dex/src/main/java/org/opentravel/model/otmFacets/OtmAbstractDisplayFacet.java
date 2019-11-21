@@ -118,6 +118,11 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     }
 
     @Override
+    public List<OtmObject> getDescendants() {
+        return Collections.emptyList();
+    }
+
+    @Override
     public Collection<OtmChildrenOwner> getDescendantsChildrenOwners() {
         return Collections.emptyList();
     }

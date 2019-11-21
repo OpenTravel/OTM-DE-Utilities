@@ -23,6 +23,8 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
+import java.util.List;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Tooltip;
@@ -58,6 +60,11 @@ public interface OtmObject {
     public DexActionManager getActionManager();
 
     public String getDeprecation();
+
+    /**
+     * @return new list of all descendants if any
+     */
+    public List<OtmObject> getDescendants();
 
     public String getDescription();
 

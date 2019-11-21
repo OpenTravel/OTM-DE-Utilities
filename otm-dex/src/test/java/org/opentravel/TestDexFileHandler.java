@@ -166,6 +166,11 @@ public class TestDexFileHandler extends AbstractFxTest {
         assertTrue( "Must have project items.", !modelManager.getProjectManager().getAllProjectItems().isEmpty() );
         assertTrue( "Must have project items.", modelManager.getProjectManager().getAllProjectItems().size() > 1 );
         log.debug( "Model now has " + modelManager.getTlModel().getAllLibraries().size() + " libraries." );
+
+        // When the project is added to the model manager
+        modelManager.addProjects();
+        assertTrue( "Manager must have libraries.", !modelManager.getLibraries().isEmpty() );
+        assertTrue( "Manager must have members.", !modelManager.getMembers().isEmpty() );
     }
 
     // x Add to the before class (change port number)

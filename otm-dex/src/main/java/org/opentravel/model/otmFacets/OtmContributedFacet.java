@@ -35,7 +35,16 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Abstract OTM Node for Custom Facets (not library members) with a parent.
+ * Abstract OTM Node for Contributed Facets (not library members).
+ * <p>
+ * Contributed facets have:
+ * <ul>
+ * <li>a parent that identifies where the facet is contributed (injected).
+ * <li>a contributor that identifies the contextual facet library member.
+ * <li>no children. All children can be access from here but are maintained on the contextual facet.
+ * {@link #add(OtmObject)} is a facade for getContributor().add(child).
+ * <li>the same TL contextual facet as the contributor contextual facet.
+ * </ul>
  * 
  * @author Dave Hollander
  * 
@@ -159,6 +168,22 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
         if (getContributor() == null)
             return false;
         return getContributor().getWhereContributed() != this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Contributed facets do not have children. Do nothing.
+     */
+    @Override
+    public void modelChildren() {
+        // No-Op
+        // if (getTL() instanceof TLIndicatorOwner)
+        // ((TLIndicatorOwner) getTL()).getIndicators().forEach( p -> OtmPropertyFactory.create( p, this ) );
+        // if (getTL() instanceof TLAttributeOwner)
+        // ((TLAttributeOwner) getTL()).getAttributes().forEach( p -> OtmPropertyFactory.create( p, this ) );
+        // if (getTL() instanceof TLPropertyOwner)
+        // ((TLPropertyOwner) getTL()).getElements().forEach( p -> OtmPropertyFactory.create( p, this ) );
     }
 
     /**

@@ -26,12 +26,16 @@ import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.OtmObjectChangeEvent;
 import org.opentravel.dex.events.OtmObjectModifiedEvent;
+import org.opentravel.dex.events.OtmObjectReplacedEvent;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmProperties.OtmProperty;
 
 import javafx.event.EventType;
 import javafx.fxml.FXML;
@@ -57,7 +61,8 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
 
     private static final EventType[] subscribedEvents =
-        {OtmObjectChangeEvent.OBJECT_CHANGED, OtmObjectModifiedEvent.OBJECT_MODIFIED,
+        {DexMemberDeleteEvent.MEMBER_DELETED, OtmObjectReplacedEvent.OBJECT_REPLACED,
+            OtmObjectChangeEvent.OBJECT_CHANGED, OtmObjectModifiedEvent.OBJECT_MODIFIED,
             DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
 
     @FXML
@@ -185,17 +190,48 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
     }
 
+    private void disableEditing() {
+        nameCol.setEditable( false );
+        descCol.setEditable( false );
+        typeCol.setEditable( false );
+        roleCol.setEditable( false );
+        minCol.setEditable( false );
+        maxCol.setEditable( false );
+        exampleCol.setEditable( false );
+        deprecatedCol.setEditable( false );
+    }
+
     @Override
     public void handleEvent(AbstractOtmEvent e) {
         // log.debug( "event handler: " + e.getClass().getSimpleName() );
         if (e instanceof DexMemberSelectionEvent)
             handleMemberSelection( (DexMemberSelectionEvent) e );
-        if (e instanceof DexModelChangeEvent)
+        else if (e instanceof DexModelChangeEvent)
             handleEvent( (DexModelChangeEvent) e );
-        if (e instanceof OtmObjectChangeEvent)
+        else if (e instanceof OtmObjectChangeEvent)
             handleEvent( (OtmObjectChangeEvent) e );
-        if (e instanceof OtmObjectModifiedEvent)
+        else if (e instanceof OtmObjectReplacedEvent)
+            handleEvent( (OtmObjectReplacedEvent) e );
+        else if (e instanceof OtmObjectModifiedEvent)
             handleEvent( (OtmObjectModifiedEvent) e );
+        else if (e instanceof DexMemberDeleteEvent)
+            handleEvent( (DexMemberDeleteEvent) e );
+    }
+
+    private void handleEvent(DexMemberDeleteEvent e) {
+        if (e.get() == postedData)
+            clear();
+        if (e.getAlternateMember() != null)
+            post( e.getAlternateMember() );
+        else
+            refresh();
+    }
+
+    public void handleEvent(DexModelChangeEvent event) {
+        if (event.get() instanceof OtmLibraryMember)
+            post( (OtmLibraryMember) event.get() );
+        else
+            clear();
     }
 
     private void handleEvent(OtmObjectChangeEvent e) {
@@ -209,11 +245,20 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         refresh();
     }
 
-    public void handleEvent(DexModelChangeEvent event) {
-        if (event.get() instanceof OtmLibraryMember)
-            post( (OtmLibraryMember) event.get() );
-        else
-            clear();
+    private void handleEvent(OtmObjectReplacedEvent e) {
+        if (e.getOrginalObject().getOwningMember() == e.getReplacementObject().getOwningMember())
+            log.error( "BAD HERE" );
+        OtmPropertyOwner parent = null;
+        if (e.getOrginalObject() instanceof OtmProperty)
+            parent = ((OtmProperty) e.getOrginalObject()).getParent();
+
+        post( e.get().getOwningMember() );
+
+        if (e.getOrginalObject() instanceof OtmProperty && parent != ((OtmProperty) e.getOrginalObject()).getParent())
+            log.debug( "CHANGED PARENT. OOPS." );
+
+        if (e.getOrginalObject().getOwningMember() == e.getReplacementObject().getOwningMember())
+            log.error( "BAD HERE" );
     }
 
     public void handleMaxEdit(TreeTableColumn.CellEditEvent<PropertiesDAO,String> event) {
@@ -253,8 +298,6 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         clear();
         if (member != null)
             new PropertiesDAO( member, this ).createChildrenItems( root, null );
-
-        // postObjectStatus( member );
     }
 
     /**
@@ -289,31 +332,6 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
             disableEditing();
         }
         // postObjectStatus( obj );
-    }
-
-    // public void assignedTypeSelectionListener() {
-    //
-    // }
-    // protected void postObjectStatus(OtmObject object) {
-    // if (object != null) {
-    // if (object.getActionManager() instanceof DexFullActionManager)
-    // getMainController().postStatus( object + " - All editing actions allowed" );
-    // else if (object.getActionManager() instanceof DexMinorVersionActionManager)
-    // getMainController().postStatus( object + " - Only minor editing actions allowed" );
-    // else
-    // getMainController().postStatus( object + " - Read-only" );
-    // }
-    // }
-
-    private void disableEditing() {
-        nameCol.setEditable( false );
-        descCol.setEditable( false );
-        typeCol.setEditable( false );
-        roleCol.setEditable( false );
-        minCol.setEditable( false );
-        maxCol.setEditable( false );
-        exampleCol.setEditable( false );
-        deprecatedCol.setEditable( false );
     }
 
     @Override

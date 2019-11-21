@@ -199,6 +199,23 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     }
 
     @Override
+    public synchronized List<OtmObject> getDescendants() {
+        List<OtmObject> objects = new ArrayList<>();
+        List<OtmObject> kids = new ArrayList<>();
+        if (this instanceof OtmChildrenOwner)
+            children.addAll( ((OtmChildrenOwner) this).getChildren() );
+
+        for (OtmObject child : kids) {
+            objects.add( child );
+            if (child instanceof OtmChildrenOwner) {
+                // Recurse
+                objects.addAll( child.getDescendants() );
+            }
+        }
+        return objects;
+    }
+
+    @Override
     public String getExample() {
         if (getTL() instanceof TLExampleOwner) {
             List<TLExample> exs = ((TLExampleOwner) getTL()).getExamples();

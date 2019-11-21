@@ -26,10 +26,12 @@ import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
+import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.OtmObjectChangeEvent;
 import org.opentravel.dex.events.OtmObjectModifiedEvent;
+import org.opentravel.dex.events.OtmObjectReplacedEvent;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
@@ -112,7 +114,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
 
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
-        {OtmObjectModifiedEvent.OBJECT_MODIFIED, OtmObjectChangeEvent.OBJECT_CHANGED,
+        {OtmObjectReplacedEvent.OBJECT_REPLACED, OtmObjectModifiedEvent.OBJECT_MODIFIED,
+            OtmObjectChangeEvent.OBJECT_CHANGED, DexMemberDeleteEvent.MEMBER_DELETED,
             DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
 
     public MemberDetailsController() {
@@ -158,7 +161,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        // log.debug( "Received event: " + event.getClass().getSimpleName() );
+        log.debug( "Received event: " + event.getClass().getSimpleName() );
         if (event instanceof DexMemberSelectionEvent)
             memberSelectionHandler( (DexMemberSelectionEvent) event );
         if (event instanceof DexModelChangeEvent)
@@ -167,6 +170,10 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             handleEvent( (OtmObjectChangeEvent) event );
         else if (event instanceof OtmObjectModifiedEvent)
             handleEvent( (OtmObjectModifiedEvent) event );
+        else if (event instanceof OtmObjectReplacedEvent)
+            handleEvent( (OtmObjectReplacedEvent) event );
+        else if (event instanceof DexMemberDeleteEvent)
+            handleEvent( (DexMemberDeleteEvent) event );
     }
 
     public void handleEvent(OtmObjectChangeEvent event) {
@@ -174,6 +181,21 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             post( (OtmLibraryMember) event.get() );
         else
             refresh();
+    }
+
+    public void handleEvent(OtmObjectReplacedEvent event) {
+        if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
+            log.error( "BAD HERE" );
+        post( event.get().getOwningMember() );
+        if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
+            log.error( "BAD HERE" );
+    }
+
+    public void handleEvent(DexMemberDeleteEvent event) {
+        if (event.getAlternateMember() != null)
+            post( event.getAlternateMember() );
+        else
+            clear();
     }
 
     public void handleEvent(OtmObjectModifiedEvent event) {

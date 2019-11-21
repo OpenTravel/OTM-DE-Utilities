@@ -183,7 +183,7 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
         try {
             post( postedData );
         } catch (Exception e) {
-            log.error( "Unhandled error refreshing repository item commit history: " + e.getLocalizedMessage() );
+            // log.error( "Unhandled error refreshing repository item commit history: " + e.getLocalizedMessage() );
         }
     }
 

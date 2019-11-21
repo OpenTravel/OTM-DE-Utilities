@@ -144,7 +144,7 @@ public class RepositoryItemCommitHistoriesController extends DexIncludedControll
         try {
             post( postedData );
         } catch (Exception e) {
-            log.error( "Unhandled error refreshing repository item commit history: " + e.getLocalizedMessage() );
+            // log.error( "Unhandled error refreshing repository item commit history: " + e.getLocalizedMessage() );
         }
     }
 }

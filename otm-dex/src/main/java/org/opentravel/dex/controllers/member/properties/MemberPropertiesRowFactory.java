@@ -20,13 +20,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
-import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyType;
 
@@ -103,10 +101,11 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
             obj.getActionManager().run( DexActions.TYPECHANGE, (OtmTypeUser) obj );
             controller.getMainController().refresh();
 
-            // FIXME - this should be done in event handler
-            OtmLibraryMember newObject = obj.getLibrary().getVersionChain().getLatestVersion( obj.getOwningMember() );
-            if (newObject != obj.getOwningMember())
-                controller.fireEvent( new DexMemberSelectionEvent( newObject ) );
+            // // FIXME - this should be done in event handler
+            // OtmLibraryMember newObject = obj.getLibrary().getVersionChain().getLatestVersion( obj.getOwningMember()
+            // );
+            // if (newObject != obj.getOwningMember())
+            // controller.fireEvent( new DexMemberSelectionEvent( newObject ) );
             // controller.post( obj.getOwningMember() );
             // Change could create new object in different library
             // controller.fireEvent( new DexModelChangeEvent() );

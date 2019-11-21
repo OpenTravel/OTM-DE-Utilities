@@ -18,6 +18,7 @@ package org.opentravel.dex.actions;
 
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.events.DexChangeEvent;
+import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.DexResourceChangeEvent;
 import org.opentravel.dex.events.DexResourceChildModifiedEvent;
@@ -44,7 +45,7 @@ public enum DexActions {
     // Library members
     NEWLIBRARYMEMBER(NewLibraryMemberAction.class, DexModelChangeEvent.class),
     SETMEMBERLIBRARY(SetLibraryAction.class, DexModelChangeEvent.class),
-    DELETELIBRARYMEMBER(DeleteLibraryMemberAction.class, DexModelChangeEvent.class),
+    DELETELIBRARYMEMBER(DeleteLibraryMemberAction.class, DexMemberDeleteEvent.class),
     // Properties
     ADDPROPERTY(AddPropertyAction.class, OtmObjectChangeEvent.class),
     DELETEPROPERTY(DeletePropertyAction.class, OtmObjectChangeEvent.class),

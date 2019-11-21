@@ -319,24 +319,39 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
             inheritedChildren = new ArrayList<>();
         else
             inheritedChildren.clear(); // RE-model
-
+        // get the base type that provides inherited children
         if (getOwningMember().getBaseType() == null)
             return;
         // This should be overrides on the sub-types.
         if (this instanceof OtmContributedFacet || this instanceof OtmListFacet)
             return;
-
+        // Why not get inherited from each?
         List<OtmFacet<TLFacet>> ancestors = getAncestors();
 
+        // Get list of all kids from all ancestors
         List<TLModelElement> tlKids = new ArrayList<>();
         for (OtmFacet<TLFacet> a : ancestors)
             tlKids.addAll( a.getTLChildren() );
 
+        // Create a new property to represent the tl in this facet
         for (TLModelElement k : tlKids) {
             OtmProperty p = OtmPropertyFactory.create( k, null );
-            p.setParent( this );
+            // If this is in a minor library AND a property with the same name already exists in some version of this
+            // facet then it is not inherited, just ignore it.
+            boolean skip = false;
+            if (this.getLibrary() != null && this.getLibrary().isMinorVersion())
+                for (OtmObject c : children) {
+                    if (c.getName().equals( p.getName() )) {
+                        skip = true;
+                        break;
+                    }
+                }
+            if (!skip) {
+                inheritedChildren.add( p );
+                p.setParent( this );
+                add( p );
+            }
             // assert (p.isInherited());
-            add( p );
             // assert inheritedChildren.contains( p );
         }
 

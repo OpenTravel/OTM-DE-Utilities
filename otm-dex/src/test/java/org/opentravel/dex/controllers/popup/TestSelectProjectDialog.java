@@ -74,26 +74,7 @@ public class TestSelectProjectDialog extends AbstractFxTest {
     }
 
     @Test
-    public void testCancelButton() {
-        // Given projects and libraries
-        // OtmModelManager mgr = testSetup();
-        // assertTrue( !mgr.getLibraries().isEmpty() );
-        //
-        // robot.clickOn( "Libraries" );
-        //
-        // robot.sleep( 5 * WATCH_TIME );
-        // WaitForAsyncUtils.waitForFxEvents();
-        // robot.clickOn( FXID_LIBTREETABLE );
-        //
-        // // Select first row
-        // robot.type( KeyCode.DOWN );
-        //
-        // robot.sleep( 2 * WATCH_TIME );
-
-        // robot.targetWindow( "Exit" ).clickOn( "Exit" );
-        // robot.clickOn( FXID_PROJECTLIST );
-
-    }
+    public void testCancelButton() {}
 
     /**
      * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
@@ -117,90 +98,4 @@ public class TestSelectProjectDialog extends AbstractFxTest {
     protected String getBackgroundTaskNodeQuery() {
         return "#libraryText";
     }
-
-
-    // @Test
-    // public void testBuildExamplesFromLibrary() throws Exception {
-    // File libraryFile = new File(wipFolder.get(), "/test-model.otm");
-    // File saveFile = new File(wipFolder.get(), "/test-model-message.xml");
-    //
-    // when(mockFileChooser.showOpenDialog(any())).thenReturn(libraryFile);
-    // when(mockFileChooser.showSaveDialog(any())).thenReturn(saveFile);
-    //
-    // robot.clickOn("#libraryFileButton");
-    // robot.waitForBackgroundTask();
-    //
-    // exerciseExampleConfiguration();
-    // }
-    //
-    // @Test
-    // public void testBuildExamplesFromLibrary_validationError() throws Exception {
-    // File libraryFile = new File(wipFolder.get(), "/test-model-error.otm");
-    //
-    // when(mockFileChooser.showOpenDialog(any())).thenReturn(libraryFile);
-    //
-    // robot.clickOn("#libraryFileButton");
-    // verifyThat("#libraryText", hasText(""));
-    // }
-    //
-    // @Test
-    // public void testBuildExamplesFromProject() throws Exception {
-    // File projectFile = new File(wipFolder.get(), "/test-project.otp");
-    // File saveFile = new File(wipFolder.get(), "/test-project-message.xml");
-    //
-    // when(mockFileChooser.showOpenDialog(any())).thenReturn(projectFile);
-    // when(mockFileChooser.showSaveDialog(any())).thenReturn(saveFile);
-    //
-    // robot.clickOn("#libraryFileButton");
-    // robot.waitForBackgroundTask();
-    //
-    // exerciseExampleConfiguration();
-    // }
-    //
-    // /**
-    // * Performs the UI functions to adjust the configuration of an example message for a model that has been
-    // pre-loaded
-    // * into the Example Helper application.
-    // */
-    // private void exerciseExampleConfiguration() {
-    // ChoiceBoxTreeTableCell<?, ?> facetChoiceCell;
-    //
-    // robot.clickOn("#entityChoice");
-    // robot.type(KeyCode.DOWN);
-    // robot.type(KeyCode.DOWN);
-    // robot.type(KeyCode.ENTER);
-    // WaitForAsyncUtils.waitForFxEvents();
-    //
-    // facetChoiceCell = (ChoiceBoxTreeTableCell<?, ?>) robot.lookup("SampleBusinessObjectSummary").query();
-    // robot.clickOn(facetChoiceCell);
-    // robot.clickOn(facetChoiceCell);
-    // robot.clickOn(facetChoiceCell);
-    // robot.type(KeyCode.DOWN);
-    // robot.type(KeyCode.DOWN);
-    // robot.type(KeyCode.DOWN);
-    // robot.type(KeyCode.ENTER);
-    // WaitForAsyncUtils.waitForFxEvents();
-    //
-    // robot.clickOn("#bindingStyleChoice");
-    // robot.type(KeyCode.DOWN);
-    // robot.type(KeyCode.ENTER);
-    // WaitForAsyncUtils.waitForFxEvents();
-    //
-    // robot.clickOn("#jsonRadio");
-    // robot.clickOn("#xmlRadio");
-    //
-    // robot.clickOn("#repeatCountSpinner");
-    // robot.type(KeyCode.UP);
-    // WaitForAsyncUtils.waitForFxEvents();
-    // robot.type(KeyCode.DOWN);
-    // WaitForAsyncUtils.waitForFxEvents();
-    //
-    // robot.clickOn("#suppressOptionalFields");
-    // robot.clickOn("#suppressOptionalFields");
-    //
-    // robot.clickOn("#saveButton");
-    // robot.waitForBackgroundTask();
-    // }
-    //
-
 }

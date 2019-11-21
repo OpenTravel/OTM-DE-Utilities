@@ -32,9 +32,11 @@ import org.opentravel.dex.controllers.popup.WebViewDialogController;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexEventDispatcher;
+import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.DexRepositorySelectionEvent;
+import org.opentravel.dex.events.OtmObjectReplacedEvent;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.repository.OpenLibraryFileTask;
 import org.opentravel.dex.tasks.repository.OpenProjectFileTask;
@@ -128,7 +130,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     private static final EventType[] subscribedEvents =
         {DexRepositorySelectionEvent.REPOSITORY_SELECTED, DexMemberSelectionEvent.MEMBER_SELECTED};
     private static final EventType[] publishedEvents =
-        {DexModelChangeEvent.MODEL_CHANGED, DexMemberSelectionEvent.MEMBER_SELECTED};
+        {DexMemberDeleteEvent.MEMBER_DELETED, OtmObjectReplacedEvent.OBJECT_REPLACED, DexModelChangeEvent.MODEL_CHANGED,
+            DexMemberSelectionEvent.MEMBER_SELECTED};
 
     public MenuBarWithProjectController() {
         super( subscribedEvents, publishedEvents );
@@ -148,6 +151,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         for (EventType<? extends DexEvent> et : publishedEvents) {
             publishedEventTypes.add( et );
         }
+        // TODO - some actions create events (assignTypeAction) that are not in the actions enumeration.
+        // For now, they are added to publishedEvents array. Find a better way to register them.
         for (DexActions action : DexActions.values()) {
             DexChangeEvent event = null;
             try {

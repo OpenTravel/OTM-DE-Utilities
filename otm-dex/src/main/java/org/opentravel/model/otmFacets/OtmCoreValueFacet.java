@@ -54,5 +54,4 @@ public class OtmCoreValueFacet extends OtmAbstractDisplayFacet {
     public Collection<OtmObject> getChildrenHierarchy() {
         return Collections.emptyList();
     }
-
 }

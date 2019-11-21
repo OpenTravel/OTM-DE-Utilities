@@ -258,7 +258,7 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
         for (OtmPropertyType type : OtmPropertyType.values()) {
             OtmProperty p = OtmPropertyType.build( type, owner );
             if (p != null) {
-                p.setName( owner + type.toString() );
+                p.setName( owner.getName() + type.toString() );
                 log.debug( "Created property " + p + " of type " + type.toString() );
             }
         }

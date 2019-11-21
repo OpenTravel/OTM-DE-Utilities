@@ -112,9 +112,6 @@ public class TestOtmModelManager extends AbstractFxTest {
         TestDexFileHandler.loadVersionProject( mgr );
         assertNotNull( mgr.getActionManager( true ) );
 
-        // When the project is added to the model manager
-        mgr.addProjects();
-
         String BASENS0 = "http://www.opentravel.org/Sandbox/Test/VersionTest_Unmanaged";
         // String BASENS1 = "http://www.opentravel.org/Sandbox/Test/v1";
         //
@@ -126,7 +123,7 @@ public class TestOtmModelManager extends AbstractFxTest {
             log.debug( "Library " + lib + " opened." );
             log.debug( "Is latest? " + lib.isLatestVersion() );
             log.debug( "Is minor? " + lib.isMinorVersion() );
-            log.debug( " Version number " + lib.getMajorVersion() + " " + lib.getMinorVersion() );
+            log.debug( "Version number " + lib.getMajorVersion() + " " + lib.getMinorVersion() );
             log.debug( "Is editable? " + lib.isEditable() );
             // DexActionManager am = lib.getActionManager();
             log.debug( "What action manager? " + lib.getActionManager().getClass().getSimpleName() );
@@ -165,20 +162,6 @@ public class TestOtmModelManager extends AbstractFxTest {
             }
 
         }
-
-        //
-        // for (OtmLibraryMember member : mgr.getMembers()) {
-        // boolean editableLibFound = false;
-        // if (member.getLibrary().getMajorVersion() == highestMajor) {
-        // log.debug( "This should be editable: " + member + " \tIs it? " + member.isEditable() );
-        // for (OtmLibrary lib : mgr.getVersionChain( member.getLibrary() ))
-        // if (lib.isEditable())
-        // editableLibFound = true;
-        // log.debug( "This should be editable: " + member + " \tIs it? " + editableLibFound );
-        // }
-        // if (latestLib.getBaseNamespace().equals( member.getLibrary().getBaseNamespace() ))
-        // log.debug( "Is member " + member.getNameWithPrefix() + " editable?" + member.isEditable() );
-        // }
     }
 
 

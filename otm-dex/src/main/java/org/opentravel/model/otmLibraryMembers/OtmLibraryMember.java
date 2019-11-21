@@ -56,10 +56,26 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public StringProperty baseTypeProperty();
 
     /**
+     * Add and remove the users library member to the where used list
+     * 
+     * @param userToRemove from where used list, can be null
+     * @param userToAdd to the where used list, can be null
+     */
+    void changeWhereUsed(OtmLibraryMember userToRemove, OtmLibraryMember userToAdd);
+
+    /**
      * @param o
      * @return true if object is direct child of member
      */
     boolean contains(OtmObject o);
+
+    /**
+     * Create a minor version of this library member.
+     * 
+     * @param minorLibrary
+     * @return new library member or null
+     */
+    OtmLibraryMember createMinorVersion(OtmLibrary minorLibrary);
 
     /**
      * Get the object that is extended by this object -- its base type.
@@ -74,13 +90,40 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      */
     String getBaseTypeName();
 
+    /**
+     * @return new list of contributed facets or empty list
+     */
+    public Collection<OtmContributedFacet> getChildrenContributedFacets();
+
+    /**
+     * Get the facet of the specified type.
+     * <p>
+     * 
+     * @param facet is the type of facet to match. Can't be contextual because members can have multiple contextual
+     *        facets;
+     * @return facet or null
+     */
+    OtmFacet<TLFacet> getFacet(OtmFacet<TLFacet> facet);
+
     public String getLibraryName();
+
+    /**
+     * @return the model manager for this object
+     */
+    OtmModelManager getModelManager();
 
     /**
      * @return
      */
     @Override
     public String getObjectTypeName();
+
+    /**
+     * Get the actual type users that use this library member or descendants as assigned type.
+     * 
+     * @return new map of user -> provider
+     */
+    Map<OtmTypeUser,OtmTypeProvider> getPropertiesWhereUsed();
 
     /**
      * TLContextualFacet or TLLibraryMember
@@ -105,6 +148,20 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public List<OtmLibraryMember> getWhereUsed();
 
     /**
+     * Is this member editable as a minor version See {@link #isEditable()}
+     * 
+     * @return true if member is in editable library or is latest in an editable chain
+     */
+    boolean isEditableMinor();
+
+    /**
+     * Is this member the latest in the version chain of its library?
+     * 
+     * @return
+     */
+    boolean isLatestVersion();
+
+    /**
      * @return fx property for library name
      */
     public StringProperty libraryProperty();
@@ -113,21 +170,6 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      * @return fx property for library prefix
      */
     public StringProperty prefixProperty();
-
-    public StringProperty versionProperty();
-
-    /**
-     * @return the model manager for this object
-     */
-    OtmModelManager getModelManager();
-
-    /**
-     * Add and remove the users library member to the where used list
-     * 
-     * @param userToRemove from where used list, can be null
-     * @param userToAdd to the where used list, can be null
-     */
-    void changeWhereUsed(OtmLibraryMember userToRemove, OtmLibraryMember userToAdd);
 
     /**
      * Set the base type if supported.
@@ -146,48 +188,7 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      */
     public void setNoLibraryActionManager(DexActionManager dexActionManager);
 
-    /**
-     * Get the facet of the specified type.
-     * <p>
-     * 
-     * @param facet is the type of facet to match. Can't be contextual because members can have multiple contextual
-     *        facets;
-     * @return facet or null
-     */
-    OtmFacet<TLFacet> getFacet(OtmFacet<TLFacet> facet);
+    public StringProperty versionProperty();
 
-    /**
-     * Get the actual type users that use this library member or descendants as assigned type.
-     * 
-     * @return new map of user -> provider
-     */
-    Map<OtmTypeUser,OtmTypeProvider> getPropertiesWhereUsed();
-
-    /**
-     * Create a minor version of this library member.
-     * 
-     * @param minorLibrary
-     * @return new library member or null
-     */
-    OtmLibraryMember createMinorVersion(OtmLibrary minorLibrary);
-
-    /**
-     * Is this member the latest in the version chain of its library?
-     * 
-     * @return
-     */
-    boolean isLatestVersion();
-
-    /**
-     * Is this member editable as a minor version See {@link #isEditable()}
-     * 
-     * @return true if member is in editable library or is latest in an editable chain
-     */
-    boolean isEditableMinor();
-
-    /**
-     * @return new list of contributed facets or empty list
-     */
-    public Collection<OtmContributedFacet> getChildrenContributedFacets();
 
 }

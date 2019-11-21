@@ -108,14 +108,90 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         }
     }
 
-    @Override
-    public Collection<OtmObject> getChildrenHierarchy() {
-        Collection<OtmObject> hierarchy = new ArrayList<>();
-        if (getInheritedChildren() != null)
-            getInheritedChildren().forEach( hierarchy::add );
-        getChildren().forEach( hierarchy::add );
-        return hierarchy;
+    private void addProvider(OtmTypeUser user, List<OtmTypeProvider> list) {
+        if (user == null)
+            return;
+        OtmTypeProvider p = user.getAssignedType();
+        if (p != null && !list.contains( p ))
+            list.add( p );
     }
+
+    @Override
+    public StringProperty baseTypeProperty() {
+        return new ReadOnlyStringWrapper( "" );
+    }
+
+    @Override
+    public void changeWhereUsed(OtmLibraryMember oldUser, OtmLibraryMember newUser) {
+        if (whereUsed == null)
+            whereUsed = new ArrayList<>();
+        if (oldUser != null)
+            whereUsed.remove( oldUser );
+        if (newUser != null && !whereUsed.contains( newUser ))
+            whereUsed.add( newUser );
+    }
+
+    /**
+     * Return true if the list contains the child or the list member.getTL() contains the child.getTL()
+     * 
+     * @param list
+     * @param child
+     * @return
+     */
+    protected boolean contains(List<OtmObject> list, OtmObject child) {
+        if (list.contains( child ))
+            return true;
+        if (child == null || child.getTL() == null)
+            return false;
+
+        ArrayList<OtmObject> localList = new ArrayList<>( list );
+        for (OtmObject c : localList)
+            if (c != null && c.getTL() != null && c.getTL() == child.getTL())
+                return true;
+        return false;
+    }
+
+    @Override
+    public boolean contains(OtmObject o) {
+        return children.contains( o );
+    }
+
+    @Override
+    public OtmLibraryMember createMinorVersion(OtmLibrary minorLibrary) {
+        OtmLibraryMember lm = null;
+        Versioned v = null;
+
+        if (getLibrary() != minorLibrary && minorLibrary.isMinorVersion() && getTL() instanceof Versioned
+            && minorLibrary.getTL() instanceof TLLibrary) {
+            TLLibrary targetTLLib = (TLLibrary) minorLibrary.getTL();
+            try {
+                MinorVersionHelper helper = new MinorVersionHelper();
+                v = helper.createNewMinorVersion( (Versioned) getTL(), targetTLLib );
+                lm = OtmLibraryMemberFactory.create( (LibraryMember) v, getModelManager() );
+            } catch (VersionSchemeException | ValidationException e) {
+                log.debug( "Exception creating minor TL version in: " + targetTLLib.getPrefix() + ":"
+                    + targetTLLib.getName() + " " + e.getLocalizedMessage() );
+                return null;
+            }
+        } else {
+            if (getLibrary() == minorLibrary)
+                log.debug( "Same library." );
+            if (!(minorLibrary.isMinorVersion()))
+                log.debug( "Not a minor verion." );
+            if (!(getTL() instanceof Versioned))
+                log.debug( "Not a versioned object type." );
+            if (!(minorLibrary.getTL() instanceof TLLibrary))
+                log.debug( "Not a TL library." );
+        }
+        return lm;
+    }
+
+
+    /**
+     * Sub-types MUST implement if any of their children are delete-able
+     */
+    @Override
+    public abstract void delete(OtmObject property);
 
     @Override
     public DexActionManager getActionManager() {
@@ -123,24 +199,26 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     @Override
-    public OtmModelManager getModelManager() {
-        return mgr;
+    public OtmObject getBaseType() {
+        if (getTL() instanceof TLExtensionOwner && ((TLExtensionOwner) getTL()).getExtension() != null)
+            return OtmModelElement
+                .get( (TLModelElement) ((TLExtensionOwner) getTL()).getExtension().getExtendsEntity() );
+        return null;
     }
 
-    /**
-     */
     @Override
-    public synchronized Collection<OtmTypeProvider> getChildrenTypeProviders() {
-        List<OtmObject> kids = new ArrayList<>( getChildren() );
-        if (!kids.isEmpty()) {
-            List<OtmTypeProvider> pChildren = new ArrayList<>();
-            for (OtmObject child : kids)
-                if (child instanceof OtmTypeProvider)
-                    pChildren.add( (OtmTypeProvider) child );
-            return pChildren;
-        } else {
-            return Collections.emptyList();
+    public String getBaseTypeName() {
+        return getBaseType() != null ? getBaseType().getName() : "";
+    }
+
+    @Override
+    public List<OtmObject> getChildren() {
+        // Only let one thread model the children
+        synchronized (this) {
+            if (children != null && children.isEmpty())
+                modelChildren();
         }
+        return children;
     }
 
     @Override
@@ -157,21 +235,30 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         }
     }
 
+    @Override
+    public Collection<OtmObject> getChildrenHierarchy() {
+        Collection<OtmObject> hierarchy = new ArrayList<>();
+        if (getInheritedChildren() != null)
+            getInheritedChildren().forEach( hierarchy::add );
+        getChildren().forEach( hierarchy::add );
+        return hierarchy;
+    }
+
+
     /**
      */
     @Override
-    public synchronized List<OtmTypeProvider> getDescendantsTypeProviders() {
-        if (membersProviders == null)
-            if (getChildrenTypeProviders() != null) {
-                membersProviders = new ArrayList<>();
-                for (OtmTypeProvider p : getChildrenTypeProviders()) {
-                    membersProviders.add( p );
-                    // Recurse
-                    if (p instanceof OtmChildrenOwner)
-                        membersProviders.addAll( ((OtmChildrenOwner) p).getDescendantsTypeProviders() );
-                }
-            }
-        return membersProviders;
+    public synchronized Collection<OtmTypeProvider> getChildrenTypeProviders() {
+        List<OtmObject> kids = new ArrayList<>( getChildren() );
+        if (!kids.isEmpty()) {
+            List<OtmTypeProvider> pChildren = new ArrayList<>();
+            for (OtmObject child : kids)
+                if (child instanceof OtmTypeProvider)
+                    pChildren.add( (OtmTypeProvider) child );
+            return pChildren;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
@@ -202,6 +289,23 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return owners;
     }
 
+    /**
+     */
+    @Override
+    public synchronized List<OtmTypeProvider> getDescendantsTypeProviders() {
+        if (membersProviders == null)
+            if (getChildrenTypeProviders() != null) {
+                membersProviders = new ArrayList<>();
+                for (OtmTypeProvider p : getChildrenTypeProviders()) {
+                    membersProviders.add( p );
+                    // Recurse
+                    if (p instanceof OtmChildrenOwner)
+                        membersProviders.addAll( ((OtmChildrenOwner) p).getDescendantsTypeProviders() );
+                }
+            }
+        return membersProviders;
+    }
+
     @Override
     public synchronized Collection<OtmTypeUser> getDescendantsTypeUsers() {
         memberTypeUsers.clear();
@@ -219,128 +323,23 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return memberTypeUsers;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public OtmObject getBaseType() {
-        if (getTL() instanceof TLExtensionOwner && ((TLExtensionOwner) getTL()).getExtension() != null)
-            return OtmModelElement
-                .get( (TLModelElement) ((TLExtensionOwner) getTL()).getExtension().getExtendsEntity() );
+    public OtmFacet<TLFacet> getFacet(OtmFacet<TLFacet> facet) {
+        if (facet != null) {
+            TLFacetType type = facet.getTL().getFacetType();
+            for (OtmObject kid : getChildren())
+                if (kid instanceof OtmFacet && kid.getTL() instanceof TLFacet
+                    && ((TLFacet) kid.getTL()).getFacetType() == type)
+                    return (OtmFacet<TLFacet>) kid;
+        }
         return null;
     }
 
     @Override
-    public String getBaseTypeName() {
-        return getBaseType() != null ? getBaseType().getName() : "";
-    }
-
-    @Override
-    public OtmObject setBaseType(OtmObject baseObj) {
-        OtmLibraryMember oldBaseOwner = null;
-        if (getBaseType() != null)
-            oldBaseOwner = getBaseType().getOwningMember();
-        if (baseObj != null) {
-            if (this.getClass() == baseObj.getClass() && getTL() instanceof TLExtensionOwner) {
-                TLExtension tlExt = ((TLExtensionOwner) getTL()).getExtension();
-                if (tlExt == null)
-                    tlExt = new TLExtension();
-                tlExt.setExtendsEntity( (NamedEntity) baseObj.getTL() );
-                ((TLExtensionOwner) getTL()).setExtension( tlExt );
-            }
-        } else {
-            // Clear the extension
-            if (getTL() instanceof TLExtensionOwner)
-                ((TLExtensionOwner) getTL()).setExtension( null );
-        }
-        // Set the where used in case resolver is not run afterwards
-        OtmLibraryMember newBaseOwner = null;
-        if (getBaseType() != null)
-            newBaseOwner = getBaseType().getOwningMember();
-        if (newBaseOwner != null)
-            newBaseOwner.changeWhereUsed( oldBaseOwner, getOwningMember() );
-        return getBaseType();
-    }
-
-    @Override
-    public boolean contains(OtmObject o) {
-        return children.contains( o );
-    }
-
-
-    /**
-     * Return true if the list contains the child or the list member.getTL() contains the child.getTL()
-     * 
-     * @param list
-     * @param child
-     * @return
-     */
-    protected boolean contains(List<OtmObject> list, OtmObject child) {
-        if (list.contains( child ))
-            return true;
-        if (child == null || child.getTL() == null)
-            return false;
-
-        ArrayList<OtmObject> localList = new ArrayList<>( list );
-        for (OtmObject c : localList)
-            if (c != null && c.getTL() != null && c.getTL() == child.getTL())
-                return true;
-        return false;
-    }
-
-    @Override
-    public List<OtmObject> getChildren() {
-        // Only let one thread model the children
-        synchronized (this) {
-            if (children != null && children.isEmpty())
-                modelChildren();
-        }
-        return children;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @return true if member has editable library
-     */
-    @Override
-    public boolean isEditable() {
-        return getLibrary() != null && getLibrary().isEditable();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @return true if member is fully editable or is latest in an editable chain
-     */
-    @Override
-    public boolean isEditableMinor() {
-        if (isEditable())
-            return true;
-        OtmVersionChain chain = getLibrary().getVersionChain();
-        return (chain.isChainEditable() && chain.isLatestChain() && chain.isLatestVersion( this ));
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * When force is true, run validation on all children and where used library members.
-     */
-    @Override
-    public boolean isValid(boolean force) {
-        if (force) {
-            synchronized (this) {
-                getChildren().forEach( c -> {
-                    if (c != this)
-                        c.isValid( force );
-                } );
-
-            }
-            // TODO - how to prevent loops?
-            // new ValidateModelManagerItemsTask( getModelManager(), null, null );
-            // getWhereUsed().forEach( m -> {
-            // if (m != this)
-            // m.isValid( force );
-            // } );
-        }
-        return super.isValid( force );
+    public List<OtmObject> getInheritedChildren() {
+        modelInheritedChildren();
+        return inheritedChildren;
     }
 
     @Override
@@ -358,27 +357,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     @Override
-    public StringProperty libraryProperty() {
-        if (isEditable())
-            return new SimpleStringProperty( getLibrary().getVersion() + "  " + getLibraryName() );
-        else
-            return new ReadOnlyStringWrapper( getLibrary().getVersion() + "  " + getLibraryName() );
-    }
-
-    @Override
-    public StringProperty prefixProperty() {
-        return new ReadOnlyStringWrapper( getPrefix() );
-    }
-
-    @Override
-    public StringProperty baseTypeProperty() {
-        return new ReadOnlyStringWrapper( "" );
-    }
-
-    @Override
-    public StringProperty versionProperty() {
-        return getLibrary() != null ? new SimpleStringProperty( getLibrary().getVersion() )
-            : new ReadOnlyStringWrapper( "" );
+    public OtmModelManager getModelManager() {
+        return mgr;
     }
 
     @Override
@@ -394,6 +374,23 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     @Override
     public String getPrefix() {
         return getTlLM().getOwningLibrary() != null ? getTlLM().getOwningLibrary().getPrefix() : "";
+    }
+
+    @Override
+    public Map<OtmTypeUser,OtmTypeProvider> getPropertiesWhereUsed() {
+        Map<OtmTypeUser,OtmTypeProvider> users = new HashMap<>();
+        List<OtmTypeProvider> thisProviders = getDescendantsTypeProviders();
+        // List<OtmTypeUser> users = new ArrayList<>();
+        for (OtmLibraryMember owner : getWhereUsed())
+            for (OtmTypeUser user : owner.getDescendantsTypeUsers())
+                if (user.getAssignedType() == this || thisProviders.contains( user.getAssignedType() ))
+                    users.put( user, user.getAssignedType() );
+        return users;
+    }
+
+    @Override
+    public LibraryMember getTlLM() {
+        return (LibraryMember) getTL();
     }
 
     // TODO - do i need a clearProviders() ???
@@ -440,52 +437,71 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return whereUsed;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @return true if member has editable library
+     */
     @Override
-    public Map<OtmTypeUser,OtmTypeProvider> getPropertiesWhereUsed() {
-        Map<OtmTypeUser,OtmTypeProvider> users = new HashMap<>();
-        List<OtmTypeProvider> thisProviders = getDescendantsTypeProviders();
-        // List<OtmTypeUser> users = new ArrayList<>();
-        for (OtmLibraryMember owner : getWhereUsed())
-            for (OtmTypeUser user : owner.getDescendantsTypeUsers())
-                if (user.getAssignedType() == this || thisProviders.contains( user.getAssignedType() ))
-                    users.put( user, user.getAssignedType() );
-        return users;
+    public boolean isEditable() {
+        return getLibrary() != null && getLibrary().isEditable();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @return true if member is fully editable or is latest in an editable chain
+     */
+    @Override
+    public boolean isEditableMinor() {
+        if (isEditable())
+            return true;
+        OtmVersionChain chain = getLibrary().getVersionChain();
+        return (chain.isChainEditable() && chain.isLatestChain() && chain.isLatestVersion( this ));
     }
 
     @Override
-    public void changeWhereUsed(OtmLibraryMember oldUser, OtmLibraryMember newUser) {
-        if (whereUsed == null)
-            whereUsed = new ArrayList<>();
-        if (oldUser != null)
-            whereUsed.remove( oldUser );
-        if (newUser != null && !whereUsed.contains( newUser ))
-            whereUsed.add( newUser );
+    public boolean isLatestVersion() {
+        // if (getLibrary().isMajorVersion())
+        // return getLibrary().isLatestVersion();
+        if (getLibrary().getVersionChain().isLatestChain())
+            return getLibrary().getVersionChain().isLatestVersion( this );
+        else
+            return false;
     }
 
-    private void addProvider(OtmTypeUser user, List<OtmTypeProvider> list) {
-        if (user == null)
-            return;
-        OtmTypeProvider p = user.getAssignedType();
-        if (p != null && !list.contains( p ))
-            list.add( p );
-    }
-
-    @SuppressWarnings("unchecked")
+    /**
+     * {@inheritDoc}
+     * <p>
+     * When force is true, run validation on all children and where used library members.
+     */
     @Override
-    public OtmFacet<TLFacet> getFacet(OtmFacet<TLFacet> facet) {
-        if (facet != null) {
-            TLFacetType type = facet.getTL().getFacetType();
-            for (OtmObject kid : getChildren())
-                if (kid instanceof OtmFacet && kid.getTL() instanceof TLFacet
-                    && ((TLFacet) kid.getTL()).getFacetType() == type)
-                    return (OtmFacet<TLFacet>) kid;
+    public boolean isValid(boolean force) {
+        if (force) {
+            synchronized (this) {
+                getChildren().forEach( c -> {
+                    if (c != this)
+                        c.isValid( force );
+                } );
+
+            }
+            // TODO - how to prevent loops?
+            // new ValidateModelManagerItemsTask( getModelManager(), null, null );
+            // getWhereUsed().forEach( m -> {
+            // if (m != this)
+            // m.isValid( force );
+            // } );
         }
-        return null;
+        return super.isValid( force );
     }
 
     @Override
-    public LibraryMember getTlLM() {
-        return (LibraryMember) getTL();
+    public StringProperty libraryProperty() {
+        if (getLibrary() == null)
+            return new ReadOnlyStringWrapper( "" ); // deleted member
+        if (isEditable())
+            return new SimpleStringProperty( getLibrary().getVersion() + "  " + getLibraryName() );
+        return new ReadOnlyStringWrapper( getLibrary().getVersion() + "  " + getLibraryName() );
     }
 
     /**
@@ -506,12 +522,6 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
                     children.add( facet );
                 }
             }
-    }
-
-    @Override
-    public List<OtmObject> getInheritedChildren() {
-        modelInheritedChildren();
-        return inheritedChildren;
     }
 
     @Override
@@ -543,71 +553,9 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     @Override
-    public boolean isLatestVersion() {
-        // if (getLibrary().isMajorVersion())
-        // return getLibrary().isLatestVersion();
-        if (getLibrary().getVersionChain().isLatestChain())
-            return getLibrary().getVersionChain().isLatestVersion( this );
-        else
-            return false;
+    public StringProperty prefixProperty() {
+        return new ReadOnlyStringWrapper( getPrefix() );
     }
-
-    @Override
-    public OtmLibraryMember createMinorVersion(OtmLibrary minorLibrary) {
-        OtmLibraryMember lm = null;
-        Versioned v = null;
-
-        if (getLibrary() != minorLibrary && minorLibrary.isMinorVersion() && getTL() instanceof Versioned
-            && minorLibrary.getTL() instanceof TLLibrary) {
-            TLLibrary targetTLLib = (TLLibrary) minorLibrary.getTL();
-            try {
-                MinorVersionHelper helper = new MinorVersionHelper();
-                v = helper.createNewMinorVersion( (Versioned) getTL(), targetTLLib );
-                lm = OtmLibraryMemberFactory.create( (LibraryMember) v, getModelManager() );
-            } catch (VersionSchemeException | ValidationException e) {
-                log.debug( "Exception creating minor TL version in: " + targetTLLib.getPrefix() + ":"
-                    + targetTLLib.getName() + " " + e.getLocalizedMessage() );
-                return null;
-            }
-        } else {
-            if (getLibrary() == minorLibrary)
-                log.debug( "Same library." );
-            if (!(minorLibrary.isMinorVersion()))
-                log.debug( "Not a minor verion." );
-            if (!(getTL() instanceof Versioned))
-                log.debug( "Not a versioned object type." );
-            if (!(minorLibrary.getTL() instanceof TLLibrary))
-                log.debug( "Not a TL library." );
-        }
-        // // Post Checks
-        // assert v != null;
-        // assert lm != null;
-        // if (!(lm instanceof OtmValueWithAttributes) && !(lm instanceof OtmSimpleObject)) // FIXME
-        // assert lm.getBaseType() == this;
-        // assert lm.getName().equals( this.getName() );
-        // assert v.getOwningLibrary() == minorLibrary.getTL();
-        // assert lm.getLibrary() == minorLibrary;
-
-        return lm;
-    }
-
-    // protected LibraryMember createMinorTLVersion(TLLibrary targetTLLib) {
-    // if (getTL() instanceof Versioned) {
-    // try {
-    // } catch (VersionSchemeException | ValidationException e) {
-    // log.debug( "Exception creating minor TL version in: " + targetTLLib.getPrefix() + ":"
-    // + targetTLLib.getName() + " " + e.getLocalizedMessage() );
-    // return null;
-    // }
-    // }
-    // return (LibraryMember) v;
-    // }
-
-    /**
-     * Sub-types MUST implement if any of their children are delete-able
-     */
-    @Override
-    public abstract void delete(OtmObject property);
 
     @Override
     public void remove(OtmObject child) {
@@ -616,14 +564,31 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         children.remove( child );
     }
 
-
-    /**
-     * Used by actions to allow editing on incomplete members.
-     */
-    public void setNoLibraryActionManager(DexActionManager actionManager) {
-        this.noLibraryActionManager = actionManager;
-        if (actionManager == null)
-            this.noLibraryActionManager = getModelManager().getActionManager( false );
+    @Override
+    public OtmObject setBaseType(OtmObject baseObj) {
+        OtmLibraryMember oldBaseOwner = null;
+        if (getBaseType() != null)
+            oldBaseOwner = getBaseType().getOwningMember();
+        if (baseObj != null) {
+            if (this.getClass() == baseObj.getClass() && getTL() instanceof TLExtensionOwner) {
+                TLExtension tlExt = ((TLExtensionOwner) getTL()).getExtension();
+                if (tlExt == null)
+                    tlExt = new TLExtension();
+                tlExt.setExtendsEntity( (NamedEntity) baseObj.getTL() );
+                ((TLExtensionOwner) getTL()).setExtension( tlExt );
+            }
+        } else {
+            // Clear the extension
+            if (getTL() instanceof TLExtensionOwner)
+                ((TLExtensionOwner) getTL()).setExtension( null );
+        }
+        // Set the where used in case resolver is not run afterwards
+        OtmLibraryMember newBaseOwner = null;
+        if (getBaseType() != null)
+            newBaseOwner = getBaseType().getOwningMember();
+        if (newBaseOwner != null)
+            newBaseOwner.changeWhereUsed( oldBaseOwner, getOwningMember() );
+        return getBaseType();
     }
 
     private void setContributor(OtmObject i, OtmObject baseType) {
@@ -644,5 +609,21 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
                     assert contributed.isInherited();
                     break;
                 }
+    }
+
+
+    /**
+     * Used by actions to allow editing on incomplete members.
+     */
+    public void setNoLibraryActionManager(DexActionManager actionManager) {
+        this.noLibraryActionManager = actionManager;
+        if (actionManager == null)
+            this.noLibraryActionManager = getModelManager().getActionManager( false );
+    }
+
+    @Override
+    public StringProperty versionProperty() {
+        return getLibrary() != null ? new SimpleStringProperty( getLibrary().getVersion() )
+            : new ReadOnlyStringWrapper( "" );
     }
 }

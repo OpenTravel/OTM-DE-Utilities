@@ -261,4 +261,24 @@ public class TestLibraryMemberBase {
         // assertTrue( "Given", lib.isValid() );
     }
 
+
+    /**
+     * TODO
+     * 
+     * @param member
+     */
+    public static void check(OtmLibraryMember member) {}
+
+    /**
+     * Check to assure all properties are owned by this member.
+     * 
+     * @param member
+     */
+    public static void checkOwnership(OtmLibraryMember member) {
+        for (OtmObject d : member.getDescendants()) {
+            assertTrue( d.getOwningMember() == member );
+            assertTrue( d.getLibrary() == member.getLibrary() );
+        }
+    }
+
 }

@@ -193,18 +193,19 @@ public class OtmVersionChain {
     public OtmPropertyOwner getNewMinorPropertyOwner(OtmPropertyOwner subject) {
         OtmLibraryMember newMinorLibraryMember = getNewMinorLibraryMember( subject.getOwningMember() );
         OtmPropertyOwner newPropertyOwner = null;
-
-        // Find matching propertyOwner
-        for (OtmPropertyOwner p : newMinorLibraryMember.getDescendantsPropertyOwners())
-            if (p.getName().equals( subject.getName() ))
-                newPropertyOwner = p;
-
+        if (newMinorLibraryMember != null) {
+            // Find matching propertyOwner
+            for (OtmPropertyOwner p : newMinorLibraryMember.getDescendantsPropertyOwners())
+                if (p.getName().equals( subject.getName() ))
+                    newPropertyOwner = p;
+        }
         return newPropertyOwner;
     }
 
     public OtmTypeUser getNewMinorTypeUser(OtmTypeUser subject) {
         OtmPropertyOwner np = getNewMinorPropertyOwner( ((OtmProperty) subject).getParent() );
-
+        if (np == null)
+            return null;
         // OtmLibraryMember newMinorLibraryMember = getNewMinorLibraryMember( subject.getOwningMember() );
         OtmTypeUser newTypeUser = null;
         OtmProperty newProperty = null;

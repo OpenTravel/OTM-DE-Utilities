@@ -181,6 +181,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
             return;
         }
         log.debug( "Pushing action onto queue: " + ignore + " " + action.toString() );
+        action.isValid();
         if (queue.contains( action )) {
             // Make sure not a duplicate
             log.debug( "Duplicate Action found!" );
@@ -213,8 +214,11 @@ public abstract class DexActionManagerBase implements DexActionManager {
         DexChangeEvent event = action.getEvent();
         if (event != null && mainController != null) {
             event.set( action.getSubject() );
+            action.isValid();
             mainController.publishEvent( event );
         }
+        // BAD HERE
+        action.isValid();
 
         // Let the user know what happened
         if (mainController != null)
