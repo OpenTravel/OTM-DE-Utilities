@@ -164,7 +164,6 @@ public class TestOtmModelManager extends AbstractFxTest {
         }
     }
 
-
     @Test
     public void testAddingManagedProject() throws Exception {
 

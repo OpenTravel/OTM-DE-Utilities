@@ -32,6 +32,7 @@ import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Verifies the functions of the <code>Dex File Handler</code>.
@@ -57,6 +58,32 @@ public class TestDexFileHandler extends AbstractFxTest {
         setupWorkInProcessArea( TestDexFileHandler.class );
         // startTestServer( "versions-repository", 9480, repositoryConfig, true, false, TestDexFileHandler.class );
         repoManager = repositoryManager.get();
+    }
+
+    /**
+     * Note, non-empty directories will not be deleted.
+     * 
+     * @param fileName
+     * @param subDirectory
+     * @return
+     * @throws IOException
+     */
+    public static File getTempFile(String fileName, String subDirectory) throws IOException {
+        File outputFolder = new File( wipFolder.get(), subDirectory );
+        outputFolder.mkdir();
+        outputFolder.deleteOnExit();
+        File file = new File( outputFolder, fileName );
+        if (!file.createNewFile()) {
+            log.error( "Error creating temporary file." );
+        }
+        file.deleteOnExit();
+        log.debug( "Created Temporary File: " + file.getCanonicalPath() );
+        return file;
+    }
+
+    public static File getTempDir(String subDirectory) {
+        File outputFolder = new File( wipFolder.get(), subDirectory );
+        return outputFolder;
     }
 
     @Test

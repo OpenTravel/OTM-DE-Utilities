@@ -181,6 +181,16 @@ public class DexFileHandler extends AbstractMainWindowController {
         return findings;
     }
 
+    /**
+     * Open the passed file using the project manager associated with the model manager.
+     * <p>
+     * Does <b>not</b> load into the model manager.
+     * 
+     * @param selectedProjectFile name must end with the PROJECT_FILE_EXTENSION
+     * @param mgr
+     * @param monitor
+     * @return
+     */
     public boolean openProject(File selectedProjectFile, OtmModelManager mgr, OpenProjectProgressMonitor monitor) {
         if (selectedProjectFile.getName().endsWith( PROJECT_FILE_EXTENSION )) {
             // Use project manager from TLModel

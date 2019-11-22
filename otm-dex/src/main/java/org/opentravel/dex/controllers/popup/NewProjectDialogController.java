@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.objecteditor.UserSettings;
 
 import java.io.File;
@@ -75,6 +76,7 @@ public class NewProjectDialogController extends DexPopupControllerBase {
             dialogStage = new Stage();
             dialogStage.setScene( new Scene( pane ) );
             dialogStage.initModality( Modality.APPLICATION_MODAL );
+            dialogStage.getScene().getStylesheets().add( "DavesViper.css" );
 
             // get the controller from it.
             controller = loader.getController();
@@ -139,6 +141,11 @@ public class NewProjectDialogController extends DexPopupControllerBase {
     }
 
 
+    /**
+     * Select the directory button action event handler.
+     * 
+     * @param e
+     */
     @FXML
     public void selectFile(ActionEvent e) {
         log.debug( "Button: " + e.toString() );
@@ -148,14 +155,33 @@ public class NewProjectDialogController extends DexPopupControllerBase {
             directoryField.setText( projFile.getPath() );
     }
 
+    private boolean canExit() {
+        if (!checkFileName())
+            return false;
+        if (modelMgr == null) {
+            postResults( "Internal error. Please cancel." );
+            return false;
+        }
+        if (contextIdField.getText().isEmpty()) {
+            postResults( "Missing Context ID." );
+            return false;
+        }
+        if (idField.getText().isEmpty()) {
+            postResults( "Missing ID." );
+            return false;
+        }
+        return true;
+    }
+
     /**
      * @see org.opentravel.dex.controllers.popup.DexPopupControllerBase#doOK()
      */
     @Override
     public void doOK() {
+        if (!canExit())
+            return;
 
-
-        // If the project file has not been selected, try to create one using the name
+        // try to create project file using the names
         projFile = new File( getFileName() );
         try {
             if (!projFile.createNewFile()) {
@@ -176,15 +202,24 @@ public class NewProjectDialogController extends DexPopupControllerBase {
             return;
         }
 
-        if (modelMgr != null)
-            try {
-                modelMgr.newProject( projFile, nameField.getText(), contextIdField.getText(), idField.getText(),
-                    descriptionField.getText() );
-            } catch (IllegalArgumentException er) {
-                postResults( "Could not create new project in model. " + er.getLocalizedMessage() );
-                projFile.delete();
-                return;
-            }
+        // Use model manager to create the project using the file and data.
+        OtmProject newProject = null;
+        try {
+            newProject = modelMgr.newProject( projFile, nameField.getText(), contextIdField.getText(),
+                idField.getText(), descriptionField.getText() );
+        } catch (Exception er) {
+            postResults( "Could not create new project in model. " + er.getLocalizedMessage() );
+            projFile.delete();
+            return;
+        }
+
+        // Now, close and reopen. See TestProject for details on why this patch is needed.
+        if (newProject != null && newProject.getTL() != null) {
+            newProject.getTL().getProjectManager().closeProject( newProject.getTL() );
+            modelMgr.close( newProject );
+            new DexFileHandler().openProject( projFile, modelMgr, null );
+            modelMgr.addProjects();
+        }
 
         log.debug( "Created project: " + projFile.getAbsolutePath() );
         super.doOK(); // all OK - close window
@@ -221,6 +256,48 @@ public class NewProjectDialogController extends DexPopupControllerBase {
         this.userSettings = settings;
     }
 
+    public boolean checkFileName() {
+        if (checkDirectory()) {
+            if (fileNameField.getText().isEmpty())
+                return false;
+            File tmpFile = new File( getFileName() );
+            if (tmpFile.exists()) {
+                postResults( "Project already exists." );
+                return false;
+            }
+            postResults( "File name OK." );
+        }
+
+        if (nameField.getText().isEmpty())
+            nameField.setText( fileNameField.getText() );
+        return true;
+    }
+
+    /**
+     * Check directory and post any errors found
+     * 
+     * @return true if directory is writable
+     */
+    public boolean checkDirectory() {
+        if (!directoryField.getText().isEmpty()) {
+            File tmpDir = new File( directoryField.getText() );
+            String cPath = "";
+            try {
+                cPath = tmpDir.getCanonicalPath();
+            } catch (IOException e) {
+                postResults( "Error accessing directory: " + getFileName() + "\n" + e.getLocalizedMessage() );
+                return false;
+            }
+            if (!tmpDir.isDirectory())
+                postResults( "Invalid directory: " + cPath );
+            else if (!tmpDir.canWrite())
+                postResults( "Can't create file in the directory: " + cPath );
+            else
+                return true;
+        }
+        return false;
+    }
+
     @Override
     protected void setup(String message) {
         super.setStage( dialogTitle, dialogStage );
@@ -228,6 +305,10 @@ public class NewProjectDialogController extends DexPopupControllerBase {
 
         dialogButtonCancel.setOnAction( e -> doCancel() );
         dialogButtonOK.setOnAction( e -> doOK() );
+
+        fileNameField.setOnAction( e -> checkFileName() );
+        directoryField.setOnAction( e -> checkFileName() );
+
         postHelp( helpText, dialogHelp );
 
         if (userSettings != null)

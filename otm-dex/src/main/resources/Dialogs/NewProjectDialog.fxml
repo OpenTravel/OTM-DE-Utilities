@@ -123,12 +123,12 @@
                         <Tooltip text="Unique ID of the project. Typically the URL of the primary libraries is used." />
                      </tooltip>
 				  </TextField>
-                  <TextField fx:id="descriptionField"  GridPane.columnIndex="2" GridPane.rowIndex="4" />
                   <TextField fx:id="contextIdField"  GridPane.columnIndex="2" GridPane.rowIndex="5" >
 				     <tooltip>
                         <Tooltip text="Default context ID to use on examples." />
                      </tooltip>
 				  </TextField>
+                  <TextField fx:id="descriptionField"  GridPane.columnIndex="2" GridPane.rowIndex="4" />
                </children>
             </GridPane>
             <TextArea fx:id="resultsArea" editable="false" focusTraversable="false" prefHeight="92.0" prefWidth="600.0" VBox.vgrow="ALWAYS" />

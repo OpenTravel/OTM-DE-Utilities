@@ -117,15 +117,17 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
         if (repoItem == null)
             return;
 
+        // Find out which project the want to add the repository item (library) to.
         OtmProject oProject = new DexProjectHandler().selectOneProject( mm.getUserProjects() );
-
-        try {
-            ProjectItem pi = mm.getProjectManager().addManagedProjectItem( repoItem, oProject.getTL() );
-            mm.add( pi.getContent() );
-            controller.fireEvent( new DexModelChangeEvent( mm ) );
-        } catch (LibraryLoaderException | RepositoryException e1) {
-            log.error( "Error opening repo item. " + e1.getLocalizedMessage() );
-        }
+        if (oProject != null)
+            try {
+                ProjectItem pi = mm.getProjectManager().addManagedProjectItem( repoItem, oProject.getTL() );
+                mm.addProjects();
+                mm.add( pi.getContent() );
+                controller.fireEvent( new DexModelChangeEvent( mm ) );
+            } catch (LibraryLoaderException | RepositoryException e1) {
+                log.error( "Error opening repo item. " + e1.getLocalizedMessage() );
+            }
     }
 
     // /**

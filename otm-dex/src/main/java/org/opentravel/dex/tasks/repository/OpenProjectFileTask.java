@@ -67,7 +67,8 @@ public class OpenProjectFileTask extends DexTaskBase<File> {
         boolean result =
             new DexFileHandler().openProject( taskData, modelMgr, new OpenProjectProgressMonitor( status ) );
         if (result)
-            modelMgr.addProjects( modelMgr.getProjectManager() );
+            modelMgr.addProjects();
+        // modelMgr.addProjects( modelMgr.getProjectManager() );
         else
             throw new IllegalStateException( "Error opening project." );
     }

@@ -46,6 +46,7 @@ import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.schemacompiler.repository.impl.BuiltInProject;
+import org.opentravel.schemacompiler.saver.LibrarySaveException;
 import org.opentravel.schemacompiler.version.VersionChain;
 import org.opentravel.schemacompiler.version.VersionChainFactory;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
@@ -319,8 +320,10 @@ public class OtmModelManager implements TaskResultHandlerI {
      * Add all the libraries in this project to the model manager. Model all libraries and contents. Run validation and
      * type resolver in the background.
      * 
+     * @deprecated - use addProjects(). That is all this method did.
      * @param pm
      */
+    @Deprecated
     public void addProjects(ProjectManager pm) {
         addProjects();
     }
@@ -420,6 +423,11 @@ public class OtmModelManager implements TaskResultHandlerI {
         projectManager.closeAll();
 
         // log.debug( "Cleared model. " + tlModel.getAllLibraries().size() );
+    }
+
+    public void close(OtmProject oProject) {
+        if (oProject != null && oProject.getTL() != null)
+            projects.remove( oProject.getTL().getName() );
     }
 
     /**
@@ -728,6 +736,8 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
     /**
+     * Create a new project.
+     * 
      * @param projectFile
      * @param required name the user-displayable name of the project
      * @param optional defaultContextId Assigns the default context ID to use for EXAMPLE generation in this project.
@@ -735,9 +745,10 @@ public class OtmModelManager implements TaskResultHandlerI {
      *        use.
      * @param description
      * @return
+     * @throws LibrarySaveException
      */
     public OtmProject newProject(File projectFile, String name, String defaultContextId, String projectId,
-        String description) {
+        String description) throws LibrarySaveException {
         if (projectFile == null || projectId == null || projectId.isEmpty())
             throw new IllegalArgumentException( "Missing required argument(s) to create new project." );
         // Verify the file exists and is writable
@@ -765,9 +776,14 @@ public class OtmModelManager implements TaskResultHandlerI {
             op.setDefaultContextId( defaultContextId );
             op.setDescription( description );
             op.setName( name );
+
+            // Saving project causes file write of contents
+            projectManager.saveProject( p );
+
             // register project in projects map
             projects.put( name, op );
         } catch (IllegalArgumentException e) {
+            log.warn( "Exception creating project: " + e.getLocalizedMessage() );
             throw new IllegalArgumentException( "Could not create valid project: " + e.getLocalizedMessage() );
         }
         return op;

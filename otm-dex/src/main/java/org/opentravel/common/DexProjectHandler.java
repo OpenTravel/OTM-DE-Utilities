@@ -98,8 +98,10 @@ public class DexProjectHandler {
     }
 
     /**
+     * User selection of project. If there is more than one project in the list, prompt the user to select one.
+     * 
      * @param list of projects to select from
-     * @return
+     * @return user selected project, the only project in the list or null
      */
     public OtmProject selectOneProject(List<OtmProject> projects) {
         // Select one project
