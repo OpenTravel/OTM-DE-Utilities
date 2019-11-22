@@ -215,9 +215,10 @@ public class NewProjectDialogController extends DexPopupControllerBase {
 
         // Now, close and reopen. See TestProject for details on why this patch is needed.
         if (newProject != null && newProject.getTL() != null) {
-            newProject.getTL().getProjectManager().closeProject( newProject.getTL() );
-            modelMgr.close( newProject );
-            new DexFileHandler().openProject( projFile, modelMgr, null );
+            newProject.close();
+            // newProject.getTL().getProjectManager().closeProject( newProject.getTL() );
+            // modelMgr.close( newProject );
+            new DexFileHandler().openProjectOLD( projFile, modelMgr, null );
             modelMgr.addProjects();
         }
 

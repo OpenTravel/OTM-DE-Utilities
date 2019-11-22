@@ -134,27 +134,33 @@ public class DexFileHandler extends AbstractMainWindowController {
         return System.getProperty( "user.home" );
     }
 
-    /**
-     * Open library or project file using library model loader. Results in an updated model.
-     * <p>
-     * To open a project and receive the project manager, use
-     * {@link #openProject(File, TLModel, OpenProjectProgressMonitor)}
-     *
-     * @param selectedFile
-     */
-    public ValidationFindings openFile(File selectedFile, OtmModelManager modelManager,
+    // /**
+    // * Open library or project file using library model loader. Results in an updated model.
+    // * <p>
+    // * To open a project and receive the project manager, use
+    // * {@link #openProject(File, TLModel, OpenProjectProgressMonitor)}
+    // *
+    // * @param selectedFile
+    // */
+    // public ValidationFindings openFile(File selectedFile, OtmModelManager modelManager,
+    // OpenProjectProgressMonitor monitor) {
+    // findings = null;
+    // if (selectedFile != null && selectedFile.canRead()) {
+    // if (selectedFile.getName().endsWith( PROJECT_FILE_EXTENSION ))
+    // openProject( selectedFile, modelManager, monitor );
+    // else if (selectedFile.getName().endsWith( LIBRARY_FILE_EXTENSION ))
+    // findings = openLibrary( selectedFile, modelManager.getTlModel(), monitor );
+    // }
+    // return findings;
+    // }
+
+    public ValidationFindings openLibrary(File selectedFile, OtmModelManager modelManager,
         OpenProjectProgressMonitor monitor) {
-        findings = null;
-        if (selectedFile != null && selectedFile.canRead()) {
-            if (selectedFile.getName().endsWith( PROJECT_FILE_EXTENSION ))
-                openProject( selectedFile, modelManager, monitor );
-            else if (selectedFile.getName().endsWith( LIBRARY_FILE_EXTENSION ))
-                findings = openLibrary( selectedFile, modelManager.getTlModel(), monitor );
-        }
-        return findings;
+        return openLibrary( selectedFile, modelManager.getTlModel(), monitor );
     }
 
-    // TODO - should be private or protected
+    // TODO - change users then embed in openLIbrary
+    @Deprecated
     public ValidationFindings openLibrary(File selectedFile, TLModel libraryModel, OpenProjectProgressMonitor monitor) {
         if (selectedFile == null)
             return null;
@@ -186,6 +192,32 @@ public class DexFileHandler extends AbstractMainWindowController {
      * <p>
      * Does <b>not</b> load into the model manager.
      * 
+     * @deprecated - use {@link #OpenProject} which adds project to model manager
+     * @param selectedProjectFile name must end with the PROJECT_FILE_EXTENSION
+     * @param mgr
+     * @param monitor
+     * @return
+     */
+    @Deprecated
+    public boolean openProjectOLD(File selectedProjectFile, OtmModelManager mgr, OpenProjectProgressMonitor monitor) {
+        if (selectedProjectFile.getName().endsWith( PROJECT_FILE_EXTENSION )) {
+            // Use project manager from TLModel
+            ProjectManager manager = mgr.getProjectManager();
+            try {
+                manager.loadProject( selectedProjectFile, findings, monitor );
+            } catch (Exception e) {
+                log.error( "Error Opening Project: " + e.getLocalizedMessage() );
+                manager.closeAll();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Open the passed file using the project manager associated with the model manager. If successful, load projects
+     * into the model manager.
+     * 
      * @param selectedProjectFile name must end with the PROJECT_FILE_EXTENSION
      * @param mgr
      * @param monitor
@@ -202,6 +234,7 @@ public class DexFileHandler extends AbstractMainWindowController {
                 manager.closeAll();
                 return false;
             }
+            mgr.addProjects();
         }
         return true;
     }

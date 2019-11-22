@@ -157,7 +157,7 @@ public class TestDexFileHandler extends AbstractFxTest {
         File localProject = new File( wipFolder.get(), "/" + FILE_TESTLOCAL );
         assertNotNull( localProject );
 
-        new DexFileHandler().openProject( localProject, modelManager, null );
+        new DexFileHandler().openProjectOLD( localProject, modelManager, null );
         log.debug( "Model now has " + modelManager.getTlModel().getAllLibraries().size() + " libraries." );
     }
 
@@ -177,7 +177,7 @@ public class TestDexFileHandler extends AbstractFxTest {
     public static void loadManagedProject(OtmModelManager modelManager) {
         File repoProject = new File( wipFolder.get(), "/" + FILE_TESTOPENTRAVELREPO );
         assertNotNull( repoProject );
-        new DexFileHandler().openProject( repoProject, modelManager, null );
+        new DexFileHandler().openProjectOLD( repoProject, modelManager, null );
         assertTrue( "Must have project items.", !modelManager.getProjectManager().getAllProjectItems().isEmpty() );
         assertTrue( "Must have project items.", modelManager.getProjectManager().getAllProjectItems().size() > 1 );
         log.debug( "Model now has " + modelManager.getTlModel().getAllLibraries().size() + " libraries." );
@@ -189,7 +189,7 @@ public class TestDexFileHandler extends AbstractFxTest {
     public static void loadVersionProject(OtmModelManager modelManager) {
         File repoProject = new File( wipFolder.get(), "/" + FILE_TESTVERSIONS_REPO );
         assertNotNull( repoProject );
-        new DexFileHandler().openProject( repoProject, modelManager, null );
+        new DexFileHandler().openProjectOLD( repoProject, modelManager, null );
         assertTrue( "Must have project items.", !modelManager.getProjectManager().getAllProjectItems().isEmpty() );
         assertTrue( "Must have project items.", modelManager.getProjectManager().getAllProjectItems().size() > 1 );
         log.debug( "Model now has " + modelManager.getTlModel().getAllLibraries().size() + " libraries." );

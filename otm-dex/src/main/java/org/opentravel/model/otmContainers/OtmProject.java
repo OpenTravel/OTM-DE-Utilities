@@ -135,6 +135,14 @@ public class OtmProject {
     }
 
     /**
+     * Close the project in the TL Project manager and OTM model manager.
+     */
+    public void close() {
+        getTL().getProjectManager().closeProject( getTL() );
+        modelManager.close( this );
+    }
+
+    /**
      * Does this project contain the library?
      * 
      * @param library

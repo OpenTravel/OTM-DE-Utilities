@@ -173,20 +173,14 @@ public class TestProject extends AbstractFxTest {
         // Find out and fix instead of using this patch.
         // When fixed, update the NewProjectDialogController
         //
-        p.getTL().getProjectManager().closeProject( p.getTL() );
-        // mgr.clear(); // Works
         // Close the project
-        mgr.close( p );
+        p.close();
         // Re-open
-        DexFileHandler dfh = new DexFileHandler();
-        boolean result = dfh.openProject( projectFile, mgr, null );
-        assertTrue( result );
-        mgr.addProjects();
-        OtmProject newP = mgr.getProject( name );
-        p = newP;
+        new DexFileHandler().openProject( projectFile, mgr, null );
+        p = mgr.getProject( name );
 
         // Get a repo item to open
-        //
+        // TODO - make this into a static utility
         assertTrue( repoManager != null );
         String remoteRepoID = "Opentravel";
         String remoteRepoEndpoint = "http://opentravelmodel.net";
@@ -198,11 +192,11 @@ public class TestProject extends AbstractFxTest {
         List<RepositoryItem> locked = rrc.getLockedItems();
         assertTrue( !locked.isEmpty() );
         List<String> baseNSList = rrc.listBaseNamespaces();
-        // List<RepositoryItem> items;
-        // for (String baseNS : baseNSList) {
-        // items = rrc.listItems( baseNS, false, true );
-        // // May be empty
-        // }
+        List<RepositoryItem> items = new ArrayList<>();
+        for (String baseNS : baseNSList) {
+            items.addAll( rrc.listItems( baseNS, false, true ) );
+        }
+        log.debug( items.size() + " items read from repository." );
         RepositoryItem repoItem = locked.get( 0 );
 
         ProjectItem pi = mgr.getProjectManager().addManagedProjectItem( repoItem, p.getTL() );
