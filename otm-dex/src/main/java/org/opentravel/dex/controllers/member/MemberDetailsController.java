@@ -25,7 +25,6 @@ import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
@@ -116,7 +115,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     private static final EventType[] subscribedEvents =
         {OtmObjectReplacedEvent.OBJECT_REPLACED, OtmObjectModifiedEvent.OBJECT_MODIFIED,
             OtmObjectChangeEvent.OBJECT_CHANGED, DexMemberDeleteEvent.MEMBER_DELETED,
-            DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+            DexMemberSelectionEvent.MEMBER_SELECTED, DexMemberSelectionEvent.TYPE_USER_SELECTED,
+            DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
 
     public MemberDetailsController() {
         super( subscribedEvents, publishedEvents );
@@ -135,8 +135,6 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             throw new IllegalStateException( "memberName not injected by FXML." );
         if (!(typeLabel instanceof Label))
             throw new IllegalStateException( "label not injected by FXML." );
-        // if (!(deleteButton instanceof Button))
-        // throw new IllegalStateException( "delete button not injected by FXML." );
         if (!(memberDescription instanceof TextField))
             throw new IllegalStateException( "member description not injected by FXML." );
         if (!(assignedTypeName instanceof TextField))
@@ -161,9 +159,9 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        // log.debug( "Received event: " + event.getClass().getSimpleName() );
+        log.debug( "Received event: " + event.getClass().getSimpleName() );
         if (event instanceof DexMemberSelectionEvent)
-            memberSelectionHandler( (DexMemberSelectionEvent) event );
+            handleEvent( (DexMemberSelectionEvent) event );
         if (event instanceof DexModelChangeEvent)
             handleEvent( (DexModelChangeEvent) event );
         else if (event instanceof OtmObjectChangeEvent)
@@ -210,16 +208,16 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             clear();
     }
 
-    public void memberSelectionHandler(DexMemberSelectionEvent event) {
+    public void handleEvent(DexMemberSelectionEvent event) {
         if (event != null && event.getMember() != null) {
             selectedMember = event.getMember();
             post( selectedMember );
         }
     }
 
-    private void postNotImplemented() {
-        DialogBoxContoller.init().show( "Not Implemented", "Work in progress." );
-    }
+    // private void postNotImplemented() {
+    // DialogBoxContoller.init().show( "Not Implemented", "Work in progress." );
+    // }
 
     public void post(OtmLibraryMember member) {
         if (member == null) {
@@ -314,31 +312,6 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             post( editminor );
         else
             post( editreadonly );
-
-        // Action Buttons
-        // deleteButton.setDisable( true );
-        // addButton.setDisable( true );
-        // This approach will work. Need to make sure not to re-add nodes
-        // if (member instanceof OtmEnumeration) {
-        // CheckBox openBox = new CheckBox( "Open" );
-        // CheckBox closeBox = new CheckBox( "Close" );
-        // // addButton.setVisible( false );
-        // // deleteButton.setVisible( false );
-        // Parent parent = deleteButton.getParent();
-        // ((VBox) parent).getChildren().remove( addButton );
-        // ((VBox) parent).getChildren().remove( deleteButton );
-        // ((VBox) parent).getChildren().add( openBox );
-        // openBox.setSelected( member instanceof OtmEnumerationOpen );
-        // ((VBox) parent).getChildren().add( closeBox );
-        // openBox.setSelected( member instanceof OtmEnumerationClosed );
-        // } else {
-        // Parent parent = deleteButton.getParent();
-        // ((VBox) parent).getChildren().add( addButton );
-        // ((VBox) parent).getChildren().add( deleteButton );
-        // // ((VBox) parent).getChildren().add( openBox );
-        // addButton.setVisible( true );
-        // deleteButton.setVisible( true );
-        // }
     }
 
     private void post(RadioButton button) {

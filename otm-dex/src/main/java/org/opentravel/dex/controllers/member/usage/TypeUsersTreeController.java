@@ -26,11 +26,13 @@ import org.opentravel.dex.controllers.member.properties.PropertiesDAO;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.application.Platform;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.VBox;
@@ -50,7 +52,9 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
     @FXML
     TreeView<PropertiesDAO> typeUsersTree;
     @FXML
-    private VBox memberWhereUsed;
+    Label columnLabel;
+    @FXML
+    private VBox typeUsersVBox;
 
     TreeItem<PropertiesDAO> root; // Root of the navigation tree. Is displayed.
     private boolean ignoreEvents = false;
@@ -58,7 +62,7 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
         {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
-    private static final EventType[] publishedEvents = {};
+    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED};
 
     /**
      * Construct a member tree table controller that can publish and receive events.
@@ -69,6 +73,8 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
 
     @Override
     public void checkNodes() {
+        if (typeUsersVBox == null)
+            throw new IllegalStateException( "Type Users' member where used is null." );
         if (typeUsersTree == null)
             throw new IllegalStateException( "Type Users Tree view is null." );
     }
@@ -89,7 +95,6 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
     public void configure(DexMainController parent) {
         super.configure( parent );
         // log.debug("Configuring Type Users Tree.");
-        eventPublisherNode = memberWhereUsed;
         configure( parent.getModelManager() );
     }
 
@@ -104,6 +109,7 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
             throw new IllegalArgumentException(
                 "Model manager is null. Must configure member tree with model manager." );
 
+        eventPublisherNode = typeUsersVBox;
 
         // Set the hidden root item
         root = new TreeItem<>();
@@ -118,8 +124,8 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
         typeUsersTree.getSelectionModel().select( 0 );
         // whereUsedTreeTable.setOnKeyReleased(this::keyReleased);
         // whereUsedTreeTable.setOnMouseClicked(this::mouseClick);
-        // typeUsersTree.getSelectionModel().selectedItemProperty()
-        // .addListener((v, old, newValue) -> memberSelectionListener(newValue));
+        typeUsersTree.getSelectionModel().selectedItemProperty()
+            .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
         // log.debug("Where used table configured.");
         refresh();
@@ -136,7 +142,11 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
 
     private void handleEvent(DexMemberSelectionEvent event) {
         if (!ignoreEvents)
-            post( event.getMember() );
+            try {
+                post( event.getMember() );
+            } catch (Exception e) {
+                // No-op
+            }
     }
 
     @Override
@@ -172,25 +182,27 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
     // }
     // }
 
-    // /**
-    // * Listener for selected library members in the tree table.
-    // *
-    // * @param item
-    // */
-    // private void memberSelectionListener(TreeItem<PropertiesDAO> item) {
-    // if (item == null)
-    // return;
-    // log.debug("Selection Listener: " + item.getValue());
-    // assert item != null;
-    // boolean editable = false;
-    // if (item.getValue() != null)
-    // editable = item.getValue().isEditable();
-    // // nameColumn.setEditable(editable); // TODO - is this still useful?
-    // ignoreEvents = true;
-    // // if (eventPublisherNode != null)
-    // // eventPublisherNode.fireEvent(new DexMemberSelectionEvent(this, item));
-    // ignoreEvents = false;
-    // }
+    /**
+     * Listener for selected library members in the tree table.
+     *
+     * @param item
+     */
+    private void memberSelectionListener(TreeItem<PropertiesDAO> item) {
+        if (item == null || eventPublisherNode == null)
+            return;
+        log.debug( "Selection Listener: " + item.getValue() );
+        OtmTypeUser p = null;
+        if (item.getValue() != null && item.getValue().getValue() instanceof OtmTypeUser)
+            p = (OtmTypeUser) item.getValue().getValue();
+
+        OtmLibraryMember member = p != null ? p.getAssignedType().getOwningMember() : null;
+        if (member == null && item.getValue() != null && item.getValue().getValue() instanceof OtmLibraryMember)
+            member = (OtmLibraryMember) item.getValue().getValue();
+        ignoreEvents = true;
+        if (member != null)
+            fireEvent( new DexMemberSelectionEvent( member, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED ) );
+        ignoreEvents = false;
+    }
 
     // public void mouseClick(MouseEvent event) {
     // // this fires after the member selection listener
@@ -203,19 +215,25 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
      * Get the library members from the model manager and put them into a cleared tree.
      * 
      * @param modelMgr
+     * @throws Exception
      */
     @Override
-    public void post(OtmLibraryMember member) {
-        clear();
+    public void post(OtmLibraryMember member) throws Exception {
         if (member != null) {
-            postedData = member;
+            super.post( member );
+            if (columnLabel != null)
+                columnLabel.setText( "Properties of " + member.getName() + " that use types" );
             new PropertiesDAO( member, this ).createChildrenItems( root, new MemberAndUserFilter() );
         }
     }
 
     @Override
     public void refresh() {
-        post( postedData );
+        try {
+            post( postedData );
+        } catch (Exception e) {
+            // No-op
+        }
         ignoreEvents = false;
     }
 

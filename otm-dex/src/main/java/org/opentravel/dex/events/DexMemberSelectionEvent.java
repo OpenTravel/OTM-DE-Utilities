@@ -41,12 +41,13 @@ public class DexMemberSelectionEvent extends DexNavigationEvent {
         new EventType<>( DEX_ALL, "MEMBER_SELECTED" );
     public static final EventType<DexMemberSelectionEvent> RESOURCE_SELECTED =
         new EventType<>( DEX_ALL, "RESOURCE_SELECTED" );
+    // Member selected because it or some descendant is assigned as type provider
+    public static final EventType<DexMemberSelectionEvent> TYPE_PROVIDER_SELECTED =
+        new EventType<>( DEX_ALL, "TYPE_PROVIDER_SELECTED" );
+    // Member selected because it or some descendant is type user
+    public static final EventType<DexMemberSelectionEvent> TYPE_USER_SELECTED =
+        new EventType<>( DEX_ALL, "TYPE_USER_SELECTED" );
 
-    // private final OtmLibraryMember member;
-    //
-    // public OtmLibraryMember getMember() {
-    // return member;
-    // }
 
     /**
      * Filter change event with no subject.
@@ -80,6 +81,16 @@ public class DexMemberSelectionEvent extends DexNavigationEvent {
      */
     public DexMemberSelectionEvent(OtmLibraryMember otm) {
         super( MEMBER_SELECTED );
+        if (otm instanceof OtmContributedFacet)
+            otm = ((OtmContributedFacet) otm).getContributor();
+        member = otm;
+    }
+
+    /**
+     * @param otm
+     */
+    public DexMemberSelectionEvent(OtmLibraryMember otm, EventType<DexMemberSelectionEvent> type) {
+        super( type );
         if (otm instanceof OtmContributedFacet)
             otm = ((OtmContributedFacet) otm).getContributor();
         member = otm;

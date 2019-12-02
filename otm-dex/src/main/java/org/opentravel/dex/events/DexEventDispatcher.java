@@ -90,8 +90,8 @@ public class DexEventDispatcher implements EventDispatcher {
                 navQueue.add( (DexNavigationEvent) event );
                 navUndoneQueue.clear();
                 // log.debug( "Pushed " + ((DexNavigationEvent) event).getMember() + " onto nav queue." );
-            } else
-                log.debug( "Using my dispatcher on my event: " + event.getClass().getSimpleName() );
+            }
+            log.debug( "Using my dispatcher on my event: " + event.getClass().getSimpleName() );
             ignoreNext = false;
             // Add code here if the event is to be handled outside of the dispatch chain
             // event.consume();

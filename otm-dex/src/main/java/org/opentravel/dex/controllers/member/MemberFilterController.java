@@ -59,11 +59,11 @@ import javafx.scene.layout.HBox;
  *
  */
 public class MemberFilterController extends DexIncludedControllerBase<Void> {
+    private static Log log = LogFactory.getLog( MemberFilterController.class );
+
     // public enum LibraryFilterNodes {
     // Library, Name, Type, State;
     // }
-
-    private static Log log = LogFactory.getLog( MemberFilterController.class );
 
     // Class specific data
     //

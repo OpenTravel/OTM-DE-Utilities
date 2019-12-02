@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.popup.StandaloneWindowControllerBase;
 
 import java.util.ArrayList;
@@ -34,13 +32,13 @@ import javafx.scene.control.MenuItem;
  *
  */
 public abstract class DexTabControllerBase implements DexTabController {
-    private static Log log = LogFactory.getLog( DexTabControllerBase.class );
+    // private static Log log = LogFactory.getLog( DexTabControllerBase.class );
 
     protected List<DexIncludedController<?>> includedControllers = new ArrayList<>();
     protected DexMainController mainController;
 
     public DexTabControllerBase() {
-        // log.debug( "Repository Tab Controller constructed." );
+        // log.debug( "Tab Controller constructed." );
     }
 
     @Override
@@ -65,12 +63,8 @@ public abstract class DexTabControllerBase implements DexTabController {
     @Override
     public void configure(DexMainController mc) {
         this.mainController = mc;
-        includedControllers.forEach( c -> mc.addIncludedController( c ) );
-        // mainController.getEventSubscriptionManager().configureEventHandlers();
+        includedControllers.forEach( mc::addIncludedController );
     }
-
-    // @Override
-    // public abstract String getDialogTitle();
 
     public void launchWindow(ActionEvent e, StandaloneWindowControllerBase wc) {
         if (wc == null)

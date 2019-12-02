@@ -13,20 +13,9 @@
      <content>
         <VBox fx:id="searchTabVBox">
            <children>
-              <!-- ToolBar fx:id="memberPropertiesToolBar">
-                <items>
-                    <TextField fx:id="propertyName"  promptText="Name" />
-                    <Button layoutX="86.0" layoutY="10.0" mnemonicParsing="false" prefWidth="55.0" styleClass="button-red" text="Delete" />
-                </items>
-              </ToolBar -->
               <fx:include fx:id="repositorySelection" source="../RepositoryViews/RepositorySelection.fxml" />
               <fx:include fx:id="searchQuery" source="SearchQuery.fxml" />
               <fx:include fx:id="searchResults" source="SearchResults.fxml" />
-              
-              <!-- fx:include fx:id="whereUsedTable" source="WhereUsedTable.fxml" VBox.hgrow="ALWAYS" / -->
-              <!-- fx:include fx:id="usersTree" source="WU_UsersTree.fxml" />
-              <fx:include fx:id="typeUsersTree" source="WU_TypeUsersTree.fxml" VBox.hgrow="ALWAYS"/>
-              <fx:include fx:id="typeProvidersTree" source="WU_TypeProvidersTree.fxml" /-->
            </children>
         </VBox>
      </content>

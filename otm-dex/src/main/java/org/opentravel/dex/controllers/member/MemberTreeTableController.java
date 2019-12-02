@@ -95,6 +95,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     // Object events may change validation state of members
     private static final EventType[] subscribedEvents = {DexFilterChangeEvent.FILTER_CHANGED,
         DexMemberDeleteEvent.MEMBER_DELETED, OtmObjectReplacedEvent.OBJECT_REPLACED,
+        DexMemberSelectionEvent.TYPE_USER_SELECTED, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED,
         DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED, OtmObjectChangeEvent.OBJECT_CHANGED,
         OtmObjectModifiedEvent.OBJECT_MODIFIED};
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};

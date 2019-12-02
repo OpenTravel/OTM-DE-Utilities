@@ -99,7 +99,7 @@ public class SearchQueryController extends DexIncludedControllerBase<OtmLibraryM
     @Override
     @FXML
     public void initialize() {
-        // log.debug( "Repository Selection Controller initialized." );
+        // log.debug( "Search Query Controller initialized." );
     }
 
     /**
@@ -114,7 +114,7 @@ public class SearchQueryController extends DexIncludedControllerBase<OtmLibraryM
     public void configure(DexMainController parent) {
         super.configure( parent );
         eventPublisherNode = searchQueryVBox;
-        // log.debug( "Search Stage set." );
+        // log.debug( "Search Query Stage set." );
     }
 
     @FXML

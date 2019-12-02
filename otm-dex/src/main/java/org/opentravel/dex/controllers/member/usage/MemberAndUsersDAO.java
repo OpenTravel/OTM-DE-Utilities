@@ -110,7 +110,8 @@ public class MemberAndUsersDAO implements DexDAO<OtmObject> {
 
     @Override
     public String toString() {
-        return otmObject != null ? otmObject.getPrefix() + ":" + otmObject.toString() : "";
+        // return otmObject != null ? otmObject.getPrefix() + ":" + otmObject.toString() : "";
+        return otmObject != null ? otmObject.toString() : "";
     }
 
     public StringProperty versionProperty() {

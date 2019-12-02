@@ -46,7 +46,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
 /**
- * Manage tree for members and type providers that provide types to the posted member.
+ * Manage tree for members and type providers that provide types to the posted member (3rd (right hand) column).
  * 
  * @author dmh
  *
@@ -60,7 +60,7 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
     @FXML
     TreeView<MemberAndProvidersDAO> typeProvidersTree;
     @FXML
-    private VBox memberWhereUsed;
+    private VBox typeProvidersVBox;
 
     TreeItem<MemberAndProvidersDAO> root; // Root of the navigation tree. Is displayed.
     private boolean ignoreEvents = false;
@@ -70,7 +70,7 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
         {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
-    private static final EventType[] publishedEvents = {};
+    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED};
 
     /**
      * Construct a member tree table controller that can publish and receive events.
@@ -81,6 +81,8 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
 
     @Override
     public void checkNodes() {
+        if (typeProvidersVBox == null)
+            throw new IllegalStateException( "TypeProvidersTreeController's Member Where Used is null." );
         if (typeProvidersTree == null)
             throw new IllegalStateException( "Type Users Tree view is null." );
     }
@@ -101,7 +103,6 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
     public void configure(DexMainController parent) {
         super.configure( parent );
         // log.debug("Configuring Member Tree Table.");
-        eventPublisherNode = memberWhereUsed;
         configure( parent.getModelManager() );
     }
 
@@ -116,6 +117,8 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
             throw new IllegalArgumentException(
                 "Model manager is null. Must configure member tree with model manager." );
 
+        eventPublisherNode = typeProvidersVBox;
+
         // Set the hidden root item
         root = new TreeItem<>();
         root.setExpanded( true ); // Startout fully expanded
@@ -127,8 +130,8 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
 
         // Add listeners and event handlers
         // typeProvidersTree.getSelectionModel().select(0);
-        // typeProvidersTree.getSelectionModel().selectedItemProperty()
-        // .addListener((v, old, newValue) -> memberSelectionListener(newValue));
+        typeProvidersTree.getSelectionModel().selectedItemProperty()
+            .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
         // log.debug("Where used table configured.");
         refresh();
@@ -200,7 +203,7 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
     }
 
     private void handleEvent(DexMemberSelectionEvent event) {
-        if (!ignoreEvents)
+        if (!ignoreEvents && event != null && event.getEventType() == DexMemberSelectionEvent.MEMBER_SELECTED)
             post( event.getMember() );
     }
 
@@ -237,25 +240,23 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
     // }
     // }
 
-    // /**
-    // * Listener for selected library members in the tree table.
-    // *
-    // * @param item
-    // */
-    // private void memberSelectionListener(TreeItem<MemberAndProvidersDAO> item) {
-    // if (item == null)
-    // return;
-    // log.debug("Selection Listener: " + item.getValue());
-    // assert item != null;
-    // boolean editable = false;
-    // if (item.getValue() != null)
-    // editable = item.getValue().isEditable();
-    // // nameColumn.setEditable(editable); // TODO - is this still useful?
-    // ignoreEvents = true;
-    // if (eventPublisherNode != null)
-    // eventPublisherNode.fireEvent(new DexMemberSelectionEvent(this, item));
-    // ignoreEvents = false;
-    // }
+    /**
+     * Listener for selected library members in the tree table.
+     *
+     * @param item
+     */
+    private void memberSelectionListener(TreeItem<MemberAndProvidersDAO> item) {
+        if (item == null || eventPublisherNode == null)
+            return; // Nothing to do
+        log.debug( "Selection Listener: " + item.getValue() );
+        OtmLibraryMember member = null;
+        if (item.getValue() != null && item.getValue().getValue() instanceof OtmLibraryMember)
+            member = (OtmLibraryMember) item.getValue().getValue();
+        ignoreEvents = true;
+        if (member != null)
+            fireEvent( new DexMemberSelectionEvent( member, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED ) );
+        ignoreEvents = false;
+    }
 
     // public void mouseClick(MouseEvent event) {
     // // this fires after the member selection listener

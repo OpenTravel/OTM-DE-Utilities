@@ -69,7 +69,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
         {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
-    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
+    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.TYPE_USER_SELECTED};
 
     /**
      * Construct a member tree table controller that can publish and receive events.
@@ -186,8 +186,9 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
     }
 
     private void handleEvent(DexMemberSelectionEvent event) {
-        if (!ignoreEvents)
-            post( event.getMember() );
+        if (!ignoreEvents && event != null && event.getEventType() == DexMemberSelectionEvent.MEMBER_SELECTED)
+            if (!ignoreEvents)
+                post( event.getMember() );
     }
 
     @Override
@@ -219,15 +220,15 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
      * @param item
      */
     private void memberSelectionListener(TreeItem<MemberAndUsersDAO> item) {
-        if (item == null)
+        if (item == null || eventPublisherNode == null)
             return;
         log.debug( "Selection Listener: " + item.getValue() );
-        ignoreEvents = true;
         OtmLibraryMember member = null;
         if (item.getValue() != null && item.getValue().getValue() instanceof OtmLibraryMember)
             member = (OtmLibraryMember) item.getValue().getValue();
-        if (eventPublisherNode != null && member != null)
-            eventPublisherNode.fireEvent( new DexMemberSelectionEvent( member ) );
+        ignoreEvents = true;
+        if (member != null)
+            fireEvent( new DexMemberSelectionEvent( member, DexMemberSelectionEvent.TYPE_USER_SELECTED ) );
         ignoreEvents = false;
     }
 

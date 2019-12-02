@@ -63,6 +63,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     private static final EventType[] subscribedEvents =
         {DexMemberDeleteEvent.MEMBER_DELETED, OtmObjectReplacedEvent.OBJECT_REPLACED,
             OtmObjectChangeEvent.OBJECT_CHANGED, OtmObjectModifiedEvent.OBJECT_MODIFIED,
+            DexMemberSelectionEvent.TYPE_USER_SELECTED, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED,
             DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
 
     @FXML
@@ -205,7 +206,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     public void handleEvent(AbstractOtmEvent e) {
         // log.debug( "event handler: " + e.getClass().getSimpleName() );
         if (e instanceof DexMemberSelectionEvent)
-            handleMemberSelection( (DexMemberSelectionEvent) e );
+            handleEvent( (DexMemberSelectionEvent) e );
         else if (e instanceof DexModelChangeEvent)
             handleEvent( (DexModelChangeEvent) e );
         else if (e instanceof OtmObjectChangeEvent)
@@ -270,8 +271,9 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
             log.warn( "ERROR - cell max edit handler has null." );
     }
 
-    public void handleMemberSelection(DexMemberSelectionEvent event) {
-        post( event.getMember() );
+    public void handleEvent(DexMemberSelectionEvent event) {
+        if (event != null)
+            post( event.getMember() );
     }
 
     private void initializeTable(TreeTableView<PropertiesDAO> table) {

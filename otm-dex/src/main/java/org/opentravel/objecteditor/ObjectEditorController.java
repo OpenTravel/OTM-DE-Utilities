@@ -80,6 +80,13 @@ public class ObjectEditorController extends DexMainControllerBase {
             throw new IllegalStateException( "Libraries tab not injected by FXML." );
         if (!(whereUsedTabController instanceof WhereUsedTabController))
             throw new IllegalStateException( "Where used tab not injected by FXML." );
+        // Other controllers not checked...to do if needed
+    }
+
+    @Override
+    public void initialize() {
+        log.debug( "Object Editor Controller - Initialize." );
+        checkNodes();
     }
 
     /**
@@ -90,7 +97,7 @@ public class ObjectEditorController extends DexMainControllerBase {
     @Override
     public void setStage(Stage stage) {
         super.setStage( stage );
-        log.debug( "Controller - Initializing Object Editor Controller" );
+        log.debug( "Object Editor Controller - Setting Stage" );
 
         // Get the user preferences
         userSettings = UserSettings.load();
@@ -113,7 +120,7 @@ public class ObjectEditorController extends DexMainControllerBase {
             userSettings.save();
         } );
 
-        // TEST - set initial position
+        // set initial position
         stage.setX( userSettings.getWindowPosition().getX() );
         stage.setY( userSettings.getWindowPosition().getY() );
 
@@ -152,42 +159,4 @@ public class ObjectEditorController extends DexMainControllerBase {
         setMainController( this );
     }
 
-    @Override
-    public void initialize() {
-        log.debug( "Object Editor Controller - Initialize w/params is now loading!" );
-        checkNodes();
-    }
-
-    // @Override
-    // public List<EventType<? extends AbstractOtmEvent>> getPublishedEventTypes() {
-    // // NO-OP - does not publish any events
-    // return null;
-    // }
-    //
-    // @Override
-    // public List<EventType<? extends AbstractOtmEvent>> getSubscribedEventTypes() {
-    // // NO-OP - does not subscribe to any events
-    // return null;
-    // }
-    //
-    // @Override
-    // public void handleEvent(AbstractOtmEvent event) {
-    // // NO-OP - does not handle any events
-    // }
-    //
-    // @Override
-    // public void setEventHandler(EventType<? extends AbstractOtmEvent> type, EventHandler<AbstractOtmEvent> handler) {
-    // // NO-OP - does not publish any events
-    // }
-
-    // // Fires whenever a tab is selected. Fires on closed tab and opened tab.
-    // @FXML
-    // public void whereUsedTabSelection(Event e) {
-    // log.debug( "Where used tab selection event" );
-    // }
-
-    // @FXML
-    // public void memberTabSelection(Event e) {
-    // log.debug( "memberTab selection event" );
-    // }
 }

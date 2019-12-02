@@ -121,7 +121,8 @@ public class MemberAndProvidersDAO implements DexDAO<OtmObject> {
     public String toString() {
         if (otmObject instanceof OtmAbstractDisplayFacet)
             return otmObject.getName();
-        return otmObject != null ? otmObject.getPrefix() + ":" + otmObject.toString() : "";
+        // return otmObject != null ? otmObject.getPrefix() + ":" + otmObject.toString() : "";
+        return otmObject != null ? otmObject.toString() : "";
     }
 
     public StringProperty usedTypesProperty() {

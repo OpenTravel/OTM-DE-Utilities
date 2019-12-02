@@ -17,14 +17,5 @@
 				<fx:include fx:id="searchResults" source="SearchResults.fxml" VBox.vgrow="ALWAYS" />
 			</children>
 		</VBox>
-		<!-- SplitPane dividerPositions="0.3" VBox.vgrow="ALWAYS"> <items> <VBox> 
-			<children> </children> </VBox> <SplitPane orientation="VERTICAL"> <items> 
-			<fx:include fx:id="repositorySearch" source="../RepositorySearch.fxml"/> 
-			<fx:include fx:id="repositorySelection" source="../RepositorySelection.fxml"/> 
-			</items> </SplitPane> </items> </SplitPane -->
 	</center>
-	<bottom>
-		<!-- fx:include fx:id="resourceErrorsTreeTable" source="ResourceErrorsTreeTable.fxml" 
-			/ -->
-	</bottom>
 </BorderPane>
