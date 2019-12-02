@@ -56,17 +56,17 @@ public class DexStatusController extends DexIncludedControllerBase<String> {
             throw new IllegalStateException( "Status label not injected by FXML." );
         if (!(taskCount instanceof Label))
             throw new IllegalStateException( "Task count not injected by FXML." );
-        log.debug( "FXML Nodes checked OK." );
+        // log.debug( "FXML Nodes checked OK." );
     }
 
     public DexStatusController() {
-        log.debug( "Starting constructor." );
+        // log.debug( "Starting constructor." );
     }
 
     @Override
     @FXML
     public void initialize() {
-        log.debug( "Status Controller initialized." );
+        // log.debug( "Status Controller initialized." );
 
         if (runningTasks == null)
             runningTasks = new ArrayList<>();

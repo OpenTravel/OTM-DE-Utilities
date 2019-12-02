@@ -261,7 +261,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     private Node getRepeatCountNode() {
         Spinner<Integer> spinner = new Spinner<>( 0, 10000, 0 );
         spinner.setDisable( !isEditable() );
-        spinner.setOnRotate( a -> log.debug( "Spinner selected" ) );
+        // spinner.setOnRotate( a -> log.debug( "Spinner selected" ) );
         return spinner;
     }
 
@@ -332,7 +332,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
 
     public String setReferenceFacetName(String name) {
         getTL().setReferenceFacetName( name );
-        log.debug( "Set reference facet to " + name );
+        // log.debug( "Set reference facet to " + name );
         return getReferenceFacetName();
     }
 
@@ -357,7 +357,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         if (type == null)
             type = TLReferenceType.NONE;
         getTL().setReferenceType( type );
-        log.debug( "Set reference type to " + getReferenceType() );
+        // log.debug( "Set reference type to " + getReferenceType() );
         return getReferenceType();
     }
 

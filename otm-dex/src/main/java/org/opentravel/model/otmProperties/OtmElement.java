@@ -133,7 +133,7 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
             getTL().setType( (TLPropertyType) type );
 
         assignedTypeProperty = null;
-        log.debug( "Set assigned TL type" );
+        // log.debug( "Set assigned TL type" );
         return getTL().getType();
     }
 

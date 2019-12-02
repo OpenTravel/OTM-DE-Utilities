@@ -90,8 +90,6 @@ public class SearchQueryController extends DexIncludedControllerBase<OtmLibraryM
             throw new IllegalStateException( "Null clear search button in repository search controller." );
         if (latestOnlyRadio == null || lockedRadio == null)
             throw new IllegalStateException( "Null node in search controller." );
-
-        log.debug( "FXML Nodes checked OK." );
     }
 
     public SearchQueryController() {
@@ -101,7 +99,7 @@ public class SearchQueryController extends DexIncludedControllerBase<OtmLibraryM
     @Override
     @FXML
     public void initialize() {
-        log.debug( "Repository Selection Controller initialized." );
+        // log.debug( "Repository Selection Controller initialized." );
     }
 
     /**
@@ -116,7 +114,7 @@ public class SearchQueryController extends DexIncludedControllerBase<OtmLibraryM
     public void configure(DexMainController parent) {
         super.configure( parent );
         eventPublisherNode = searchQueryVBox;
-        log.debug( "Search Stage set." );
+        // log.debug( "Search Stage set." );
     }
 
     @FXML
@@ -173,7 +171,7 @@ public class SearchQueryController extends DexIncludedControllerBase<OtmLibraryM
      */
     @Override
     public void handleTaskComplete(WorkerStateEvent event) {
-        log.debug( "Search returned." );
+        // log.debug( "Search returned." );
         if (event != null && event.getTarget() instanceof SearchRepositoryTask) {
             List<RepositorySearchResult> repoResults = ((SearchRepositoryTask) event.getTarget()).getResults();
             SearchResultsDAO results = new SearchResultsDAO( currentRepository, repoResults );

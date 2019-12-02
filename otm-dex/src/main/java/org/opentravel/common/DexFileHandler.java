@@ -168,7 +168,7 @@ public class DexFileHandler extends AbstractMainWindowController {
             log.debug( "Can't read file: " + selectedFile.getAbsolutePath() );
             return null;
         }
-        log.debug( "Open selected file: " + selectedFile.getName() );
+        // log.debug( "Open selected file: " + selectedFile.getName() );
         findings = null;
 
         // Assure OTM library file
@@ -276,7 +276,7 @@ public class DexFileHandler extends AbstractMainWindowController {
                 final URL libraryUrl = tlLib.getLibraryUrl();
 
                 try {
-                    log.debug( "Saving library: " + libraryName + " " + libraryUrl );
+                    // log.debug( "Saving library: " + libraryName + " " + libraryUrl );
                     findings.addAll( lms.saveLibrary( tlLib ) );
                     successfulSaves.append( "\n" ).append( libraryName ).append( " (" ).append( libraryUrl )
                         .append( ")" );

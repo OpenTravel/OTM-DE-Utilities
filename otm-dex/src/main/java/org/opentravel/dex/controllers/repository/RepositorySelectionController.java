@@ -53,8 +53,6 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
     private Label repositoryUser;
     @FXML
     private Button addRepository;
-    // @FXML
-    // private RepositoryLoginDialogContoller loginDialogController;
 
     private RepositoryManager repositoryManager;
 
@@ -66,7 +64,7 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
 
     public RepositorySelectionController() {
         super( null, publishedEvents );
-        log.debug( "Starting constructor." );
+        // log.debug( "Starting constructor." );
     }
 
     private void addRepository() {
@@ -92,10 +90,12 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
      * Remove all items from the tables
      */
     @Override
-    public void clear() {}
+    public void clear() {
+        // No-op
+    }
 
     private void configureRepositoryChoice() {
-        log.debug( "Configuring repository choice box." );
+        // log.debug( "Configuring repository choice box." );
 
         ObservableList<String> repositoryIds = FXCollections.observableArrayList();
         repositoryIds.add( LOCAL_REPO );
@@ -106,7 +106,7 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
         // Configure listener for choice box
         repositoryChoice.valueProperty()
             .addListener( (observable, oldValue, newValue) -> repositorySelectionChanged() );
-        log.debug( "Repository choice has " + repositoryIds.size() + " items." );
+        // log.debug( "Repository choice has " + repositoryIds.size() + " items." );
     }
 
 
@@ -131,7 +131,7 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
     @Override
     @FXML
     public void initialize() {
-        log.debug( "Repository Selection Controller initialized." );
+        // log.debug( "Repository Selection Controller initialized." );
     }
 
     @Override
@@ -160,7 +160,7 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
      * @throws RepositoryException
      */
     private void repositorySelectionChanged() {
-        log.debug( "Selected new repository" );
+        // log.debug( "Selected new repository" );
         try {
             postUser( getSelectedRepository() );
             repositoryChoice.fireEvent( new DexRepositorySelectionEvent( getSelectedRepository() ) );
@@ -183,7 +183,7 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
         // loginDialogController = RepositoryLoginDialogContoller.init( repositoryManager );
         addRepository.setOnAction( e -> addRepository() );
 
-        log.debug( "Repository Selection configured." );
+        // log.debug( "Repository Selection configured." );
     }
 
 }

@@ -153,7 +153,7 @@ public class OtmAttribute<T extends TLAttribute> extends OtmPropertyBase<TLAttri
             setAssignedTLType( (TLAttributeType) type.getTL() );
             type.getOwningMember().changeWhereUsed( null, getOwningMember() );
         }
-        log.debug( "Set assigned type " + getAssignedType() + " to " + this );
+        // log.debug( "Set assigned type " + getAssignedType() + " to " + this );
         return getAssignedType();
     }
 

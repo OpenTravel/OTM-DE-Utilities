@@ -102,7 +102,7 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         if (tlParameter != null && !getTL().getParameters().contains( tlParameter )) {
             getTL().addParameter( tlParameter );
             parameter = new OtmParameter( tlParameter, this );
-            log.debug( "Added parameter to " + this );
+            // log.debug( "Added parameter to " + this );
             getOwningMember().refresh( true );
         }
         return parameter;
@@ -287,12 +287,12 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
 
     public void setIdGroup(boolean value) {
         getTL().setIdGroup( value );
-        log.debug( "Set id group to " + isIdGroup() );
+        // log.debug( "Set id group to " + isIdGroup() );
     }
 
     public String setName(String value) {
         getTL().setName( value );
-        log.debug( "Set name to " + getTL().getName() );
+        // log.debug( "Set name to " + getTL().getName() );
         return getTL().getName();
     }
 
@@ -309,7 +309,7 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
             getTL().setFacetRef( (TLFacet) facet.getTL() );
         else
             getTL().setFacetRef( null );
-        log.debug( "Set reference facet to " + getReferenceFacet() );
+        // log.debug( "Set reference facet to " + getReferenceFacet() );
         return getReferenceFacet();
     }
 

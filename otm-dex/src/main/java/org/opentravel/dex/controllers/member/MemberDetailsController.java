@@ -120,7 +120,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
 
     public MemberDetailsController() {
         super( subscribedEvents, publishedEvents );
-        log.debug( "Member Details Controller constructor." );
+        // log.debug( "Member Details Controller constructor." );
     }
 
     @Override
@@ -145,7 +145,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
 
     @Override
     public void initialize() {
-        log.debug( "Member Filter Controller - Initialize" );
+        // log.debug( "Member Filter Controller - Initialize" );
         checkNodes();
     }
 
@@ -161,7 +161,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        log.debug( "Received event: " + event.getClass().getSimpleName() );
+        // log.debug( "Received event: " + event.getClass().getSimpleName() );
         if (event instanceof DexMemberSelectionEvent)
             memberSelectionHandler( (DexMemberSelectionEvent) event );
         if (event instanceof DexModelChangeEvent)
@@ -348,7 +348,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
 
     // Called when button is pressed
     private void setAssignedType() {
-        log.debug( "Set assigned type event." );
+        // log.debug( "Set assigned type event." );
         if (selectedMember instanceof OtmTypeUser)
             selectedMember.getActionManager().run( DexActions.TYPECHANGE, selectedMember );
         refresh();

@@ -46,11 +46,6 @@ public class RepositoryItemWebViewController extends DexIncludedControllerBase<R
     @FXML
     public TextField webURL;
 
-    // <RepoItemCommitDAO> commitHistoriesTable;
-    // private TableView<RepoItemCommitDAO> historyTable;
-
-    // private ObservableList<RepoItemCommitDAO> commitList = FXCollections.observableArrayList();
-
     public RepositoryItemWebViewController() {
         super( subscribedEvents );
     }
@@ -86,7 +81,7 @@ public class RepositoryItemWebViewController extends DexIncludedControllerBase<R
 
     @Override
     public void initialize() {
-        log.debug( "Initializing repository library table view." );
+        // log.debug( "Initializing repository library table view." );
     }
 
     @Override

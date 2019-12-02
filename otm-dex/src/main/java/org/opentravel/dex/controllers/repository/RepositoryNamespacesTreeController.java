@@ -97,7 +97,7 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
 
     @Override
     public void initialize() {
-        log.debug( "Initializing repository namespace tree controller." );
+        // log.debug( "Initializing repository namespace tree controller." );
 
         if (repositoryNamespacesTree == null)
             throw new IllegalArgumentException( "Repository namespaces tree view is null." );
@@ -117,7 +117,7 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
     private void namespaceSelectionListener(TreeItem<NamespacesDAO> item) {
         if (item == null)
             return;
-        log.debug( "Namespace selected: " + item.getValue() );
+        // log.debug( "Namespace selected: " + item.getValue() );
         tree.fireEvent( new DexRepositoryNamespaceSelectionEvent( this, item.getValue() ) );
     }
 
@@ -205,45 +205,39 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
 
     @Override
     public void handleTaskComplete(WorkerStateEvent event) {
-        if (event.getTarget() instanceof ListSubnamespacesTask) {
-            log.debug( "Handling sub-namespace task results" );
-            String fullPath;
-            // String childNS;
-            String parentNS;
-            if (event == null || !(event.getTarget() instanceof ListSubnamespacesTask)) {
-                log.error( "Invalid event returned." );
-                return;
-            }
-            ListSubnamespacesTask task = (ListSubnamespacesTask) event.getTarget();
-            if (task == null) {
-                log.error( "Missing task." );
-                return;
-            }
-            if (task.getErrorException() != null) {
-                mainController.postError( task.getErrorException(), "Error listing namespaces." );
-                return;
-            }
-            Map<String,NamespacesDAO> map = ((ListSubnamespacesTask) event.getTarget()).getMap();
-            for (Entry<String,NamespacesDAO> nsEntry : map.entrySet()) {
-                // un-marshal the entry
-                fullPath = nsEntry.getValue().getFullPath();
-                parentNS = nsEntry.getValue().getBasePath();
-                if (parentNS == null || namespaceMap.get( parentNS ) == null) {
-                    // log.debug("Skipping.");
-                    continue;
-                }
-
-                TreeItem<NamespacesDAO> item = new TreeItem<>( nsEntry.getValue() );
-                item.setExpanded( false );
-                namespaceMap.put( fullPath, item );
-
-                // null parent is a root already in the tree
-                TreeItem<NamespacesDAO> parent = namespaceMap.get( parentNS );
-                if ((parent != null) && (currentFilter == null || currentFilter.containsKey( fullPath )))
-                    parent.getChildren().add( item );
-                // log.debug("Added " + childNS + " to " + parentNS);
+        if (event == null || !(event.getTarget() instanceof ListSubnamespacesTask))
+            return;
+        ListSubnamespacesTask task = (ListSubnamespacesTask) event.getTarget();
+        if (task == null) {
+            log.error( "Missing task." );
+            return;
+        }
+        if (task.getErrorException() != null) {
+            mainController.postError( task.getErrorException(), "Error listing namespaces." );
+            return;
+        }
+        // log.debug( "Handling sub-namespace task results" );
+        String fullPath;
+        String parentNS;
+        Map<String,NamespacesDAO> map = ((ListSubnamespacesTask) event.getTarget()).getMap();
+        for (Entry<String,NamespacesDAO> nsEntry : map.entrySet()) {
+            // un-marshal the entry
+            fullPath = nsEntry.getValue().getFullPath();
+            parentNS = nsEntry.getValue().getBasePath();
+            if (parentNS == null || namespaceMap.get( parentNS ) == null) {
+                // log.debug("Skipping.");
+                continue;
             }
 
+            TreeItem<NamespacesDAO> item = new TreeItem<>( nsEntry.getValue() );
+            item.setExpanded( false );
+            namespaceMap.put( fullPath, item );
+
+            // null parent is a root already in the tree
+            TreeItem<NamespacesDAO> parent = namespaceMap.get( parentNS );
+            if ((parent != null) && (currentFilter == null || currentFilter.containsKey( fullPath )))
+                parent.getChildren().add( item );
+            // log.debug("Added " + childNS + " to " + parentNS);
         }
     }
 
@@ -298,12 +292,12 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
         return filterController == null || filterController.isSelected( item.getValue().getFullPath() );
     }
 
-    /**
-     * Provide this controller a filter.
-     * 
-     * @param repositorySearchController
-     */
-    public void setFilter(RepositorySearchController repositorySearchController) {
-        filterController = repositorySearchController;
-    }
+    // /**
+    // * Provide this controller a filter.
+    // *
+    // * @param repositorySearchController
+    // */
+    // public void setFilter(RepositorySearchController repositorySearchController) {
+    // filterController = repositorySearchController;
+    // }
 }

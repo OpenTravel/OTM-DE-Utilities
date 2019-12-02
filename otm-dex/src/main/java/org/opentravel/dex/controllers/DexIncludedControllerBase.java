@@ -31,7 +31,6 @@ import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TreeTableColumn;
 
 /**
@@ -56,7 +55,7 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
     protected Node eventPublisherNode = null;
 
     public DexIncludedControllerBase() {
-        log.debug( "Constructing included controller." );
+        // log.debug( "Constructing included controller." );
     }
 
     @Override
@@ -73,7 +72,7 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
     }
 
     public DexIncludedControllerBase(EventType<? extends AbstractOtmEvent>[] subscribed) {
-        log.debug( "Constructing included controller with subscribed event types." );
+        // log.debug( "Constructing included controller with subscribed event types." );
         if (subscribed != null && subscribed.length > 0)
             subscribedEventTypes = Collections.unmodifiableList( Arrays.asList( subscribed ) );
     }
@@ -87,7 +86,7 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
     public DexIncludedControllerBase(EventType<? extends AbstractOtmEvent>[] subscribed,
         EventType<? extends AbstractOtmEvent>[] published) {
         this( subscribed );
-        log.debug( "Constructing included controller with subscribed and published event types." );
+        // log.debug( "Constructing included controller with subscribed and published event types." );
         if (published != null && published.length > 0)
             publishedEventTypes = Collections.unmodifiableList( Arrays.asList( published ) );
     }
@@ -113,7 +112,7 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
             return; // Error
         if (eventPublisherNode != null && publishedEventTypes.contains( type )) {
             eventPublisherNode.addEventHandler( type, handler );
-            log.debug( "Event handler set: " + type.getName() + " " + handler.getClass().getName() );
+            // log.debug( "Event handler set: " + type.getName() + " " + handler.getClass().getName() );
         } else
             log.warn( "Publisher node not set or unhandled event type attempted to have handler set." );
     }
@@ -130,7 +129,7 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
     public void configure(DexMainController parent) {
         checkNodes();
         this.mainController = parent;
-        log.debug( "Main controller set." );
+        // log.debug( "Main controller set." );
     }
 
     // Only use to fire events from Undo actions
@@ -161,7 +160,7 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
     @FXML
     @Override
     public void initialize() {
-        log.debug( "Initializing controller." );
+        // log.debug( "Initializing controller." );
     }
 
     @Override
@@ -216,16 +215,16 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
     }
 
 
-    /**
-     * TODO
-     */
-    protected void setWidths(TableView table) {
-        // Give all left over space to the last column
-        // double width = fileCol.widthProperty().get();
-        // width += versionCol.widthProperty().get();
-        // width += statusCol.widthProperty().get();
-        // width += lockedCol.widthProperty().get();
-        // remarkCol.prefWidthProperty().bind(table.widthProperty().subtract(width));
-    }
+    // /**
+    // * TODO
+    // */
+    // protected void setWidths(TableView table) {
+    // // Give all left over space to the last column
+    // // double width = fileCol.widthProperty().get();
+    // // width += versionCol.widthProperty().get();
+    // // width += statusCol.widthProperty().get();
+    // // width += lockedCol.widthProperty().get();
+    // // remarkCol.prefWidthProperty().bind(table.widthProperty().subtract(width));
+    // }
 
 }

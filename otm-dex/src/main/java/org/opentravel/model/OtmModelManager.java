@@ -94,9 +94,15 @@ public class OtmModelManager implements TaskResultHandlerI {
 
     private DexStatusController statusController;
     private ProjectManager projectManager;
-    private RepositoryManager repositoryManager;
-
+    // private RepositoryManager repositoryManager;
     private TLModel tlModel = null;
+
+    public static final String OTA_LIBRARY_NAMESPACE = "http://www.opentravel.org/OTM/Common/v0";
+    public static final String OTA_EMPTY_NAME = "Empty";
+
+    private DialogBoxContoller dialogBox = null;
+    private boolean showingError = false;
+
 
 
     /**
@@ -121,7 +127,7 @@ public class OtmModelManager implements TaskResultHandlerI {
             projectManager = new ProjectManager( tlModel, true, repositoryManager );
         else
             projectManager = new ProjectManager( tlModel );
-        this.repositoryManager = repositoryManager;
+        // this.repositoryManager = repositoryManager;
 
         // Main controller will pass one if enabled by settings
         if (fullActionManager == null) {
@@ -135,7 +141,7 @@ public class OtmModelManager implements TaskResultHandlerI {
         readOnlyActionManager.setMainController( this.fullActionManager.getMainController() );
         minorActionManager.setMainController( this.fullActionManager.getMainController() );
 
-        log.debug( "Model Manager constructor complete." );
+        // log.debug( "Model Manager constructor complete." );
     }
 
 
@@ -218,12 +224,12 @@ public class OtmModelManager implements TaskResultHandlerI {
             if (versionChainFactory != null) {
                 baseNSManaged.put( otmLibrary.getNameWithBasenamespace(),
                     versionChainFactory.getVersionChain( (TLLibrary) absLibrary ) );
-                log.debug( "Added " + otmLibrary.getNameWithBasenamespace() + otmLibrary.getVersion()
-                    + " to base NS managed." );
+                // log.debug( "Added " + otmLibrary.getNameWithBasenamespace() + otmLibrary.getVersion()
+                // + " to base NS managed." );
             } else {
                 baseNSUnmanaged.put( otmLibrary.getNameWithBasenamespace(), otmLibrary );
-                log.debug( "Added " + otmLibrary.getNameWithBasenamespace() + otmLibrary.getVersion()
-                    + " to base NS UN-managed." );
+                // log.debug( "Added " + otmLibrary.getNameWithBasenamespace() + otmLibrary.getVersion()
+                // + " to base NS UN-managed." );
             }
 
         // For each named member use the factory to create and add OtmObject
@@ -253,10 +259,10 @@ public class OtmModelManager implements TaskResultHandlerI {
             if (versionChainFactory != null) {
                 baseNSManaged.put( otmLibrary.getNameWithBasenamespace(),
                     versionChainFactory.getVersionChain( (TLLibrary) absLibrary ) );
-                log.debug( "Added chain for manged base namespace: " + otmLibrary.getNameWithBasenamespace() );
+                // log.debug( "Added chain for manged base namespace: " + otmLibrary.getNameWithBasenamespace() );
             } else {
                 baseNSUnmanaged.put( otmLibrary.getNameWithBasenamespace(), otmLibrary );
-                log.debug( "Added unmanged base namespace: " + otmLibrary.getNameWithBasenamespace() );
+                // log.debug( "Added unmanged base namespace: " + otmLibrary.getNameWithBasenamespace() );
             }
 
         // For each named member use the factory to create and add OtmObject
@@ -300,7 +306,7 @@ public class OtmModelManager implements TaskResultHandlerI {
                 showingError = true;
                 Platform.runLater( this::chainError );
             }
-            log.debug( "Exception trying to construct version chain factory: " + e.getLocalizedMessage() );
+            // log.debug( "Exception trying to construct version chain factory: " + e.getLocalizedMessage() );
         }
         return versionChainFactory;
     }
@@ -333,7 +339,7 @@ public class OtmModelManager implements TaskResultHandlerI {
      * modeled. Start validation and type resolution task.
      */
     public void addProjects() {
-        log.debug( "AddProjects() with " + getTlModel().getAllLibraries().size() + " libraries" );
+        // log.debug( "AddProjects() with " + getTlModel().getAllLibraries().size() + " libraries" );
 
         // Add projects to project map
         for (Project project : projectManager.getAllProjects())
@@ -349,7 +355,7 @@ public class OtmModelManager implements TaskResultHandlerI {
         }
 
         startValidatingAndResolvingTasks();
-        log.debug( "Model has " + members.size() + " members." );
+        // log.debug( "Model has " + members.size() + " members." );
     }
 
     public OtmProject getProject(String projectName) {
@@ -399,7 +405,7 @@ public class OtmModelManager implements TaskResultHandlerI {
         AbstractLibrary absLibrary = pi.getContent();
         if (absLibrary == null)
             return;
-        log.debug( "Adding project item: " + absLibrary.getName() + " in " + absLibrary.getNamespace() );
+        // log.debug( "Adding project item: " + absLibrary.getName() + " in " + absLibrary.getNamespace() );
         if (contains( absLibrary )) {
             // let the library track project as needed to know if the library is editable
             libraries.get( absLibrary ).add( pi );
@@ -474,14 +480,14 @@ public class OtmModelManager implements TaskResultHandlerI {
      * @return OtmLibrary associated with the abstract library
      */
     public OtmLibrary get(AbstractLibrary absLibrary) {
-        if (!libraries.containsKey( absLibrary )) {
-            // abstract library may be in the library pi list
-            if (absLibrary != null)
-                log.debug( "Missing library associated with: " + absLibrary.getName() );
-            else
-                log.debug( "Can not get library because TL library is null." );
-            // printLibraries();
-        }
+        // if (!libraries.containsKey( absLibrary )) {
+        // // abstract library may be in the library pi list
+        // if (absLibrary != null)
+        // log.debug( "Missing library associated with: " + absLibrary.getName() );
+        // else
+        // log.debug( "Can not get library because TL library is null." );
+        // // printLibraries();
+        // }
         return libraries.get( absLibrary );
     }
 
@@ -557,8 +563,8 @@ public class OtmModelManager implements TaskResultHandlerI {
             for (TLLibrary tlLib : chain.getVersions())
                 if (libraries.get( tlLib ) != null)
                     libs.add( libraries.get( tlLib ) );
-                else
-                    log.debug( "OOPS - library in chain is null." );
+            // else
+            // log.debug( "OOPS - library in chain is null." );
         } else {
             libs.add( baseNSUnmanaged.get( baseNamespace ) );
         }
@@ -708,13 +714,13 @@ public class OtmModelManager implements TaskResultHandlerI {
     @Override
     public void handleTaskComplete(WorkerStateEvent event) {
         // NO-OP
-        if (event != null && event.getTarget() != null) {
-            if (event.getTarget() instanceof TypeResolverTask)
-                log.debug( "Type Resolver Task complete" );
-            else if (event.getTarget() instanceof ValidateModelManagerItemsTask)
-                log.debug( "Validation Task complete" );
-        } else
-            log.debug( "Task complete" );
+        // if (event != null && event.getTarget() != null) {
+        // if (event.getTarget() instanceof TypeResolverTask)
+        // log.debug( "Type Resolver Task complete" );
+        // else if (event.getTarget() instanceof ValidateModelManagerItemsTask)
+        // log.debug( "Validation Task complete" );
+        // } else
+        // log.debug( "Task complete" );
     }
 
     /**
@@ -765,7 +771,7 @@ public class OtmModelManager implements TaskResultHandlerI {
         if (projectManager == null)
             throw new IllegalArgumentException( "Missing required project manager." );
 
-        log.debug( "Creating new project in file: " + projectFile.getAbsolutePath() );
+        // log.debug( "Creating new project in file: " + projectFile.getAbsolutePath() );
 
         Project p = new Project( projectManager );
         try {
@@ -878,17 +884,11 @@ public class OtmModelManager implements TaskResultHandlerI {
                 tlId = lib.getTL().getNamedMember( XSD_ID_NAME );
         }
         OtmObject id = OtmModelElement.get( (TLModelElement) tlId );
-        if (id == null)
-            log.debug( "Missing ID type to return." );
+        // if (id == null)
+        // log.debug( "Missing ID type to return." );
         return id instanceof OtmXsdSimple ? (OtmXsdSimple) id : null;
     }
 
-
-    public static final String OTA_LIBRARY_NAMESPACE = "http://www.opentravel.org/OTM/Common/v0";
-    public static final String OTA_EMPTY_NAME = "Empty";
-
-    private DialogBoxContoller dialogBox = null;
-    private boolean showingError = false;
 
     /**
      * @return
@@ -898,7 +898,7 @@ public class OtmModelManager implements TaskResultHandlerI {
         for (OtmLibrary lib : getLibraries()) {
             if (lib.getTL() instanceof BuiltInLibrary && lib.getTL().getNamespace().equals( OTA_LIBRARY_NAMESPACE ))
                 tlId = lib.getTL().getNamedMember( OTA_EMPTY_NAME );
-            log.debug( "Library " + lib + " namespace = " + lib.getTL().getNamespace() );
+            // log.debug( "Library " + lib + " namespace = " + lib.getTL().getNamespace() );
         }
         OtmObject id = OtmModelElement.get( (TLModelElement) tlId );
         return id instanceof OtmXsdSimple ? (OtmXsdSimple) id : null;

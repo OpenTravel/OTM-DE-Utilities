@@ -234,7 +234,7 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
             getTL().setPayloadType( actionFacet.getTL() );
         else
             getTL().setPayloadType( null );
-        log.debug( "Set action facet to " + getPayloadActionFacet() );
+        // log.debug( "Set action facet to " + getPayloadActionFacet() );
         return getPayloadActionFacet();
     }
 

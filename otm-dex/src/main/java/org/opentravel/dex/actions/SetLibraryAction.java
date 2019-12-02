@@ -63,7 +63,7 @@ public class SetLibraryAction extends DexRunAction {
         if (candidates.size() == 1)
             return doIt( candidates.get( 0 ) );
 
-        log.debug( "TEST - select library to set." );
+        // log.debug( "TEST - select library to set." );
         SelectLibraryDialogController controller = SelectLibraryDialogController.init();
         controller.setModelManager( otm.getModelManager() );
         if (controller.showAndWait( "New Library Member" ) == Results.OK)
@@ -113,7 +113,7 @@ public class SetLibraryAction extends DexRunAction {
             // Debugging
             // assert member.getLibrary() == lib;
             // assert member.getTlLM().getOwningLibrary() == lib.getTL();
-            log.debug( "Set library to " + get() );
+            // log.debug( "Set library to " + get() );
         }
         return get();
     }
@@ -152,7 +152,7 @@ public class SetLibraryAction extends DexRunAction {
     @Override
     public OtmLibrary undoIt() {
         doIt( oldLibrary );
-        log.debug( "Undo set library." );
+        // log.debug( "Undo set library." );
         return get();
     }
 }

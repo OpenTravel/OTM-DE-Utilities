@@ -66,7 +66,7 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
     @FXML
     TreeTableView<ErrorsAndWarningsDAO> resourceErrors;
     @FXML
-    private TitledPane resourceErrorsPane;
+    private TitledPane errorsTitledPane;
     @FXML
     private ImageView objectImageView;
 
@@ -125,6 +125,8 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
 
     @Override
     public void checkNodes() {
+        if (errorsTitledPane == null)
+            throw new IllegalStateException( "Resource errors titled pane is null." );
         if (resourceErrors == null)
             throw new IllegalStateException( "Resource errors tree table is null." );
     }
@@ -146,7 +148,6 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
     public void configure(DexMainController parent) {
         super.configure( parent );
         // log.debug("Configuring Member Tree Table.");
-        eventPublisherNode = resourceErrorsPane;
         configure( parent.getModelManager(), treeEditingEnabled );
     }
 
@@ -161,6 +162,7 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
             throw new IllegalArgumentException(
                 "Model manager is null. Must configure member tree with model manager." );
 
+        eventPublisherNode = errorsTitledPane;
         this.treeEditingEnabled = editable;
 
         // Set the hidden root item

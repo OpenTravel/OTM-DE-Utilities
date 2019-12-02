@@ -56,7 +56,7 @@ public class TestLibrary {
         OtmModelManager mgr = new OtmModelManager( fullMgr, null );
 
         OtmLibrary lib1 = TestLibrary.buildOtm( mgr, "Namespace1", "p1", "Library1" );
-        log.debug( "Lib 1 name is: " + lib1.getFullName() );
+        // log.debug( "Lib 1 name is: " + lib1.getFullName() );
 
         // Create business object
         OtmBusinessObject member = TestBusiness.buildOtm( mgr, "TestBusinessObject" );
@@ -122,7 +122,7 @@ public class TestLibrary {
             assertFalse( mgr.getMembers().contains( member ) );
             assertFalse( lib.getTL().getNamedMembers().contains( member.getTL() ) );
 
-            log.debug( "Added and removed: " + member );
+            // log.debug( "Added and removed: " + member );
         }
     }
 
@@ -145,7 +145,7 @@ public class TestLibrary {
             assertTrue( major < 2 );
             int minor = lib.getMinorVersion();
             // Can't test isMinor() because of library state
-            log.debug( "Testing: " + ns + " = " + major + " " + minor );
+            // log.debug( "Testing: " + ns + " = " + major + " " + minor );
         }
     }
 

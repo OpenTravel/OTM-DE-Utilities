@@ -59,7 +59,7 @@ public class TestLibraryMemberBase {
     @BeforeClass
     public static void beforeClass() {
         staticModelManager = new OtmModelManager( null, null );
-        log.debug( "Model manager created." );
+        // log.debug( "Model manager created." );
     }
 
 
@@ -85,7 +85,7 @@ public class TestLibraryMemberBase {
             assertFalse( mgr.contains( member.getTlLM() ) );
             assertFalse( mgr.getMembers().contains( member ) );
 
-            log.debug( "Added and removed: " + member );
+            // log.debug( "Added and removed: " + member );
         }
     }
 
@@ -107,7 +107,7 @@ public class TestLibraryMemberBase {
 
             String label = OtmLibraryMemberType.getLabel( member );
             assertTrue( !label.isEmpty() );
-            log.debug( "Label for " + member.getClass().getSimpleName() + " is " + label );
+            // log.debug( "Label for " + member.getClass().getSimpleName() + " is " + label );
         }
     }
 
@@ -193,7 +193,7 @@ public class TestLibraryMemberBase {
                 ((TLExtensionOwner) subject.getTL()).getExtension().getExtendsEntity() == base.getTL() );
             assertTrue( "Then - must have returned base type.", result == base );
             assertTrue( "Then - all extension owners must be extended", subject.getBaseType() == base );
-            log.debug( "Created base type for " + subject.getClass().getSimpleName() );
+            // log.debug( "Created base type for " + subject.getClass().getSimpleName() );
         }
         return base;
     }

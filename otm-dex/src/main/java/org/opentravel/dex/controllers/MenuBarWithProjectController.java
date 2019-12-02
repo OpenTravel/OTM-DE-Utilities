@@ -99,8 +99,6 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     public MenuItem doNewProjectItem;
     @FXML
     public MenuItem fileOpenItem;
-    // @FXML
-    // public MenuItem resourcesMenuItem;
     @FXML
     private Label actionCount;
     @FXML
@@ -116,14 +114,9 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     private Stage stage;
     private OtmModelManager modelMgr;
-
     private DialogBoxContoller dialogBox;
-    // private ResourcesWindowController rwc;
-
     private UserSettings userSettings;
-
     private Repository selectedRepository = null;
-
     private DexEventDispatcher eventDispatcher;
 
     // All event types listened to by this controller's handlers
@@ -202,9 +195,9 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     @FXML
     public void appExit(Event e) {
-        log.debug( "exit" );
+        // log.debug( "exit" );
         e.consume(); // take the event away from windows in case they answer no.
-        if (DialogBox.display( "Exit", "Do you really want to exit?" ))
+        if (DialogBox.display( "Exit", "Please confirm you want to exit." ))
             stage.close();
     }
 
@@ -212,7 +205,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     public void checkNodes() {
         if (menuToolBar == null || projectCombo == null || projectLabel == null)
             throw new IllegalStateException( "Menu bar is missing FXML injected fields." );
-        log.debug( "FXML Nodes checked OK." );
+        // log.debug( "FXML Nodes checked OK." );
     }
 
     @Override
@@ -235,21 +228,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         setUndoAction( e -> undoAction() );
 
         updateNavigationButtons();
-        // rwc = ResourcesWindowController.init();
-        // rwc.setup( "" );
-        // rwc.configure( mainController );
-
-        // // Set up Compile Menu
-        // configureCompileMenu();
-        // doCompileMenu.setOnAction( this::doCompile );
     }
-
-    // private void configureCompileMenu() {
-    // // FIXME - don't show built-in project
-    // doCompileMenu.getItems().clear();
-    // doCompileMenu.setDisable( modelMgr.getProjects().isEmpty() );
-    // modelMgr.getProjects().forEach( p -> doCompileMenu.getItems().add( new MenuItem( p.getName() ) ) );
-    // }
 
     private DialogBoxContoller getDialogBox(UserSettings settings) {
         dialogBox = DialogBoxContoller.init();
@@ -272,11 +251,9 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         projectCombo.setOnAction( listener );
     }
 
-    /** *********************************************************** **/
-
     @FXML
     public void undoAction(ActionEvent e) {
-        log.debug( "Close menu item selected." );
+        // log.debug( "Close menu item selected." );
         dialogBox.show( "Undo", "Not Implemented" );
     }
 
@@ -305,18 +282,12 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         CompileDialogController cdc = CompileDialogController.init();
         cdc.configure( modelMgr, userSettings );
         cdc.show( "" );
-        // String projectName = null;
-        // if (e.getTarget() instanceof MenuItem)
-        // projectName = ((MenuItem) e.getTarget()).getText();
-        // OtmProject project = modelMgr.getProject( projectName );
-        // if (project != null)
-        // new CompileProjectTask( project, this::handleTaskComplete, mainController.getStatusController() ).go();
     }
 
     @FXML
     public void doClose(ActionEvent e) {
         // This is only run if the handler is not set.
-        log.debug( "Close menu item selected." );
+        // log.debug( "Close menu item selected." );
         getDialogBox( null ).show( "Close", "Not Implemented" );
     }
 
@@ -346,7 +317,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     @FXML
     public void fileOpen(ActionEvent e) {
         // This is only run if the handler is not set.
-        log.debug( "File Open selected." );
+        // log.debug( "File Open selected." );
         getDialogBox( null ).show( "Open", "Not implemented" );
     }
 
@@ -366,7 +337,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
      */
 
     public void handleOpenMenu(ActionEvent event) {
-        log.debug( "Handle file open action event." );
+        // log.debug( "Handle file open action event." );
         DexFileHandler fileHandler = new DexFileHandler();
         if (event.getTarget() instanceof MenuItem) {
             File selectedFile = fileHandler.fileChooser( stage, userSettings );
@@ -413,7 +384,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     public void addViewItem(DexTabController tc) {
         if (tc.getDialogTitle() != null) {
-            log.debug( "Add controller" );
+            // log.debug( "Add controller" );
             MenuItem item = new MenuItem( tc.getDialogTitle() );
             item.setOnAction( tc::launchWindow );
             viewsMenu.getItems().add( item );
@@ -423,20 +394,20 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
 
     public void projectComboSelectionListener(Event e) {
-        log.debug( "project selection event" );
+        // log.debug( "project selection event" );
         if (e.getTarget() instanceof ComboBox)
             openFile( projectMap.get( ((ComboBox<?>) e.getTarget()).getValue() ) );
     }
 
     public void handleSaveAllMenu(ActionEvent event) {
-        log.debug( "Handle save all action event." );
+        // log.debug( "Handle save all action event." );
         String results = DexFileHandler.saveLibraries( modelMgr.getEditableLibraries() );
         DialogBoxContoller dialog = getDialogBox( null );
         dialog.show( "Save Results", results );
     }
 
     public void handleCloseMenu(ActionEvent event) {
-        log.debug( "Handle close action event." );
+        // log.debug( "Handle close action event." );
 
         if (event.getTarget() instanceof MenuItem) {
             clear();
@@ -469,21 +440,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
                 dialogBox.close();
             fireEvent( new DexModelChangeEvent( modelMgr ) );
             mainController.refresh();
-
-            // configureCompileMenu();
         }
     }
-
-    // @FXML
-    // private MenuItem launchResourceWindow;
-    //
-    // @FXML
-    // private void launchResourceWindow() {
-    // // if (resourcesMenuItem.isSelected())
-    // rwc.show( "" );
-    // // else
-    // // rwc.hide();
-    // }
 
     @FXML
     private MenuItem launchWebRepoWindow;

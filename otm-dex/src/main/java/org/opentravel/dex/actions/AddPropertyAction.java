@@ -81,7 +81,7 @@ public class AddPropertyAction extends DexRunAction {
 
             isValid();
         }
-        log.debug( "Added new property " + get() );
+        // log.debug( "Added new property " + get() );
         return get();
     }
 
@@ -149,7 +149,7 @@ public class AddPropertyAction extends DexRunAction {
             newPropertyOwner = null;
             newProperty = null;
         }
-        log.debug( "Undo new property." );
+        // log.debug( "Undo new property." );
         return newProperty;
     }
 }

@@ -197,7 +197,7 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
                             assertTrue( ((OtmIndicator) k).getTL().getOwner() == facet.getTL() );
                         assertFalse( k.isInherited() );
                     }
-                    log.debug( "Changed " + oldType + " and undid change." );
+                    // log.debug( "Changed " + oldType + " and undid change." );
                 }
             }
         }
@@ -246,7 +246,7 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
         assertTrue( "Must have parent", otm.getParent() != null );
         assertTrue( "Must have owning member", otm.getOwningMember() != null );
         assertTrue( "Must have identity listner.", OtmModelElement.get( otm.getTL() ) == otm );
-        log.debug( "Property " + otm.getName() + " OK." );
+        // log.debug( "Property " + otm.getName() + " OK." );
     }
 
     /**
@@ -259,7 +259,7 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
             OtmProperty p = OtmPropertyType.build( type, owner );
             if (p != null) {
                 p.setName( owner.getName() + type.toString() );
-                log.debug( "Created property " + p + " of type " + type.toString() );
+                // log.debug( "Created property " + p + " of type " + type.toString() );
             }
         }
     }

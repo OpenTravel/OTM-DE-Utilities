@@ -167,7 +167,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
             if (tlAction.getRequest() == null)
                 tlAction.setRequest( new TLActionRequest() );
             action = new OtmAction( tlAction, this );
-            log.debug( "Added action to " + this );
+            // log.debug( "Added action to " + this );
             refresh( true );
         }
         return action;
@@ -184,14 +184,14 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         if (tlAction != null && !getTL().getActionFacets().contains( tlAction )) {
             getTL().addActionFacet( tlAction );
             action = new OtmActionFacet( tlAction, this );
-            log.debug( "Added action facet to " + this );
+            // log.debug( "Added action facet to " + this );
             refresh( true );
         }
         return action;
     }
 
     public OtmResourceChild add(TLModelElement tlChild) {
-        log.debug( "Add " + tlChild.getClass().getSimpleName() + " to " + this + " not supported yet." );
+        // log.debug( "Add " + tlChild.getClass().getSimpleName() + " to " + this + " not supported yet." );
         return null; // Not supported (yet).
     }
 
@@ -206,7 +206,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         if (tlGroup != null && !getTL().getParamGroups().contains( tlGroup )) {
             getTL().addParamGroup( tlGroup );
             group = new OtmParameterGroup( tlGroup, this );
-            log.debug( "Added parameter group to " + this );
+            // log.debug( "Added parameter group to " + this );
             refresh( true );
         }
         return group;
@@ -236,7 +236,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
                 tlParentRef.setParentResource( parent.getTL() );
             }
             refresh( true );
-            log.debug( "Added parent reference to " + this );
+            // log.debug( "Added parent reference to " + this );
         }
         return parentRef;
     }
@@ -267,7 +267,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     private void assignSubject() {
-        log.debug( "Button selected" );
+        // log.debug( "Button selected" );
         getActionManager().run( DexActions.ASSIGNSUBJECT, this );
     }
 
@@ -649,7 +649,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      * @param deep if true, refresh all sub resources too. Sub-resources have this resource in their paths
      */
     public void refresh(boolean deep) {
-        log.debug( "Deep refesh of " + this );
+        // log.debug( "Deep refesh of " + this );
         parentRefsEndpointMap = null; // build on next access
 
         if (deep)
@@ -753,7 +753,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         // With a change to the class, remodel inheritance
         getActions().forEach( a -> a.modelInheritedChildren() );
 
-        log.debug( "Set extension to " + getExtendedResource() );
+        // log.debug( "Set extension to " + getExtendedResource() );
         return getExtendedResource();
     }
 
@@ -773,7 +773,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     public void setFirstClass(boolean b) {
         getTL().setFirstClass( b );
         refresh( true );
-        log.debug( "First class set to " + isFirstClass() );
+        // log.debug( "First class set to " + isFirstClass() );
     }
 
     @Override

@@ -121,7 +121,7 @@ public class OtmLibrary {
             // if (pi.getContent() != tlLib)
             throw new IllegalArgumentException( "Can not add project item with wrong library." );
         projectItems.add( pi );
-        log.debug( "Added project item to " + this.getName() + ". Now has " + projectItems.size() + " items." );
+        // log.debug( "Added project item to " + this.getName() + ". Now has " + projectItems.size() + " items." );
     }
 
     /**

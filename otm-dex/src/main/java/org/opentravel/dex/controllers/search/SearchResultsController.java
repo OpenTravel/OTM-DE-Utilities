@@ -55,13 +55,13 @@ public class SearchResultsController extends DexIncludedControllerBase<SearchRes
     @Override
     @FXML
     public void initialize() {
-        log.debug( "Search Results Controller initialized." );
+        // log.debug( "Search Results Controller initialized." );
     }
 
     @Override
     public void post(SearchResultsDAO results) throws Exception {
         super.post( results ); // Clear tree and save results
-        log.debug( "Posting search results." );
+        // log.debug( "Posting search results." );
         results.createTreeItems( resultsTreeView.getRoot() );
     }
 
@@ -73,7 +73,7 @@ public class SearchResultsController extends DexIncludedControllerBase<SearchRes
         resultsTreeView.setRoot( new TreeItem<SearchResultItemDAO>() );
         resultsTreeView.setShowRoot( false );
 
-        log.debug( "Search results Stage set." );
+        // log.debug( "Search results Stage set." );
     }
 
 

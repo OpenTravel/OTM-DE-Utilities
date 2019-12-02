@@ -89,7 +89,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
 
     public ResourceDetailsController() {
         super( subscribedEvents, publishedEvents );
-        log.debug( "Member Details Controller constructor." );
+        // log.debug( "Member Details Controller constructor." );
     }
 
     @Override
@@ -104,7 +104,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
 
     @Override
     public void initialize() {
-        log.debug( "Member Filter Controller - Initialize" );
+        // log.debug( "Member Filter Controller - Initialize" );
         checkNodes();
 
     }
