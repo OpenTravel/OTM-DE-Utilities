@@ -13,11 +13,11 @@
          <children>
             <HBox spacing="12.0">
                <children>
-                  <Label layoutX="22.0" layoutY="10.0" stylesheets="@DavesViper.css" text="    " />
-                  <Label layoutX="22.0" layoutY="10.0" stylesheets="@DavesViper.css" text="Permission: " />
+                  <Label layoutX="22.0" layoutY="10.0" stylesheets="../@DavesViper.css" text="    " />
+                  <Label layoutX="22.0" layoutY="10.0" stylesheets="../@DavesViper.css" text="Permission: " />
                   <Label fx:id="permissionLabel" text="permission" />
-                  <Label layoutX="22.0" layoutY="10.0" stylesheets="@DavesViper.css" text="    " />
-                  <Label layoutX="22.0" layoutY="10.0" stylesheets="@DavesViper.css" text="Namespace: " />
+                  <Label layoutX="22.0" layoutY="10.0" stylesheets="../@DavesViper.css" text="    " />
+                  <Label layoutX="22.0" layoutY="10.0" stylesheets="../@DavesViper.css" text="Namespace: " />
                   <Label fx:id="namespaceLabel" text="namespace" />
                </children>
                <padding>

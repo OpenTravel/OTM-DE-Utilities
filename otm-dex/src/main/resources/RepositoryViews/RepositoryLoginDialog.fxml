@@ -20,7 +20,8 @@
    <top>
       <VBox styleClass="menu-bar" stylesheets="../@DavesViper.css" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="dialogTitleLabel2" style="-fx-alignment: center;" styleClass="bold-label" stylesheets="../@DavesViper.css" text="Repository Login" />
+            <Label fx:id="dialogTitleLabel2" style="-fx-alignment: center;" styleClass="bold-label" 
+            		stylesheets="../@DavesViper.css" text="Repository Login" />
          </children>
       </VBox>
    </top>
@@ -35,13 +36,15 @@
                   <Insets right="5.0" />
                </padding>
             </RadioButton>
-            <Button fx:id="dialogButtonOK" alignment="CENTER" contentDisplay="CENTER" layoutX="419.0" layoutY="10.0" mnemonicParsing="false" prefWidth="75.0" styleClass="button-blue" stylesheets="../@DavesViper.css" text="OK" textAlignment="CENTER">
+            <Button fx:id="dialogButtonOK" alignment="CENTER" contentDisplay="CENTER" layoutX="419.0" layoutY="10.0" mnemonicParsing="false" prefWidth="75.0" styleClass="button-blue" 
+            		stylesheets="../@DavesViper.css" text="OK" textAlignment="CENTER">
                <opaqueInsets>
                   <Insets bottom="10.0" />
                </opaqueInsets>
             </Button>
             <Separator orientation="VERTICAL" />
-            <Button fx:id="dialogButtonCancel" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-red" stylesheets="../@DavesViper.css" text="Cancel" textAlignment="CENTER">
+            <Button fx:id="dialogButtonCancel" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-red" 
+            		stylesheets="../@DavesViper.css" text="Cancel" textAlignment="CENTER">
                <opaqueInsets>
                   <Insets bottom="10.0" />
                </opaqueInsets>
@@ -92,7 +95,9 @@
                <children>
                   <VBox>
                      <children>
-                        <Button fx:id="dialogButtonTest" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-blue" stylesheets="../@DavesViper.css" text="Test" textAlignment="CENTER">
+                        <Button fx:id="dialogButtonTest" alignment="CENTER" contentDisplay="CENTER" 
+                        		mnemonicParsing="false" prefWidth="75.0" styleClass="button-blue" 
+                        		stylesheets="../@DavesViper.css" text="Test" textAlignment="CENTER">
                            <opaqueInsets>
                               <Insets bottom="10.0" />
                            </opaqueInsets>

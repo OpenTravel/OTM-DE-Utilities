@@ -11,7 +11,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="searchQueryVBox" spacing="5.0" stylesheets="../@DavesViper.css" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.search.SearchQueryController">
+<VBox fx:id="searchQueryVBox" spacing="5.0" stylesheets="../@DavesViper.css" 
+		xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" 
+		fx:controller="org.opentravel.dex.controllers.search.SearchQueryController">
    <children>
       <HBox spacing="5.0">
          <children>
@@ -34,8 +36,10 @@
                   <Insets top="5.0" />
                </HBox.margin>
             </TextField>
-          <Button fx:id="doSearch" onAction="#doSearch" prefWidth="100.0" mnemonicParsing="false" styleClass="button-blue" stylesheets="@DavesViper.css" text="Search" textAlignment="CENTER"/>
-          <Button fx:id="clearSearch" onAction="#clearSearch" prefWidth="100.0" mnemonicParsing="false" styleClass="button-blue" stylesheets="@DavesViper.css" text="Clear" textAlignment="CENTER">
+          <Button fx:id="doSearch" onAction="#doSearch" prefWidth="100.0" mnemonicParsing="false" 
+          		styleClass="button-blue" stylesheets="../@DavesViper.css" text="Search" textAlignment="CENTER"/>
+          <Button fx:id="clearSearch" onAction="#clearSearch" prefWidth="100.0" mnemonicParsing="false" 
+          		styleClass="button-blue" stylesheets="../@DavesViper.css" text="Clear" textAlignment="CENTER">
                <HBox.margin>
                   <Insets left="20.0" />
                </HBox.margin>

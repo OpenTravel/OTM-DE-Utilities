@@ -4,11 +4,13 @@
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="typeUsersVBox" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.member.usage.TypeUsersTreeController">
+<VBox fx:id="typeUsersVBox" xmlns="http://javafx.com/javafx/9.0.1" 
+		xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.member.usage.TypeUsersTreeController">
    <children>
-         <Label fx:id="columnLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="18.0" prefWidth="300.0" 
-                 stylesheets="../@DavesViper.css" 
-                 text="Properties that use types" textAlignment="CENTER" />
+         <Label fx:id="columnLabel" alignment="CENTER" contentDisplay="CENTER" 
+         		prefHeight="18.0" prefWidth="300.0" 
+                stylesheets="../@DavesViper.css" 
+                text="Properties that use types" textAlignment="CENTER" />
       <TreeView fx:id="typeUsersTree" prefWidth="300.0" VBox.vgrow="ALWAYS" />
    </children>
 </VBox>

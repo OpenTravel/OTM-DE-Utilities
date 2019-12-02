@@ -4,9 +4,11 @@
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="typeProvidersVBox" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.member.usage.TypeProvidersTreeController">
+<VBox fx:id="typeProvidersVBox" xmlns="http://javafx.com/javafx/9.0.1" 
+		xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.member.usage.TypeProvidersTreeController">
    <children>
-      <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="18.0" prefWidth="300.0" stylesheets="@DavesViper.css" text="Used Types" textAlignment="CENTER" />
+      <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="18.0" 
+      		prefWidth="300.0" stylesheets="@DavesViper.css" text="Used Types" textAlignment="CENTER" />
       <TreeView fx:id="typeProvidersTree" prefWidth="300.0" VBox.vgrow="ALWAYS" />
    </children>
 </VBox>
