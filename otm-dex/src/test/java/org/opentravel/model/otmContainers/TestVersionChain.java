@@ -74,44 +74,17 @@ public class TestVersionChain extends AbstractFxTest {
 
         // Given a project that uses the OpenTravel repository
         OtmModelManager mgr = TestOtmModelManager.buildModelManager( new DexFullActionManager( null ) );
-        TestDexFileHandler.loadVersionProject( mgr );
         assertNotNull( mgr.getActionManager( true ) );
 
-        String BASENS0 = "http://www.opentravel.org/Sandbox/Test/VersionTest_Unmanaged";
-        // String BASENS1 = "http://www.opentravel.org/Sandbox/Test/v1";
-        //
+        // Load project and get latest library
+        if (!TestDexFileHandler.loadVersionProject( mgr ))
+            return; // No editable libraries
         OtmLibrary latestLib = getMinorInChain( mgr );
-        // OtmLibrary latestLib = null;
-        // int highestMajor = 0;
-        // for (OtmLibrary lib : mgr.getLibraries()) {
-        // if (lib.isBuiltIn())
-        // continue;
-        // log.debug( "Library " + lib + " opened." );
-        // log.debug( "Is latest? " + lib.isLatestVersion() );
-        // log.debug( "Is minor? " + lib.isMinorVersion() );
-        // log.debug( "Version number " + lib.getMajorVersion() + " " + lib.getMinorVersion() );
-        // log.debug( "Is editable? " + lib.isEditable() );
-        // // DexActionManager am = lib.getActionManager();
-        // log.debug( "What action manager? " + lib.getActionManager().getClass().getSimpleName() );
-        //
-        // // List<OtmLibrary> chain = mgr.getVersionChain( lib );
-        // log.debug( "Version chain contains " + mgr.getVersionChain( lib ).size() + " libraries" );
-        // log.debug( "" );
-        //
-        // if (lib.getMajorVersion() > highestMajor)
-        // highestMajor = lib.getMajorVersion();
-        // if (lib.isLatestVersion())
-        // latestLib = lib;
-        // }
 
-        //
         // Test adding properties to object in latest major
-        //
         createMinorMembers( latestLib );
 
-        //
         // Test deleting the new members
-        //
         List<OtmLibraryMember> minors = mgr.getMembers( latestLib );
         for (OtmLibraryMember m : minors) {
             log.debug( "Deleting " + m );
@@ -121,8 +94,6 @@ public class TestVersionChain extends AbstractFxTest {
         // Assure other members still have their properties ownership set correctly.
         for (OtmLibraryMember m : mgr.getMembers())
             TestLibraryMemberBase.checkOwnership( m );
-
-
     }
 
     /**
@@ -227,19 +198,6 @@ public class TestVersionChain extends AbstractFxTest {
             assertTrue( "This must be chain editable: ", member.getLibrary().isChainEditable() );
 
             // Create a new minor version with a new type users or just a minor version if no type users.
-            vlm = null;
-            // minor version helper Will fail to create minor type user
-            // OtmTypeUser typeUser = null;
-            // OtmTypeUser newUser;
-            // for (OtmTypeUser user : member.getDescendantsTypeUsers()) {
-            // typeUser = user;
-            // break;
-            // }
-            // if (typeUser != null) {
-            // newUser = library.getVersionChain().getNewMinorTypeUser( typeUser );
-            // if (newUser != null)
-            // vlm = newUser.getOwningMember();
-            // } else
             vlm = member.createMinorVersion( latestLib );
             log.debug( "Created minor version of " + member + " = " + vlm );
 

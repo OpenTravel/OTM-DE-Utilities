@@ -200,7 +200,8 @@ public class TestInheritance extends AbstractFxTest {
 
     @Test
     public void testInheritanceInMinorVersion() throws VersionSchemeException {
-        TestDexFileHandler.loadVersionProject( mgr );
+        if (!TestDexFileHandler.loadVersionProject( mgr ))
+            return; // No editable libraries
 
         OtmLibrary minorLibrary = TestVersionChain.getMinorInChain( mgr );
         assertTrue( "Given", minorLibrary != null );

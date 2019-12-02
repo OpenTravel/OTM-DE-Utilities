@@ -27,23 +27,18 @@ import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.dex.action.manager.DexActionManager;
-import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
-import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
 import org.opentravel.model.otmLibraryMembers.TestContextualFacet;
 import org.opentravel.objecteditor.ObjectEditorApp;
-import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLModel;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.repository.ProjectManager;
-import org.opentravel.schemacompiler.version.Versioned;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
 
@@ -104,65 +99,66 @@ public class TestOtmModelManager extends AbstractFxTest {
     }
 
     /** ******************************************************************* **/
-    @Test
-    public void testAddingVersionedProject() throws Exception {
-
-        // Given a project that uses the OpenTravel repository
-        OtmModelManager mgr = new OtmModelManager( new DexFullActionManager( null ), repoManager );
-        TestDexFileHandler.loadVersionProject( mgr );
-        assertNotNull( mgr.getActionManager( true ) );
-
-        String BASENS0 = "http://www.opentravel.org/Sandbox/Test/VersionTest_Unmanaged";
-        // String BASENS1 = "http://www.opentravel.org/Sandbox/Test/v1";
-        //
-        OtmLibrary latestLib = null;
-        int highestMajor = 0;
-        for (OtmLibrary lib : mgr.getLibraries()) {
-            if (lib.isBuiltIn())
-                continue;
-            log.debug( "Library " + lib + " opened." );
-            log.debug( "Is latest? " + lib.isLatestVersion() );
-            log.debug( "Is minor? " + lib.isMinorVersion() );
-            log.debug( "Version number " + lib.getMajorVersion() + " " + lib.getMinorVersion() );
-            log.debug( "Is editable? " + lib.isEditable() );
-            // DexActionManager am = lib.getActionManager();
-            log.debug( "What action manager? " + lib.getActionManager().getClass().getSimpleName() );
-
-            // List<OtmLibrary> chain = mgr.getVersionChain( lib );
-            log.debug( "Version chain contains " + mgr.getVersionChain( lib ).size() + " libraries" );
-            log.debug( "" );
-
-            if (lib.getMajorVersion() > highestMajor)
-                highestMajor = lib.getMajorVersion();
-            if (lib.isLatestVersion())
-                latestLib = lib;
-        }
-
-        //
-        // Test adding properties to object in latest major
-        //
-        // Get the latest library and make sure we can add properties to the objects
-        assertTrue( "Given: Library in repository must be editable.", latestLib.isEditable() );
-        OtmLibraryMember vlm = null;
-        for (OtmLibraryMember member : mgr.getMembers( latestLib.getVersionChain().getMajor() )) {
-            assertTrue( "This must be chain editable: ", member.getLibrary().isChainEditable() );
-            vlm = member.createMinorVersion( latestLib );
-            log.debug( "Created minor version of " + member );
-            // Services are not versioned
-            if (vlm == null)
-                assertTrue( !(member.getTL() instanceof Versioned) );
-            else {
-                // Post Checks
-                assertTrue( vlm != null );
-                if (!(vlm instanceof OtmValueWithAttributes) && !(vlm instanceof OtmSimpleObject)) // FIXME
-                    assertTrue( vlm.getBaseType() == member );
-                assertTrue( vlm.getName().equals( member.getName() ) );
-                assertTrue( ((LibraryMember) vlm.getTL()).getOwningLibrary() == latestLib.getTL() );
-                assertTrue( vlm.getLibrary() == latestLib );
-            }
-
-        }
-    }
+    // // MOVED to TestProject
+    // @Test
+    // public void testAddingVersionedProject() throws Exception {
+    //
+    // // Given a project that uses the OpenTravel repository
+    // OtmModelManager mgr = new OtmModelManager( new DexFullActionManager( null ), repoManager );
+    // boolean editable = TestDexFileHandler.loadVersionProject( mgr );
+    // assertNotNull( mgr.getActionManager( true ) );
+    //
+    // String BASENS0 = "http://www.opentravel.org/Sandbox/Test/VersionTest_Unmanaged";
+    // // String BASENS1 = "http://www.opentravel.org/Sandbox/Test/v1";
+    // //
+    // OtmLibrary latestLib = null;
+    // int highestMajor = 0;
+    // for (OtmLibrary lib : mgr.getLibraries()) {
+    // if (lib.isBuiltIn())
+    // continue;
+    // log.debug( "Library " + lib + " opened." );
+    // log.debug( "Is latest? " + lib.isLatestVersion() );
+    // log.debug( "Is minor? " + lib.isMinorVersion() );
+    // log.debug( "Version number " + lib.getMajorVersion() + " " + lib.getMinorVersion() );
+    // log.debug( "Is editable? " + lib.isEditable() );
+    // // DexActionManager am = lib.getActionManager();
+    // log.debug( "What action manager? " + lib.getActionManager().getClass().getSimpleName() );
+    //
+    // // List<OtmLibrary> chain = mgr.getVersionChain( lib );
+    // log.debug( "Version chain contains " + mgr.getVersionChain( lib ).size() + " libraries" );
+    // log.debug( "" );
+    //
+    // if (lib.getMajorVersion() > highestMajor)
+    // highestMajor = lib.getMajorVersion();
+    // if (lib.isLatestVersion())
+    // latestLib = lib;
+    // }
+    //
+    // //
+    // // Test adding properties to object in latest major
+    // //
+    // // Get the latest library and make sure we can add properties to the objects
+    // assertTrue( "Given: Library in repository must be editable.", latestLib.isEditable() );
+    // OtmLibraryMember vlm = null;
+    // for (OtmLibraryMember member : mgr.getMembers( latestLib.getVersionChain().getMajor() )) {
+    // assertTrue( "This must be chain editable: ", member.getLibrary().isChainEditable() );
+    // vlm = member.createMinorVersion( latestLib );
+    // log.debug( "Created minor version of " + member );
+    // // Services are not versioned
+    // if (vlm == null)
+    // assertTrue( !(member.getTL() instanceof Versioned) );
+    // else {
+    // // Post Checks
+    // assertTrue( vlm != null );
+    // if (!(vlm instanceof OtmValueWithAttributes) && !(vlm instanceof OtmSimpleObject)) // FIXME
+    // assertTrue( vlm.getBaseType() == member );
+    // assertTrue( vlm.getName().equals( member.getName() ) );
+    // assertTrue( ((LibraryMember) vlm.getTL()).getOwningLibrary() == latestLib.getTL() );
+    // assertTrue( vlm.getLibrary() == latestLib );
+    // }
+    //
+    // }
+    // }
 
     @Test
     public void testAddingManagedProject() throws Exception {

@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.model.TLModel;
 import org.opentravel.utilities.testutil.AbstractFxTest;
@@ -33,6 +34,8 @@ import org.opentravel.utilities.testutil.TestFxMode;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Verifies the functions of the <code>Dex File Handler</code>.
@@ -184,29 +187,31 @@ public class TestDexFileHandler extends AbstractFxTest {
     }
 
     /**
-     * load project that uses the OpenTravel repository
+     * load project that uses the OpenTravel repository. Note: it uses credentials so may not contain editable
+     * libraries.
+     * 
+     * @return true if there is an editable library
      */
-    public static void loadVersionProject(OtmModelManager modelManager) {
+    public static boolean loadVersionProject(OtmModelManager modelManager) {
         File repoProject = new File( wipFolder.get(), "/" + FILE_TESTVERSIONS_REPO );
         assertNotNull( repoProject );
-        new DexFileHandler().openProjectOLD( repoProject, modelManager, null );
-        assertTrue( "Must have project items.", !modelManager.getProjectManager().getAllProjectItems().isEmpty() );
-        assertTrue( "Must have project items.", modelManager.getProjectManager().getAllProjectItems().size() > 1 );
-        log.debug( "Model now has " + modelManager.getTlModel().getAllLibraries().size() + " libraries." );
-
+        new DexFileHandler().openProject( repoProject, modelManager, null );
+        // new DexFileHandler().openProjectOLD( repoProject, modelManager, null );
+        // modelManager.addProjects();
         // When the project is added to the model manager
-        modelManager.addProjects();
-        assertTrue( "Manager must have libraries.", !modelManager.getLibraries().isEmpty() );
+        List<OtmLibrary> libs = new ArrayList<>( modelManager.getLibraries() );
+        assertTrue( "Must have libraries.", libs.size() > 1 );
+        boolean editable = false;
+        for (OtmLibrary lib : libs)
+            if (lib.isEditable())
+                editable = true;
         assertTrue( "Manager must have members.", !modelManager.getMembers().isEmpty() );
+        assertTrue( "Must have project items.", modelManager.getProjectManager().getAllProjectItems().size() > 1 );
+        // log.debug( "Model now has " + modelManager.getTlModel().getAllLibraries().size() + " libraries." );
+        log.warn( "No editable libraries. Check access to repository for libraries in " + FILE_TESTVERSIONS_REPO );
+        return editable;
     }
 
-    // x Add to the before class (change port number)
-    // x Insert AfterClass from DiffUtil (for managed)
-    // Put libraries/projects into resource/test-data
-    // files copied to target/test-workspace/wip
-    // TestDiffUnmanagedModels
-    // see File oldLibraryFile = new ...
-    // Mock nativeComponentBuilder
 
     @Test
     public void testFileChooser() throws Exception {

@@ -88,9 +88,8 @@ public class TestMemberPropertiesController extends AbstractFxTest {
     public void testPropertiesDAO_MinorMembers() {
         OtmModelManager mgr = new OtmModelManager( new DexFullActionManager( null ), repoManager );
         // Givens - projects
-        // TestDexFileHandler.loadAndAddManagedProject( mgr );
-        // TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
-        TestDexFileHandler.loadVersionProject( mgr ); // TODO - fix project id conflict
+        if (!TestDexFileHandler.loadVersionProject( mgr ))
+            return; // No editable libraries
         assertTrue( "Given", !mgr.getMembers().isEmpty() );
 
         DexMainController controller = (DexMainController) application.getController();
@@ -125,7 +124,8 @@ public class TestMemberPropertiesController extends AbstractFxTest {
     public void testPropertiesDAO_MinorTypeUsers() throws VersionSchemeException {
         OtmModelManager mgr = new OtmModelManager( new DexFullActionManager( null ), repoManager );
         // Given - vesioned project
-        TestDexFileHandler.loadVersionProject( mgr ); // TODO - fix project id conflict
+        if (!TestDexFileHandler.loadVersionProject( mgr ))
+            return; // No editable libraries
         assertTrue( "Given", !mgr.getMembers().isEmpty() );
 
         DexMainController controller = (DexMainController) application.getController();
@@ -161,7 +161,8 @@ public class TestMemberPropertiesController extends AbstractFxTest {
         for (OtmLibraryMember member : mgr.getMembers( major )) {
             // Get a type user for the member
             OtmTypeUser user = null;
-            for (OtmTypeUser tu : member.getDescendantsTypeUsers())
+            List<OtmTypeUser> users = new ArrayList<>( member.getDescendantsTypeUsers() );
+            for (OtmTypeUser tu : users)
                 user = tu;
             if (user == null) {
                 log.debug( "Could find type user of :" + member );
