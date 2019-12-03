@@ -171,7 +171,7 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
     }
 
     @Override
-    public void post(Repository repository) throws Exception {
+    public void post(Repository repository) {
         if (repository == null)
             return;
         if (postedData == repository) {

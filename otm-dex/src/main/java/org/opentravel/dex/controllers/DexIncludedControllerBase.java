@@ -164,12 +164,9 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
     }
 
     @Override
-    public void post(C businessData) throws Exception {
-        // Clear the view
-        clear(); // no-op unless overridden
-        // Hold onto data
-        postedData = businessData;
-        // FUTURE - create navigation event
+    public void post(C businessData) {
+        clear(); // Clear the view
+        postedData = businessData; // Hold onto data
     }
 
     @Override
@@ -179,11 +176,7 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
 
     @Override
     public void refresh() {
-        try {
-            post( postedData );
-        } catch (Exception e) {
-            // log.error( "Unhandled error refreshing repository item commit history: " + e.getLocalizedMessage() );
-        }
+        post( postedData );
     }
 
     @Override

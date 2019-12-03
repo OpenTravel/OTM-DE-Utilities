@@ -193,7 +193,7 @@ public class RepositorySearchController extends DexIncludedControllerBase<Reposi
     }
 
     @Override
-    public void post(RepositoryManager repositoryManager) throws Exception {
+    public void post(RepositoryManager repositoryManager) {
         // does nothing
     }
 

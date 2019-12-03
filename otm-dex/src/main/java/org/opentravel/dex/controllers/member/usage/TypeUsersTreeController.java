@@ -50,9 +50,9 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
      * FXML injected
      */
     @FXML
-    TreeView<PropertiesDAO> typeUsersTree;
+    private TreeView<PropertiesDAO> typeUsersTree;
     @FXML
-    Label columnLabel;
+    private Label columnLabel;
     @FXML
     private VBox typeUsersVBox;
 
@@ -118,7 +118,7 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
         // Set up the TreeTable
         typeUsersTree.setRoot( getRoot() );
         typeUsersTree.setShowRoot( false );
-        typeUsersTree.setEditable( true );
+        typeUsersTree.setEditable( false );
 
         // Add listeners and event handlers
         typeUsersTree.getSelectionModel().select( 0 );
@@ -218,9 +218,9 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
      * @throws Exception
      */
     @Override
-    public void post(OtmLibraryMember member) throws Exception {
+    public void post(OtmLibraryMember member) {
+        super.post( member );
         if (member != null) {
-            super.post( member );
             if (columnLabel != null)
                 columnLabel.setText( "Properties of " + member.getName() + " that use types" );
             new PropertiesDAO( member, this ).createChildrenItems( root, new MemberAndUserFilter() );
@@ -229,11 +229,7 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
 
     @Override
     public void refresh() {
-        try {
-            post( postedData );
-        } catch (Exception e) {
-            // No-op
-        }
+        post( postedData );
         ignoreEvents = false;
     }
 

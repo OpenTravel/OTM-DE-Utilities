@@ -176,7 +176,7 @@ public class NamespaceLibrariesTreeTableController extends DexIncludedController
     }
 
     @Override
-    public void post(NamespacesDAO nsNode) throws Exception {
+    public void post(NamespacesDAO nsNode) {
         super.post( nsNode );
         log.debug( "Posting new namespace node: " + nsNode );
         currentNamespaceDAO = nsNode;

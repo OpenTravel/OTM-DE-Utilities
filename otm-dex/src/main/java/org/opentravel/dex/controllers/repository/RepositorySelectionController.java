@@ -135,7 +135,7 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
     }
 
     @Override
-    public void post(RepositoryManager repositoryManager) throws Exception {
+    public void post(RepositoryManager repositoryManager) {
         super.post( repositoryManager );
         if (repositoryManager != null)
             this.repositoryManager = repositoryManager;

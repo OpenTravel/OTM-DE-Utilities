@@ -8,7 +8,8 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.TextField?>
 
-<Tab fx:id="whereUsedTab" text="Where Used" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.member.usage.WhereUsedTabController">
+<Tab fx:id="whereUsedTab" text="Where Used" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" 
+		fx:controller="org.opentravel.dex.controllers.member.usage.WhereUsedTabController">
   <content>
      <HBox fx:id="whereUsedTabHBox">
         <children>

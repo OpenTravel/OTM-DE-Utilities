@@ -117,10 +117,11 @@ public class SearchResultsController extends DexIncludedControllerBase<SearchRes
     }
 
     @Override
-    public void post(SearchResultsDAO results) throws Exception {
+    public void post(SearchResultsDAO results) {
         super.post( results ); // Clear tree and save results
         log.debug( "Posting search results." );
-        results.createTreeItems( resultsTreeView.getRoot() );
+        if (results != null)
+            results.createTreeItems( resultsTreeView.getRoot() );
     }
 
     @Override

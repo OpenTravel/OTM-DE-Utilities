@@ -85,7 +85,7 @@ public class RepositoryItemWebViewController extends DexIncludedControllerBase<R
     }
 
     @Override
-    public void post(RepoItemDAO repoItem) throws Exception {
+    public void post(RepoItemDAO repoItem) {
         super.post( repoItem );
 
 

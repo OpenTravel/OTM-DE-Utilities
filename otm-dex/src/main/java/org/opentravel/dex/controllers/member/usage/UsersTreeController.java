@@ -39,6 +39,7 @@ import java.util.List;
 import javafx.application.Platform;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.VBox;
@@ -59,10 +60,12 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
     TreeView<MemberAndUsersDAO> usersTree;
     @FXML
     private VBox memberWhereUsed;
+    @FXML
+    private Label columnLabel;
 
     TreeItem<MemberAndUsersDAO> root; // Root of the navigation tree. Is displayed.
     private boolean ignoreEvents = false;
-    private OtmLibraryMember postedMember = null;
+    // private OtmLibraryMember postedMember = null;
 
     private OtmModelManager modelMgr;
 
@@ -89,7 +92,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
      */
     @Override
     public void clear() {
-        postedMember = null;
+        postedData = null;
         usersTree.getRoot().getChildren().clear();
     }
 
@@ -232,53 +235,22 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
         ignoreEvents = false;
     }
 
-    // public void mouseClick(MouseEvent event) {
-    // // this fires after the member selection listener
-    // if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2)
-    // log.debug("Double click selection: ");
-    // // + whereUsedTreeTable.getSelectionModel().getSelectedItem().getValue().nameProperty().toString());
-    // }
-
     @Override
     public void post(OtmLibraryMember member) {
-        try {
-            super.post( member );
-        } catch (Exception e) {
-        }
-        clear();
-        postedMember = member;
-        createTreeItems( postedMember );
-        // launchSearch();
+        if (member == null || member == postedData)
+            return;
+
+        super.post( member );
+        createTreeItems( member );
+        if (columnLabel != null)
+            columnLabel.setText( "Objects that use " + member.getName() + " as type." );
     }
-
-    // public void launchSearch() {
-    // Repository repo = mainController.getSelectedRepository();
-    // // if (repo instanceof RemoteRepositoryClient) {
-    // if (postedData != null && repo instanceof RemoteRepository) {
-    // RepositorySearchCriteria criteria = new RepositorySearchCriteria( repo, postedData );
-    // SearchRepositoryTask t =
-    // new SearchRepositoryTask( criteria, this::handleSearchResults, mainController.getStatusController() );
-    // t.go();
-    // log.debug( "Started search" );
-    // }
-    // }
-
-    // public void handleSearchResults(WorkerStateEvent event) {
-    // log.debug( " search result handler" );
-    // if (event.getTarget() instanceof SearchRepositoryTask) {
-    // SearchRepositoryTask task = (SearchRepositoryTask) event.getTarget();
-    // String error = task.getErrorMsg();
-    // List<EntitySearchResult> results = task.getEntityResults();
-    // // See how validation finding list was posted so easily
-    // log.debug( " post results" );
-    // createTreeItems( results );
-    // }
-    //
-    // }
 
     @Override
     public void refresh() {
-        post( postedMember );
+        OtmLibraryMember member = postedData;
+        postedData = null;
+        post( member );
         ignoreEvents = false;
     }
 
@@ -303,8 +275,4 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
             log.warn( otm.getName() + " not found in member tree." );
         }
     }
-
-    // public void setOnMouseClicked(EventHandler<? super MouseEvent> handler) {
-    // usersTree.setOnMouseClicked(handler);
-    // }
 }

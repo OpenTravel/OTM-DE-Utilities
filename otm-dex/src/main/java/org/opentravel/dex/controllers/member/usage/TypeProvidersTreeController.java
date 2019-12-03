@@ -39,6 +39,7 @@ import java.util.Map;
 
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -51,7 +52,7 @@ import javafx.scene.layout.VBox;
  * @author dmh
  *
  */
-public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmModelManager> implements DexController {
+public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLibraryMember> implements DexController {
     private static Log log = LogFactory.getLog( TypeProvidersTreeController.class );
 
     /*
@@ -61,11 +62,13 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
     TreeView<MemberAndProvidersDAO> typeProvidersTree;
     @FXML
     private VBox typeProvidersVBox;
+    @FXML
+    private Label columnLabel;
 
     TreeItem<MemberAndProvidersDAO> root; // Root of the navigation tree. Is displayed.
     private boolean ignoreEvents = false;
 
-    private OtmLibraryMember postedMember;
+    // private OtmLibraryMember postedMember;
 
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
@@ -92,7 +95,7 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
      */
     @Override
     public void clear() {
-        postedMember = null;
+        postedData = null;
         typeProvidersTree.getRoot().getChildren().clear();
     }
 
@@ -126,7 +129,7 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
         // Set up the TreeTable
         typeProvidersTree.setRoot( getRoot() );
         typeProvidersTree.setShowRoot( false );
-        typeProvidersTree.setEditable( true );
+        typeProvidersTree.setEditable( false );
 
         // Add listeners and event handlers
         // typeProvidersTree.getSelectionModel().select(0);
@@ -197,10 +200,10 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
         return root;
     }
 
-    public MemberAndProvidersDAO getSelected() {
-        return typeProvidersTree.getSelectionModel().getSelectedItem() != null
-            ? typeProvidersTree.getSelectionModel().getSelectedItem().getValue() : null;
-    }
+    // public MemberAndProvidersDAO getSelected() {
+    // return typeProvidersTree.getSelectionModel().getSelectedItem() != null
+    // ? typeProvidersTree.getSelectionModel().getSelectedItem().getValue() : null;
+    // }
 
     private void handleEvent(DexMemberSelectionEvent event) {
         if (!ignoreEvents && event != null && event.getEventType() == DexMemberSelectionEvent.MEMBER_SELECTED)
@@ -219,26 +222,6 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
                 refresh();
         }
     }
-    //
-    // public void keyReleased(KeyEvent event) {
-    // // TreeItem<MemberDAO> item = whereUsedTreeTable.getSelectionModel().getSelectedItem();
-    // // ObservableList<TreeTablePosition<MemberDAO, ?>> cells =
-    // // whereUsedTreeTable.getSelectionModel().getSelectedCells();
-    // int row = typeProvidersTree.getSelectionModel().getSelectedIndex();
-    // log.debug("Selection row = " + row);
-    // if (event.getCode() == KeyCode.RIGHT) {
-    // typeProvidersTree.getSelectionModel().getSelectedItem().setExpanded(true);
-    // typeProvidersTree.getSelectionModel().select(row);
-    // // whereUsedTreeTable.getSelectionModel().focus(row);
-    // // Not sure how to: whereUsedTreeTable.getSelectionModel().requestFocus();
-    // // event.consume();
-    // } else if (event.getCode() == KeyCode.LEFT) {
-    // typeProvidersTree.getSelectionModel().getSelectedItem().setExpanded(false);
-    // typeProvidersTree.getSelectionModel().select(row);
-    // // whereUsedTreeTable.getSelectionModel().focus(row);
-    // // event.consume();
-    // }
-    // }
 
     /**
      * Listener for selected library members in the tree table.
@@ -258,24 +241,19 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
         ignoreEvents = false;
     }
 
-    // public void mouseClick(MouseEvent event) {
-    // // this fires after the member selection listener
-    // if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2)
-    // log.debug("Double click selection: ");
-    // // + whereUsedTreeTable.getSelectionModel().getSelectedItem().getValue().nameProperty().toString());
-    // }
-
     /**
      * Get the library members from the model manager and put them into a cleared tree.
      * 
      * @param modelMgr
      */
-    // @Override
+    @Override
     public void post(OtmLibraryMember member) {
-        clear();
-        postedMember = member;
-        if (member == null)
+        if (member == null || member == postedData)
             return;
+        super.post( member );
+        if (columnLabel != null)
+            columnLabel.setText( "Objects that provide types to " + member.getName() + "." );
+
         // log.debug( "Posting type providers to: " + member );
 
         // Create map of namespace prefixes and tree items
@@ -297,43 +275,13 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmMo
             else
                 root.getChildren().add( item );
         } );
-        // typeProvidersTree.sort();
     }
 
     @Override
     public void refresh() {
-        post( postedMember );
+        OtmLibraryMember member = postedData;
+        postedData = null;
+        post( member );
         ignoreEvents = false;
     }
-
-    // public void select(OtmLibraryMember otm) {
-    // post( otm );
-    // if (otm != null) {
-    // for (TreeItem<MemberDAO> item : typeProvidersTree.getRoot().getChildren()) {
-    // if (item.getValue().getValue() == otm) {
-    // int row = typeProvidersTree.getRow(item);
-    // // This may not highlight the row if the event comes from or goes to a different controller.
-    // Platform.runLater(() -> {
-    // // ignoreEvents = true;
-    // typeProvidersTree.requestFocus();
-    // typeProvidersTree.getSelectionModel().clearAndSelect(row);
-    // typeProvidersTree.scrollTo(row);
-    // typeProvidersTree.getFocusModel().focus(row);
-    // // ignoreEvents = false;
-    // });
-    // log.debug("Selected " + otm.getName() + " in member tree.");
-    // return;
-    // }
-    // }
-    // log.debug(otm.getName() + " not found in member tree.");
-    // }
-    // }
-
-    // public void setFilter(MemberFilterController filter) {
-    // this.filter = filter;
-    // }
-
-    // public void setOnMouseClicked(EventHandler<? super MouseEvent> handler) {
-    // typeProvidersTree.setOnMouseClicked(handler);
-    // }
 }

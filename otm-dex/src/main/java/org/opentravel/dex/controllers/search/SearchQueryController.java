@@ -192,7 +192,7 @@ public class SearchQueryController extends DexIncludedControllerBase<OtmLibraryM
     }
 
     @Override
-    public void post(OtmLibraryMember member) throws Exception {
+    public void post(OtmLibraryMember member) {
         if (member != null) {
             currentMember = member;
             searchTerm.setText( member.getName() );

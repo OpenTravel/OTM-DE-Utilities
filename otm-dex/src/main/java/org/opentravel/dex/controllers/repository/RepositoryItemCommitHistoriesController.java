@@ -124,7 +124,7 @@ public class RepositoryItemCommitHistoriesController extends DexIncludedControll
     }
 
     @Override
-    public void post(RepoItemDAO repoItem) throws Exception {
+    public void post(RepoItemDAO repoItem) {
         super.post( repoItem );
 
         if (repoItem == null)
