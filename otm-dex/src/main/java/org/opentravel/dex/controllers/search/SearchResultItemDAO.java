@@ -20,6 +20,7 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.schemacompiler.repository.EntitySearchResult;
 import org.opentravel.schemacompiler.repository.LibrarySearchResult;
+import org.opentravel.schemacompiler.repository.RepositorySearchResult;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
@@ -35,6 +36,7 @@ public class SearchResultItemDAO implements DexDAO<String> {
     // private static Log log = LogFactory.getLog( SearchResultItemDAO.class );
 
     protected String resultString;
+    private RepositorySearchResult result = null;
 
     /**
      * Create a label row with no other content
@@ -49,25 +51,64 @@ public class SearchResultItemDAO implements DexDAO<String> {
     // TODO create a ModelSearchResult object and constructor to use is
     //
     public SearchResultItemDAO(EntitySearchResult result) {
+        this.result = result;
         StringBuilder rs = new StringBuilder();
         rs.append( result.getEntityName() );
         rs.append( " " + result.getEntityType() );
         if (result.getRepositoryItem() != null) {
+            rs.append( " " + result.getRepositoryItem().getBaseNamespace() );
             rs.append( " " + result.getRepositoryItem().getLibraryName() );
             rs.append( " " + result.getRepositoryItem().getVersion() );
-            rs.append( " " + result.getRepositoryItem().getBaseNamespace() );
         }
         resultString = rs.toString();
     }
 
     public SearchResultItemDAO(LibrarySearchResult result) {
+        this.result = result;
         StringBuilder rs = new StringBuilder();
         if (result.getRepositoryItem() != null) {
+            rs.append( " " + result.getRepositoryItem().getBaseNamespace() );
             rs.append( " " + result.getRepositoryItem().getLibraryName() );
             rs.append( " " + result.getRepositoryItem().getVersion() );
-            rs.append( " " + result.getRepositoryItem().getBaseNamespace() );
         }
         resultString = rs.toString();
+    }
+
+    public StringProperty entityProperty() {
+        if (result instanceof EntitySearchResult)
+            return new ReadOnlyStringWrapper( ((EntitySearchResult) result).getEntityName() );
+        else if (result instanceof RepositorySearchResult)
+            return new ReadOnlyStringWrapper( "" );
+        else
+            return new ReadOnlyStringWrapper( resultString );
+    }
+
+    public StringProperty typeProperty() {
+        if (result instanceof EntitySearchResult)
+            return new ReadOnlyStringWrapper( ((EntitySearchResult) result).getEntityType().getSimpleName() );
+        else
+            return new ReadOnlyStringWrapper( "" );
+    }
+
+    public StringProperty baseNsProperty() {
+        if (result instanceof RepositorySearchResult)
+            return new ReadOnlyStringWrapper( result.getRepositoryItem().getBaseNamespace() );
+        else
+            return new ReadOnlyStringWrapper( "" );
+    }
+
+    public StringProperty libraryProperty() {
+        if (result instanceof RepositorySearchResult)
+            return new ReadOnlyStringWrapper( result.getRepositoryItem().getLibraryName() );
+        else
+            return new ReadOnlyStringWrapper( "" );
+    }
+
+    public StringProperty versionProperty() {
+        if (result instanceof RepositorySearchResult)
+            return new ReadOnlyStringWrapper( result.getRepositoryItem().getVersion() );
+        else
+            return new ReadOnlyStringWrapper( "" );
     }
 
     @Override

@@ -29,15 +29,17 @@
          </children>
       </HBox>
       <Separator prefWidth="200.0" />
-      <HBox>
+      <HBox spacing="10.0">
          <children>
             <TextField fx:id="searchTerm" promptText="Query" text="Query">
                <HBox.margin>
                   <Insets top="5.0" />
                </HBox.margin>
             </TextField>
-          <Button fx:id="doSearch" onAction="#doSearch" prefWidth="100.0" mnemonicParsing="false" 
-          		styleClass="button-blue" stylesheets="../@DavesViper.css" text="Search" textAlignment="CENTER"/>
+          <Button fx:id="doSearch" onAction="#doSearch" prefWidth="175.0" mnemonicParsing="false" 
+          		styleClass="button-blue" stylesheets="../@DavesViper.css" text="Object Search" textAlignment="CENTER"/>
+          <Button fx:id="doFullTextSearch" onAction="#doFullTextSearch" prefWidth="175.0" mnemonicParsing="false" 
+          		styleClass="button-blue" stylesheets="../@DavesViper.css" text="Text Search" textAlignment="CENTER"/>
           <Button fx:id="clearSearch" onAction="#clearSearch" prefWidth="100.0" mnemonicParsing="false" 
           		styleClass="button-blue" stylesheets="../@DavesViper.css" text="Clear" textAlignment="CENTER">
                <HBox.margin>

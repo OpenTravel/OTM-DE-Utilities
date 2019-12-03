@@ -114,27 +114,39 @@ public class SearchQueryController extends DexIncludedControllerBase<OtmLibraryM
     public void configure(DexMainController parent) {
         super.configure( parent );
         eventPublisherNode = searchQueryVBox;
+        doSearch.setDisable( true );
+
         // log.debug( "Search Query Stage set." );
     }
 
     @FXML
     public void clearSearch(ActionEvent event) {
         searchTerm.setText( "" );
+        currentMember = null;
+        doSearch.setDisable( true );
     }
 
     @FXML
     public void doSearch(ActionEvent e) {
-        runSearch( e );
+        runSearch( true );
     }
 
-    private void runSearch(ActionEvent event) {
+    @FXML
+    public void doFullTextSearch(ActionEvent e) {
+        runSearch( false );
+    }
+
+    private void runSearch(boolean objectSearch) {
         DexStatusController statusController = null;
         if (mainController != null) {
             currentRepository = mainController.getSelectedRepository();
             statusController = mainController.getStatusController();
         }
         RepositorySearchCriteria criteria = new RepositorySearchCriteria( currentRepository, searchTerm.getText() );
-        criteria.setSubject( currentMember );
+        if (objectSearch)
+            criteria.setSubject( currentMember );
+        else
+            criteria.setSubject( null );
         criteria.setLatestVersionsOnly( latestOnlyRadio.isSelected() );
         criteria.setLockedOnly( lockedRadio.isSelected() );
 
@@ -181,7 +193,11 @@ public class SearchQueryController extends DexIncludedControllerBase<OtmLibraryM
 
     @Override
     public void post(OtmLibraryMember member) throws Exception {
-        currentMember = member;
-        searchTerm.setText( member.getName() );
+        if (member != null) {
+            currentMember = member;
+            searchTerm.setText( member.getName() );
+            if (member.getLibrary() != null)
+                doSearch.setDisable( member.getLibrary().isUnmanaged() );
+        }
     }
 }

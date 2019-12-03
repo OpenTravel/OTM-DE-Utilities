@@ -46,8 +46,8 @@ public class SearchResultsDAO implements DexDAO<String> {
 
     private List<SearchResultItemDAO> results = null;
 
-    List<EntitySearchResult> entityResults = null;
-    List<LibrarySearchResult> libraryResults = null;
+    private List<EntitySearchResult> entityResults = null;
+    private List<LibrarySearchResult> libraryResults = null;
 
 
     public SearchResultsDAO(Repository repo, List<RepositorySearchResult> repoResults) {
@@ -108,14 +108,16 @@ public class SearchResultsDAO implements DexDAO<String> {
         SearchResultItemDAO dao = null;
         TreeItem<SearchResultItemDAO> categoryItem = null;
 
-        dao = new SearchResultItemDAO( "Library" );
-        categoryItem = createTreeItem( dao, parent );
-        for (LibrarySearchResult result : libraryResults) {
-            dao = new SearchResultItemDAO( result );
-            results.add( dao );
-            createTreeItem( dao, categoryItem );
+        dao = new SearchResultItemDAO( "Libraries" );
+        if (!libraryResults.isEmpty()) {
+            categoryItem = createTreeItem( dao, parent );
+            for (LibrarySearchResult result : libraryResults) {
+                dao = new SearchResultItemDAO( result );
+                results.add( dao );
+                createTreeItem( dao, categoryItem );
+            }
         }
-        dao = new SearchResultItemDAO( "Entity" );
+        dao = new SearchResultItemDAO( "Entities" );
         categoryItem = createTreeItem( dao, parent );
         for (EntitySearchResult result : entityResults) {
             dao = new SearchResultItemDAO( result );

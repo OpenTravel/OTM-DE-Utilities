@@ -46,7 +46,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
 /**
- * Manage tree for members and type providers that provide types to the posted member (3rd (right hand) column).
+ * Manage tree for members and type providers that provide types to the posted member (3rd, right hand column).
  * 
  * @author dmh
  *
