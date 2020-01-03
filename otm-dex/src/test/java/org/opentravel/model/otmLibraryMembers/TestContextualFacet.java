@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
@@ -89,7 +90,6 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         assertFalse( cf.getChildren().isEmpty() );
         testContributedFacet( contrib, cf, member );
 
-
         // When - adding a TL directly
         childCount = cf.getChildren().size();
         TLAttribute tla = new TLAttribute();
@@ -104,7 +104,6 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         assertTrue( cf.getChildren().contains( p ) );
         assertTrue( contrib.getChildren().contains( p ) );
         testContributedFacet( contrib, cf, member );
-
     }
 
     public void testCFInheritance(OtmLibraryMember extension) {
@@ -189,6 +188,32 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         // When deleted
         member.delete( cf );
         assertFalse( member.getChildren().contains( contrib ) );
+    }
+
+
+    @Test
+    public void testInModelManager() {
+        log.debug( "Testing contextual facets in model manager." );
+
+        // Given - a Choice object and contextual facet
+        OtmChoiceObject co1 = TestChoice.buildOtm( staticModelManager );
+        staticModelManager.add( co1 );
+        assertTrue( "Model manager must contain choice object.", staticModelManager.getMembers().contains( co1 ) );
+
+        // Given - a contextual facet contributed to the choice object
+        OtmContextualFacet cf = TestChoiceFacet.buildOtm( staticModelManager );
+        OtmContributedFacet contrib = co1.add( cf );
+        assertTrue( "Manager must not contain contextual facet.", !staticModelManager.getMembers().contains( cf ) );
+        assertTrue( "Manager must not contain contributed.", !staticModelManager.getMembers().contains( contrib ) );
+
+        // When - contextual facet added to model manager
+        staticModelManager.add( cf );
+        assertTrue( "Manager must contain contextual facet.", staticModelManager.getMembers().contains( cf ) );
+
+        // Given - a contextual facet NOT contributed
+        OtmContextualFacet cf2 = TestChoiceFacet.buildOtm( staticModelManager );
+        staticModelManager.add( cf2 );
+        assertTrue( "Manager must contain contextual facet.", staticModelManager.getMembers().contains( cf2 ) );
     }
 
     //

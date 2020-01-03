@@ -35,7 +35,6 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmEmptyTableFacet;
-import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.application.Platform;
@@ -224,9 +223,11 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         // Apply Filter
         if (filter != null && !filter.isSelected( member ))
             return;
+
+        // 1/3/2020 - let the CFs be shown, the users expect to see them
         // Skip over contextual facets that have been injected into an object. Their contributed facets will be modeled.
-        if (member instanceof OtmContextualFacet && ((OtmContextualFacet) member).getWhereContributed() != null)
-            return;
+        // if (member instanceof OtmContextualFacet && ((OtmContextualFacet) member).getWhereContributed() != null)
+        // return;
 
         // Create item for the library member
         TreeItem<MemberAndProvidersDAO> item = new MemberAndProvidersDAO( member ).createTreeItem( parent );

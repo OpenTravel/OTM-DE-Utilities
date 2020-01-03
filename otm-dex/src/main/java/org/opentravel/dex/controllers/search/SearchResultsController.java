@@ -73,7 +73,7 @@ public class SearchResultsController extends DexIncludedControllerBase<SearchRes
         setColumnProps( entityCol, true, true, true, 150, "entity" );
         // Type Column
         typeCol = new TreeTableColumn<>( "Type" );
-        setColumnProps( typeCol, true, true, false, 150, "type" );
+        setColumnProps( typeCol, true, true, true, 150, "type" );
         // BaseNs Column
         baseNsCol = new TreeTableColumn<>( "Base Namespace" );
         setColumnProps( baseNsCol, true, true, true, 200, "baseNs" );
@@ -82,7 +82,7 @@ public class SearchResultsController extends DexIncludedControllerBase<SearchRes
         setColumnProps( libraryCol, true, true, true, 150, "library" );
         // Version Column
         versionCol = new TreeTableColumn<>( "Version" );
-        setColumnProps( versionCol, true, true, false, 50, "version" );
+        setColumnProps( versionCol, true, true, true, 50, "version" );
 
         table.getColumns().addAll( entityCol, typeCol, baseNsCol, libraryCol, versionCol );
     }

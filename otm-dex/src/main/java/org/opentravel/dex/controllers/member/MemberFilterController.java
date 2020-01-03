@@ -30,6 +30,7 @@ import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -84,6 +85,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     public static final String SIMPLE = "Simple";
     public static final String ENUMERATION = "Enumeration";
     public static final String VWA = "Value With Attributes";
+    public static final String CONTEXTUAL = "Contextual Facets";
 
     /**
      * FXML Java FX Nodes this controller is dependent upon
@@ -257,8 +259,8 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         checkNodes();
 
         // Would work for combo
-        ObservableList<String> data = FXCollections.observableArrayList( ALL, RESOURCE, BUSINESS, CHOICE, CORE, SIMPLE,
-            ENUMERATION, VWA, SERVICE );
+        ObservableList<String> data = FXCollections.observableArrayList( ALL, RESOURCE, BUSINESS, CHOICE, CORE,
+            CONTEXTUAL, SIMPLE, ENUMERATION, VWA, SERVICE );
         memberTypeCombo.setPromptText( "Object Type" );
         memberTypeCombo.setOnAction( this::setTypeFilter );
         memberTypeCombo.setItems( data );
@@ -294,8 +296,10 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             return false;
         if (editableOnly && !member.isEditableMinor())
             return false;
-        if (classNameFilter != null && !member.getClass().getSimpleName().startsWith( classNameFilter ))
+        if (!isMemberTypeSelected( member ))
             return false;
+        // if (classNameFilter != null && !member.getClass().getSimpleName().startsWith( classNameFilter ))
+        // return false;
         if (errorsOnly && member.isValid( false ))
             return false;
         if (!builtIns && member.getLibrary().getTL() instanceof BuiltInLibrary)
@@ -434,7 +438,8 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
 
     public void setTypeFilter(String value) {
         if (value.isEmpty() || value.equals( ALL ))
-            classNameFilter = null;
+            setTypeFilterValue( null );
+        // classNameFilter = null;
         else if (value.startsWith( RESOURCE ))
             setTypeFilterValue( OtmResource.class.getSimpleName() );
         else if (value.startsWith( SERVICE ))
@@ -443,6 +448,8 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             setTypeFilterValue( OtmBusinessObject.class.getSimpleName() );
         else if (value.startsWith( CHOICE ))
             setTypeFilterValue( OtmChoiceObject.class.getSimpleName() );
+        else if (value.startsWith( CONTEXTUAL ))
+            setTypeFilterValue( OtmContextualFacet.class.getSimpleName() );
         else if (value.startsWith( CORE ))
             setTypeFilterValue( OtmCore.class.getSimpleName() );
         else if (value.startsWith( SIMPLE ))
@@ -451,6 +458,24 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             setTypeFilterValue( OtmEnumeration.class.getSimpleName() );
         else if (value.startsWith( VWA ))
             setTypeFilterValue( OtmValueWithAttributes.class.getSimpleName() );
+    }
+
+    /**
+     * Return false if the member fails to pass the class name filter (member object type). If the filter value is null,
+     * all member pass through the filter.
+     * 
+     * @param member
+     * @return
+     */
+    public boolean isMemberTypeSelected(OtmLibraryMember member) {
+        if (classNameFilter == null)
+            return true; // No filter applied
+        if (member == null)
+            return false;
+        if (classNameFilter.equals( OtmContextualFacet.class.getSimpleName() ))
+            return member instanceof OtmContextualFacet;
+        else
+            return member.getClass().getSimpleName().startsWith( classNameFilter );
     }
 
     /**
