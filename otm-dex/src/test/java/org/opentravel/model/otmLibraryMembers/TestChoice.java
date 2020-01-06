@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLProperty;
@@ -53,6 +54,24 @@ public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
 
 
     /** ****************************************************** **/
+
+    /**
+     * Create a choice object. Add element and attribute to shared facet.
+     * 
+     * @param library library to add the new choice object to. Must have model manager set.
+     * @param name if null, uses "TestChoice"
+     * @return
+     */
+    public static OtmChoiceObject buildOtm(OtmLibrary library, String name) {
+        assertTrue( "Library must have model manager.", library.getModelManager() != null );
+        OtmChoiceObject ch = new OtmChoiceObject( buildTL(), library.getModelManager() );
+        if (name != null)
+            ch.setName( name );
+        library.add( ch );
+        assertTrue( ch.getLibrary() == library );
+        assertTrue( library.getTL().getNamedMembers().contains( ch.getTL() ) );
+        return ch;
+    }
 
     /**
      * Create a choice object. Add element and attribute to shared facet.

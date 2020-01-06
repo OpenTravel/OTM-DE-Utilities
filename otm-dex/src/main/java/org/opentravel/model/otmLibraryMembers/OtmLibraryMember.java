@@ -56,6 +56,11 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public StringProperty baseTypeProperty();
 
     /**
+     * Update or clear any cached values (string properties).
+     */
+    public void refresh();
+
+    /**
      * Add and remove the users library member to the where used list
      * 
      * @param userToRemove from where used list, can be null

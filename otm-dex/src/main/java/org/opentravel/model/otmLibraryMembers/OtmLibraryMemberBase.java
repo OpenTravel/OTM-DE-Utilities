@@ -96,6 +96,10 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         this.noLibraryActionManager = getModelManager().getActionManager( false );
     }
 
+    public void refresh() {
+        nameProperty = null;
+    }
+
     @Override
     public void addAlias(TLAlias tla) {
         if (tla.getOwningEntity() instanceof TLFacet) {

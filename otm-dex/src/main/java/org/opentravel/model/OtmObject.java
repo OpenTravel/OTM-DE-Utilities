@@ -156,11 +156,38 @@ public interface OtmObject {
     public boolean isValid(boolean refresh);
 
     /**
-     * FX observable property for this name. If editable, a listener for the action will be set.
+     * Get the FX observable property for this name simply for display. Use {@link #nameEditingProperty()} if intended
+     * for use where the name could be edited if enabled.
+     * <p>
+     * If editable, returns a simple string property with a listener assigned by the object's action manager. If not
+     * editable a read-only property is returned.
      * 
-     * @return a string property either read only or from action manager (never null)
+     * @return a string property (never null)
      */
     public StringProperty nameProperty();
+
+    /**
+     * Get the FX observable property for this name. Intended for use where the name could be edited if enabled. Use
+     * {@link #nameProperty()} if the name is simply for display.
+     * <p>
+     * If editable, returns a simple string property with a listener assigned by the object's action manager. If not
+     * editable a read-only property is returned.
+     * <p>
+     * Objects whose name has contributions from other objects must override this method to create a property that has
+     * only the editable portion of the name.
+     * 
+     * @return a string property (never null)
+     */
+    public StringProperty nameEditingProperty();
+
+    /**
+     * Create the nameEditingProperty string property and set its value. Used to override the default behavior of using
+     * the same value as nameProperty().
+     * 
+     * @param editableName
+     * @return
+     */
+    public StringProperty nameEditingProperty(String editableName);
 
     /**
      * Set the deprecation documentation value. Even though the TL maintains a list, the facades only use the first

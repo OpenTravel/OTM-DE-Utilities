@@ -342,9 +342,8 @@ public abstract class DexActionManagerBase implements DexActionManager {
             if (mainController != null) {
                 mainController.updateActionQueueSize( getQueueSize() );
                 mainController.postStatus( "Undid action: " + action.toString() );
-                action.getSubject().getModelManager().startValidatingAndResolvingTasks();
-                // new ValidateModelManagerItemsTask( action.getSubject().getModelManager(),
-                // action.getSubject().getModelManager(), mainController.getStatusController() ).go();
+                if (action.getSubject() != null)
+                    action.getSubject().getModelManager().startValidatingAndResolvingTasks();
             }
         }
         ignore = false;

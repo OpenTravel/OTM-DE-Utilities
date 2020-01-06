@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.action.manager.DexActionManagerBase;
-import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
 import org.opentravel.dex.events.DexChangeEvent;
@@ -30,6 +29,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmProperties.OtmIdAttribute;
 import org.opentravel.model.resource.OtmActionFacet;
@@ -123,9 +123,9 @@ public class AssignedTypeChangeAction extends DexRunAction {
 
         // Set applicable filters
         if (otm instanceof OtmResource)
-            controller.getMemberFilterController().setTypeFilter( MemberFilterController.BUSINESS );
+            controller.getMemberFilterController().setTypeFilterValue( OtmLibraryMemberType.BUSINESS );
         if (otm instanceof OtmActionFacet)
-            controller.getMemberFilterController().setTypeFilter( MemberFilterController.CORE );
+            controller.getMemberFilterController().setTypeFilterValue( OtmLibraryMemberType.CORE );
 
         // Get the user's selected new provider
         controller.showAndWait( "MSG" );

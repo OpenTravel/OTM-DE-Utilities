@@ -130,6 +130,16 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         return super.baseTypeProperty();
     }
 
+    /**
+     * {@inheritDoc} Clear this name property <b>only</b>. In most cases use
+     * {@link OtmContributedFacet#clearNameProperty()}
+     */
+    // @SuppressWarnings(value = {"squid:S1185"})
+    @Override
+    public void clearNameProperty() {
+        super.clearNameProperty();
+    }
+
     @Override
     public void delete(OtmObject property) {
         if (property.getTL() instanceof TLAttribute)
@@ -216,8 +226,13 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         return Collections.emptyList(); // TODO
     }
 
+    /**
+     * {@inheritDoc} Get the full name complete with owning object's prefix
+     */
     @Override
     public String getName() {
+        // String ln = getTL().getLocalName(); // ObjectName_FacetName
+        // String sn = getTL().getName(); // FacetName
         return getTL().getLocalName();
         // return this.getClass().getSimpleName();
     }
@@ -313,6 +328,14 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public StringProperty nameEditingProperty() {
+        return nameEditingProperty( getTL().getName() );
+    }
+
     @Override
     public void modelChildren() {
         if (getTL() instanceof TLIndicatorOwner)
@@ -340,11 +363,12 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
             OtmLibraryMember lm = (OtmLibraryMember) baseObj;
             // Set the TL Owning entity
             getTL().setOwningEntity( (TLFacetOwner) lm.getTL() );
+
             // Create or change where contributed
-            if (whereContributed == null)
+            if (getWhereContributed() == null)
                 whereContributed = new OtmContributedFacet( lm, this );
             whereContributed.setParent( lm, this );
-
+            whereContributed.clearNameProperty();
         }
         // Where used
         return getBaseType();
@@ -353,6 +377,9 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
     @Override
     public String setName(String name) {
         getTL().setName( name );
+        nameProperty = null;
+        if (getWhereContributed() != null)
+            getWhereContributed().clearNameProperty();
         return getTL().getName();
     }
 

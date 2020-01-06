@@ -151,6 +151,12 @@ public class TestLibrary {
 
     /** ****************************************************** **/
 
+    /**
+     * Create a TL_library and OtmLibrary named "LibraryName" in example.com namespace
+     * 
+     * @param mgr
+     * @return
+     */
     public static OtmLibrary buildOtm(OtmModelManager mgr) {
         TLLibrary tlLib = buildTL();
         tlLib.setName( "LibraryName" );

@@ -39,12 +39,14 @@ public class DexWizardActionManager extends DexActionManagerBase {
     }
 
     /**
-     * Use reflection on the action to get the action handler's isEnabled method and return its result.
      * <p>
      * Note: this could be static but do NOT move to DexActions because there are multiple action managers.
      */
     @Override
     public boolean isEnabled(DexActions action, OtmObject subject) {
+        // If there is no library, make the user select that first
+        if (subject.getLibrary() == null)
+            return action == DexActions.SETMEMBERLIBRARY;
         return true;
     }
 

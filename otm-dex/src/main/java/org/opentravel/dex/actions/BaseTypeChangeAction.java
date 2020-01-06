@@ -26,10 +26,9 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmChoiceFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmFacets.OtmQueryFacet;
-import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
-import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.schemacompiler.model.TLExtensionOwner;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
@@ -64,7 +63,7 @@ public class BaseTypeChangeAction extends DexRunAction {
      * This action will get the data from the user via modal dialog
      */
     public OtmObject doIt() {
-        // log.debug( "Ready to set base type to " + otm + " " + ignore );
+        log.debug( "Ready to set base type to " + otm + " " + ignore );
         if (!isEnabled( getSubject() ) || ignore)
             return null;
 
@@ -72,12 +71,13 @@ public class BaseTypeChangeAction extends DexRunAction {
         MemberAndProvidersDAO selected = null;
         TypeSelectionContoller controller = TypeSelectionContoller.init();
         controller.setManager( getSubject().getModelManager() );
+
         if (getSubject() instanceof OtmChoiceFacet)
-            controller.getMemberFilterController().setTypeFilterValue( OtmChoiceObject.class.getSimpleName() );
+            controller.getMemberFilterController().setTypeFilterValue( OtmLibraryMemberType.CHOICE );
         else if (getSubject() instanceof OtmQueryFacet || getSubject() instanceof OtmCustomFacet)
-            controller.getMemberFilterController().setTypeFilterValue( OtmBusinessObject.class.getSimpleName() );
+            controller.getMemberFilterController().setTypeFilterValue( OtmLibraryMemberType.BUSINESS );
         else
-            controller.getMemberFilterController().setTypeFilter( (OtmLibraryMember) getSubject() );
+            controller.getMemberFilterController().setTypeFilter( getSubject() );
 
         // Run dialog to get user selection
         if (controller.showAndWait( "MSG" ) == Results.OK) {
@@ -131,6 +131,11 @@ public class BaseTypeChangeAction extends DexRunAction {
         return otm.isValid();
     }
 
+    /**
+     * {@inheritDoc} Must be a library member.
+     * 
+     * @see org.opentravel.dex.actions.DexAction#setSubject(org.opentravel.model.OtmObject)
+     */
     @Override
     public boolean setSubject(OtmObject subject) {
         if (!(subject instanceof OtmLibraryMember))

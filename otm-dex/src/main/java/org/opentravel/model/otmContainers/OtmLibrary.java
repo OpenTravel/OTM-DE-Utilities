@@ -96,7 +96,7 @@ public class OtmLibrary {
                 if (getTL().getNamedMember( ((LibraryMember) member.getTL()).getLocalName() ) == null)
                     getTL().addNamedMember( (LibraryMember) member.getTL() );
                 else
-                    log.warn( "Did not add member to library because it was already a member." );
+                    log.warn( "Did not add member " + member + " to library because it was already a member." );
                 if (getModelManager() != null)
                     getModelManager().add( member );
                 return member;

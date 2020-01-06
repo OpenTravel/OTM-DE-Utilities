@@ -41,7 +41,7 @@ import org.opentravel.schemacompiler.model.TLProperty;
  */
 public class TestChoiceFacet extends TestContextualFacet {
     // private static Log log = LogFactory.getLog( TestContextualFacet.class );
-    private static final String CF_NAME = "TestCF";
+    public static final String CF_NAME = "TestCF";
 
 
     @BeforeClass
@@ -228,7 +228,7 @@ public class TestChoiceFacet extends TestContextualFacet {
     }
 
     /**
-     * Build a choice facet. It will not have where contributed or children!
+     * Build a choice facet. It will not have where contributed or children! Contributed to a new choice object.
      * 
      * @param mgr
      * @return

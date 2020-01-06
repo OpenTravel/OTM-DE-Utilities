@@ -25,6 +25,7 @@ import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
@@ -58,7 +59,7 @@ public class AssignResourceSubjectAction extends DexRunAction {
         MemberAndProvidersDAO selected = null;
         TypeSelectionContoller controller = TypeSelectionContoller.init();
         MemberFilterController filter = controller.getMemberFilterController();
-        filter.setTypeFilter( MemberFilterController.BUSINESS );
+        filter.setTypeFilterValue( OtmLibraryMemberType.BUSINESS );
 
         controller.setManager( resource.getModelManager() );
         if (controller.showAndWait( "MSG" ) == Results.OK) {

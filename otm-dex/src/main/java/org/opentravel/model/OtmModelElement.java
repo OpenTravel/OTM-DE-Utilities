@@ -93,6 +93,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     protected List<OtmObject> inheritedChildren = null;
 
     protected StringProperty nameProperty;
+    protected StringProperty nameEditingProperty;
     private StringProperty descriptionProperty;
     private StringProperty validationProperty;
     private ObjectProperty<ImageView> validationImageProperty;
@@ -394,21 +395,44 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         return sFindings;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * String property contains the value from getName()
+     */
     @Override
     public StringProperty nameProperty() {
-        if (nameProperty == null) {
-            if (getActionManager() != null && isRenameable())
-                nameProperty = getActionManager().add( DexActions.NAMECHANGE, getName(), this );
-            else
-                nameProperty = new ReadOnlyStringWrapper( getName() );
-        }
-        // nameProperty.set( getName() );
+        if (nameProperty == null)
+            nameProperty = setNameProperty( getName() );
         return nameProperty;
+    }
+
+    @Override
+    public StringProperty nameEditingProperty() {
+        if (nameEditingProperty == null)
+            nameEditingProperty = setNameProperty( getName() );
+        return nameEditingProperty;
+    }
+
+    private StringProperty setNameProperty(String value) {
+        StringProperty property;
+        if (getActionManager() != null && isRenameable())
+            property = getActionManager().add( DexActions.NAMECHANGE, value, this );
+        else
+            property = new ReadOnlyStringWrapper( value );
+        return property;
+    }
+
+    @Override
+    public StringProperty nameEditingProperty(String editableName) {
+        nameEditingProperty = setNameProperty( editableName );
+        return nameEditingProperty;
     }
 
     @Override
     public void clearNameProperty() {
         nameProperty = null;
+        nameEditingProperty = null;
     }
 
     @Override

@@ -41,9 +41,14 @@ import java.util.List;
  * <ul>
  * <li>a parent that identifies where the facet is contributed (injected).
  * <li>a contributor that identifies the contextual facet library member.
- * <li>no children. All children can be access from here but are maintained on the contextual facet.
- * {@link #add(OtmObject)} is a facade for getContributor().add(child).
  * <li>the same TL contextual facet as the contributor contextual facet.
+ * </ul>
+ * <p>
+ * Access to data maintained on the contributor:
+ * <ul>
+ * <li>All children can be accessed from here but are maintained on the contextual facet. {@link #add(OtmObject)} is a
+ * facade for getContributor().add(child).
+ * <li>Name
  * </ul>
  * 
  * @author Dave Hollander
@@ -73,6 +78,13 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
         setContributor( contributor );
     }
 
+    @Override
+    public String setName(String name) {
+        if (getContributor() == null)
+            return "";
+        return getContributor().setName( name );
+    }
+
     /**
      * Set the parent, contributor and tlObject fields. Add this to parent. When set to null, the facet is no longer
      * contributed to an object.
@@ -81,6 +93,8 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
      * @param cf provides the TLContextualFacet to set into the TL Object
      */
     public void setParent(OtmLibraryMember parent, OtmContextualFacet cf) {
+        if (getParent() != null)
+            getParent().delete( cf );
         this.parent = parent;
         parent.add( this );
         tlObject = cf.getTL();
@@ -103,9 +117,14 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
         return null;
     }
 
+    /**
+     * {@inheritDoc} Clear this name property and the contributor's name property.
+     * 
+     * @see org.opentravel.model.OtmModelElement#clearNameProperty()
+     */
     @Override
     public void clearNameProperty() {
-        nameProperty = null;
+        super.clearNameProperty(); // null out this name property
         getContributor().clearNameProperty();
     }
 

@@ -62,6 +62,13 @@ public enum OtmLibraryMemberType {
         return "";
     }
 
+    public static OtmLibraryMemberType getClass(String label) {
+        for (OtmLibraryMemberType type : values())
+            if (type.label.equals( label ))
+                return type;
+        return null;
+    }
+
     public static OtmLibraryMemberType get(OtmLibraryMember member) {
         if (member == null)
             return null;
@@ -69,6 +76,10 @@ public enum OtmLibraryMemberType {
             if (type.memberClass() == member.getClass())
                 return type;
         return null;
+    }
+
+    public static boolean is(OtmLibraryMember member, OtmLibraryMemberType type) {
+        return type.memberClass() == member.getClass();
     }
 
     /**

@@ -230,7 +230,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         objectImageView.setImage( ImageManager.getImage( member.getIconType() ) );
 
         // Member name
-        StringProperty property = member.nameProperty();
+        // StringProperty property = member.nameProperty();
+        StringProperty property = member.nameEditingProperty();
         memberName.setEditable( !(property instanceof ReadOnlyStringWrapper) );
         memberName.setText( property.get() );
         memberName.setOnAction( e -> {
@@ -246,6 +247,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             member.getActionManager().run( DexActions.SETMEMBERLIBRARY, member );
             member.libraryProperty().set( member.getLibraryName() );
             libraryName.setText( member.getLibraryName() );
+            refresh();
         } );
 
         // Description
@@ -268,7 +270,6 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             member.baseTypeProperty().set( member.getBaseTypeName() );
             baseTypeName.setText( member.getBaseTypeName() );
         } );
-        // TESTME - add action
 
         // Assigned type label
         final String TYPELABEL = "Assigned Type";
