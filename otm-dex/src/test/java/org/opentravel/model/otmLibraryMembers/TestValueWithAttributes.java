@@ -119,4 +119,15 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
         Collection<OtmTypeUser> d = vwa.getDescendantsTypeUsers();
         assertTrue( !d.isEmpty() );
     }
+
+    @Test
+    public void testBaseType() {
+        OtmValueWithAttributes vwa = buildOtm( staticModelManager, "TestVwa" );
+        OtmValueWithAttributes baseVwa = buildOtm( staticModelManager, "BaseVwa" );
+
+        OtmValueWithAttributes base = vwa.getBaseType();
+        vwa.setBaseType( baseVwa );
+        base = vwa.getBaseType();
+        assertTrue( base == baseVwa );
+    }
 }

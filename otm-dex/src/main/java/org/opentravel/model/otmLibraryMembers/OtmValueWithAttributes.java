@@ -152,8 +152,9 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
      */
     @Override
     public StringProperty baseTypeProperty() {
-        if (getTL().getParentType() instanceof TLValueWithAttributes)
-            return new SimpleStringProperty( getTL().getParentTypeName() );
+        OtmValueWithAttributes base = getBaseType();
+        if (base instanceof OtmValueWithAttributes)
+            return new SimpleStringProperty( base.getName() );
         else
             return new ReadOnlyStringWrapper( "" );
     }
@@ -201,7 +202,10 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
      */
     @Override
     public OtmValueWithAttributes getBaseType() {
-        return (OtmValueWithAttributes) super.getBaseType();
+        OtmObject p = OtmModelElement.get( (TLModelElement) getTL().getParentType() );
+        if (p instanceof OtmValueWithAttributes)
+            return (OtmValueWithAttributes) p;
+        return null;
     }
 
     @Override
