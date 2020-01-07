@@ -206,6 +206,10 @@ public class TestOtmModelManager extends AbstractFxTest {
             assertFalse( mgr.getLibraryChain( baseNS ).isEmpty() );
         }
         int baseNSCount = mgr.getBaseNamespaces().size();
+        // OtmModelManager mgr = new OtmModelManager( null, null );
+        // mgr.addBuiltInLibraries( new TLModel() );
+        assertNotNull( mgr.getIdType() );
+        assertNotNull( mgr.getEmptyType() );
 
         // When - cleared
         mgr.clear();
@@ -214,8 +218,15 @@ public class TestOtmModelManager extends AbstractFxTest {
         assertTrue( mgr.getBaseNamespaces().isEmpty() );
         assertTrue( mgr.getUserProjects().isEmpty() );
         assertTrue( mgr.getProjects().isEmpty() );
-        assertTrue( mgr.getMembers().isEmpty() );
-        assertTrue( mgr.getLibraries().isEmpty() );
+        for (OtmLibraryMember mbr : mgr.getMembers())
+            assertTrue( mbr.getLibrary().isBuiltIn() );
+        // assertTrue( mgr.getMembers().isEmpty() );
+        for (OtmLibrary lib : mgr.getLibraries())
+            assertTrue( lib.isBuiltIn() );
+        // assertTrue( mgr.getLibraries().isEmpty() );
+        //
+        assertNotNull( mgr.getIdType() );
+        assertNotNull( mgr.getEmptyType() );
 
         // When - loaded again
         TestDexFileHandler.loadManagedProject( mgr );

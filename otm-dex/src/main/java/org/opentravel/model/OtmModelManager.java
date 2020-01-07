@@ -34,6 +34,7 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberFactory;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
+import org.opentravel.schemacompiler.event.ModelElementListener;
 import org.opentravel.schemacompiler.ic.ModelIntegrityChecker;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.BuiltInLibrary;
@@ -113,7 +114,9 @@ public class OtmModelManager implements TaskResultHandlerI {
      * @param controller
      */
     public OtmModelManager(DexActionManager fullActionManager, RepositoryManager repositoryManager) {
-        // Create a TL Model to manager
+
+        // Create a TL Model to manage
+        //
         try {
             tlModel = new TLModel();
         } catch (Exception e) {
@@ -121,15 +124,19 @@ public class OtmModelManager implements TaskResultHandlerI {
         }
         // Tell model to track changes to maintain its type integrity
         tlModel.addListener( new ModelIntegrityChecker() );
+        // Bring in the built-in libraries
+        addBuiltInLibraries( tlModel );
 
         // Create a master project manager
+        //
         if (repositoryManager != null)
             projectManager = new ProjectManager( tlModel, true, repositoryManager );
         else
             projectManager = new ProjectManager( tlModel );
-        // this.repositoryManager = repositoryManager;
 
+        // Action managers
         // Main controller will pass one if enabled by settings
+        //
         if (fullActionManager == null) {
             this.fullActionManager = new DexReadOnlyActionManager();
             minorActionManager = new DexReadOnlyActionManager();
@@ -382,6 +389,11 @@ public class OtmModelManager implements TaskResultHandlerI {
             }
             libraries.put( tlLib, new OtmBuiltInLibrary( tlLib, this ) );
             for (LibraryMember tlMember : tlLib.getNamedMembers()) {
+                // If it has listeners, remove them
+                if (!tlMember.getListeners().isEmpty()) {
+                    ArrayList<ModelElementListener> listeners = new ArrayList<>( tlMember.getListeners() );
+                    listeners.forEach( l -> tlMember.removeListener( l ) );
+                }
                 OtmLibraryMemberFactory.create( tlMember, this ); // creates and adds
             }
         }
@@ -425,8 +437,10 @@ public class OtmModelManager implements TaskResultHandlerI {
         members.clear();
         projects.clear();
 
-        tlModel.clearModel();
+        getTlModel().clearModel();
         projectManager.closeAll();
+
+        addBuiltInLibraries( getTlModel() );
 
         // log.debug( "Cleared model. " + tlModel.getAllLibraries().size() );
     }
@@ -891,7 +905,7 @@ public class OtmModelManager implements TaskResultHandlerI {
 
 
     /**
-     * @return
+     * @return the ota 2.0 Empty simple type
      */
     public OtmXsdSimple getEmptyType() {
         LibraryMember tlId = null;

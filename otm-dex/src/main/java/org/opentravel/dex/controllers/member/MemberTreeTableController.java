@@ -36,6 +36,7 @@ import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmEmptyTableFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.objecteditor.ObjectEditorController;
 
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -218,7 +219,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
      * @return
      */
     public void createTreeItem(OtmLibraryMember member, TreeItem<MemberAndProvidersDAO> parent) {
-        // log.debug("Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName());
+        // log.debug( "Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName() );
 
         // Apply Filter
         if (filter != null && !filter.isSelected( member ))
@@ -374,6 +375,9 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         if (modelMgr != null && memberTree != null) {
             currentModelMgr = modelMgr;
             clear();
+            // Get the filter to use if needed
+            if (filter == null && getMainController() instanceof ObjectEditorController)
+                filter = ((ObjectEditorController) getMainController()).getMemberFilterController();
 
             // create cells for members
             // Collection<OtmLibraryMember> members = currentModelMgr.getMembers();

@@ -72,15 +72,6 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     private OtmLibraryMemberType objectType = null;
 
     public static final String ALL = "All Objects";
-    // public static final String BUSINESS = "Business";
-    // public static final String CHOICE = "Choice";
-    // public static final String CORE = "Core";
-    // public static final String RESOURCE = "Resource";
-    // public static final String SERVICE = "Service";
-    // public static final String SIMPLE = "Simple";
-    // public static final String ENUMERATION = "Enumeration";
-    // public static final String VWA = "Value With Attributes";
-    // public static final String CONTEXTUAL = "Contextual Facets";
 
     /**
      * FXML Java FX Nodes this controller is dependent upon
@@ -109,7 +100,6 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     private String textFilterValue = null;
     private OtmModelManager modelMgr;
 
-    // private HashMap<String,OtmLibrary> libraryMap = new HashMap<>();
     private TreeMap<String,OtmLibrary> libraryMap2 = new TreeMap<>();
 
     private String libraryFilter = null;
@@ -252,22 +242,15 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     public void initialize() {
         // log.debug("Member Filter Controller - Initialize");
         checkNodes();
+        builtInsButton.setSelected( builtIns );
 
         // Would work for combo
         configMemberTypeChoice();
-        // ObservableList<String> data = FXCollections.observableArrayList( ALL, RESOURCE, BUSINESS, CHOICE, CORE,
-        // CONTEXTUAL, SIMPLE, ENUMERATION, VWA, SERVICE );
-        // memberTypeCombo.setPromptText( "Object Type" );
-        // memberTypeCombo.setOnAction( this::setTypeFilter );
-        // memberTypeCombo.setItems( data );
         errorsButton.setOnAction( e -> setErrorsOnly() );
         memberNameFilter.textProperty().addListener( (v, o, n) -> applyTextFilter() );
-        // memberNameFilter.setOnKeyTyped(e -> applyTextFilter(e)); // Key event happens before the textField is updated
-        // memberNameFilter.setOnAction(e -> applyTextFilter()); // Fires on CR only
         editableButton.setOnAction( e -> setEditableOnly() );
         latestButton.setOnAction( e -> setLatestOnly() );
         builtInsButton.setOnAction( e -> setBuiltIns() );
-
     }
 
     private void configMemberTypeChoice() {
@@ -279,7 +262,6 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         memberTypeCombo.setPromptText( "Object Type" );
         memberTypeCombo.setOnAction( this::setTypeFilter );
         memberTypeCombo.setItems( data );
-
     }
 
     /**
@@ -292,6 +274,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             log.warn( "Filter passed invalid member." );
             return true;
         }
+        // log.debug( "Is " + member + " selected?" );
         // debugPrint( member );
         if (minorVersionMatch != null
             && !minorVersionMatch.getLibrary().getVersionChain().isLaterVersion( minorVersionMatch, member ))
@@ -306,8 +289,6 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             return false;
         if (!isMemberTypeSelected( member ))
             return false;
-        // if (classNameFilter != null && !member.getClass().getSimpleName().startsWith( classNameFilter ))
-        // return false;
         if (errorsOnly && member.isValid( false ))
             return false;
         if (!builtIns && member.getLibrary().getTL() instanceof BuiltInLibrary)
@@ -431,7 +412,6 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         }
     }
 
-    // // TODO - use OtmLibraryMemberType enumeration
     /**
      * Set the type filter to the object type's class simple name
      * 
@@ -456,31 +436,6 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             setTypeFilterValue( OtmLibraryMemberType.getClass( value ) );
     }
 
-    // @Obsolete
-    // public void setTypeFilter(String value, String x) {
-    // if (value.isEmpty() || value.equals( ALL ))
-    // // setTypeFilterValue( null );
-    // classNameFilter = null;
-    // else if (value.startsWith( RESOURCE ))
-    // setTypeFilterValue( OtmResource.class.getSimpleName() );
-    // else if (value.startsWith( SERVICE ))
-    // setTypeFilterValue( OtmServiceObject.class.getSimpleName() );
-    // else if (value.startsWith( BUSINESS ))
-    // setTypeFilterValue( OtmBusinessObject.class.getSimpleName() );
-    // else if (value.startsWith( CHOICE ))
-    // setTypeFilterValue( OtmChoiceObject.class.getSimpleName() );
-    // else if (value.startsWith( CONTEXTUAL ))
-    // setTypeFilterValue( OtmContextualFacet.class.getSimpleName() );
-    // else if (value.startsWith( CORE ))
-    // setTypeFilterValue( OtmCore.class.getSimpleName() );
-    // else if (value.startsWith( SIMPLE ))
-    // setTypeFilterValue( OtmSimpleObject.class.getSimpleName() );
-    // else if (value.startsWith( ENUMERATION ))
-    // setTypeFilterValue( OtmEnumeration.class.getSimpleName() );
-    // else if (value.startsWith( VWA ))
-    // setTypeFilterValue( OtmValueWithAttributes.class.getSimpleName() );
-    // }
-
     /**
      * Return false if the member fails to pass the class name filter (member object type). If the filter value is null,
      * all member pass through the filter.
@@ -496,26 +451,6 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         return OtmLibraryMemberType.is( member, objectType );
     }
 
-    // /**
-    // * Return false if the member fails to pass the class name filter (member object type). If the filter value is
-    // null,
-    // * all member pass through the filter.
-    // *
-    // * @param member
-    // * @return
-    // */
-    // @Obsolete
-    // public boolean isMemberTypeSelected(OtmLibraryMember member, String x) {
-    // if (classNameFilter == null)
-    // return true; // No filter applied
-    // if (member == null)
-    // return false;
-    // if (classNameFilter.equals( OtmContextualFacet.class.getSimpleName() ))
-    // return member instanceof OtmContextualFacet;
-    // else
-    // return member.getClass().getSimpleName().startsWith( classNameFilter );
-    // }
-
     /**
      * Set the type filter value. Expected to be the object type's class simple name
      * 
@@ -526,17 +461,4 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         fireFilterChangeEvent();
         // log.debug("Set Type Filter: " + classNameFilter);
     }
-
-    // /**
-    // * Set the type filter value. Expected to be the object type's class simple name
-    // *
-    // * @param value
-    // */
-    // @Obsolete
-    // public void setTypeFilterValue(String value) {
-    // classNameFilter = value;
-    // fireFilterChangeEvent();
-    // // log.debug("Set Type Filter: " + classNameFilter);
-    // }
-
 }

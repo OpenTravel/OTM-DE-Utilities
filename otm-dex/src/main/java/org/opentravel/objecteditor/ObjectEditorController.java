@@ -148,8 +148,8 @@ public class ObjectEditorController extends DexMainControllerBase {
 
         // Include controllers that are not in tabs
         addIncludedController( memberFilterController, eventManager );
-        addIncludedController( memberTreeTableController, eventManager );
         memberTreeTableController.setFilter( memberFilterController );
+        addIncludedController( memberTreeTableController, eventManager );
 
         memberPropertiesTabController.configure( this );
 
@@ -159,4 +159,7 @@ public class ObjectEditorController extends DexMainControllerBase {
         setMainController( this );
     }
 
+    public MemberFilterController getMemberFilterController() {
+        return memberFilterController;
+    }
 }
