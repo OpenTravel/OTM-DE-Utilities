@@ -57,6 +57,8 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
         return vwa;
     }
 
+    /** ******************************************************** **/
+
     /**
      * @param mgr
      * @param string

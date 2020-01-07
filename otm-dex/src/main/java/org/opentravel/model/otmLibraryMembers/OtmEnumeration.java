@@ -25,6 +25,7 @@ import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmFacets.OtmEnumerationValueFacet;
 import org.opentravel.model.otmProperties.OtmEnumerationValue;
 import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyFactory;
 import org.opentravel.schemacompiler.model.TLAbstractEnumeration;
 import org.opentravel.schemacompiler.model.TLEnumValue;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -159,13 +160,19 @@ public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
 
         if (getTL().getExtension() != null) {
             OtmEnumeration<?> base = getBaseType();
-            if (base instanceof OtmEnumeration)
-                // TEST - try using the actual facade, not creating a new one
-                base.getChildren().forEach( c -> addInherited( (OtmEnumerationValue) c ) );
-
-            // ((TLAbstractEnumeration) tlBase).getValues().forEach(
-            // v -> addInherited(new OtmEnumerationValue(v, (OtmEnumeration<TLAbstractEnumeration>) this)));
-            log.warn( "TEST - modeled inherited children" );
+            if (base instanceof OtmEnumeration) {
+                // Create new facades to the existing TLValues and add to inherited list
+                for (TLEnumValue v : ((TLAbstractEnumeration) base.getTL()).getValues()) {
+                    // Use the factory so it does not get added to this enumeration as a child
+                    OtmProperty p = OtmPropertyFactory.create( v, null );
+                    inheritedChildren.add( p );
+                    p.setParent( this );
+                    // New facade's parent must NOT be tlValue's owning enumeration to be inherited
+                    // add(p);
+                }
+            }
+            // ((TLAbstractEnumeration) base.getTL()).getValues().forEach(
+            // v -> addInherited( new OtmEnumerationValue( v, (OtmEnumeration<TLAbstractEnumeration>) this ) ) );
         }
     }
 

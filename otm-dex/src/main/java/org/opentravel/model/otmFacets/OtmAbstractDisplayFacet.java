@@ -172,6 +172,16 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     }
 
     @Override
+    public StringProperty nameEditingProperty() {
+        return new ReadOnlyStringWrapper( getName() );
+    }
+
+    @Override
+    public StringProperty nameEditingProperty(String name) {
+        return new ReadOnlyStringWrapper( name );
+    }
+
+    @Override
     public String getNamespace() {
         return parent.getNamespace();
     }

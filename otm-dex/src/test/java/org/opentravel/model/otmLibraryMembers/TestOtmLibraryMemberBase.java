@@ -27,14 +27,18 @@ import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmFacets.OtmAbstractFacet;
+import org.opentravel.model.otmFacets.OtmRoleEnumeration;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLExtension;
 import org.opentravel.schemacompiler.model.TLExtensionOwner;
 import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -173,7 +177,6 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
     @SuppressWarnings("unchecked")
     @Test
     public void testInheritance() {
-
         if (subject != null && baseObject != null) {
             extendObject( (L) baseObject, (L) subject );
             testInheritance( (L) subject );
@@ -181,12 +184,30 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
     }
 
     public void testInheritance(L otm) {
-        OtmObject base = otm.getBaseType();
+        if (otm.getBaseType() == null)
+            return;
 
-        // If there is a base type, assure the children are inherited
-        if (base instanceof OtmChildrenOwner && ((OtmChildrenOwner) base).getChildren().isEmpty()) {
-            assertTrue( !((OtmChildrenOwner) otm).getInheritedChildren().isEmpty() );
-            ((OtmChildrenOwner) otm).getInheritedChildren().forEach( i -> assertTrue( i.isInherited() ) );
+        if (otm instanceof OtmChildrenOwner) {
+            List<OtmObject> otmInherited = otm.getInheritedChildren();
+            List<OtmObject> baseKids = ((OtmChildrenOwner) otm.getBaseType()).getChildren();
+            // Remove the kids that can't be inherited
+            // Note: this list was based on test results and not analysis after fixing enumeration inheritance
+            List<OtmObject> candidates = new ArrayList<OtmObject>( baseKids );
+            for (OtmObject k : candidates) {
+                if (k instanceof OtmAbstractFacet)
+                    baseKids.remove( k );
+                if (k instanceof OtmRoleEnumeration)
+                    baseKids.remove( k );
+                if (k instanceof OtmResourceChild)
+                    baseKids.remove( k );
+            }
+
+            assertTrue( "Must have interited child for every base child.", baseKids.size() == otmInherited.size() );
+            for (OtmObject i : otmInherited) {
+                assertTrue( "Inherited child must report it is inherited.", i.isInherited() );
+            }
+            // otmInherited.forEach( i -> assertTrue( "Inherited child must report it is inherited.", i.isInherited() )
+            // );
         }
     }
 

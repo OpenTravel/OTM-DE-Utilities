@@ -119,12 +119,15 @@ public class OtmPropertyFactory {
         return indicator;
     }
 
-    protected static OtmEnumerationValue create(TLEnumValue tlValue, OtmEnumeration<TLAbstractEnumeration> parent) {
+    protected static OtmEnumerationValue create(TLEnumValue tlValue, OtmPropertyOwner parent) {
+        if (parent != null && !(parent instanceof OtmEnumeration))
+            return null;
+
         // Set the TL owner if not set.
         if (parent != null && parent.getTL() instanceof TLAbstractEnumeration)
             ((TLAbstractEnumeration) parent.getTL()).addValue( tlValue );
 
-        return new OtmEnumerationValue( tlValue, parent );
+        return new OtmEnumerationValue( tlValue, (OtmEnumeration<TLAbstractEnumeration>) parent );
     }
 
     protected static OtmRoleValue create(TLRole tlValue, OtmRoleEnumeration parent) {
@@ -152,8 +155,8 @@ public class OtmPropertyFactory {
             p = OtmPropertyFactory.create( (TLProperty) tl, parent );
         else if (tl instanceof TLAttribute)
             p = OtmPropertyFactory.create( (TLAttribute) tl, parent );
-        else if (tl instanceof TLEnumValue && parent instanceof OtmEnumeration)
-            p = OtmPropertyFactory.create( (TLEnumValue) tl, (OtmEnumeration<TLAbstractEnumeration>) parent );
+        else if (tl instanceof TLEnumValue)
+            p = OtmPropertyFactory.create( (TLEnumValue) tl, parent );
         else if (tl instanceof TLRole && parent instanceof OtmRoleEnumeration)
             p = OtmPropertyFactory.create( (TLRole) tl, (OtmRoleEnumeration) parent );
         else {

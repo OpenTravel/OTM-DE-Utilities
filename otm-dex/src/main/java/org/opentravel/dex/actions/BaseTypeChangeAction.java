@@ -47,6 +47,7 @@ public class BaseTypeChangeAction extends DexRunAction {
     // org.opentravel.schemacompiler.TLBusinessObject.versionExtension.INVALID_VERSION_EXTENSION
 
     public static boolean isEnabled(OtmObject subject) {
+        // VWA is not member of TLExtensionOwner!
         if (subject != null && subject.isEditable()) {
             return subject instanceof OtmContextualFacet || subject.getTL() instanceof TLExtensionOwner;
         }

@@ -481,6 +481,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
      */
     @Override
     public boolean isValid(boolean force) {
+        if (getLibrary() == null)
+            return false; // Can't be valid if not in a library.
         if (force) {
             synchronized (this) {
                 getChildren().forEach( c -> {

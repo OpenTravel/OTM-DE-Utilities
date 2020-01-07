@@ -18,6 +18,7 @@ package org.opentravel.model.otmProperties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.schemacompiler.model.TLAbstractEnumeration;
 import org.opentravel.schemacompiler.model.TLEnumValue;
@@ -38,21 +39,6 @@ public class OtmEnumerationValue extends OtmValueProperty {
             parent.add( this );
     }
 
-    // /**
-    // * {@inheritDoc}
-    // * <p>
-    // * No rules applied
-    // */
-    // @Override
-    // public String fixName(String name) {
-    // return name;
-    // }
-
-    // @Override
-    // public Icons getIconType() {
-    // return ImageManager.Icons.ENUMERATION_VALUE;
-    // }
-
     @Override
     public TLEnumValue getTL() {
         return (TLEnumValue) tlObject;
@@ -67,11 +53,6 @@ public class OtmEnumerationValue extends OtmValueProperty {
         return getName();
     }
 
-    // @Override
-    // public OtmEnumeration<TLAbstractEnumeration> getOwningMember() {
-    // return getParent();
-    // }
-
     @Override
     public String getName() {
         return getTL().getLiteral();
@@ -82,20 +63,19 @@ public class OtmEnumerationValue extends OtmValueProperty {
         return parent;
     }
 
-    // @Override
-    // public OtmPropertyType getPropertyType() {
-    // return OtmPropertyType.ENUMVALUE;
-    // }
-    //
-    // @Override
-    // public boolean isManditory() {
-    // return false;
-    // }
-    //
-    // @Override
-    // public void setManditory(boolean value) {
-    // // No-op
-    // }
+    @Override
+    public boolean isInherited() {
+        if (getTL() == null || getParent() == null)
+            return false;
+        return getTL().getOwningEnum() != getParent().getTL();
+    }
+
+    @Override
+    public OtmPropertyOwner setParent(OtmPropertyOwner parent) {
+        if (parent instanceof OtmEnumeration)
+            this.parent = (OtmEnumeration<TLAbstractEnumeration>) parent;
+        return parent;
+    }
 
     @Override
     public void clone(OtmProperty property) {

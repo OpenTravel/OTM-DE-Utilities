@@ -336,6 +336,7 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
     @Override
     public String setName(String name) {
         getTL().setName( name );
+        clearNameProperty();
         isValid( true );
         return getName();
     }
