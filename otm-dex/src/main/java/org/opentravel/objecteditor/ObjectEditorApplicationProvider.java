@@ -28,7 +28,7 @@ import org.opentravel.repositoryviewer.Images;
 public class ObjectEditorApplicationProvider implements OTA2ApplicationProvider {
 
     private static final OTA2ApplicationSpec spec = new OTA2ApplicationSpec( "OTM-DEX Object Editor",
-        "Edit OTA2 Models", 2, OTA2LauncherTabSpec.EXPERIMENTAL_TAB, Images.launcherIcon, ObjectEditorApp.class );
+        "Edit OTA2 Models", 2, OTA2LauncherTabSpec.RELEASED_TAB, Images.launcherIcon, ObjectEditorApp.class );
 
     /**
      * @see org.opentravel.application.common.OTA2ApplicationProvider#getApplicationSpec()

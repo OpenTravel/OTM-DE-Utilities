@@ -197,12 +197,6 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
     @Override
     public void modelChildren() {
         // No-Op
-        // if (getTL() instanceof TLIndicatorOwner)
-        // ((TLIndicatorOwner) getTL()).getIndicators().forEach( p -> OtmPropertyFactory.create( p, this ) );
-        // if (getTL() instanceof TLAttributeOwner)
-        // ((TLAttributeOwner) getTL()).getAttributes().forEach( p -> OtmPropertyFactory.create( p, this ) );
-        // if (getTL() instanceof TLPropertyOwner)
-        // ((TLPropertyOwner) getTL()).getElements().forEach( p -> OtmPropertyFactory.create( p, this ) );
     }
 
     /**
