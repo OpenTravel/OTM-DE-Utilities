@@ -180,7 +180,18 @@ public class UserSettings extends AbstractUserSettings {
     private int exampleMaxRepeat;
     private int exampleMaxDepth;
     private boolean suppressOptionalFields = false;
+    private String lastRepositoryId = "";
 
+
+    public String getLastRepositoryId() {
+        return lastRepositoryId;
+    }
+
+    public void setLastRepositoryId(String lastRepositoryId) {
+        if (lastRepositoryId == null)
+            lastRepositoryId = "";
+        this.lastRepositoryId = lastRepositoryId;
+    }
 
     /**
      * Returns the user settings from the prior session. If no prior settings exist, default settings are returned.
@@ -243,6 +254,7 @@ public class UserSettings extends AbstractUserSettings {
         // settings.setLastModelFile( new File( userHomeDirectory + "/dummy-file.otm" ) );
         settings.setLastProjectFolder( new File( userHomeDirectory ) );
         settings.setHideOpenProjectDialog( false );
+        settings.setLastRepositoryId( "" );
 
         // Compiler Options
         settings.setCompileSchemas( true );
@@ -274,7 +286,7 @@ public class UserSettings extends AbstractUserSettings {
 
         String hideOpenProjectDialog = settingsProps.getProperty( HIDE_PROJECT_OPEN_DIALOG );
         setHideOpenProjectDialog( Boolean.valueOf( hideOpenProjectDialog ) );
-
+        setLastRepositoryId( settingsProps.getProperty( "lastRepositoryId" ) );
         // int rptCount = Integer.parseInt( settingsProps.getProperty( "repeatCount" ) );
         // setRepeatCount( rptCount );
 
@@ -307,6 +319,7 @@ public class UserSettings extends AbstractUserSettings {
         // defaultValues.getLastModelFile().getAbsolutePath() : this.lastModelFile.getAbsolutePath();
         String projectFolder = (this.lastProjectFile == null) ? defaultValues.getLastProjectFolder().getAbsolutePath()
             : this.lastProjectFile.getAbsolutePath();
+        settingsProps.put( "lastRepositoryId", lastRepositoryId );
 
         // settingsProps.put( "repeatCount", repeatCount + "" );
         // settingsProps.put( "lastModelFile", modelFile );

@@ -30,6 +30,8 @@ import org.opentravel.dex.controllers.repository.RepositoryTabController;
 import org.opentravel.dex.controllers.resources.ResourcesTabController;
 import org.opentravel.dex.controllers.search.SearchTabController;
 import org.opentravel.dex.controllers.search.SearchWindowController;
+import org.opentravel.dex.events.DexRepositorySelectionEvent;
+import org.opentravel.schemacompiler.repository.Repository;
 
 import java.awt.Dimension;
 
@@ -99,8 +101,12 @@ public class ObjectEditorController extends DexMainControllerBase {
         super.setStage( stage );
         log.debug( "Object Editor Controller - Setting Stage" );
 
-        // Get the user preferences
-        userSettings = UserSettings.load();
+        // Get the user preferences, Override with the instance from the abstract main controller
+        if (getUserSettings() instanceof UserSettings)
+            userSettings = getUserSettings();
+        else
+            userSettings = UserSettings.load();
+
         // Set the stage size based on user preferences
         Dimension size = userSettings.getWindowSize();
         stage.setHeight( size.height );
@@ -157,6 +163,11 @@ public class ObjectEditorController extends DexMainControllerBase {
         eventManager.configureEventHandlers();
 
         setMainController( this );
+
+        // Try opening the last repository they used
+        Repository lastRepo = getRepositoryManager().getRepository( userSettings.getLastRepositoryId() );
+        if (lastRepo != null)
+            menuBarWithProjectController.fireEvent( new DexRepositorySelectionEvent( lastRepo ) );
     }
 
     public MemberFilterController getMemberFilterController() {

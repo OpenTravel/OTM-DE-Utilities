@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
@@ -60,10 +61,10 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
     private static final EventType[] publishedEvents = {DexRepositorySelectionEvent.REPOSITORY_SELECTED};
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents = {};
+    private static final EventType[] subscribedEvents = {DexRepositorySelectionEvent.REPOSITORY_SELECTED};
 
     public RepositorySelectionController() {
-        super( null, publishedEvents );
+        super( subscribedEvents, publishedEvents );
         // log.debug( "Starting constructor." );
     }
 
@@ -109,6 +110,17 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
         // log.debug( "Repository choice has " + repositoryIds.size() + " items." );
     }
 
+    @Override
+    public void handleEvent(AbstractOtmEvent event) {
+        if (event instanceof DexRepositorySelectionEvent) {
+            String rid = "";
+            Repository repo = ((DexRepositorySelectionEvent) event).getRepository();
+            if (repo != null)
+                rid = repo.getId();
+            if (!rid.isEmpty())
+                repositoryChoice.getSelectionModel().select( rid );
+        }
+    }
 
 
     /**
@@ -163,6 +175,8 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
         // log.debug( "Selected new repository" );
         try {
             postUser( getSelectedRepository() );
+            if (getMainController().getUserSettings() != null)
+                getMainController().getUserSettings().setLastRepositoryId( getSelectedRepository().getId() );
             repositoryChoice.fireEvent( new DexRepositorySelectionEvent( getSelectedRepository() ) );
         } catch (Exception e) {
             log.error( "Error posting repository: " + e.getLocalizedMessage() );

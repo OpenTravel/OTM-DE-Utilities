@@ -143,6 +143,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         publishedEventTypes.add( DexModelChangeEvent.MODEL_CHANGED );
         publishedEventTypes.add( DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED );
         publishedEventTypes.add( DexMemberSelectionEvent.TYPE_USER_SELECTED );
+        publishedEventTypes.add( DexRepositorySelectionEvent.REPOSITORY_SELECTED );
+
         for (EventType<? extends DexEvent> et : publishedEvents) {
             publishedEventTypes.add( et );
         }
