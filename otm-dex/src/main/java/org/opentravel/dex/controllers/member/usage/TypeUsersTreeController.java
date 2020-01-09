@@ -26,6 +26,7 @@ import org.opentravel.dex.controllers.member.properties.PropertiesDAO;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
@@ -62,7 +63,7 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
         {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
-    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED};
+    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.TYPE_USER_SELECTED};
 
     /**
      * Construct a member tree table controller that can publish and receive events.
@@ -190,17 +191,22 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
     private void memberSelectionListener(TreeItem<PropertiesDAO> item) {
         if (item == null || eventPublisherNode == null)
             return;
+        if (item.getValue() == null || item.getValue().getValue() == null)
+            return;
+        OtmObject obj = item.getValue().getValue();
         log.debug( "Selection Listener: " + item.getValue() );
-        OtmTypeUser p = null;
-        if (item.getValue() != null && item.getValue().getValue() instanceof OtmTypeUser)
-            p = (OtmTypeUser) item.getValue().getValue();
 
-        OtmLibraryMember member = p != null ? p.getAssignedType().getOwningMember() : null;
-        if (member == null && item.getValue() != null && item.getValue().getValue() instanceof OtmLibraryMember)
-            member = (OtmLibraryMember) item.getValue().getValue();
+        // Throw event with either the owning member or the owning member of the assigned type.
+        OtmLibraryMember member = null;
+        if (obj instanceof OtmTypeUser) {
+            if (((OtmTypeUser) obj).getAssignedType() != null)
+                member = ((OtmTypeUser) obj).getAssignedType().getOwningMember();
+        } else
+            member = obj.getOwningMember();
+
         ignoreEvents = true;
         if (member != null)
-            fireEvent( new DexMemberSelectionEvent( member, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED ) );
+            fireEvent( new DexMemberSelectionEvent( member, DexMemberSelectionEvent.TYPE_USER_SELECTED ) );
         ignoreEvents = false;
     }
 

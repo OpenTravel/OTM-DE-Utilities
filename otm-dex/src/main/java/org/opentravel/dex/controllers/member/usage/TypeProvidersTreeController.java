@@ -71,8 +71,8 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
     // private OtmLibraryMember postedMember;
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents =
-        {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] subscribedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED,
+        DexModelChangeEvent.MODEL_CHANGED, DexMemberSelectionEvent.TYPE_USER_SELECTED};
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED};
 
     /**
@@ -206,14 +206,36 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
     // }
 
     private void handleEvent(DexMemberSelectionEvent event) {
-        if (!ignoreEvents && event != null && event.getEventType() == DexMemberSelectionEvent.MEMBER_SELECTED)
+        if (event.getEventType() == DexMemberSelectionEvent.MEMBER_SELECTED)
             post( event.getMember() );
+        else if (event.getEventType() == DexMemberSelectionEvent.TYPE_USER_SELECTED) {
+            typeProvidersTree.getSelectionModel().clearSelection();
+            // TODO - this logic selects the right tree item, but it does not highlight.
+            // TODO - use the event member to find the corresponding tree item or row number to select it.
+            // TODO - re-factor into OtmNamespaceFacet.contains()
+            // OtmLibraryMember member = event.getMember();
+            // for (TreeItem<MemberAndProvidersDAO> ti : typeProvidersTree.getRoot().getChildren()) {
+            // OtmObject candidate = ti.getValue().getValue();
+            // if (candidate instanceof OtmNamespaceFacet
+            // && ((OtmNamespaceFacet) candidate).getNamespace().equals( member.getNamespace() ))
+            // for (TreeItem<MemberAndProvidersDAO> ti2 : ti.getChildren()) {
+            // // OtmObject c2 = ti2.getValue().getValue();
+            // if (ti2.getValue().getValue() == event.getMember()) {
+            // typeProvidersTree.getSelectionModel().select( ti2 );
+            // typeProvidersTree.getFocusModel()
+            // .focus( typeProvidersTree.getSelectionModel().getSelectedIndex() );
+            // log.debug( "Type provider tree - Selected " + ti2.getValue().getValue() + " at index "
+            // + typeProvidersTree.getSelectionModel().getSelectedIndex() );
+            // }
+            // }
+            // }
+        }
     }
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
         // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
-        if (!ignoreEvents) {
+        if (!ignoreEvents && event != null && event.getEventType() != null) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
             if (event instanceof DexModelChangeEvent)
@@ -235,10 +257,12 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
         OtmLibraryMember member = null;
         if (item.getValue() != null && item.getValue().getValue() instanceof OtmLibraryMember)
             member = (OtmLibraryMember) item.getValue().getValue();
-        ignoreEvents = true;
-        if (member != null)
-            fireEvent( new DexMemberSelectionEvent( member, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED ) );
-        ignoreEvents = false;
+        if (!ignoreEvents) {
+            ignoreEvents = true;
+            if (member != null)
+                fireEvent( new DexMemberSelectionEvent( member, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED ) );
+            ignoreEvents = false;
+        }
     }
 
     /**

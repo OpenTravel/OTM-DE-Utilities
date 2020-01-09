@@ -44,12 +44,17 @@
     -fx-text-fill: #FFFFFF;
     -fx-background-radius: 4;
 }
-/** 
-#.tree-view, .tree-cell{
+
+/**
+.tree-view, .tree-cell{
+	    -fx-selection-bar: #404040 ;
+	}
+ * .tree-view, .tree-cell{
     # -fx-background-color: #7cafc2;
     #-fx-text-fill: #a03030;
     #-fx-text-color: #a03000;
-	#}
+    -fx-selection-bar: transparent ;
+	}
     */
 .tree-cell:selected {
     -fx-font-weight: bold ;

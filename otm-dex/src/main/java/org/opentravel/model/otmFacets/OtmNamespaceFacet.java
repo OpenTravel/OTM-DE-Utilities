@@ -51,6 +51,11 @@ public class OtmNamespaceFacet extends OtmAbstractDisplayFacet {
     }
 
     @Override
+    public String getNamespace() {
+        return object.getNamespace();
+    }
+
+    @Override
     public Collection<OtmObject> getChildrenHierarchy() {
         return Collections.emptyList();
     }

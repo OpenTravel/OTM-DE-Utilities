@@ -16,6 +16,8 @@
 
 package org.opentravel.application.common.events;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.OtmEventUser;
 
 import java.util.ArrayList;
@@ -35,7 +37,7 @@ import javafx.event.EventType;
  * 
  */
 public class OtmEventSubscriptionManager {
-    // private static Log log = LogFactory.getLog( OtmEventSubscriptionManager.class );
+    private static Log log = LogFactory.getLog( OtmEventSubscriptionManager.class );
 
     // Map of event types to list of publishers of that event type
     private Map<EventType<? extends AbstractOtmEvent>,List<OtmEventUser>> publishedEvents = new HashMap<>();
@@ -104,7 +106,8 @@ public class OtmEventSubscriptionManager {
     private void addController(Map<EventType<? extends AbstractOtmEvent>,List<OtmEventUser>> map,
         EventType<? extends AbstractOtmEvent> et, OtmEventUser controller) {
         if (map.containsKey( et )) {
-            map.get( et ).add( controller );
+            if (!map.get( et ).contains( controller ))
+                map.get( et ).add( controller );
         } else {
             ArrayList<OtmEventUser> list = new ArrayList<>();
             list.add( controller );
@@ -146,6 +149,8 @@ public class OtmEventSubscriptionManager {
         if (subscribedEvents.containsKey( publishedEvent )) {
             for (OtmEventUser subscriber : subscribedEvents.get( publishedEvent )) {
                 publisher.setEventHandler( publishedEvent, subscriber::handleEvent );
+                log.debug(
+                    "Set Subscriber to " + publishedEvent.getName() + " for " + subscriber.getClass().getSimpleName() );
             }
         }
     }

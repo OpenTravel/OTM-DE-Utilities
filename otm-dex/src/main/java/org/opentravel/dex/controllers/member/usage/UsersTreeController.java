@@ -70,8 +70,8 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
     private OtmModelManager modelMgr;
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents =
-        {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] subscribedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED,
+        DexModelChangeEvent.MODEL_CHANGED, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED};
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.TYPE_USER_SELECTED};
 
     /**
@@ -189,15 +189,16 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
     }
 
     private void handleEvent(DexMemberSelectionEvent event) {
-        if (!ignoreEvents && event != null && event.getEventType() == DexMemberSelectionEvent.MEMBER_SELECTED)
-            if (!ignoreEvents)
-                post( event.getMember() );
+        if (event.getEventType() == DexMemberSelectionEvent.MEMBER_SELECTED)
+            post( event.getMember() );
+        else if (event.getEventType() == DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED)
+            usersTree.getSelectionModel().clearSelection();
     }
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
         // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
-        if (!ignoreEvents) {
+        if (!ignoreEvents && event != null && event.getEventType() != null) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
             if (event instanceof DexModelChangeEvent)
