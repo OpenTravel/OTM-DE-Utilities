@@ -22,8 +22,10 @@ import org.opentravel.common.DexProjectHandler;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
-import org.opentravel.dex.controllers.popup.UnlockLibraryDialogContoller;
+import org.opentravel.dex.controllers.popup.UnlockAndCommitLibraryDialogController;
+import org.opentravel.dex.controllers.popup.UnlockAndCommitLibraryDialogController.TaskRequested;
 import org.opentravel.dex.controllers.repository.RepositoryResultHandler;
+import org.opentravel.dex.tasks.repository.CommitLibraryTask;
 import org.opentravel.dex.tasks.repository.LockLibraryTask;
 import org.opentravel.dex.tasks.repository.ManageLibraryTask;
 import org.opentravel.dex.tasks.repository.PromoteLibraryTask;
@@ -60,7 +62,8 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
 
     private final ContextMenu contextMenu = new ContextMenu();
     private MenuItem lockLibrary;
-    private MenuItem unlockLibrary;
+    // private MenuItem unlockLibrary;
+    private MenuItem commitLibrary = new MenuItem( "Commit and Unlock" );
     private MenuItem projectAdd;
     private MenuItem projectRemove;
     private MenuItem saveLibrary;
@@ -80,7 +83,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     public LibraryRowFactory() {
         // Create Context menu
         lockLibrary = new MenuItem( "Lock" );
-        unlockLibrary = new MenuItem( "Unlock" );
+        // unlockLibrary = new MenuItem( "Commit and Unlock" );
         projectAdd = new MenuItem( "Add to project" );
         projectRemove = new MenuItem( "Remove from project" );
         saveLibrary = new MenuItem( "Save" );
@@ -95,7 +98,8 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         // versionMenu.getItems().addAll( major, minor, patch );
 
         lockLibrary.setOnAction( e -> lockLibrary() );
-        unlockLibrary.setOnAction( e -> unlockLibrary() );
+        // unlockLibrary.setOnAction( e -> unlockLibrary() );
+        commitLibrary.setOnAction( e -> commitLibrary() );
         projectAdd.setOnAction( this::addToProject );
         projectRemove.setOnAction( this::removeLibrary );
         saveLibrary.setOnAction( e -> saveLibrary() );
@@ -104,7 +108,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         versionMenu.setOnAction( this::versionLibrary );
         refresh.setOnAction( e -> refreshView() );
 
-        contextMenu.getItems().addAll( saveLibrary, new SeparatorMenuItem(), lockLibrary, unlockLibrary );
+        contextMenu.getItems().addAll( saveLibrary, new SeparatorMenuItem(), lockLibrary, commitLibrary );
         contextMenu.getItems().addAll( new SeparatorMenuItem(), projectAdd, projectRemove );
         contextMenu.getItems().addAll( new SeparatorMenuItem(), manage, promote, versionMenu );
         contextMenu.getItems().addAll( new SeparatorMenuItem(), refresh );
@@ -264,7 +268,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
             OtmLibrary library = newTreeItem.getValue().getValue();
             if (library != null && library.getModelManager() != null) {
                 lockLibrary.setDisable( !library.canBeLocked() );
-                unlockLibrary.setDisable( !library.canBeUnlocked() );
+                commitLibrary.setDisable( !library.canBeUnlocked() );
                 // whereUsed.setDisable( true );
                 projectAdd.setDisable( !library.getModelManager().hasProjects() );
                 projectRemove.setDisable( library.getProjects().isEmpty() );
@@ -278,7 +282,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
                 obsolete.setDisable( !PromoteLibraryTask.isEnabled( library, TLLibraryStatus.OBSOLETE ) );
             } else {
                 lockLibrary.setDisable( true );
-                unlockLibrary.setDisable( true );
+                commitLibrary.setDisable( true );
                 projectAdd.setDisable( true );
                 projectRemove.setDisable( true );
                 //
@@ -294,14 +298,39 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         }
     }
 
-    private void unlockLibrary() {
-        log.debug( "Unlock in Row Factory.   " + controller.getSelectedItem().getValue().getClass().hashCode() );
-        UnlockLibraryDialogContoller uldc = UnlockLibraryDialogContoller.init();
-        uldc.showAndWait( "" );
-        boolean commitWIP = uldc.getCommitState();
-        String remarks = uldc.getCommitRemarks();
+    // private void unlockLibrary() {
+    // log.debug( "Unlock in Row Factory. " + controller.getSelectedItem().getValue().getClass().hashCode() );
+    // UnlockLibraryDialogContoller uldc = UnlockLibraryDialogContoller.init();
+    // uldc.showAndWait( "" );
+    // boolean commitWIP = uldc.getCommitState();
+    // String remarks = uldc.getCommitRemarks();
+    //
+    // new UnlockLibraryTask( controller.getSelectedItem().getValue(), commitWIP, remarks,
+    // new RepositoryResultHandler( mainController ), mainController.getStatusController() ).go();
+    // }
 
-        new UnlockLibraryTask( controller.getSelectedItem().getValue(), commitWIP, remarks,
-            new RepositoryResultHandler( mainController ), mainController.getStatusController() ).go();
+    private void commitLibrary() {
+        log.debug(
+            "Commit library in Row Factory.   " + controller.getSelectedItem().getValue().getClass().hashCode() );
+        UnlockAndCommitLibraryDialogController uldc = UnlockAndCommitLibraryDialogController.init();
+        uldc.showAndWait( "" );
+        String remarks = uldc.getCommitRemarks();
+        TaskRequested task = uldc.getTask();
+        switch (task) {
+            case Cancel:
+                break;
+            case UnlockOnly:
+                new UnlockLibraryTask( controller.getSelectedItem().getValue(), false, remarks,
+                    new RepositoryResultHandler( mainController ), mainController.getStatusController() ).go();
+                break;
+            case CommitAndUnlock:
+                new UnlockLibraryTask( controller.getSelectedItem().getValue(), true, remarks,
+                    new RepositoryResultHandler( mainController ), mainController.getStatusController() ).go();
+                break;
+            case CommitOnly:
+                new CommitLibraryTask( controller.getSelectedItem().getValue(), remarks,
+                    new RepositoryResultHandler( mainController ), mainController.getStatusController() ).go();
+                break;
+        }
     }
 }

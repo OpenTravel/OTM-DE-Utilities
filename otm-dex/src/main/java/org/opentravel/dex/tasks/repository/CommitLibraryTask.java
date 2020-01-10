@@ -29,31 +29,31 @@ import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.schemacompiler.repository.RepositoryException;
 
 /**
- * A Dex/JavaFX task for unlocking libraries via their project item
+ * A Dex/JavaFX task for committing libraries via their project item
  * 
  * @author dmh
  *
  */
-public class UnlockLibraryTask extends DexTaskBase<OtmLibrary> {
-    private static Log log = LogFactory.getLog( UnlockLibraryTask.class );
+public class CommitLibraryTask extends DexTaskBase<OtmLibrary> {
+    private static Log log = LogFactory.getLog( CommitLibraryTask.class );
 
-    boolean commitWIP = true;
-    String remarks = "testing";
+    public static final String TASKNAME = "Committing";
+    String remarks = "";
 
-    public UnlockLibraryTask(OtmLibrary taskData, boolean commitWIP, String remarks, TaskResultHandlerI handler,
+    public CommitLibraryTask(OtmLibrary taskData, String remarks, TaskResultHandlerI handler,
         DexStatusController status) {
         super( taskData, handler, status );
-        this.commitWIP = commitWIP;
         this.remarks = remarks;
 
         // Replace start message from super-type.
-        msgBuilder = new StringBuilder( "Unlocking: " );
+        msgBuilder = new StringBuilder( TASKNAME + ": " );
         msgBuilder.append( taskData.getName() );
         updateMessage( msgBuilder.toString() );
     }
 
     @Override
     public void doIT() throws RepositoryException {
+        log.debug( TASKNAME );
         OtmProject managingProject = taskData.getManagingProject();
         if (managingProject != null) {
             Project managingTLProject = managingProject.getTL();
@@ -61,8 +61,7 @@ public class UnlockLibraryTask extends DexTaskBase<OtmLibrary> {
             if (managingTLProject != null && pi != null) {
                 ProjectManager projectManager = managingTLProject.getProjectManager();
                 if (projectManager != null)
-                    projectManager.unlock( pi, commitWIP, remarks );
-                // projectManager.commit( pi, remarks );
+                    projectManager.commit( pi, remarks );
             }
         }
     }

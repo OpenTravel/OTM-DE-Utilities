@@ -85,8 +85,8 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
 
         // Create action for events
         // lockLibrary.setOnAction((e) -> lockLibraryEventHandler());
-        unlockLibrary.setOnAction( (e) -> unlockLibraryEventHandler() );
-        promoteLibrary.setOnAction( this::promoteLibraryEventHandler );
+        unlockLibrary.setOnAction( (e) -> unlockLibrary() );
+        promoteLibrary.setOnAction( this::promoteLibrary );
         addToProject.setOnAction( this::addToProject );
         browser.setOnAction( this::previewInBrowser );
         refresh.setOnAction( e -> refreshView() );
@@ -141,8 +141,8 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
     // mainController.getStatusController(), controller, mainController.getModelManager()).go();
     // }
 
-    private void unlockLibraryEventHandler() {
-        log.debug( "Unlock in Row Factory.   " + controller.getSelectedItem().getValue().getClass().hashCode() );
+    private void unlockLibrary() {
+        // log.debug( "Unlock in Row Factory. " + controller.getSelectedItem().getValue().getClass().hashCode() );
         UnlockLibraryDialogContoller uldc = UnlockLibraryDialogContoller.init();
         uldc.showAndWait( "" );
         boolean commitWIP = uldc.getCommitState();
@@ -152,7 +152,7 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
             new RepositoryResultHandler( mainController ), mainController.getStatusController() ).go();
     }
 
-    private void promoteLibraryEventHandler(ActionEvent t) {
+    private void promoteLibrary(ActionEvent t) {
         log.debug( "TODO - implement Promote in Row Factory." );
     }
 
