@@ -154,6 +154,8 @@ public class TestLibraryMemberBase {
                 continue;
             if (lm instanceof OtmSimpleObjects)
                 continue;
+            if (lm instanceof OtmXsdElement)
+                continue;
 
             assertTrue( "Must have children", !lm.getChildren().isEmpty() );
             for (OtmObject child : lm.getChildren()) {

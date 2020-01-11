@@ -332,10 +332,12 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
         return getAssignedType();
     }
 
-    // @Override
-    // public OtmObject setBaseType(OtmObject baseObj) {
-    // return null; // No-Op
-    // }
+    @Override
+    public OtmObject setBaseType(OtmObject baseObj) {
+        if (baseObj instanceof OtmValueWithAttributes)
+            setAssignedType( (OtmValueWithAttributes) baseObj );
+        return getBaseType();
+    }
 
     @Override
     public String setName(String name) {
