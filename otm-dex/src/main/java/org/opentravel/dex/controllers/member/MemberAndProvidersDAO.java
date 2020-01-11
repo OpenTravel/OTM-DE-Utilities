@@ -47,6 +47,7 @@ public class MemberAndProvidersDAO implements DexDAO<OtmObject> {
     private static Log log = LogFactory.getLog( MemberAndProvidersDAO.class );
 
     protected OtmObject otmObject;
+    protected OtmLibraryMember usingMember = null;
 
     public MemberAndProvidersDAO(OtmObject member) {
         this.otmObject = member;
@@ -54,6 +55,11 @@ public class MemberAndProvidersDAO implements DexDAO<OtmObject> {
 
     public MemberAndProvidersDAO(OtmTypeProvider provider) {
         this.otmObject = provider;
+    }
+
+    public MemberAndProvidersDAO(OtmTypeProvider provider, OtmLibraryMember usingMember) {
+        this.otmObject = provider;
+        this.usingMember = usingMember;
     }
 
     /**
@@ -80,6 +86,10 @@ public class MemberAndProvidersDAO implements DexDAO<OtmObject> {
 
     public StringProperty errorProperty() {
         return otmObject.validationProperty();
+    }
+
+    public OtmLibraryMember getUsingMember() {
+        return usingMember;
     }
 
     @Override

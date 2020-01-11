@@ -58,11 +58,10 @@
     */
 .tree-cell:selected {
     -fx-font-weight: bold ;
-    -fx-text-fill: #603030;
+    -fx-text-fill:  black ;
 }
 .tree-cell:hover {
-    -fx-text-fill: #E0E0E0;
-    -fx-background-color: #3c3fa2;
+    -fx-background-color: lightgray;
 }
 .tree-cell {
     -fx-font-weight: normal ;
@@ -72,8 +71,22 @@
 }
 .tree {
     -fx-font-weight: normal ;
-    -fx-text-fill: #603030;
+    -fx-text-fill: black ;
 }
+.tree-cell:editable {
+    -fx-font-weight: bold ;
+}
+.tree-cell:inherited {
+    -fx-background-color: #f0f0f0;
+	-fx-font-style: italic ;
+	-fx-font-weight: normal ;
+}
+.tree-cell:divider {
+    -fx-background-color: #9ccfe2;
+    -fx-text-fill: black ;
+    -fx-font-style: italic ;
+}
+
 .tree-table-cell:editable {
     -fx-font-weight: bold ;
     -fx-text-fill: #603030;

@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexController;
+import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
@@ -96,6 +97,9 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
     @Override
     public void clear() {
         postedData = null;
+        // How to clear treeCell psueudo settings
+        // pseudoClassStateChanged
+        // typeProvidersTree.getRoot().getChildren().filtered( c -> c. )
         typeProvidersTree.getRoot().getChildren().clear();
     }
 
@@ -132,9 +136,11 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
         typeProvidersTree.setEditable( false );
 
         // Add listeners and event handlers
-        // typeProvidersTree.getSelectionModel().select(0);
         typeProvidersTree.getSelectionModel().selectedItemProperty()
             .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
+
+        // Enable context menus at the row level and add change listener for for applying style
+        typeProvidersTree.setCellFactory( (TreeView<MemberAndProvidersDAO> p) -> new TypeProviderCellFactory( this ) );
 
         // log.debug("Where used table configured.");
         refresh();
@@ -204,6 +210,11 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
     // return typeProvidersTree.getSelectionModel().getSelectedItem() != null
     // ? typeProvidersTree.getSelectionModel().getSelectedItem().getValue() : null;
     // }
+
+    @Override
+    public DexDAO<?> getSelection() {
+        return typeProvidersTree.getSelectionModel().getSelectedItem().getValue();
+    }
 
     private void handleEvent(DexMemberSelectionEvent event) {
         if (event.getEventType() == DexMemberSelectionEvent.MEMBER_SELECTED)
@@ -293,7 +304,7 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
         } );
 
         member.getUsedTypes().forEach( u -> {
-            TreeItem<MemberAndProvidersDAO> item = new TreeItem<>( new MemberAndProvidersDAO( u ) );
+            TreeItem<MemberAndProvidersDAO> item = new TreeItem<>( new MemberAndProvidersDAO( u, member ) );
             if (usedPrefixes.get( u.getPrefix() ) != null)
                 usedPrefixes.get( u.getPrefix() ).getChildren().add( item );
             else
