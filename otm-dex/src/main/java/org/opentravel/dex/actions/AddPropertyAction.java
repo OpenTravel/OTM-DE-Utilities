@@ -24,7 +24,6 @@ import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyType;
-import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 /**
  * This action creates a new property in the subject property owner.
@@ -100,10 +99,10 @@ public class AddPropertyAction extends DexRunAction {
         return (OtmPropertyOwner) otm;
     }
 
-    @Override
-    public ValidationFindings getVetoFindings() {
-        return null;
-    }
+    // @Override
+    // public ValidationFindings getVetoFindings() {
+    // return null;
+    // }
 
     @Override
     public boolean isValid() {

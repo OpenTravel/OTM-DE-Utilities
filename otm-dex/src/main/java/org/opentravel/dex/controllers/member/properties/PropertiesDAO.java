@@ -225,7 +225,7 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
             obj = ((PropertiesDAO) object).getValue();
         if (obj instanceof OtmObject) {
             obj.setExpanded( e.wasExpanded() );
-            log.debug( "Set " + obj + " is expanded to " + obj.isExpanded() + " " + e.wasExpanded() );
+            // log.debug( "Set " + obj + " is expanded to " + obj.isExpanded() + " " + e.wasExpanded() );
         }
     }
 

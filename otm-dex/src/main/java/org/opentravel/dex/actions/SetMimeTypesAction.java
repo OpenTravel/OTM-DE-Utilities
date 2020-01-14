@@ -23,7 +23,6 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmActionResponse;
 import org.opentravel.schemacompiler.model.TLMimeType;
-import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.util.Collections;
 import java.util.List;
@@ -71,10 +70,10 @@ public class SetMimeTypesAction extends DexRunAction {
         return Collections.emptyList();
     }
 
-    @Override
-    public ValidationFindings getVetoFindings() {
-        return null;
-    }
+    // @Override
+    // public ValidationFindings getVetoFindings() {
+    // return null;
+    // }
 
     @Override
     public boolean isValid() {

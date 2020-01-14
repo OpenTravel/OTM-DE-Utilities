@@ -195,5 +195,19 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
 
     public StringProperty versionProperty();
 
+    /**
+     * @param provider
+     * @return list of type user descendants assigned to the provider, or an empty list
+     */
+    public List<OtmTypeUser> getTypeUsers(OtmTypeProvider provider);
+
+    /**
+     * Get a descendant type provider of the same class as the passed provider.
+     * 
+     * @param provider
+     * @return match or null
+     */
+    public OtmTypeProvider getMatchingProvider(OtmTypeProvider provider);
+
 
 }

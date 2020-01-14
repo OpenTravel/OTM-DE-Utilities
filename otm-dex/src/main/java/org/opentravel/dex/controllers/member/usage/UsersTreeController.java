@@ -27,14 +27,16 @@ import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmFacets.OtmNamespaceFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.repository.EntitySearchResult;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javafx.application.Platform;
 import javafx.event.EventType;
@@ -133,6 +135,9 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
         usersTree.getSelectionModel().selectedItemProperty()
             .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
+        // Enable context menus at the row level and add change listener for for applying style
+        usersTree.setCellFactory( (TreeView<MemberAndUsersDAO> p) -> new UserCellFactory( this ) );
+
         // log.debug("Where used table configured.");
         refresh();
     }
@@ -147,13 +152,33 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
      * @return
      */
     public void createTreeItems(OtmLibraryMember member) {
-        if (member == null)
+        if (member == null || member.getWhereUsed() == null)
             return;
         // log.debug("Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName());
 
-        // Get all providers for this member
-        Collection<OtmLibraryMember> whereUsed = member.getWhereUsed();
-        whereUsed.forEach( wu -> new MemberAndUsersDAO( wu ).createTreeItem( root ) );
+        // Create map of namespace prefixes and tree items
+        Map<String,TreeItem<MemberAndUsersDAO>> usedPrefixes = new HashMap<>();
+        member.getWhereUsed().forEach( u -> {
+            if (!usedPrefixes.containsKey( u.getPrefix() )) {
+                TreeItem<MemberAndUsersDAO> nsItem =
+                    new TreeItem<>( new MemberAndUsersDAO( new OtmNamespaceFacet( u ) ) );
+                usedPrefixes.put( u.getPrefix(), nsItem );
+                root.getChildren().add( nsItem );
+                nsItem.setExpanded( true );
+            }
+        } );
+
+        member.getWhereUsed().forEach( u -> {
+            TreeItem<MemberAndUsersDAO> item = new TreeItem<>( new MemberAndUsersDAO( u ) );
+            if (usedPrefixes.get( u.getPrefix() ) != null)
+                usedPrefixes.get( u.getPrefix() ).getChildren().add( item );
+            else
+                root.getChildren().add( item );
+        } );
+
+        // // Get all providers for this member
+        // Collection<OtmLibraryMember> whereUsed = member.getWhereUsed();
+        // whereUsed.forEach( wu -> new MemberAndUsersDAO( wu ).createTreeItem( root ) );
 
     }
 

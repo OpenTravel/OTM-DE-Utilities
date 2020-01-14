@@ -25,7 +25,6 @@ import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -100,10 +99,10 @@ public class DeleteLibraryMemberAction extends DexRunAction {
         return deletedMember;
     }
 
-    @Override
-    public ValidationFindings getVetoFindings() {
-        return null;
-    }
+    // @Override
+    // public ValidationFindings getVetoFindings() {
+    // return null;
+    // }
 
     @Override
     public boolean isValid() {

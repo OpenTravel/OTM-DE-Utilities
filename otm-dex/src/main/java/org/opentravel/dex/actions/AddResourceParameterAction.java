@@ -21,7 +21,6 @@ import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.resource.OtmParameter;
 import org.opentravel.model.resource.OtmParameterGroup;
 import org.opentravel.schemacompiler.model.TLParameter;
-import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 /**
  * Actions that add a resource child to a resource.
@@ -83,10 +82,10 @@ public class AddResourceParameterAction extends DexRunAction {
         return result;
     }
 
-    @Override
-    public ValidationFindings getVetoFindings() {
-        return null;
-    }
+    // @Override
+    // public ValidationFindings getVetoFindings() {
+    // return null;
+    // }
 
     @Override
     public boolean isValid() {

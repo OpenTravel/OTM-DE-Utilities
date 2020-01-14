@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.resource.OtmActionFacet;
-import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 /**
  * This action remove base payload from action facet.
@@ -79,10 +78,10 @@ public class RemoveActionFacetBasePayloadAction extends DexRunAction {
         return oldPayload;
     }
 
-    @Override
-    public ValidationFindings getVetoFindings() {
-        return null;
-    }
+    // @Override
+    // public ValidationFindings getVetoFindings() {
+    // return null;
+    // }
 
     @Override
     public boolean isValid() {

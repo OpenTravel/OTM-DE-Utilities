@@ -128,6 +128,9 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
         typeUsersTree.getSelectionModel().selectedItemProperty()
             .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
+        // Enable context menus at the row level and add change listener for for applying style
+        typeUsersTree.setCellFactory( (TreeView<PropertiesDAO> p) -> new TypeUserCellFactory( this ) );
+
         // log.debug("Where used table configured.");
         refresh();
     }
@@ -228,7 +231,7 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
         super.post( member );
         if (member != null) {
             if (columnLabel != null)
-                columnLabel.setText( "Properties of " + member.getName() + " that use types" );
+                columnLabel.setText( "Properties of " + member.getNameWithPrefix() + " that use types" );
             new PropertiesDAO( member, this ).createChildrenItems( root, new MemberAndUserFilter() );
         }
     }

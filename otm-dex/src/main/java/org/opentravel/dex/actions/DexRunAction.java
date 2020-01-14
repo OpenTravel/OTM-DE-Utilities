@@ -19,6 +19,7 @@ package org.opentravel.dex.actions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
+import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -56,6 +57,16 @@ public abstract class DexRunAction extends DexActionBase implements DexAction<Ob
     @Override
     public ObservableValue<? extends OtmObject> getObservable() {
         return null; // There is no observable for directly run actions
+    }
+
+    /**
+     * Override if the action can veto successful run
+     * 
+     * @see org.opentravel.dex.actions.DexAction#getVetoFindings()
+     */
+    @Override
+    public ValidationFindings getVetoFindings() {
+        return null;
     }
 
     @Override

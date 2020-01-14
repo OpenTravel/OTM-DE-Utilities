@@ -19,6 +19,8 @@ package org.opentravel.dex.controllers.member.usage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
+import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.actions.UpdateToLaterVersionAction;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.model.OtmObject;
@@ -64,34 +66,39 @@ public final class TypeProviderCellFactory extends TreeCell<MemberAndProvidersDA
     private void updateProvider(ActionEvent e) {
         OtmTypeProvider provider = getSelectedProvider();
         OtmLibraryMember member = getTreeItem().getValue().getUsingMember();
-        if (provider != null && member != null) {
-            log.debug( "todo - update " + member + " to version update " + provider );
-        }
-        // Object x = e.getSource();
-        // OtmObject obj = getValue();
-        // DexDAO<?> dao = controller.getSelection();
-        // Object value = dao.getValue();
-        // Object p = getSelectedProvider();
-        // // TODO
-        // log.debug(
-        // "Update to later version: provider = " + obj + " owner is: " + controller.getSelection().getValue() );
+        if (provider != null && member != null)
+            member.getActionManager().run( DexActions.VERSIONUPDATE, member, provider );
     }
 
     private OtmTypeProvider getSelectedProvider() {
+        if (controller == null || controller.getSelection() == null)
+            return null;
         Object v = controller.getSelection().getValue();
         return v instanceof OtmTypeProvider ? (OtmTypeProvider) v : null;
     }
 
-    /**
-     * @return the value OtmObject or null
-     */
-    private OtmObject getValue() {
-        return getSelectedObject( getTreeItem() );
-    }
+    // /**
+    // * @return the value OtmObject or null
+    // */
+    // private OtmObject getValue() {
+    // return getSelectedObject( getTreeItem() );
+    // }
 
     private OtmObject getSelectedObject(TreeItem<MemberAndProvidersDAO> item) {
         if (item != null && item.getValue() != null && item.getValue().getValue() instanceof OtmObject)
             return (item.getValue().getValue());
+        return null;
+    }
+
+    /**
+     * Get the library member from the DAO if and only if it is editable
+     * 
+     * @param item
+     * @return library member or null if missing or not editable
+     */
+    private OtmLibraryMember getEditableMember(TreeItem<MemberAndProvidersDAO> item) {
+        if (item != null && item.getValue() != null && item.getValue().getUsingMember() instanceof OtmLibraryMember)
+            return item.getValue().getUsingMember().isEditable() ? item.getValue().getUsingMember() : null;
         return null;
     }
 
@@ -102,12 +109,9 @@ public final class TypeProviderCellFactory extends TreeCell<MemberAndProvidersDA
      * @return
      */
     private void setCSSClass(TreeCell<MemberAndProvidersDAO> tc, TreeItem<MemberAndProvidersDAO> newTreeItem) {
-        OtmObject obj = getSelectedObject( newTreeItem );
-        if (obj != null) {
-            // tc.pseudoClassStateChanged( DIVIDER, getSelectedObject( newTreeItem ) instanceof OtmNamespaceFacet );
-
-            updateProviderVersion.setDisable( false );
-        }
+        updateProviderVersion.setDisable( true );
+        updateProviderVersion.setDisable( !UpdateToLaterVersionAction.isEnabled( getEditableMember( newTreeItem ),
+            getSelectedObject( newTreeItem ) ) );
     }
 
     @Override

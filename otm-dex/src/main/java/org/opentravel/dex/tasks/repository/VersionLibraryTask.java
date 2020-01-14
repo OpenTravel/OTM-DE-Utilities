@@ -36,6 +36,8 @@ import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryItemState;
 import org.opentravel.schemacompiler.saver.LibrarySaveException;
+import org.opentravel.schemacompiler.validate.FindingMessageFormat;
+import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.validate.ValidationException;
 import org.opentravel.schemacompiler.version.MajorVersionHelper;
 import org.opentravel.schemacompiler.version.MinorVersionHelper;
@@ -107,10 +109,15 @@ public class VersionLibraryTask extends DexTaskBase<OtmLibrary> {
                 errorMsg = "State is not managed and unlocked " + lib;
             else if (lib.getStatus() != TLLibraryStatus.FINAL)
                 errorMsg = "Status is not final. " + lib;
-            else if (!lib.isValid())
-                errorMsg = "Library is not valid " + lib + " version " + lib.getVersion();
+            else if (!lib.isValid()) {
+                errorMsg = "Library is not valid " + lib;
+                // TODO - refactor this into ValidationUtils
+                for (String msg : lib.getFindings().getValidationMessages( FindingType.ERROR,
+                    FindingMessageFormat.DEFAULT ))
+                    errorMsg += msg;
+            }
         }
-        // log.debug( "Is versioning enabled? " + errorMsg );
+        log.debug( "Versioning: IsEnabled? " + errorMsg == null );
         return errorMsg == null;
     }
 

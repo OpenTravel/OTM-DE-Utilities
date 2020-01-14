@@ -23,7 +23,6 @@ import org.opentravel.dex.controllers.popup.SelectLibraryDialogController;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.util.List;
 
@@ -129,10 +128,10 @@ public class SetLibraryAction extends DexRunAction {
         return otm.getLibrary();
     }
 
-    @Override
-    public ValidationFindings getVetoFindings() {
-        return null;
-    }
+    // @Override
+    // public ValidationFindings getVetoFindings() {
+    // return null;
+    // }
 
     @Override
     public boolean isValid() {

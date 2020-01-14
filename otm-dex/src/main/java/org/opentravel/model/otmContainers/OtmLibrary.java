@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
@@ -512,7 +513,8 @@ public class OtmLibrary {
 
     public boolean isValid() {
         findings = OtmModelElement.isValid( getTL() );
-        return findings == null || findings.isEmpty();
+        return !ValidationUtils.hasErrors( findings );
+        // return findings == null || findings.isEmpty();
     }
 
     /**

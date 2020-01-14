@@ -273,6 +273,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
                 projectAdd.setDisable( !library.getModelManager().hasProjects() );
                 projectRemove.setDisable( library.getProjects().isEmpty() );
                 //
+                boolean versionEnabled = VersionLibraryTask.isEnabled( library );
                 patch.setDisable( !VersionLibraryTask.isEnabled( library ) );
                 minor.setDisable( !VersionLibraryTask.isEnabled( library ) );
                 major.setDisable( !VersionLibraryTask.isEnabled( library ) );

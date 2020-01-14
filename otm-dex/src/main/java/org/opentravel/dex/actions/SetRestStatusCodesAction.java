@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.RestStatusCodesMap;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.resource.OtmActionResponse;
-import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.util.Collections;
 import java.util.List;
@@ -67,10 +66,10 @@ public class SetRestStatusCodesAction extends DexRunAction {
         return Collections.emptyList();
     }
 
-    @Override
-    public ValidationFindings getVetoFindings() {
-        return null;
-    }
+    // @Override
+    // public ValidationFindings getVetoFindings() {
+    // return null;
+    // }
 
     @Override
     public boolean isValid() {

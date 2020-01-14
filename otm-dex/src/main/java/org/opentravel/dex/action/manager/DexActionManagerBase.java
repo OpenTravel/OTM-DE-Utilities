@@ -245,6 +245,9 @@ public abstract class DexActionManagerBase implements DexActionManager {
     public Object run(DexActions action, OtmObject subject, Object value) {
         DexAction<?> actionHandler = null;
         Object result = null;
+        if (subject == null)
+            return null;
+
         try {
             actionHandler = DexActions.getAction( action, subject, this );
             if (actionHandler instanceof DexRunAction) {

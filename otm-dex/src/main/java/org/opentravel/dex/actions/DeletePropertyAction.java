@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmProperties.OtmProperty;
-import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 /**
  * Actions that delete a property.
@@ -80,13 +79,13 @@ public class DeletePropertyAction extends DexRunAction {
         return null;
     }
 
-    /**
-     * @see org.opentravel.dex.actions.DexAction#getVetoFindings()
-     */
-    @Override
-    public ValidationFindings getVetoFindings() {
-        return null;
-    }
+    // /**
+    // * @see org.opentravel.dex.actions.DexAction#getVetoFindings()
+    // */
+    // @Override
+    // public ValidationFindings getVetoFindings() {
+    // return null;
+    // }
 
     // /**
     // * @see org.opentravel.dex.actions.DexAction#isValid()

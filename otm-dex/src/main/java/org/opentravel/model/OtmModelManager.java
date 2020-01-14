@@ -664,6 +664,35 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
     /**
+     * @param name
+     * @return list of members with matching names
+     */
+    public List<OtmLibraryMember> getMembers(OtmLibraryMember m) {
+        List<OtmLibraryMember> matches = new ArrayList<>();
+        for (OtmLibraryMember candidate : getMembers())
+            if (m != candidate && candidate.getName().equals( m.getName() ))
+                matches.add( candidate );
+        return matches;
+    }
+
+    /**
+     * Return a library member with the same name that is in the latest version of the libraries with the same base
+     * namespace
+     * 
+     * @param member
+     * @return
+     */
+    public OtmLibraryMember getLatestMember(OtmLibraryMember member) {
+        for (OtmLibraryMember c : getMembers()) {
+            if (c.getLibrary().getBaseNamespace().equals( member.getLibrary().getBaseNamespace() )
+                && c.getName().equals( member.getName() ) && c.isLatestVersion())
+                return c;
+        }
+        return null;
+    }
+
+
+    /**
      * @return all the library members being managed in a unmodifiableCollection
      */
     public Collection<OtmLibraryMember> getMembers() {
@@ -917,5 +946,6 @@ public class OtmModelManager implements TaskResultHandlerI {
         OtmObject id = OtmModelElement.get( (TLModelElement) tlId );
         return id instanceof OtmXsdSimple ? (OtmXsdSimple) id : null;
     }
+
 
 }

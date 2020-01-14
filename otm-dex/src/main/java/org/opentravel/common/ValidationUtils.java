@@ -98,4 +98,12 @@ public class ValidationUtils {
         return relevant;
     }
 
+    /**
+     * @param findings
+     * @return true if the findings contains errors
+     */
+    public static boolean hasErrors(ValidationFindings findings) {
+        return !findings.getFindingsAsList( FindingType.ERROR ).isEmpty();
+    }
+
 }

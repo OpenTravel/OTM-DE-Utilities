@@ -27,7 +27,6 @@ import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
-import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 public class AssignResourceSubjectAction extends DexRunAction {
     private static Log log = LogFactory.getLog( AssignResourceSubjectAction.class );
@@ -108,10 +107,10 @@ public class AssignResourceSubjectAction extends DexRunAction {
         return resource.getSubject();
     }
 
-    @Override
-    public ValidationFindings getVetoFindings() {
-        return null;
-    }
+    // @Override
+    // public ValidationFindings getVetoFindings() {
+    // return null;
+    // }
 
     @Override
     public boolean isValid() {

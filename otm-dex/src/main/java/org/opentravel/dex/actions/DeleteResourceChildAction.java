@@ -23,7 +23,6 @@ import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionResponse;
 import org.opentravel.model.resource.OtmParameter;
 import org.opentravel.model.resource.OtmParameterGroup;
-import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 /**
  * Actions that delete a resource child from a resource.
@@ -93,13 +92,13 @@ public class DeleteResourceChildAction extends DexRunAction {
         return null;
     }
 
-    /**
-     * @see org.opentravel.dex.actions.DexAction#getVetoFindings()
-     */
-    @Override
-    public ValidationFindings getVetoFindings() {
-        return null;
-    }
+    // /**
+    // * @see org.opentravel.dex.actions.DexAction#getVetoFindings()
+    // */
+    // @Override
+    // public ValidationFindings getVetoFindings() {
+    // return null;
+    // }
 
     /**
      * @see org.opentravel.dex.actions.DexAction#isValid()

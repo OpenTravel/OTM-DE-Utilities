@@ -426,7 +426,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
                     return;
                 }
             }
-            log.warn( otm.getName() + " not found in member tree." );
+            // log.warn( otm.getName() + " not found in member tree." );
         }
     }
 

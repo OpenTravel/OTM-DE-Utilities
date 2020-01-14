@@ -36,8 +36,8 @@ import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
-public class AssignedTypeChangeAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( AssignedTypeChangeAction.class );
+public class SetAssignedTypeAction extends DexRunAction {
+    private static Log log = LogFactory.getLog( SetAssignedTypeAction.class );
 
     private static final String VETO1 = "org.opentravel.schemacompiler.TLProperty.name.ELEMENT_REF_NAME_MISMATCH";
     private static final String VETO2 = ".OBSOLETE_TYPE_REFERENCE";
@@ -69,7 +69,7 @@ public class AssignedTypeChangeAction extends DexRunAction {
 
     private DexChangeEvent event = null;
 
-    public AssignedTypeChangeAction() {
+    public SetAssignedTypeAction() {
         // Constructor for reflection
     }
 

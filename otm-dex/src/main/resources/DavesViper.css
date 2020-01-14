@@ -55,11 +55,11 @@
     #-fx-text-color: #a03000;
     -fx-selection-bar: transparent ;
 	}
-    */
 .tree-cell:selected {
     -fx-font-weight: bold ;
     -fx-text-fill:  black ;
 }
+    */
 .tree-cell:hover {
     -fx-background-color: lightgray;
 }

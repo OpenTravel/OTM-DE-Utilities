@@ -21,7 +21,6 @@ import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionResponse;
 import org.opentravel.schemacompiler.model.TLActionResponse;
-import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 /**
  * Actions that add a resource child to a resource.
@@ -84,14 +83,14 @@ public class AddResourceResponseAction extends DexRunAction {
         return result;
     }
 
-    /**
-     * @see org.opentravel.dex.actions.DexAction#getVetoFindings()
-     */
-    @Override
-    public ValidationFindings getVetoFindings() {
-        return null;
-    }
-
+    // /**
+    // * @see org.opentravel.dex.actions.DexAction#getVetoFindings()
+    // */
+    // @Override
+    // public ValidationFindings getVetoFindings() {
+    // return null;
+    // }
+    //
     /**
      * @see org.opentravel.dex.actions.DexAction#isValid()
      */

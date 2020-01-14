@@ -27,6 +27,7 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.OtmObjectChangeEvent;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
@@ -72,8 +73,9 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
     // private OtmLibraryMember postedMember;
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED,
-        DexModelChangeEvent.MODEL_CHANGED, DexMemberSelectionEvent.TYPE_USER_SELECTED};
+    private static final EventType[] subscribedEvents =
+        {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED,
+            OtmObjectChangeEvent.OBJECT_CHANGED, DexMemberSelectionEvent.TYPE_USER_SELECTED};
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED};
 
     /**
@@ -213,7 +215,9 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
 
     @Override
     public DexDAO<?> getSelection() {
-        return typeProvidersTree.getSelectionModel().getSelectedItem().getValue();
+        if (typeProvidersTree.getSelectionModel().getSelectedItem() != null)
+            return typeProvidersTree.getSelectionModel().getSelectedItem().getValue();
+        return null;
     }
 
     private void handleEvent(DexMemberSelectionEvent event) {
@@ -249,8 +253,10 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
         if (!ignoreEvents && event != null && event.getEventType() != null) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
-            if (event instanceof DexModelChangeEvent)
-                clear();
+            else if (event instanceof OtmObjectChangeEvent)
+                refresh();
+            else if (event instanceof DexModelChangeEvent)
+                refresh();
             else
                 refresh();
         }

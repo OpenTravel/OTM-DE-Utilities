@@ -18,7 +18,6 @@ package org.opentravel.dex.actions;
 
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmProperties.OtmElement;
-import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 /**
  * Set the repeat count on a property.
@@ -76,10 +75,10 @@ public class SetRepeatCountAction extends DexRunAction {
         return getSubject().getRepeatCount();
     }
 
-    @Override
-    public ValidationFindings getVetoFindings() {
-        return null;
-    }
+    // @Override
+    // public ValidationFindings getVetoFindings() {
+    // return null;
+    // }
 
     @Override
     public boolean isValid() {

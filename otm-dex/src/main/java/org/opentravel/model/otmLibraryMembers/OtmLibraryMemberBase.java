@@ -361,6 +361,31 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     @Override
+    public List<OtmTypeUser> getTypeUsers(OtmTypeProvider provider) {
+        List<OtmTypeUser> users = new ArrayList<>();
+        if (this instanceof OtmTypeUser && ((OtmTypeUser) this).getAssignedType() == provider)
+            users.add( (OtmTypeUser) this );
+        for (OtmTypeUser candidate : getDescendantsTypeUsers())
+            if (candidate.getAssignedType() == provider)
+                users.add( candidate );
+        return users;
+    }
+
+    @Override
+    public OtmTypeProvider getMatchingProvider(OtmTypeProvider provider) {
+        OtmTypeProvider match = null;
+        if (this.getClass() == provider.getClass())
+            match = this;
+        else
+            for (OtmTypeProvider p : getDescendantsTypeProviders())
+                if (p.getClass() == provider.getClass()) {
+                    match = p;
+                    break;
+                }
+        return match;
+    }
+
+    @Override
     public OtmModelManager getModelManager() {
         return mgr;
     }
