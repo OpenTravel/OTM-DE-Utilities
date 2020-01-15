@@ -28,6 +28,7 @@ import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.TLAlias;
+import org.opentravel.schemacompiler.model.TLAliasOwner;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,15 +53,39 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
     public OtmAlias(TLAlias tl, OtmLibraryMember parent) {
         super( tl );
         this.parent = parent;
+        parent.add( this );
+
+        if (tl.getOwningEntity() == null && parent.getTL() instanceof TLAliasOwner)
+            ((TLAliasOwner) parent.getTL()).addAlias( tl );
 
         if (this.parent == null)
             throw new IllegalStateException( "Created alias without parent." );
     }
 
+    // /**
+    // * Create an alias and add to the TL model and OTM parent
+    // *
+    // * @param owning library member
+    // */
+    // public OtmAlias(String name, OtmLibraryMember parent) {
+    // this( new TLAlias(), parent );
+    // if (parent.getTL() instanceof TLAliasOwner) {
+    // ((TLAliasOwner) parent.getTL()).addAlias( tlObject );
+    // parent.addAlias( getTL() );
+    // setName( name );
+    // }
+    // }
+
     @Override
-    public void delete(OtmObject property) {
-        // NO-OP - no delete-able children
+    public String setName(String name) {
+        tlObject.setName( name );
+        return getName();
     }
+
+    // @Override
+    // public void delete(OtmObject property) {
+    // // NO-OP - no delete-able children
+    // }
 
     @Override
     public void remove(OtmObject property) {
@@ -86,11 +111,6 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
     public List<OtmObject> getChildren() {
         return children;
     }
-
-    // @Override
-    // public boolean isExpanded() {
-    // return false;
-    // }
 
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
@@ -154,9 +174,6 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
         // TODO - model child ?? do we need to?
     }
 
-    /**
-     * @see org.opentravel.model.OtmChildrenOwner#add(org.opentravel.model.OtmObject)
-     */
     @Override
     public OtmAliasFacet add(OtmObject child) {
         if (child instanceof OtmAliasFacet && !children.contains( child )) {
@@ -164,6 +181,11 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
             return (OtmAliasFacet) child;
         }
         return null;
+    }
+
+    @Override
+    public void delete(OtmObject property) {
+        // NO-OP
     }
 
 }

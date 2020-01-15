@@ -142,6 +142,7 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
 
     @Override
     public void delete(OtmObject property) {
+        super.delete( property );
         if (property.getTL() instanceof TLAttribute)
             getTL().removeAttribute( ((TLAttribute) property.getTL()) );
         if (property.getTL() instanceof TLIndicator)
@@ -149,14 +150,6 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         if (property.getTL() instanceof TLProperty)
             getTL().removeProperty( ((TLProperty) property.getTL()) );
         remove( property );
-
-        // assert (!children.contains( property ));
-        // if (property.getTL() instanceof TLAttribute)
-        // assert (!getTL().getAttributes().contains( property.getTL() ));
-        // if (property.getTL() instanceof TLIndicator)
-        // assert (!getTL().getIndicators().contains( property.getTL() ));
-        // if (property.getTL() instanceof TLProperty)
-        // assert (!getTL().getElements().contains( property.getTL() ));
     }
 
     /**

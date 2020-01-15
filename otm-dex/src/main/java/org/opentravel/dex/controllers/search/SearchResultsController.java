@@ -119,7 +119,7 @@ public class SearchResultsController extends DexIncludedControllerBase<SearchRes
     @Override
     public void post(SearchResultsDAO results) {
         super.post( results ); // Clear tree and save results
-        log.debug( "Posting search results." );
+        // log.debug( "Posting search results." );
         if (results != null)
             results.createTreeItems( resultsTreeView.getRoot() );
     }
@@ -146,7 +146,7 @@ public class SearchResultsController extends DexIncludedControllerBase<SearchRes
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        log.debug( event.getEventType() + " event received. " );
+        // log.debug( event.getEventType() + " event received. " );
         if (event instanceof DexSearchResultsEvent)
             handleEvent( (DexSearchResultsEvent) event );
         else

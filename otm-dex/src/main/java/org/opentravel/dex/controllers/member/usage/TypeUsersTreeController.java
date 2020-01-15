@@ -123,8 +123,6 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
 
         // Add listeners and event handlers
         typeUsersTree.getSelectionModel().select( 0 );
-        // whereUsedTreeTable.setOnKeyReleased(this::keyReleased);
-        // whereUsedTreeTable.setOnMouseClicked(this::mouseClick);
         typeUsersTree.getSelectionModel().selectedItemProperty()
             .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
@@ -166,26 +164,6 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
         }
     }
 
-    // public void keyReleased(KeyEvent event) {
-    // // TreeItem<PropertiesDAO> item = whereUsedTreeTable.getSelectionModel().getSelectedItem();
-    // // ObservableList<TreeTablePosition<PropertiesDAO, ?>> cells =
-    // // whereUsedTreeTable.getSelectionModel().getSelectedCells();
-    // int row = typeUsersTree.getSelectionModel().getSelectedIndex();
-    // log.debug("Selection row = " + row);
-    // if (event.getCode() == KeyCode.RIGHT) {
-    // typeUsersTree.getSelectionModel().getSelectedItem().setExpanded(true);
-    // typeUsersTree.getSelectionModel().select(row);
-    // // whereUsedTreeTable.getSelectionModel().focus(row);
-    // // Not sure how to: whereUsedTreeTable.getSelectionModel().requestFocus();
-    // // event.consume();
-    // } else if (event.getCode() == KeyCode.LEFT) {
-    // typeUsersTree.getSelectionModel().getSelectedItem().setExpanded(false);
-    // typeUsersTree.getSelectionModel().select(row);
-    // // whereUsedTreeTable.getSelectionModel().focus(row);
-    // // event.consume();
-    // }
-    // }
-
     /**
      * Listener for selected library members in the tree table.
      *
@@ -197,11 +175,13 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
         if (item.getValue() == null || item.getValue().getValue() == null)
             return;
         OtmObject obj = item.getValue().getValue();
-        log.debug( "Selection Listener: " + item.getValue() );
+        // log.debug( "Selection Listener: " + item.getValue() );
 
         // Throw event with either the owning member or the owning member of the assigned type.
         OtmLibraryMember member = null;
-        if (obj instanceof OtmTypeUser) {
+        if (obj instanceof OtmLibraryMember)
+            member = (OtmLibraryMember) obj;
+        else if (obj instanceof OtmTypeUser) {
             if (((OtmTypeUser) obj).getAssignedType() != null)
                 member = ((OtmTypeUser) obj).getAssignedType().getOwningMember();
         } else
@@ -213,13 +193,6 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
         ignoreEvents = false;
     }
 
-    // public void mouseClick(MouseEvent event) {
-    // // this fires after the member selection listener
-    // if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2)
-    // log.debug("Double click selection: ");
-    // // + whereUsedTreeTable.getSelectionModel().getSelectedItem().getValue().nameProperty().toString());
-    // }
-    //
     /**
      * Get the library members from the model manager and put them into a cleared tree.
      * 
@@ -232,7 +205,15 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
         if (member != null) {
             if (columnLabel != null)
                 columnLabel.setText( "Properties of " + member.getNameWithPrefix() + " that use types" );
-            new PropertiesDAO( member, this ).createChildrenItems( root, new MemberAndUserFilter() );
+            //
+            MemberAndUserFilter filter = new MemberAndUserFilter();
+            PropertiesDAO dao = new PropertiesDAO( member, this );
+            TreeItem<PropertiesDAO> item = dao.createTreeItem( root, filter );
+            if (item != null) {
+                item.setExpanded( true );
+                dao.createChildrenItems( item, filter );
+            }
+            // new PropertiesDAO( member, this ).createChildrenItems( root, new MemberAndUserFilter() );
         }
     }
 
@@ -263,8 +244,4 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
             // log.debug(otm.getName() + " not found in member tree.");
         }
     }
-
-    // public void setOnMouseClicked(EventHandler<? super MouseEvent> handler) {
-    // typeUsersTree.setOnMouseClicked(handler);
-    // }
 }

@@ -77,7 +77,7 @@ public class DialogBoxContoller extends DexPopupControllerBase {
     @Override
     @FXML
     public void initialize() {
-        log.debug( "Initialize injection point." );
+        // log.debug( "Initialize injection point." );
     }
 
     @Override

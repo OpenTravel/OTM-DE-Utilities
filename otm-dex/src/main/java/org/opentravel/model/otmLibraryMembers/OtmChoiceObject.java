@@ -22,7 +22,6 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.otmFacets.OtmAbstractFacet;
 import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmFacets.OtmChoiceFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
@@ -88,11 +87,11 @@ public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
      * @see org.opentravel.model.OtmChildrenOwner#add(org.opentravel.model.OtmObject)
      */
     @Override
-    public OtmAbstractFacet<?> add(OtmObject child) {
+    public OtmObject add(OtmObject child) {
         if (child instanceof OtmContextualFacet)
             return add( (OtmContextualFacet) child );
         else {
-            OtmAbstractFacet<?> result = null;
+            OtmObject result = null;
             result = super.add( child );
             if (child instanceof OtmContributedFacet) {
                 ((OtmContributedFacet) child).getTL().setOwningEntity( getTL() );
@@ -123,6 +122,7 @@ public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
 
     @Override
     public void delete(OtmObject child) {
+        super.delete( child );
         if (child instanceof OtmContributedFacet)
             child = ((OtmContributedFacet) child).getContributor();
         if (child == null)

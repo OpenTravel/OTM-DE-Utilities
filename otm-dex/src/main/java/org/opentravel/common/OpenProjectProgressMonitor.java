@@ -45,7 +45,7 @@ public class OpenProjectProgressMonitor implements LoaderProgressMonitor {
     public void beginLoad(int libraryCount) {
         // Library count is not always accurate due to includes
         increment = increment / libraryCount * 0.7F;
-        log.debug( "Progress: begin with " + libraryCount + " increment = " + increment );
+        // log.debug( "Progress: begin with " + libraryCount + " increment = " + increment );
     }
 
     @Override
@@ -63,7 +63,7 @@ public class OpenProjectProgressMonitor implements LoaderProgressMonitor {
 
     @Override
     public void done() {
-        log.debug( "Progress: done" );
+        // log.debug( "Progress: done" );
         controller.postStatus( "Done" );
     }
 

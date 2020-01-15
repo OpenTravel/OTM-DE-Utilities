@@ -16,6 +16,8 @@
 
 package org.opentravel.model.otmFacets;
 
+import org.opentravel.common.ImageManager;
+import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 
@@ -38,6 +40,11 @@ public class OtmNamespaceFacet extends OtmAbstractDisplayFacet {
         super( null );
         this.modelManager = object.getModelManager();
         this.object = object;
+    }
+
+    @Override
+    public Icons getIconType() {
+        return ImageManager.Icons.NAMESPACEFACET;
     }
 
     @Override

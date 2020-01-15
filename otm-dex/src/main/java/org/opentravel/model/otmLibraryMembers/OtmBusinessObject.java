@@ -23,7 +23,6 @@ import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.otmFacets.OtmAbstractFacet;
 import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
@@ -69,11 +68,11 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
      * @see org.opentravel.model.OtmChildrenOwner#add(org.opentravel.model.OtmObject)
      */
     @Override
-    public OtmAbstractFacet<?> add(OtmObject child) {
+    public OtmObject add(OtmObject child) {
         if (child instanceof OtmContextualFacet)
             return add( (OtmContextualFacet) child );
         else {
-            OtmAbstractFacet<?> result = null;
+            OtmObject result = null;
             result = super.add( child );
             if (child instanceof OtmContributedFacet) {
                 ((OtmContributedFacet) child).getTL().setOwningEntity( getTL() );
@@ -112,24 +111,10 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
         return null;
     }
 
-    // @Override
-    // public OtmObject setBaseType(OtmObject baseBo) {
-    // if (baseBo instanceof OtmBusinessObject) {
-    // TLExtension tlExt = getTL().getExtension();
-    // if (tlExt == null)
-    // tlExt = new TLExtension();
-    // tlExt.setExtendsEntity( ((OtmBusinessObject) baseBo).getTL() );
-    // getTL().setExtension( tlExt );
-    // }
-    // return getBaseType();
-    // }
-
     @Override
     public String setName(String name) {
         getTL().setName( name );
         return super.setName( name );
-        // isValid( true );
-        // return getName();
     }
 
     @Override
@@ -156,6 +141,7 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
 
     @Override
     public void delete(OtmObject child) {
+        super.delete( child );
         if (child instanceof OtmContributedFacet)
             child = ((OtmContributedFacet) child).getContributor();
         if (child == null)
@@ -170,58 +156,4 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
         }
         remove( child );
     }
-
-    // @Override
-    // public ComponentNode createMinorVersionComponent() {
-    // TLBusinessObject tlMinor = (TLBusinessObject) createMinorTLVersion(this);
-    // if (tlMinor != null)
-    // return super.createMinorVersionComponent(new BusinessObjectNode(tlMinor));
-    // return null;
-    // }
-    //
-    //
-    // /**
-    // * Assure business object has one and only one ID and it is in the ID facet. Change extra IDs to attributes.
-    // Create
-    // * new ID if needed.
-    // *
-    // * @return
-    // */
-    // private IdNode fixIDs() {
-    // IdNode finalID = null;
-    // // Use from ID facet if found. if more than one found, change extras to attribute
-    // for (Node n : getFacet_ID().getChildren())
-    // if (n instanceof IdNode)
-    // if (finalID == null) {
-    // ((IdNode) n).moveProperty(getFacet_ID());
-    // finalID = (IdNode) n;
-    // } else
-    // ((PropertyNode) n).changePropertyRole(PropertyNodeType.ATTRIBUTE);
-    //
-    // // Search for any ID types. Move 1st one to ID facet and make rest into attributes.
-    // List<Node> properties = new ArrayList<>(getFacet_Summary().getChildren());
-    // properties.addAll(getFacet_Detail().getChildren());
-    // for (Node n : properties)
-    // if (n instanceof IdNode)
-    // if (finalID == null) {
-    // ((IdNode) n).moveProperty(getFacet_ID());
-    // finalID = (IdNode) n;
-    // } else
-    // ((PropertyNode) n).changePropertyRole(PropertyNodeType.ATTRIBUTE);
-    //
-    // // If none were found, make one
-    // if (finalID == null)
-    // finalID = new IdNode(getFacet_ID(), "newID"); // BO must have at least one ID facet property
-    // return finalID;
-    // }
-    //
-    // @Override
-    // public List<AliasNode> getAliases() {
-    // List<AliasNode> aliases = new ArrayList<>();
-    // for (Node c : getChildren())
-    // if (c instanceof AliasNode)
-    // aliases.add((AliasNode) c);
-    // return aliases;
-    // }
-    //
 }

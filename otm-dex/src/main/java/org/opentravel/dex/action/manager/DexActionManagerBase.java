@@ -177,14 +177,14 @@ public abstract class DexActionManagerBase implements DexActionManager {
     @Override
     public void push(DexAction<?> action) {
         if (action == null) {
-            log.debug( "Pushed a null action!" );
+            // log.debug( "Pushed a null action!" );
             return;
         }
-        log.debug( "Pushing action onto queue: " + ignore + " " + action.toString() );
+        // log.debug( "Pushing action onto queue: " + ignore + " " + action.toString() );
         action.isValid();
         if (queue.contains( action )) {
             // Make sure not a duplicate
-            log.debug( "Duplicate Action found!" );
+            log.warn( "Duplicate Action found!" );
             return;
         }
         ValidationFindings findings = action.getVetoFindings();
@@ -196,7 +196,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
             ignore = true;
             action.undoIt();
             ignore = false;
-            log.debug( "Action vetoed!" );
+            log.warn( "Action vetoed!" );
             // Possible enhancement - if warnings, post them and allow undo option in dialog.
 
             if (mainController != null)
@@ -233,7 +233,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
 
         if (mainController != null)
             action.getSubject().getModelManager().startValidatingAndResolvingTasks();
-        log.debug( "Put action on queue: " + action.getClass().getSimpleName() );
+        // log.debug( "Put action on queue: " + action.getClass().getSimpleName() );
     }
 
     @Override
@@ -329,7 +329,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
         ignore = true;
         if (!queue.isEmpty()) {
             DexAction<?> action = queue.pop();
-            log.debug( "Undo action: " + action.getClass().getSimpleName() );
+            // log.debug( "Undo action: " + action.getClass().getSimpleName() );
             action.undoIt();
 
             if (action.getSubject() != null)

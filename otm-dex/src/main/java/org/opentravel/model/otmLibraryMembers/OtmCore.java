@@ -142,19 +142,19 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
     public Collection<OtmObject> getChildrenHierarchy() {
         Collection<OtmObject> ch = new ArrayList<>();
         ch.add( new OtmCoreValueFacet( this ) );
+        // Add aliases first
+        children.forEach( c -> {
+            if (c instanceof OtmAlias)
+                ch.add( c );
+        } );
         children.forEach( c -> {
             if (c instanceof OtmSummaryFacet)
-                ch.add( c );
-            if (c instanceof OtmAlias)
                 ch.add( c );
             if (c instanceof OtmRoleEnumeration)
                 ch.add( c );
             if (c instanceof OtmListFacet)
                 ch.add( c );
         } );
-
-        // TODO - roles
-        // TODO - lists
         return ch;
     }
 
@@ -225,10 +225,10 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
             log.warn( "TODO - model inherited children" );
     }
 
-    @Override
-    public void delete(OtmObject property) {
-        // NO-OP - no delete-able children
-    }
+    // @Override
+    // public void delete(OtmObject property) {
+    // // NO-OP - no delete-able children
+    // }
 
 
     //

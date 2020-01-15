@@ -299,17 +299,6 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         }
     }
 
-    // private void unlockLibrary() {
-    // log.debug( "Unlock in Row Factory. " + controller.getSelectedItem().getValue().getClass().hashCode() );
-    // UnlockLibraryDialogContoller uldc = UnlockLibraryDialogContoller.init();
-    // uldc.showAndWait( "" );
-    // boolean commitWIP = uldc.getCommitState();
-    // String remarks = uldc.getCommitRemarks();
-    //
-    // new UnlockLibraryTask( controller.getSelectedItem().getValue(), commitWIP, remarks,
-    // new RepositoryResultHandler( mainController ), mainController.getStatusController() ).go();
-    // }
-
     private void commitLibrary() {
         log.debug(
             "Commit library in Row Factory.   " + controller.getSelectedItem().getValue().getClass().hashCode() );

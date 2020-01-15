@@ -156,17 +156,6 @@ public interface OtmObject {
     public boolean isValid(boolean refresh);
 
     /**
-     * Get the FX observable property for this name simply for display. Use {@link #nameEditingProperty()} if intended
-     * for use where the name could be edited if enabled.
-     * <p>
-     * If editable, returns a simple string property with a listener assigned by the object's action manager. If not
-     * editable a read-only property is returned.
-     * 
-     * @return a string property (never null)
-     */
-    public StringProperty nameProperty();
-
-    /**
      * Get the FX observable property for this name. Intended for use where the name could be edited if enabled. Use
      * {@link #nameProperty()} if the name is simply for display.
      * <p>
@@ -188,6 +177,17 @@ public interface OtmObject {
      * @return
      */
     public StringProperty nameEditingProperty(String editableName);
+
+    /**
+     * Get the FX observable property for this name simply for display. Use {@link #nameEditingProperty()} if intended
+     * for use where the name could be edited if enabled.
+     * <p>
+     * If editable, returns a simple string property with a listener assigned by the object's action manager. If not
+     * editable a read-only property is returned.
+     * 
+     * @return a string property (never null)
+     */
+    public StringProperty nameProperty();
 
     /**
      * Set the deprecation documentation value. Even though the TL maintains a list, the facades only use the first

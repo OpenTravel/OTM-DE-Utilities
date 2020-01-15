@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
@@ -35,6 +36,8 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableRow;
 
 /**
+ * Row factory for the members tree table. Controls context menu and CSS style.
+ * 
  * @author dmh
  *
  */
@@ -65,11 +68,6 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
 
         // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
-
-        // // Not sure this helps!
-        // if (getTreeItem() != null && getTreeItem().getValue() != null) {
-        // setEditable( getTreeItem().getValue().isEditable() );
-        // }
     }
 
     // TODO - create utils class with statics for row factories
@@ -93,6 +91,8 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
             obj = ((OtmContributedFacet) obj).getContributor();
         if (obj instanceof OtmLibraryMember)
             obj.getActionManager().run( DexActions.DELETELIBRARYMEMBER, (OtmLibraryMember) obj );
+        else if (obj instanceof OtmAlias)
+            obj.getActionManager().run( DexActions.DELETEALIAS, obj );
         super.updateTreeItem( getTreeItem().getParent() );
     }
 
@@ -148,8 +148,14 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         if (obj != null) {
             tc.pseudoClassStateChanged( EDITABLE, newTreeItem.getValue().isEditable() );
 
-            deleteItem.setDisable( !obj.isEditable() );
             newMenu.setDisable( !obj.getModelManager().hasEditableLibraries() );
+            deleteItem.setDisable( true );
+            // TODO - confirm that there will never be contributed facet then remove from code
+            if ((obj instanceof OtmLibraryMember || obj instanceof OtmContributedFacet)
+                && obj.getActionManager() != null)
+                deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETELIBRARYMEMBER, obj ) );
+            if (obj instanceof OtmAlias && obj.getActionManager() != null)
+                deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETEALIAS, obj ) );
         }
     }
 }

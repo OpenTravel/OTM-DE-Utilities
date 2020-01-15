@@ -57,9 +57,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     private static Log log = LogFactory.getLog( OtmModelElement.class );
 
     private static final String NONAMESPACE = "no-namespace-for-for-this-object";
-
     private static final String NONAME = "no-name-for-for-this-object";
-
     private static final String EXAMPLE_CONTEXT = "Example";
 
     /**

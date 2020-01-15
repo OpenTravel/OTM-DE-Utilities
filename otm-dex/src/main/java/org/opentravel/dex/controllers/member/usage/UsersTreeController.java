@@ -67,7 +67,6 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
 
     TreeItem<MemberAndUsersDAO> root; // Root of the navigation tree. Is displayed.
     private boolean ignoreEvents = false;
-    // private OtmLibraryMember postedMember = null;
 
     private OtmModelManager modelMgr;
 
@@ -175,11 +174,6 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
             else
                 root.getChildren().add( item );
         } );
-
-        // // Get all providers for this member
-        // Collection<OtmLibraryMember> whereUsed = member.getWhereUsed();
-        // whereUsed.forEach( wu -> new MemberAndUsersDAO( wu ).createTreeItem( root ) );
-
     }
 
     public void createTreeItems(List<EntitySearchResult> results) {
@@ -199,9 +193,6 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
                 log.debug( "found named entity that is not library member." );
         }
         foundObjects.forEach( o -> new MemberAndUsersDAO( o ).createTreeItem( root ) );
-        // Collection<OtmLibraryMember> whereUsed = member.getWhereUsed();
-        // whereUsed.forEach( wu -> new MemberAndUsersDAO( wu ).createTreeItem( root ) );
-
     }
 
     public TreeItem<MemberAndUsersDAO> getRoot() {
@@ -233,16 +224,6 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
         }
     }
 
-    // public void keyReleased(KeyEvent event) {
-    // int row = usersTree.getSelectionModel().getSelectedIndex();
-    // log.debug("Selection row = " + row);
-    // if (event.getCode() == KeyCode.RIGHT) {
-    // // event.consume();
-    // } else if (event.getCode() == KeyCode.LEFT) {
-    // // event.consume();
-    // }
-    // }
-
     /**
      * Listener for selected library members in the tree table.
      *
@@ -251,7 +232,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
     private void memberSelectionListener(TreeItem<MemberAndUsersDAO> item) {
         if (item == null || eventPublisherNode == null)
             return;
-        log.debug( "Selection Listener: " + item.getValue() );
+        // log.debug( "Selection Listener: " + item.getValue() );
         OtmLibraryMember member = null;
         if (item.getValue() != null && item.getValue().getValue() instanceof OtmLibraryMember)
             member = (OtmLibraryMember) item.getValue().getValue();

@@ -109,8 +109,23 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
                 if (c instanceof OtmAlias && c.getName().equals( baseName ))
                     ((OtmAlias) c).add( tla );
             } );
+        } else if (getTL() instanceof TLAliasOwner) {
+            ((TLAliasOwner) getTL()).addAlias( tla );
+            new OtmAlias( tla, this );
         }
     }
+
+    // /**
+    // *
+    // * @param alias must have a tlAlais object
+    // */
+    // @Override
+    // public void add(OtmAlias alias) {
+    // if (getTL() instanceof TLAliasOwner) {
+    // ((TLAliasOwner) getTL()).addAlias( alias.getTL() );
+    // }
+    // children.add( alias );
+    // }
 
     private void addProvider(OtmTypeUser user, List<OtmTypeProvider> list) {
         if (user == null)
@@ -192,10 +207,16 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
 
     /**
-     * Sub-types MUST implement if any of their children are delete-able
+     * {@inheritDoc} Delete aliases. Sub-types MUST implement if any of their children are delete-able
      */
     @Override
-    public abstract void delete(OtmObject property);
+    public void delete(OtmObject property) {
+        if (property instanceof OtmAlias && getTL() instanceof TLAliasOwner) {
+            ((TLAliasOwner) getTL()).removeAlias( (TLAlias) property.getTL() );
+            children.remove( property );
+            // TODO - what about where used?
+        }
+    }
 
     @Override
     public DexActionManager getActionManager() {
@@ -543,8 +564,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         assert children.isEmpty();
         // Must do aliases first so facet aliases will have a parent
         // Aliases from contextual facets come from the member where injected (contributed)
-        if (!(this instanceof OtmContextualFacet) && getTL() instanceof TLAliasOwner)
-            ((TLAliasOwner) getTL()).getAliases().forEach( t -> children.add( new OtmAlias( t, this ) ) );
+        if (getTL() instanceof TLAliasOwner && !(this instanceof OtmContextualFacet))
+            ((TLAliasOwner) getTL()).getAliases().forEach( t -> new OtmAlias( t, this ) );
 
         if (getTL() instanceof TLFacetOwner)
             for (TLFacet tlFacet : ((TLFacetOwner) getTL()).getAllFacets()) {

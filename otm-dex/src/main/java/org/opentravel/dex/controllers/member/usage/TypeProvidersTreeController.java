@@ -70,8 +70,6 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
     TreeItem<MemberAndProvidersDAO> root; // Root of the navigation tree. Is displayed.
     private boolean ignoreEvents = false;
 
-    // private OtmLibraryMember postedMember;
-
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
         {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED,
@@ -99,9 +97,6 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
     @Override
     public void clear() {
         postedData = null;
-        // How to clear treeCell psueudo settings
-        // pseudoClassStateChanged
-        // typeProvidersTree.getRoot().getChildren().filtered( c -> c. )
         typeProvidersTree.getRoot().getChildren().clear();
     }
 
@@ -208,11 +203,6 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
         return root;
     }
 
-    // public MemberAndProvidersDAO getSelected() {
-    // return typeProvidersTree.getSelectionModel().getSelectedItem() != null
-    // ? typeProvidersTree.getSelectionModel().getSelectedItem().getValue() : null;
-    // }
-
     @Override
     public DexDAO<?> getSelection() {
         if (typeProvidersTree.getSelectionModel().getSelectedItem() != null)
@@ -270,7 +260,7 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
     private void memberSelectionListener(TreeItem<MemberAndProvidersDAO> item) {
         if (item == null || eventPublisherNode == null)
             return; // Nothing to do
-        log.debug( "Selection Listener: " + item.getValue() );
+        // log.debug( "Selection Listener: " + item.getValue() );
         OtmLibraryMember member = null;
         if (item.getValue() != null && item.getValue().getValue() instanceof OtmLibraryMember)
             member = (OtmLibraryMember) item.getValue().getValue();

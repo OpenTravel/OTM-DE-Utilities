@@ -44,9 +44,9 @@ import javafx.beans.property.StringProperty;
 public interface OtmLibraryMember extends OtmChildrenOwner {
 
     /**
-     * Add this facet alias to the appropriate alias
+     * Add this facet alias to the appropriate TLAliasOwner
      * 
-     * @param tla must be an alias on a tlFacet
+     * @param tla must be an alias on a tlFacet or a library member that is an alias owner.
      */
     public void addAlias(TLAlias tla);
 
@@ -54,11 +54,6 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      * @return
      */
     public StringProperty baseTypeProperty();
-
-    /**
-     * Update or clear any cached values (string properties).
-     */
-    public void refresh();
 
     /**
      * Add and remove the users library member to the where used list
@@ -113,6 +108,14 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public String getLibraryName();
 
     /**
+     * Get a descendant type provider of the same class as the passed provider.
+     * 
+     * @param provider
+     * @return match or null
+     */
+    public OtmTypeProvider getMatchingProvider(OtmTypeProvider provider);
+
+    /**
      * @return the model manager for this object
      */
     OtmModelManager getModelManager();
@@ -139,6 +142,12 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      * @return the TLObject cast to LibraryMember
      */
     public LibraryMember getTlLM();
+
+    /**
+     * @param provider
+     * @return list of type user descendants assigned to the provider, or an empty list
+     */
+    public List<OtmTypeUser> getTypeUsers(OtmTypeProvider provider);
 
     /**
      * @return non-null, sorted list of type providers used by all descendants of this member.
@@ -177,6 +186,11 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public StringProperty prefixProperty();
 
     /**
+     * Update or clear any cached values (string properties).
+     */
+    public void refresh();
+
+    /**
      * Set the base type if supported.
      * 
      * @param baseObject
@@ -194,20 +208,6 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public void setNoLibraryActionManager(DexActionManager dexActionManager);
 
     public StringProperty versionProperty();
-
-    /**
-     * @param provider
-     * @return list of type user descendants assigned to the provider, or an empty list
-     */
-    public List<OtmTypeUser> getTypeUsers(OtmTypeProvider provider);
-
-    /**
-     * Get a descendant type provider of the same class as the passed provider.
-     * 
-     * @param provider
-     * @return match or null
-     */
-    public OtmTypeProvider getMatchingProvider(OtmTypeProvider provider);
 
 
 }

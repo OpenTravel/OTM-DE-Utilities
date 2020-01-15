@@ -159,7 +159,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        log.debug( "Received event: " + event.getClass().getSimpleName() + ":" + event.getEventType() );
+        // log.debug( "Received event: " + event.getClass().getSimpleName() + ":" + event.getEventType() );
         if (event instanceof DexMemberSelectionEvent)
             handleEvent( (DexMemberSelectionEvent) event );
         if (event instanceof DexModelChangeEvent)
@@ -182,11 +182,11 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     }
 
     public void handleEvent(OtmObjectReplacedEvent event) {
-        if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
-            log.error( "BAD HERE" );
+        // if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
+        // log.error( "BAD HERE" );
         post( event.get().getOwningMember() );
-        if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
-            log.error( "BAD HERE" );
+        // if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
+        // log.error( "BAD HERE" );
     }
 
     public void handleEvent(DexMemberDeleteEvent event) {
@@ -351,6 +351,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
      * Scan text fields name and description and force changes to be saved
      */
     public void commitChanges() {
+        log.debug( "Committing changes." );
         selectedMember.setName( memberName.getText() );
         selectedMember.nameProperty().set( memberName.getText() );
         //

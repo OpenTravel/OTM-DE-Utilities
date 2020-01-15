@@ -25,6 +25,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
+import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyType;
 
@@ -49,7 +50,7 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
 
     private final ContextMenu contextMenu = new ContextMenu();
     private Menu addMenu;
-    private MenuItem deleteProperty;
+    private MenuItem deleteItem;
     private MenuItem changeType;
     MenuItem validateItem = null;
 
@@ -60,7 +61,7 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
         // Create Context menu
         addMenu = new Menu( "Add" );
         setupAddMenu( addMenu );
-        deleteProperty = new MenuItem( "Delete" );
+        deleteItem = new MenuItem( "Delete" );
         changeType = new MenuItem( "Change Assigned Type" );
         validateItem = new MenuItem( "Validate" );
 
@@ -69,11 +70,11 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
         // SeparatorMenuItem separator = new SeparatorMenuItem();
         // contextMenu.getItems().addAll( addMenu, deleteProperty, changeType, separator, upObject, downObject );
 
-        contextMenu.getItems().addAll( addMenu, deleteProperty, changeType, validateItem );
+        contextMenu.getItems().addAll( addMenu, deleteItem, changeType, validateItem );
         setContextMenu( contextMenu );
 
         changeType.setOnAction( e -> changeAssignedType() );
-        deleteProperty.setOnAction( e -> deleteProperty() );
+        deleteItem.setOnAction( e -> delete() );
         validateItem.setOnAction( e -> validateMember() );
 
         // Set style listener (css class)
@@ -100,24 +101,24 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
         if (obj instanceof OtmTypeUser) {
             obj.getActionManager().run( DexActions.TYPECHANGE, (OtmTypeUser) obj );
             controller.getMainController().refresh();
-
-            // // FIXME - this should be done in event handler
-            // OtmLibraryMember newObject = obj.getLibrary().getVersionChain().getLatestVersion( obj.getOwningMember()
-            // );
-            // if (newObject != obj.getOwningMember())
-            // controller.fireEvent( new DexMemberSelectionEvent( newObject ) );
-            // controller.post( obj.getOwningMember() );
-            // Change could create new object in different library
-            // controller.fireEvent( new DexModelChangeEvent() );
         }
     }
 
-    private void deleteProperty() {
-        OtmProperty p = getProperty( getObject() );
-        if (p != null) {
-            p.getActionManager().run( DexActions.DELETEPROPERTY, p );
-            controller.refresh();
-        }
+    private void delete() {
+        OtmObject object = getObject();
+        if (object instanceof OtmProperty)
+            delete( (OtmProperty) object );
+        if (object instanceof OtmAlias)
+            delete( (OtmAlias) object );
+        controller.refresh();
+    }
+
+    private void delete(OtmProperty p) {
+        p.getActionManager().run( DexActions.DELETEPROPERTY, p );
+    }
+
+    private void delete(OtmAlias a) {
+        a.getActionManager().run( DexActions.DELETEALIAS, a );
     }
 
     /**
@@ -141,6 +142,15 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
         return null;
     }
 
+    /**
+     * @return treeItem.getValue().getValue() or null
+     */
+    private OtmAlias getAlias(OtmObject object) {
+        if (object instanceof OtmAlias)
+            return ((OtmAlias) object);
+        return null;
+    }
+
     private OtmPropertyOwner getPropertyOwner(OtmObject object) {
         if (object instanceof OtmProperty)
             return ((OtmProperty) object).getParent();
@@ -148,6 +158,8 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
             return ((OtmAbstractDisplayFacet) object).getParent();
         if (object instanceof OtmPropertyOwner)
             return (OtmPropertyOwner) object;
+        // if (object instanceof OtmAlias)
+        // return ((OtmAlias)object).getOwningMember();
         return null;
 
     }
@@ -161,29 +173,40 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
         OtmObject object = getObject();
         if (object == null)
             return;
+        DexActionManager am = object.getActionManager();
 
-        OtmProperty property = getProperty( object );
-        OtmPropertyOwner propertyOwner = getPropertyOwner( object );
-        DexActionManager am = propertyOwner != null ? propertyOwner.getActionManager() : null;
-
+        addMenu.setDisable( true );
+        changeType.setDisable( true );
+        deleteItem.setDisable( true );
+        // Turn on menu items
         if (am != null) {
-            addMenu.setDisable( !am.isEnabled( DexActions.ADDPROPERTY, propertyOwner ) );
-            deleteProperty.setDisable( !am.isEnabled( DexActions.DELETEPROPERTY, property ) );
-            changeType.setDisable( !am.isEnabled( DexActions.TYPECHANGE, property ) );
-            // enable/disable each property type menu item
-            OtmPropertyType.enableMenuItems( addMenu, propertyOwner );
+            if (object instanceof OtmAlias) {
+                log.debug( "Alias = " + getAlias( object ) + am.getClass().getSimpleName() );
+                deleteItem.setDisable( !am.isEnabled( DexActions.DELETEALIAS, getAlias( object ) ) );
+            } else {
+                OtmProperty property = getProperty( object );
+                OtmPropertyOwner propertyOwner = getPropertyOwner( object );
+                // DexActionManager am = propertyOwner != null ? propertyOwner.getActionManager() : null;
+                // log.debug( "Property = " + property + "\tOwner = " + property + " " + am.getClass().getSimpleName()
+                // );
+
+                addMenu.setDisable( !am.isEnabled( DexActions.ADDPROPERTY, propertyOwner ) );
+                changeType.setDisable( !am.isEnabled( DexActions.TYPECHANGE, property ) );
+                deleteItem.setDisable( !am.isEnabled( DexActions.DELETEPROPERTY, property ) );
+                // enable/disable each property type menu item
+                OtmPropertyType.enableMenuItems( addMenu, propertyOwner );
+            }
         }
 
         // Set style
+        tc.setEditable( object.isEditable() );
+        tc.pseudoClassStateChanged( INHERITED, newTreeItem.getValue().isInherited() );
+        tc.pseudoClassStateChanged( EDITABLE, object.isEditable() );
         if (object instanceof OtmChildrenOwner) {
-            // Make facets dividers
-            tc.pseudoClassStateChanged( DIVIDER, true );
-            tc.setEditable( false );
+            // Make facets dividers, not aliases
+            tc.pseudoClassStateChanged( DIVIDER, !(object instanceof OtmAlias) );
         } else {
             tc.pseudoClassStateChanged( DIVIDER, false );
-            tc.pseudoClassStateChanged( INHERITED, newTreeItem.getValue().isInherited() );
-            tc.pseudoClassStateChanged( EDITABLE, object.isEditable() );
-            tc.setEditable( object.isEditable() );
         }
     }
 

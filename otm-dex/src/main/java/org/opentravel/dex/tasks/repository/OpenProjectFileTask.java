@@ -63,7 +63,7 @@ public class OpenProjectFileTask extends DexTaskBase<File> {
     // Make sure only one thread is opening project at a time to prevent concurrency errors
     @Override
     public synchronized void doIT() {
-        log.debug( "Opening " + taskData.getName() );
+        // log.debug( "Opening " + taskData.getName() );
         boolean result =
             new DexFileHandler().openProject( taskData, modelMgr, new OpenProjectProgressMonitor( status ) );
         if (!result)

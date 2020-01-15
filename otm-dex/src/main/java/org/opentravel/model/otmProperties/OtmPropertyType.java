@@ -129,7 +129,7 @@ public enum OtmPropertyType {
                     case ELEMENT:
                     case IDREFELEMENT:
                     case INDICATORELEMENT:
-                        item.setDisable( !(owner.getTL() instanceof TLPropertyOwner) );
+                        item.setDisable( owner == null || !(owner.getTL() instanceof TLPropertyOwner) );
                         if (owner instanceof OtmEnumeration || owner instanceof OtmRoleEnumeration)
                             item.setDisable( true );
                         break;

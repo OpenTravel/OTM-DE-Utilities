@@ -77,13 +77,6 @@ public final class TypeProviderCellFactory extends TreeCell<MemberAndProvidersDA
         return v instanceof OtmTypeProvider ? (OtmTypeProvider) v : null;
     }
 
-    // /**
-    // * @return the value OtmObject or null
-    // */
-    // private OtmObject getValue() {
-    // return getSelectedObject( getTreeItem() );
-    // }
-
     private OtmObject getSelectedObject(TreeItem<MemberAndProvidersDAO> item) {
         if (item != null && item.getValue() != null && item.getValue().getValue() instanceof OtmObject)
             return (item.getValue().getValue());

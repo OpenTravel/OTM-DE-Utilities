@@ -58,6 +58,7 @@ public class ImageManager {
         ATTRIBUTE("/icons/Attribute.jpg"),
         INDICATOR("/icons/Indicator.gif"),
         INDICATORELEMENT("/icons/IndicatorElement.gif"),
+        NAMESPACEFACET("/icons/namespace.gif"),
         OPERATION("/icons/Operation.jpg"),
         RESOURCE("/icons/ResourceObject.gif"),
         RESOURCE_ACTION("/icons/ResourceAction.gif"),

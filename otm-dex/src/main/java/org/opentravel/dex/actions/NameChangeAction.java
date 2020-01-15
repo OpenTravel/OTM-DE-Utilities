@@ -67,8 +67,8 @@ public class NameChangeAction extends DexStringAction {
 
     @Override
     public String doIt(ObservableValue<? extends String> o, String oldName, String name) {
-        log.debug( "Ready to set name to " + name + "  from: " + oldName + " on: " + otm.getClass().getSimpleName()
-            + " " + ignore );
+        // log.debug( "Ready to set name to " + name + " from: " + oldName + " on: " + otm.getClass().getSimpleName()
+        // + " " + ignore );
 
         // Apply naming rules
         String modifiedName = name;

@@ -149,8 +149,8 @@ public class OtmEventSubscriptionManager {
         if (subscribedEvents.containsKey( publishedEvent )) {
             for (OtmEventUser subscriber : subscribedEvents.get( publishedEvent )) {
                 publisher.setEventHandler( publishedEvent, subscriber::handleEvent );
-                log.debug(
-                    "Set Subscriber to " + publishedEvent.getName() + " for " + subscriber.getClass().getSimpleName() );
+                // log.debug(
+                // "Set Subscriber to " + publishedEvent.getName() + " for " + subscriber.getClass().getSimpleName() );
             }
         }
     }

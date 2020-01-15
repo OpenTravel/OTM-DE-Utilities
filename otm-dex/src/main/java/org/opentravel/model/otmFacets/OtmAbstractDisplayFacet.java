@@ -58,9 +58,7 @@ import javafx.scene.image.ImageView;
 public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     private static Log log = LogFactory.getLog( OtmAbstractDisplayFacet.class );
 
-    // private OtmChildrenOwner parent;
     private OtmPropertyOwner parent;
-    // private List<OtmProperty> children;
 
     public OtmAbstractDisplayFacet(OtmPropertyOwner parent) {
         this.parent = parent;
@@ -75,16 +73,6 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     public OtmProperty add(TLModelElement tl) {
         return parent.add( tl );
     }
-
-    // private boolean contains(List<OtmObject> list, OtmObject child) {
-    // if (list.contains( child ))
-    // return true;
-    // for (OtmObject c : list)
-    // if (c.getTL() == child.getTL())
-    // return true;
-    //
-    // return false;
-    // }
 
     @Override
     public void delete(OtmObject property) {
@@ -303,9 +291,6 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public boolean isInherited() {
-        // log.debug("Is " + this + " inherited? " + !getParent().contains(this));
-        // if (getParent() instanceof OtmLibraryMember)
-        // return !((OtmLibraryMember) getParent()).contains( this );
         return false;
     }
 
@@ -330,27 +315,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     }
 
     @Override
-    public void modelInheritedChildren() {
-        // // Only model once
-        // if (inheritedChildren == null)
-        // inheritedChildren = new ArrayList<>();
-        // else
-        // inheritedChildren.clear(); // RE-model
-        // // return;
-        //
-        // // All properties, local and inherited
-        // // List<TLProperty> inheritedElements = PropertyCodegenUtils.getInheritedProperties(getTL());
-        //
-        // // Get only the directly inherited properties
-        // if (getOwningMember().getBaseType() != null && getTL() instanceof TLFacet) {
-        // PropertyCodegenUtils.getInheritedFacetProperties( (TLFacet) getTL() )
-        // .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
-        // PropertyCodegenUtils.getInheritedFacetAttributes( (TLFacet) getTL() )
-        // .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
-        // PropertyCodegenUtils.getInheritedFacetIndicators( (TLFacet) getTL() )
-        // .forEach( ie -> OtmPropertyFactory.create( ie, this ) );
-        // }
-    }
+    public void modelInheritedChildren() {}
 
     @Override
     public boolean isRenameable() {
@@ -360,10 +325,6 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     @Override
     public void remove(OtmObject property) {
         parent.remove( property );
-        // if (children.contains( property ))
-        // children.remove( property );
-        // if (inheritedChildren.contains( property ))
-        // inheritedChildren.remove( property );
     }
 
     @Override
@@ -398,7 +359,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public String getNameWithPrefix() {
-        return "";
+        return getOwningMember().getPrefix() + ":" + getName();
     }
 
     @Override

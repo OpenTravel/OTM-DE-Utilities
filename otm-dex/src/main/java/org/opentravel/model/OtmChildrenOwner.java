@@ -132,4 +132,5 @@ public interface OtmChildrenOwner extends OtmObject {
      * @return new list of property owners or empty list.
      */
     public Collection<? extends OtmPropertyOwner> getDescendantsPropertyOwners();
+
 }

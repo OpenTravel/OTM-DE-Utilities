@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.tasks.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTaskBase;
@@ -50,7 +48,7 @@ import org.opentravel.schemacompiler.version.VersionSchemeException;
  *
  */
 public class VersionLibraryTask extends DexTaskBase<OtmLibrary> {
-    private static Log log = LogFactory.getLog( VersionLibraryTask.class );
+    // private static Log log = LogFactory.getLog( VersionLibraryTask.class );
 
     public enum VersionType {
         MAJOR, MINOR, PATCH;
@@ -117,7 +115,7 @@ public class VersionLibraryTask extends DexTaskBase<OtmLibrary> {
                     errorMsg += msg;
             }
         }
-        log.debug( "Versioning: IsEnabled? " + errorMsg == null );
+        // log.debug( "Versioning: IsEnabled? " + errorMsg == null );
         return errorMsg == null;
     }
 
@@ -132,7 +130,7 @@ public class VersionLibraryTask extends DexTaskBase<OtmLibrary> {
         PublishWithLocalDependenciesException, LibraryLoaderException {
 
         if (isEnabled( library ) && proj != null && type != null) {
-            log.debug( type + "Version with project item: " + proj.getProjectItem( library.getTL() ) );
+            // log.debug( type + "Version with project item: " + proj.getProjectItem( library.getTL() ) );
 
             // Create a version in local files
             TLLibrary tlNewLibrary = null;
@@ -164,7 +162,7 @@ public class VersionLibraryTask extends DexTaskBase<OtmLibrary> {
                 proj.getTL().getProjectManager().addManagedProjectItem( item, proj.getTL() );
                 library.getModelManager().addProjects();
             }
-            log.debug( "Version library task complete. " );
+            // log.debug( "Version library task complete. " );
         }
     }
 
