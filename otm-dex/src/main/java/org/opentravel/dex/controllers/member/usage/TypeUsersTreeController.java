@@ -203,8 +203,8 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
     public void post(OtmLibraryMember member) {
         super.post( member );
         if (member != null) {
-            if (columnLabel != null)
-                columnLabel.setText( "Properties of " + member.getNameWithPrefix() + " that use types" );
+            // if (columnLabel != null)
+            // columnLabel.setText( "Properties of " + member.getNameWithPrefix() + " that use types" );
             //
             MemberAndUserFilter filter = new MemberAndUserFilter();
             PropertiesDAO dao = new PropertiesDAO( member, this );

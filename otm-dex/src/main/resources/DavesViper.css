@@ -3,7 +3,7 @@
 }
 .label{
     -fx-text-fill: #181818;
-    -fx-font-size: 12pt
+    -fx-font-size: 14pt
 }
 .text{
     -fx-text-fill: #984818;
@@ -83,6 +83,11 @@
 }
 .tree-cell:divider {
     -fx-background-color: #9ccfe2;
+    -fx-text-fill: black ;
+    -fx-font-style: italic ;
+}
+.tree-cell:sub-divider {
+    -fx-background-color: lightgray;
     -fx-text-fill: black ;
     -fx-font-style: italic ;
 }

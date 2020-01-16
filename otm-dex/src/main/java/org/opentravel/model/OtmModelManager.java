@@ -439,13 +439,13 @@ public class OtmModelManager implements TaskResultHandlerI {
 
         getTlModel().clearModel();
         projectManager.closeAll();
-
         addBuiltInLibraries( getTlModel() );
 
         // log.debug( "Cleared model. " + tlModel.getAllLibraries().size() );
     }
 
     public void close(OtmProject oProject) {
+        // Done in project - projectManager.closeProject( project );
         if (oProject != null && oProject.getTL() != null)
             projects.remove( oProject.getTL().getName() );
     }

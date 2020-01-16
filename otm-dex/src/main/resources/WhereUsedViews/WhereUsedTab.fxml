@@ -1,26 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.text.Font?>
 
-<Tab fx:id="whereUsedTab" text="Where Used" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" 
-		fx:controller="org.opentravel.dex.controllers.member.usage.WhereUsedTabController">
+<Tab fx:id="whereUsedTab" text="Where Used" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.member.usage.WhereUsedTabController">
   <content>
-     <HBox fx:id="whereUsedTabHBox">
-        <children>
-           <SplitPane dividerPositions="0.3" HBox.hgrow="ALWAYS">
-              <items>
-                 <fx:include fx:id="usersTree" source="WU_UsersTree.fxml" />
-                 <fx:include fx:id="typeUsersTree" source="WU_TypeUsersTree.fxml" />
-                 <fx:include fx:id="typeProvidersTree" source="WU_TypeProvidersTree.fxml" />
-              </items>
-           </SplitPane>
-        </children>
-     </HBox>
+           <HBox fx:id="whereUsedTabHBox">
+              <children>
+                 <SplitPane dividerPositions="0.3, 0.5" HBox.hgrow="ALWAYS">
+                    <items>
+                       <fx:include fx:id="usersTree" source="WU_UsersTree.fxml" />
+                       <fx:include fx:id="typeUsersTree" source="WU_TypeUsersTree.fxml" />
+                       <fx:include fx:id="typeProvidersTree" source="WU_TypeProvidersTree.fxml" />
+                    </items>
+                 </SplitPane>
+              </children>
+           </HBox>
   </content>
 </Tab>

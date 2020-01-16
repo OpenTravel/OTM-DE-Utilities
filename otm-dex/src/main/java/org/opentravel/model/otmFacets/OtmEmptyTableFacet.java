@@ -16,6 +16,7 @@
 
 package org.opentravel.model.otmFacets;
 
+import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 
@@ -30,10 +31,23 @@ public class OtmEmptyTableFacet extends OtmAbstractDisplayFacet {
     // private static Log log = LogFactory.getLog( OtmEmptyTableFacet.class );
 
     private OtmModelManager modelManager;
+    private String label = "No Content in Table";
 
     public OtmEmptyTableFacet(OtmModelManager modelManager) {
         super( null );
         this.modelManager = modelManager;
+    }
+
+    /**
+     * Create an empty, labeled facet
+     * 
+     * @param label
+     * @param modelManager
+     */
+    public OtmEmptyTableFacet(String label, OtmModelManager modelManager) {
+        super( null );
+        this.modelManager = modelManager;
+        this.label = label;
     }
 
     @Override
@@ -43,7 +57,13 @@ public class OtmEmptyTableFacet extends OtmAbstractDisplayFacet {
 
     @Override
     public String getName() {
-        return "No Content in Table";
+        return label;
+    }
+
+    @Override
+    public Icons getIconType() {
+        // return ImageManager.Icons.NAMESPACEFACET;
+        return null;
     }
 
     @Override

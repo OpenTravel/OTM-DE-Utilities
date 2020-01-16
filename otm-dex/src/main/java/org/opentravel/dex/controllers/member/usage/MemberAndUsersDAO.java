@@ -23,7 +23,7 @@ import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.model.otmFacets.OtmNamespaceFacet;
+import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import java.util.List;
@@ -58,10 +58,10 @@ public class MemberAndUsersDAO implements DexDAO<OtmObject> {
     }
 
     /**
-     * @param otmNamespaceFacet
+     * @param displayFacet
      */
-    public MemberAndUsersDAO(OtmNamespaceFacet otmNamespaceFacet) {
-        this.otmObject = otmNamespaceFacet;
+    public MemberAndUsersDAO(OtmAbstractDisplayFacet displayFacet) {
+        this.otmObject = displayFacet;
     }
 
     @Override

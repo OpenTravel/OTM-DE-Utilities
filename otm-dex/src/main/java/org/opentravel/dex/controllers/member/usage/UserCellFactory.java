@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.model.otmFacets.OtmEmptyTableFacet;
 import org.opentravel.model.otmFacets.OtmNamespaceFacet;
 
 import javafx.css.PseudoClass;
@@ -36,6 +37,7 @@ public final class UserCellFactory extends TreeCell<MemberAndUsersDAO> {
 
     private static final PseudoClass EDITABLE = PseudoClass.getPseudoClass( "editable" );
     private static final PseudoClass DIVIDER = PseudoClass.getPseudoClass( "divider" );
+    private static final PseudoClass SUBDIVIDER = PseudoClass.getPseudoClass( "sub-divider" );
     // private DexIncludedController<?> controller;
 
     // private final ContextMenu providerMenu = new ContextMenu();
@@ -53,6 +55,8 @@ public final class UserCellFactory extends TreeCell<MemberAndUsersDAO> {
             setText( null );
             setGraphic( null );
             pseudoClassStateChanged( DIVIDER, false );
+            pseudoClassStateChanged( EDITABLE, false );
+            pseudoClassStateChanged( SUBDIVIDER, false );
         } else {
             if (isEditing()) {
                 // if (textField != null) {
@@ -69,6 +73,7 @@ public final class UserCellFactory extends TreeCell<MemberAndUsersDAO> {
                 // }
                 pseudoClassStateChanged( EDITABLE, item.getValue() != null && item.getValue().isEditable() );
                 pseudoClassStateChanged( DIVIDER, item.getValue() instanceof OtmNamespaceFacet );
+                pseudoClassStateChanged( SUBDIVIDER, item.getValue() instanceof OtmEmptyTableFacet );
             }
         }
     }

@@ -283,7 +283,7 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
             return;
         super.post( member );
         if (columnLabel != null)
-            columnLabel.setText( "Objects that provide types to " + member.getName() + "." );
+            columnLabel.setText( "Providers" );
 
         // log.debug( "Posting type providers to: " + member );
 

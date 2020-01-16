@@ -37,6 +37,7 @@ public class WhereUsedTabController extends DexTabControllerBase {
     private UsersTreeController usersTreeController;
     @FXML
     private TypeProvidersTreeController typeProvidersTreeController;
+
     // Available but not used
     // @FXML
     // private Tab whereUsedTab;

@@ -27,8 +27,8 @@ import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.otmFacets.OtmNamespaceFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.repository.EntitySearchResult;
@@ -154,27 +154,46 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
         if (member == null || member.getWhereUsed() == null)
             return;
         // log.debug("Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName());
+        // Usage Categories
+        // As type
+        // As site where contributed
+        // As base type
+        // As object exposed by resource
+        // As extension facet in resource
 
-        // Create map of namespace prefixes and tree items
-        Map<String,TreeItem<MemberAndUsersDAO>> usedPrefixes = new HashMap<>();
-        member.getWhereUsed().forEach( u -> {
-            if (!usedPrefixes.containsKey( u.getPrefix() )) {
-                TreeItem<MemberAndUsersDAO> nsItem =
-                    new TreeItem<>( new MemberAndUsersDAO( new OtmNamespaceFacet( u ) ) );
-                usedPrefixes.put( u.getPrefix(), nsItem );
-                root.getChildren().add( nsItem );
-                nsItem.setExpanded( true );
-            }
-        } );
-
-        member.getWhereUsed().forEach( u -> {
-            TreeItem<MemberAndUsersDAO> item = new TreeItem<>( new MemberAndUsersDAO( u ) );
-            if (usedPrefixes.get( u.getPrefix() ) != null)
-                usedPrefixes.get( u.getPrefix() ).getChildren().add( item );
+        Map<String,UsersManager> namespaceMap = new HashMap<>();
+        member.getWhereUsed().forEach( w -> {
+            if (!namespaceMap.containsKey( w.getPrefix() ))
+                namespaceMap.put( w.getPrefix(), new UsersManager( w, member, root ) );
+            if (w.getBaseType() == member)
+                namespaceMap.get( w.getPrefix() ).addBase( w );
+            else if (w instanceof OtmResource)
+                namespaceMap.get( w.getPrefix() ).addResource( w );
             else
-                root.getChildren().add( item );
+                namespaceMap.get( w.getPrefix() ).addAssigned( w );
         } );
+
+        // // Create map of namespace prefixes with their tree items
+        // Map<String,TreeItem<MemberAndUsersDAO>> usedPrefixes = new HashMap<>();
+        // member.getWhereUsed().forEach( u -> {
+        // if (!usedPrefixes.containsKey( u.getPrefix() )) {
+        // TreeItem<MemberAndUsersDAO> nsItem =
+        // new TreeItem<>( new MemberAndUsersDAO( new OtmNamespaceFacet( u ) ) );
+        // usedPrefixes.put( u.getPrefix(), nsItem );
+        // root.getChildren().add( nsItem );
+        // nsItem.setExpanded( true );
+        // }
+        // } );
+        //
+        // member.getWhereUsed().forEach( u -> {
+        // TreeItem<MemberAndUsersDAO> item = new TreeItem<>( new MemberAndUsersDAO( u ) );
+        // if (usedPrefixes.get( u.getPrefix() ) != null)
+        // usedPrefixes.get( u.getPrefix() ).getChildren().add( item );
+        // else
+        // root.getChildren().add( item );
+        // } );
     }
+
 
     public void createTreeItems(List<EntitySearchResult> results) {
         if (results == null)
@@ -250,7 +269,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
         super.post( member );
         createTreeItems( member );
         if (columnLabel != null)
-            columnLabel.setText( "Objects that use " + member.getName() + " as type." );
+            columnLabel.setText( "Users " );
     }
 
     @Override
