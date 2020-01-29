@@ -19,7 +19,7 @@ package org.opentravel.dex.actions;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.resource.OtmParameter;
 
-public class SetParameterLocationAction extends DexStringAction {
+public class SetParameterFieldAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
 
     /**
@@ -32,10 +32,10 @@ public class SetParameterLocationAction extends DexStringAction {
         return false;
     }
 
-    protected SetParameterLocationAction() {}
+    protected SetParameterFieldAction() {}
 
     protected String get() {
-        return getSubject().getLocation() != null ? getSubject().getLocation().toString() : "";
+        return getSubject().getFieldRefName();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class SetParameterLocationAction extends DexStringAction {
     }
 
     protected void set(String value) {
-        getSubject().setLocationString( value );
+        getSubject().setFieldString( value );
     }
 
     @Override
@@ -57,7 +57,7 @@ public class SetParameterLocationAction extends DexStringAction {
 
     @Override
     public String toString() {
-        return "Action facet set to " + get();
+        return "Parameter field set to " + get();
     }
 
 }

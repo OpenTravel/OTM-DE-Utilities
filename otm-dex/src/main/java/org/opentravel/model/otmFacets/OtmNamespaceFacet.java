@@ -54,7 +54,7 @@ public class OtmNamespaceFacet extends OtmAbstractDisplayFacet {
 
     @Override
     public String getName() {
-        return object.getNamespace();
+        return object.getPrefix() + " - " + object.getNamespace();
     }
 
     @Override

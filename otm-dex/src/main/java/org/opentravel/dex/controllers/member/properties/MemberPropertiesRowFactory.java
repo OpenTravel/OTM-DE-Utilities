@@ -181,7 +181,7 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
         // Turn on menu items
         if (am != null) {
             if (object instanceof OtmAlias) {
-                log.debug( "Alias = " + getAlias( object ) + am.getClass().getSimpleName() );
+                // log.debug( "Alias = " + getAlias( object ) + am.getClass().getSimpleName() );
                 deleteItem.setDisable( !am.isEnabled( DexActions.DELETEALIAS, getAlias( object ) ) );
             } else {
                 OtmProperty property = getProperty( object );

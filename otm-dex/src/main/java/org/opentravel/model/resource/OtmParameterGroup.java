@@ -210,11 +210,6 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         StringProperty selection =
             getActionManager().add( DexActions.SETPARAMETERGROUPFACET, getReferenceFacetName(), this );
         return DexEditField.makeComboBox( getReferenceFacetCandidates(), selection );
-
-        // ComboBox<String> box = new ComboBox<>( getSubjectFacetCandidates() );
-        // box.setEditable( getOwningMember().isEditable() );
-        // box.getSelectionModel().select( getTL().getFacetRefName() );
-        // return box;
     }
 
     /**
@@ -225,17 +220,6 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
     protected ObservableList<String> getReferenceFacetCandidates() {
         ObservableList<String> facets = FXCollections.observableArrayList();
         getFacetCandidates().forEach( c -> facets.add( c.getName() ) );
-        // if (getOwningMember() != null) {
-        // getOwningMember().getSubjectFacets().forEach( f -> {
-        // if (f instanceof OtmFacet)
-        // facets.add( f.getName() );
-        // else if (f instanceof OtmQueryFacet) {
-        // if (!isIdGroup())
-        // facets.add( f.getName() );
-        // } else if (f instanceof OtmContextualFacet)
-        // facets.add( f.getName() );
-        // } );
-        // }
         return facets;
     }
 

@@ -28,6 +28,7 @@ import org.opentravel.dex.events.DexFilterChangeEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.DexResourceChangeEvent;
+import org.opentravel.dex.events.DexResourceChildModifiedEvent;
 import org.opentravel.dex.events.DexResourceChildSelectionEvent;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
@@ -89,8 +90,9 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
     // private boolean treeEditingEnabled = true;
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents = {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED,
-        DexResourceChangeEvent.RESOURCE_CHANGED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] subscribedEvents =
+        {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED, DexResourceChangeEvent.RESOURCE_CHANGED,
+            DexResourceChildModifiedEvent.RESOURCE_CHILD_MODIFIED, DexModelChangeEvent.MODEL_CHANGED};
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED,
         DexMemberSelectionEvent.RESOURCE_SELECTED, DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED};
 

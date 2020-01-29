@@ -25,6 +25,7 @@ import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
+import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.OtmObjectChangeEvent;
@@ -46,6 +47,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 /**
@@ -74,7 +76,8 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
     private static final EventType[] subscribedEvents =
         {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED,
             OtmObjectChangeEvent.OBJECT_CHANGED, DexMemberSelectionEvent.TYPE_USER_SELECTED};
-    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED};
+    private static final EventType[] publishedEvents =
+        {DexMemberSelectionEvent.MEMBER_SELECTED, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED};
 
     /**
      * Construct a member tree table controller that can publish and receive events.
@@ -135,12 +138,21 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
         // Add listeners and event handlers
         typeProvidersTree.getSelectionModel().selectedItemProperty()
             .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
+        typeProvidersTree.setOnMouseClicked( this::doubleClick );
 
         // Enable context menus at the row level and add change listener for for applying style
         typeProvidersTree.setCellFactory( (TreeView<MemberAndProvidersDAO> p) -> new TypeProviderCellFactory( this ) );
 
         // log.debug("Where used table configured.");
         refresh();
+    }
+
+    public void doubleClick(MouseEvent click) {
+        if (click.getClickCount() == 2) {
+            // Broadcast a broader event type than single click
+            memberSelectionListener( typeProvidersTree.getSelectionModel().getSelectedItem(),
+                DexMemberSelectionEvent.MEMBER_SELECTED );
+        }
     }
 
     /**
@@ -258,6 +270,11 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
      * @param item
      */
     private void memberSelectionListener(TreeItem<MemberAndProvidersDAO> item) {
+        memberSelectionListener( item, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED );
+    }
+
+    private void memberSelectionListener(TreeItem<MemberAndProvidersDAO> item,
+        EventType<DexMemberSelectionEvent> eventType) {
         if (item == null || eventPublisherNode == null)
             return; // Nothing to do
         // log.debug( "Selection Listener: " + item.getValue() );
@@ -266,8 +283,11 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
             member = (OtmLibraryMember) item.getValue().getValue();
         if (!ignoreEvents) {
             ignoreEvents = true;
-            if (member != null)
-                fireEvent( new DexMemberSelectionEvent( member, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED ) );
+            if (member != null) {
+                DexEvent event = new DexMemberSelectionEvent( member, eventType );
+                fireEvent( event );
+                // fireEvent(new DexMemberSelectionEvent( member, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED ) );
+            }
             ignoreEvents = false;
         }
     }

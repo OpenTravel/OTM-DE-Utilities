@@ -41,6 +41,7 @@ public class UsersManager {
 
     private TreeItem<MemberAndUsersDAO> nsItem = null;
     private TreeItem<MemberAndUsersDAO> assignedTypes;
+    private TreeItem<MemberAndUsersDAO> contributed;
     private TreeItem<MemberAndUsersDAO> baseTypes;
     private TreeItem<MemberAndUsersDAO> resourceTypes;
 
@@ -53,6 +54,10 @@ public class UsersManager {
         nsItem = new TreeItem<>( new MemberAndUsersDAO( new OtmNamespaceFacet( user ) ) );
         parent.getChildren().add( nsItem );
         nsItem.setExpanded( true );
+    }
+
+    protected void addContributed(OtmLibraryMember user) {
+        contributed = add( user, contributed, "Contributors" );
     }
 
     protected void addAssigned(OtmLibraryMember user) {
@@ -84,6 +89,7 @@ public class UsersManager {
             new TreeItem<>( new MemberAndUsersDAO( new OtmEmptyTableFacet( label, modelMgr ) ) );
         parent.getChildren().add( item );
         item.setExpanded( true );
+        // parent.getChildren().sort( null );
         return item;
     }
 

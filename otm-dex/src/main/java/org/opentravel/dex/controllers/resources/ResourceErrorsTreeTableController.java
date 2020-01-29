@@ -255,8 +255,9 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
             ValidationFindings findings = resource.getFindings();
             String f = ValidationUtils.getMessagesAsString( findings );
 
-            for (ValidationFinding finding : findings.getAllFindingsAsList())
-                new ErrorsAndWarningsDAO( finding ).createTreeItem( root );
+            if (findings != null)
+                for (ValidationFinding finding : findings.getAllFindingsAsList())
+                    new ErrorsAndWarningsDAO( finding ).createTreeItem( root );
         }
         ignoreEvents = false;
     }

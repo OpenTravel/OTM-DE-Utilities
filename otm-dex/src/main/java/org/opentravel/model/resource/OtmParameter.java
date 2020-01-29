@@ -27,6 +27,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.schemacompiler.model.TLExample;
 import org.opentravel.schemacompiler.model.TLExampleOwner;
 import org.opentravel.schemacompiler.model.TLMemberField;
@@ -53,15 +54,21 @@ import javafx.scene.control.Tooltip;
  */
 public class OtmParameter extends OtmResourceChildBase<TLParameter> implements OtmResourceChild {
     private static Log log = LogFactory.getLog( OtmParameter.class );
+    private static TLParamLocation defaultLocation = TLParamLocation.PATH;
 
     public OtmParameter(TLParameter tla, OtmParameterGroup parent) {
         super( tla, parent );
 
-        // tla.getFieldRefName();
+        if (tla.getLocation() == null)
+            tla.setLocation( defaultLocation );
     }
 
     public OtmObject getFieldRef() {
         return OtmModelElement.get( (TLModelElement) getTL().getFieldRef() );
+    }
+
+    public String getFieldRefName() {
+        return getFieldRef() != null ? getFieldRef().getName() : "";
     }
 
     /**
@@ -92,14 +99,46 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
 
     @Override
     public String getName() {
-        return getTL().getFieldRefName();
+        return getTL().getFieldRef() != null ? getTL().getFieldRef().getName() : getTL().getFieldRefName();
     }
 
     @Override
     public List<DexEditField> getFields() {
         List<DexEditField> fields = new ArrayList<>();
-        // fields.add( new DexEditField( 0, 0, FIELD_LABEL, FIELD_TOOLTIP, new ComboBox<String>() ) );
+        fields.add( new DexEditField( 1, 0, FIELD_LABEL, FIELD_TOOLTIP, getFieldsNode() ) );
         fields.add( new DexEditField( 0, 0, LOCATION_LABEL, LOCATION_TOOLTIP, getLocationsNode() ) );
+        return fields;
+    }
+
+    /**
+     * Get an FX node used to select from Reference Facet field candidates
+     * 
+     * @return
+     */
+    public Node getFieldsNode() {
+        StringProperty selection = getActionManager().add( DexActions.SETPARAMETERFIELD, getFieldRefName(), this );
+        return DexEditField.makeComboBox( getFieldCandidates(), selection );
+    }
+
+    /**
+     * Get facet names from subject business object. Omit query facets if this is an ID Parameter Group.
+     * 
+     * @return a string array of subject facet names.
+     */
+    protected ObservableList<String> getFieldCandidates() {
+        ObservableList<String> fields = FXCollections.observableArrayList();
+        getFieldRefCandidates().forEach( c -> fields.add( c.getName() ) );
+        return fields;
+    }
+
+    protected List<OtmProperty> getFieldRefCandidates() {
+        List<OtmProperty> fields = new ArrayList<>();
+        for (OtmObject candidate : getParent().getReferenceFacet().getDescendants())
+            if (candidate instanceof OtmProperty) {
+                // FIXME - only simple fields
+                // if ( ((OtmProperty)candidate).isField()
+                fields.add( (OtmProperty) candidate );
+            }
         return fields;
     }
 
@@ -169,13 +208,22 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
     }
 
     private Node getLocationsNode() {
-        StringProperty selection =
-            getActionManager().add( DexActions.SETPARAMETERLOCATION, getLocation().toString(), this );
+        String location = "";
+        if (getLocation() != null)
+            location = getLocation().toString();
+        StringProperty selection = getActionManager().add( DexActions.SETPARAMETERLOCATION, location, this );
         return DexEditField.makeComboBox( getLocationCandidates(), selection );
-        // ComboBox<String> box = new ComboBox<>( getLocationCandidates() );
-        // box.getSelectionModel().select( getTL().getLocation().toString() );
-        // box.setEditable( getOwningMember().isEditable() );
-        // return box;
+    }
+
+    public void setFieldString(String fieldName) {
+        for (OtmProperty c : getFieldRefCandidates())
+            if (c.getName().equals( fieldName ))
+                setFieldRef( c );
+    }
+
+    public void setFieldRef(OtmProperty field) {
+        if (field != null && field.getTL() instanceof TLMemberField)
+            getTL().setFieldRef( (TLMemberField<?>) field.getTL() );
     }
 
 
@@ -199,8 +247,8 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
 
     private static final String TOOLTIP =
         "Provides a reference to a property, attribute or element that should be used as a parameter in a REST request message.Tip: If you want to return a 404 (not found) error when the parameter value does not correspond to an existing resource then use a PATH parameter.";
-    // private static final String FIELD_LABEL = "Field";
-    // private static final String FIELD_TOOLTIP = "Name of the field to be used as a REST request parameter. ";
+    private static final String FIELD_LABEL = "Field";
+    private static final String FIELD_TOOLTIP = "Name of the field to be used as a REST request parameter. ";
     private static final String LOCATION_LABEL = "Location";
     private static final String LOCATION_TOOLTIP = "Specifies the location of the parameter in the REST request. ";
 
@@ -216,6 +264,10 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
         if (getLocation() != null)
             location = getLocation().toString();
         return new ReadOnlyStringWrapper( location );
+    }
+
+    public StringProperty nameProperty() {
+        return new ReadOnlyStringWrapper( getName() );
     }
 
     /**

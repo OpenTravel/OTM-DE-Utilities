@@ -202,7 +202,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         List<OtmObject> objects = new ArrayList<>();
         List<OtmObject> kids = new ArrayList<>();
         if (this instanceof OtmChildrenOwner)
-            children.addAll( ((OtmChildrenOwner) this).getChildren() );
+            kids.addAll( ((OtmChildrenOwner) this).getChildren() );
 
         for (OtmObject child : kids) {
             objects.add( child );

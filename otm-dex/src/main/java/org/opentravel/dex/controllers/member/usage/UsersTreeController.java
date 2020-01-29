@@ -24,18 +24,12 @@ import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
-import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
-import org.opentravel.schemacompiler.model.NamedEntity;
-import org.opentravel.schemacompiler.model.TLModelElement;
-import org.opentravel.schemacompiler.repository.EntitySearchResult;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javafx.application.Platform;
@@ -162,57 +156,65 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
         // As extension facet in resource
 
         Map<String,UsersManager> namespaceMap = new HashMap<>();
-        member.getWhereUsed().forEach( w -> {
-            if (!namespaceMap.containsKey( w.getPrefix() ))
-                namespaceMap.put( w.getPrefix(), new UsersManager( w, member, root ) );
-            if (w.getBaseType() == member)
-                namespaceMap.get( w.getPrefix() ).addBase( w );
-            else if (w instanceof OtmResource)
-                namespaceMap.get( w.getPrefix() ).addResource( w );
-            else
-                namespaceMap.get( w.getPrefix() ).addAssigned( w );
-        } );
 
-        // // Create map of namespace prefixes with their tree items
-        // Map<String,TreeItem<MemberAndUsersDAO>> usedPrefixes = new HashMap<>();
-        // member.getWhereUsed().forEach( u -> {
-        // if (!usedPrefixes.containsKey( u.getPrefix() )) {
-        // TreeItem<MemberAndUsersDAO> nsItem =
-        // new TreeItem<>( new MemberAndUsersDAO( new OtmNamespaceFacet( u ) ) );
-        // usedPrefixes.put( u.getPrefix(), nsItem );
-        // root.getChildren().add( nsItem );
-        // nsItem.setExpanded( true );
-        // }
-        // } );
-        //
-        // member.getWhereUsed().forEach( u -> {
-        // TreeItem<MemberAndUsersDAO> item = new TreeItem<>( new MemberAndUsersDAO( u ) );
-        // if (usedPrefixes.get( u.getPrefix() ) != null)
-        // usedPrefixes.get( u.getPrefix() ).getChildren().add( item );
-        // else
-        // root.getChildren().add( item );
-        // } );
+        member.getWhereUsed().forEach( w -> addToMap( w, member, namespaceMap ) );
+        member.getChildrenContributedFacets().forEach( cf -> addToMap( cf.getContributor(), member, namespaceMap ) );
     }
 
-
-    public void createTreeItems(List<EntitySearchResult> results) {
-        if (results == null)
-            return;
-        // log.debug("Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName());
-
-        // Get all providers for this member
-        List<OtmLibraryMember> foundObjects = new ArrayList<>();
-        for (EntitySearchResult result : results) {
-            // This won't work ... entities are not in the model!
-            NamedEntity tl = result.findEntity( modelMgr.getTlModel() );
-            OtmObject otm = OtmModelElement.get( (TLModelElement) tl );
-            if (otm instanceof OtmLibraryMember)
-                foundObjects.add( (OtmLibraryMember) otm );
-            else
-                log.debug( "found named entity that is not library member." );
-        }
-        foundObjects.forEach( o -> new MemberAndUsersDAO( o ).createTreeItem( root ) );
+    private void addToMap(OtmLibraryMember w, OtmLibraryMember member, Map<String,UsersManager> namespaceMap) {
+        if (!namespaceMap.containsKey( w.getPrefix() ))
+            namespaceMap.put( w.getPrefix(), new UsersManager( w, member, root ) );
+        // CF test must come first since they report having base type
+        if (w instanceof OtmContextualFacet)
+            namespaceMap.get( w.getPrefix() ).addContributed( w );
+        else if (w.getBaseType() == member)
+            namespaceMap.get( w.getPrefix() ).addBase( w );
+        else if (w instanceof OtmResource)
+            namespaceMap.get( w.getPrefix() ).addResource( w );
+        else
+            namespaceMap.get( w.getPrefix() ).addAssigned( w );
     }
+
+    // // Create map of namespace prefixes with their tree items
+    // Map<String,TreeItem<MemberAndUsersDAO>> usedPrefixes = new HashMap<>();
+    // member.getWhereUsed().forEach( u -> {
+    // if (!usedPrefixes.containsKey( u.getPrefix() )) {
+    // TreeItem<MemberAndUsersDAO> nsItem =
+    // new TreeItem<>( new MemberAndUsersDAO( new OtmNamespaceFacet( u ) ) );
+    // usedPrefixes.put( u.getPrefix(), nsItem );
+    // root.getChildren().add( nsItem );
+    // nsItem.setExpanded( true );
+    // }
+    // } );
+    //
+    // member.getWhereUsed().forEach( u -> {
+    // TreeItem<MemberAndUsersDAO> item = new TreeItem<>( new MemberAndUsersDAO( u ) );
+    // if (usedPrefixes.get( u.getPrefix() ) != null)
+    // usedPrefixes.get( u.getPrefix() ).getChildren().add( item );
+    // else
+    // root.getChildren().add( item );
+    // } );
+    // }
+
+
+    // public void createTreeItems(List<EntitySearchResult> results) {
+    // if (results == null)
+    // return;
+    // // log.debug("Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName());
+    //
+    // // Get all providers for this member
+    // List<OtmLibraryMember> foundObjects = new ArrayList<>();
+    // for (EntitySearchResult result : results) {
+    // // This won't work ... entities are not in the model!
+    // NamedEntity tl = result.findEntity( modelMgr.getTlModel() );
+    // OtmObject otm = OtmModelElement.get( (TLModelElement) tl );
+    // if (otm instanceof OtmLibraryMember)
+    // foundObjects.add( (OtmLibraryMember) otm );
+    // else
+    // log.debug( "found named entity that is not library member." );
+    // }
+    // foundObjects.forEach( o -> new MemberAndUsersDAO( o ).createTreeItem( root ) );
+    // }
 
     public TreeItem<MemberAndUsersDAO> getRoot() {
         return root;

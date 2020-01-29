@@ -60,6 +60,7 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
     Menu addMenu = null;
     private MenuItem deleteItem = null;
     private MenuItem addResource = null;
+    private MenuItem validateResource = null;
 
     private DexIncludedController<?> controller;
 
@@ -75,6 +76,7 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         addItem( addMenu, "Add Action Facet", e -> addChild( new TLActionFacet() ) );
         addItem( addMenu, "Add ParentRef", e -> addChild( new TLResourceParentRef() ) );
         addItem( addMenu, "Add Parameter Group", e -> addChild( new TLParamGroup() ) );
+
         addMenu.getItems().add( new SeparatorMenuItem() );
         arItem = addItem( addMenu, "Add Action Response", e -> addResponse() );
         paramItem = addItem( addMenu, "Add Parameter", e -> addParameter() );
@@ -85,6 +87,10 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         //
         resourceMenu.getItems().add( new SeparatorMenuItem() );
         addResource = addItem( "New Resource", e -> newResource() );
+
+        // validate
+        resourceMenu.getItems().add( new SeparatorMenuItem() );
+        validateResource = addItem( "Validate", e -> validateResource() );
 
         // Add the menu to the factory
         setContextMenu( resourceMenu );
@@ -105,6 +111,18 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         menu.getItems().add( item );
         item.setOnAction( handler );
         return item;
+    }
+
+    private void validateResource() {
+        OtmObject obj = getValue();
+        if (obj == null && controller.getSelection() != null
+            && controller.getSelection().getValue() instanceof OtmObject)
+            obj = (OtmObject) controller.getSelection().getValue();
+
+        if (obj != null)
+            obj.isValid( true );
+
+        controller.refresh();
     }
 
     private void newResource() {
