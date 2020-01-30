@@ -307,7 +307,6 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
     public OtmObject setReferenceFacetString(String value) {
         OtmObject f = null;
         for (OtmObject c : getFacetCandidates()) {
-            log.debug( c.getName() );
             if (c.getName().equals( value ) || c.getNameWithPrefix().equals( value ))
                 f = c;
         }

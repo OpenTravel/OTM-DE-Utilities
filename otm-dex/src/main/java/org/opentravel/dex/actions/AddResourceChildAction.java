@@ -70,9 +70,6 @@ public class AddResourceChildAction extends DexRunAction {
                 newChild = resource.add( (TLAction) tlChild );
             else if (tlChild instanceof TLActionFacet)
                 newChild = resource.add( (TLActionFacet) tlChild );
-
-            // // Record action to allow undo. Will validate results and warn user.
-            // resource.getActionManager().push( this );
         }
         return newChild;
     }

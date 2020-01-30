@@ -22,6 +22,7 @@ import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.actions.DexActions;
+import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -133,13 +134,24 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
 
     protected List<OtmProperty> getFieldRefCandidates() {
         List<OtmProperty> fields = new ArrayList<>();
-        if (getParent() != null && getParent().getReferenceFacet() != null)
-            for (OtmObject candidate : getParent().getReferenceFacet().getDescendants())
+        // for (OtmObject candidate : getParent().getReferenceFacet().getDescendants())
+        OtmChildrenOwner facet = null;
+        if (getParent() != null && getParent().getReferenceFacet() instanceof OtmChildrenOwner)
+            facet = (OtmChildrenOwner) getParent().getReferenceFacet();
+        if (facet != null) {
+            for (OtmObject candidate : facet.getChildren())
                 if (candidate instanceof OtmProperty) {
                     // FIXME - only simple fields
                     // if ( ((OtmProperty)candidate).isField()
                     fields.add( (OtmProperty) candidate );
                 }
+            for (OtmObject candidate : facet.getInheritedChildren())
+                if (candidate instanceof OtmProperty) {
+                    // FIXME - only simple fields
+                    // if ( ((OtmProperty)candidate).isField()
+                    fields.add( (OtmProperty) candidate );
+                }
+        }
         return fields;
     }
 
@@ -217,14 +229,19 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
     }
 
     public void setFieldString(String fieldName) {
-        for (OtmProperty c : getFieldRefCandidates())
-            if (c.getName().equals( fieldName ))
-                setFieldRef( c );
+        if (fieldName == null || fieldName.isEmpty())
+            getTL().setFieldRef( null );
+        else
+            for (OtmProperty c : getFieldRefCandidates())
+                if (c.getName().equals( fieldName ))
+                    setFieldRef( c );
+        nameProperty = null;
     }
 
     public void setFieldRef(OtmProperty field) {
         if (field != null && field.getTL() instanceof TLMemberField)
             getTL().setFieldRef( (TLMemberField<?>) field.getTL() );
+        nameProperty = null;
     }
 
 
@@ -268,7 +285,9 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
     }
 
     public StringProperty nameProperty() {
-        return new ReadOnlyStringWrapper( getName() );
+        if (nameProperty == null)
+            nameProperty = new ReadOnlyStringWrapper( getName() );
+        return nameProperty;
     }
 
     /**
