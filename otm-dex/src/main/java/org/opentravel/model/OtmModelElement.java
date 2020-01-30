@@ -493,6 +493,11 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         return validationImageProperty;
     }
 
+    /**
+     * Get a string wrapper around existing findings.
+     * 
+     * @see org.opentravel.model.OtmObject#validationProperty()
+     */
     @Override
     public StringProperty validationProperty() {
         if (validationProperty == null)

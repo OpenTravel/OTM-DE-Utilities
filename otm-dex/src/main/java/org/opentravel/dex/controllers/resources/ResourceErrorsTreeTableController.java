@@ -19,7 +19,6 @@ package org.opentravel.dex.controllers.resources;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
-import org.opentravel.common.ValidationUtils;
 import org.opentravel.common.cellfactories.ValidationErrorsAndWarningsTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
@@ -253,7 +252,7 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
             objectImageView.setImage( resource.validationImage().getImage() );
 
             ValidationFindings findings = resource.getFindings();
-            String f = ValidationUtils.getMessagesAsString( findings );
+            // String f = ValidationUtils.getMessagesAsString( findings );
 
             if (findings != null)
                 for (ValidationFinding finding : findings.getAllFindingsAsList())

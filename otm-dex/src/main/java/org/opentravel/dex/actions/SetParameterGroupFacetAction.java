@@ -17,7 +17,13 @@
 package org.opentravel.dex.actions;
 
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.resource.OtmParameter;
 import org.opentravel.model.resource.OtmParameterGroup;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javafx.beans.value.ObservableValue;
 
 public class SetParameterGroupFacetAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
@@ -31,6 +37,8 @@ public class SetParameterGroupFacetAction extends DexStringAction {
             return subject.isEditable();
         return false;
     }
+
+    private List<OtmParameter> children;
 
     protected SetParameterGroupFacetAction() {
         // actionType = DexActions.SETPARAMETERGROUPFACET;
@@ -47,6 +55,35 @@ public class SetParameterGroupFacetAction extends DexStringAction {
 
     protected void set(String value) {
         getSubject().setReferenceFacetString( value );
+    }
+
+    /**
+     * {@inheritDoc} Also save parameter children.
+     */
+    @Override
+    public String doIt(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+        // Save then delete existing parameter children
+        this.children = new ArrayList<>();
+        getSubject().getChildren().forEach( c -> {
+            if (c instanceof OtmParameter)
+                children.add( (OtmParameter) c );
+        } );
+        children.forEach( c -> getSubject().delete( c ) );
+
+        return super.doIt( observable, oldValue, newValue );
+    }
+
+    /**
+     * {@inheritDoc} Also remove added parameters and restore parameter children.
+     */
+    @Override
+    public String undoIt() {
+        // Remove added parameters and then restore saved children
+        List<OtmObject> kids = new ArrayList<>( getSubject().getChildren() );
+        kids.forEach( c -> getSubject().delete( c ) );
+        children.forEach( c -> getSubject().add( c.getTL() ) );
+
+        return super.undoIt();
     }
 
     @Override

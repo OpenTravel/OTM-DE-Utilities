@@ -74,4 +74,28 @@ public abstract class OtmResourceChildBase<C> extends OtmModelElement<TLModelEle
         return owner;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * When force is true, run validation on all children and where used library members.
+     */
+    @Override
+    public boolean isValid(boolean force) {
+        if (getLibrary() == null)
+            return false; // Can't be valid if not in a library.
+        if (force) {
+            if (this instanceof OtmChildrenOwner) {
+                synchronized (this) {
+                    ((OtmChildrenOwner) this).getChildren().forEach( c -> {
+                        if (c != this)
+                            c.isValid( force );
+                    } );
+
+                }
+            }
+        }
+        return super.isValid( force );
+    }
+
+
 }

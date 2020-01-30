@@ -133,12 +133,13 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
 
     protected List<OtmProperty> getFieldRefCandidates() {
         List<OtmProperty> fields = new ArrayList<>();
-        for (OtmObject candidate : getParent().getReferenceFacet().getDescendants())
-            if (candidate instanceof OtmProperty) {
-                // FIXME - only simple fields
-                // if ( ((OtmProperty)candidate).isField()
-                fields.add( (OtmProperty) candidate );
-            }
+        if (getParent() != null && getParent().getReferenceFacet() != null)
+            for (OtmObject candidate : getParent().getReferenceFacet().getDescendants())
+                if (candidate instanceof OtmProperty) {
+                    // FIXME - only simple fields
+                    // if ( ((OtmProperty)candidate).isField()
+                    fields.add( (OtmProperty) candidate );
+                }
         return fields;
     }
 

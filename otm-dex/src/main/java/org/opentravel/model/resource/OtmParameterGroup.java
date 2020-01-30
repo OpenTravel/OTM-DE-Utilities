@@ -101,7 +101,12 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         OtmParameter parameter = null;
         if (tlParameter != null && !getTL().getParameters().contains( tlParameter )) {
             getTL().addParameter( tlParameter );
-            parameter = new OtmParameter( tlParameter, this );
+            OtmObject oldParam = OtmModelElement.get( tlParameter );
+            // Reuse existing OTM facade if it exists
+            if (oldParam instanceof OtmParameter)
+                parameter = (OtmParameter) oldParam;
+            else
+                parameter = new OtmParameter( tlParameter, this );
             // log.debug( "Added parameter to " + this );
             getOwningMember().refresh( true );
         }
@@ -227,13 +232,15 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         List<OtmObject> facets = new ArrayList<>();
         if (getOwningMember() != null) {
             getOwningMember().getSubjectFacets().forEach( f -> {
-                if (f instanceof OtmFacet)
-                    facets.add( f );
-                else if (f instanceof OtmQueryFacet) {
-                    if (!isIdGroup())
+                if (f != getReferenceFacet()) {
+                    if (f instanceof OtmFacet)
                         facets.add( f );
-                } else if (f instanceof OtmContextualFacet)
-                    facets.add( f );
+                    else if (f instanceof OtmQueryFacet) {
+                        if (!isIdGroup())
+                            facets.add( f );
+                    } else if (f instanceof OtmContextualFacet)
+                        facets.add( f );
+                }
             } );
         }
         return facets;
@@ -293,15 +300,17 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
             getTL().setFacetRef( (TLFacet) facet.getTL() );
         else
             getTL().setFacetRef( null );
-        // log.debug( "Set reference facet to " + getReferenceFacet() );
+        log.debug( "Set reference facet to " + getReferenceFacet() );
         return getReferenceFacet();
     }
 
     public OtmObject setReferenceFacetString(String value) {
         OtmObject f = null;
-        for (OtmObject c : getFacetCandidates())
-            if (c.getName().equals( value ))
+        for (OtmObject c : getFacetCandidates()) {
+            log.debug( c.getName() );
+            if (c.getName().equals( value ) || c.getNameWithPrefix().equals( value ))
                 f = c;
+        }
         if (f == null)
             log.debug( "Did not find a facet matching " + value );
         return setReferenceFacet( f );

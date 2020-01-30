@@ -314,6 +314,8 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
 
     @Override
     public void refresh() {
+        // Validate all resources
+        currentModelMgr.getResources( false ).forEach( r -> r.isValid( true ) );
         post( currentModelMgr );
     }
 
