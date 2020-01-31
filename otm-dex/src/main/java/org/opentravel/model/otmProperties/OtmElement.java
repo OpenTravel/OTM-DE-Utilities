@@ -119,6 +119,9 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
     public boolean isManditory() {
         return getTL().isMandatory();
     }
+    // public boolean isField() {
+    // return
+    // }
 
     /**
      * {@inheritDoc}

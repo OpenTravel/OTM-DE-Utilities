@@ -326,4 +326,15 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
     public void remove(OtmObject param) {
         children.remove( param );
     }
+
+    /**
+     * @return list of path parameters or empty list
+     */
+    public List<OtmParameter> getPathParameters() {
+        List<OtmParameter> params = new ArrayList<>();
+        for (OtmParameter p : getParameters())
+            if (p.isPathParam())
+                params.add( p );
+        return params;
+    }
 }

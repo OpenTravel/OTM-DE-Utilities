@@ -29,6 +29,7 @@ import org.opentravel.dex.events.DexResourceChangeEvent;
 import org.opentravel.dex.events.DexResourceChildModifiedEvent;
 import org.opentravel.dex.events.DexResourceChildSelectionEvent;
 import org.opentravel.dex.events.DexResourceModifiedEvent;
+import org.opentravel.dex.events.OtmObjectChangeEvent;
 import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -85,7 +86,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     private static final EventType[] subscribedEvents = {DexResourceModifiedEvent.RESOURCE_MODIFIED,
         DexResourceChildModifiedEvent.RESOURCE_CHILD_MODIFIED, DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED,
         DexMemberSelectionEvent.MEMBER_SELECTED, DexMemberSelectionEvent.RESOURCE_SELECTED,
-        OtmObjectModifiedEvent.OBJECT_MODIFIED, DexModelChangeEvent.MODEL_CHANGED};
+        OtmObjectModifiedEvent.OBJECT_MODIFIED, DexModelChangeEvent.MODEL_CHANGED, OtmObjectChangeEvent.OBJECT_CHANGED};
 
     public ResourceDetailsController() {
         super( subscribedEvents, publishedEvents );
@@ -131,6 +132,8 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
             handleEvent( (DexModelChangeEvent) event );
         else if (event instanceof OtmObjectModifiedEvent)
             handleEvent( (OtmObjectModifiedEvent) event );
+        else if (event instanceof OtmObjectChangeEvent)
+            handleEvent( (OtmObjectChangeEvent) event );
     }
 
     public void handleEvent(DexResourceChildModifiedEvent event) {
@@ -139,6 +142,11 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     }
 
     public void handleEvent(OtmObjectModifiedEvent event) {
+        if (event.get() == postedObject)
+            refresh();
+    }
+
+    public void handleEvent(OtmObjectChangeEvent event) {
         if (event.get() == postedObject)
             refresh();
     }

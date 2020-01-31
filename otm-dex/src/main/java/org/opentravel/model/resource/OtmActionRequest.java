@@ -77,6 +77,9 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     private static final String PARAMETERS_TOOLTIP =
         "Name of the parameter group that provides the URL and header parameters (if any) for the request.";
 
+    private static final String NO_PARAMETERS = "NONE";
+    private static final String NO_PAYLOAD = "NONE";
+
     public static MenuButton makeMenuButton(List<String> values, OtmObject object) {
         MenuButton mb = new MenuButton();
         values.forEach( v -> mb.getItems().add( new CheckMenuItem( v ) ) );
@@ -171,8 +174,10 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
             ? ((OtmAction) OtmModelElement.get( getTL().getOwner() )) : null;
     }
 
+    // FIXME - add NONE
     public ObservableList<String> getParameterGroupCandidates() {
         ObservableList<String> groups = FXCollections.observableArrayList();
+        groups.add( "NONE" );
         getOwningMember().getParameterGroups().forEach( pg -> groups.add( pg.getName() ) );
         return groups;
     }
@@ -190,7 +195,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     public String getParamGroupName() {
-        return getParamGroup() != null ? getParamGroup().getName() : "";
+        return getParamGroup() != null ? getParamGroup().getName() : NO_PARAMETERS;
 
     }
 
@@ -234,14 +239,16 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     public String getPayloadActionFacetName() {
         if (getPayloadActionFacet() != null)
             return getPayloadActionFacet().getName();
-        return getTL().getPayloadTypeName() != null ? getTL().getPayloadTypeName() : "";
+        return getTL().getPayloadTypeName() != null ? getTL().getPayloadTypeName() : NO_PAYLOAD;
     }
 
     public ObservableList<String> getPayloadCandidates() {
         ObservableList<String> actionFacets = FXCollections.observableArrayList();
-        actionFacets.add( "NONE" );
-        getOwningMember().getActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
+        actionFacets.add( NO_PARAMETERS );
+        if (!getMethod().equals( TLHttpMethod.GET ))
+            getOwningMember().getActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
         return actionFacets;
+        // TODO - payloads are not allowed for GET
     }
 
     /**
@@ -290,8 +297,10 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         getTL().setHttpMethod( method );
         if (method != null)
             log.debug( "Set method to " + getMethod() );
-        // else
-        // log.debug( "Set method to null" );
+        // if set to GET then payload must be NONE
+        if (method != null && method.equals( TLHttpMethod.GET ))
+            setPayloadType( null );
+        // TODO - make this undo-able in action
         return getMethod();
     }
 
@@ -304,6 +313,11 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         else
             getTL().setParamGroup( null );
         // log.debug( "Set parameter group to " + group );
+
+        // If the group is ID group and has path parameters, update the path template
+        setPathTemplate( getPathTemplate(), true );
+
+        // TODO - make this undo-able
         return group;
     }
 
@@ -316,9 +330,10 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      */
     public OtmParameterGroup setParamGroupString(String value) {
         OtmParameterGroup pg = null;
-        for (OtmParameterGroup c : getOwningMember().getParameterGroups())
-            if (c.getName().equals( value ))
-                pg = c;
+        if (!value.equals( NO_PARAMETERS ))
+            for (OtmParameterGroup c : getOwningMember().getParameterGroups())
+                if (c.getName().equals( value ))
+                    pg = c;
 
         return setParamGroup( pg );
     }
@@ -361,9 +376,10 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      */
     public OtmActionFacet setPayloadActionFacetString(String value) {
         OtmActionFacet af = null;
-        for (OtmActionFacet c : getOwningMember().getActionFacets())
-            if (c.getName().equals( value ))
-                af = c;
+        if (!value.equals( NO_PAYLOAD ))
+            for (OtmActionFacet c : getOwningMember().getActionFacets())
+                if (c.getName().equals( value ))
+                    af = c;
         return setPayloadType( af );
     }
 

@@ -154,6 +154,8 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
         // As base type
         // As object exposed by resource
         // As extension facet in resource
+        //
+        // TODO - as parameter reference in a resource
 
         Map<String,UsersManager> namespaceMap = new HashMap<>();
 

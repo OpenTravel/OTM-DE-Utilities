@@ -128,7 +128,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
 
     private Node getRemoveBasePayloadNode() {
         Button button = new Button( "-Remove-" );
-        button.setDisable( !isEditable() );
+        button.setDisable( !isEditable() || getBasePayload() == null );
         button.setOnAction( a -> getActionManager().run( DexActions.REMOVEAFBASEPAYLOAD, this ) );
         return button;
     }
@@ -161,6 +161,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         fields.add( new DexEditField( 3, 0, REPEAT_COUNT_LABEL, REPEAT_COUNT_TOOLTIP, getRepeatCountNode() ) );
         return fields;
     }
+    // FIXME - repeat count needs to support typing in values
 
     @Override
     public Icons getIconType() {
@@ -184,6 +185,14 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
             obj = ((OtmContextualFacet) obj).getWhereContributed();
 
         return obj instanceof OtmFacet ? (OtmFacet<?>) obj : null;
+    }
+
+    public int getRepeatCount() {
+        return getTL().getReferenceRepeat();
+    }
+
+    public void setRepeatCount(int value) {
+        getTL().setReferenceRepeat( value );
     }
 
     /**
@@ -259,10 +268,31 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     }
 
     private Node getRepeatCountNode() {
-        Spinner<Integer> spinner = new Spinner<>( 0, 10000, 0 );
+        Spinner<Integer> spinner = new Spinner<>( 0, 10000, getRepeatCount() ); // min, max, init
         spinner.setDisable( !isEditable() );
-        // spinner.setOnRotate( a -> log.debug( "Spinner selected" ) );
+        spinner.setEditable( isEditable() );
+        spinner.getEditor().setOnAction( a -> spinnerListener( spinner ) );
+        spinner.focusedProperty().addListener( (o, old, newV) -> spinnerListener( spinner ) );
         return spinner;
+    }
+
+    /**
+     * Handle focus change and typing <Enter>. If value changed, run action.
+     * 
+     * @param spinner
+     */
+    private void spinnerListener(Spinner<Integer> spinner) {
+        if (spinner != null) {
+            // If they type, the editor will access the value
+            int value = Integer.parseInt( spinner.getEditor().getText() );
+            if (spinner.getValue() != value)
+                spinner.getValueFactory().setValue( value );
+
+            // If the value changed, run the action
+            if (spinner.getValue() != getRepeatCount()) {
+                getActionManager().run( DexActions.SETAFREFERENCEFACETCOUNT, this, spinner.getValue() );
+            }
+        }
     }
 
     /**

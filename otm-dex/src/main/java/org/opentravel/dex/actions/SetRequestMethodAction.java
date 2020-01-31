@@ -17,10 +17,17 @@
 package org.opentravel.dex.actions;
 
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.model.resource.OtmActionRequest;
+import org.opentravel.schemacompiler.model.TLHttpMethod;
+
+import javafx.beans.value.ObservableValue;
 
 public class SetRequestMethodAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( SetAbstractAction.class );
+
+    // Setting method to get will remove old payload
+    private OtmActionFacet oldPayload = null;
 
     /**
      * @param subject
@@ -55,6 +62,29 @@ public class SetRequestMethodAction extends DexStringAction {
             return false;
         otm = subject;
         return true;
+    }
+
+    /**
+     * @see org.opentravel.dex.actions.DexStringAction#doIt(javafx.beans.value.ObservableValue, java.lang.String,
+     *      java.lang.String)
+     */
+    @Override
+    public String doIt(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+        // If it is a GET, save the payload for undo
+        if (TLHttpMethod.valueOf( newValue ).equals( TLHttpMethod.GET ))
+            oldPayload = getSubject().getPayloadActionFacet();
+
+        return super.doIt( observable, oldValue, newValue );
+    }
+
+    /**
+     * @see org.opentravel.dex.actions.DexStringAction#undoIt()
+     */
+    @Override
+    public String undoIt() {
+        if (oldPayload instanceof OtmActionFacet)
+            getSubject().setPayloadType( oldPayload );
+        return super.undoIt();
     }
 
     @Override

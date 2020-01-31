@@ -22,15 +22,16 @@ import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.actions.DexActions;
-import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.schemacompiler.codegen.util.ResourceCodegenUtils;
 import org.opentravel.schemacompiler.model.TLExample;
 import org.opentravel.schemacompiler.model.TLExampleOwner;
+import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLMemberField;
 import org.opentravel.schemacompiler.model.TLMemberFieldOwner;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -132,26 +133,47 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
         return fields;
     }
 
+    /**
+     * Use the compiler to get a list of field reference candidates.
+     * <p>
+     * Note: children of types assigned to complex fields will be included.
+     * 
+     * @return new list of eligible properties
+     */
     protected List<OtmProperty> getFieldRefCandidates() {
         List<OtmProperty> fields = new ArrayList<>();
-        // for (OtmObject candidate : getParent().getReferenceFacet().getDescendants())
-        OtmChildrenOwner facet = null;
-        if (getParent() != null && getParent().getReferenceFacet() instanceof OtmChildrenOwner)
-            facet = (OtmChildrenOwner) getParent().getReferenceFacet();
-        if (facet != null) {
-            for (OtmObject candidate : facet.getChildren())
-                if (candidate instanceof OtmProperty) {
-                    // FIXME - only simple fields
-                    // if ( ((OtmProperty)candidate).isField()
-                    fields.add( (OtmProperty) candidate );
-                }
-            for (OtmObject candidate : facet.getInheritedChildren())
-                if (candidate instanceof OtmProperty) {
-                    // FIXME - only simple fields
-                    // if ( ((OtmProperty)candidate).isField()
-                    fields.add( (OtmProperty) candidate );
-                }
+        TLFacet facetRef = null;
+        if (getTL() != null && getTL().getOwner() != null)
+            facetRef = getTL().getOwner().getFacetRef();
+        if (facetRef != null) {
+            OtmObject field;
+            for (TLMemberField<TLMemberFieldOwner> tlField : ResourceCodegenUtils
+                .getEligibleParameterFields( (TLFacet) facetRef )) {
+                field = OtmModelElement.get( (TLModelElement) tlField );
+                if (field instanceof OtmProperty)
+                    fields.add( (OtmProperty) field );
+            }
         }
+        // for (OtmObject candidate : getParent().getReferenceFacet().getDescendants())
+        // log.debug( "Check this out." );
+        // // Old way
+        // OtmChildrenOwner facet = null;
+        // if (getParent() != null && getParent().getReferenceFacet() instanceof OtmChildrenOwner)
+        // facet = (OtmChildrenOwner) getParent().getReferenceFacet();
+        // if (facet != null) {
+        // for (OtmObject candidate : facet.getChildren())
+        // if (candidate instanceof OtmProperty) {
+        // // FIXME - only simple fields
+        // // if ( ((OtmProperty)candidate).isField()
+        // fields.add( (OtmProperty) candidate );
+        // }
+        // for (OtmObject candidate : facet.getInheritedChildren())
+        // if (candidate instanceof OtmProperty) {
+        // // FIXME - only simple fields
+        // // if ( ((OtmProperty)candidate).isField()
+        // fields.add( (OtmProperty) candidate );
+        // }
+        // }
         return fields;
     }
 

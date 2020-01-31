@@ -55,6 +55,8 @@ import javafx.scene.layout.VBox;
 /**
  * Manage the library member where used view.
  * 
+ * 1/31/2020 - i think this is dead code.
+ * 
  * @author dmh
  *
  */

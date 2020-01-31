@@ -189,6 +189,9 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
         return tlProperties;
     }
 
+    /**
+     * {@inheritDoc} - NOT IMPLEMENTED for facets
+     */
     @Override
     public Collection<OtmTypeProvider> getChildrenTypeProviders() {
         return Collections.emptyList();
