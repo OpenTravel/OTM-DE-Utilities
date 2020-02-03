@@ -38,6 +38,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.Tooltip;
@@ -77,8 +78,13 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     private static final String PARAMETERS_TOOLTIP =
         "Name of the parameter group that provides the URL and header parameters (if any) for the request.";
 
+    private static final String PATH_DEFAULT_LABEL = "Default";
+    private static final String PATH_DEFAULT_TOOLTIP = "Reset to default path for action request.";
+
     public static final String NO_PARAMETERS = "NONE";
     public static final String NO_PAYLOAD = "NONE";
+
+    private StringProperty pathProperty;
 
     public static MenuButton makeMenuButton(List<String> values, OtmObject object) {
         MenuButton mb = new MenuButton();
@@ -109,8 +115,17 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         fields.add( new DexEditField( 2, 0, METHOD_LABEL, METHOD_TOOLTIP, getMethodNode() ) );
         fields.add( new DexEditField( 3, 0, MIME_LABEL, MIME_TOOLTIP, getMimeNode() ) );
         fields.add( new DexEditField( 4, 0, PATH_LABEL, PATH_TOOLTIP, getPathNode() ) );
+        fields.add( new DexEditField( 4, 2, null, PATH_DEFAULT_TOOLTIP, getDefaultPathNode() ) );
 
         return fields;
+    }
+
+    private Node getDefaultPathNode() {
+        Button button = new Button( PATH_DEFAULT_LABEL );
+        button.setDisable( !isEditable() );
+        button.setOnAction( e -> pathProperty.set( DexParentRefsEndpointMap.getPathParameterContributions( this ) ) );
+        // button.setOnAction( e -> getActionManager().add( DexActions.SETREQUESTPATH, "", this ) );
+        return button;
     }
 
     @Override
@@ -174,7 +189,6 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
             ? ((OtmAction) OtmModelElement.get( getTL().getOwner() )) : null;
     }
 
-    // FIXME - add NONE
     public ObservableList<String> getParameterGroupCandidates() {
         ObservableList<String> groups = FXCollections.observableArrayList();
         groups.add( "NONE" );
@@ -205,11 +219,13 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     private Node getPathNode() {
-        StringProperty selection = getActionManager().add( DexActions.SETREQUESTPATH, getPathTemplate(), this );
-        return DexEditField.makeTextField( selection );
+        log.debug( "Parent URL: " + getParent().getEndpointURL() );
+        pathProperty = getActionManager().add( DexActions.SETREQUESTPATH, getPathTemplate(), this );
+        return DexEditField.makeTextField( pathProperty );
     }
 
     public String getPathTemplate() {
+        log.debug( "TL Path Template = " + getTL().getPathTemplate() );
         return getTL().getPathTemplate();
     }
 
@@ -316,7 +332,6 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         // If the group is ID group and has path parameters, update the path template
         setPathTemplate( getPathTemplate(), true );
 
-        // TODO - make this undo-able
         return group;
     }
 
@@ -362,6 +377,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
             }
             getTL().setPathTemplate( path.toString() );
         }
+        log.debug( "Set path template to: " + getTL().getPathTemplate() );
         return getTL().getPathTemplate();
     }
 

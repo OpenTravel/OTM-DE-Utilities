@@ -70,6 +70,8 @@ public class AddResourceChildAction extends DexRunAction {
                 newChild = resource.add( (TLAction) tlChild );
             else if (tlChild instanceof TLActionFacet)
                 newChild = resource.add( (TLActionFacet) tlChild );
+            resource.setExpanded( true );
+            newChild.setExpanded( true );
         }
         return newChild;
     }

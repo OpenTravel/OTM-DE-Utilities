@@ -167,7 +167,7 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
     public String getEndpointURL() {
         StringBuilder path = new StringBuilder();
         if (getOwningMember().isFirstClass()) {
-            path.append( DexParentRefsEndpointMap.getResourceBaseURL() );
+            path.append( DexParentRefsEndpointMap.getResourceBaseURL( this.getOwningMember() ) );
             path.append( DexParentRefsEndpointMap.getActionContribution( this ) );
         } else {
             if (getOwningMember().getParentRefs().isEmpty())

@@ -25,6 +25,7 @@ import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexFilterChangeEvent;
+import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.DexResourceChangeEvent;
@@ -90,9 +91,10 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
     // private boolean treeEditingEnabled = true;
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents =
-        {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED, DexResourceChangeEvent.RESOURCE_CHANGED,
-            DexResourceChildModifiedEvent.RESOURCE_CHILD_MODIFIED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] subscribedEvents = {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED,
+        DexResourceChangeEvent.RESOURCE_CHANGED, DexResourceChildModifiedEvent.RESOURCE_CHILD_MODIFIED,
+        DexModelChangeEvent.MODEL_CHANGED, DexMemberDeleteEvent.MEMBER_DELETED};
+
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED,
         DexMemberSelectionEvent.RESOURCE_SELECTED, DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED};
 
@@ -304,10 +306,12 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
         if (resourcesTreeTable != null) {
             resourcesTreeTable.getSelectionModel().clearSelection();
             resourcesTreeTable.getRoot().getChildren().clear();
-
             // create cells for sorted list of resources
             List<OtmResource> resources = currentModelMgr.getResources( true );
             resources.forEach( r -> createTreeItem( r, root ) );
+
+            resourcesTreeTable.refresh();
+            log.debug( "Posted " + resources.size() + " resources." );
         }
         ignoreEvents = false;
     }

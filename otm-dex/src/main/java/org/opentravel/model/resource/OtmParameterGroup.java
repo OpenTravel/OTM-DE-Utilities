@@ -296,10 +296,12 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
     }
 
     public OtmObject setReferenceFacet(OtmObject facet) {
-        if (facet != null && facet.getTL() instanceof TLFacet)
+        if (facet != null && facet.getTL() instanceof TLFacet) {
             getTL().setFacetRef( (TLFacet) facet.getTL() );
-        else
+            nameProperty.setValue( getName() );
+        } else
             getTL().setFacetRef( null );
+
         log.debug( "Set reference facet to " + getReferenceFacet() );
         return getReferenceFacet();
     }

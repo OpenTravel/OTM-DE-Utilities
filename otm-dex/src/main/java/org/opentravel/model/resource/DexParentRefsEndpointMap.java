@@ -327,7 +327,20 @@ public class DexParentRefsEndpointMap {
         // resourceBaseURL = compilePreferences.getResourceBaseUrl();
         // In junits the resource base URL will be empty
         // if (resourceBaseURL.isEmpty())
-        resourceBaseURL = SYSTEM;
+        resourceBaseURL = SYSTEM; // FIXME - this should come from user settings
+        return resourceBaseURL;
+    }
+
+    public static String getResourceBaseURL(OtmResource resource) {
+        String resourceBaseURL;
+        // FIXME - how is the base URL accessed in DEX?
+        // final CompilerPreferences compilePreferences = new CompilerPreferences(
+        // CompilerPreferences.loadPreferenceStore());
+        // resourceBaseURL = compilePreferences.getResourceBaseUrl();
+        // In junits the resource base URL will be empty
+        // if (resourceBaseURL.isEmpty())
+        resourceBaseURL = SYSTEM; // FIXME - this should come from user settings
+        resourceBaseURL += resource.getBasePath();
         return resourceBaseURL;
     }
 

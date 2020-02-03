@@ -262,7 +262,7 @@ public class CompileDialogController extends DexPopupControllerBase {
 
     @FXML
     public void doCompile(ActionEvent e) {
-        log.debug( "TODO - Do compile." );
+        log.debug( "Do compile." );
         if (selectedProject == null)
             return;
 
@@ -270,6 +270,11 @@ public class CompileDialogController extends DexPopupControllerBase {
         String folderName = targetDirectoryField.getText();
         if (folderName == null)
             return;
+        // Deactivate button
+        resultsPane.setExpanded( false );
+        compileButton.setDisable( true );
+        resultsTableView.setDisable( true );
+
         File targetFile = new File( folderName );
         CompileProjectTask.createCompileDirectory( targetFile );
         // FIXME - error handling
@@ -281,7 +286,12 @@ public class CompileDialogController extends DexPopupControllerBase {
         ValidationFindings findings = CompileProjectTask.compile( targetFile, selectedProject, userSettings );
 
         resultsTableView.getItems().clear();
+
         post( findings );
+        resultsPane.setExpanded( true );
+        compileButton.setDisable( false );
+        resultsTableView.setDisable( false );
+        log.debug( "Compile finished." );
     }
 
     public void updateCompileOptions() {
@@ -430,53 +440,4 @@ public class CompileDialogController extends DexPopupControllerBase {
         validationDescriptionColumn.setCellValueFactory( nodeFeatures -> new ReadOnlyStringWrapper(
             nodeFeatures.getValue().getFormattedMessage( FindingMessageFormat.BARE_FORMAT ) ) );
     }
-
-    // compileXmlSchemasCheckbox.selectedProperty()
-    // .addListener( (observable, oldValue,
-    // newValue) -> new WritableValueUndoableAction<>( compileXmlSchemasCheckbox.selectedProperty(), oldValue,
-    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-    // compileServicesCheckbox.selectedProperty()
-    // .addListener( (observable, oldValue,
-    // newValue) -> new WritableValueUndoableAction<>( compileServicesCheckbox.selectedProperty(), oldValue,
-    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-    // compileJsonSchemasCheckbox.selectedProperty()
-    // .addListener( (observable, oldValue,
-    // newValue) -> new WritableValueUndoableAction<>( compileJsonSchemasCheckbox.selectedProperty(), oldValue,
-    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-    // compileSwaggerCheckbox.selectedProperty()
-    // .addListener( (observable, oldValue,
-    // newValue) -> new WritableValueUndoableAction<>( compileSwaggerCheckbox.selectedProperty(), oldValue,
-    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-    // compileDocumentationCheckbox.selectedProperty()
-    // .addListener( (observable, oldValue,
-    // newValue) -> new WritableValueUndoableAction<>( compileDocumentationCheckbox.selectedProperty(),
-    // oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-    // serviceEndpointUrl.textProperty().addListener(
-    // (observable, oldValue, newValue) -> new WritableValueUndoableAction<>( serviceEndpointUrl.textProperty(),
-    // oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-    // baseResourceUrl.textProperty().addListener(
-    // (observable, oldValue, newValue) -> new WritableValueUndoableAction<>( baseResourceUrl.textProperty(),
-    // oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-    // suppressExtensionsCheckbox.selectedProperty()
-    // .addListener( (observable, oldValue,
-    // newValue) -> new WritableValueUndoableAction<>( suppressExtensionsCheckbox.selectedProperty(), oldValue,
-    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-    // generateExamplesCheckbox.selectedProperty()
-    // .addListener( (observable, oldValue,
-    // newValue) -> new WritableValueUndoableAction<>( generateExamplesCheckbox.selectedProperty(), oldValue,
-    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-    // exampleMaxDetailCheckbox.selectedProperty()
-    // .addListener( (observable, oldValue,
-    // newValue) -> new WritableValueUndoableAction<>( exampleMaxDetailCheckbox.selectedProperty(), oldValue,
-    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-    // maxRepeatSpinner.valueProperty()
-    // .addListener( (observable, oldValue, newValue) -> new SpinnerUndoableAction<>( maxRepeatSpinner, oldValue,
-    // undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-    // maxRecursionDepthSpinner.valueProperty()
-    // .addListener( (observable, oldValue, newValue) -> new SpinnerUndoableAction<>( maxRecursionDepthSpinner,
-    // oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
-    // suppressOptionalFieldsCheckbox.selectedProperty()
-    // .addListener( (observable, oldValue,
-    // newValue) -> new WritableValueUndoableAction<>( suppressOptionalFieldsCheckbox.selectedProperty(),
-    // oldValue, undoManager, OTMReleaseController.this::handleCompileOptionModified ).submit() );
 }

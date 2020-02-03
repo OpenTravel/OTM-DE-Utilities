@@ -117,6 +117,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
                 setRepeatCount( DEFAULT_REPEAT_COUNT );
                 break;
         }
+        isValid( true );
     }
 
     /**

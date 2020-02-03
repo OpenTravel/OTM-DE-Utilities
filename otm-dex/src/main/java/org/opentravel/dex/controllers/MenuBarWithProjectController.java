@@ -412,7 +412,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     public void handleCloseMenu(ActionEvent event) {
         // log.debug( "Handle close action event." );
-
+        // Close all menu item
         if (event.getTarget() instanceof MenuItem) {
             clear();
             if (modelMgr != null) {

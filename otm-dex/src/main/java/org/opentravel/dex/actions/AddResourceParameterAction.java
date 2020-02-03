@@ -57,6 +57,8 @@ public class AddResourceParameterAction extends DexRunAction {
     public OtmResourceChild doIt(OtmParameterGroup group, TLParameter tlChild) {
         if (group != null && tlChild != null) {
             newChild = group.add( tlChild );
+            newChild.setExpanded( true );
+            group.setExpanded( true );
         }
         return newChild;
     }
