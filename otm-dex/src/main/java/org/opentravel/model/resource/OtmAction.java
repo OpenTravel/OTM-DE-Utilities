@@ -59,6 +59,10 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
     private static final String COMMON_TOOLTIP =
         "Indicates that the action is a common or shared action, meaning that all other actions defined for the resource will inherit the characteristics (typically responses) defined for it.";
 
+    public enum BuildTemplate {
+        GET, POST
+    }
+
     private DexParentRefsEndpointMap endpoints = null;
 
     public OtmAction(String name, OtmResource parent) {
@@ -96,6 +100,19 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
             getOwningMember().refresh( true );
         }
         return response;
+    }
+
+    public void build(BuildTemplate template) {
+        switch (template) {
+            case GET:
+                setName( "Get" );
+                // setReferenceType( TLReferenceType.REQUIRED );
+                // Create action response
+                break;
+            case POST:
+                setName( getOwningMember().getSubjectName() + "Post" );
+                break;
+        }
     }
 
 

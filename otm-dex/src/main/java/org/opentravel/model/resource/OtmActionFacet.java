@@ -87,11 +87,37 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     private static final String BASE_PAYLOAD_TOOLTIP =
         " Optional reference to a core or choice object that indicates the basic structure of the message payload. If the 'referenceType' value is NONE, this will indicate the entirity of the message structure.  For reference type values other than NONE, the message structure will include all elements of the base payload, plus reference(s) to the owning resource's business ";
 
+    private static final int DEFAULT_REPEAT_COUNT = 1000;
+
+    public enum BuildTemplate {
+        REQUEST, RESPONSE, LIST
+    }
+    // For actions - GET, POST
+    // Queries - launch a query facet selection dialog
+    // Name is the name of the facet w/o object base name
+
     public OtmActionFacet(String name, OtmResource parent) {
         super( new TLActionFacet(), parent );
         setName( name );
     }
 
+    public void build(BuildTemplate template) {
+        switch (template) {
+            case REQUEST:
+                setName( getOwningMember().getSubjectName() + "Request" );
+                setReferenceType( TLReferenceType.REQUIRED );
+                break;
+            case RESPONSE:
+                setName( getOwningMember().getSubjectName() + "Response" );
+                setReferenceType( TLReferenceType.OPTIONAL );
+                break;
+            case LIST:
+                setName( getOwningMember().getSubjectName() + "List" );
+                setReferenceType( TLReferenceType.OPTIONAL );
+                setRepeatCount( DEFAULT_REPEAT_COUNT );
+                break;
+        }
+    }
 
     /**
      * Add this action facet to the OtmResource. Do not change the TL object.

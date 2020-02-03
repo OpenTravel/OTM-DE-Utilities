@@ -77,8 +77,8 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     private static final String PARAMETERS_TOOLTIP =
         "Name of the parameter group that provides the URL and header parameters (if any) for the request.";
 
-    private static final String NO_PARAMETERS = "NONE";
-    private static final String NO_PAYLOAD = "NONE";
+    public static final String NO_PARAMETERS = "NONE";
+    public static final String NO_PAYLOAD = "NONE";
 
     public static MenuButton makeMenuButton(List<String> values, OtmObject object) {
         MenuButton mb = new MenuButton();
@@ -245,10 +245,9 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     public ObservableList<String> getPayloadCandidates() {
         ObservableList<String> actionFacets = FXCollections.observableArrayList();
         actionFacets.add( NO_PARAMETERS );
-        if (!getMethod().equals( TLHttpMethod.GET ))
+        if (getMethod() == null || !getMethod().equals( TLHttpMethod.GET ))
             getOwningMember().getActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
         return actionFacets;
-        // TODO - payloads are not allowed for GET
     }
 
     /**
@@ -330,7 +329,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      */
     public OtmParameterGroup setParamGroupString(String value) {
         OtmParameterGroup pg = null;
-        if (!value.equals( NO_PARAMETERS ))
+        if (value != null && !value.equals( NO_PARAMETERS ))
             for (OtmParameterGroup c : getOwningMember().getParameterGroups())
                 if (c.getName().equals( value ))
                     pg = c;
@@ -376,7 +375,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      */
     public OtmActionFacet setPayloadActionFacetString(String value) {
         OtmActionFacet af = null;
-        if (!value.equals( NO_PAYLOAD ))
+        if (value != null && !value.equals( NO_PAYLOAD ))
             for (OtmActionFacet c : getOwningMember().getActionFacets())
                 if (c.getName().equals( value ))
                     af = c;

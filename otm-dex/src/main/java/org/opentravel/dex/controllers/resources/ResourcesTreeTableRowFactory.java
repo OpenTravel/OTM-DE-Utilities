@@ -25,6 +25,7 @@ import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.resource.OtmAction;
+import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.model.resource.OtmParameterGroup;
 import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLActionFacet;
@@ -58,6 +59,7 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
     MenuItem arItem = null;
     MenuItem paramItem = null;
     Menu addMenu = null;
+    Menu addAFMenu = null;
     private MenuItem deleteItem = null;
     private MenuItem addResource = null;
     private MenuItem validateResource = null;
@@ -72,14 +74,25 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
 
         // Add is a sub-menu
         addMenu = new Menu( "Add" ); // Menu is sub-type of menuItem
-        addItem( addMenu, "Add Action", e -> addChild( new TLAction() ) );
-        addItem( addMenu, "Add Action Facet", e -> addChild( new TLActionFacet() ) );
-        addItem( addMenu, "Add ParentRef", e -> addChild( new TLResourceParentRef() ) );
-        addItem( addMenu, "Add Parameter Group", e -> addChild( new TLParamGroup() ) );
+        addItem( addMenu, " Action", e -> addChild( new TLAction() ) );
+        addItem( addMenu, " ParentRef", e -> addChild( new TLResourceParentRef() ) );
+        addItem( addMenu, " Parameter Group", e -> addChild( new TLParamGroup() ) );
+
 
         addMenu.getItems().add( new SeparatorMenuItem() );
-        arItem = addItem( addMenu, "Add Action Response", e -> addResponse() );
-        paramItem = addItem( addMenu, "Add Parameter", e -> addParameter() );
+        addItem( addMenu, " Action Facet", e -> addChild( new TLActionFacet() ) );
+        addAFMenu = new Menu( "Action Facets" ); // Menu is sub-type of menuItem
+        addItem( addAFMenu, "Request Action Facet",
+            e -> addChild( new TLActionFacet(), OtmActionFacet.BuildTemplate.REQUEST ) );
+        addItem( addAFMenu, "Response Action Facet",
+            e -> addChild( new TLActionFacet(), OtmActionFacet.BuildTemplate.RESPONSE ) );
+        addItem( addAFMenu, "List Response Action Facet",
+            e -> addChild( new TLActionFacet(), OtmActionFacet.BuildTemplate.LIST ) );
+        addMenu.getItems().add( addAFMenu );
+
+        addMenu.getItems().add( new SeparatorMenuItem() );
+        arItem = addItem( addMenu, " Action Response", e -> addResponse() );
+        paramItem = addItem( addMenu, " Parameter", e -> addParameter() );
         resourceMenu.getItems().add( addMenu );
         //
         resourceMenu.getItems().add( new SeparatorMenuItem() );
@@ -160,13 +173,22 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         // super.updateTreeItem( getTreeItem().getParent() ); // needed to apply stylesheet to new item
     }
 
-    private void addChild(TLModelElement tlChild) {
+    private Object addChild(TLModelElement tlChild) {
         OtmObject obj = getValue();
+        Object result = null;
         if (obj != null && obj.getOwningMember() instanceof OtmResource) {
             OtmResource resource = (OtmResource) obj.getOwningMember();
-            Object result = resource.getActionManager().run( DexActions.ADDRESOURCECHILD, resource, tlChild );
+            result = resource.getActionManager().run( DexActions.ADDRESOURCECHILD, resource, tlChild );
             refresh( result );
         }
+        return result;
+    }
+
+    private void addChild(TLModelElement tlChild, OtmActionFacet.BuildTemplate template) {
+        Object result = addChild( tlChild );
+        if (result instanceof OtmActionFacet)
+            ((OtmActionFacet) result).build( template );
+        refresh( result );
     }
 
     private void addResponse() {
