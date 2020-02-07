@@ -284,7 +284,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     @FXML
     public void doCompile(ActionEvent e) {
         CompileDialogController cdc = CompileDialogController.init();
-        cdc.configure( modelMgr, userSettings );
+        cdc.configure( modelMgr, userSettings, mainController.getStatusController() );
         cdc.show( "" );
     }
 

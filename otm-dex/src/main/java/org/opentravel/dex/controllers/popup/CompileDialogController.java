@@ -20,6 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.common.DexFileHandler;
+import org.opentravel.dex.controllers.DexStatusController;
+import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.model.CompileProjectTask;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmProject;
@@ -32,11 +34,13 @@ import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -65,7 +69,7 @@ import javafx.stage.Stage;
  * @author dmh
  *
  */
-public class CompileDialogController extends DexPopupControllerBase {
+public class CompileDialogController extends DexPopupControllerBase implements TaskResultHandlerI {
     private static Log log = LogFactory.getLog( CompileDialogController.class );
 
     public static final String LAYOUT_FILE = "/Dialogs/CompileDialog.fxml";
@@ -111,24 +115,10 @@ public class CompileDialogController extends DexPopupControllerBase {
         return controller;
     }
 
-    // @FXML
-    // BorderPane newLibraryDialog;
-    // @FXML
-    // Label dialogTitleLabel;
-    // @FXML
-    // TextFlow dialogHelp;
     @FXML
     Button closeButton;
     @FXML
     Button compileButton;
-    // @FXML
-    // Button validateButton;
-    // @FXML
-    // TextField nameField;
-    // @FXML
-    // TextField nsField;
-    // @FXML
-    // TextField projectField;
     @FXML
     TextField descriptionField;
     @FXML
@@ -183,14 +173,14 @@ public class CompileDialogController extends DexPopupControllerBase {
     // @FXML
     // private Button openProjectButton;
 
-    private File libraryFile = null;
+    // private File libraryFile = null;
     private OtmModelManager modelMgr;
     // private OtmLibrary otmLibrary = null;
     private OtmProject selectedProject = null;
 
     private String resultText;
-
     private UserSettings userSettings;
+    private DexStatusController statusController;
 
     public String getResultText() {
         return resultText;
@@ -199,7 +189,6 @@ public class CompileDialogController extends DexPopupControllerBase {
     @Override
     public void checkNodes() {
         if (projectChoiceBox == null || targetDirectoryField == null || compileButton == null)
-            // || dialogButtonOK == null || resultsArea == null)
             throw new IllegalStateException( "Missing injected field." );
     }
 
@@ -209,37 +198,6 @@ public class CompileDialogController extends DexPopupControllerBase {
     }
 
     public void disableControls() {
-        // newMenu.setDisable( true );
-        // openMenu.setDisable( true );
-        // saveMenu.setDisable( true );
-        // saveAsMenu.setDisable( true );
-        // compileMenu.setDisable( true );
-        // closeMenu.setDisable( true );
-        // exitMenu.setDisable( true );
-        // undoMenu.setDisable( true );
-        // redoMenu.setDisable( true );
-        // addLibraryMenu.setDisable( true );
-        // reloadModelMenu.setDisable( true );
-        // openManagedMenu.setDisable( true );
-        // publishReleaseMenu.setDisable( true );
-        // newReleaseVersionMenu.setDisable( true );
-        // unpublishReleaseMenu.setDisable( true );
-        // aboutMenu.setDisable( true );
-        // releaseFileButton.setDisable( true );
-        // releaseFilename.setDisable( true );
-        // releaseName.setDisable( true );
-        // releaseBaseNamespace.setDisable( true );
-        // releaseStatus.setDisable( true );
-        // releaseVersion.setDisable( true );
-        // defaultEffectiveDate.setDisable( true );
-        // timeZoneLabel.setDisable( true );
-        // applyToAllButton.setDisable( true );
-        // releaseDescription.setDisable( true );
-        // addLibraryButton.setDisable( true );
-        // removeLibraryButton.setDisable( true );
-        // reloadModelButton.setDisable( true );
-        // principalTableView.setDisable( true );
-        // referencedTableView.setDisable( true );
         bindingStyleChoice.setDisable( true );
         compileXmlSchemasCheckbox.setDisable( true );
         compileServicesCheckbox.setDisable( true );
@@ -254,44 +212,33 @@ public class CompileDialogController extends DexPopupControllerBase {
         maxRepeatSpinner.setDisable( true );
         maxRecursionDepthSpinner.setDisable( true );
         suppressExtensionsCheckbox.setDisable( true );
-        // facetSelectionTableView.setDisable( true );
-        // validationTableView.setDisable( true );
-        // libraryTreeView.setDisable( true );
     }
 
 
     @FXML
     public void doCompile(ActionEvent e) {
         log.debug( "Do compile." );
+
         if (selectedProject == null)
             return;
-
         // Get the target folder as a file
         String folderName = targetDirectoryField.getText();
         if (folderName == null)
             return;
+
         // Deactivate button
         resultsPane.setExpanded( false );
         compileButton.setDisable( true );
         resultsTableView.setDisable( true );
-
-        File targetFile = new File( folderName );
-        CompileProjectTask.createCompileDirectory( targetFile );
-        // FIXME - error handling
+        resultsTableView.setItems( FXCollections.observableList( Collections.emptyList() ) );
 
         //
         updateCompileOptions();
 
-        // Run the compile
-        ValidationFindings findings = CompileProjectTask.compile( targetFile, selectedProject, userSettings );
-
-        resultsTableView.getItems().clear();
-
-        post( findings );
-        resultsPane.setExpanded( true );
-        compileButton.setDisable( false );
-        resultsTableView.setDisable( false );
-        log.debug( "Compile finished." );
+        CompileProjectTask task =
+            new CompileProjectTask( selectedProject, this, statusController, folderName, userSettings );
+        task.go();
+        // On completion, the handleTaskComplete method will run
     }
 
     public void updateCompileOptions() {
@@ -379,10 +326,10 @@ public class CompileDialogController extends DexPopupControllerBase {
      * @param manager used to create project
      * @param initialProjectFolder used in user file selection dialog
      */
-    public void configure(OtmModelManager manager, UserSettings settings) {
+    public void configure(OtmModelManager manager, UserSettings settings, DexStatusController statusController) {
         this.modelMgr = manager;
         this.userSettings = settings;
-
+        this.statusController = statusController;
     }
 
     private void post(File targetDirectory) {
@@ -406,7 +353,17 @@ public class CompileDialogController extends DexPopupControllerBase {
 
     private void post(ValidationFindings findings) {
         resultsPane.setExpanded( true );
+        if (findings == null) {
+            ValidationFinding ok = new ValidationFinding( selectedProject.getTL().getModel(), FindingType.WARNING,
+                "Completed with no errors.", null );
+            findings = new ValidationFindings();
+            findings.addFinding( ok );
+        }
+
+        // if (findings != null)
         resultsTableView.setItems( FXCollections.observableList( findings.getAllFindingsAsList() ) );
+        // else
+        // resultsTableView.setItems( FXCollections.observableList( Collections.emptyList() ) );
     }
 
     private void post(OtmProject project) {
@@ -439,5 +396,25 @@ public class CompileDialogController extends DexPopupControllerBase {
             nodeFeatures -> new ReadOnlyStringWrapper( nodeFeatures.getValue().getSource().getValidationIdentity() ) );
         validationDescriptionColumn.setCellValueFactory( nodeFeatures -> new ReadOnlyStringWrapper(
             nodeFeatures.getValue().getFormattedMessage( FindingMessageFormat.BARE_FORMAT ) ) );
+    }
+
+    /**
+     * @see org.opentravel.dex.tasks.TaskResultHandlerI#handleTaskComplete(javafx.concurrent.WorkerStateEvent)
+     */
+    @Override
+    public void handleTaskComplete(WorkerStateEvent event) {
+        ValidationFindings findings = null;
+        // Get findings from task
+        if (event.getSource() instanceof CompileProjectTask) {
+            findings = ((CompileProjectTask) event.getSource()).getFindings();
+        }
+        resultsTableView.getItems().clear();
+
+        post( findings );
+        resultsPane.setExpanded( true );
+        compileButton.setDisable( false );
+        resultsTableView.setDisable( false );
+        log.debug( "Compile task complete." );
+
     }
 }

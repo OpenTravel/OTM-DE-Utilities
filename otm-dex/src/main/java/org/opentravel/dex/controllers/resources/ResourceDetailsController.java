@@ -85,8 +85,9 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents = {DexResourceModifiedEvent.RESOURCE_MODIFIED,
         DexResourceChildModifiedEvent.RESOURCE_CHILD_MODIFIED, DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED,
-        DexMemberSelectionEvent.MEMBER_SELECTED, DexMemberSelectionEvent.RESOURCE_SELECTED,
-        OtmObjectModifiedEvent.OBJECT_MODIFIED, DexModelChangeEvent.MODEL_CHANGED, OtmObjectChangeEvent.OBJECT_CHANGED};
+        DexMemberSelectionEvent.MEMBER_SELECTED, DexResourceChangeEvent.RESOURCE_CHANGED,
+        DexMemberSelectionEvent.RESOURCE_SELECTED, OtmObjectModifiedEvent.OBJECT_MODIFIED,
+        DexModelChangeEvent.MODEL_CHANGED, OtmObjectChangeEvent.OBJECT_CHANGED};
 
     public ResourceDetailsController() {
         super( subscribedEvents, publishedEvents );
@@ -128,6 +129,8 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
             handleEvent( (DexResourceChildModifiedEvent) event );
         else if (event instanceof DexResourceModifiedEvent)
             handleEvent( (DexResourceModifiedEvent) event );
+        else if (event instanceof DexResourceChangeEvent)
+            handleEvent( (DexResourceChangeEvent) event );
         else if (event instanceof DexModelChangeEvent)
             handleEvent( (DexModelChangeEvent) event );
         else if (event instanceof OtmObjectModifiedEvent)
@@ -157,6 +160,12 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
 
     public void handleEvent(DexResourceChildSelectionEvent event) {
         post( event.get() );
+    }
+
+    public void handleEvent(DexResourceChangeEvent event) {
+        OtmObject obj = event.get();
+        log.debug( obj );
+        // post( event.get() );
     }
 
     public void handleEvent(DexMemberSelectionEvent event) {

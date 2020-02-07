@@ -199,8 +199,8 @@ public abstract class DexActionManagerBase implements DexActionManager {
             log.warn( "Action vetoed!" );
             // Possible enhancement - if warnings, post them and allow undo option in dialog.
 
-            if (mainController != null)
-                action.getSubject().getModelManager().startValidatingAndResolvingTasks();
+            // if (mainController != null)
+            // action.getSubject().getModelManager().startValidatingAndResolvingTasks();
             return;
         }
 
@@ -345,8 +345,8 @@ public abstract class DexActionManagerBase implements DexActionManager {
             if (mainController != null) {
                 mainController.updateActionQueueSize( getQueueSize() );
                 mainController.postStatus( "Undid action: " + action.toString() );
-                if (action.getSubject() != null)
-                    action.getSubject().getModelManager().startValidatingAndResolvingTasks();
+                // if (action.getSubject() != null)
+                // action.getSubject().getModelManager().startValidatingAndResolvingTasks();
             }
         }
         ignore = false;

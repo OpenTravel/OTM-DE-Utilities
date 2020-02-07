@@ -41,6 +41,11 @@ public class CompileProjectTask extends DexTaskBase<OtmProject> implements DexTa
     private static Log log = LogFactory.getLog( CompileProjectTask.class );
     private static final String COMPILER_SUFFIX = "CompilerOutput";
 
+    private OtmProject selectedProject = null;
+    private File targetFile = null;
+    private UserSettings userSettings = null;
+    private ValidationFindings findings = null;
+
     /**
      * Create compile project task.
      * 
@@ -51,16 +56,32 @@ public class CompileProjectTask extends DexTaskBase<OtmProject> implements DexTa
     public CompileProjectTask(OtmProject taskData, TaskResultHandlerI handler, DexStatusController status) {
         super( taskData, handler, status );
 
+        selectedProject = taskData;
+
         // Replace start message from super-type.
         msgBuilder = new StringBuilder( "Compiling: " );
         msgBuilder.append( taskData.getName() );
         updateMessage( msgBuilder.toString() );
     }
 
+    public CompileProjectTask(OtmProject taskData, TaskResultHandlerI handler, DexStatusController status,
+        String folderName, UserSettings userSettings) {
+        this( taskData, handler, status );
+
+        targetFile = new File( folderName );
+        createCompileDirectory( targetFile );
+        this.userSettings = userSettings;
+    }
+
     @Override
     public void doIT() {
-        // FIXME - where to get user settings?
-        // compile( createCompileDirectory( getCompileDirectory( taskData ) ), taskData );
+        if (targetFile != null && userSettings != null) {
+            findings = compile( targetFile, selectedProject, userSettings );
+        }
+    }
+
+    public ValidationFindings getFindings() {
+        return findings;
     }
 
     public static String getCompileDirectoryPath(OtmProject project) {

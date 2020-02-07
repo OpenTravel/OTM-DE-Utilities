@@ -117,6 +117,10 @@ public class AddResourceChildAction extends DexRunAction {
         return false;
     }
 
+    // FIXME
+    // Throw different event DexResourceChildCreated
+    // Give that event the newChild not otm as subject
+    //
     @Override
     public OtmResource getSubject() {
         return otm instanceof OtmResource ? (OtmResource) otm : null;
