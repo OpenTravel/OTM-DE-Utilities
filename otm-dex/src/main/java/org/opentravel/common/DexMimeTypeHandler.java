@@ -19,8 +19,11 @@ package org.opentravel.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.actions.SetMimeTypesAction;
 import org.opentravel.model.OtmObject;
+import org.opentravel.schemacompiler.model.TLMimeType;
 
+import java.util.List;
 import java.util.Map.Entry;
 
 import javafx.event.ActionEvent;
@@ -38,10 +41,21 @@ public class DexMimeTypeHandler {
 
     private OtmObject object;
     private MimeTypeMap values;
+    private HBox hBox = null;
 
     public DexMimeTypeHandler(OtmObject object) {
         this.object = object;
         values = new MimeTypeMap( object );
+    }
+
+    public HBox getHBox() {
+        if (hBox == null)
+            hBox = makeMimeTypeBox();
+        return hBox;
+    }
+
+    public List<TLMimeType> getTLValues() {
+        return values.getTLList();
     }
 
     /**
@@ -62,6 +76,12 @@ public class DexMimeTypeHandler {
         return hb;
     }
 
+    /**
+     * Change the map based on selected/unselected button. If action is enabled, run the set mime types action using the
+     * object and MimeType value
+     * 
+     * @param e
+     */
     public void eventHandler(ActionEvent e) {
         if (e.getTarget() instanceof CheckBox) {
             CheckBox cb = (CheckBox) e.getTarget();
@@ -70,8 +90,9 @@ public class DexMimeTypeHandler {
             log.debug( "Check box " + cb.getText() + " = " + cb.isSelected() );
             // values.print();
 
-            // Create and run the action
-            object.getActionManager().run( DexActions.SETMIMETYPES, object, this.values );
+            // If enabled, create and run the action
+            if (SetMimeTypesAction.isEnabled( object ))
+                object.getActionManager().run( DexActions.SETMIMETYPES, object, this.values );
         }
     }
 

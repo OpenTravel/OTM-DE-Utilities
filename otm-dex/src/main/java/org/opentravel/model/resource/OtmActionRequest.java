@@ -408,6 +408,11 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
             getTL().setMimeTypes( null ); // validation error if set and no payload
         } else {
             getTL().setPayloadType( actionFacet.getTL() );
+            // Set to default mime types if the payload is set and mime types is not set
+            if ((getTL().getMimeTypes() == null || getTL().getMimeTypes().isEmpty())
+                && getOwningMember().getMimeHandler() != null) {
+                getTL().setMimeTypes( getOwningMember().getMimeHandler().getTLValues() );
+            }
         }
         // log.debug( "Set payload action facet to " + getPayloadActionFacet() );
         return getPayloadActionFacet();

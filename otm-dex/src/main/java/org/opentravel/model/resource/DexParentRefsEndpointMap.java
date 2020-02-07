@@ -203,7 +203,8 @@ public class DexParentRefsEndpointMap {
                 if (param.isPathParam())
                     path.append( separator + param.getPathContribution() );
             }
-        }
+        } else
+            path.append( separator );
         return path.toString();
     }
 

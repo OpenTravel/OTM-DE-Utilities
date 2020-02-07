@@ -233,7 +233,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
         memberName.setDisable( obj.nameProperty() instanceof ReadOnlyStringWrapper );
         memberName.setEditable( !(obj.nameProperty() instanceof ReadOnlyStringWrapper) );
         memberName.setText( obj.nameProperty().get() );
-        // Changing the property will trigger the action
+        // Changing the property will trigger the NAMECHANGE action
         memberName.setOnAction( e -> obj.nameProperty().set( memberName.getText() ) );
         propertyGrid.add( memberName, 1, rowIndex++ );
     }
@@ -241,6 +241,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     private void postDescription(OtmObject obj) {
         memberDescription.setEditable( obj.isEditable() );
         memberDescription.setText( obj.descriptionProperty().get() );
+        // ??Will Changing the property will trigger the action
         memberDescription.setOnAction( e -> obj.descriptionProperty().set( memberDescription.getText() ) );
         propertyGrid.add( new Label( "Description" ), 0, rowIndex );
         propertyGrid.add( memberDescription, 1, rowIndex++ );

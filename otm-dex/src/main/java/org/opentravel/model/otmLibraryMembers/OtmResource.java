@@ -19,9 +19,12 @@ package org.opentravel.model.otmLibraryMembers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
+import org.opentravel.common.DexMimeTypeHandler;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
+import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
@@ -57,10 +60,13 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 
 /**
  * OTM Object for Resource objects.
@@ -110,7 +116,35 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     private static final String baseResponseWizard_TOOLTIP =
         "Set base response on all Action Facets used for responses.";
 
+    private static final String DEFAULT_MIME_LABEL = "Default Mime Types";
+
+    private static final String DEFAULT_MIME_TOOLTIP =
+        "Specifies the message MIME type for new actions. Can be changed on each request and response.";
+
+    private static final String DEFAULT_BASE_PAYLOAD_LABEL = "Default Base Payload";
+
+    private static final String DEFAULT_BASE_PAYLOAD_TOOLTIP =
+        " Default reference to a core or choice object that indicates the basic structure of the message payload.";
+
     private DexParentRefsEndpointMap parentRefsEndpointMap;
+
+    // Session storage of mime type defaults.
+    // TODO - save these in user settings
+    private DexMimeTypeHandler mimeHandler = null;
+    private OtmTypeProvider defaultRequestPayload;
+    private OtmTypeProvider defaultResponsePayload;
+
+    public OtmTypeProvider getDefaultRequestPayload() {
+        return defaultRequestPayload;
+    }
+
+    public OtmTypeProvider getDefaultResponsePayload() {
+        return defaultResponsePayload;
+    }
+
+    public DexMimeTypeHandler getMimeHandler() {
+        return mimeHandler;
+    }
 
     // private ResourceCodegenUtils codegenUtils;
 
@@ -122,7 +156,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     public OtmResource(TLResource tlo, OtmModelManager mgr) {
         super( tlo, mgr );
         modelChildren();
-
         // Factory will add object to mgr
 
         // Do not build on construction - all parents may not exist
@@ -472,8 +505,72 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         fields.add( new DexEditField( 2, 0, basePath_LABEL, basePath_TOOLTIP, getBasePathNode() ) );
         fields.add( new DexEditField( 3, 0, null, abstract_TOOLTIP, getIsAbstractNode() ) );
         fields.add( new DexEditField( 3, 1, null, firstClass_TOOLTIP, getIsFirstClassNode() ) );
+        //
+        fields.add( new DexEditField( 4, 0, DEFAULT_MIME_LABEL, DEFAULT_MIME_TOOLTIP, getMimeNode() ) );
+        fields.add( new DexEditField( 5, 0, DEFAULT_BASE_PAYLOAD_LABEL, DEFAULT_BASE_PAYLOAD_TOOLTIP,
+            makeDefaultPayloadBox() ) );
+
         return fields;
 
+    }
+
+    public HBox makeDefaultPayloadBox() {
+        HBox hb = new HBox();
+        hb.setSpacing( 10 );
+        Label labelRQ = new Label( "Request" );
+        Button buttonRQ = new Button( NONE );
+        if (getDefaultRequestPayload() != null)
+            buttonRQ.setText( getDefaultRequestPayload().getNameWithPrefix() );
+        buttonRQ.setDisable( !isEditable() );
+        hb.getChildren().add( labelRQ );
+        hb.getChildren().add( buttonRQ );
+
+        Label labelRS = new Label( "Response" );
+        Button buttonRS = new Button( NONE );
+        if (getDefaultResponsePayload() != null)
+            buttonRS.setText( getDefaultResponsePayload().getNameWithPrefix() );
+        buttonRS.setDisable( !isEditable() );
+        hb.getChildren().add( labelRS );
+        hb.getChildren().add( buttonRS );
+
+        Label labelClear = new Label( "Clear" );
+        Button buttonClear = new Button( "Clear" );
+        buttonClear.setDisable( !isEditable() );
+        hb.getChildren().add( labelClear );
+        hb.getChildren().add( buttonClear );
+
+        buttonRQ.setOnAction( e -> defaultRequestPayload = getUserSelectedDefaultPayload( e ) );
+        buttonRS.setOnAction( e -> defaultResponsePayload = getUserSelectedDefaultPayload( e ) );
+        buttonClear.setOnAction( e -> {
+            defaultRequestPayload = null;
+            defaultResponsePayload = null;
+            buttonRQ.setText( NONE );
+            buttonRS.setText( NONE );
+        } );
+        return hb;
+    }
+
+    private OtmTypeProvider getUserSelectedDefaultPayload(ActionEvent e) {
+        // Setup controller to get the users selection
+        TypeSelectionContoller controller = TypeSelectionContoller.init();
+        controller.setManager( mgr );
+        controller.getMemberFilterController().setTypeFilterValue( OtmLibraryMemberType.CORE );
+
+        controller.showAndWait( "MSG" );
+        OtmTypeProvider selected = controller.getSelectedProvider();
+        if (selected != null && controller.getResult() == Results.OK) {
+            if (e != null && e.getSource() instanceof Button)
+                ((Button) e.getSource()).setText( selected.getNameWithPrefix() );
+            return selected;
+        } else {
+            return null;
+        }
+    }
+
+    private Node getMimeNode() {
+        if (mimeHandler == null)
+            mimeHandler = new DexMimeTypeHandler( this );
+        return mimeHandler.getHBox();
     }
 
     @Override
@@ -581,7 +678,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     public String getSubjectName() {
         if (getAssignedType() == null)
             return getTlAssignedTypeName();
-        return getAssignedType().getName();
+        return getAssignedType().getNameWithPrefix();
     }
 
     @Override

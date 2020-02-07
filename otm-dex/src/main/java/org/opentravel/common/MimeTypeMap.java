@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmActionResponse;
+import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLMimeType;
 
 import java.util.ArrayList;
@@ -46,6 +47,9 @@ public class MimeTypeMap {
             types = ((OtmActionRequest) object).getTL().getMimeTypes();
         else if (object instanceof OtmActionResponse)
             types = ((OtmActionResponse) object).getTL().getMimeTypes();
+        else
+            // Default to the types available for requests
+            types = new TLActionRequest().getMimeTypes();
 
         if (types != null)
             for (TLMimeType t : TLMimeType.values())

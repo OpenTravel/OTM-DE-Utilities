@@ -104,17 +104,20 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     public void build(BuildTemplate template) {
         switch (template) {
             case REQUEST:
-                setName( getOwningMember().getSubjectName() + "Request" );
+                setName( getOwningMember().getSubject().getName() + "Request" );
                 setReferenceType( TLReferenceType.REQUIRED );
+                setBasePayload( getOwningMember().getDefaultRequestPayload() );
                 break;
             case RESPONSE:
-                setName( getOwningMember().getSubjectName() + "Response" );
+                setName( getOwningMember().getSubject().getName() + "Response" );
                 setReferenceType( TLReferenceType.OPTIONAL );
+                setBasePayload( getOwningMember().getDefaultResponsePayload() );
                 break;
             case LIST:
-                setName( getOwningMember().getSubjectName() + "List" );
+                setName( getOwningMember().getSubject().getName() + "List" );
                 setReferenceType( TLReferenceType.OPTIONAL );
                 setRepeatCount( DEFAULT_REPEAT_COUNT );
+                setBasePayload( getOwningMember().getDefaultResponsePayload() );
                 break;
         }
         isValid( true );

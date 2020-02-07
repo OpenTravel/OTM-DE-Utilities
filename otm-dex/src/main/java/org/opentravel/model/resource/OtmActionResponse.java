@@ -230,9 +230,14 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
      * @param action facet to set as payload type
      */
     public OtmActionFacet setPayloadActionFacet(OtmActionFacet actionFacet) {
-        if (actionFacet != null)
+        if (actionFacet != null) {
             getTL().setPayloadType( actionFacet.getTL() );
-        else
+            // Set to default mime types if the payload is set and mime types is not set
+            if ((getTL().getMimeTypes() == null || getTL().getMimeTypes().isEmpty())
+                && getOwningMember().getMimeHandler() != null) {
+                getTL().setMimeTypes( getOwningMember().getMimeHandler().getTLValues() );
+            }
+        } else
             getTL().setPayloadType( null );
         // log.debug( "Set action facet to " + getPayloadActionFacet() );
         return getPayloadActionFacet();
