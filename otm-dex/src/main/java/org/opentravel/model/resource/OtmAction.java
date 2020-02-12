@@ -32,7 +32,9 @@ import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.codegen.util.ResourceCodegenUtils;
 import org.opentravel.schemacompiler.model.TLAction;
+import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLActionResponse;
+import org.opentravel.schemacompiler.model.TLHttpMethod;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,12 +69,17 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
 
     public OtmAction(String name, OtmResource parent) {
         super( new TLAction(), parent );
+        if (parent != null)
+            parent.getTL().addAction( getTL() );
         setName( name );
     }
 
     public OtmAction(TLAction tla, OtmResource parent) {
         super( tla, parent );
         // Do it now so the methods that use the TLAction directly will have listeners.
+        if (parent != null && tla.getOwner() == null)
+            parent.getTL().addAction( getTL() );
+
         modelChildren();
         modelInheritedChildren();
     }
@@ -103,15 +110,28 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
     }
 
     public void build(BuildTemplate template) {
-        switch (template) {
-            case GET:
-                setName( "Get" );
-                // setReferenceType( TLReferenceType.REQUIRED );
-                // Create action response
-                break;
-            case POST:
-                setName( getOwningMember().getSubjectName() + "Post" );
-                break;
+        String baseName = "";
+        if (getOwningMember() != null) {
+            OtmActionRequest rq = new OtmActionRequest( new TLActionRequest(), this );
+            OtmActionResponse rs = new OtmActionResponse( new TLActionResponse(), this );
+            List<Integer> codes = new ArrayList<>();
+            codes.add( 200 );
+
+            if (getOwningMember().getSubject() != null)
+                baseName = getOwningMember().getSubject().getName();
+
+            switch (template) {
+                case GET:
+                    setName( "Get" );
+                    rq.setMethod( TLHttpMethod.GET );
+                    rq.setParamGroup( getOwningMember().getIdGroup() );
+                    rq.setPathTemplate( rq.getPathTemplateDefault(), false );
+                    rs.setRestStatusCodes( codes );
+                    break;
+                case POST:
+                    setName( baseName + "Post" );
+                    break;
+            }
         }
     }
 
@@ -175,6 +195,9 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
             else
                 path.append( DexParentRefsEndpointMap.NO_PATH );
         }
+        log.debug( "Resource Base Url = " + DexParentRefsEndpointMap.getResourceBaseURL( this.getOwningMember() ) );
+        log.debug( "Action contribution = " + DexParentRefsEndpointMap.getActionContribution( this ) );
+        log.debug( "Endpoint URL on " + this + " is " + path.toString() );
         return path.toString();
     }
 

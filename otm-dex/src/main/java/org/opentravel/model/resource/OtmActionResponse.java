@@ -64,8 +64,19 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
 
     private static final String STATUS_CODES_TOOLTIP = "Specifies the acceptable HTTP response codes.";
 
+    /**
+     * Create action response from the passed tl response. Assure tl response has owner and add to parent.
+     * 
+     * @param tla
+     * @param parent
+     */
     public OtmActionResponse(TLActionResponse tla, OtmAction parent) {
         super( tla, parent );
+
+        if (parent != null && tla.getOwner() == null) {
+            parent.getTL().addResponse( tla );
+            parent.add( this );
+        }
     }
 
     /**

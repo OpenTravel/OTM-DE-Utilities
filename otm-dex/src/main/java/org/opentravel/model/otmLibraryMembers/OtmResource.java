@@ -35,6 +35,7 @@ import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.resource.DexParentRefsEndpointMap;
 import org.opentravel.model.resource.OtmAction;
+import org.opentravel.model.resource.OtmAction.BuildTemplate;
 import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmActionResponse;
@@ -97,8 +98,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     private static final String basePath_LABEL = "Base Path";
 
-    private static final String basePath_TOOLTIP =
-        "Specifies the base path for this resource. Changing will cause changes to action request path templates. ";
+    private static final String BASEPATH_TOOLTIP =
+        "Specifies the base path for this resource. Will be used as part of basePath in OpenAPI file. ";
 
     private static final String basePath_PROMPT = "Enter / to use the business object name as the collection name.";
 
@@ -158,10 +159,15 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         modelChildren();
         // Factory will add object to mgr
 
-        // Do not build on construction - all parents may not exist
+        // Do not build on construction - all parents may not exist yet
         // parentRefsEndpointMap = new DexParentRefsEndpointMap( this );
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * NOTE: Caller must make sure tlResource has this child - that is a type specific operation
+     */
     @Override
     public OtmResourceChild add(OtmObject child) {
         if (child instanceof OtmResourceChild) {
@@ -170,7 +176,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
                 children = new ArrayList<>();
             else if (contains( children, child ))
                 return null;
-
+            // Caller must make sure tlResource has this child - that is a type specific operation
             if (inheritedChildren == null)
                 inheritedChildren = new ArrayList<>();
             else if (contains( inheritedChildren, child ))
@@ -253,24 +259,40 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      */
     public OtmParentRef add(TLResourceParentRef tlParentRef) {
         return add( tlParentRef, null );
+        // TODO - unused
     }
 
+    /**
+     * Create a parentRef and set its path template.
+     * 
+     * @param tlParentRef - existing tl object. if null, a new TLResorceParentRef will be created.
+     * @param parent
+     * @return
+     */
     public OtmParentRef add(TLResourceParentRef tlParentRef, OtmResource parent) {
         // Do we need to test if already done?
         OtmParentRef parentRef = null;
-        if (tlParentRef != null) {
-            if (!getTL().getParentRefs().contains( tlParentRef )) {
-                getTL().addParentRef( tlParentRef );
-                parentRef = new OtmParentRef( tlParentRef, this );
-            }
-            if (parent != null) {
-                // Set parent and initial path template
-                tlParentRef.setPathTemplate( parent.getBasePath() );
-                tlParentRef.setParentResource( parent.getTL() );
-            }
-            refresh( true );
-            // log.debug( "Added parent reference to " + this );
+
+        if (tlParentRef == null)
+            tlParentRef = new TLResourceParentRef();
+
+        // ? Should this test first to make sure not duplicate ?
+        OtmObject x = OtmModelElement.get( tlParentRef );
+        if (!(x instanceof OtmParentRef))
+            parentRef = new OtmParentRef( tlParentRef, this );
+        else
+            parentRef = (OtmParentRef) x;
+
+        if (!getTL().getParentRefs().contains( tlParentRef ))
+            getTL().addParentRef( tlParentRef );
+
+        if (parent != null) {
+            // Set parent and initial path template
+            tlParentRef.setPathTemplate( parent.getBasePath() );
+            tlParentRef.setParentResource( parent.getTL() );
         }
+        // log.debug( "Added parent reference to " + this );
+        refresh( true );
         return parentRef;
     }
 
@@ -310,13 +332,43 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     /**
+     * {@inheritDoc} Add a new parameter group, action facet, and action.
+     */
+    @Override
+    public void build() {
+        OtmParameterGroup pg = new OtmParameterGroup( new TLParamGroup(), this );
+        if (getSubject() != null) {
+            pg.setReferenceFacet( getSubject().getIdFacet() );
+            pg.setIdGroup( true );
+            pg.setName( "Identifier" );
+            // ? How to add a parameter ?
+        }
+        OtmActionFacet af = new OtmActionFacet( new TLActionFacet(), this );
+        af.build( org.opentravel.model.resource.OtmActionFacet.BuildTemplate.REQUEST );
+
+        OtmAction action = new OtmAction( new TLAction(), this );
+        action.build( BuildTemplate.GET );
+        setFirstClass( true );
+
+        if (getBasePath() == null || getBasePath().isEmpty())
+            setBasePath( DexParentRefsEndpointMap.PATH_SEPERATOR );
+        // TODO - get defaults from settings
+    }
+
+
+    /**
      * Create a TL parent reference, set its path and parent if present, add to TL and Otm resource
+     * <p>
+     * 
+     * @deprecated - pass a null TL to add(TL, Parent)
      * 
      * @param parent the parent resource to reference (not owner)
      * @return
      */
+    @Deprecated
     public OtmParentRef createParentRef(OtmResource parent) {
         return add( new TLResourceParentRef(), parent );
+        // TODO - only used in tests
     }
 
     /**
@@ -420,6 +472,9 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return (OtmBusinessObject) OtmModelElement.get( (TLModelElement) getAssignedTLType() );
     }
 
+    /**
+     * @return the contents of the TL objects base path
+     */
     public String getBasePath() {
         return getTL().getBasePath();
     }
@@ -502,7 +557,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         List<DexEditField> fields = new ArrayList<>();
         fields.add( new DexEditField( 0, 0, extension_LABEL, extension_TOOLTIP, getExtensionNode() ) );
         fields.add( new DexEditField( 1, 0, businessObject_LABEL, businessObject_TOOLTIP, getSubectNode() ) );
-        fields.add( new DexEditField( 2, 0, basePath_LABEL, basePath_TOOLTIP, getBasePathNode() ) );
+        fields.add( new DexEditField( 2, 0, basePath_LABEL, BASEPATH_TOOLTIP, getBasePathNode() ) );
         fields.add( new DexEditField( 3, 0, null, abstract_TOOLTIP, getIsAbstractNode() ) );
         fields.add( new DexEditField( 3, 1, null, firstClass_TOOLTIP, getIsFirstClassNode() ) );
         //
@@ -733,9 +788,10 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     /**
-     * Something changed in this resource so refresh it. To refresh all who use this resource as parent
-     * {@link #refresh(boolean)}
+     * Something changed in this resource so refresh it. Updates the endpoint map. To refresh all who use this resource
+     * as parent {@link #refresh(boolean)}
      */
+    @Override
     public void refresh() {
         refresh( false );
     }
@@ -747,7 +803,10 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      */
     public void refresh(boolean deep) {
         // log.debug( "Deep refesh of " + this );
-        parentRefsEndpointMap = null; // build on next access
+        // clear the map. Leave this object in place
+        if (parentRefsEndpointMap != null)
+            parentRefsEndpointMap.refresh();
+        basePathProperty().setValue( getBasePath() );
 
         if (deep)
             getAllSubResources().forEach( sr -> sr.refresh( true ) );
@@ -803,33 +862,54 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     /**
-     * {@inheritDoc} For resources, <b>must</b> be a business object.
+     * {@inheritDoc} For resources, <b>must</b> be a business object. Also sets base path if not already set.
      * 
      * @see org.opentravel.model.OtmTypeUser#setAssignedType(org.opentravel.model.OtmTypeProvider)
      */
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
         OtmLibraryMember oldUser = getAssignedType() == null ? null : getAssignedType().getOwningMember();
-        if (setAssignedTLType( (NamedEntity) type.getTL() ) != null)
-            // add to type's typeUsers
-            type.getOwningMember().changeWhereUsed( oldUser, getOwningMember() );
-
+        if (type == null) {
+            setAssignedTLType( null );
+            if (oldUser != null)
+                oldUser.changeWhereUsed( this, null );
+        } else {
+            if (setAssignedTLType( (NamedEntity) type.getTL() ) != null) {
+                // add to type's typeUsers
+                type.getOwningMember().changeWhereUsed( oldUser, getOwningMember() );
+                // Set the base path with the subject as the collection if base path is not already set.
+                if (getBasePath() == null || getBasePath().isEmpty())
+                    setBasePath( DexParentRefsEndpointMap.PATH_SEPERATOR
+                        + DexParentRefsEndpointMap.makePlural( type.getName() ) );
+            }
+        }
         return getAssignedType();
     }
 
 
     /**
-     * Set the base path on this resource. If override is true, do all the action resources also.
+     * Set the base path on this resource then refresh the object.
      * 
      * @param basePath
-     * @param override
      */
-    public void setBasePath(String basePath, boolean override) {
+    public void setBasePath(String basePath) {
         getTL().setBasePath( basePath );
-        if (override)
-            getActionRequests().forEach( ar -> ar.setPathTemplate( basePath, override ) );
         refresh( true );
     }
+
+    // /**
+    // * Set the base path on this resource. If override is true, do all the action requests also.
+    // *
+    // * @param basePath
+    // * @param override
+    // */
+    // @Deprecated
+    // public void setBasePath(String basePath, boolean override) {
+    // getTL().setBasePath( basePath );
+    // if (override)
+    // getActionRequests().forEach( ar -> ar.setPathTemplate( basePath, override ) );
+    // refresh( true );
+    // }
 
     /**
      * {@link TLResource#setExtension()}
@@ -897,5 +977,15 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     @Override
     public void setTLTypeName(String name) {
         // no-op
+    }
+
+    /**
+     * @return id parameter group or null
+     */
+    public OtmParameterGroup getIdGroup() {
+        for (OtmParameterGroup pg : getParameterGroups())
+            if (pg.isIdGroup())
+                return pg;
+        return null;
     }
 }

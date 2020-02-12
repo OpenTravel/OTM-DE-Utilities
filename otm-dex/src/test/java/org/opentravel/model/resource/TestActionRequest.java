@@ -169,6 +169,157 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
 
     }
 
+    public static final String THEPATH = "/MySubjectPath";
+    public static final String SUBJECTNAME = "MySubject";
+    public static final String TEMPLATE1 = "/{id}";
+    public static final String TEMPLATE2 = "/";
+    public static final String TEMPLATE3 = "";
+
+    @Test
+    public void testSettingPathTemplate() {
+
+        OtmResource resource = TestResource.buildFullOtm( THEPATH, SUBJECTNAME, staticModelManager );
+        TestParamGroup.buildIdGroup( resource );
+        DexParentRefsEndpointMap endpoints = resource.getParentRefEndpointsMap();
+        String pt, original;
+
+        for (OtmAction a : resource.getActions()) {
+            //
+            original = a.getRequest().getPathTemplate();
+            // When - path template set
+            a.getRequest().setPathTemplate( TEMPLATE1, false );
+            assertTrue( "Must be set to TEMPLATE1", a.getRequest().getPathTemplate().equals( TEMPLATE1 ) );
+            // When - path template set
+            a.getRequest().setPathTemplate( TEMPLATE2, false );
+            assertTrue( "Must be set to TEMPLATE2", a.getRequest().getPathTemplate().equals( TEMPLATE2 ) );
+            // When - path template set
+            a.getRequest().setPathTemplate( TEMPLATE3, false );
+            assertTrue( "Must be set to TEMPLATE3", a.getRequest().getPathTemplate().equals( TEMPLATE3 ) );
+
+            // When - set to null
+            a.getRequest().setPathTemplate( null, false );
+            pt = a.getRequest().getPathTemplate();
+            // log.debug( "New path template = " + pt );
+            assertTrue( "Must be null", pt == null );
+        }
+    }
+
+    @Test
+    public void testSettingPathTemplateWithParams() {
+
+        OtmResource resource = TestResource.buildFullOtm( THEPATH, SUBJECTNAME, staticModelManager );
+        OtmParameterGroup idGroup = TestParamGroup.buildIdGroup( resource );
+        assertTrue( "Given", idGroup.isIdGroup() );
+        assertTrue( "Given", !idGroup.getParameters().isEmpty() );
+        String original, pt, paramContribution = null;
+
+        for (OtmAction a : resource.getActions()) {
+            OtmActionRequest rq = a.getRequest();
+            assertTrue( "Given: must have request", rq != null );
+            rq.setParamGroup( idGroup );
+            OtmParameterGroup pg = rq.getParamGroup();
+            assertTrue( "Given: must have parameter group", pg != null );
+
+            if (a.getRequest().getParamGroup() != null && a.getRequest().getParamGroup().isIdGroup()) {
+                paramContribution = DexParentRefsEndpointMap.getPathParameterContributions( rq.getParamGroup() );
+                assertTrue( "Must have param conribution.", !paramContribution.isEmpty() );
+            }
+            original = a.getRequest().getPathTemplate();
+
+            // When - path template set
+            a.getRequest().setPathTemplate( TEMPLATE1, true );
+            // Then
+            pt = a.getRequest().getPathTemplate();
+            log.debug( "New path template = " + pt );
+            assertTrue( "Must be contain TEMPLATE1", pt.contains( TEMPLATE1 ) );
+            assertTrue( "Must be contain param contributions.", pt.contains( paramContribution ) );
+
+            a.getRequest().setPathTemplate( TEMPLATE2, true );
+            // Then
+            pt = a.getRequest().getPathTemplate();
+            log.debug( "New path template = " + pt );
+            assertTrue( "Must be contain TEMPLATE2", pt.contains( TEMPLATE2 ) );
+            assertTrue( "Must be contain param contributions.", pt.contains( paramContribution ) );
+
+            a.getRequest().setPathTemplate( TEMPLATE3, true );
+            // Then
+            pt = a.getRequest().getPathTemplate();
+            log.debug( "New path template = " + pt );
+            assertTrue( "Must be contain TEMPLATE3", pt.contains( TEMPLATE3 ) );
+            assertTrue( "Must be contain param contributions.", pt.contains( paramContribution ) );
+
+            // When - set to null
+            a.getRequest().setPathTemplate( null, true );
+            // Then
+            pt = a.getRequest().getPathTemplate();
+            log.debug( "New path template = " + pt );
+            assertTrue( "Must be null", pt == null );
+        }
+    }
+
+    @Test
+    public void testGetPathParameterContribution() {
+        OtmResource resource = TestResource.buildFullOtm( THEPATH, SUBJECTNAME, staticModelManager );
+        OtmParameterGroup idGroup = TestParamGroup.buildIdGroup( resource );
+        assertTrue( "Given", idGroup.isIdGroup() );
+        assertTrue( "Given", !idGroup.getParameters().isEmpty() );
+        DexParentRefsEndpointMap endpoints = resource.getParentRefEndpointsMap();
+        String paramContrib = DexParentRefsEndpointMap.getPathParameterContributions( idGroup );
+        String pt, ppc, ac, originalPt, originalAc, originalPpc;
+
+        for (OtmAction a : resource.getActions()) {
+            OtmActionRequest rq = a.getRequest();
+            assertTrue( "Given: must have request", rq != null );
+
+            // When - param group is set
+            rq.setParamGroup( idGroup );
+
+            // Then - path parameters are present
+            ppc = DexParentRefsEndpointMap.getPathParameterContributions( rq );
+            // log.debug( "path param contributions = " + ppc );
+            assertTrue( "Must not have //.", !ppc.contains( "//" ) );
+            assertTrue( "Must have contribution from path parameters.", ppc.contains( paramContrib ) );
+        }
+    }
+
+    // Setting to default in GUI uses:
+    // button.setOnAction( e -> pathProperty.set( getPathPathTemplateDefault() );
+
+    @Test
+    public void testDefaultPathTemplate() {
+        OtmResource resource = TestResource.buildFullOtm( THEPATH, SUBJECTNAME, staticModelManager );
+        OtmParameterGroup idGroup = TestParamGroup.buildIdGroup( resource );
+        String ds;
+
+        for (OtmActionRequest rq : resource.getActionRequests()) {
+            // No params or path set
+            rq.setParamGroup( null );
+            rq.setPathTemplate( null, false );
+            ds = rq.getPathTemplateDefault();
+            // Then
+            assertTrue( !ds.isEmpty() );
+            assertTrue( ds.equals( "/" ) );
+
+            // When - No params but path is set
+            rq.setParamGroup( null );
+            rq.setPathTemplate( "SOMETHING", false );
+            ds = rq.getPathTemplateDefault();
+            assertTrue( !ds.isEmpty() );
+            assertTrue( ds.equals( "/" ) );
+
+            // When Path set and id param group set
+            // When - No params but path is set
+            rq.setParamGroup( idGroup );
+            rq.setPathTemplate( "SOMETHING", false );
+            ds = rq.getPathTemplateDefault();
+            assertTrue( !ds.isEmpty() );
+            assertTrue( !ds.equals( "/" ) );
+            assertTrue( ds.startsWith( "/" ) );
+            assertTrue( ds.contains( DexParentRefsEndpointMap.getPathParameterContributions( idGroup ) ) );
+            assertTrue( !ds.contains( "//" ) );
+        }
+    }
+
     @Test
     public void testSetters() {
         // Given a business object

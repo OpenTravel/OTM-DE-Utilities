@@ -92,8 +92,19 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         return mb;
     }
 
+    /**
+     * Create action request from the passed tl request. Assure tl request has owner and add to parent.
+     * 
+     * @param tla
+     * @param parent
+     */
     public OtmActionRequest(TLActionRequest tla, OtmAction parent) {
         super( tla, parent );
+
+        if (parent != null && tla.getOwner() == null) {
+            parent.getTL().setRequest( tla );
+            parent.add( this );
+        }
     }
 
     /**
@@ -123,8 +134,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     private Node getDefaultPathNode() {
         Button button = new Button( PATH_DEFAULT_LABEL );
         button.setDisable( !isEditable() );
-        button.setOnAction( e -> pathProperty.set( DexParentRefsEndpointMap.getPathParameterContributions( this ) ) );
-        // button.setOnAction( e -> getActionManager().add( DexActions.SETREQUESTPATH, "", this ) );
+        button.setOnAction( e -> pathProperty.set( getPathTemplateDefault() ) );
         return button;
     }
 
@@ -224,9 +234,24 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         return DexEditField.makeTextField( pathProperty );
     }
 
+    /**
+     * Get the TL Path Template value.
+     * 
+     * @return string from TL which may be null
+     */
     public String getPathTemplate() {
-        log.debug( "TL Path Template = " + getTL().getPathTemplate() );
+        // log.debug( "TL Path Template = " + getTL().getPathTemplate() );
         return getTL().getPathTemplate();
+    }
+
+    /**
+     * Get the default path template. This is a slash followed by any path parameters if in ID group
+     * 
+     * @return
+     */
+    public String getPathTemplateDefault() {
+        String d = DexParentRefsEndpointMap.getPathParameterContributions( this );
+        return d.isEmpty() ? "/" : d;
     }
 
     /**
@@ -365,21 +390,53 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
             getTL().setPathTemplate( null );
         else {
             StringBuilder path = new StringBuilder( basePath );
-            if (addParameters && getParamGroup() != null && getParamGroup().isIdGroup()) {
-                if (!getParamGroup().getParameters().isEmpty())
-                    path.append( "/" );
-                // Add these parameters
-                for (OtmParameter p : getParamGroup().getParameters()) {
-                    path.append( "{" );
-                    path.append( p.getName() );
-                    path.append( "}" );
-                }
-            }
+            if (addParameters)
+                path.append( DexParentRefsEndpointMap.getPathParameterContributions( getParamGroup() ) );
+            // if (addParameters && getParamGroup() != null && getParamGroup().isIdGroup()) {
+            // if (!getParamGroup().getParameters().isEmpty())
+            // path.append( "/" );
+            // // Add these parameters
+            // for (OtmParameter p : getParamGroup().getParameters()) {
+            // path.append( "{" );
+            // path.append( p.getName() );
+            // path.append( "}" );
+            // }
+            // }
             getTL().setPathTemplate( path.toString() );
         }
-        log.debug( "Set path template to: " + getTL().getPathTemplate() );
+        // log.debug( "Set path template to: " + getTL().getPathTemplate() );
         return getTL().getPathTemplate();
     }
+
+    // /**
+    // * Create string starting with /. If the parameter group is an ID group, append all path parameters
+    // *
+    // * @return
+    // */
+    // public String makeTemplateFromParamGroup() {
+    // return DexParentRefsEndpointMap.getPathParameterContributions( getParamGroup() );
+    //// StringBuilder path = new StringBuilder();
+    //// // if (getParamGroup() != null && getParamGroup().isIdGroup()) {
+    //// // if (!getParamGroup().getParameters().isEmpty())
+    //// // path.append( "/" );
+    //// // // Add these parameters
+    //// // for (OtmParameter p : getParamGroup().getParameters()) {
+    //// // path.append( "{" );
+    //// // path.append( p.getName() );
+    //// // path.append( "}" );
+    //// // }
+    //// // }
+    //// String separator = "/";
+    //// if (getParamGroup() != null && getParamGroup().isIdGroup()) {
+    //// for (OtmParameter param : getParamGroup().getParameters()) {
+    //// if (param.isPathParam())
+    //// path.append( separator + param.getPathContribution() );
+    //// }
+    //// } else
+    //// path.append( separator );
+    ////
+    //// return path.toString();
+    // }
 
     /**
      * Set the payload from owner's action facet with the passed {@link OtmActionFacet#getName()} value. *

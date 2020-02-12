@@ -22,9 +22,11 @@ import org.opentravel.dex.action.manager.DexWizardActionManager;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.MemberDetailsPopupController;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.lang.reflect.InvocationTargetException;
@@ -86,6 +88,18 @@ public class NewLibraryMemberAction extends DexRunAction {
                         // Cancel
                         member = null;
                 }
+
+                if (member instanceof OtmResource) {
+                    ((OtmResource) member).setBasePath( null );
+                    OtmBusinessObject subject =
+                        AssignResourceSubjectAction.getUserTypeSelection( member.getModelManager() );
+                    ((OtmResource) member).setSubject( subject );
+                }
+
+                // Try to build out the object
+                if (member != null)
+                    member.build();
+
             } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException
                 | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
 

@@ -69,6 +69,9 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
         return OtmModelElement.get( (TLModelElement) getTL().getFieldRef() );
     }
 
+    /**
+     * @return null or name from the otm wrapper of the TL field ref
+     */
     public String getFieldRefName() {
         return getFieldRef() != null ? getFieldRef().getName() : "";
     }

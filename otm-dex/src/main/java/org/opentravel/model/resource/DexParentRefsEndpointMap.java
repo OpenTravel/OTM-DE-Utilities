@@ -19,6 +19,7 @@ package org.opentravel.model.resource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
 
 import java.util.HashMap;
@@ -26,12 +27,28 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Resources can supply Actions with multiple endpoint paths; one for each 1st class parent reference.
+ * This map is assigned to a resource and created on demand. Resources can supply Actions with multiple endpoint paths;
+ * one for each 1st class parent reference.
  * <p>
  * This map has an entry for each 1st class parent ref. The strings are just the path contribution--they do not contain
  * system or action contributions.
  * <p>
+ * This class also has static utilities related to building URLs.
+ * <ul>
+ * <li>get*Contribution - what this object contributes to the path
+ * <li>get*URL - the URL for that object. If multiple are possible, pick a default one.
+ * </ul>
+ * <p>
  * Note: this resource's contribution is not in the paths. Its contribution depends on the action.
+ * <p>
+ * Contribution components:
+ * <ul>
+ * <li><b>System</b> - from user settings or default string
+ * <li><b>Parent(s)</b> - parentRefs add after system and before resource. May come from path template on parent ref
+ * <li><b>Resource</b> - base path added before action contribution. Starts with / and will not end with /.
+ * <li><b>Action</b>
+ * <li><b>Request</b>
+ * </ul>
  * 
  * @author Dave Hollander
  * 
@@ -53,82 +70,84 @@ public class DexParentRefsEndpointMap {
         "No path -- make 1st class or add parent references.";
     public static final String NO_PATH = "No Path -- only accessed using parent path.";
     public static final String NO_PAYLOAD = "None";
+    public static final String PATH_SEPERATOR = "/";
     private static final String SYSTEM = "http://example.com";
 
     private static Log log = LogFactory.getLog( DexParentRefsEndpointMap.class );
-    private OtmResource resource = null;
-    private Map<OtmParentRef,String> endpoints = new HashMap<>();
-
-    public DexParentRefsEndpointMap(OtmResource resource) {
-        this.resource = resource;
-        build();
-    }
 
     /**
-     * Build the map if empty then return it.
+     * Utility to get a path for the action, use it's request path template and parameters. Collection's contribution +
+     * request's path parameter contribution
      * 
+     * @param action can be null
      * @return
      */
-    public Map<OtmParentRef,String> get() {
-        if (endpoints.isEmpty())
-            build();
-        return endpoints;
+    public static String getActionContribution(OtmAction action) {
+        // Path template from action's request. It should have parameters already in it!
+        StringBuilder builder = new StringBuilder();
+        if (action != null && action.getRequest() != null) {
+            builder.append( getCollectionContribution( action ) );
+            builder.append( getPathParameterContributions( action.getRequest() ) );
+
+            // log.debug( "Collection contribution = " + getCollectionContribution( action ) );
+            // log.debug( "path param contribution = " + getPathParameterContributions( action.getRequest() ) );
+        }
+        return builder.toString();
     }
 
     /**
-     * Get the string associated with the parent reference.
+     * Get base path and assure it starts with slash and ends without slash
+     */
+    public static String getResourceContribution(OtmResource resource) {
+        String path = resource.getBasePath();
+        if (path == null || path.isEmpty())
+            path = "/";
+        else {
+            if (!path.startsWith( PATH_SEPERATOR ))
+                path = PATH_SEPERATOR + path;
+            if (path.endsWith( PATH_SEPERATOR ))
+                path = path.substring( 0, path.lastIndexOf( PATH_SEPERATOR ) );
+        }
+        return path;
+    }
+
+    public static String getSystemContribution(UserSettings settings) {
+        if (settings == null)
+            return SYSTEM;
+        return SYSTEM; // TODO
+    }
+
+    /**
+     * Collection contribution is from the request template <b>or</b> from the subject. If there is something in the
+     * path template besides slashes and parameters, use that as the collection.
+     * <P>
+     * 2/12/2020 - removed: Otherwise use the plural of the subject.
+     * <p>
+     * The user may set the rq template something like: /Fishes/{id} to overcome the plural supplied otherwise.
+     * <p>
+     * Utility to get the path template from the action request stripped of all parameters. If empty, use the resource's
+     * plural subject name.
+     * <P>
      * 
-     * @param parentRef
+     * @param request
      * @return
      */
-    public String get(OtmParentRef parentRef) {
-        if (endpoints.containsKey( parentRef ))
-            return endpoints.get( parentRef );
-        return "not found";
-    }
+    public static String getCollectionContribution(OtmAction action) {
+        String path = "";
+        if (action == null)
+            return "";
 
-    /**
-     * Get the string associated with the resource. Resource must parent reference of a parentRef in the map.
-     * 
-     * @param resource
-     * @return associated path string or empty string
-     */
-    public String get(OtmResource resource) {
-        for (Entry<OtmParentRef,String> es : endpoints.entrySet()) {
-            if (es.getKey().getParentResource() == resource)
-                return es.getValue();
-        }
-        return "";
-    }
+        OtmActionRequest request = action.getRequest();
+        // If the request has a path template with more than parameters and slash, use it
+        if (request != null && request.getPathTemplate() != null && !request.getPathTemplate().isEmpty())
+            path = stripParameters( request.getPathTemplate() ); // override may correct template
 
-    /**
-     * Each action can have multiple endpoint paths.
-     * <ul>
-     * <li>If 1st class, then just it's template and path parameters
-     * <li>One for each 1st class parentRef path with this path path from the ref's ID parameters and its ancestors
-     * 
-     * @return this endpoint map
-     */
-    public DexParentRefsEndpointMap build() {
-        endpoints.clear();
+        // Use the resource subject
+        // if (path.isEmpty())
+        // path = PATH_SEPERATOR + makePlural( action.getOwningMember().getSubject().getName() );
 
-        // Add path for each 1st class parent referenced
-        for (OtmParentRef parentRef : resource.getParentRefs())
-            getEndpointRefs( "", endpoints, parentRef );
+        return path;
 
-        return this;
-    }
-
-    protected void getEndpointRefs(String parentPart, Map<OtmParentRef,String> endpoints, OtmParentRef parentRef) {
-        if (parentRef != null && parentRef.getParentResource() != null) {
-            if (parentRef.isParentFirstClass())
-                endpoints.put( parentRef, getEndpointPath( parentRef ) + parentPart );
-
-            parentPart = getEndpointPath( parentRef ) + parentPart;
-
-            for (OtmParentRef ref : parentRef.getParentResource().getParentRefs())
-                getEndpointRefs( parentPart, endpoints, ref );
-        }
     }
 
     /**
@@ -151,41 +170,8 @@ public class DexParentRefsEndpointMap {
 
     public static String getEndpointPath(OtmResource resource, OtmParameterGroup group) {
         StringBuilder builder = new StringBuilder();
-        builder.append( getBasePathContribution( resource ) );
+        builder.append( getResourceContribution( resource ) );
         builder.append( getPathParameterContributions( group ) );
-        return builder.toString();
-    }
-
-    public static String getPathParameterContributions(OtmParentRef parentRef) {
-        return getPathParameterContributions( parentRef.getParameterGroup() );
-    }
-
-    public static String getPathParameterContributions(OtmParameterGroup parameterGroup) {
-        StringBuilder path = new StringBuilder();
-        String separator = "/";
-        if (parameterGroup != null) {
-            for (OtmParameter param : parameterGroup.getParameters()) {
-                if (param.isPathParam())
-                    path.append( separator + param.getPathContribution() );
-            }
-        }
-        return path.toString();
-    }
-
-
-    /**
-     * Utility to get a path for the action, use it's request path template and parameters.
-     * 
-     * @param action can be null
-     * @return
-     */
-    public static String getActionContribution(OtmAction action) {
-        // Path template from action's request. It should have parameters already in it!
-        StringBuilder builder = new StringBuilder();
-        if (action != null && action.getRequest() != null) {
-            builder.append( getCollectionContribution( action ) );
-            builder.append( getPathParameterContributions( action.getRequest() ) );
-        }
         return builder.toString();
     }
 
@@ -196,105 +182,39 @@ public class DexParentRefsEndpointMap {
      * @return
      */
     public static String getPathParameterContributions(OtmActionRequest request) {
+        // TODO - changed this a OtmActionRequest - why is this done differently than in OtmActionRequest
+        // StringBuilder path = new StringBuilder();
+        // String separator = "/";
+        // if (request != null && request.getParamGroup() != null) {
+        // for (OtmParameter param : request.getParamGroup().getParameters()) {
+        // if (param.isPathParam())
+        // path.append( separator + param.getPathContribution() );
+        // }
+        // } else
+        // path.append( separator );
+        // return path.toString();
+        return request != null ? getPathParameterContributions( request.getParamGroup() ) : "";
+    }
+
+    /**
+     * Create string for id parameters. If the parameter group is an ID group, append all path parameters
+     * 
+     * @return
+     */
+    public static String getPathParameterContributions(OtmParameterGroup parameterGroup) {
         StringBuilder path = new StringBuilder();
-        String separator = "/";
-        if (request != null && request.getParamGroup() != null) {
-            for (OtmParameter param : request.getParamGroup().getParameters()) {
+        String separator = PATH_SEPERATOR;
+        if (parameterGroup != null && parameterGroup.isIdGroup()) {
+            for (OtmParameter param : parameterGroup.getParameters()) {
                 if (param.isPathParam())
                     path.append( separator + param.getPathContribution() );
             }
-        } else
-            path.append( separator );
+        }
         return path.toString();
     }
 
-    /**
-     * Utility to get the path template from the action request stripped of all parameters. If empty, use the resource's
-     * plural subject name.
-     * 
-     * @param request
-     * @return
-     */
-    public static String getCollectionContribution(OtmAction action) {
-        String path = "";
-        OtmActionRequest request = action.getRequest();
-        // If the request has a path template, use it
-        if (request != null && request.getPathTemplate() != null && !request.getPathTemplate().isEmpty())
-            path = stripParameters( request.getPathTemplate() ); // override may correct template
-        else {
-            // else Use the resource subject
-            path = "/" + makePlural( action.getOwningMember().getSubjectName() );
-        }
-        return path;
-    }
-
-    /**
-     * Utility to strip parameters from string (anything after the first {). Assure starts with slash (/) and does not
-     * end with slash.
-     * 
-     * @param value
-     * @return
-     */
-    public static String stripParameters(String value) {
-        // Strip off anything after the first parameter's {
-        value = value.trim();
-        if (value.contains( "{" ))
-            value = value.substring( 0, value.indexOf( '{' ) ).trim();
-        if (value.endsWith( "/" ))
-            value = value.substring( 0, value.length() - 1 );
-        if (!value.startsWith( "/" ))
-            value = "/" + value;
-        return value;
-    }
-
-    /**
-     * Get base path and assure it starts with slash and ends without slash
-     */
-    public static String getBasePathContribution(OtmResource resource) {
-        String path = resource.getBasePath();
-        if (path == null)
-            path = "";
-        if (!path.isEmpty()) {
-            if (!path.startsWith( "/" ))
-                path = "/" + path;
-            if (path.endsWith( "/" ))
-                path = path.substring( 0, path.lastIndexOf( "/" ) );
-        }
-        return path;
-    }
-
-    /**
-     * Utility to add s to string if it does not end in s
-     * 
-     * @param string
-     * @return
-     */
-    public static String makePlural(String string) {
-        if (!string.endsWith( "s" ))
-            string = string + "s";
-        return string;
-    }
-
-
-
-    /**
-     * Debugging Utility
-     */
-    public void print() {
-        log.debug( "-- " + resource + " Parent Reference Paths" );
-        if (endpoints == null || endpoints.isEmpty()) {
-            log.debug( "EMPTY MAP!" );
-            return;
-        }
-        for (Entry<OtmParentRef,String> set : endpoints.entrySet())
-            log.debug( "Path from parent " + set.getKey().getName() + " is " + set.getValue() );
-    }
-
-    /**
-     * Debugging Utility
-     */
-    public int size() {
-        return endpoints.size();
+    public static String getPathParameterContributions(OtmParentRef parentRef) {
+        return getPathParameterContributions( parentRef.getParameterGroup() );
     }
 
     /**
@@ -343,6 +263,146 @@ public class DexParentRefsEndpointMap {
         resourceBaseURL = SYSTEM; // FIXME - this should come from user settings
         resourceBaseURL += resource.getBasePath();
         return resourceBaseURL;
+    }
+
+
+    /**
+     * Utility to add s to string if it does not end in s
+     * 
+     * @param string
+     * @return
+     */
+    public static String makePlural(String string) {
+        if (!string.endsWith( "s" ))
+            string = string + "s";
+        return string;
+    }
+
+    /**
+     * Utility to strip parameters from string (anything after the first {). Assure starts with slash (/) if not empty
+     * and does not end with slash.
+     * 
+     * @param value
+     * @return
+     */
+    public static String stripParameters(String value) {
+        // Strip off anything after the first parameter's {
+        value = value.trim();
+        if (value.contains( "{" ))
+            value = value.substring( 0, value.indexOf( '{' ) ).trim();
+        if (value.endsWith( PATH_SEPERATOR ))
+            value = value.substring( 0, value.length() - 1 );
+        if (!value.isEmpty() && !value.startsWith( PATH_SEPERATOR ))
+            value = PATH_SEPERATOR + value;
+        return value;
+    }
+
+    private OtmResource resource = null;
+
+    private Map<OtmParentRef,String> endpoints = new HashMap<>();
+
+    public DexParentRefsEndpointMap(OtmResource resource) {
+        this.resource = resource;
+        build();
+    }
+
+    /**
+     * Each action can have multiple endpoint paths.
+     * <ul>
+     * <li>If 1st class, then just it's template and path parameters
+     * <li>One for each 1st class parentRef path with this path path from the ref's ID parameters and its ancestors
+     * 
+     * @return this endpoint map
+     */
+    public DexParentRefsEndpointMap build() {
+        endpoints.clear();
+
+        // Add path for each 1st class parent referenced
+        for (OtmParentRef parentRef : resource.getParentRefs())
+            getEndpointRefs( "", endpoints, parentRef );
+
+        return this;
+    }
+
+    public void refresh() {
+        endpoints.clear();
+    }
+
+    /**
+     * Build the map if empty then return it.
+     * 
+     * @return
+     */
+    public Map<OtmParentRef,String> get() {
+        if (endpoints.isEmpty())
+            build();
+        return endpoints;
+    }
+
+    /**
+     * Get the string associated with the parent reference.
+     * 
+     * @param parentRef
+     * @return
+     */
+    public String get(OtmParentRef parentRef) {
+        if (getEndpoints().containsKey( parentRef ))
+            return getEndpoints().get( parentRef );
+        return "not found";
+    }
+
+    /**
+     * Get the string associated with the resource. Resource must parent reference of a parentRef in the map.
+     * 
+     * @param resource
+     * @return associated path string or empty string
+     */
+    public String get(OtmResource resource) {
+        for (Entry<OtmParentRef,String> es : getEndpoints().entrySet()) {
+            if (es.getKey().getParentResource() == resource)
+                return es.getValue();
+        }
+        return "";
+    }
+
+    public Map<OtmParentRef,String> getEndpoints() {
+        if (endpoints == null || endpoints.isEmpty())
+            build();
+        return endpoints;
+    }
+
+    protected void getEndpointRefs(String parentPart, Map<OtmParentRef,String> endpoints, OtmParentRef parentRef) {
+        if (parentRef != null && parentRef.getParentResource() != null) {
+            String p = getEndpointPath( parentRef );
+            if (parentRef.isParentFirstClass()) {
+                if (!parentPart.isEmpty())
+                    p = p + PATH_SEPERATOR + parentPart;
+                endpoints.put( parentRef, p );
+            }
+
+            for (OtmParentRef ref : parentRef.getParentResource().getParentRefs())
+                getEndpointRefs( p, endpoints, ref );
+        }
+    }
+
+    /**
+     * Debugging Utility
+     */
+    public void print() {
+        log.debug( "-- " + resource + " Parent Reference Paths" );
+        if (endpoints == null || endpoints.isEmpty()) {
+            log.debug( "EMPTY MAP!" );
+            return;
+        }
+        for (Entry<OtmParentRef,String> set : endpoints.entrySet())
+            log.debug( "Path from parent " + set.getKey().getName() + " is " + set.getValue() );
+    }
+
+    /**
+     * Debugging Utility
+     */
+    public int size() {
+        return getEndpoints().size();
     }
 
     // /**

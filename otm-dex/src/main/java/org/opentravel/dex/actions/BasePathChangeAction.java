@@ -46,7 +46,7 @@ public class BasePathChangeAction extends DexStringAction {
     }
 
     protected void set(String value) {
-        getSubject().setBasePath( value, true );
+        getSubject().setBasePath( value );
     }
 
 

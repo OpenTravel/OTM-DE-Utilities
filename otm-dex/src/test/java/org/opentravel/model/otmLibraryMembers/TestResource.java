@@ -112,7 +112,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         assertTrue( r.getActionManager().isEnabled( DexActions.BASEPATHCHANGE, r ) );
 
         // Given - an initial base path
-        r.setBasePath( INITIALBASEPATH, true );
+        r.setBasePath( INITIALBASEPATH );
         // Given - no actions in the queue
         assertTrue( fullActionMgr.getQueueSize() == 0 );
 
@@ -371,7 +371,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         OtmResource parentR = TestResource.buildOtm( mgr );
         parentR.setName( name );
         parentR.setAssignedType( parentBO );
-        parentR.setBasePath( parentPathString, true );
+        parentR.setBasePath( parentPathString );
         parentR.getTL().setFirstClass( true );
         OtmParameterGroup idGroup = TestParamGroup.buildIdGroup( parentR );
 
@@ -402,7 +402,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
      */
     public static OtmResource buildFullOtm(String pathString, String subjectName, OtmModelManager mgr) {
         OtmResource resource = TestResource.buildOtm( mgr );
-        resource.setBasePath( pathString, true );
+        resource.setBasePath( pathString );
         resource.setFirstClass( true );
 
         OtmBusinessObject testBO = TestBusiness.buildOtm( mgr );
@@ -424,7 +424,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
      */
     public static OtmResource buildBaseOtm(OtmResource resource, OtmModelManager mgr) {
         OtmResource base = TestResource.buildOtm( mgr );
-        base.setBasePath( "BasePath", true );
+        base.setBasePath( "BasePath" );
         base.setFirstClass( false );
         base.setAbstract( true );
         OtmActionFacet af = TestActionFacet.buildOtm( base );

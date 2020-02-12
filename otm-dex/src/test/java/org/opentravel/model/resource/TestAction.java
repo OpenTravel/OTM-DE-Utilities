@@ -49,6 +49,10 @@ import java.util.List;
 public class TestAction extends TestOtmResourceBase<OtmAction> {
     private static Log log = LogFactory.getLog( TestAction.class );
 
+    public static final String THEPATH = "/MySubjectPath";
+    public static final String SUBJECTNAME = "MySubject";
+    public static final String TEMPLATE = "ThisIsMyTemplate";
+
     @BeforeClass
     public static void beforeClass() {
         staticModelManager = new OtmModelManager( null, null );
@@ -57,6 +61,14 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
 
         subject = buildOtm( testResource );
         log.debug( "Before class ran." );
+    }
+
+    public static void check(OtmAction a) {
+        assertTrue( "Must have a request.", a.getRequest() != null );
+        if (a.getOwningMember() != null) {
+            assertTrue( a.getOwningMember().getActions().contains( a ) );
+            assertTrue( a.getOwningMember().getTL().getAction( a.getTL().getActionId() ) != null );
+        }
     }
 
     @Test
@@ -175,10 +187,6 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
         // TODO - test deep inheritance
     }
 
-    public static final String THEPATH = "/MySubjectPath";
-    public static final String SUBJECTNAME = "MySubject";
-    public static final String TEMPLATE = "ThisIsMyTemplate";
-
     @Test
     public void testEndpointPathsNotFirstClass() {
         // Given one 1st class resource with ID group
@@ -212,22 +220,40 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
         }
     }
 
+
+
+    // Used in ActionDAO
+    // wrapper = new ReadOnlyStringWrapper( ((OtmAction) otmObject).getEndpointURL() );
     @Test
     public void testEndpointPathsFirstClassNoParentRefs() {
         // Given one 1st class resource with ID group
         OtmResource resource = TestResource.buildFullOtm( THEPATH, SUBJECTNAME, staticModelManager );
-        TestParamGroup.buildIdGroup( resource );
+        OtmParameterGroup idGroup = TestParamGroup.buildIdGroup( resource );
         DexParentRefsEndpointMap endpoints = resource.getParentRefEndpointsMap();
         assertTrue( "Must be empty when no parent references.", endpoints.size() == 0 );
 
         for (OtmAction a : resource.getActions()) {
+            OtmActionRequest rq = a.getRequest();
+            assertTrue( "Given: ", rq != null );
+            log.debug( "initial rq template = " + rq.getPathTemplate() );
+            log.debug( "initial resource base path = " + resource.getBasePath() );
+
+            // When - no parameter group
+            a.getRequest().setParamGroup( null );
+            // Then - use only the template
             log.debug( "Testing action: " + a + "  Url = " + a.getEndpointURL() );
+            checkURLs( a );
+
+            // When - param group set
+            a.getRequest().setParamGroup( idGroup );
+            log.debug( "Testing action with ID group: " + a + "  Url = " + a.getEndpointURL() );
             checkURLs( a );
         }
     }
 
     /**
-     * Make sure URL with and with out template on request are correct
+     * Check that the URL both with and with out request's template. First class resources use the template, others do
+     * not.
      * 
      * @param a
      */
@@ -238,19 +264,23 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
         String url = "";
 
         if (a.getOwningMember().isFirstClass()) {
+            url = a.getEndpointURL();
+            assertTrue( "Must not have // in url", !url.substring( 8 ).contains( "//" ) );
+
             // When - template on request
             a.getRequest().setPathTemplate( TEMPLATE, true );
             url = a.getEndpointURL();
             // Then
             assertTrue( "Must use template.", url.contains( TEMPLATE ) );
-            assertFalse( "Must not have subject name.", url.contains( subjectName ) );
+            assertTrue( "Must not have subject name.", !url.contains( subjectName ) );
+            assertTrue( "Must not have // in url", !url.substring( 8 ).contains( "//" ) );
 
             // When - template is null
             a.getRequest().setPathTemplate( null, true );
             url = a.getEndpointURL();
             // Then
-            assertFalse( "Must not use template.", url.contains( TEMPLATE ) );
-            assertTrue( "Must have subject name.", url.contains( subjectName ) );
+            assertTrue( "Must not use template.", !url.contains( TEMPLATE ) );
+            assertTrue( "Must not have subject name.", !url.contains( subjectName ) );
         } else {
             // Then - url is fixed
             assertFalse( a.getEndpointURL().startsWith( DexParentRefsEndpointMap.getResourceBaseURL() ) );

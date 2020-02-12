@@ -81,6 +81,8 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
     public OtmParameterGroup(TLParamGroup tla, OtmResource parent) {
         super( tla, parent );
         // Model the children to set their identity listeners
+        if (parent != null && tla.getOwner() == null)
+            parent.getTL().addParamGroup( getTL() );
         modelChildren();
     }
 
@@ -255,7 +257,11 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         return new Tooltip( TOOLTIP );
     }
 
-
+    /**
+     * Is this an ID group. Only Id groups can contribute path parameters to the path template.
+     * 
+     * @return
+     */
     public boolean isIdGroup() {
         return getTL().isIdGroup();
     }

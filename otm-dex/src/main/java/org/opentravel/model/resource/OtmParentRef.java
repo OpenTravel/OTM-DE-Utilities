@@ -54,8 +54,9 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
 
     private static final String PATH_LABEL = "Path Template";
 
-    private static final String PATH_TOOLTIP =
-        "Specifies the path template for the parent resource. This path will be pre-pended to all action path templates when the child resource is treated as a sub-resource (non-first class).";
+    private static final String PATH_TOOLTIP = "Specifies the path template for the parent resource. "
+        + "This path will be pre-pended to all action path templates when the child resource "
+        + "is treated as a sub-resource (non-first class).";
 
     private static final String PARENT_LABEL = "Parent";
 
@@ -77,7 +78,7 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
         List<DexEditField> fields = new ArrayList<>();
         fields.add( new DexEditField( 0, 0, PARENT_LABEL, PARENT_TOOLTIP, getParentNode() ) );
         fields.add( new DexEditField( 1, 0, PARAM_GROUP_LABEL, PARAM_GROUP_TOOLTIP, getParameterGroupNode() ) );
-        fields.add( new DexEditField( 2, 0, PATH_LABEL, PATH_LABEL, getPathNode() ) );
+        fields.add( new DexEditField( 2, 0, PATH_LABEL, PATH_TOOLTIP, getPathNode() ) );
         return fields;
     }
 
@@ -91,6 +92,11 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
         return getParentResourceName();
         // return getParentResource().getName();
     }
+
+    // TODO
+    // Add default path button like on request
+    // Add default path method
+
 
     /**
      * @return the parameter group used by this parent reference {@link TLResourceParentRef#getParentParamGroup()}.
@@ -157,7 +163,7 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
     }
 
     /**
-     * @return
+     * @return the template from the tl object
      */
     public String getPathTemplate() {
         return getTL().getPathTemplate();
@@ -236,6 +242,7 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
      */
     public String setPathTemplate(String path) {
         getTL().setPathTemplate( path );
+        getOwningMember().refresh(); // update endpoint map
         return getTL().getPathTemplate();
     }
 

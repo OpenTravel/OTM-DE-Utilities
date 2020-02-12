@@ -56,6 +56,11 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public StringProperty baseTypeProperty();
 
     /**
+     * Build out the default configuration of a new library member.
+     */
+    public void build();
+
+    /**
      * Add and remove the users library member to the where used list
      * 
      * @param userToRemove from where used list, can be null

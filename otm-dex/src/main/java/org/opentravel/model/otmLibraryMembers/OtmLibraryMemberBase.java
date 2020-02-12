@@ -141,6 +141,11 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     @Override
+    public void build() {
+        // NoOp
+    }
+
+    @Override
     public void changeWhereUsed(OtmLibraryMember oldUser, OtmLibraryMember newUser) {
         if (whereUsed == null)
             whereUsed = new ArrayList<>();

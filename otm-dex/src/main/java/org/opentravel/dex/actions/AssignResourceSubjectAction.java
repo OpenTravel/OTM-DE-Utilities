@@ -22,11 +22,14 @@ import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
+import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+
+import javafx.application.Platform;
 
 public class AssignResourceSubjectAction extends DexRunAction {
     private static Log log = LogFactory.getLog( AssignResourceSubjectAction.class );
@@ -55,22 +58,49 @@ public class AssignResourceSubjectAction extends DexRunAction {
             return null;
 
         // Get the user's selected business object
-        MemberAndProvidersDAO selected = null;
-        TypeSelectionContoller controller = TypeSelectionContoller.init();
-        MemberFilterController filter = controller.getMemberFilterController();
-        filter.setTypeFilterValue( OtmLibraryMemberType.BUSINESS );
+        OtmBusinessObject selection = getUserTypeSelection( resource.getModelManager() );
+        if (selection != null)
+            doIt( selection );
 
-        controller.setManager( resource.getModelManager() );
-        if (controller.showAndWait( "MSG" ) == Results.OK) {
-            selected = controller.getSelected();
-
-            if (selected != null && selected.getValue() instanceof OtmBusinessObject)
-                doIt( selected.getValue() );
-            else
-                log.error( "Missing selection from Type Selection Controller" ); // cancel?
-        }
+        // MemberAndProvidersDAO selected = null;
+        // TypeSelectionContoller controller = TypeSelectionContoller.init();
+        // MemberFilterController filter = controller.getMemberFilterController();
+        // filter.setTypeFilterValue( OtmLibraryMemberType.BUSINESS );
+        //
+        // controller.setManager( resource.getModelManager() );
+        // if (controller.showAndWait( "MSG" ) == Results.OK) {
+        // selected = controller.getSelected();
+        //
+        // if (selected != null && selected.getValue() instanceof OtmBusinessObject)
+        // doIt( selected.getValue() );
+        // else
+        // log.error( "Missing selection from Type Selection Controller" ); // cancel?
+        // }
 
         return get();
+
+    }
+
+    /**
+     * Get the users business object selection from the type selection controller.
+     * 
+     * @return selected business object or null
+     */
+    public static OtmBusinessObject getUserTypeSelection(OtmModelManager mgr) {
+        OtmBusinessObject selection = null;
+        if (Platform.isFxApplicationThread()) {
+            TypeSelectionContoller controller = TypeSelectionContoller.init();
+            MemberFilterController filter = controller.getMemberFilterController();
+            filter.setTypeFilterValue( OtmLibraryMemberType.BUSINESS );
+
+            controller.setManager( mgr );
+            if (controller.showAndWait( "MSG" ) == Results.OK) {
+                MemberAndProvidersDAO selected = controller.getSelected();
+                if (selected != null && selected.getValue() instanceof OtmBusinessObject)
+                    selection = (OtmBusinessObject) selected.getValue();
+            }
+        }
+        return selection;
     }
 
     /**

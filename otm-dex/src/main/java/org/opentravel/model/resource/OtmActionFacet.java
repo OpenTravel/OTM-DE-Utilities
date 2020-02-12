@@ -98,29 +98,9 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
 
     public OtmActionFacet(String name, OtmResource parent) {
         super( new TLActionFacet(), parent );
+        if (parent != null)
+            parent.getTL().addActionFacet( getTL() );
         setName( name );
-    }
-
-    public void build(BuildTemplate template) {
-        switch (template) {
-            case REQUEST:
-                setName( getOwningMember().getSubject().getName() + "Request" );
-                setReferenceType( TLReferenceType.REQUIRED );
-                setBasePayload( getOwningMember().getDefaultRequestPayload() );
-                break;
-            case RESPONSE:
-                setName( getOwningMember().getSubject().getName() + "Response" );
-                setReferenceType( TLReferenceType.OPTIONAL );
-                setBasePayload( getOwningMember().getDefaultResponsePayload() );
-                break;
-            case LIST:
-                setName( getOwningMember().getSubject().getName() + "List" );
-                setReferenceType( TLReferenceType.OPTIONAL );
-                setRepeatCount( DEFAULT_REPEAT_COUNT );
-                setBasePayload( getOwningMember().getDefaultResponsePayload() );
-                break;
-        }
-        isValid( true );
     }
 
     /**
@@ -132,10 +112,36 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     public OtmActionFacet(TLActionFacet tla, OtmResource parent) {
         super( tla, parent );
 
-        // tla.getReferenceFacetName(); -
-        // tla.getBasePayloadName();
-        // tla.getReferenceRepeat();
-        // tla.getReferenceType();
+        if (parent != null && tla.getOwningResource() == null)
+            parent.getTL().addActionFacet( getTL() );
+    }
+
+
+    public void build(BuildTemplate template) {
+        if (getOwningMember() != null) {
+            String nameBase = "";
+            if (getOwningMember().getSubject() != null)
+                nameBase = getOwningMember().getSubject().getName();
+            switch (template) {
+                case REQUEST:
+                    setName( nameBase + "Request" );
+                    setReferenceType( TLReferenceType.REQUIRED );
+                    setBasePayload( getOwningMember().getDefaultRequestPayload() );
+                    break;
+                case RESPONSE:
+                    setName( nameBase + "Response" );
+                    setReferenceType( TLReferenceType.OPTIONAL );
+                    setBasePayload( getOwningMember().getDefaultResponsePayload() );
+                    break;
+                case LIST:
+                    setName( nameBase + "List" );
+                    setReferenceType( TLReferenceType.OPTIONAL );
+                    setRepeatCount( DEFAULT_REPEAT_COUNT );
+                    setBasePayload( getOwningMember().getDefaultResponsePayload() );
+                    break;
+            }
+            isValid( true );
+        }
     }
 
     /**
