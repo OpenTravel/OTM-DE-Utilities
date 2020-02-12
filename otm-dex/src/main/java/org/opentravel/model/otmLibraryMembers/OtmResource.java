@@ -106,7 +106,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     private static final String extension_LABEL = "Extends";
 
     private static final String extension_TOOLTIP =
-        "Reference to the resource from which the child resource will inherit.";
+        "Add parentRef to make this a sub-resource. Extension sets the resource from which this resource will inherit action facets and responses.";
 
     private static final String parent_LABEL = "Parent";
 
@@ -337,12 +337,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     @Override
     public void build() {
         OtmParameterGroup pg = new OtmParameterGroup( new TLParamGroup(), this );
-        if (getSubject() != null) {
-            pg.setReferenceFacet( getSubject().getIdFacet() );
-            pg.setIdGroup( true );
-            pg.setName( "Identifier" );
-            // ? How to add a parameter ?
-        }
+        pg.build();
+
         OtmActionFacet af = new OtmActionFacet( new TLActionFacet(), this );
         af.build( org.opentravel.model.resource.OtmActionFacet.BuildTemplate.REQUEST );
 
@@ -879,8 +875,9 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
                 type.getOwningMember().changeWhereUsed( oldUser, getOwningMember() );
                 // Set the base path with the subject as the collection if base path is not already set.
                 if (getBasePath() == null || getBasePath().isEmpty())
-                    setBasePath( DexParentRefsEndpointMap.PATH_SEPERATOR
-                        + DexParentRefsEndpointMap.makePlural( type.getName() ) );
+                    // setBasePath( DexParentRefsEndpointMap.PATH_SEPERATOR
+                    // + DexParentRefsEndpointMap.makePlural( type.getName() ) );
+                    setBasePath( DexParentRefsEndpointMap.PATH_SEPERATOR );
             }
         }
         return getAssignedType();

@@ -197,7 +197,7 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         }
         log.debug( "Resource Base Url = " + DexParentRefsEndpointMap.getResourceBaseURL( this.getOwningMember() ) );
         log.debug( "Action contribution = " + DexParentRefsEndpointMap.getActionContribution( this ) );
-        log.debug( "Endpoint URL on " + this + " is " + path.toString() );
+        // log.debug( "Endpoint URL on " + this + " is " + path.toString() );
         return path.toString();
     }
 
@@ -208,7 +208,7 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
      */
     public String getEndpointURL(OtmParentRef parentRef) {
         StringBuilder path = new StringBuilder();
-        path.append( DexParentRefsEndpointMap.getResourceBaseURL() );
+        path.append( DexParentRefsEndpointMap.getResourceBaseURL( this.getOwningMember() ) );
         path.append( getOwningMember().getParentRefEndpointsMap().get( parentRef ) );
         path.append( DexParentRefsEndpointMap.getActionContribution( this ) );
         return path.toString();

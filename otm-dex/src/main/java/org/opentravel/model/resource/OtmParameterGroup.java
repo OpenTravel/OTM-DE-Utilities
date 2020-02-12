@@ -35,6 +35,7 @@ import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLParamGroup;
+import org.opentravel.schemacompiler.model.TLParamLocation;
 import org.opentravel.schemacompiler.model.TLParameter;
 
 import java.util.ArrayList;
@@ -113,6 +114,17 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
             getOwningMember().refresh( true );
         }
         return parameter;
+    }
+
+    public void build() {
+        if (getOwningMember().getSubject() != null) {
+            setReferenceFacet( getOwningMember().getSubject().getIdFacet() );
+            setIdGroup( true );
+            setName( "Identifier" );
+            // ? How to add a parameter ?
+            OtmParameter param = new OtmParameter( new TLParameter(), this );
+            param.setLocation( TLParamLocation.PATH );
+        }
     }
 
     @Override

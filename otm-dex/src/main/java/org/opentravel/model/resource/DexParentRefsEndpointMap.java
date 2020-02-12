@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
+import org.opentravel.schemacompiler.version.VersionSchemeException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -119,9 +120,8 @@ public class DexParentRefsEndpointMap {
 
     /**
      * Collection contribution is from the request template <b>or</b> from the subject. If there is something in the
-     * path template besides slashes and parameters, use that as the collection.
-     * <P>
-     * 2/12/2020 - removed: Otherwise use the plural of the subject.
+     * path template besides slashes and parameters, use that as the collection. Otherwise use the plural of the
+     * subject.
      * <p>
      * The user may set the rq template something like: /Fishes/{id} to overcome the plural supplied otherwise.
      * <p>
@@ -137,14 +137,20 @@ public class DexParentRefsEndpointMap {
         if (action == null)
             return "";
 
-        OtmActionRequest request = action.getRequest();
         // If the request has a path template with more than parameters and slash, use it
+        OtmActionRequest request = action.getRequest();
         if (request != null && request.getPathTemplate() != null && !request.getPathTemplate().isEmpty())
             path = stripParameters( request.getPathTemplate() ); // override may correct template
 
         // Use the resource subject
-        // if (path.isEmpty())
-        // path = PATH_SEPERATOR + makePlural( action.getOwningMember().getSubject().getName() );
+        String subjectName = "";
+        if (path.isEmpty() && action.getOwningMember() != null) {
+            if (action.getOwningMember().getSubject() != null)
+                subjectName = action.getOwningMember().getSubject().getName();
+            if (action.getOwningMember().getBasePath() == null
+                || !action.getOwningMember().getBasePath().contains( subjectName ))
+                path = PATH_SEPERATOR + makePlural( subjectName );
+        }
 
         return path;
 
@@ -240,31 +246,38 @@ public class DexParentRefsEndpointMap {
         return !payload.isEmpty() ? " <" + payload + ">...</" + payload + ">" : NO_PAYLOAD;
     }
 
+    /**
+     * @deprecated - delete from tests. Use the method with resource parameter.
+     * @return
+     */
     public static String getResourceBaseURL() {
         String resourceBaseURL;
-        // FIXME - how is the base URL accessed in DEX?
-        // final CompilerPreferences compilePreferences = new CompilerPreferences(
-        // CompilerPreferences.loadPreferenceStore());
-        // resourceBaseURL = compilePreferences.getResourceBaseUrl();
-        // In junits the resource base URL will be empty
-        // if (resourceBaseURL.isEmpty())
-        resourceBaseURL = SYSTEM; // FIXME - this should come from user settings
+        resourceBaseURL = SYSTEM;
         return resourceBaseURL;
     }
 
     public static String getResourceBaseURL(OtmResource resource) {
         String resourceBaseURL;
-        // FIXME - how is the base URL accessed in DEX?
-        // final CompilerPreferences compilePreferences = new CompilerPreferences(
-        // CompilerPreferences.loadPreferenceStore());
-        // resourceBaseURL = compilePreferences.getResourceBaseUrl();
-        // In junits the resource base URL will be empty
-        // if (resourceBaseURL.isEmpty())
-        resourceBaseURL = SYSTEM; // FIXME - this should come from user settings
+        resourceBaseURL = getSystemContribution( null );
+        resourceBaseURL += PATH_SEPERATOR + getVersionContribution( resource );
         resourceBaseURL += resource.getBasePath();
+        if (resourceBaseURL.endsWith( PATH_SEPERATOR ))
+            resourceBaseURL = resourceBaseURL.substring( 0, resourceBaseURL.lastIndexOf( PATH_SEPERATOR ) );
         return resourceBaseURL;
     }
 
+    public static String getVersionContribution(OtmResource resource) {
+        String versionContribution = "";
+        if (resource != null && resource.getLibrary() != null) {
+            try {
+                versionContribution =
+                    "v" + resource.getLibrary().getMajorVersion() + "_" + resource.getLibrary().getMinorVersion();
+            } catch (VersionSchemeException e) {
+                versionContribution = "";
+            }
+        }
+        return versionContribution;
+    }
 
     /**
      * Utility to add s to string if it does not end in s

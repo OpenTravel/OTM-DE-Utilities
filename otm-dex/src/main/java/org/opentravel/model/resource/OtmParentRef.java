@@ -34,6 +34,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 
 /**
@@ -61,6 +62,10 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
     private static final String PARENT_LABEL = "Parent";
 
     private static final String PARENT_TOOLTIP = "Specifies a parent reference for a REST resource.";
+    private static final String PATH_DEFAULT_LABEL = "Default";
+    private static final String PATH_DEFAULT_TOOLTIP = "Reset to default path for action request.";
+
+    private StringProperty pathProperty;
 
 
     /**
@@ -79,8 +84,33 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
         fields.add( new DexEditField( 0, 0, PARENT_LABEL, PARENT_TOOLTIP, getParentNode() ) );
         fields.add( new DexEditField( 1, 0, PARAM_GROUP_LABEL, PARAM_GROUP_TOOLTIP, getParameterGroupNode() ) );
         fields.add( new DexEditField( 2, 0, PATH_LABEL, PATH_TOOLTIP, getPathNode() ) );
+        fields.add( new DexEditField( 2, 2, null, PATH_DEFAULT_TOOLTIP, getDefaultPathNode() ) );
         return fields;
     }
+
+    // TODO
+    // DONE - Add default path button like on request
+    // FIX - Add default path method
+
+    private Node getDefaultPathNode() {
+        Button button = new Button( PATH_DEFAULT_LABEL );
+        button.setDisable( !isEditable() );
+        button.setOnAction( e -> pathProperty.set( getPathTemplateDefault() ) );
+        return button;
+    }
+
+    /**
+     * Get the default path template. This is a slash followed by any path parameters if in ID group
+     * 
+     * @return
+     */
+    public String getPathTemplateDefault() {
+        String d = DexParentRefsEndpointMap.PATH_SEPERATOR
+            + DexParentRefsEndpointMap.makePlural( getParentResource().getSubject().getName() )
+            + DexParentRefsEndpointMap.getPathParameterContributions( this );
+        return d.isEmpty() ? "/" : d;
+    }
+
 
     @Override
     public Icons getIconType() {
@@ -89,14 +119,8 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
 
     @Override
     public String getName() {
-        return getParentResourceName();
-        // return getParentResource().getName();
+        return getTL().getParentResourceName() + "Ref";
     }
-
-    // TODO
-    // Add default path button like on request
-    // Add default path method
-
 
     /**
      * @return the parameter group used by this parent reference {@link TLResourceParentRef#getParentParamGroup()}.
@@ -158,8 +182,8 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
     }
 
     private Node getPathNode() {
-        StringProperty selection = getActionManager().add( DexActions.SETPARENTPATHTEMPLATE, getPathTemplate(), this );
-        return DexEditField.makeTextField( selection );
+        pathProperty = getActionManager().add( DexActions.SETPARENTPATHTEMPLATE, getPathTemplate(), this );
+        return DexEditField.makeTextField( pathProperty );
     }
 
     /**
@@ -228,11 +252,13 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
     }
 
     public OtmResource setParentResource(OtmResource resource) {
-        if (resource != null)
+        if (resource != null) {
             getTL().setParentResource( resource.getTL() );
-        else
+            // if (getName().isEmpty())
+            // setName( getParentResourceName() + "Ref" );
+        } else
             getTL().setParentResource( null );
-        log.debug( "Set parent resource to " + getParentResource() );
+        // log.debug( "Set parent resource to " + getParentResource() );
         return getParentResource();
     }
 

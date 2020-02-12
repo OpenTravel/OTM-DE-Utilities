@@ -250,7 +250,8 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      * @return
      */
     public String getPathTemplateDefault() {
-        String d = DexParentRefsEndpointMap.getPathParameterContributions( this );
+        // String d = DexParentRefsEndpointMap.getPathParameterContributions( this );
+        String d = DexParentRefsEndpointMap.getActionContribution( getOwner() );
         return d.isEmpty() ? "/" : d;
     }
 

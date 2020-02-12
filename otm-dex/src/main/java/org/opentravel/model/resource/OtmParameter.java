@@ -61,6 +61,9 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
     public OtmParameter(TLParameter tla, OtmParameterGroup parent) {
         super( tla, parent );
 
+        if (parent != null && tla.getOwner() == null)
+            parent.getTL().addParameter( tla );
+
         if (tla.getLocation() == null)
             tla.setLocation( defaultLocation );
     }
