@@ -79,24 +79,8 @@ public class LockLibraryTask extends DexTaskBase<OtmLibrary> {
 
     @Override
     public void doIT() throws RepositoryException {
-        log.debug( "Lock library task: " + library.hashCode() );
-        // if (mgr == null)
-        // return;
-
         if (proj != null) {
-            log.debug( "Locking with project item: " + proj.getProjectItem( library.getTL() ).hashCode() );
-
             proj.getTL().getProjectManager().lock( proj.getProjectItem( library.getTL() ) );
-
-            // RepositoryItem newRI = taskData.getRepository().getRepositoryItem(taskData.getBaseNamespace(),
-            // taskData.getFilename(), taskData.getVersion());
-            // if (newRI != null && repoItem != newRI) {
-            // // repoItem is now stale--and held in a list by the NamespacesDAO
-            // // throw event so ns-library view is rebuilt on task complete.
-            // log.debug("Ready to replace" + repoItem.hashCode() + " with " + newRI.hashCode());
-            // throwRepoItemReplacedEvent(repoItem, newRI);
-            // log.debug(newRI.getLibraryName() + " locked by " + newRI.getLockedByUser());
-            // }
         }
     }
 

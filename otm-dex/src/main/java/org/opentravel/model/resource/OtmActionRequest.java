@@ -173,7 +173,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
 
     public void setMimeTypes(List<TLMimeType> list) {
         getTL().setMimeTypes( list );
-        log.debug( "Mime Types set: " + getTL().getMimeTypes() );
+        // log.debug( "Mime Types set: " + getTL().getMimeTypes() );
     }
 
     @Override
@@ -229,7 +229,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     private Node getPathNode() {
-        log.debug( "Parent URL: " + getParent().getEndpointURL() );
+        // log.debug( "Parent URL: " + getParent().getEndpointURL() );
         pathProperty = getActionManager().add( DexActions.SETREQUESTPATH, getPathTemplate(), this );
         return DexEditField.makeTextField( pathProperty );
     }
@@ -245,13 +245,14 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     /**
-     * Get the default path template. This is a slash followed by any path parameters if in ID group
+     * Get the default request path template. This is the collection contribution, a slash, any path parameters if in ID
+     * group
      * 
      * @return
      */
     public String getPathTemplateDefault() {
-        // String d = DexParentRefsEndpointMap.getPathParameterContributions( this );
-        String d = DexParentRefsEndpointMap.getContribution( getOwner() );
+        setPathTemplate( null, false );
+        String d = DexParentRefsEndpointMap.getContribution( getParent() );
         return d.isEmpty() ? "/" : d;
     }
 
@@ -336,8 +337,8 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
 
     public TLHttpMethod setMethod(TLHttpMethod method) {
         getTL().setHttpMethod( method );
-        if (method != null)
-            log.debug( "Set method to " + getMethod() );
+        // if (method != null)
+        // log.debug( "Set method to " + getMethod() );
         // if set to GET then payload must be NONE
         if (method != null && method.equals( TLHttpMethod.GET ))
             setPayloadType( null );

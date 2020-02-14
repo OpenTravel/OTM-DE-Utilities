@@ -73,7 +73,7 @@ public class DexEditField {
         CheckBox box = new CheckBox( label );
         box.setSelected( value );
         box.setDisable( !object.getOwningMember().isEditable() );
-        box.setOnAction( a -> log.debug( label + " check box selected." ) );
+        // box.setOnAction( a -> log.debug( label + " check box selected." ) );
         return box;
     }
 
@@ -84,7 +84,7 @@ public class DexEditField {
             box.setDisable( false );
             box.setOnAction( a -> {
                 value.set( box.isSelected() );
-                log.debug( label + " check box set to " + value.get() );
+                // log.debug( label + " check box set to " + value.get() );
             } );
         } else
             box.setDisable( true );
@@ -98,7 +98,7 @@ public class DexEditField {
         for (Entry<String,Boolean> t : values.entrySet()) {
             cb = DexEditField.makeCheckBox( t.getValue(), t.getKey(), object );
             hb.getChildren().add( cb );
-            cb.setOnAction( a -> log.debug( "Check box selected." ) );
+            // cb.setOnAction( a -> log.debug( "Check box selected." ) );
         }
         return hb;
     }
@@ -111,7 +111,7 @@ public class DexEditField {
         box.setOnAction( a -> {
             // ec.fireEvent( new DexResourceChangeEvent() );
             selection.set( box.getValue() );
-            log.debug( "Combo box selected" );
+            // log.debug( "Combo box selected" );
         } );
         return box;
     }
@@ -131,7 +131,7 @@ public class DexEditField {
         }
         field.setOnAction( a -> {
             stringProperty.set( ((TextField) a.getSource()).getText() );
-            log.debug( "String Property Field edited" );
+            // log.debug( "String Property Field edited" );
         } );
         return field;
     }

@@ -98,6 +98,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     public void refresh() {
         nameProperty = null;
+        nameEditingProperty = null;
     }
 
     @Override

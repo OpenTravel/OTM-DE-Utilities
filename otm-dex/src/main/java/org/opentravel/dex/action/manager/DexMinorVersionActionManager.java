@@ -98,6 +98,12 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
         }
     }
 
+    /**
+     * Is the subject inherited? If so, it is not new to this owner.
+     * 
+     * @param subject
+     * @return
+     */
     private boolean isNewProperty(OtmObject subject) {
         if (subject instanceof OtmProperty) {
             return !subject.isInherited(); // if not in latest minor, the lib will not be editable

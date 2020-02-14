@@ -16,8 +16,6 @@
 
 package org.opentravel.model.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
@@ -52,7 +50,7 @@ import javafx.scene.control.Tooltip;
  * 
  */
 public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmResourceChild, OtmChildrenOwner {
-    private static Log log = LogFactory.getLog( OtmAction.class );
+    // private static Log log = LogFactory.getLog( OtmAction.class );
 
     private static final String TOOLTIP = "Specify an action request and possible responses.";
 
@@ -103,7 +101,7 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         if (tlActionResponse != null && !getTL().getResponses().contains( tlActionResponse )) {
             getTL().addResponse( tlActionResponse );
             response = new OtmActionResponse( tlActionResponse, this );
-            log.debug( "Added response to " + this );
+            // log.debug( "Added response to " + this );
             getOwningMember().refresh( true );
         }
         return response;
@@ -195,8 +193,8 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
             else
                 path.append( DexParentRefsEndpointMap.NO_PATH );
         }
-        log.debug( "Resource Base Url = " + DexParentRefsEndpointMap.getResourceBaseURL( this.getOwningMember() ) );
-        log.debug( "Action contribution = " + DexParentRefsEndpointMap.getContribution( this ) );
+        // log.debug( "Resource Base Url = " + DexParentRefsEndpointMap.getResourceBaseURL( this.getOwningMember() ) );
+        // log.debug( "Action contribution = " + DexParentRefsEndpointMap.getContribution( this ) );
         // log.debug( "Endpoint URL on " + this + " is " + path.toString() );
         return path.toString();
     }

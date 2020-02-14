@@ -160,7 +160,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
      * Lock a library
      */
     private void lockLibrary() {
-        log.debug( "Lock in Row Factory.  " + controller.getSelectedItem().getValue().hashCode() );
+        // log.debug( "Lock in Row Factory. " + controller.getSelectedItem().getValue().hashCode() );
         OtmLibrary lib = getSelected();
         if (lib != null)
             new LockLibraryTask( lib, new RepositoryResultHandler( mainController ), statusController, controller,
@@ -173,7 +173,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     private void promoteLibrary(ActionEvent e) {
         OtmLibrary lib = getSelected();
         if (lib != null) {
-            log.debug( "Promote " + lib + " in Row Factory.  " + controller.getSelectedItem().getValue().hashCode() );
+            // log.debug( "Promote " + lib + " in Row Factory. " + controller.getSelectedItem().getValue().hashCode() );
             TLLibraryStatus targetStatus = null;
             if (e.getTarget() == finalState)
                 targetStatus = TLLibraryStatus.FINAL;
@@ -196,7 +196,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     private void manageLibrary(ActionEvent e) {
         OtmLibrary lib = getSelected();
         if (lib != null) {
-            log.debug( "manage " + lib + " in Row Factory.  " + controller.getSelectedItem().getValue() );
+            // log.debug( "manage " + lib + " in Row Factory. " + controller.getSelectedItem().getValue() );
 
             if (ManageLibraryTask.isEnabled( lib )) {
                 e.getSource();
@@ -224,7 +224,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
      */
     private void versionLibrary(ActionEvent e) {
         OtmLibrary lib = getSelected();
-        log.debug( "Version " + lib + " in Row Factory.  " + controller.getSelectedItem().getValue().hashCode() );
+        // log.debug( "Version " + lib + " in Row Factory. " + controller.getSelectedItem().getValue().hashCode() );
         VersionLibraryTask.VersionType type = null;
         if (e.getTarget() == major)
             type = VersionType.MAJOR;
@@ -300,8 +300,8 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     }
 
     private void commitLibrary() {
-        log.debug(
-            "Commit library in Row Factory.   " + controller.getSelectedItem().getValue().getClass().hashCode() );
+        // log.debug(
+        // "Commit library in Row Factory. " + controller.getSelectedItem().getValue().getClass().hashCode() );
         UnlockAndCommitLibraryDialogController uldc = UnlockAndCommitLibraryDialogController.init();
         uldc.showAndWait( "" );
         String remarks = uldc.getCommitRemarks();

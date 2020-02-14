@@ -384,9 +384,9 @@ public class OtmModelManager implements TaskResultHandlerI {
      */
     protected void addBuiltInLibraries(TLModel tlModel) {
         for (BuiltInLibrary tlLib : tlModel.getBuiltInLibraries()) {
-            if (libraries.containsKey( tlLib )) {
-                log.warn( "Trying to add builtin library again." );
-            }
+            // if (libraries.containsKey( tlLib )) {
+            // log.warn( "Trying to add builtin library again." );
+            // }
             libraries.put( tlLib, new OtmBuiltInLibrary( tlLib, this ) );
             for (LibraryMember tlMember : tlLib.getNamedMembers()) {
                 // If it has listeners, remove them

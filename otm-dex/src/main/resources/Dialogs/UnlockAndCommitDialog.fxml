@@ -34,13 +34,13 @@
             <Insets bottom="5.0" left="10.0" right="20.0" top="5.0" />
          </BorderPane.margin>
          <buttons>
-            <Button fx:id="dialogButtonCancel" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-red" stylesheets="@../DavesViper.css" text="Cancel" textAlignment="CENTER">
+            <Button fx:id="dialogButtonOK" alignment="CENTER" contentDisplay="CENTER" layoutX="419.0" layoutY="10.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="200.0" styleClass="button-blue" stylesheets="@../DavesViper.css" text="Commit and Unlock" textAlignment="CENTER">
                <opaqueInsets>
                   <Insets bottom="10.0" />
                </opaqueInsets>
             </Button>
             <Separator orientation="VERTICAL" />
-            <Button fx:id="dialogButtonOK" alignment="CENTER" contentDisplay="CENTER" layoutX="419.0" layoutY="10.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="200.0" styleClass="button-blue" stylesheets="@../DavesViper.css" text="Commit and Unlock" textAlignment="CENTER">
+            <Button fx:id="dialogButtonCancel" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-red" stylesheets="@../DavesViper.css" text="Cancel" textAlignment="CENTER">
                <opaqueInsets>
                   <Insets bottom="10.0" />
                </opaqueInsets>

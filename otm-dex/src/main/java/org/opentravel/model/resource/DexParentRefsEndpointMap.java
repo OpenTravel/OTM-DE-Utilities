@@ -87,40 +87,40 @@ public class DexParentRefsEndpointMap {
      * @param request
      * @return
      */
-    protected static String getCollectionContribution(OtmAction action) {
+    protected static String getCollectionContribution(OtmActionRequest request) {
         String path = "";
-        if (action == null)
+        if (request == null)
             return "";
 
         // If the request has a path template with more than parameters and slash, use it
-        OtmActionRequest request = action.getRequest();
+        // OtmActionRequest request = action.getRequest();
         if (request != null && request.getPathTemplate() != null && !request.getPathTemplate().isEmpty())
             path = stripParameters( request.getPathTemplate() ); // override may correct template
 
         // If the path is still empty, use the resource subject
         String subjectName = "";
-        if (path.isEmpty() && action.getOwningMember() != null) {
-            if (action.getOwningMember().getSubject() != null)
-                subjectName = action.getOwningMember().getSubject().getName();
-            if (action.getOwningMember().getBasePath() == null
-                || !action.getOwningMember().getBasePath().contains( subjectName ))
+        OtmResource resource = request.getOwningMember();
+        if (path.isEmpty() && resource != null) {
+            if (resource.getSubject() != null)
+                subjectName = resource.getSubject().getName();
+            if (resource.getBasePath() == null || !resource.getBasePath().contains( subjectName ))
                 path = PATH_SEPERATOR + makePlural( subjectName );
         }
         return path;
     }
 
     /**
-     * Utility to get a path for the action, use it's request path template and parameters. Collection's contribution +
-     * request's path parameter contribution
+     * Utility to get a path contribution for the action. Contribution combines collection contribution and the
+     * request's parameter group's contribution.
      * 
-     * @param action can be null
+     * @param action. If null, path is empty.
      * @return
      */
     public static String getContribution(OtmAction action) {
         // Path template from action's request. It should have parameters already in it!
         StringBuilder builder = new StringBuilder();
         if (action != null && action.getRequest() != null) {
-            builder.append( getCollectionContribution( action ) );
+            builder.append( getCollectionContribution( action.getRequest() ) );
             builder.append( getContribution( action.getRequest().getParamGroup() ) );
         }
         return builder.toString();

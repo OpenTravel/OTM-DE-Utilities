@@ -311,7 +311,7 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
             resources.forEach( r -> createTreeItem( r, root ) );
 
             resourcesTreeTable.refresh();
-            log.debug( "Posted " + resources.size() + " resources." );
+            // log.debug( "Posted " + resources.size() + " resources." );
         }
         ignoreEvents = false;
     }

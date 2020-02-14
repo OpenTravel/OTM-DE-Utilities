@@ -240,20 +240,6 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         return dialogBox;
     }
 
-    /**
-     * Configure the combo box with a list and listener.
-     * <p>
-     * Usage: menuBarWithProjectController.configureProjectMenuButton(projectList, this::projectComboSelectionListener);
-     * 
-     * @param projectList
-     * @param listener
-     */
-    private void configureProjectComboBox(ObservableList<String> projectList, EventHandler<ActionEvent> listener) {
-        // log.debug("Setting combo.");
-        projectList.sort( null );
-        projectCombo.setItems( projectList );
-        projectCombo.setOnAction( listener );
-    }
 
     @FXML
     public void undoAction(ActionEvent e) {
@@ -325,26 +311,14 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         getDialogBox( null ).show( "Open", "Not implemented" );
     }
 
-    /**
-     * Menu action event handler for opening a file.
-     * <p>
-     * <ol>
-     * <li>Run file chooser
-     * <li>Display dialog
-     * <li>Get default directory from settings
-     * <li>clear current model and all controllers
-     * <li>Create open project task and run it
-     * <li>Handle on complete
-     * </ol>
-     * 
-     * @param event
-     */
-
     public void handleOpenMenu(ActionEvent event) {
         // log.debug( "Handle file open action event." );
         DexFileHandler fileHandler = new DexFileHandler();
         if (event.getTarget() instanceof MenuItem) {
             File selectedFile = fileHandler.fileChooser( stage, userSettings );
+            // TEST ME - Update Combo in menu bar
+            configureProjectCombo( selectedFile.getParentFile() );
+            // Run the task
             openFile( selectedFile );
         }
     }
@@ -368,8 +342,12 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     private HashMap<String,File> projectMap = new HashMap<>();
 
     public void configureProjectCombo() {
-        DexFileHandler fileHandler = new DexFileHandler();
         File initialDirectory = userSettings.getLastProjectFolder();
+        configureProjectCombo( initialDirectory );
+    }
+
+    public void configureProjectCombo(File initialDirectory) {
+        DexFileHandler fileHandler = new DexFileHandler();
         if (initialDirectory != null) {
             for (File file : fileHandler.getProjectList( initialDirectory )) {
                 projectMap.put( file.getName(), file );
@@ -378,6 +356,22 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
             configureProjectComboBox( projectList, this::projectComboSelectionListener );
         }
     }
+
+    /**
+     * Configure the combo box with a list and listener.
+     * <p>
+     * Usage: menuBarWithProjectController.configureProjectMenuButton(projectList, this::projectComboSelectionListener);
+     * 
+     * @param projectList
+     * @param listener
+     */
+    private void configureProjectComboBox(ObservableList<String> projectList, EventHandler<ActionEvent> listener) {
+        log.debug( "Setting combo." );
+        projectList.sort( null );
+        projectCombo.setItems( projectList );
+        projectCombo.setOnAction( listener );
+    }
+
     // FUTURE
     // public void addViewItems(List<DexIncludedController<?>> controllers) {
     // for (DexIncludedController<?> c : controllers) {

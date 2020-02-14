@@ -89,7 +89,7 @@ public abstract class DexStringAction extends DexActionBase implements DexAction
         if (observable instanceof SimpleStringProperty)
             ((SimpleStringProperty) observable).set( newValue );
 
-        log.debug( "Set to: " + newValue );
+        // log.debug( "Set to: " + newValue );
         ignore = false;
         return get();
     }
@@ -126,7 +126,7 @@ public abstract class DexStringAction extends DexActionBase implements DexAction
         if (observable instanceof SimpleStringProperty)
             ((SimpleStringProperty) observable).set( oldString );
 
-        log.debug( "Undo - " + toString() + " using " + oldString );
+        // log.debug( "Undo - " + toString() + " using " + oldString );
         ignore = false;
         return oldString;
     }

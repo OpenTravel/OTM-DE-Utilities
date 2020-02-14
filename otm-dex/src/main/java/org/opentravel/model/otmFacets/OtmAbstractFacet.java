@@ -344,7 +344,7 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
             boolean skip = false;
             if (this.getLibrary() != null && this.getLibrary().isMinorVersion())
                 for (OtmObject c : children) {
-                    if (c.getName().equals( p.getName() )) {
+                    if (c.getName() == null || c.getName().equals( p.getName() )) {
                         skip = true;
                         break;
                     }

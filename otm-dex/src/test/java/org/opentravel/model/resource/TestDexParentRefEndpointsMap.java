@@ -165,7 +165,7 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
             // When - path template is null
             a.getRequest().setPathTemplate( null, false );
             // Then - collection contribution is plural of subject name
-            cc = DexParentRefsEndpointMap.getCollectionContribution( a );
+            cc = DexParentRefsEndpointMap.getCollectionContribution( a.getRequest() );
             assertTrue( "Must be empty:", cc.isEmpty() );
             // assertTrue( "Must not have :", !cc.contains( ":" ) );
             // assertTrue( "Must not have subject name.", !cc.contains( a.getOwningMember().getSubject().getName() ) );
@@ -173,31 +173,31 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
             // When - path template is empty
             a.getRequest().setPathTemplate( "", false );
             // Then - collection contribution is plural of subject name
-            cc = DexParentRefsEndpointMap.getCollectionContribution( a );
+            cc = DexParentRefsEndpointMap.getCollectionContribution( a.getRequest() );
             assertTrue( "Must be empty:", cc.isEmpty() );
             // assertTrue( "Must not have subject name.", !cc.contains( a.getOwningMember().getSubject().getName() ) );
 
             // When - path template is set to / + parameter
             a.getRequest().setPathTemplate( rqTemplate1, false );
             // Then - collection contribution portion of template without parameters
-            cc = DexParentRefsEndpointMap.getCollectionContribution( a );
+            cc = DexParentRefsEndpointMap.getCollectionContribution( a.getRequest() );
             assertTrue( "Must be empty:", cc.isEmpty() );
             // assertTrue( "Must not have subject name.", !cc.contains( a.getOwningMember().getSubject().getName() ) );
 
             // When - path template is set to prefix + parameter
             a.getRequest().setPathTemplate( rqTemplate2, false );
             // Then - collection contribution portion of template without parameters
-            cc = DexParentRefsEndpointMap.getCollectionContribution( a );
+            cc = DexParentRefsEndpointMap.getCollectionContribution( a.getRequest() );
             assertTrue( "Must have template prefix.", cc.contains( rqTemplatePrefix ) );
 
             // When - path template is set to / + prefix + parameter
             a.getRequest().setPathTemplate( rqTemplate3, false );
             // Then - collection contribution portion of template without parameters
-            cc = DexParentRefsEndpointMap.getCollectionContribution( a );
+            cc = DexParentRefsEndpointMap.getCollectionContribution( a.getRequest() );
             assertTrue( "Must have template prefix.", cc.contains( rqTemplatePrefix ) );
 
             ac = DexParentRefsEndpointMap.getContribution( a );
-            cc = DexParentRefsEndpointMap.getCollectionContribution( a );
+            cc = DexParentRefsEndpointMap.getCollectionContribution( a.getRequest() );
             ppc = DexParentRefsEndpointMap.getContribution( a.getRequest().getParamGroup() );
             assertTrue( ppc.contains( paramName ) );
             assertTrue( "Must start with slash", ac.startsWith( "/" ) );
