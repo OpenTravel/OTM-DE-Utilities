@@ -221,7 +221,7 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
             assertTrue( "Given: must have parameter group", pg != null );
 
             if (a.getRequest().getParamGroup() != null && a.getRequest().getParamGroup().isIdGroup()) {
-                paramContribution = DexParentRefsEndpointMap.getPathParameterContributions( rq.getParamGroup() );
+                paramContribution = DexParentRefsEndpointMap.getContribution( rq.getParamGroup() );
                 assertTrue( "Must have param conribution.", !paramContribution.isEmpty() );
             }
             original = a.getRequest().getPathTemplate();
@@ -264,7 +264,7 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
         assertTrue( "Given", idGroup.isIdGroup() );
         assertTrue( "Given", !idGroup.getParameters().isEmpty() );
         DexParentRefsEndpointMap endpoints = resource.getParentRefEndpointsMap();
-        String paramContrib = DexParentRefsEndpointMap.getPathParameterContributions( idGroup );
+        String paramContrib = DexParentRefsEndpointMap.getContribution( idGroup );
         String pt, ppc, ac, originalPt, originalAc, originalPpc;
 
         for (OtmAction a : resource.getActions()) {
@@ -275,7 +275,7 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
             rq.setParamGroup( idGroup );
 
             // Then - path parameters are present
-            ppc = DexParentRefsEndpointMap.getPathParameterContributions( rq );
+            ppc = DexParentRefsEndpointMap.getContribution( rq.getParamGroup() );
             // log.debug( "path param contributions = " + ppc );
             assertTrue( "Must not have //.", !ppc.contains( "//" ) );
             assertTrue( "Must have contribution from path parameters.", ppc.contains( paramContrib ) );
@@ -305,7 +305,7 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
             rq.setPathTemplate( "SOMETHING", false );
             ds = rq.getPathTemplateDefault();
             assertTrue( !ds.isEmpty() );
-            assertTrue( ds.equals( "/" ) );
+            assertTrue( ds.equals( "/SOMETHING" ) );
 
             // When Path set and id param group set
             // When - No params but path is set
@@ -315,7 +315,7 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
             assertTrue( !ds.isEmpty() );
             assertTrue( !ds.equals( "/" ) );
             assertTrue( ds.startsWith( "/" ) );
-            assertTrue( ds.contains( DexParentRefsEndpointMap.getPathParameterContributions( idGroup ) ) );
+            assertTrue( ds.contains( DexParentRefsEndpointMap.getContribution( idGroup ) ) );
             assertTrue( !ds.contains( "//" ) );
         }
     }

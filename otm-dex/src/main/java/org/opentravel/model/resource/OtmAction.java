@@ -188,7 +188,7 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         StringBuilder path = new StringBuilder();
         if (getOwningMember().isFirstClass()) {
             path.append( DexParentRefsEndpointMap.getResourceBaseURL( this.getOwningMember() ) );
-            path.append( DexParentRefsEndpointMap.getActionContribution( this ) );
+            path.append( DexParentRefsEndpointMap.getContribution( this ) );
         } else {
             if (getOwningMember().getParentRefs().isEmpty())
                 path.append( DexParentRefsEndpointMap.NO_PATH_NOTFIRSTCLASS_AND_NOPARENTREFS );
@@ -196,7 +196,7 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
                 path.append( DexParentRefsEndpointMap.NO_PATH );
         }
         log.debug( "Resource Base Url = " + DexParentRefsEndpointMap.getResourceBaseURL( this.getOwningMember() ) );
-        log.debug( "Action contribution = " + DexParentRefsEndpointMap.getActionContribution( this ) );
+        log.debug( "Action contribution = " + DexParentRefsEndpointMap.getContribution( this ) );
         // log.debug( "Endpoint URL on " + this + " is " + path.toString() );
         return path.toString();
     }
@@ -210,7 +210,7 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         StringBuilder path = new StringBuilder();
         path.append( DexParentRefsEndpointMap.getResourceBaseURL( this.getOwningMember() ) );
         path.append( getOwningMember().getParentRefEndpointsMap().get( parentRef ) );
-        path.append( DexParentRefsEndpointMap.getActionContribution( this ) );
+        path.append( DexParentRefsEndpointMap.getContribution( this ) );
         return path.toString();
     }
 

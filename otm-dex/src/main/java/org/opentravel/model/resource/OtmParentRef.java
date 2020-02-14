@@ -107,7 +107,7 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
     public String getPathTemplateDefault() {
         String d = DexParentRefsEndpointMap.PATH_SEPERATOR
             + DexParentRefsEndpointMap.makePlural( getParentResource().getSubject().getName() )
-            + DexParentRefsEndpointMap.getPathParameterContributions( this );
+            + DexParentRefsEndpointMap.getContribution( this.getParameterGroup() );
         return d.isEmpty() ? "/" : d;
     }
 

@@ -70,7 +70,7 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
         String path1 = "/MyCollection";
         String subjectName = "MySubject";
         OtmResource resource = TestResource.buildFullOtm( path1, subjectName, staticModelManager );
-        String rc = DexParentRefsEndpointMap.getResourceContribution( resource );
+        String rc = DexParentRefsEndpointMap.getContribution( resource );
 
         assertTrue( !DexParentRefsEndpointMap.getSystemContribution( null ).isEmpty() );
     }
@@ -103,7 +103,7 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
 
         for (OtmAction a : actions) {
             a.getRequest().setPathTemplate( "/{id}", false );
-            ac = DexParentRefsEndpointMap.getActionContribution( a );
+            ac = DexParentRefsEndpointMap.getContribution( a );
             aURL = rbURL + ac;
             log.debug( aURL );
             assertTrue( "Must not have double /.", !aURL.substring( 8 ).contains( "//" ) );
@@ -136,9 +136,9 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
         String ac;
         String cc, ppc;
 
-        // Null action
-        ac = DexParentRefsEndpointMap.getActionContribution( null );
-        assertTrue( "Must be empty string.", ac.isEmpty() );
+        // // Null action
+        // ac = DexParentRefsEndpointMap.getContribution( null );
+        // assertTrue( "Must be empty string.", ac.isEmpty() );
 
         // Null actionRequest - this never happens and will cause failures
         // comment out if you really need to test behavior with no request
@@ -196,9 +196,9 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
             cc = DexParentRefsEndpointMap.getCollectionContribution( a );
             assertTrue( "Must have template prefix.", cc.contains( rqTemplatePrefix ) );
 
-            ac = DexParentRefsEndpointMap.getActionContribution( a );
+            ac = DexParentRefsEndpointMap.getContribution( a );
             cc = DexParentRefsEndpointMap.getCollectionContribution( a );
-            ppc = DexParentRefsEndpointMap.getPathParameterContributions( a.getRequest() );
+            ppc = DexParentRefsEndpointMap.getContribution( a.getRequest().getParamGroup() );
             assertTrue( ppc.contains( paramName ) );
             assertTrue( "Must start with slash", ac.startsWith( "/" ) );
             assertTrue( "Must not have double /.", !ac.contains( "//" ) );
@@ -320,34 +320,34 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
 
         // When - template is set
         parentRef.setPathTemplate( parentPathTemplate );
-        ep = DexParentRefsEndpointMap.getEndpointPath( parentRef );
+        ep = DexParentRefsEndpointMap.getContribution( parentRef );
         assertTrue( "Must have template.", ep.contains( parentPathTemplate ) );
         assertTrue( "Must not have parameters.", !ep.contains( "{" ) );
 
         // When - template is empty
         parentRef.setPathTemplate( "" );
-        ep = DexParentRefsEndpointMap.getEndpointPath( parentRef );
+        ep = DexParentRefsEndpointMap.getContribution( parentRef );
         assertTrue( "Must have path .", ep.contains( subjectName ) );
         assertTrue( "Must not have parameters.", !ep.contains( "{" ) );
 
         // When - template is null
         parentRef.setPathTemplate( null );
-        ep = DexParentRefsEndpointMap.getEndpointPath( parentRef );
+        ep = DexParentRefsEndpointMap.getContribution( parentRef );
         assertTrue( "Must have path.", ep.contains( subjectName ) );
 
         // When - null template + no subject + no id group
         parent.setSubject( null );
-        ep = DexParentRefsEndpointMap.getEndpointPath( parentRef );
+        ep = DexParentRefsEndpointMap.getContribution( parentRef );
 
         // When - null template + no id group
         parent.setSubject( parentSubject );
-        ep = DexParentRefsEndpointMap.getEndpointPath( parentRef );
+        ep = DexParentRefsEndpointMap.getContribution( parentRef );
         assertTrue( "Must have path .", ep.contains( subjectName ) );
         assertTrue( "Must not have parameters.", !ep.contains( "{" ) );
 
         // When - null template + id group
         parentRef.setParameterGroup( idGroup );
-        ep = DexParentRefsEndpointMap.getEndpointPath( parentRef );
+        ep = DexParentRefsEndpointMap.getContribution( parentRef );
         assertTrue( "Must have path .", ep.contains( subjectName ) );
         assertTrue( "Must have parameters.", ep.contains( "{" ) );
         assertTrue( "Must have parameters.", ep.contains( idGroup.getPathParameters().get( 0 ).getName() ) );
@@ -364,30 +364,30 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
 
         String subjectName = "MySubject";
         OtmResource resource = TestResource.buildFullOtm( path1, subjectName, staticModelManager );
-        String rc = DexParentRefsEndpointMap.getResourceContribution( resource );
+        String rc = DexParentRefsEndpointMap.getContribution( resource );
 
         // When - path set to null
         resource.setBasePath( null );
-        rc = DexParentRefsEndpointMap.getResourceContribution( resource );
+        rc = DexParentRefsEndpointMap.getContribution( resource );
         assertTrue( rc.equals( emptyPath ) );
         // When - empty
         resource.setBasePath( "" );
-        rc = DexParentRefsEndpointMap.getResourceContribution( resource );
+        rc = DexParentRefsEndpointMap.getContribution( resource );
         assertTrue( rc.equals( emptyPath ) );
 
         // When - variations of starting and ending with slash
         resource.setBasePath( path1 );
-        rc = DexParentRefsEndpointMap.getResourceContribution( resource );
+        rc = DexParentRefsEndpointMap.getContribution( resource );
         assertTrue( rc.contains( path1 ) );
         testStartsAndEnds( rc, path1 );
 
         resource.setBasePath( path2 );
-        rc = DexParentRefsEndpointMap.getResourceContribution( resource );
+        rc = DexParentRefsEndpointMap.getContribution( resource );
         assertTrue( rc.contains( path1 ) );
         testStartsAndEnds( rc, path1 );
 
         resource.setBasePath( path3 );
-        rc = DexParentRefsEndpointMap.getResourceContribution( resource );
+        rc = DexParentRefsEndpointMap.getContribution( resource );
         testStartsAndEnds( rc, path1 );
     }
 

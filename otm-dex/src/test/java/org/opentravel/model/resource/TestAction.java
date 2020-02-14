@@ -283,7 +283,8 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
             assertTrue( "Must not have subject name.", !url.contains( subjectName ) );
         } else {
             // Then - url is fixed
-            assertFalse( a.getEndpointURL().startsWith( DexParentRefsEndpointMap.getResourceBaseURL() ) );
+            assertFalse(
+                a.getEndpointURL().startsWith( DexParentRefsEndpointMap.getResourceBaseURL( a.getOwningMember() ) ) );
         }
 
         a.getRequest().setPathTemplate( initialTemplate, false );
@@ -306,8 +307,9 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
             // Then - there is a url for all parent refs
             for (OtmParentRef pr : resource.getAllParentRefs( true )) {
                 log.debug( a.getEndpointURL( pr ) );
-                log.debug( DexParentRefsEndpointMap.getResourceBaseURL() );
-                assertTrue( a.getEndpointURL( pr ).startsWith( DexParentRefsEndpointMap.getResourceBaseURL() ) );
+                log.debug( DexParentRefsEndpointMap.getResourceBaseURL( resource ) );
+                assertTrue(
+                    a.getEndpointURL( pr ).startsWith( DexParentRefsEndpointMap.getResourceBaseURL( resource ) ) );
             }
         }
     }
@@ -334,7 +336,8 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
             // Then - there is a url for all parent refs
             for (OtmParentRef pr : resource.getAllParentRefs( true )) {
                 log.debug( a.getEndpointURL( pr ) );
-                assertTrue( a.getEndpointURL( pr ).startsWith( DexParentRefsEndpointMap.getResourceBaseURL() ) );
+                assertTrue(
+                    a.getEndpointURL( pr ).startsWith( DexParentRefsEndpointMap.getResourceBaseURL( resource ) ) );
             }
         }
     }

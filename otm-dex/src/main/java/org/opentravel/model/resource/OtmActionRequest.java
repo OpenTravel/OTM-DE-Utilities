@@ -251,7 +251,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      */
     public String getPathTemplateDefault() {
         // String d = DexParentRefsEndpointMap.getPathParameterContributions( this );
-        String d = DexParentRefsEndpointMap.getActionContribution( getOwner() );
+        String d = DexParentRefsEndpointMap.getContribution( getOwner() );
         return d.isEmpty() ? "/" : d;
     }
 
@@ -392,7 +392,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         else {
             StringBuilder path = new StringBuilder( basePath );
             if (addParameters)
-                path.append( DexParentRefsEndpointMap.getPathParameterContributions( getParamGroup() ) );
+                path.append( DexParentRefsEndpointMap.getContribution( getParamGroup() ) );
             // if (addParameters && getParamGroup() != null && getParamGroup().isIdGroup()) {
             // if (!getParamGroup().getParameters().isEmpty())
             // path.append( "/" );
