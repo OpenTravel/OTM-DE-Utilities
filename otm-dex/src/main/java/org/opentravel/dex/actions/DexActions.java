@@ -44,9 +44,10 @@ public enum DexActions {
     BASETYPECHANGE(BaseTypeChangeAction.class, OtmObjectChangeEvent.class),
     VERSIONUPDATE(UpdateToLaterVersionAction.class, OtmObjectChangeEvent.class),
     // Library members
-    NEWLIBRARYMEMBER(NewLibraryMemberAction.class, DexModelChangeEvent.class),
-    SETMEMBERLIBRARY(SetLibraryAction.class, DexModelChangeEvent.class),
+    COPYLIBRARYMEMBER(CopyLibraryMemberAction.class, DexModelChangeEvent.class),
     DELETELIBRARYMEMBER(DeleteLibraryMemberAction.class, DexMemberDeleteEvent.class),
+    NEWLIBRARYMEMBER(NewLibraryMemberAction.class, DexModelChangeEvent.class),
+    SETLIBRARY(SetLibraryAction.class, DexModelChangeEvent.class),
     ADDALIAS(AddAliasAction.class, OtmObjectChangeEvent.class),
     DELETEALIAS(DeleteAliasAction.class, OtmObjectChangeEvent.class),
     // Properties

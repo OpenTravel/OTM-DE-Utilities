@@ -28,6 +28,7 @@ import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmSharedFacet;
 import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
+import org.opentravel.schemacompiler.model.TLFacetType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -120,16 +121,58 @@ public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
         return getName();
     }
 
+    /**
+     * {@inheritDoc} Also remove any contributed facets.
+     */
+    @Override
+    public OtmChoiceObject copy() {
+        OtmLibraryMember copy = super.copy();
+
+        // Remove any contributed facets
+        Collection<OtmContributedFacet> contribs = copy.getChildrenContributedFacets();
+        for (OtmContributedFacet contrib : contribs) {
+            copy.delete( contrib );
+        }
+
+        // if (!copy.getChildrenContributedFacets().isEmpty())
+        // log.warn( "Error - still has contributed facets." );
+        // if (!((TLBusinessObject) copy.getTL()).getCustomFacets().isEmpty())
+        // log.warn( "Error - still has custom facets." );
+
+        log.debug( "Copied a Choice object." + copy.getChildren() );
+        return (OtmChoiceObject) copy;
+    }
+
+
+
     @Override
     public void delete(OtmObject child) {
-        super.delete( child );
-        if (child instanceof OtmContributedFacet)
+        super.delete( child ); // will delete aliases
+        TLContextualFacet tlFacet = null;
+        if (child instanceof OtmContributedFacet) {
+            tlFacet = ((OtmContributedFacet) child).getTL();
+            remove( child );
             child = ((OtmContributedFacet) child).getContributor();
-        if (child == null)
-            return;
-        if (child.getTL() instanceof TLContextualFacet)
-            getTL().removeChoiceFacet( (TLContextualFacet) child.getTL() );
+        }
+        if (tlFacet == null && child instanceof OtmContextualFacet)
+            tlFacet = ((OtmContextualFacet) child).getTL();
         remove( child );
+        // Get TL - Use TLFacetType - tl from either contributor or contributed
+        if (tlFacet == null)
+            return;
+        if (tlFacet.getFacetType() == TLFacetType.CHOICE) {
+            getTL().removeChoiceFacet( tlFacet );
+        }
+
+        //
+        // super.delete( child );
+        // if (child instanceof OtmContributedFacet)
+        // child = ((OtmContributedFacet) child).getContributor();
+        // if (child == null)
+        // return;
+        // if (child.getTL() instanceof TLContextualFacet)
+        // getTL().removeChoiceFacet( (TLContextualFacet) child.getTL() );
+        // remove( child );
     }
 
     @Override

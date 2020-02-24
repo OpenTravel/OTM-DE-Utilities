@@ -125,7 +125,8 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
     @Override
     public void clearNameProperty() {
         super.clearNameProperty(); // null out this name property
-        getContributor().clearNameProperty();
+        if (getContributor() != null)
+            getContributor().clearNameProperty();
     }
 
     /**

@@ -164,6 +164,8 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
     }
 
     private void addToMap(OtmLibraryMember w, OtmLibraryMember member, Map<String,UsersManager> namespaceMap) {
+        if (w == null)
+            return;
         if (!namespaceMap.containsKey( w.getPrefix() ))
             namespaceMap.put( w.getPrefix(), new UsersManager( w, member, root ) );
         // CF test must come first since they report having base type

@@ -139,21 +139,64 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
         return ch;
     }
 
+    /**
+     * {@inheritDoc} Also remove any contributed facets.
+     */
+    @Override
+    public OtmBusinessObject copy() {
+        OtmLibraryMember copy = super.copy();
+
+        // Remove any contributed facets
+        Collection<OtmContributedFacet> contribs = copy.getChildrenContributedFacets();
+        for (OtmContributedFacet contrib : contribs) {
+            copy.delete( contrib );
+        }
+
+        // if (!copy.getChildrenContributedFacets().isEmpty())
+        // log.warn( "Error - still has contributed facets." );
+        // if (!((TLBusinessObject) copy.getTL()).getCustomFacets().isEmpty())
+        // log.warn( "Error - still has custom facets." );
+
+        log.debug( "Copied a business object." + copy.getChildren() );
+        return (OtmBusinessObject) copy;
+    }
+
     @Override
     public void delete(OtmObject child) {
-        super.delete( child );
-        if (child instanceof OtmContributedFacet)
+        super.delete( child ); // will delete aliases
+        TLContextualFacet tlFacet = null;
+        if (child instanceof OtmContributedFacet) {
+            tlFacet = ((OtmContributedFacet) child).getTL();
+            remove( child );
             child = ((OtmContributedFacet) child).getContributor();
-        if (child == null)
-            return;
-        if (child.getTL() instanceof TLContextualFacet) {
-            if (child instanceof OtmCustomFacet)
-                getTL().removeCustomFacet( (TLContextualFacet) child.getTL() );
-            else if (child instanceof OtmQueryFacet)
-                getTL().removeQueryFacet( (TLContextualFacet) child.getTL() );
-            else if (child instanceof OtmUpdateFacet)
-                getTL().removeUpdateFacet( (TLContextualFacet) child.getTL() );
         }
+        if (tlFacet == null && child instanceof OtmContextualFacet)
+            tlFacet = ((OtmContextualFacet) child).getTL();
         remove( child );
+        // Get TL - Use TLFacetType - tl from either contributor or contributed
+        if (tlFacet == null)
+            return;
+        switch (tlFacet.getFacetType()) {
+            case CUSTOM:
+                getTL().removeCustomFacet( tlFacet );
+                break;
+            case QUERY:
+                getTL().removeQueryFacet( tlFacet );
+                break;
+            case UPDATE:
+                getTL().removeUpdateFacet( tlFacet );
+                break;
+            default:
+                // Not remove-able
+                break;
+        }
+        // if (child.getTL() instanceof TLContextualFacet) {
+        // if (child instanceof OtmCustomFacet)
+        // getTL().removeCustomFacet( (TLContextualFacet) child.getTL() );
+        // else if (child instanceof OtmQueryFacet)
+        // getTL().removeQueryFacet( (TLContextualFacet) child.getTL() );
+        // else if (child instanceof OtmUpdateFacet)
+        // getTL().removeUpdateFacet( (TLContextualFacet) child.getTL() );
+        // }
     }
 }

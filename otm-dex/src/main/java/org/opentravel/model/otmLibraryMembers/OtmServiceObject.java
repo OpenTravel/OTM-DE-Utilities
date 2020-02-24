@@ -60,6 +60,11 @@ public class OtmServiceObject extends OtmLibraryMemberBase<TLService> {
         // TODO - delete-able children
     }
 
+    // @Override
+    // public OtmServiceObject copy() {
+    // return null; // You can't copy services
+    // }
+
     @Override
     public void remove(OtmObject property) {
         // TODO - delete-able children

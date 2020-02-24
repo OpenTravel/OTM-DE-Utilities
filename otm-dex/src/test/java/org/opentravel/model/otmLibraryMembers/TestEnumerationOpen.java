@@ -19,6 +19,7 @@ package org.opentravel.model.otmLibraryMembers;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
@@ -34,6 +35,13 @@ public class TestEnumerationOpen extends TestOtmLibraryMemberBase<OtmEnumeration
     @BeforeClass
     public static void beforeClass() {
         staticModelManager = new OtmModelManager( null, null );
+        // subject = buildOtm( staticModelManager );
+        // baseObject = buildOtm( staticModelManager );
+        // baseObject.setName( "BaseBO" );
+    }
+
+    @Before
+    public void beforeEach() {
         subject = buildOtm( staticModelManager );
         baseObject = buildOtm( staticModelManager );
         baseObject.setName( "BaseBO" );

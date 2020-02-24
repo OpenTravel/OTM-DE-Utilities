@@ -90,6 +90,9 @@ public interface DexAction<T> {
 
     /**
      * Set the subject for this action to act upon.
+     * <p>
+     * Actions must refuse to set the subject and return false if the subject is not appropriate for the specific
+     * action.
      * 
      * @param subject
      * @return false if the subject could not be set

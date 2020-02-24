@@ -16,6 +16,7 @@
 
 package org.opentravel.dex.action.manager;
 
+import org.opentravel.dex.actions.CopyLibraryMemberAction;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmObject;
 
@@ -34,6 +35,9 @@ public class DexReadOnlyActionManager extends DexActionManagerBase {
 
     @Override
     public boolean isEnabled(DexActions action, OtmObject subject) {
+        // All copying content from any source.
+        if (action == DexActions.COPYLIBRARYMEMBER)
+            return CopyLibraryMemberAction.isEnabled( subject );
         return false;
     }
 }

@@ -52,11 +52,13 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
     Menu newMenu = null;
     MenuItem deleteItem = null;
     MenuItem validateItem = null;
+    MenuItem copyItem = null;
 
     public MemberRowFactory(DexIncludedController<?> controller) {
         this.controller = controller;
 
         // Create Context menu
+        copyItem = addItem( memberMenu, "Copy", e -> copyMember() );
         deleteItem = addItem( memberMenu, "Delete", e -> deleteMember() );
         newMenu = new Menu( "New" );
         // Create sub-menu for new objects
@@ -93,6 +95,17 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
             obj.getActionManager().run( DexActions.DELETELIBRARYMEMBER, (OtmLibraryMember) obj );
         else if (obj instanceof OtmAlias)
             obj.getActionManager().run( DexActions.DELETEALIAS, obj );
+        super.updateTreeItem( getTreeItem().getParent() );
+    }
+
+    private void copyMember() {
+        OtmObject obj = getValue();
+        if (obj instanceof OtmContributedFacet)
+            obj = ((OtmContributedFacet) obj).getContributor();
+        if (obj instanceof OtmLibraryMember)
+            obj.getActionManager().run( DexActions.COPYLIBRARYMEMBER, (OtmLibraryMember) obj );
+        // else if (obj instanceof OtmAlias)
+        // obj.getActionManager().run( DexActions.DELETEALIAS, obj );
         super.updateTreeItem( getTreeItem().getParent() );
     }
 

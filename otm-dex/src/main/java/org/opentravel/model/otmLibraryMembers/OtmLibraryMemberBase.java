@@ -33,6 +33,7 @@ import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmFacets.OtmFacetFactory;
 import org.opentravel.schemacompiler.codegen.util.FacetCodegenUtils;
+import org.opentravel.schemacompiler.model.LibraryElement;
 import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAlias;
@@ -179,6 +180,19 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     @Override
     public boolean contains(OtmObject o) {
         return children.contains( o );
+    }
+
+    @Override
+    public OtmLibraryMember copy() {
+        LibraryElement tlMember = null;
+        try {
+            tlMember = getTL().cloneElement();
+        } catch (Exception e) {
+            log.debug( "Error cloning." + getClass().getSimpleName() + " " + getName() );
+        }
+        if (tlMember instanceof LibraryMember)
+            return OtmLibraryMemberFactory.create( (LibraryMember) tlMember, getModelManager() );
+        return null;
     }
 
     @Override

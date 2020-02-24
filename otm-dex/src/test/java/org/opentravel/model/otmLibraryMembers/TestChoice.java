@@ -24,10 +24,13 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLProperty;
+
+import java.util.List;
 
 /**
  *
@@ -50,6 +53,24 @@ public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
         OtmChoiceObject ch = buildOtm( staticModelManager );
 
         assertNotNull( ch.getShared() );
+    }
+
+    @Override
+    public void testCopy(OtmLibraryMember member) {
+        // testTLCopy( member );
+        // testCopySteps( member ); // Test each step in the copy process
+
+        OtmChoiceObject co = (OtmChoiceObject) member;
+        assertTrue( "Given: must have contributed facet.", !co.getChildrenContributedFacets().isEmpty() );
+        List<OtmObject> kids_member = co.getChildren();
+
+        // When - copied
+        OtmChoiceObject copy = co.copy();
+
+        // Then
+        List<OtmObject> copy_member = copy.getChildren();
+        assertTrue( "Copy must not have contributed children.", copy.getChildrenContributedFacets().isEmpty() );
+        assertTrue( "Copy must not have choice facets.", copy.getTL().getChoiceFacets().isEmpty() );
     }
 
 
@@ -87,6 +108,8 @@ public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
 
         assertTrue( !ch.getChildren().isEmpty() );
         assertTrue( ch.getShared().getChildren().size() == 2 );
+
+        TestChoiceFacet.buildOtm( mgr, ch );
         return ch;
     }
 

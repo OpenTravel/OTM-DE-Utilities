@@ -32,12 +32,16 @@ import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmProperties.OtmAttribute;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
+import org.opentravel.schemacompiler.codegen.util.FacetCodegenUtils;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLExtensionOwner;
+import org.opentravel.schemacompiler.model.TLFacetOwner;
+import org.opentravel.schemacompiler.model.TLFacetType;
 import org.opentravel.schemacompiler.model.TLModelElement;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -113,6 +117,7 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         // Given - a member to use as base type with CF and contrib
         assertTrue( member != null );
         assertTrue( extension != null );
+        // assertTrue( extension.getLibrary() != null );
         assertTrue( member.getClass() == extension.getClass() );
         assertTrue( member.getTL() instanceof TLExtensionOwner );
 
@@ -125,16 +130,19 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         assertTrue( "Given",
             ((TLExtensionOwner) extension.getTL()).getExtension().getExtendsEntity() == member.getTL() );
 
-        // Then
-        // non-contextual facets will not be inherited.
-        List<OtmObject> cfKids = new ArrayList<>();
-        member.getChildren().forEach( c -> {
-            if (c instanceof OtmContributedFacet)
-                cfKids.add( c );
-        } );
+        if (member instanceof OtmChoiceObject) {
+            // Then - facet codegen utils reports out inherited children as used in to modelInheritedChildren()
+            List<TLContextualFacet> tlKids = ((OtmChoiceObject) member).getTL().getChoiceFacets();
+            assertTrue( "Given: there must be TL choice facets.", !tlKids.isEmpty() );
+            TLFacetOwner extendedOwner = (TLFacetOwner) extension.getTL();
+            List<TLContextualFacet> ghosts = FacetCodegenUtils.findGhostFacets( extendedOwner, TLFacetType.CHOICE );
+            assertTrue( "CodegenUtils must find ghost facets.", !ghosts.isEmpty() );
+        }
+
+        // Then - non-contextual facets will not be inherited.
+        Collection<OtmContributedFacet> cfKids = member.getChildrenContributedFacets();
         List<OtmObject> iKids = extension.getInheritedChildren();
         assertTrue( cfKids.size() == iKids.size() );
-        // ?? These are not the same contributed facet or TL object
     }
 
     public void testNestedContributedFacets(OtmContextualFacet nestedCF) {

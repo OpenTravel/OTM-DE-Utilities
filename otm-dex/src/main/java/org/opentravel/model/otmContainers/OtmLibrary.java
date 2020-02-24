@@ -26,6 +26,7 @@ import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmServiceObject;
 import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryPermission;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.BuiltInLibrary;
@@ -85,21 +86,35 @@ public class OtmLibrary {
     /**
      * Add the TL member to the Tl library and model manager.
      * <p>
+     * Note: will not add second member if one with the same name already is in TL library
+     * <p>
+     * Note: will not add second service and return null if attempted.
+     * <p>
      * <b>Note:</b> adds member to the model manager. See {@link OtmModelManager#add(OtmLibraryMember)}
      * 
      * @param a library member
      * @return the member if added OK
      */
     public OtmLibraryMember add(OtmLibraryMember member) {
+        // Libraries can only have 1 service
+        if (member instanceof OtmServiceObject && hasService())
+            return null;
+
         if (member != null && member.getTL() instanceof LibraryMember)
             try {
                 // make sure not already a member
                 if (getTL().getNamedMember( ((LibraryMember) member.getTL()).getLocalName() ) == null)
                     getTL().addNamedMember( (LibraryMember) member.getTL() );
-                else
+                else {
                     log.warn( "Did not add member " + member + " to library because it was already a member." );
+                    return null;
+                }
+                // Add to model manager
                 if (getModelManager() != null)
                     getModelManager().add( member );
+                // Sanity check
+                if (member.getTlLM().getOwningLibrary() != getTL())
+                    log.warn( "Member does not have correct owning library." );
                 return member;
             } catch (IllegalArgumentException e) {
                 log.warn( "Exception: " + e.getLocalizedMessage() );
@@ -281,6 +296,15 @@ public class OtmLibrary {
     }
 
     /**
+     * Get the members of this library from the model manager.
+     * 
+     * @return
+     */
+    public List<OtmLibraryMember> getMembers() {
+        return getModelManager().getMembers( this );
+    }
+
+    /**
      * @return the minor version number
      * @throws VersionSchemeException
      */
@@ -430,6 +454,13 @@ public class OtmLibrary {
      */
     public String getVersion() {
         return getTL().getVersion();
+    }
+
+    public boolean hasService() {
+        for (OtmLibraryMember m : getMembers())
+            if (m instanceof OtmServiceObject)
+                return true;
+        return false;
     }
 
     public boolean isBuiltIn() {

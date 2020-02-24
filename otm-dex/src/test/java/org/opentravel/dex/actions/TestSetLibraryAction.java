@@ -117,7 +117,7 @@ public class TestSetLibraryAction {
         assertTrue( "Given", member.getLibrary() == lib1 );
 
         SetLibraryAction setLibraryHandler =
-            (SetLibraryAction) DexActions.getAction( DexActions.SETMEMBERLIBRARY, member, actionManager );
+            (SetLibraryAction) DexActions.getAction( DexActions.SETLIBRARY, member, actionManager );
         assertTrue( "Given", setLibraryHandler != null );
 
         // When
@@ -158,7 +158,7 @@ public class TestSetLibraryAction {
 
         // The action to test
         SetLibraryAction setLibraryHandler =
-            (SetLibraryAction) DexActions.getAction( DexActions.SETMEMBERLIBRARY, assignedType, actionManager );
+            (SetLibraryAction) DexActions.getAction( DexActions.SETLIBRARY, assignedType, actionManager );
         assertTrue( "Given", setLibraryHandler != null );
 
         // When

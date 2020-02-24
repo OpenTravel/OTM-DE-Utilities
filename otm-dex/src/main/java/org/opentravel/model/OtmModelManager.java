@@ -902,7 +902,7 @@ public class OtmModelManager implements TaskResultHandlerI {
 
 
     /**
-     * @param library
+     * @param library, can be null
      * @return true if any library except the passed library is editable
      */
     public boolean hasEditableLibraries(OtmLibrary library) {

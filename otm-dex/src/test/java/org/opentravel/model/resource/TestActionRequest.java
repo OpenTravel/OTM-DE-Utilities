@@ -305,7 +305,7 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
             rq.setPathTemplate( "SOMETHING", false );
             ds = rq.getPathTemplateDefault();
             assertTrue( !ds.isEmpty() );
-            assertTrue( ds.equals( "/SOMETHING" ) );
+            assertTrue( ds.equals( "/" ) );
 
             // When Path set and id param group set
             // When - No params but path is set

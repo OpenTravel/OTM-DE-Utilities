@@ -75,6 +75,13 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     boolean contains(OtmObject o);
 
     /**
+     * Make and return a full copy of this library member. New member will not be in a library.
+     * 
+     * @return copy of member or null if it can not be copied
+     */
+    public OtmLibraryMember copy();
+
+    /**
      * Create a minor version of this library member.
      * 
      * @param minorLibrary

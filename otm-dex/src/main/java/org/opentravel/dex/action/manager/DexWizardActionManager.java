@@ -46,7 +46,7 @@ public class DexWizardActionManager extends DexActionManagerBase {
     public boolean isEnabled(DexActions action, OtmObject subject) {
         // If there is no library, make the user select that first
         if (subject.getLibrary() == null)
-            return action == DexActions.SETMEMBERLIBRARY;
+            return action == DexActions.SETLIBRARY;
         return true;
     }
 

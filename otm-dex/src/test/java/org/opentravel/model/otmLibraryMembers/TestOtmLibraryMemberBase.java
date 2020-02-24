@@ -129,6 +129,27 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
     }
 
     @Test
+    public void testCopy() {
+        testCopy( subject );
+    }
+
+    public void testCopy(OtmLibraryMember member) {
+        OtmLibraryMember copy = member.copy();
+        TestLibraryMemberBase.check( copy );
+
+        if (copy != null) {
+            assertTrue( copy.getClass() == member.getClass() );
+            List<OtmObject> memberDesc = member.getDescendants();
+            List<OtmObject> copyDesc = copy.getDescendants();
+
+            assertTrue( copy.getDescendants().size() == member.getDescendants().size() );
+
+            if (copy instanceof OtmChildrenOwner)
+                testChildrenOwner( copy );
+        }
+    }
+
+    @Test
     public void testTypeUser() {
         if (subject instanceof OtmTypeUser)
             testTypeUser( (OtmTypeUser) subject );

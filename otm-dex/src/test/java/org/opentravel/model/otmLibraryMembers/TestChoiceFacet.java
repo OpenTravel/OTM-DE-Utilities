@@ -55,35 +55,19 @@ public class TestChoiceFacet extends TestContextualFacet {
     @Before
     public void beforeTest() {
         member = TestChoice.buildOtm( staticModelManager );
-        cf = buildOtm( staticModelManager );
+        cf = buildOtm( staticModelManager, "AnotherCF" );
         contrib = (OtmContributedFacet) member.add( cf );
         testContributedFacet( contrib, cf, member );
     }
 
     @Test
     public void testInheritance() {
-        // OtmChoiceObject baseBo = TestChoice.buildOtm( staticModelManager );
-        // baseBo.setName( "BaseBO" );
-        // OtmContextualFacet inheritedCf = buildOtm( staticModelManager, baseBo );
-        // assertTrue( "Given", !inheritedCf.isInherited() );
-        //
-        // OtmChoiceObject bo = TestChoice.buildOtm( staticModelManager );
-        // OtmContextualFacet cf = buildOtm( staticModelManager, bo );
-        // bo.setName( "SubType" );
-        // assertTrue( "Given", !cf.isInherited() );
 
         OtmChoiceObject extension = TestChoice.buildOtm( staticModelManager );
+        extension.setName( extension.getName() + "x" );
+        extension.getChildrenContributedFacets().forEach( c -> c.setName( c.getName() + "x" ) );
+
         super.testCFInheritance( extension );
-        // // When - bo extends baseBo
-        // bo.setBaseType( baseBo );
-        // assertTrue( "Given", bo.getBaseType() == baseBo );
-        // assertTrue( "Given", bo.getTL().getExtension() != null );
-        // assertTrue( "Given", bo.getTL().getExtension().getExtendsEntity() == baseBo.getTL() );
-        //
-        // // Then
-        // List<OtmObject> ic1 = bo.getInheritedChildren();
-        // List<OtmObject> ic2 = baseBo.getInheritedChildren();
-        // // assertTrue( "Extension must have inherited CF", bo.getInheritedChildren().contains( inheritedCf ) );
     }
 
     @Test
@@ -167,34 +151,43 @@ public class TestChoiceFacet extends TestContextualFacet {
         assertFalse( co.getTL().getChoiceFacets().contains( cf2.getTL() ) );
     }
 
+    public void addAndTest(OtmLibraryMember m, OtmLibrary lib) {
+        assertTrue( "Add must return member.", lib.add( m ) == m );
+        assertTrue( m.getLibrary() == lib );
+        assertTrue( m.getModelManager().contains( m ) );
+    }
+
     @Test
     public void testDeletingAsLibraryMember() {
         // Given - a Choice object and contextual facet
         OtmChoiceObject co1 = TestChoice.buildOtm( staticModelManager );
-        OtmContextualFacet cf = buildOtm( staticModelManager );
-        OtmContributedFacet contrib = co1.add( cf );
-        // Given - a choice object and contextual facet
+        OtmContextualFacet cf1 = buildOtm( staticModelManager );
+        OtmContributedFacet contrib = co1.add( cf1 );
+
+        // Given - a second choice object and contextual facet
         OtmChoiceObject co2 = TestChoice.buildOtm( staticModelManager );
+        co2.setName( co2.getName() + "2" );
         OtmChoiceFacet cf2 = buildOtm( staticModelManager );
         OtmContributedFacet contrib2 = co2.add( cf2 );
+        cf2.setName( cf2.getName() + "2" );
 
         // Given - a library for the objects
         OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
-        lib.add( co1 );
-        lib.add( co2 );
-        lib.add( cf );
-        lib.add( cf2 );
-        assertTrue( cf.getLibrary() != null );
-        assertTrue( cf.getModelManager().contains( cf ) );
+        addAndTest( co1, lib );
+        addAndTest( co2, lib );
+        addAndTest( cf1, lib );
+        addAndTest( cf2, lib );
         //
-        testContributedFacet( contrib, cf, co1 );
+        testContributedFacet( contrib, cf1, co1 );
         testContributedFacet( contrib2, cf2, co2 );
 
         // When deleted
-        lib.delete( cf );
-        assertFalse( cf.getModelManager().contains( cf ) );
-        assertFalse( co1.getChildren().contains( contrib ) );
-        assertFalse( co1.getTL().getChoiceFacets().contains( cf.getTL() ) );
+        lib.delete( cf1 );
+        assertFalse( "Library member must be removed from model manager.", cf1.getModelManager().contains( cf ) );
+        assertFalse( "Choice object must not have the removed contributed facet.",
+            co1.getChildren().contains( contrib ) );
+        assertFalse( "TL Choice must not contain the tl Facet.",
+            co1.getTL().getChoiceFacets().contains( cf1.getTL() ) );
         //
         lib.delete( cf2 );
         assertFalse( co2.getChildren().contains( contrib2 ) );
@@ -225,6 +218,19 @@ public class TestChoiceFacet extends TestContextualFacet {
         OtmChoiceFacet cf = buildOtm( modelManager );
         bo.add( cf );
         return cf;
+    }
+
+    /**
+     * Build a choice facet. It will not have where contributed or children! Contributed to a new choice object.
+     * 
+     * @param mgr
+     * @param name
+     * @return
+     */
+    public static OtmChoiceFacet buildOtm(OtmModelManager mgr, String name) {
+        OtmChoiceFacet newFacet = buildOtm( mgr );
+        newFacet.setName( name );
+        return newFacet;
     }
 
     /**
