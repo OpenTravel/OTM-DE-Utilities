@@ -53,11 +53,13 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
     MenuItem deleteItem = null;
     MenuItem validateItem = null;
     MenuItem copyItem = null;
+    MenuItem addAliasItem = null;
 
     public MemberRowFactory(DexIncludedController<?> controller) {
         this.controller = controller;
 
         // Create Context menu
+        copyItem = addItem( memberMenu, "Add Alias", e -> addAlias() );
         copyItem = addItem( memberMenu, "Copy", e -> copyMember() );
         deleteItem = addItem( memberMenu, "Delete", e -> deleteMember() );
         newMenu = new Menu( "New" );
@@ -95,6 +97,15 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
             obj.getActionManager().run( DexActions.DELETELIBRARYMEMBER, (OtmLibraryMember) obj );
         else if (obj instanceof OtmAlias)
             obj.getActionManager().run( DexActions.DELETEALIAS, obj );
+        super.updateTreeItem( getTreeItem().getParent() );
+    }
+
+    private void addAlias() {
+        OtmObject obj = getValue();
+        if (obj instanceof OtmContributedFacet)
+            return;
+        if (obj instanceof OtmLibraryMember)
+            obj.getActionManager().run( DexActions.ADDALIAS, (OtmLibraryMember) obj );
         super.updateTreeItem( getTreeItem().getParent() );
     }
 
