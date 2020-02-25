@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.DexFileHandler;
-import org.opentravel.common.DialogBox;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.popup.CompileDialogController;
@@ -28,6 +27,7 @@ import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.controllers.popup.NewLibraryDialogController;
 import org.opentravel.dex.controllers.popup.NewProjectDialogController;
+import org.opentravel.dex.controllers.popup.SaveAndExitDialogController;
 import org.opentravel.dex.controllers.popup.WebViewDialogController;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.dex.events.DexEvent;
@@ -197,11 +197,18 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
             selectedRepository = ((DexRepositorySelectionEvent) event).getRepository();
     }
 
+    /**
+     * Prompt user to save work and exit, or cancel.
+     */
     @FXML
     public void appExit(Event e) {
-        // log.debug( "exit" );
+        // Use save and exit controller with will prompt user to save if it finds there are changes in the queue
+        SaveAndExitDialogController controller = SaveAndExitDialogController.init();
+        controller.setModelManager( modelMgr );
+        controller.showAndWait( "" );
         e.consume(); // take the event away from windows in case they answer no.
-        if (DialogBox.display( "Exit", "Please confirm you want to exit." ))
+
+        if (controller.okResult())
             stage.close();
     }
 
@@ -269,6 +276,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     @FXML
     public void doCompile(ActionEvent e) {
+        // FIXME - if not saved, save now
         CompileDialogController cdc = CompileDialogController.init();
         cdc.configure( modelMgr, userSettings, mainController.getStatusController() );
         cdc.show( "" );

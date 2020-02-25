@@ -73,6 +73,9 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         // Only implement if needed for this controller
     }
 
+    /**
+     * Clear, close stage and set result to Cancel
+     */
     public void doCancel() {
         clear();
         popupStage.close();
@@ -87,6 +90,9 @@ public abstract class DexPopupControllerBase implements DexPopupController {
             launchedFromMenuItem.setDisable( false );
     }
 
+    /**
+     * Clear, close stage and set result to OK
+     */
     public void doOK() {
         clear();
         popupStage.close();

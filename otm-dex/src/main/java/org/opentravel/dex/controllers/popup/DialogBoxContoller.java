@@ -38,11 +38,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
- * Controller for dialog box pop-up menu. LAYOUT_FILE = "/DialogBox.fxml"
+ * Controller for MODAL dialog box pop-up menu. LAYOUT_FILE = "/DialogBox.fxml"
  * <p>
  * Note: must be in same directory as primary controller or it will not get injected with FXML objects.
  * <p>
- * This MUST be constructed by passing an FXMLLoader instance which needs access to default constructor.
+ * Use the static init() method to create this controller or else this MUST be constructed by passing an FXMLLoader
+ * instance which needs access to default constructor.
  * 
  * @author dmh
  *
@@ -50,7 +51,7 @@ import javafx.stage.Stage;
 public class DialogBoxContoller extends DexPopupControllerBase {
     private static Log log = LogFactory.getLog( DialogBoxContoller.class );
 
-    public static final String LAYOUT_FILE = "/DialogBox.fxml";
+    public static final String LAYOUT_FILE = "/Dialogs/DialogBox.fxml";
 
     @FXML
     BorderPane dialogBox;
@@ -86,8 +87,6 @@ public class DialogBoxContoller extends DexPopupControllerBase {
             throw new IllegalStateException( "Missing stage." );
         if (dialogButtonClose == null)
             throw new IllegalStateException( "Missing close." );
-        // if (dialogButtonOK == null)
-        // throw new IllegalStateException("Missing ok.");
         if (dialogTitle == null)
             throw new IllegalStateException( "Missing title." );
         if (dialogText == null)
@@ -169,6 +168,37 @@ public class DialogBoxContoller extends DexPopupControllerBase {
     }
 
     /**
+     * Show the title and message in a pop-up dialog window.
+     * 
+     * @param title
+     * @param message
+     */
+    public void showAndWait(String title, String message) {
+        setTitle( title );
+        showAndWait( message );
+    }
+
+    /**
+     * Show dialog with OK and Close buttons and wait for an answer.
+     */
+    @Override
+    public Results showAndWait(String message) {
+
+        dialogButtonClose.setOnAction( e -> close() );
+
+        if (dialogButtonOK != null) {
+            dialogButtonOK.setVisible( false );
+            dialogButtonOK.setOnAction( e -> doOK() );
+        }
+
+        dialogTitle.getChildren().clear();
+        dialogTitle.getChildren().add( new Text( title ) );
+        dialogText.setText( message );
+
+        return super.showAndWait( message );
+    }
+
+    /**
      * Add the message to the displayed text
      * 
      * @param message
@@ -184,8 +214,9 @@ public class DialogBoxContoller extends DexPopupControllerBase {
     }
 
     public void close() {
-        clear();
-        dialogStage.close();
+        super.doCancel();
+        // clear();
+        // dialogStage.close();
     }
 
     @Override

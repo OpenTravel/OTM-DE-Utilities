@@ -16,6 +16,8 @@
 
 package org.opentravel.common;
 
+import org.opentravel.dex.controllers.popup.DialogBoxContoller;
+
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -25,9 +27,11 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
+ * @deprecated - use {@link DialogBoxContoller}
  * @author dmh
  *
  */
+@Deprecated
 public class DialogBox {
     static boolean answer;
     private static String cancelText = "Cancel";
