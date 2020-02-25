@@ -20,8 +20,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmAlias;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.TLAlias;
+import org.opentravel.schemacompiler.model.TLAliasOwner;
 
 /**
  * This action creates a new OtmAlias the subject library member.
@@ -36,6 +38,10 @@ public class AddAliasAction extends DexRunAction {
      * @return
      */
     public static boolean isEnabled(OtmObject subject) {
+        if (subject == null || !(subject.getTL() instanceof TLAliasOwner))
+            return false;
+        if (subject instanceof OtmContextualFacet)
+            return false; // unsupported operation exception thrown
         return subject instanceof OtmLibraryMember && subject.isEditable();
     }
 
@@ -53,7 +59,12 @@ public class AddAliasAction extends DexRunAction {
     @Override
     public Object doIt(Object data) {
         String name = data instanceof String ? (String) data : "NewAliasName";
-        newAlias = new OtmAlias( new TLAlias(), getSubject() );
+        try {
+            newAlias = new OtmAlias( new TLAlias(), getSubject() );
+        } catch (Exception e) {
+            log.debug( "Error creating alias." );
+            return null;
+        }
         newAlias.setName( name );
         return newAlias;
     }
@@ -116,7 +127,7 @@ public class AddAliasAction extends DexRunAction {
 
     @Override
     public boolean setSubject(OtmObject subject) {
-        if (subject instanceof OtmLibraryMember)
+        if (isEnabled( subject ))
             otm = subject;
         return otm != null;
     }

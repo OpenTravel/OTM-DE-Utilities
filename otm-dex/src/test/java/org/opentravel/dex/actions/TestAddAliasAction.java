@@ -25,10 +25,9 @@ import org.junit.Test;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
-import org.opentravel.model.otmContainers.TestLibrary;
+import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.otmLibraryMembers.OtmServiceObject;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestLibraryMemberBase;
 import org.opentravel.schemacompiler.model.TLLibrary;
@@ -67,62 +66,52 @@ public class TestAddAliasAction {
     public void testGettingAction() {
         assertTrue( "Given: ", globalBO.getActionManager() instanceof DexFullActionManager );
         // When - Then
-        assertTrue( getAction() instanceof CopyLibraryMemberAction );
+        assertTrue( getAction( globalBO ) instanceof AddAliasAction );
     }
 
-    public CopyLibraryMemberAction getAction() {
-        assertTrue( "Given: ", globalBO.getActionManager() instanceof DexFullActionManager );
+    public AddAliasAction getAction(OtmLibraryMember member) {
+        assertTrue( "Given: ", member.getActionManager() instanceof DexFullActionManager );
         // When
         DexAction<?> action = null;
         try {
-            action = DexActions.getAction( DexActions.COPYLIBRARYMEMBER, globalBO, globalBO.getActionManager() );
+            action = DexActions.getAction( DexActions.ADDALIAS, member, globalBO.getActionManager() );
         } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException e) {
             log.debug( "Error getting action. " + e.getMessage() );
         }
         // Then
-        assertTrue( action instanceof CopyLibraryMemberAction );
-        return (CopyLibraryMemberAction) action;
+        // assertTrue( action instanceof AddAliasAction );
+        return (AddAliasAction) action;
     }
 
     @Test
     public void testDoIt() {
         // Given - library with one of each member type in it
         TestLibraryMemberBase.buildOneOfEachWithProperties( staticModelManager, lib );
-        // Given - another library to copy to
-        OtmLibrary targetLib = TestLibrary.buildOtm( staticModelManager );
-        assertTrue( "Given: ", targetLib.isEditable() );
-        // Given - the action
-        CopyLibraryMemberAction action = getAction();
+        // Given - initial size of library
+        int initialSize = lib.getMembers().size();
 
-        // When - copy each member in lib to target lib
+        // When - For each library member type, add then remove alias
         for (OtmLibraryMember lm : staticModelManager.getMembers( lib )) {
-            action.setSubject( lm );
-            action.doIt( targetLib );
+            // Given - the action
+            AddAliasAction action = getAction( lm );
+
+            // Skip those that are not enabled and do not return an action
+            if (action == null)
+                continue; // Not all library members can have aliases
+
+            // When - executed
+            Object a = action.doIt();
+            // Then
+            assertTrue( "Must have an alias.", a instanceof OtmAlias );
+            assertTrue( lm.getChildren().contains( a ) );
+
+            // When - undone
+            action.undoIt();
+            // Then
+            assertTrue( "Must not have  alias.", !lm.getChildren().contains( a ) );
         }
         // Then -
-        assertTrue( "targetLib has members.", !targetLib.getMembers().isEmpty() );
-        assertTrue( "Both libraries must be same size.", lib.getMembers().size() == targetLib.getMembers().size() );
-
-        //
-        // When - run with copy being added to source library
-        int initialSize = lib.getMembers().size();
-        int currentSize = 0;
-        int copies = 0;
-        for (OtmLibraryMember lm : staticModelManager.getMembers( lib )) {
-            action.setSubject( lm );
-            if (action.doIt( lib ) != null)
-                copies++;
-            else
-                assertTrue( "Must fail to copy service to same library.", lm instanceof OtmServiceObject );
-            currentSize = lib.getMembers().size();
-            assertTrue( "Must have new member count.", lib.getMembers().size() == initialSize + copies );
-        }
-        int finalSize = lib.getMembers().size();
-        assertTrue( "Must have 2x member count.", lib.getMembers().size() == initialSize + copies );
+        assertTrue( "Library must be same size.", lib.getMembers().size() == initialSize );
     }
 
-    // @Test
-    // public void testObjectsWithContextualFacets() {
-    // // TODO
-    // }
 }
