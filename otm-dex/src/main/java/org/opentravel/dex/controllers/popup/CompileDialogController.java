@@ -116,6 +116,8 @@ public class CompileDialogController extends DexPopupControllerBase implements T
     }
 
     @FXML
+    private Button saveButton;
+    @FXML
     Button closeButton;
     @FXML
     Button compileButton;
@@ -188,7 +190,7 @@ public class CompileDialogController extends DexPopupControllerBase implements T
 
     @Override
     public void checkNodes() {
-        if (projectChoiceBox == null || targetDirectoryField == null || compileButton == null)
+        if (saveButton == null || projectChoiceBox == null || targetDirectoryField == null || compileButton == null)
             throw new IllegalStateException( "Missing injected field." );
     }
 
@@ -319,7 +321,13 @@ public class CompileDialogController extends DexPopupControllerBase implements T
         super.doOK(); // all OK - close window
     }
 
-
+    @FXML
+    public void doSave() {
+        // log.debug( "Run save task" );
+        DialogBoxContoller dialogBox = DialogBoxContoller.init();
+        String results = DexFileHandler.saveLibraries( modelMgr.getEditableLibraries() );
+        dialogBox.showAndWait( "Save Results", results );
+    }
 
     /**
      * 
@@ -348,7 +356,13 @@ public class CompileDialogController extends DexPopupControllerBase implements T
                 projectChoiceBox.getSelectionModel().select( 0 );
             selectedProject = projectChoiceBox.getSelectionModel().getSelectedItem();
             post( CompileProjectTask.getCompileDirectory( selectedProject ) );
+
+            // Enable save button if there are changes in the queue
+            if (mgr.getActionManager( true ) != null && mgr.getActionManager( true ).getQueueSize() > 0) {
+                saveButton.setDisable( false );
+            }
         }
+
     }
 
     private void post(ValidationFindings findings) {
@@ -377,6 +391,7 @@ public class CompileDialogController extends DexPopupControllerBase implements T
         checkNodes();
 
         // Get the projects from project manager
+        saveButton.setDisable( true );
         post( modelMgr );
 
         maxRepeatSpinner.setValueFactory( new IntegerSpinnerValueFactory( 1, 3, 3, 1 ) );

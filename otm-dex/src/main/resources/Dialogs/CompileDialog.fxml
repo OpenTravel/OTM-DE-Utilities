@@ -13,7 +13,6 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -25,51 +24,42 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.TextFlow?>
 
-<BorderPane fx:id="newLibraryDialog" maxHeight="-Infinity"
-	maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-	prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1"
-	xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.popup.CompileDialogController">
+<BorderPane fx:id="newLibraryDialog" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.popup.CompileDialogController">
 	<top>
-		<VBox prefHeight="58.0" prefWidth="600.0" styleClass="menu-bar"
-			stylesheets="@../DavesViper.css" BorderPane.alignment="CENTER">
+		<VBox prefHeight="58.0" prefWidth="600.0" styleClass="menu-bar" stylesheets="@../DavesViper.css" BorderPane.alignment="CENTER">
 			<children>
-				<Label fx:id="dialogTitleLabel" style="-fx-alignment: center;"
-					styleClass="bold-label" stylesheets="@../DavesViper.css" text="">
+				<Label fx:id="dialogTitleLabel" style="-fx-alignment: center;" styleClass="bold-label" stylesheets="@../DavesViper.css" text="">
 					<VBox.margin>
 						<Insets left="20.0" top="10.0" />
 					</VBox.margin>
 				</Label>
-				<TextFlow fx:id="dialogHelp" prefHeight="45.0" prefWidth="600.0"
-					styleClass="label" stylesheets="@../DavesViper.css">
+				<TextFlow fx:id="dialogHelp" prefHeight="45.0" prefWidth="600.0" styleClass="label" stylesheets="@../DavesViper.css">
 					<VBox.margin>
 						<Insets left="20.0" />
 					</VBox.margin>
 				</TextFlow>
-				<Label fx:id="dialogTitleLabel2" style="-fx-alignment: center;"
-					styleClass="bold-label" stylesheets="@../DavesViper.css" text="" />
+				<Label fx:id="dialogTitleLabel2" style="-fx-alignment: center;" styleClass="bold-label" stylesheets="@../DavesViper.css" text="" />
 			</children>
 		</VBox>
 	</top>
 	<bottom>
-		<ButtonBar prefHeight="11.0" prefWidth="570.0"
-			BorderPane.alignment="CENTER">
+		<ButtonBar prefHeight="11.0" prefWidth="570.0" BorderPane.alignment="CENTER">
 			<BorderPane.margin>
 				<Insets bottom="5.0" left="10.0" right="20.0" top="5.0" />
 			</BorderPane.margin>
 			<buttons>
-				<Button fx:id="compileButton" onAction="#doCompile"
-					alignment="CENTER" contentDisplay="CENTER" layoutX="419.0" layoutY="10.0"
-					mnemonicParsing="false" prefWidth="140.0" styleClass="button-blue"
-					stylesheets="@../DavesViper.css" text="Compile" textAlignment="CENTER">
+            <Button fx:id="saveButton" alignment="CENTER" contentDisplay="CENTER" layoutX="139.0" layoutY="10.0" mnemonicParsing="false" onAction="#doSave" prefWidth="140.0" styleClass="button-blue" stylesheets="@../DavesViper.css" text="Save" textAlignment="CENTER">
+               <opaqueInsets>
+                  <Insets bottom="10.0" />
+               </opaqueInsets>
+            </Button>
+				<Button fx:id="compileButton" alignment="CENTER" contentDisplay="CENTER" layoutX="419.0" layoutY="10.0" mnemonicParsing="false" onAction="#doCompile" prefWidth="140.0" styleClass="button-blue" stylesheets="@../DavesViper.css" text="Compile" textAlignment="CENTER">
 					<opaqueInsets>
 						<Insets bottom="10.0" />
 					</opaqueInsets>
 				</Button>
 				<Separator orientation="VERTICAL" />
-				<Button fx:id="closeButton" onAction="#doOK" alignment="CENTER"
-					contentDisplay="CENTER" mnemonicParsing="false" prefWidth="140.0"
-					styleClass="button-red" stylesheets="@../DavesViper.css" text="Close"
-					textAlignment="CENTER">
+				<Button fx:id="closeButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#doOK" prefWidth="140.0" styleClass="button-red" stylesheets="@../DavesViper.css" text="Close" textAlignment="CENTER">
 					<opaqueInsets>
 						<Insets bottom="10.0" />
 					</opaqueInsets>
@@ -79,60 +69,44 @@
 	</bottom>
 	<center>
 
-		<SplitPane minHeight="-Infinity" prefHeight="20.0"
-			prefWidth="200.0" BorderPane.alignment="CENTER">
+		<SplitPane minHeight="-Infinity" prefHeight="20.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 			<items>
-				<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0"
-					prefWidth="100.0">
+				<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
 					<children>
-						<VBox layoutX="117.0" layoutY="53.0" prefHeight="20.0"
-							prefWidth="100.0" AnchorPane.bottomAnchor="0.0"
-							AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-							AnchorPane.topAnchor="0.0">
+						<VBox layoutX="117.0" layoutY="53.0" prefHeight="20.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 							<children>
 								<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
 									<columnConstraints>
 										<ColumnConstraints minWidth="-Infinity" />
-										<ColumnConstraints hgrow="SOMETIMES"
-											maxWidth="1.7976931348623157E308" minWidth="10.0" />
+										<ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" />
 										<ColumnConstraints hgrow="SOMETIMES" />
 									</columnConstraints>
 									<rowConstraints>
-										<RowConstraints minHeight="10.0" prefHeight="30.0"
-											vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0"
-											vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
 										<RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
 									</rowConstraints>
 									<children>
-										<Label text="Target Directory" GridPane.halignment="RIGHT"
-											GridPane.valignment="CENTER">
+										<Label text="Target Directory" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
 											<padding>
 												<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 											</padding>
 										</Label>
-										<Label text="Project" GridPane.halignment="RIGHT"
-											GridPane.rowIndex="1" GridPane.valignment="CENTER">
+										<Label text="Project" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
 											<padding>
 												<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 											</padding>
 										</Label>
-										<TextField fx:id="targetDirectoryField" editable="false"
-											style="-fx-background-color: #EEE; -fx-border-color: #888; -fx-border-radius: 3;"
-											GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-										<Button fx:id="targetDirectoryButton" mnemonicParsing="false"
-											onAction="#selectTargetDirectory" text="..."
-											GridPane.columnIndex="2">
+										<TextField fx:id="targetDirectoryField" editable="false" style="-fx-background-color: #EEE; -fx-border-color: #888; -fx-border-radius: 3;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+										<Button fx:id="targetDirectoryButton" mnemonicParsing="false" onAction="#selectTargetDirectory" text="..." GridPane.columnIndex="2">
 											<GridPane.margin>
 												<Insets left="5.0" />
 											</GridPane.margin>
 										</Button>
-										<ChoiceBox fx:id="projectChoiceBox" prefHeight="26.0" onAction="#selectProject"
-											GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" GridPane.rowIndex="1" />
+										<ChoiceBox fx:id="projectChoiceBox" onAction="#selectProject" prefHeight="26.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
 										<TextField fx:id="descriptionField" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
 										</TextField>
-										<Label text="Description" GridPane.halignment="RIGHT"
-											GridPane.rowIndex="2" GridPane.valignment="TOP">
+										<Label text="Description" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP">
 											<padding>
 												<Insets bottom="5.0" left="5.0" right="5.0" top="7.0" />
 											</padding>
@@ -145,162 +119,99 @@
 										<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 									</padding>
 								</GridPane>
-								<Accordion fx:id="releaseAccordion" minHeight="20.0"
-									prefHeight="20.0" VBox.vgrow="ALWAYS">
+								<Accordion fx:id="releaseAccordion" minHeight="20.0" prefHeight="20.0" VBox.vgrow="ALWAYS">
 									<panes>
-										<TitledPane expanded="false" minHeight="20.0"
-											prefHeight="20.0" text="Compiler Options">
+										<TitledPane expanded="false" minHeight="20.0" prefHeight="20.0" text="Compiler Options">
 											<content>
-												<ScrollPane fx:id="optionsScrollPane" fitToWidth="true"
-													maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+												<ScrollPane fx:id="optionsScrollPane" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
 													<content>
-														<AnchorPane maxHeight="1.7976931348623157E308"
-															maxWidth="1.7976931348623157E308" minHeight="0.0"
-															minWidth="0.0">
+														<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
 															<children>
-																<VBox maxWidth="1.7976931348623157E308" minHeight="200.0"
-																	AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-																	AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+																<VBox maxWidth="1.7976931348623157E308" minHeight="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 																	<children>
-																		<GridPane maxHeight="1.7976931348623157E308"
-																			maxWidth="1.7976931348623157E308" minHeight="-Infinity"
-																			VBox.vgrow="ALWAYS">
+																		<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" VBox.vgrow="ALWAYS">
 																			<columnConstraints>
 																				<ColumnConstraints minWidth="10.0" />
-																				<ColumnConstraints hgrow="ALWAYS"
-																					minWidth="10.0" prefWidth="100.0" />
+																				<ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
 																			</columnConstraints>
 																			<rowConstraints>
-																				<RowConstraints minHeight="10.0"
-																					prefHeight="30.0" vgrow="SOMETIMES" />
-																				<RowConstraints minHeight="10.0"
-																					prefHeight="30.0" vgrow="SOMETIMES" />
-																				<RowConstraints minHeight="10.0"
-																					prefHeight="30.0" vgrow="SOMETIMES" />
-																				<RowConstraints minHeight="10.0"
-																					prefHeight="30.0" vgrow="SOMETIMES" />
-																				<RowConstraints minHeight="10.0"
-																					prefHeight="30.0" vgrow="SOMETIMES" />
-																				<RowConstraints minHeight="10.0"
-																					prefHeight="30.0" vgrow="SOMETIMES" />
-																				<RowConstraints minHeight="10.0"
-																					prefHeight="30.0" vgrow="SOMETIMES" />
-																				<RowConstraints minHeight="10.0"
-																					prefHeight="30.0" vgrow="SOMETIMES" />
-																				<RowConstraints minHeight="10.0"
-																					prefHeight="30.0" vgrow="SOMETIMES" />
-																				<RowConstraints minHeight="10.0"
-																					prefHeight="30.0" vgrow="SOMETIMES" />
+																				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+																				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+																				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+																				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+																				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+																				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+																				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+																				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+																				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+																				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
 																			</rowConstraints>
 																			<children>
-																				<Label text="Binding Style"
-																					GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+																				<Label text="Binding Style" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
 																					<padding>
-																						<Insets bottom="5.0" left="5.0" right="5.0"
-																							top="5.0" />
+																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Compile XML Schemas"
-																					GridPane.halignment="RIGHT" GridPane.rowIndex="1"
-																					GridPane.valignment="CENTER">
+																				<Label text="Compile XML Schemas" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
 																					<padding>
-																						<Insets bottom="5.0" left="5.0" right="5.0"
-																							top="5.0" />
+																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Compile Services"
-																					GridPane.halignment="RIGHT" GridPane.rowIndex="2"
-																					GridPane.valignment="CENTER">
+																				<Label text="Compile Services" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
 																					<padding>
-																						<Insets bottom="5.0" left="5.0" right="5.0"
-																							top="5.0" />
+																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Compile JSON Schemas"
-																					GridPane.halignment="RIGHT" GridPane.rowIndex="3"
-																					GridPane.valignment="CENTER">
+																				<Label text="Compile JSON Schemas" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
 																					<padding>
-																						<Insets bottom="5.0" left="5.0" right="5.0"
-																							top="5.0" />
+																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Compile Swagger"
-																					GridPane.halignment="RIGHT" GridPane.rowIndex="4"
-																					GridPane.valignment="CENTER">
+																				<Label text="Compile Swagger" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
 																					<padding>
-																						<Insets bottom="5.0" left="5.0" right="5.0"
-																							top="5.0" />
+																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Compile Documentation"
-																					GridPane.halignment="RIGHT" GridPane.rowIndex="5"
-																					GridPane.valignment="CENTER">
+																				<Label text="Compile Documentation" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
 																					<padding>
-																						<Insets bottom="5.0" left="5.0" right="5.0"
-																							top="5.0" />
+																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Service Endpoint URL"
-																					GridPane.halignment="RIGHT" GridPane.rowIndex="6"
-																					GridPane.valignment="CENTER">
+																				<Label text="Service Endpoint URL" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
 																					<padding>
-																						<Insets bottom="5.0" left="5.0" right="5.0"
-																							top="5.0" />
+																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Base Resource URL"
-																					GridPane.halignment="RIGHT" GridPane.rowIndex="7"
-																					GridPane.valignment="CENTER">
+																				<Label text="Base Resource URL" GridPane.halignment="RIGHT" GridPane.rowIndex="7" GridPane.valignment="CENTER">
 																					<padding>
-																						<Insets bottom="5.0" left="5.0" right="5.0"
-																							top="5.0" />
+																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Suppress OTM Extensions"
-																					GridPane.halignment="RIGHT" GridPane.rowIndex="8"
-																					GridPane.valignment="CENTER">
+																				<Label text="Suppress OTM Extensions" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.valignment="CENTER">
 																					<padding>
-																						<Insets bottom="5.0" left="5.0" right="5.0"
-																							top="5.0" />
+																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<ChoiceBox fx:id="bindingStyleChoice"
-																					prefHeight="25.0" prefWidth="75.0"
-																					GridPane.columnIndex="1" />
-																				<CheckBox fx:id="compileXmlSchemasCheckbox"
-																					mnemonicParsing="false" GridPane.columnIndex="1"
-																					GridPane.rowIndex="1" />
-																				<CheckBox fx:id="compileServicesCheckbox"
-																					mnemonicParsing="false" GridPane.columnIndex="1"
-																					GridPane.rowIndex="2" />
-																				<CheckBox fx:id="compileJsonSchemasCheckbox"
-																					mnemonicParsing="false" GridPane.columnIndex="1"
-																					GridPane.rowIndex="3" />
-																				<CheckBox fx:id="compileSwaggerCheckbox"
-																					mnemonicParsing="false" GridPane.columnIndex="1"
-																					GridPane.rowIndex="4" />
-																				<CheckBox fx:id="compileDocumentationCheckbox"
-																					mnemonicParsing="false" GridPane.columnIndex="1"
-																					GridPane.rowIndex="5" />
-																				<CheckBox fx:id="suppressExtensionsCheckbox"
-																					mnemonicParsing="false" GridPane.columnIndex="1"
-																					GridPane.rowIndex="8" />
-																				<TextField fx:id="serviceEndpointUrl"
-																					GridPane.columnIndex="1" GridPane.rowIndex="6">
+																				<ChoiceBox fx:id="bindingStyleChoice" prefHeight="25.0" prefWidth="75.0" GridPane.columnIndex="1" />
+																				<CheckBox fx:id="compileXmlSchemasCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+																				<CheckBox fx:id="compileServicesCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+																				<CheckBox fx:id="compileJsonSchemasCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+																				<CheckBox fx:id="compileSwaggerCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+																				<CheckBox fx:id="compileDocumentationCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+																				<CheckBox fx:id="suppressExtensionsCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+																				<TextField fx:id="serviceEndpointUrl" GridPane.columnIndex="1" GridPane.rowIndex="6">
 																					<GridPane.margin>
 																						<Insets right="5.0" />
 																					</GridPane.margin>
 																				</TextField>
-																				<TextField fx:id="baseResourceUrl"
-																					GridPane.columnIndex="1" GridPane.rowIndex="7">
+																				<TextField fx:id="baseResourceUrl" GridPane.columnIndex="1" GridPane.rowIndex="7">
 																					<GridPane.margin>
 																						<Insets right="5.0" />
 																					</GridPane.margin>
 																				</TextField>
 																				<HBox GridPane.rowIndex="9">
 																					<children>
-																						<CheckBox fx:id="generateExamplesCheckbox"
-																							mnemonicParsing="false">
+																						<CheckBox fx:id="generateExamplesCheckbox" mnemonicParsing="false">
 																							<HBox.margin>
 																								<Insets left="10.0" right="5.0" top="15.0" />
 																							</HBox.margin>
@@ -314,68 +225,46 @@
 																				</HBox>
 																			</children>
 																		</GridPane>
-																		<GridPane prefWidth="483.0"
-																			style="-fx-border-color: black; -fx-border-width: 0.5; -fx-border-radius: 5;">
+																		<GridPane prefWidth="483.0" style="-fx-border-color: black; -fx-border-width: 0.5; -fx-border-radius: 5;">
 																			<columnConstraints>
-																				<ColumnConstraints hgrow="SOMETIMES"
-																					minWidth="10.0" />
-																				<ColumnConstraints hgrow="ALWAYS"
-																					minWidth="10.0" prefWidth="100.0" />
+																				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+																				<ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
 																			</columnConstraints>
 																			<rowConstraints>
-																				<RowConstraints minHeight="10.0"
-																					prefHeight="30.0" vgrow="SOMETIMES" />
-																				<RowConstraints minHeight="10.0"
-																					prefHeight="30.0" vgrow="SOMETIMES" />
-																				<RowConstraints minHeight="10.0"
-																					vgrow="SOMETIMES" />
-																				<RowConstraints minHeight="10.0"
-																					prefHeight="30.0" vgrow="SOMETIMES" />
-																				<RowConstraints maxHeight="5.0"
-																					minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
+																				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+																				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+																				<RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+																				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+																				<RowConstraints maxHeight="5.0" minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
 																			</rowConstraints>
 																			<VBox.margin>
-																				<Insets bottom="10.0" left="10.0" right="10.0"
-																					top="10.0" />
+																				<Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
 																			</VBox.margin>
 																			<children>
 																				<Label text="Max Details" GridPane.halignment="RIGHT">
 																					<padding>
-																						<Insets bottom="5.0" left="5.0" right="5.0"
-																							top="5.0" />
+																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Max Repeat Count"
-																					GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+																				<Label text="Max Repeat Count" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
 																					<padding>
-																						<Insets bottom="5.0" left="5.0" right="5.0"
-																							top="5.0" />
+																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Max Recursion Depth"
-																					GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+																				<Label text="Max Recursion Depth" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
 																					<padding>
-																						<Insets bottom="5.0" left="5.0" right="5.0"
-																							top="5.0" />
+																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Suppress Optional Fields"
-																					GridPane.halignment="RIGHT" GridPane.rowIndex="3">
+																				<Label text="Suppress Optional Fields" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
 																					<padding>
-																						<Insets bottom="5.0" left="5.0" right="5.0"
-																							top="5.0" />
+																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<CheckBox fx:id="exampleMaxDetailCheckbox"
-																					mnemonicParsing="false" GridPane.columnIndex="1" />
-																				<Spinner fx:id="maxRepeatSpinner" prefWidth="100.0"
-																					GridPane.columnIndex="1" GridPane.rowIndex="1" />
-																				<Spinner fx:id="maxRecursionDepthSpinner"
-																					prefWidth="100.0" GridPane.columnIndex="1"
-																					GridPane.rowIndex="2" />
-																				<CheckBox fx:id="suppressOptionalFieldsCheckbox"
-																					mnemonicParsing="false" GridPane.columnIndex="1"
-																					GridPane.rowIndex="3" />
+																				<CheckBox fx:id="exampleMaxDetailCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" />
+																				<Spinner fx:id="maxRepeatSpinner" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+																				<Spinner fx:id="maxRecursionDepthSpinner" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+																				<CheckBox fx:id="suppressOptionalFieldsCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 																			</children>
 																		</GridPane>
 																	</children>
@@ -389,24 +278,15 @@
 												</ScrollPane>
 											</content>
 										</TitledPane>
-										<TitledPane fx:id="resultsPane" expanded="false" minHeight="20.0"
-											prefHeight="20.0" text="Results">
+										<TitledPane fx:id="resultsPane" expanded="false" minHeight="20.0" prefHeight="20.0" text="Results">
 											<content>
-												<AnchorPane minHeight="100.0" minWidth="0.0"
-													prefHeight="180.0" prefWidth="200.0">
+												<AnchorPane minHeight="100.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
 													<children>
-														<TableView fx:id="resultsTableView" minHeight="100.0"
-															prefHeight="200.0" prefWidth="200.0"
-															AnchorPane.bottomAnchor="-5.0" AnchorPane.leftAnchor="-5.0"
-															AnchorPane.rightAnchor="-5.0" AnchorPane.topAnchor="-5.0">
+														<TableView fx:id="resultsTableView" minHeight="100.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="-5.0" AnchorPane.leftAnchor="-5.0" AnchorPane.rightAnchor="-5.0" AnchorPane.topAnchor="-5.0">
 															<columns>
-																<TableColumn fx:id="validationLevelColumn"
-																	maxWidth="20.0" minWidth="20.0" prefWidth="20.0"
-																	style="-fx-alignment: CENTER;" />
-																<TableColumn fx:id="validationComponentColumn"
-																	prefWidth="185.0" text="Component" />
-																<TableColumn fx:id="validationDescriptionColumn"
-																	prefWidth="276.0" text="Description" />
+																<TableColumn fx:id="validationLevelColumn" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" style="-fx-alignment: CENTER;" />
+																<TableColumn fx:id="validationComponentColumn" prefWidth="185.0" text="Component" />
+																<TableColumn fx:id="validationDescriptionColumn" prefWidth="276.0" text="Description" />
 															</columns>
 															<columnResizePolicy>
 																<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
