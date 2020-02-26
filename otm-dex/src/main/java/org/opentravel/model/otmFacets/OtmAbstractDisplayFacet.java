@@ -323,6 +323,11 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     }
 
     @Override
+    public void refresh() {
+        // NO-OP
+    }
+
+    @Override
     public void remove(OtmObject property) {
         parent.remove( property );
     }

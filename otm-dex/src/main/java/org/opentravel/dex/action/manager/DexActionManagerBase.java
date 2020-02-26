@@ -182,6 +182,10 @@ public abstract class DexActionManagerBase implements DexActionManager {
         }
         // log.debug( "Pushing action onto queue: " + ignore + " " + action.toString() );
         action.isValid();
+        // Refresh is much more light weight than full validation/resolver
+        if (action.getSubject() != null)
+            action.getSubject().refresh();
+
         if (queue.contains( action )) {
             // Make sure not a duplicate
             log.warn( "Duplicate Action found!" );
@@ -231,8 +235,8 @@ public abstract class DexActionManagerBase implements DexActionManager {
         // action.getSubject().getOwningMember().isValid( true ); // Force the owner to refresh its findings.
         // action.getSubject().isValid( true ); // Force the subject to refresh its findings.
 
-        if (mainController != null)
-            action.getSubject().getModelManager().startValidatingAndResolvingTasks();
+        // if (mainController != null)
+        // action.getSubject().getModelManager().startValidatingAndResolvingTasks();
         // log.debug( "Put action on queue: " + action.getClass().getSimpleName() );
     }
 
@@ -347,6 +351,9 @@ public abstract class DexActionManagerBase implements DexActionManager {
                 mainController.postStatus( "Undid action: " + action.toString() );
                 // if (action.getSubject() != null)
                 // action.getSubject().getModelManager().startValidatingAndResolvingTasks();
+                // Refresh is much more light weight than full validation/resolver
+                if (action.getSubject() != null)
+                    action.getSubject().refresh();
             }
         }
         ignore = false;

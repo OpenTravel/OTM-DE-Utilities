@@ -81,7 +81,7 @@ public interface OtmChildrenOwner extends OtmObject {
      * <p>
      * Used in views such as Properties tab's view to give modeler a clearer understanding of target object structures.
      * 
-     * @return list of children or empty list.
+     * @return new list of children or empty list.
      */
     public Collection<OtmObject> getChildrenHierarchy();
 

@@ -161,7 +161,7 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
             if (children != null && children.isEmpty())
                 modelChildren();
         }
-        return children;
+        return children != null ? children : Collections.emptyList();
     }
 
     @Override

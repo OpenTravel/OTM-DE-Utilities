@@ -36,9 +36,6 @@ import org.opentravel.model.otmFacets.OtmVWAValueFacet;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.model.otmProperties.OtmPropertyType;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyIntegerWrapper;
@@ -164,9 +161,9 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
             // create cells for member's facets and properties
             member = (OtmChildrenOwner) element;
 
-            // Create a local copy to prevent concurrent modification
-            Collection<OtmObject> kids = new ArrayList<>( member.getChildrenHierarchy() );
-            for (OtmObject child : kids) {
+            // // Create a local copy to prevent concurrent modification
+            // Collection<OtmObject> kids = new ArrayList<>( member.getChildrenHierarchy() );
+            for (OtmObject child : member.getChildrenHierarchy()) {
                 assert child != null;
                 // Create item and add to tree at parent
                 TreeItem<PropertiesDAO> item =

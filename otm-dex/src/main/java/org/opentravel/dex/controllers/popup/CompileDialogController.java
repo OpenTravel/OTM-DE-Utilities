@@ -312,14 +312,13 @@ public class CompileDialogController extends DexPopupControllerBase implements T
         }
     }
 
-    /**
-     * @see org.opentravel.dex.controllers.popup.DexPopupControllerBase#doOK()
-     */
-    @Override
-    public void doOK() {
-
-        super.doOK(); // all OK - close window
-    }
+    // /**
+    // * @see org.opentravel.dex.controllers.popup.DexPopupControllerBase#doOK()
+    // */
+    // @Override
+    // public void doOK() {
+    // super.doOK(); // all OK - close window
+    // }
 
     @FXML
     public void doSave() {

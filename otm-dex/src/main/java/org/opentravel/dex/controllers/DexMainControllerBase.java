@@ -72,7 +72,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     // protected Stage stage;
     protected static Stage stage;
 
-    public void setStageStatic(Stage stage) {
+    private static void setStageStatic(Stage stage) {
         DexMainControllerBase.stage = stage;
     }
 
@@ -225,7 +225,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
      */
     public void setStage(Stage primaryStage) {
         // These may be needed by sub-controllers
-        this.stage = primaryStage;
+        setStageStatic( primaryStage );
         this.mainController = null;
 
         // Initialize managers
@@ -246,15 +246,15 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
             modelMgr.setStatusController( getStatusController() );
     }
 
-    /**
-     * Create a main controller that has a main controller parent.
-     * 
-     * @param parent
-     */
-    public void setParent(DexMainController parent) {
-        this.stage = parent.getStage();
-        this.mainController = parent;
-    }
+    // /**
+    // * Create a main controller that has a main controller parent.
+    // *
+    // * @param parent
+    // */
+    // public void setParent(DexMainController parent) {
+    // this.stage = parent.getStage();
+    // this.mainController = parent;
+    // }
 
     // Required by AbstractApp...
     @Override

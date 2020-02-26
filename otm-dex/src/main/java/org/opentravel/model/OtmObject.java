@@ -190,6 +190,12 @@ public interface OtmObject {
     public StringProperty nameProperty();
 
     /**
+     * Remove any cached values. These include FX properties, children lists, validation results and other lazy
+     * evaluated lists.
+     */
+    public void refresh();
+
+    /**
      * Set the deprecation documentation value. Even though the TL maintains a list, the facades only use the first
      * item.
      * 

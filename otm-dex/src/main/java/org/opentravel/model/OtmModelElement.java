@@ -406,6 +406,19 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     }
 
     @Override
+    public void refresh() {
+        descriptionProperty = null;
+        findings = null;
+        children = null;
+        inheritedChildren = null;
+        nameProperty = null;
+        nameEditingProperty = null;
+        validationImageProperty = null;
+        validationProperty = null;
+        log.debug( "Refreshed " + getName() );
+    }
+
+    @Override
     public StringProperty nameEditingProperty() {
         if (nameEditingProperty == null)
             nameEditingProperty = setNameProperty( getName() );
