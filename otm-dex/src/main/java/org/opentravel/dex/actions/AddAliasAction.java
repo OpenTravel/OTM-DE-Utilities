@@ -32,7 +32,7 @@ public class AddAliasAction extends DexRunAction {
     private static Log log = LogFactory.getLog( AddAliasAction.class );
 
     /**
-     * Any OTM object that uses the intended model manager.
+     * Enabled for any editable OTM object whose TL is an TLAliasOwner and not a contextual facet.
      * 
      * @param subject
      * @return
@@ -41,7 +41,7 @@ public class AddAliasAction extends DexRunAction {
         if (subject == null || !(subject.getTL() instanceof TLAliasOwner))
             return false;
         if (subject instanceof OtmContextualFacet)
-            return false; // unsupported operation exception thrown
+            return false; // would throw an unsupported operation exception
         return subject instanceof OtmLibraryMember && subject.isEditable();
     }
 
@@ -51,11 +51,6 @@ public class AddAliasAction extends DexRunAction {
         // Constructor for reflection
     }
 
-    // /**
-    // * {@inheritDoc} Create a new property of passed type to the subject property owner.
-    // *
-    // * @see org.opentravel.dex.actions.DexRunAction#doIt(java.lang.Object)
-    // */
     @Override
     public Object doIt(Object data) {
         String name = data instanceof String ? (String) data : "NewAliasName";
@@ -72,30 +67,6 @@ public class AddAliasAction extends DexRunAction {
     public Object doIt() {
         return doIt( "NewAliasName" );
     }
-    // if (otm != null && otm.getModelManager() != null && data instanceof OtmPropertyType) {
-    //
-    // OtmLibrary subjectLibrary = getSubject().getLibrary();
-    // if (subjectLibrary == null)
-    // return null;
-    //
-    // // Create a minor version if the subject is in an older library in editable chain
-    // //
-    // if (!subjectLibrary.isEditable() && subjectLibrary.isChainEditable()) {
-    // // Get the latest library in the chain that is editable
-    // newPropertyOwner = subjectLibrary.getVersionChain().getNewMinorPropertyOwner( getSubject() );
-    // if (newPropertyOwner == null)
-    // return null;
-    // }
-    //
-    // // Build and hold onto for undo
-    // OtmPropertyOwner pOwner = newPropertyOwner == null ? getSubject() : newPropertyOwner;
-    // newProperty = OtmPropertyType.build( (OtmPropertyType) data, pOwner );
-    //
-    // isValid();
-    // }
-    // // log.debug( "Added new property " + get() );
-    // return get();
-    // }
 
     /**
      * Return the new member or null if none created.
@@ -111,19 +82,6 @@ public class AddAliasAction extends DexRunAction {
     public OtmLibraryMember getSubject() {
         return (OtmLibraryMember) otm;
     }
-
-    // @Override
-    // public ValidationFindings getVetoFindings() {
-    // return null;
-    // }
-
-    // @Override
-    // public boolean isValid() {
-    // // Validate the parent - adding a property could change validation status
-    // if (newProperty != null && newProperty.getOwningMember() != null)
-    // newProperty.getOwningMember().isValid( true );
-    // return newProperty != null ? newProperty.isValid() : false;
-    // }
 
     @Override
     public boolean setSubject(OtmObject subject) {
