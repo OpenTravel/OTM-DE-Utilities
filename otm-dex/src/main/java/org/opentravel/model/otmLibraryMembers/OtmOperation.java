@@ -114,7 +114,7 @@ public class OtmOperation extends OtmModelElement<TLOperation> implements OtmChi
     public List<OtmObject> getChildren() {
         if (children != null && children.isEmpty())
             modelChildren();
-        return children;
+        return children != null ? children : Collections.emptyList();
     }
 
     @Override

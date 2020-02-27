@@ -97,10 +97,10 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         this.noLibraryActionManager = getModelManager().getActionManager( false );
     }
 
-    public void refresh() {
-        nameProperty = null;
-        nameEditingProperty = null;
-    }
+    // public void refresh() {
+    // nameProperty = null;
+    // nameEditingProperty = null;
+    // }
 
     @Override
     public void addAlias(TLAlias tla) {

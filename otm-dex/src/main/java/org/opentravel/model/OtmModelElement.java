@@ -409,8 +409,10 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     public void refresh() {
         descriptionProperty = null;
         findings = null;
-        children = null;
-        inheritedChildren = null;
+        if (children != null)
+            children.clear();
+        if (inheritedChildren != null)
+            inheritedChildren.clear();
         nameProperty = null;
         nameEditingProperty = null;
         validationImageProperty = null;

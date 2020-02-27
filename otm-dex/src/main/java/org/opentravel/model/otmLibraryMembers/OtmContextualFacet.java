@@ -184,13 +184,11 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
      */
     @Override
     public List<OtmObject> getChildren() {
-        // children.clear();
         synchronized (this) {
             if (children != null && children.isEmpty())
                 modelChildren();
         }
-        // FIXME - what about children that are other contextual facets?
-        return children;
+        return children != null ? children : Collections.emptyList();
     }
 
     /**

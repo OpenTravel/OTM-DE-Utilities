@@ -109,12 +109,12 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
 
     @Override
     public List<OtmObject> getChildren() {
-        return children;
+        return children != null ? children : Collections.emptyList();
     }
 
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
-        return children;
+        return children != null ? children : Collections.emptyList();
     }
 
     @Override
