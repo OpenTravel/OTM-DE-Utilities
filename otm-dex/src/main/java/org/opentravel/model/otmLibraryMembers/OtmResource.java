@@ -378,6 +378,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
             if (OtmModelElement.get( af ) instanceof OtmActionFacet)
                 actionFacets.add( (OtmActionFacet) OtmModelElement.get( af ) );
         } );
+        actionFacets.sort( null );
         return actionFacets;
     }
 
@@ -406,6 +407,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
             if (OtmModelElement.get( ta ) instanceof OtmAction)
                 actions.add( (OtmAction) OtmModelElement.get( ta ) );
         } );
+        actions.sort( null );
         return actions;
     }
 
@@ -652,6 +654,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
             if (OtmModelElement.get( pg ) instanceof OtmParameterGroup)
                 groups.add( (OtmParameterGroup) OtmModelElement.get( pg ) );
         } );
+        groups.sort( null );
         return groups;
     }
 
