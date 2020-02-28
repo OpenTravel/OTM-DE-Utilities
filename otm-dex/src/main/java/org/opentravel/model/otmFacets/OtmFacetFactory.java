@@ -18,6 +18,7 @@ package org.opentravel.model.otmFacets;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
@@ -88,11 +89,11 @@ public class OtmFacetFactory {
      * @return
      */
     public static OtmFacet<?> create(TLFacet tlFacet, OtmLibraryMember parent) {
-        // return create( tlFacet, parent, null );
-        // }
-        //
-        // // Use the base as the source of the contributed facet
-        // public static OtmFacet<?> create(TLFacet tlFacet, OtmLibraryMember parent, OtmLibraryMember base) {
+
+        // If it was previously modeled, use that otm facade.
+        if (OtmModelElement.get( tlFacet ) instanceof OtmFacet)
+            return (OtmFacet<?>) OtmModelElement.get( tlFacet );
+
         OtmFacet<?> facet = null;
         switch (tlFacet.getFacetType()) {
             case SUMMARY:

@@ -62,7 +62,7 @@ public class TestMemberPropertiesController extends AbstractFxTest {
 
     @Test
     public void testSelectProjectSetup() {
-        testSetup();
+        // testSetup();
     }
 
     public OtmModelManager testSetup() {

@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
@@ -101,13 +102,28 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
     @Override
     public void modelChildren() {
         super.modelChildren(); // Will model facets
-        // Add
+
         // Role Enumeration - TLRoleEnumeration / TLRole
-        children.add( new OtmRoleEnumeration( getTL().getRoleEnumeration(), this ) );
+        if (OtmModelElement.get( getTL().getRoleEnumeration() ) != null)
+            children.add( OtmModelElement.get( getTL().getRoleEnumeration() ) );
+        else
+            children.add( new OtmRoleEnumeration( getTL().getRoleEnumeration(), this ) );
+
         // Simple Facet - TLSimpleFacet
-        children.add( new OtmListFacet( getTL().getSimpleListFacet(), this ) );
-        children.add( new OtmListFacet( getTL().getSummaryListFacet(), this ) );
-        children.add( new OtmListFacet( getTL().getDetailListFacet(), this ) );
+        if (OtmModelElement.get( getTL().getSimpleListFacet() ) != null)
+            children.add( OtmModelElement.get( getTL().getSimpleListFacet() ) );
+        else
+            children.add( new OtmListFacet( getTL().getSimpleListFacet(), this ) );
+
+        if (OtmModelElement.get( getTL().getSummaryListFacet() ) != null)
+            children.add( OtmModelElement.get( getTL().getSummaryListFacet() ) );
+        else
+            children.add( new OtmListFacet( getTL().getSummaryListFacet(), this ) );
+
+        if (OtmModelElement.get( getTL().getDetailListFacet() ) != null)
+            children.add( OtmModelElement.get( getTL().getDetailListFacet() ) );
+        else
+            children.add( new OtmListFacet( getTL().getDetailListFacet(), this ) );
     }
 
     public OtmRoleEnumeration getRoles() {

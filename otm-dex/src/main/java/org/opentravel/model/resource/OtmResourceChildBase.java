@@ -64,8 +64,13 @@ public abstract class OtmResourceChildBase<C> extends OtmModelElement<TLModelEle
 
     @Override
     public int compareTo(OtmResourceChild o) {
-        return this.getName().compareTo( o.getName() );
+        return getName() != null && o != null ? this.getName().compareTo( o.getName() ) : 1;
     }
+
+    // @Override
+    // public boolean equals(OtmResourceChild o) {
+    // return o != null ? this.getName().equals( o.getName() ) : false;
+    // }
 
     @Override
     public OtmResource getOwningMember() {
