@@ -90,6 +90,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     // Use lazy inflation on the getter.
     protected List<OtmObject> inheritedChildren = null;
 
+    // JavaFX Properties
     protected StringProperty nameProperty;
     protected StringProperty nameEditingProperty;
     private StringProperty descriptionProperty;
@@ -130,8 +131,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     /**
      * {@inheritDoc} Unless overridden, apply the initial capital rule.
-     * 
-     * @see org.opentravel.model.OtmObject#fixName(java.lang.String)
      */
     @Override
     public String fixName(String name) {
@@ -256,22 +255,11 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         return ImageManager.getImage( this.getIconType() );
     }
 
-    // @Override
-    // public abstract ImageManager.Icons getIconType();
-
-    /**
-     * @return this library, owning library or null
-     */
     @Override
     public OtmLibrary getLibrary() {
         return getOwningMember() != null ? getOwningMember().getLibrary() : null;
     }
 
-    /**
-     * Return the named entity's local name
-     * 
-     * @see org.opentravel.model.OtmObject#getName()
-     */
     @Override
     public String getName() {
         return tlObject instanceof NamedEntity ? ((NamedEntity) tlObject).getLocalName() : NONAME;
@@ -330,11 +318,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         return false; // Override for classes that can be inherited (facets, properties)
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @return true if owning member is editable
-     */
     @Override
     public boolean isEditable() {
         return getOwningMember() != null && getOwningMember().isEditable();
@@ -393,11 +376,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         return sFindings;
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * String property contains the value from getName()
-     */
     @Override
     public StringProperty nameProperty() {
         if (nameProperty == null)
@@ -468,12 +446,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
             descriptionProperty.setValue( description );
     }
 
-    /**
-     * Set the name if possible.
-     * 
-     * @param name
-     * @return the actual name after assignment attempted
-     */
     @Override
     public String setName(String name) {
         // NO-OP unless overridden
@@ -508,11 +480,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         return validationImageProperty;
     }
 
-    /**
-     * Get a string wrapper around existing findings.
-     * 
-     * @see org.opentravel.model.OtmObject#validationProperty()
-     */
     @Override
     public StringProperty validationProperty() {
         if (validationProperty == null)

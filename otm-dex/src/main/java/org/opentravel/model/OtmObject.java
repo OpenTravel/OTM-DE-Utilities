@@ -20,6 +20,7 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
@@ -57,6 +58,12 @@ public interface OtmObject {
      */
     public String fixName(String candidateName);
 
+    /**
+     * Get the active action manager for this object. Different action managers controls which set of actions are
+     * enabled.
+     * 
+     * @return
+     */
     public DexActionManager getActionManager();
 
     public String getDeprecation();
@@ -70,8 +77,18 @@ public interface OtmObject {
 
     public String getExample();
 
+    /**
+     * Get the validation findings associated with this object. Lazy evaluated: if null, validation will be run.
+     * 
+     * @return
+     */
     public ValidationFindings getFindings();
 
+    /**
+     * Get the image associated with type of object.
+     * 
+     * @return
+     */
     public Image getIcon();
 
     public ImageManager.Icons getIconType();
@@ -89,6 +106,9 @@ public interface OtmObject {
      **/
     public String getName();
 
+    /**
+     * @return the namespace associated with the owner's library.
+     */
     public String getNamespace();
 
     /**
@@ -96,19 +116,40 @@ public interface OtmObject {
      */
     public String getNameWithPrefix();
 
+    /**
+     * @return display name for this type of object. Library member display name is declared in the
+     *         {@link OtmLibraryMemberType} enumeration.
+     */
     public String getObjectTypeName();
 
+    /**
+     * @return the library member that owns this object. Library members return themselves.
+     */
     public OtmLibraryMember getOwningMember();
 
     /**
-     * 
+     * @return the namespace prefix associated with the owner's library.
      */
     public String getPrefix();
 
+    /**
+     * Get the underlying TL element cast to its specific type.
+     * 
+     * @return the TL model element is object wraps.
+     */
     public TLModelElement getTL();
 
+    /**
+     * @return FX Tooltip containing display string describing this object
+     */
     public Tooltip getTooltip();
 
+    /**
+     * Findings will contain a header and either a message that the are no findings or the findings made into a single
+     * string.
+     * 
+     * @return findings as a string
+     */
     public String getValidationFindingsAsString();
 
     /**
@@ -170,8 +211,8 @@ public interface OtmObject {
     public StringProperty nameEditingProperty();
 
     /**
-     * Create the nameEditingProperty string property and set its value. Used to override the default behavior of using
-     * the same value as nameProperty().
+     * Create the nameEditingProperty FX string property and set its value. Used to override the default behavior of
+     * using the same value as nameProperty().
      * 
      * @param editableName
      * @return
@@ -179,13 +220,15 @@ public interface OtmObject {
     public StringProperty nameEditingProperty(String editableName);
 
     /**
-     * Get the FX observable property for this name simply for display. Use {@link #nameEditingProperty()} if intended
-     * for use where the name could be edited if enabled.
+     * Get the FX observable property for this name simply for display. By default, contains the value from
+     * {@link #getName()}.
+     * <p>
+     * Use {@link #nameEditingProperty()} if intended for use where the name could be edited if enabled.
      * <p>
      * If editable, returns a simple string property with a listener assigned by the object's action manager. If not
      * editable a read-only property is returned.
      * 
-     * @return a string property (never null)
+     * @return a FX string property (never null)
      */
     public StringProperty nameProperty();
 
@@ -229,12 +272,23 @@ public interface OtmObject {
      */
     public String setName(String name);
 
+    /**
+     * @return name with prefix or similar global identifier
+     */
     @Override
     public String toString();
 
+    /**
+     * If the findings are null, returns null. Otherwise returns OK unless findings contains errors or warnings.
+     * 
+     * @return null, OK image view or error/warning image view
+     */
     public ImageView validationImage();
 
     public ObjectProperty<ImageView> validationImageProperty();
 
+    /**
+     * @return a string wrapper around existing finding counts.
+     */
     public StringProperty validationProperty();
 }

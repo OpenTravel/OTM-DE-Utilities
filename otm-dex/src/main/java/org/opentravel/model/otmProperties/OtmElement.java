@@ -87,6 +87,11 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
         return getTL().getName();
     }
 
+    /**
+     * Simply return the count from the TL element.
+     * 
+     * @return
+     */
     public int getRepeatCount() {
         return getTL().getRepeat();
     }
@@ -119,14 +124,11 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
     public boolean isManditory() {
         return getTL().isMandatory();
     }
-    // public boolean isField() {
-    // return
-    // }
 
     /**
      * {@inheritDoc}
      * <p>
-     * Setting TL type does NOT enforce name control
+     * Note: Setting TL type does <b>not</b> enforce name control
      */
     @Override
     public TLPropertyType setAssignedTLType(NamedEntity type) {
@@ -149,9 +151,9 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
         if (type == null)
             setAssignedTLType( null );
         else if (type.getTL() instanceof TLPropertyType) {
-            // Sanity check
-            if (OtmModelElement.get( type.getTL() ) != type)
-                log.debug( "ERROR - invalid identity listener on TLObject." );
+            // // Sanity check
+            // if (OtmModelElement.get( type.getTL() ) != type)
+            // log.debug( "ERROR - invalid identity listener on TLObject." );
 
             setAssignedTLType( (TLPropertyType) type.getTL() );
             type.getOwningMember().changeWhereUsed( null, getOwningMember() );
@@ -174,6 +176,12 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
         return getName();
     }
 
+    /**
+     * Simply set the TL element's repeat count.
+     * 
+     * @param value
+     * @return
+     */
     public int setRepeatCount(int value) {
         getTL().setRepeat( value );
         return getRepeatCount();
