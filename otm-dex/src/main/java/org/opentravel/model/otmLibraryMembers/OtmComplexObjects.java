@@ -88,6 +88,11 @@ public abstract class OtmComplexObjects<T extends TLComplexTypeBase> extends Otm
         return getTL().getLocalName();
     }
 
+    /**
+     * {@inheritDoc} Wraps name from TL extension's extends entity name.
+     * 
+     * @see org.opentravel.model.otmLibraryMembers.OtmLibraryMemberBase#baseTypeProperty()
+     */
     @Override
     public StringProperty baseTypeProperty() {
         if (getTL().getExtension() != null) {

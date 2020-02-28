@@ -97,11 +97,6 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         this.noLibraryActionManager = getModelManager().getActionManager( false );
     }
 
-    // public void refresh() {
-    // nameProperty = null;
-    // nameEditingProperty = null;
-    // }
-
     @Override
     public void addAlias(TLAlias tla) {
         if (tla.getOwningEntity() instanceof TLFacet) {
@@ -116,18 +111,6 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             new OtmAlias( tla, this );
         }
     }
-
-    // /**
-    // *
-    // * @param alias must have a tlAlais object
-    // */
-    // @Override
-    // public void add(OtmAlias alias) {
-    // if (getTL() instanceof TLAliasOwner) {
-    // ((TLAliasOwner) getTL()).addAlias( alias.getTL() );
-    // }
-    // children.add( alias );
-    // }
 
     private void addProvider(OtmTypeUser user, List<OtmTypeProvider> list) {
         if (user == null)
@@ -149,6 +132,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public void changeWhereUsed(OtmLibraryMember oldUser, OtmLibraryMember newUser) {
+        // TODO - why not just recompute? getWhereUsed(force)?
         if (whereUsed == null)
             whereUsed = new ArrayList<>();
         if (oldUser != null)
@@ -289,9 +273,6 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return hierarchy;
     }
 
-
-    /**
-     */
     @Override
     public synchronized Collection<OtmTypeProvider> getChildrenTypeProviders() {
         List<OtmObject> kids = new ArrayList<>( getChildren() );
@@ -334,8 +315,6 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return owners;
     }
 
-    /**
-     */
     @Override
     public synchronized List<OtmTypeProvider> getDescendantsTypeProviders() {
         if (membersProviders == null)
@@ -353,6 +332,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public synchronized Collection<OtmTypeUser> getDescendantsTypeUsers() {
+        // TODO - shouldn't this be cached?
         memberTypeUsers.clear();
         List<OtmObject> children = new ArrayList<>( getChildren() );
         for (OtmObject child : children) {
@@ -482,46 +462,36 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     /**
-     * Get the where used list. If <i>forced</i> or null list it will get users of the library member and all its type
+     * Get the lazy evaluated where used list.
+     * <p>
+     * When <i>forced</i> by type resolver or list is null, it will get users of the library member and all its type
      * provider descendants.
      * 
-     * @param force will clear list and recompute
+     * @param force will clear list and recompute users to add to existing list
      * @return
      */
     public List<OtmLibraryMember> getWhereUsed(boolean force) {
-        if (force)
-            whereUsed = null;
         if (whereUsed == null) {
             whereUsed = new ArrayList<>();
-
+            force = true;
+        }
+        if (force) {
+            whereUsed.clear();
             whereUsed.addAll( mgr.findUsersOf( this ) );
-            whereUsed.addAll( mgr.findSubtypesOf( this ) );
+            whereUsed.addAll( mgr.findSubtypesOf( this ) ); // base types
+            // FIXME - get resources when they expose this library member
             //
-            getDescendantsTypeProviders().forEach( p -> {
-                whereUsed.addAll( mgr.findUsersOf( p ) );
-            } );
+            getDescendantsTypeProviders().forEach( p -> whereUsed.addAll( mgr.findUsersOf( p ) ) );
             // log.debug( "Created Where Used List " + whereUsed.size() + " for : " + this.getNameWithPrefix() );
         }
-        // FIXME - base types
-        // FIXME - get resources when they expose this library member
         return whereUsed;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @return true if member has editable library
-     */
     @Override
     public boolean isEditable() {
         return getLibrary() != null && getLibrary().isEditable();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @return true if member is fully editable or is latest in an editable chain
-     */
     @Override
     public boolean isEditableMinor() {
         if (isEditable())
@@ -532,19 +502,12 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public boolean isLatestVersion() {
-        // if (getLibrary().isMajorVersion())
-        // return getLibrary().isLatestVersion();
         if (getLibrary().getVersionChain().isLatestChain())
             return getLibrary().getVersionChain().isLatestVersion( this );
         else
             return false;
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * When force is true, run validation on all children and where used library members.
-     */
     @Override
     public boolean isValid(boolean force) {
         if (getLibrary() == null)
@@ -557,16 +520,11 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
                 } );
 
             }
-            // TODO - how to prevent loops?
-            // new ValidateModelManagerItemsTask( getModelManager(), null, null );
-            // getWhereUsed().forEach( m -> {
-            // if (m != this)
-            // m.isValid( force );
-            // } );
         }
         return super.isValid( force );
     }
 
+    // TODO - why is this editable?
     @Override
     public StringProperty libraryProperty() {
         if (getLibrary() == null)
@@ -577,7 +535,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     /**
-     * {@inheritDoc} Creates facets to represent facets in the TL object.
+     * {@inheritDoc} Create aliases and facets to represent facets in the TL object.
      */
     @Override
     public void modelChildren() {
@@ -596,6 +554,9 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             }
     }
 
+    /**
+     * {@inheritDoc} Recompute inherited custom, query, choice and update facets
+     */
     @Override
     public void modelInheritedChildren() {
         if (inheritedChildren == null)
@@ -627,6 +588,17 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     @Override
     public StringProperty prefixProperty() {
         return new ReadOnlyStringWrapper( getPrefix() );
+    }
+
+    /**
+     * {@inheritDoc} Null out member providers and where used lists.
+     */
+    @Override
+    public void refresh() {
+        super.refresh();
+        membersProviders = null; // Created by getDescendantsTypeProviders
+        getWhereUsed( true );
+        // memberTypeUsers = null; // Created by getDescendantsTypeUsers.
     }
 
     @Override
@@ -693,6 +665,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             this.noLibraryActionManager = getModelManager().getActionManager( false );
     }
 
+    // TODO - why is this editable?
     @Override
     public StringProperty versionProperty() {
         return getLibrary() != null ? new SimpleStringProperty( getLibrary().getVersion() )

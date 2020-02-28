@@ -98,6 +98,9 @@ public interface OtmObject {
      */
     public OtmLibrary getLibrary();
 
+    /**
+     * @return the model manager for this object
+     */
     public OtmModelManager getModelManager();
 
     /**
@@ -191,7 +194,7 @@ public interface OtmObject {
     /**
      * Are there any warnings or errors in the findings?
      * 
-     * @param force regenerating findings by validating with the compiler
+     * @param When force is true, run validation on all children and where used library members.
      * @return
      */
     public boolean isValid(boolean refresh);

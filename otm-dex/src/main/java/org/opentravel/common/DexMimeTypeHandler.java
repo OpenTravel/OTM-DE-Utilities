@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.actions.SetMimeTypesAction;
 import org.opentravel.model.OtmObject;
+import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.model.TLMimeType;
 
 import java.util.List;
@@ -42,10 +43,19 @@ public class DexMimeTypeHandler {
     private OtmObject object;
     private MimeTypeMap values;
     private HBox hBox = null;
+    private UserSettings userSettings = null;
 
     public DexMimeTypeHandler(OtmObject object) {
+        this( object, null );
+    }
+
+    public DexMimeTypeHandler(OtmObject object, UserSettings settings) {
         this.object = object;
-        values = new MimeTypeMap( object );
+        this.userSettings = settings;
+        if (settings != null)
+            values = new MimeTypeMap( object, settings.getDefaultMimeTypes() );
+        else
+            values = new MimeTypeMap( object, null );
     }
 
     public HBox getHBox() {
@@ -89,6 +99,12 @@ public class DexMimeTypeHandler {
             values.get().put( cb.getText(), cb.isSelected() );
             log.debug( "Check box " + cb.getText() + " = " + cb.isSelected() );
             // values.print();
+
+            // If the user settings was passed in, update them
+            if (userSettings != null) {
+                userSettings.setDefaultMimeTypes( values.toString() );
+                userSettings.save();
+            }
 
             // If enabled, create and run the action
             if (SetMimeTypesAction.isEnabled( object ))

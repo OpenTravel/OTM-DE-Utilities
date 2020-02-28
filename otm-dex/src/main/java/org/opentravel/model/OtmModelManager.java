@@ -34,6 +34,7 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberFactory;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
+import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.event.ModelElementListener;
 import org.opentravel.schemacompiler.ic.ModelIntegrityChecker;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
@@ -104,6 +105,8 @@ public class OtmModelManager implements TaskResultHandlerI {
     private DialogBoxContoller dialogBox = null;
     private boolean showingError = false;
 
+    private UserSettings userSettings;
+
 
 
     /**
@@ -112,6 +115,18 @@ public class OtmModelManager implements TaskResultHandlerI {
      * @param fullActionManager edit-enabled action manager to assign to all members. If null, read-only action manager
      *        will be used.
      * @param controller
+     * @param userSettings used by object builders default values
+     */
+    public OtmModelManager(DexActionManager fullActionManager, RepositoryManager repositoryManager,
+        UserSettings userSettings) {
+        this( fullActionManager, repositoryManager );
+        this.userSettings = userSettings;
+    }
+
+    /**
+     * @deprecated - pass in null user settings if they are not known.
+     * @param fullActionManager
+     * @param repositoryManager
      */
     public OtmModelManager(DexActionManager fullActionManager, RepositoryManager repositoryManager) {
 
@@ -743,6 +758,14 @@ public class OtmModelManager implements TaskResultHandlerI {
                 projectList.add( p );
         } );
         return projectList;
+    }
+
+    /**
+     * 
+     * @return user settings or null
+     */
+    public UserSettings getUserSettings() {
+        return userSettings;
     }
 
     /**

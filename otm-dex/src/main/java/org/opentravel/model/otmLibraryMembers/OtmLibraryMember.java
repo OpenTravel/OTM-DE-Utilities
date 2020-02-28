@@ -18,7 +18,6 @@ package org.opentravel.model.otmLibraryMembers;
 
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmChildrenOwner;
-import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
@@ -51,7 +50,9 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public void addAlias(TLAlias tla);
 
     /**
-     * @return
+     * Create new FX read only property containing the base type name.
+     * 
+     * @return new FX observable property containing base type name.
      */
     public StringProperty baseTypeProperty();
 
@@ -97,7 +98,6 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public OtmObject getBaseType();
 
     /**
-     * 
      * @return the name of the base type object ({@link #getBaseType()}) or empty string
      */
     String getBaseTypeName();
@@ -127,16 +127,13 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      */
     public OtmTypeProvider getMatchingProvider(OtmTypeProvider provider);
 
-    /**
-     * @return the model manager for this object
-     */
-    OtmModelManager getModelManager();
+    // OtmModelManager getModelManager();
 
-    /**
-     * @return
-     */
-    @Override
-    public String getObjectTypeName();
+    // /**
+    // * @return
+    // */
+    // @Override
+    // public String getObjectTypeName();
 
     /**
      * Get the actual type users that use this library member or descendants as assigned type.
@@ -188,7 +185,7 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     boolean isLatestVersion();
 
     /**
-     * @return fx property for library name
+     * @return a new FX property for library name
      */
     public StringProperty libraryProperty();
 
@@ -197,10 +194,10 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      */
     public StringProperty prefixProperty();
 
-    /**
-     * Update or clear any cached values (string properties).
-     */
-    public void refresh();
+    // /**
+    // * Update or clear any cached values (string properties).
+    // */
+    // public void refresh();
 
     /**
      * Set the base type if supported.
@@ -219,6 +216,9 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      */
     public void setNoLibraryActionManager(DexActionManager dexActionManager);
 
+    /**
+     * @return new FX string property containing library's version number
+     */
     public StringProperty versionProperty();
 
 

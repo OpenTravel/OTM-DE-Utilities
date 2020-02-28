@@ -19,6 +19,7 @@ package org.opentravel.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmActionResponse;
 import org.opentravel.schemacompiler.model.TLActionRequest;
@@ -41,7 +42,8 @@ public class MimeTypeMap {
 
     private SortedMap<String,Boolean> values = new TreeMap<>();
 
-    public MimeTypeMap(OtmObject object) {
+    public MimeTypeMap(OtmObject object, String defaultValues) {
+
         List<TLMimeType> types = null;
         if (object instanceof OtmActionRequest)
             types = ((OtmActionRequest) object).getTL().getMimeTypes();
@@ -54,7 +56,16 @@ public class MimeTypeMap {
         if (types != null)
             for (TLMimeType t : TLMimeType.values())
                 values.put( t.toString(), types.contains( t ) );
+
+        if (object instanceof OtmResource && defaultValues != null)
+            // Use default from resource and user settings
+            fromString( defaultValues );
     }
+
+    public MimeTypeMap(OtmObject object) {
+        this( object, null );
+    }
+
 
     public SortedMap<String,Boolean> get() {
         return values;
@@ -71,6 +82,23 @@ public class MimeTypeMap {
                 types.add( TLMimeType.valueOf( key ) );
         } );
         return types;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder string = new StringBuilder();
+        for (Entry<String,Boolean> e : values.entrySet())
+            if (e.getValue())
+                string.append( e.getKey() + ";" );
+        return string.toString();
+    }
+
+    public void fromString(String string) {
+        String[] tokens = string.split( ";" );
+        for (String token : tokens) {
+            values.put( token, true );
+        }
+        print();
     }
 
     protected void print() {

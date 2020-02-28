@@ -163,6 +163,8 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
 
     @Override
     public UserSettings getUserSettings() {
+        if (userSettings == null)
+            userSettings = UserSettings.load();
         return userSettings;
     }
 
@@ -229,7 +231,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         this.mainController = null;
 
         // Initialize managers
-        modelMgr = new OtmModelManager( new DexFullActionManager( this ), getRepositoryManager() );
+        modelMgr = new OtmModelManager( new DexFullActionManager( this ), getRepositoryManager(), getUserSettings() );
         imageMgr = new ImageManager( primaryStage );
 
         checkNodes();

@@ -133,6 +133,7 @@ public class TestDeleteLibraryMemberAction {
         //
         int queueSize = fullMgr.getQueueSize();
         assignedType.getActionManager().run( DexActions.DELETELIBRARYMEMBER, typeOwner );
+        // Then
         assertTrue( "Then - queue size increased.", ++queueSize == fullMgr.getQueueSize() );
         assertTrue( assignedType.getLibrary() == null );
         assertTrue( !mgr.contains( typeOwner ) );
@@ -161,7 +162,9 @@ public class TestDeleteLibraryMemberAction {
         assertTrue( typeOwner.getWhereUsed() == userOwners );
         TypeResolverTask.runResolver( mgr );
         ValidateModelManagerItemsTask.runValidator( mgr );
-        assertFalse( typeOwner.getWhereUsed() == userOwners );
+        // assertFalse( typeOwner.getWhereUsed() == userOwners );
+        // 2/28/2020 - reuses the same array list when recomputed.
+        assertTrue( typeOwner.getWhereUsed() == userOwners );
 
         // Then - Check list contents to verify resolver restored the contents correctly
         for (OtmLibraryMember owner : userOwners)

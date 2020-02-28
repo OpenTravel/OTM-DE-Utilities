@@ -132,22 +132,46 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     // Session storage of mime type defaults.
     // TODO - save these in user settings
     private DexMimeTypeHandler mimeHandler = null;
-    private OtmTypeProvider defaultRequestPayload;
-    private OtmTypeProvider defaultResponsePayload;
+    private OtmTypeProvider defaultRequestPayload = null;
+    private OtmTypeProvider defaultResponsePayload = null;
 
     public OtmTypeProvider getDefaultRequestPayload() {
+        if (defaultRequestPayload == null && getModelManager().getUserSettings() != null) {
+            OtmObject obj = getModelManager().getUserSettings().getDefaultRequestPayload( getModelManager() );
+            if (obj instanceof OtmTypeProvider)
+                defaultRequestPayload = (OtmTypeProvider) obj;
+        }
         return defaultRequestPayload;
     }
 
+    public void setDefaultRequestPayload(OtmTypeProvider payload) {
+        defaultRequestPayload = payload;
+        if (getModelManager().getUserSettings() != null) {
+            getModelManager().getUserSettings().setDefaultRequestPayload( payload );
+            getModelManager().getUserSettings().save();
+        }
+    }
+
     public OtmTypeProvider getDefaultResponsePayload() {
+        if (defaultResponsePayload == null && getModelManager().getUserSettings() != null) {
+            OtmObject obj = getModelManager().getUserSettings().getDefaultResponsePayload( getModelManager() );
+            if (obj instanceof OtmTypeProvider)
+                defaultResponsePayload = (OtmTypeProvider) obj;
+        }
         return defaultResponsePayload;
+    }
+
+    public void setDefaultResponsePayload(OtmTypeProvider payload) {
+        defaultResponsePayload = payload;
+        if (getModelManager().getUserSettings() != null) {
+            getModelManager().getUserSettings().setDefaultResponsePayload( payload );
+            getModelManager().getUserSettings().save();
+        }
     }
 
     public DexMimeTypeHandler getMimeHandler() {
         return mimeHandler;
     }
-
-    // private ResourceCodegenUtils codegenUtils;
 
     public OtmResource(String name, OtmModelManager mgr) {
         super( new TLResource(), mgr );
@@ -592,8 +616,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         hb.getChildren().add( labelClear );
         hb.getChildren().add( buttonClear );
 
-        buttonRQ.setOnAction( e -> defaultRequestPayload = getUserSelectedDefaultPayload( e ) );
-        buttonRS.setOnAction( e -> defaultResponsePayload = getUserSelectedDefaultPayload( e ) );
+        buttonRQ.setOnAction( e -> setDefaultRequestPayload( getUserSelectedDefaultPayload( e ) ) );
+        buttonRS.setOnAction( e -> setDefaultResponsePayload( getUserSelectedDefaultPayload( e ) ) );
         buttonClear.setOnAction( e -> {
             defaultRequestPayload = null;
             defaultResponsePayload = null;
@@ -622,7 +646,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     private Node getMimeNode() {
         if (mimeHandler == null)
-            mimeHandler = new DexMimeTypeHandler( this );
+            mimeHandler = new DexMimeTypeHandler( this, getModelManager().getUserSettings() );
         return mimeHandler.getHBox();
     }
 

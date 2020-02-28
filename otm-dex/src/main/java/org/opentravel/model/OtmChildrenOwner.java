@@ -50,28 +50,12 @@ public interface OtmChildrenOwner extends OtmObject {
     public void delete(OtmObject property);
 
     /**
-     * Simply remove the child from the children or inherited children list. See also: {@link #delete(OtmProperty)}
-     * 
-     * @param child
-     */
-    public void remove(OtmObject property);
-
-    /**
      * Get list of all the children of this object. To allow lazy evaluation, implementations are expected to attempt to
      * model the children if the list is empty.
      * 
      * @return live list of children or empty list.
      */
     public List<OtmObject> getChildren();
-
-    /**
-     * Get a list of all the inherited children of this object. Because this list can not be inflated until after the
-     * model is loaded, implementations must allow lazy evaluation--implementations are expected to attempt to model the
-     * children if the list is null or empty.
-     * 
-     * @return list of inherited children or empty list.
-     */
-    public List<OtmObject> getInheritedChildren();
 
     /**
      * Get a list of children organized by inheritance. For example, a business object will only report out the ID facet
@@ -98,16 +82,39 @@ public interface OtmChildrenOwner extends OtmObject {
     public Collection<OtmChildrenOwner> getDescendantsChildrenOwners();
 
     /**
-     * Get a list of children and their descendants that are type providers.
+     * Get a list of descendants that are property owners.
+     * 
+     * @return new list of property owners or empty list.
+     */
+    public Collection<? extends OtmPropertyOwner> getDescendantsPropertyOwners();
+
+    /**
+     * Get a lazy evaluated list of children and their descendants that are type providers.
      * 
      * @return list of children or empty list.
      */
     public Collection<OtmTypeProvider> getDescendantsTypeProviders();
 
     /**
-     * @return
+     * @return list containing all descendants that are type users or empty list.
      */
     public Collection<OtmTypeUser> getDescendantsTypeUsers();
+
+    /**
+     * Get a list of all the inherited children of this object. Because this list can not be inflated until after the
+     * model is loaded, implementations must allow lazy evaluation--implementations are expected to attempt to model the
+     * children if the list is null or empty.
+     * 
+     * @return list of inherited children or empty list.
+     */
+    public List<OtmObject> getInheritedChildren();
+
+    /**
+     * Should this owner be displayed with its children visible?
+     * 
+     * @return true if children should be visible.
+     */
+    public boolean isExpanded();
 
     /**
      * Model the children of this object from its' tlObject(s).
@@ -120,17 +127,10 @@ public interface OtmChildrenOwner extends OtmObject {
     public void modelInheritedChildren();
 
     /**
-     * Should this owner be displayed with its children visible?
+     * Simply remove the child from the children or inherited children list. See also: {@link #delete(OtmProperty)}
      * 
-     * @return true if children should be visible.
+     * @param child
      */
-    public boolean isExpanded();
-
-    /**
-     * Get a list of descendants that are property owners.
-     * 
-     * @return new list of property owners or empty list.
-     */
-    public Collection<? extends OtmPropertyOwner> getDescendantsPropertyOwners();
+    public void remove(OtmObject property);
 
 }

@@ -17,6 +17,8 @@
 package org.opentravel.objecteditor;
 
 import org.opentravel.application.common.AbstractUserSettings;
+import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,6 +135,47 @@ public class UserSettings extends AbstractUserSettings {
         return exampleContext;
     }
 
+    /**
+     * Default request payload
+     */
+    public OtmObject getDefaultRequestPayload(OtmModelManager mgr) {
+        return mgr.getMember( defaultRequestPayload );
+    }
+
+    public void setDefaultRequestPayload(String nameWithPrefix) {
+        this.defaultRequestPayload = nameWithPrefix;
+    }
+
+    public void setDefaultRequestPayload(OtmObject payload) {
+        setDefaultRequestPayload( payload.getNameWithPrefix() );
+    }
+
+    /**
+     * Default resource mime types
+     */
+    public String getDefaultMimeTypes() {
+        return defaultMimeTypes;
+    }
+
+    public void setDefaultMimeTypes(String values) {
+        defaultMimeTypes = values;
+    }
+
+    /**
+     * Default response payload
+     */
+    public OtmObject getDefaultResponsePayload(OtmModelManager mgr) {
+        return mgr.getMember( defaultResponsePayload );
+    }
+
+    public void setDefaultResponsePayload(OtmObject payload) {
+        setDefaultResponsePayload( payload.getNameWithPrefix() );
+    }
+
+    public void setDefaultResponsePayload(String nameWithPrefix) {
+        this.defaultResponsePayload = nameWithPrefix;
+    }
+
     public void setExampleContext(String exampleContext) {
         this.exampleContext = exampleContext;
     }
@@ -176,6 +219,11 @@ public class UserSettings extends AbstractUserSettings {
     private boolean suppressOtmExtensions = false;
     private boolean generateExamples = true;
     private boolean generateMaxDetailsForExamples = true;
+
+    private String defaultMimeTypes;
+    private String defaultRequestPayload;
+    private String defaultResponsePayload;
+
     private String exampleContext;
     private int exampleMaxRepeat;
     private int exampleMaxDepth;
@@ -255,6 +303,9 @@ public class UserSettings extends AbstractUserSettings {
         settings.setLastProjectFolder( new File( userHomeDirectory ) );
         settings.setHideOpenProjectDialog( false );
         settings.setLastRepositoryId( "" );
+        settings.defaultMimeTypes = "APPLICATION_JSON;APPLICATION_XML";
+        settings.defaultRequestPayload = "";
+        settings.defaultResponsePayload = "";
 
         // Compiler Options
         settings.setCompileSchemas( true );
@@ -289,6 +340,11 @@ public class UserSettings extends AbstractUserSettings {
         setLastRepositoryId( settingsProps.getProperty( "lastRepositoryId" ) );
         // int rptCount = Integer.parseInt( settingsProps.getProperty( "repeatCount" ) );
         // setRepeatCount( rptCount );
+
+        // Resource defaults
+        setDefaultMimeTypes( settingsProps.getProperty( "defaultMimeTypes" ) );
+        setDefaultRequestPayload( settingsProps.getProperty( "defaultRequestPayload" ) );
+        setDefaultResponsePayload( settingsProps.getProperty( "defaultResponsePayload" ) );
 
         // Compiler Options
         setCompileSchemas( Boolean.valueOf( settingsProps.getProperty( "compileSchemas" ) ) );
@@ -325,6 +381,11 @@ public class UserSettings extends AbstractUserSettings {
         // settingsProps.put( "lastModelFile", modelFile );
         settingsProps.put( PROJECT_DIRECTORY_LABEL, projectFolder );
         settingsProps.put( HIDE_PROJECT_OPEN_DIALOG, Boolean.toString( hideProjectOpenDialog ) );
+
+        // Resource Defaults
+        settingsProps.put( "defaultMimeTypes", defaultMimeTypes );
+        settingsProps.put( "defaultResponsePayload", defaultResponsePayload );
+        settingsProps.put( "defaultRequestPayload", defaultRequestPayload );
 
         // Compiler Options
         settingsProps.put( "compileSchemas", Boolean.toString( compileSchemas ) );
