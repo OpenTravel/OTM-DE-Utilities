@@ -65,6 +65,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
@@ -583,8 +584,10 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         fields.add( new DexEditField( 3, 0, null, abstract_TOOLTIP, getIsAbstractNode() ) );
         fields.add( new DexEditField( 3, 1, null, firstClass_TOOLTIP, getIsFirstClassNode() ) );
         //
-        fields.add( new DexEditField( 4, 0, DEFAULT_MIME_LABEL, DEFAULT_MIME_TOOLTIP, getMimeNode() ) );
-        fields.add( new DexEditField( 5, 0, DEFAULT_BASE_PAYLOAD_LABEL, DEFAULT_BASE_PAYLOAD_TOOLTIP,
+        fields.add( new DexEditField( 4, 0, null, "", new Separator() ) );
+        fields.add( new DexEditField( 4, 1, null, "", new Separator() ) );
+        fields.add( new DexEditField( 5, 0, DEFAULT_MIME_LABEL, DEFAULT_MIME_TOOLTIP, getMimeNode() ) );
+        fields.add( new DexEditField( 6, 0, DEFAULT_BASE_PAYLOAD_LABEL, DEFAULT_BASE_PAYLOAD_TOOLTIP,
             makeDefaultPayloadBox() ) );
 
         return fields;
