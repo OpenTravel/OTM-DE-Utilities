@@ -98,14 +98,10 @@ public class MimeTypeMap {
         for (String token : tokens) {
             values.put( token, true );
         }
-        print();
     }
 
     protected void print() {
         for (Entry<String,Boolean> e : values.entrySet())
             log.debug( e.getKey() + " = " + e.getValue() );
     }
-
-
-
 }

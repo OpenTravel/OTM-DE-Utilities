@@ -64,10 +64,10 @@ public class OpenProjectFileTask extends DexTaskBase<File> {
     @Override
     public synchronized void doIT() {
         // log.debug( "Opening " + taskData.getName() );
-        boolean result =
-            new DexFileHandler().openProject( taskData, modelMgr, new OpenProjectProgressMonitor( status ) );
-        if (!result)
-            throw new IllegalStateException( "Error opening project." );
+        DexFileHandler fileHandler = new DexFileHandler();
+        boolean result = fileHandler.openProject( taskData, modelMgr, new OpenProjectProgressMonitor( status ) );
+        if (!result) // get string from file handler
+            throw new IllegalStateException( fileHandler.getErrorMessage() );
     }
 
 }

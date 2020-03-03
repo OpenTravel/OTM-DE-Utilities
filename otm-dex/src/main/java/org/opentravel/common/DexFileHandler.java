@@ -57,6 +57,11 @@ public class DexFileHandler extends AbstractMainWindowController {
     public static final String FILE_SEPARATOR = "/";
 
     ValidationFindings findings = null;
+    private String errorMessage = "";
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
 
     /**
      * Return a file selected by the user. Save the directory in the user settings.
@@ -217,6 +222,8 @@ public class DexFileHandler extends AbstractMainWindowController {
     /**
      * Open the passed file using the project manager associated with the model manager. If successful, load projects
      * into the model manager.
+     * <p>
+     * If the result is false indicating an error, the error can be retrieved using {@link #getErrorMessage()}
      * 
      * @param selectedProjectFile name must end with the PROJECT_FILE_EXTENSION
      * @param mgr
@@ -230,8 +237,9 @@ public class DexFileHandler extends AbstractMainWindowController {
             try {
                 manager.loadProject( selectedProjectFile, findings, monitor );
             } catch (Exception e) {
-                log.error( "Error Opening Project: " + e.getLocalizedMessage() );
-                manager.closeAll();
+                errorMessage = "Error Opening Project: " + e.getLocalizedMessage();
+                log.error( errorMessage );
+                manager.closeAll(); // This is the error message i want to show
                 return false;
             }
             mgr.addProjects();
