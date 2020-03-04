@@ -206,14 +206,13 @@ public class OtmLibrary {
     public DexActionManager getActionManager() {
         if (isMinorVersion())
             return getModelManager().getMinorActionManager( isEditable() );
-        // if (isChainEditable())
-        // return getModelManager().getMinorActionManager( isLatestVersion() );
         return getModelManager().getActionManager( isEditable() );
     }
 
     /**
      * Get Read-only, Minor or Full action manager. To determine which manager to return, consider
      * <ul>
+     * <li>managed or unmanaged - when unmanaged always return the full action manager from model manager
      * <li>library version
      * <li>library status
      * <li>if the member is new to the chain and editable library
@@ -223,6 +222,8 @@ public class OtmLibrary {
      * @return action manager
      */
     public DexActionManager getActionManager(OtmLibraryMember member) {
+        if (isUnmanaged())
+            return getModelManager().getActionManager( true );
         if (isMajorVersion() && isEditable())
             return getModelManager().getActionManager( true );
         if (isChainEditable()) {
@@ -468,15 +469,13 @@ public class OtmLibrary {
     }
 
     /**
-     * 
      * A library is editable if any associated project item state is Managed_WIP -OR- unmanaged. Regardless of action
      * manager.
      * 
      * @return
      */
     public boolean isEditable() {
-        // log.debug( "State of " + getName() + " is " + getState().toString() );
-        // Can only edit Draft libraries
+        // log.debug( getName() + " State = " + getState().toString() + " Status = " + getStatus() );
         if (getStatus() != TLLibraryStatus.DRAFT)
             return false;
         return getState() == RepositoryItemState.MANAGED_WIP || getState() == RepositoryItemState.UNMANAGED;
@@ -519,6 +518,8 @@ public class OtmLibrary {
      * @return true if minor version number is > 0 and managed in repository
      */
     public boolean isMinorVersion() {
+        if (getPatchVersion() > 0)
+            return false;
         return (getMinorVersion() > 0 && getState() != RepositoryItemState.UNMANAGED);
     }
 
@@ -526,6 +527,8 @@ public class OtmLibrary {
      * @return true if minor version number is = 0 and managed in repository
      */
     public boolean isMajorVersion() {
+        if (getPatchVersion() > 0)
+            return false;
         return (getMinorVersion() == 0 && getState() != RepositoryItemState.UNMANAGED);
     }
 

@@ -66,6 +66,9 @@ public class NewLibraryMemberAction extends DexRunAction {
         OtmLibraryMember member = null;
         if (otm != null && otm.getModelManager() != null && data instanceof OtmLibraryMemberType) {
             try {
+                if (((OtmLibraryMemberType) data).equals( OtmLibraryMemberType.EXTENSIONPOINTFACET ))
+                    return null; // TODO - implement when patch library is fully implemented.
+
                 // Build and hold onto for undo
                 member = OtmLibraryMemberType.buildMember( (OtmLibraryMemberType) data, "New", otm.getModelManager() );
 

@@ -247,7 +247,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             if (children != null && children.isEmpty())
                 modelChildren();
         }
-        return children;
+        return children != null ? children : Collections.emptyList();
     }
 
     @Override

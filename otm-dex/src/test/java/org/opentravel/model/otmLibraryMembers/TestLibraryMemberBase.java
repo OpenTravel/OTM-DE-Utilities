@@ -66,7 +66,7 @@ public class TestLibraryMemberBase {
     @Test
     public void testAddAndRemove() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
         NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
-        OtmModelManager mgr = new OtmModelManager( null, null );
+        OtmModelManager mgr = new OtmModelManager( null, null, null );
         OtmLibrary lib = mgr.add( new TLLibrary() );
 
         for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
@@ -86,6 +86,30 @@ public class TestLibraryMemberBase {
             assertFalse( mgr.getMembers().contains( member ) );
 
             // log.debug( "Added and removed: " + member );
+        }
+    }
+
+    @Test
+    public void testDelete() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
+        NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
+        OtmModelManager mgr = new OtmModelManager( null, null, null );
+        OtmLibrary lib = mgr.add( new TLLibrary() );
+
+        // Given - one of each type added to the library
+        for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
+            OtmLibraryMember member = OtmLibraryMemberType.buildMember( type, "Test" + type.toString(), mgr );
+            lib.add( member );
+        }
+
+        ArrayList<OtmLibraryMember> members = new ArrayList<>( mgr.getMembers() );
+        for (OtmLibraryMember member : members) {
+            String memberName = member.getName();
+            // When - deleted from library
+            lib.delete( member );
+            log.debug( "Deleted library member: " + memberName );
+
+            assertFalse( mgr.contains( member.getTlLM() ) );
+            assertFalse( mgr.getMembers().contains( member ) );
         }
     }
 

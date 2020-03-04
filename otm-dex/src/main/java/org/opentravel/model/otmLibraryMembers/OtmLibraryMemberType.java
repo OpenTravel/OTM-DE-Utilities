@@ -37,6 +37,7 @@ public enum OtmLibraryMemberType {
     CHOICEFACET("Choice Facet", OtmChoiceFacet.class),
     CUSTOM("Custom Facet", OtmCustomFacet.class),
     QUERY("Query Facet", OtmQueryFacet.class),
+    EXTENSIONPOINTFACET("Extension Point", OtmExtensionPointFacet.class),
     SERVICE("Service", OtmServiceObject.class);
 
     private final String label;

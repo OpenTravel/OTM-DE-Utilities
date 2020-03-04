@@ -81,6 +81,8 @@ public class TestNewLibraryMemberAction {
         Object result = null;
         OtmLibraryMember member = null;
         for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
+            if (type == OtmLibraryMemberType.EXTENSIONPOINTFACET)
+                continue;
             // FIXED - DexActions no longer only uses subject's AM, not the caller
             result = actionManager.run( DexActions.NEWLIBRARYMEMBER, testBO, type );
             assertTrue( "Must create library member.", result instanceof OtmLibraryMember );
@@ -112,6 +114,8 @@ public class TestNewLibraryMemberAction {
         Object result = null;
         OtmLibraryMember member = null;
         for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
+            if (type == OtmLibraryMemberType.EXTENSIONPOINTFACET)
+                continue;
             // FIXED - DexActions no longer only uses subject's AM, not the caller
             result = wizardAM.run( DexActions.NEWLIBRARYMEMBER, testBO, type );
             assertTrue( "Must create library member.", result instanceof OtmLibraryMember );

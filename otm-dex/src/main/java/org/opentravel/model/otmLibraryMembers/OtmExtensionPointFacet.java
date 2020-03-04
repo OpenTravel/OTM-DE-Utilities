@@ -25,11 +25,12 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmFacets.OtmAbstractFacet;
-import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyFactory;
+import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeOwner;
+import org.opentravel.schemacompiler.model.TLExtension;
 import org.opentravel.schemacompiler.model.TLExtensionPointFacet;
 import org.opentravel.schemacompiler.model.TLIndicator;
 import org.opentravel.schemacompiler.model.TLIndicatorOwner;
@@ -54,14 +55,18 @@ import javafx.beans.property.StringProperty;
 public class OtmExtensionPointFacet extends OtmLibraryMemberBase<TLExtensionPointFacet> implements OtmPropertyOwner {
     private static Log log = LogFactory.getLog( OtmExtensionPointFacet.class );
 
-    // // The contributed facet that is child of a library member.
-    // private OtmContributedFacet whereContributed = null;
+    /**
+    * 
+    */
+    public OtmExtensionPointFacet(String name, OtmModelManager mgr) {
+        super( new TLExtensionPointFacet(), mgr );
+    }
 
     public OtmExtensionPointFacet(TLExtensionPointFacet tl, OtmModelManager manager) {
         super( tl, manager );
         // FIXME
         // this logic
-        // ability to create, add to enum, and filter
+        // ability to create and filter
         // JUNIT
         // ICON
         // Inheritance representation into base type
@@ -106,25 +111,6 @@ public class OtmExtensionPointFacet extends OtmLibraryMemberBase<TLExtensionPoin
         return null;
     }
 
-    // public OtmContextualFacet addCF(OtmContextualFacet child) {
-    // if (children == null)
-    // children = new ArrayList<>();
-    // else if (contains( children, child ))
-    // return null;
-    //
-    // if (inheritedChildren == null)
-    // inheritedChildren = new ArrayList<>();
-    // else if (contains( inheritedChildren, child ))
-    // return null;
-    //
-    // if (!child.isInherited())
-    // children.add( child );
-    // else
-    // inheritedChildren.add( child );
-    // return child;
-    // }
-
-
     @Override
     public StringProperty baseTypeProperty() {
         if (getBaseType() != null) {
@@ -133,15 +119,15 @@ public class OtmExtensionPointFacet extends OtmLibraryMemberBase<TLExtensionPoin
         return super.baseTypeProperty();
     }
 
-    /**
-     * {@inheritDoc} Clear this name property <b>only</b>. In most cases use
-     * {@link OtmContributedFacet#clearNameProperty()}
-     */
-    // @SuppressWarnings(value = {"squid:S1185"})
-    @Override
-    public void clearNameProperty() {
-        super.clearNameProperty();
-    }
+    // /**
+    // * {@inheritDoc} Clear this name property <b>only</b>. In most cases use
+    // * {@link OtmContributedFacet#clearNameProperty()}
+    // */
+    // // @SuppressWarnings(value = {"squid:S1185"})
+    // @Override
+    // public void clearNameProperty() {
+    // super.clearNameProperty();
+    // }
 
     @Override
     public void delete(OtmObject property) {
@@ -172,60 +158,49 @@ public class OtmExtensionPointFacet extends OtmLibraryMemberBase<TLExtensionPoin
 
     @Override
     public String getBaseTypeName() {
-        return getBaseType() != null ? getBaseType().getName() : "";
+        return getBaseType() != null ? getBaseType().getNameWithPrefix() : "";
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Children are maintained on the contextual facet not the contributed. Children must be maintained even when a
-     * contextual facet is not injected into an object.
-     * 
-     */
-    @Override
-    public List<OtmObject> getChildren() {
-        synchronized (this) {
-            if (children != null && children.isEmpty())
-                modelChildren();
-        }
-        return children != null ? children : Collections.emptyList();
-    }
+    // /**
+    // * {@inheritDoc}
+    // * <p>
+    // * Children are maintained on the contextual facet not the contributed. Children must be maintained even when a
+    // * contextual facet is not injected into an object.
+    // *
+    // */
+    // @Override
+    // public List<OtmObject> getChildren() {
+    // synchronized (this) {
+    // if (children != null && children.isEmpty())
+    // modelChildren();
+    // }
+    // return children != null ? children : Collections.emptyList();
+    // }
 
-    /**
-     * @see OtmExtensionPointFacet#getBaseType()
-     * @see OtmExtensionPointFacet#getOwningMember()
-     * @return the object where this facet is contributed.
-     */
-    public OtmLibraryMember getContributedObject() {
-        if (getBaseType() instanceof OtmLibraryMember)
-            return (OtmLibraryMember) getBaseType();
-        return null;
-    }
+    // /**
+    // * @see OtmExtensionPointFacet#getBaseType()
+    // * @see OtmExtensionPointFacet#getOwningMember()
+    // * @return the object where this facet is contributed.
+    // */
+    // public OtmLibraryMember getContributedObject() {
+    // if (getBaseType() instanceof OtmLibraryMember)
+    // return (OtmLibraryMember) getBaseType();
+    // return null;
+    // }
 
     @Override
     public Icons getIconType() {
         return ImageManager.Icons.FACET_CONTEXTUAL;
     }
 
-    // @Override
-    // public boolean isExpanded() {
-    // return true;
-    // }
-
     @Override
     public List<OtmObject> getInheritedChildren() {
         return Collections.emptyList(); // TODO
     }
 
-    /**
-     * {@inheritDoc} Get the full name complete with owning object's prefix
-     */
     @Override
     public String getName() {
-        // String ln = getTL().getLocalName(); // ObjectName_FacetName
-        // String sn = getTL().getName(); // FacetName
         return getTL().getLocalName();
-        // return this.getClass().getSimpleName();
     }
 
     /**
@@ -245,84 +220,11 @@ public class OtmExtensionPointFacet extends OtmLibraryMemberBase<TLExtensionPoin
         return (TLExtensionPointFacet) tlObject;
     }
 
-
-    // /**
-    // * NOTE: detection of "ghost" inherited facets depends on Contributor will not have ghost set as where
-    // contributed.
-    // *
-    // * @return the non-ghost contributed facet where this facet is used
-    // */
-    // public OtmContributedFacet getWhereContributed() {
-    // if (whereContributed == null) {
-    // // If the TL object has owning entity, use that to find the contributed facet
-    // OtmObject o = OtmModelElement.get( (TLModelElement) getTL().getOwningEntity() );
-    // if (o instanceof OtmContributedFacet)
-    // o = ((OtmContributedFacet) o).getContributor();
-    //
-    // // Try to find a contributed facet child with same TL
-    // if (o instanceof OtmChildrenOwner)
-    // findWhereContributed( (OtmChildrenOwner) o );
-    //
-    // // if still not found
-    // if (whereContributed == null) {
-    // if (o instanceof OtmLibraryMember) {
-    // // Build a contributed facet and add to parent
-    // whereContributed = new OtmContributedFacet( (OtmLibraryMember) o, this );
-    // ((OtmLibraryMember) o).add( whereContributed );
-    // } else {
-    // // Fail-safe - search the manager for a match
-    // findWhereContributed();
-    // }
-    // }
-    // }
-    //
-    // return whereContributed;
-    // }
-
-    // /**
-    // * See if the children owner has a contributed facet with the same TL as this contextual facet
-    // *
-    // * @param owner
-    // */
-    // private void findWhereContributed(OtmChildrenOwner owner) {
-    // for (OtmObject c : owner.getChildren()) {
-    // // NAME match is not reliable!
-    // // if (c instanceof OtmContributedFacet && c.getName().equals( this.getName() )) {
-    // if (c instanceof OtmContributedFacet && c.getTL() == this.getTL()) {
-    // whereContributed = (OtmContributedFacet) c;
-    // ((OtmContributedFacet) c).setContributor( this );
-    // }
-    // }
-    // }
-
-    // /*
-    // * See if the model manager has the owning entity by name. If so, create and set contributed facet.
-    // */
-    // private void findWhereContributed() {
-    // if (getTL().getOwningEntityName() == null)
-    // return;
-    // if (!getTL().getOwningEntityName().isEmpty()) {
-    // OtmLibraryMember candidate = mgr.getMember( getTL().getOwningEntityName() );
-    // if (candidate != null && candidate.getTL() instanceof TLFacetOwner) {
-    // log.debug( "Name Match Found for contextual facet with no owner: " + candidate );
-    // getTL().setOwningEntity( (TLFacetOwner) candidate.getTL() );
-    // whereContributed = new OtmContributedFacet( candidate, this );
-    // candidate.add( whereContributed );
-    // } else {
-    // log.warn( "Can't find where contributed. Member = " + this + " owning entity = "
-    // + getTL().getOwningEntityName() );
-    // }
-    // }
-    // }
-
     @Override
     public boolean isNameControlled() {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public StringProperty nameEditingProperty() {
         return nameEditingProperty( getTL().getLocalName() );
@@ -331,12 +233,11 @@ public class OtmExtensionPointFacet extends OtmLibraryMemberBase<TLExtensionPoin
     @Override
     public void modelChildren() {
         if (getTL() instanceof TLIndicatorOwner)
-            ((TLIndicatorOwner) getTL()).getIndicators().forEach( p -> OtmPropertyFactory.create( p, this ) );
+            (getTL()).getIndicators().forEach( p -> OtmPropertyFactory.create( p, this ) );
         if (getTL() instanceof TLAttributeOwner)
-            ((TLAttributeOwner) getTL()).getAttributes().forEach( p -> OtmPropertyFactory.create( p, this ) );
+            (getTL()).getAttributes().forEach( p -> OtmPropertyFactory.create( p, this ) );
         if (getTL() instanceof TLPropertyOwner)
-            ((TLPropertyOwner) getTL()).getElements().forEach( p -> OtmPropertyFactory.create( p, this ) );
-        // TODO - add other facets???
+            (getTL()).getElements().forEach( p -> OtmPropertyFactory.create( p, this ) );
     }
 
     @Override
@@ -344,25 +245,25 @@ public class OtmExtensionPointFacet extends OtmLibraryMemberBase<TLExtensionPoin
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public void remove(OtmObject child) {
-        children.remove( child );
-    }
+    // @Override
+    // public void remove(OtmObject child) {
+    // children.remove( child );
+    // }
 
+    /**
+     * {@inheritDoc} Sets base type into the TL extension object
+     * 
+     * @see org.opentravel.model.otmLibraryMembers.OtmLibraryMemberBase#setBaseType(org.opentravel.model.OtmObject)
+     */
     @Override
     public OtmObject setBaseType(OtmObject baseObj) {
-        // if (baseObj instanceof OtmLibraryMember && baseObj.getTL() instanceof TLFacetOwner) {
-        // OtmLibraryMember lm = (OtmLibraryMember) baseObj;
-        // // Set the TL Owning entity
-        // getTL().setOwningEntity( (TLFacetOwner) lm.getTL() );
-        //
-        // // Create or change where contributed
-        // if (getWhereContributed() == null)
-        // whereContributed = new OtmContributedFacet( lm, this );
-        // whereContributed.setParent( lm, this );
-        // whereContributed.clearNameProperty();
-        // }
-        // // Where used
+        TLExtension tle = getTL().getExtension();
+        if (tle == null) {
+            tle = new TLExtension();
+            getTL().setExtension( tle );
+        }
+        if (baseObj.getTL() instanceof NamedEntity)
+            tle.setExtendsEntity( (NamedEntity) baseObj.getTL() );
         return getBaseType();
     }
 
