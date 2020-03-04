@@ -176,6 +176,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
             propertiesTable.getRoot().getChildren().clear();
         if (propertiesTable.getSelectionModel() != null)
             propertiesTable.getSelectionModel().clearSelection();
+        postedData = null;
     }
 
     @Override
@@ -204,7 +205,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
     @Override
     public void handleEvent(AbstractOtmEvent e) {
-        // log.debug( "event handler: " + e.getClass().getSimpleName() );
+        log.debug( "event handler: " + e.getClass().getSimpleName() );
         if (e instanceof DexMemberSelectionEvent)
             handleEvent( (DexMemberSelectionEvent) e );
         else if (e instanceof DexModelChangeEvent)
