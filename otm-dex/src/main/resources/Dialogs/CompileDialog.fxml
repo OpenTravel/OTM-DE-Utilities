@@ -167,7 +167,7 @@
 																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Compile Swagger" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+																				<Label text="Compile OpenAPI (Swagger)" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
 																					<padding>
 																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
