@@ -17,6 +17,7 @@
 package org.opentravel.dex.controllers;
 
 import org.opentravel.application.common.events.OtmEventSubscriptionManager;
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
@@ -123,8 +124,16 @@ public interface DexMainController extends DexController {
     public void publishEvent(DexChangeEvent event);
 
     /**
-     * @param queueSize
+     * Update any displays of the action manager status or queue
+     * 
+     * @param actionManager
      */
-    public void updateActionQueueSize(int queueSize);
+    public void updateActionManagerDisplay(DexActionManager actionManager);
+
+    // /**
+    // * @deprecated - use updateActionManagerDisplay(actionManager)
+    // * @param queueSize
+    // */
+    // public void updateActionQueueSize(int queueSize);
 
 }

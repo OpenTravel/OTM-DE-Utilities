@@ -55,6 +55,7 @@ public abstract class OtmComplexObjects<T extends TLComplexTypeBase> extends Otm
         return (T) tlObject;
     }
 
+
     /**
      * @see org.opentravel.model.OtmChildrenOwner#add(org.opentravel.model.OtmObject)
      */

@@ -148,13 +148,13 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
 
     @Test
     public void testTypeChange() {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
+        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
         OtmChoiceObject choice = TestChoice.buildOtm( staticModelManager );
-        // Get a facet with one of each property type
+        // Givens: a facet with one of each property type
         OtmFacet<?> facet = choice.getShared();
         List<OtmObject> kids = new ArrayList<>( facet.getChildren() );
         kids.forEach( k -> facet.delete( (OtmProperty) k ) );
-        buildOneOfEach( facet );
+        buildOneOfEach2( facet );
         int kidCount = facet.getChildren().size();
 
         PropertyRoleChangeAction action = null;
@@ -171,24 +171,26 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
                     // Then - if not the same type, there should be a new property
                     if (newProperty != null) {
                         assertTrue( newProperty.getPropertyType() == type );
+                        assertTrue( "Must have correct parent.", newProperty.getParent() == facet );
+                        // Then - new property replaced old property
                         assertTrue( facet.getChildren().size() == kidCount );
-                        assertTrue( facet.getChildren().contains( newProperty ) );
-                        assertFalse( facet.getChildren().contains( k ) );
-                        assertTrue( newProperty.getParent() == facet );
+                        assertFalse( facet.contains( k ) );
+                        assertTrue( facet.contains( newProperty ) );
+                        // Then - TL facet must contain the new TL property
                         if (newProperty instanceof OtmElement)
-                            assertTrue( ((OtmElement) newProperty).getTL().getOwner() == facet.getTL() );
+                            assertTrue( ((OtmElement<?>) newProperty).getTL().getOwner() == facet.getTL() );
                         if (newProperty instanceof OtmAttribute)
-                            assertTrue( ((OtmAttribute) newProperty).getTL().getOwner() == facet.getTL() );
+                            assertTrue( ((OtmAttribute<?>) newProperty).getTL().getOwner() == facet.getTL() );
                         if (newProperty instanceof OtmIndicator)
-                            assertTrue( ((OtmIndicator) newProperty).getTL().getOwner() == facet.getTL() );
+                            assertTrue( ((OtmIndicator<?>) newProperty).getTL().getOwner() == facet.getTL() );
                         assertFalse( newProperty.isInherited() );
 
                         // Change it back
                         action.undo();
                         assertTrue( facet.getChildren().size() == kidCount );
                         assertTrue( ((OtmProperty) k).getPropertyType() == oldType );
-                        assertFalse( facet.getChildren().contains( newProperty ) );
-                        assertTrue( facet.getChildren().contains( k ) );
+                        assertFalse( facet.contains( newProperty ) );
+                        assertTrue( facet.contains( k ) );
                         if (k instanceof OtmElement)
                             assertTrue( ((OtmElement) k).getTL().getOwner() == facet.getTL() );
                         if (k instanceof OtmAttribute)
@@ -202,6 +204,7 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
             }
         }
     }
+
 
     @Test
     public void testCloneTypeAssignments() {

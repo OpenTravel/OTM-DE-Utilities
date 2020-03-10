@@ -72,8 +72,9 @@ public class DeletePropertyAction extends DexRunAction {
     @Override
     public OtmResourceChild undoIt() {
         if (deletedProperty != null) {
-            log.debug( "FIXME - undo delete" );
+            log.debug( "TEST - undo delete" );
             deletedProperty.getParent().add( deletedProperty.getTL() );
+            deletedProperty.getParent().refresh();
             deletedProperty = null;
         }
         return null;

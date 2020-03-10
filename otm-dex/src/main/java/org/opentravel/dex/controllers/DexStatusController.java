@@ -78,17 +78,23 @@ public class DexStatusController extends DexIncludedControllerBase<String> {
     }
 
     public void postStatus(String status) {
+        String displayText = status;
+        if (status != null && status.length() > 80)
+            displayText = displayText.substring( 0, 80 );// don't overflow the status bar area
         if (statusLabel != null)
             if (Platform.isFxApplicationThread())
-                statusLabel.setText( status );
+                statusLabel.setText( displayText );
             else
                 Platform.runLater( () -> postStatus( status ) );
     }
 
     public void postStatus(int count, String status) {
+        String displayText = status;
+        if (status != null && status.length() > 80)
+            displayText = displayText.substring( 0, 80 );// don't overflow the status bar area
         if (statusLabel != null)
             if (Platform.isFxApplicationThread()) {
-                statusLabel.setText( status );
+                statusLabel.setText( displayText );
                 taskCount.setText( String.valueOf( count ) );
             } else
                 Platform.runLater( () -> postStatus( count, status ) );

@@ -25,6 +25,7 @@ import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.controllers.popup.TextAreaEditorContoller;
 import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
@@ -46,9 +47,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
 
 /**
  * Controller for library member details controller.
@@ -70,7 +71,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
      * FXML Java FX Nodes this controller is dependent upon
      */
     @FXML
-    private VBox memberDetails;
+    private TitledPane memberDetails;
     @FXML
     private TextField memberName;
     @FXML
@@ -95,6 +96,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     private Button changeTypeButton;
     @FXML
     private TextField memberDescription;
+    @FXML
+    private Button descriptionEditButton;
     @FXML
     private RadioButton editreadonly;
     @FXML
@@ -125,7 +128,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
 
     @Override
     public void checkNodes() {
-        if (!(memberDetails instanceof VBox))
+        if (!(memberDetails instanceof TitledPane))
             throw new IllegalStateException( "Member Details not injected by FXML." );
         if (objectLabel == null)
             throw new IllegalStateException( "Object label not injected by FXML." );
@@ -215,10 +218,6 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         }
     }
 
-    // private void postNotImplemented() {
-    // DialogBoxContoller.init().show( "Not Implemented", "Work in progress." );
-    // }
-
     public void post(OtmLibraryMember member) {
         if (member == null) {
             clear();
@@ -238,7 +237,6 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             property.set( memberName.getText() );
             memberName.setText( property.get() );
         } );
-
         // Set library
         libraryName.setEditable( false );
         libraryName.setText( member.libraryProperty().get() );
@@ -254,6 +252,9 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         memberDescription.setEditable( member.isEditable() );
         memberDescription.setText( member.descriptionProperty().get() );
         memberDescription.setOnAction( e -> member.descriptionProperty().set( memberDescription.getText() ) );
+        descriptionEditButton.setDisable( !member.isEditable() );
+        descriptionEditButton
+            .setOnAction( ae -> TextAreaEditorContoller.init().showAndWait( member.descriptionProperty() ) );
 
         // Base type
         final String BASETYPELABEL = "Base Type";

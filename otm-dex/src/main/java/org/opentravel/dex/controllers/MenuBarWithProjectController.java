@@ -258,16 +258,31 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         undoActionButton.setOnAction( handler );
     }
 
-    // TODO -- it should get its own size
-    public void updateActionQueueSize(int size) {
-        actionCount.setText( Integer.toString( size ) );
-        undoActionButton.setDisable( size <= 0 );
-        String last = "";
-        if (modelMgr != null && modelMgr.getActionManager( true ) != null
-            && modelMgr.getActionManager( true ).getLastAction() != null)
-            last = modelMgr.getActionManager( true ).getLastAction().toString();
-        lastAction.setText( last );
+    public void updateActionManagerDisplay(DexActionManager actionManger) {
+        if (actionManger != null) {
+            actionCount.setText( Integer.toString( actionManger.getQueueSize() ) );
+            undoActionButton.setDisable( actionManger.getQueueSize() <= 0 );
+            String last = "";
+            if (actionManger.getLastAction() != null)
+                last = (actionManger.getLastAction().toString());
+            if (last != null && last.length() > 40)
+                last = last.substring( 0, 40 ); // don't overflow the menu bar space
+            lastAction.setText( last );
+        }
     }
+
+    // // DONE -- it should get its own size
+    // public void updateActionQueueSize(int size) {
+    // actionCount.setText( Integer.toString( size ) );
+    // undoActionButton.setDisable( size <= 0 );
+    // String last = "";
+    // if (modelMgr != null && modelMgr.getActionManager( true ) != null
+    // && modelMgr.getActionManager( true ).getLastAction() != null)
+    // last = modelMgr.getActionManager( true ).getLastAction().toString();
+    // if (last != null && last.length() > 40)
+    // last = last.substring( 0, 40 ); // don't overflow the menu bar space
+    // lastAction.setText( last );
+    // }
 
     public void undoAction() {
         modelMgr.getActionManager( true ).undo();
@@ -276,7 +291,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     @FXML
     public void doCompile(ActionEvent e) {
-        // FIXME - if not saved, save now
+        // DONE - if not saved, save now
         CompileDialogController cdc = CompileDialogController.init();
         cdc.configure( modelMgr, userSettings, mainController.getStatusController() );
         cdc.show( "" );
@@ -425,7 +440,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
                 DexActionManager actionMgr = modelMgr.getActionManager( true );
                 if (actionMgr != null) {
                     actionMgr.clearQueue();
-                    updateActionQueueSize( actionMgr.getQueueSize() );
+                    updateActionManagerDisplay( actionMgr );
                 }
                 // clear status line
                 mainController.getStatusController().postStatus( "" );

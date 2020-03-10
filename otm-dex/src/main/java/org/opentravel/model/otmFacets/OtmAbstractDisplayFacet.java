@@ -80,6 +80,11 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     }
 
     @Override
+    public StringProperty deprecationProperty() {
+        return null;
+    }
+
+    @Override
     public DexActionManager getActionManager() {
         return parent.getActionManager();
     }

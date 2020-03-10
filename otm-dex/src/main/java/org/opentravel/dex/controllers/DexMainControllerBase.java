@@ -23,6 +23,7 @@ import org.opentravel.application.common.OtmEventUser;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.application.common.events.OtmEventSubscriptionManager;
 import org.opentravel.common.ImageManager;
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.controllers.repository.RepositorySelectionController;
@@ -266,10 +267,16 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     }
 
     @Override
-    public void updateActionQueueSize(int size) {
-        if (menuBarController != null)
-            menuBarController.updateActionQueueSize( size );
+    public void updateActionManagerDisplay(DexActionManager actionManager) {
+        menuBarController.updateActionManagerDisplay( actionManager );
     }
+
+    // @Deprecated
+    // @Override
+    // public void updateActionQueueSize(int size) {
+    // if (menuBarController != null)
+    // menuBarController.updateActionQueueSize( size );
+    // }
 
     public void updateValidation() {
         new ValidateModelManagerItemsTask( getModelManager(), this, statusController ).go();

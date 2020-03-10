@@ -140,6 +140,7 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
         if (getTL() instanceof TLPropertyOwner && property.getTL() instanceof TLProperty)
             ((TLPropertyOwner) getTL()).removeProperty( ((TLProperty) property.getTL()) );
         remove( property );
+        refresh();
     }
 
     /**

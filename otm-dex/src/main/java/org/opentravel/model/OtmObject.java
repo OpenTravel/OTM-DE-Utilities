@@ -46,7 +46,12 @@ public interface OtmObject {
     void clearNameProperty();
 
     /**
-     * @return fx property for description
+     * @return FX property for deprecation or null
+     */
+    public StringProperty deprecationProperty();
+
+    /**
+     * @return FX property for description
      */
     public StringProperty descriptionProperty();
 
@@ -294,4 +299,6 @@ public interface OtmObject {
      * @return a string wrapper around existing finding counts.
      */
     public StringProperty validationProperty();
+
+
 }

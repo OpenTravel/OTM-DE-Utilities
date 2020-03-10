@@ -16,11 +16,14 @@
 
 package org.opentravel.model.otmProperties;
 
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.TLModelElement;
+
+import javafx.beans.property.StringProperty;
 
 /**
  * Abstract base class for all OTM properties.
@@ -32,6 +35,7 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
     implements OtmProperty {
 
     private OtmPropertyOwner parent;
+    private StringProperty exampleProperty;
 
     /**
      * @param tl property owner
@@ -55,6 +59,14 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
     }
 
     @Override
+    public StringProperty exampleProperty() {
+        if (exampleProperty == null && getActionManager() != null) {
+            exampleProperty = getActionManager().add( DexActions.EXAMPLECHANGE, getExample(), this );
+        }
+        return exampleProperty;
+    }
+
+    @Override
     public String getNamespace() {
         return getOwningMember().getNamespace();
     }
@@ -68,6 +80,12 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
         return parent;
     }
 
+    @Override
+    public void refresh() {
+        exampleProperty = null;
+        super.refresh();
+    }
+
     public OtmPropertyOwner setParent(OtmPropertyOwner parent) {
         this.parent = parent;
         return parent;
@@ -76,11 +94,6 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
     public OtmPropertyType getPropertyType() {
         return OtmPropertyType.getType( this );
     }
-
-    // @Override
-    // public boolean isEditable() {
-    // return getOwningMember() != null && getOwningMember().isEditable();
-    // }
 
     @Override
     public String toString() {

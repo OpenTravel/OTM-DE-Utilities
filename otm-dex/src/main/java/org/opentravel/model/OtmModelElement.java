@@ -94,6 +94,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     protected StringProperty nameProperty;
     protected StringProperty nameEditingProperty;
     private StringProperty descriptionProperty;
+    private StringProperty deprecationProperty;
     private StringProperty validationProperty;
     private ObjectProperty<ImageView> validationImageProperty;
 
@@ -127,6 +128,14 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
             descriptionProperty = getActionManager().add( DexActions.DESCRIPTIONCHANGE, getDescription(), this );
         }
         return descriptionProperty;
+    }
+
+    @Override
+    public StringProperty deprecationProperty() {
+        if (deprecationProperty == null && getActionManager() != null) {
+            deprecationProperty = getActionManager().add( DexActions.DEPRECATIONCHANGE, getDeprecation(), this );
+        }
+        return deprecationProperty;
     }
 
     /**
@@ -385,6 +394,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     @Override
     public void refresh() {
+        deprecationProperty = null;
         descriptionProperty = null;
         findings = null;
         if (children != null)

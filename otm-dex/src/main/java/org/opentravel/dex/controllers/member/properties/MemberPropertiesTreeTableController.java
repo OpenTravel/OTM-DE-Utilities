@@ -29,6 +29,7 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.DexPropertySelectionEvent;
 import org.opentravel.dex.events.OtmObjectChangeEvent;
 import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.dex.events.OtmObjectReplacedEvent;
@@ -57,8 +58,8 @@ import javafx.scene.layout.VBox;
 public class MemberPropertiesTreeTableController extends DexIncludedControllerBase<OtmLibraryMember> {
     private static Log log = LogFactory.getLog( MemberPropertiesTreeTableController.class );
 
-    private static final EventType[] publishedEvents =
-        {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED,
+        DexModelChangeEvent.MODEL_CHANGED, DexPropertySelectionEvent.PROPERTY_SELECTED};
 
     private static final EventType[] subscribedEvents =
         {DexMemberDeleteEvent.MEMBER_DELETED, OtmObjectReplacedEvent.OBJECT_REPLACED,
@@ -297,8 +298,8 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
     @Override
     public void post(OtmLibraryMember member) {
-        postedData = member;
         clear();
+        postedData = member;
         if (member != null)
             new PropertiesDAO( member, this ).createChildrenItems( root, null );
     }
@@ -334,6 +335,8 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         } else {
             disableEditing();
         }
+        if (obj instanceof OtmProperty)
+            fireEvent( new DexPropertySelectionEvent( (OtmProperty) obj ) );
         // postObjectStatus( obj );
     }
 

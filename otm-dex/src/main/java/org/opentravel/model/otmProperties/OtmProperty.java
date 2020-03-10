@@ -20,6 +20,8 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
+import javafx.beans.property.StringProperty;
+
 /**
  * Interface for all OTM properties.
  * 
@@ -28,6 +30,11 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
  */
 public interface OtmProperty extends OtmObject {
 
+
+    /**
+     * @return FX property for examples
+     */
+    public StringProperty exampleProperty();
 
     public String getName();
 

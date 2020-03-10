@@ -36,6 +36,8 @@ public class MemberPropertiesTabController extends DexTabControllerBase {
     private MemberPropertiesTreeTableController memberPropertiesTreeTableController;
     @FXML
     private MemberDetailsController memberDetailsController;
+    @FXML
+    private PropertyDetailsController propertyDetailsController;
 
     public MemberPropertiesTabController() {
         // No-op
@@ -45,6 +47,7 @@ public class MemberPropertiesTabController extends DexTabControllerBase {
     public void configure(DexMainController mainController) {
         includedControllers.add( memberPropertiesTreeTableController );
         includedControllers.add( memberDetailsController );
+        includedControllers.add( propertyDetailsController );
         super.configure( mainController );
     }
 

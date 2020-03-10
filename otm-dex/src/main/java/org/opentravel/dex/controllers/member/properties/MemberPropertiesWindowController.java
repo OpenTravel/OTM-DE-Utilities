@@ -50,6 +50,8 @@ public class MemberPropertiesWindowController extends StandaloneWindowController
     private MemberDetailsController memberDetailsController;
     @FXML
     private MemberPropertiesTreeTableController memberPropertiesTreeTableController;
+    @FXML
+    private PropertyDetailsController propertyDetailsController;
 
     public MemberPropertiesWindowController() {
         // No-op
@@ -59,6 +61,7 @@ public class MemberPropertiesWindowController extends StandaloneWindowController
     public void configure(DexMainController mc, MenuItem menuItem) {
         includedControllers.add( memberDetailsController );
         includedControllers.add( memberPropertiesTreeTableController );
+        includedControllers.add( propertyDetailsController );
         super.configure( mc, menuItem );
     }
 

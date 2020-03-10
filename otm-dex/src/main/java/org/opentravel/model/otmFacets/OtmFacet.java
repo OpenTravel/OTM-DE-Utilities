@@ -19,9 +19,13 @@ package org.opentravel.model.otmFacets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmProperties.OtmAttribute;
+import org.opentravel.model.otmProperties.OtmElement;
+import org.opentravel.model.otmProperties.OtmIndicator;
 import org.opentravel.schemacompiler.model.TLFacet;
 
 /**
@@ -39,6 +43,25 @@ public abstract class OtmFacet<T extends TLFacet> extends OtmAbstractFacet<TLFac
     public OtmFacet(T tl, OtmLibraryMember parent) {
         super( tl );
         this.parent = parent;
+    }
+
+    /**
+     * Check the TL facet to assure it has the TL property.
+     * <p>
+     * This is the right way to check because the children list may get rebuilt with new facades.
+     * 
+     * @param facet
+     * @param property
+     * @return
+     */
+    public boolean contains(OtmObject property) {
+        if (property instanceof OtmElement)
+            return getTL().getElements().contains( property.getTL() );
+        if (property instanceof OtmAttribute)
+            return getTL().getAttributes().contains( property.getTL() );
+        if (property instanceof OtmIndicator)
+            return getTL().getIndicators().contains( property.getTL() );
+        return false;
     }
 
     public DexActionManager getActionManger() {

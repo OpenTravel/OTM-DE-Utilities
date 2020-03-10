@@ -225,11 +225,11 @@ public abstract class DexActionManagerBase implements DexActionManager {
         action.isValid();
 
         // Let the user know what happened
-        if (mainController != null)
-            mainController.updateActionQueueSize( getQueueSize() );
-        if (mainController != null)
+        if (mainController != null) {
+            mainController.updateActionManagerDisplay( this );
+            // mainController.updateActionQueueSize( getQueueSize() );
             mainController.postStatus( "Performed action: " + action.toString() );
-
+        }
         // Let the action update the action appropriate validation status
         action.isValid();
         // action.getSubject().getOwningMember().isValid( true ); // Force the owner to refresh its findings.
@@ -347,7 +347,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
             }
 
             if (mainController != null) {
-                mainController.updateActionQueueSize( getQueueSize() );
+                mainController.updateActionManagerDisplay( this );
                 mainController.postStatus( "Undid action: " + action.toString() );
                 // if (action.getSubject() != null)
                 // action.getSubject().getModelManager().startValidatingAndResolvingTasks();

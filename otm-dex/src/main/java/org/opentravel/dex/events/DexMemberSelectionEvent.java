@@ -100,5 +100,4 @@ public class DexMemberSelectionEvent extends DexNavigationEvent {
         super( RESOURCE_SELECTED );
         member = otm;
     }
-
 }
