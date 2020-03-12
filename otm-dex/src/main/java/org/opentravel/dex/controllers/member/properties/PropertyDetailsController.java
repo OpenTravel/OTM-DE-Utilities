@@ -28,6 +28,7 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.popup.TextAreaEditorContoller;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.DexNavigationEvent;
 import org.opentravel.dex.events.DexPropertySelectionEvent;
 import org.opentravel.dex.events.OtmObjectChangeEvent;
 import org.opentravel.dex.events.OtmObjectModifiedEvent;
@@ -35,6 +36,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
 import org.opentravel.model.otmProperties.OtmProperty;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
@@ -118,6 +120,9 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
         log.debug( "Event received: " + event.getClass().getSimpleName() );
         if (event instanceof DexPropertySelectionEvent)
             handleEvent( (DexPropertySelectionEvent) event );
+        else if (event instanceof DexMemberSelectionEvent
+            && ((DexMemberSelectionEvent) event).getMember() instanceof OtmSimpleObject)
+            post( ((DexNavigationEvent) event).getMember() );
         else if (event instanceof OtmObjectModifiedEvent)
             refresh();
         else if (event instanceof OtmObjectChangeEvent)
@@ -138,6 +143,10 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
     @Override
     public void post(OtmObject obj) {
         log.debug( "Posting object " + obj );
+        if (obj == null) {
+            clear();
+            return;
+        }
         if (obj instanceof OtmProperty)
             post( (OtmProperty) obj );
         else if (obj instanceof OtmSimpleObject)
@@ -159,6 +168,7 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
             clear();
             return;
         }
+
         propertyGrid.getChildren().clear();
         postButtons( property );
 
@@ -173,6 +183,24 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
 
     public void post(OtmSimpleObject property) {
         log.debug( "TO DO - Posting simple object " + property );
+        postedData = property;
+        propertyGrid.getChildren().clear();
+        postTitle( property );
+        currentRow = 0;
+        propertyButtons.setVisible( false );
+
+        // List
+        BooleanProperty listProperty =
+            property.getActionManager().add( DexActions.SETLIST, property.isList(), property );
+        Node checkBox = DexEditField.makeCheckBox( listProperty, "Set to make value repeat." );
+        DexEditField field = new DexEditField( currentRow++, 0, "List", "Does this value repeat.", checkBox );
+        postField( field, property );
+
+        // Pattern
+        // Min/Max Length
+        // Fraction/Total digits
+        // Min/Max inclusive
+        // Min/Max exclusive
     }
 
     private Button postButton(ObservableList<Node> list, DexActions action, OtmProperty p, String label) {
@@ -189,6 +217,7 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
     private void postButtons(OtmProperty p) {
         ObservableList<Node> list = propertyButtons.getButtons();
         if (list != null) {
+            propertyButtons.setVisible( true );
             list.clear();
             postButton( list, DexActions.TYPECHANGE, p, "Change Type" );
             postButton( list, null, p, "Copy" );

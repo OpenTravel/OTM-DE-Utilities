@@ -140,6 +140,14 @@ public class OtmSimpleObject extends OtmSimpleObjects<TLSimple> implements OtmTy
         return getName();
     }
 
+    public boolean isList() {
+        return getTL().isListTypeInd();
+    }
+
+    public void setList(boolean value) {
+        getTL().setListTypeInd( value );
+    }
+
     @Override
     public void setTLTypeName(String name) {
         getTL().setParentType( null );

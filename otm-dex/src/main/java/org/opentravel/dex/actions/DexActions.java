@@ -85,7 +85,8 @@ public enum DexActions {
     SETRESPONSEPAYLOAD(SetResponsePayloadAction.class, DexResourceChildModifiedEvent.class),
     SETRESTSTATUSCODES(SetRestStatusCodesAction.class, DexResourceChildModifiedEvent.class),
     SETPARAMETERFIELD(SetParameterFieldAction.class, DexResourceChildModifiedEvent.class),
-    SETAFREFERENCEFACETCOUNT(SetAFReferenceCountAction.class, DexResourceChildModifiedEvent.class);
+    SETAFREFERENCEFACETCOUNT(SetAFReferenceCountAction.class, DexResourceChildModifiedEvent.class),
+    SETLIST(SetListAction.class, OtmObjectModifiedEvent.class);
 
     private final Class<? extends DexChangeEvent> eventClass;
 
