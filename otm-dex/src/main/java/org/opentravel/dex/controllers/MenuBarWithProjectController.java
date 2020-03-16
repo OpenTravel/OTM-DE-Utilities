@@ -339,8 +339,9 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         DexFileHandler fileHandler = new DexFileHandler();
         if (event.getTarget() instanceof MenuItem) {
             File selectedFile = fileHandler.fileChooser( stage, userSettings );
-            // TEST ME - Update Combo in menu bar
-            configureProjectCombo( selectedFile.getParentFile() );
+            // Update Combo in menu bar
+            if (selectedFile != null)
+                configureProjectCombo( selectedFile.getParentFile() );
             // Run the task
             openFile( selectedFile );
         }

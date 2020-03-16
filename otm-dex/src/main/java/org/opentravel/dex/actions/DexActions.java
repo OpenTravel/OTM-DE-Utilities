@@ -61,7 +61,8 @@ public enum DexActions {
     ADDRESOURCERESPONSE(AddResourceResponseAction.class, DexResourceChangeEvent.class),
     DELETERESOURCECHILD(DeleteResourceChildAction.class, DexResourceChangeEvent.class),
     //
-    ASSIGNSUBJECT(AssignResourceSubjectAction.class, DexResourceModifiedEvent.class),
+    // Assigning resource subject can cause a new resource to be created.
+    ASSIGNSUBJECT(AssignResourceSubjectAction.class, DexModelChangeEvent.class),
     BASEPATHCHANGE(BasePathChangeAction.class, DexResourceModifiedEvent.class),
     SETABSTRACT(SetAbstractAction.class, DexResourceModifiedEvent.class),
     SETFIRSTCLASS(SetFirstClassAction.class, DexResourceModifiedEvent.class),

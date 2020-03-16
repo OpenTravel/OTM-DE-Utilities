@@ -205,7 +205,7 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
 
     private Button postButton(ObservableList<Node> list, DexActions action, OtmProperty p, String label) {
         Button button = new Button( label );
-        if (p != null && p.getActionManager() != null) {
+        if (action != null && p != null && p.getActionManager() != null) {
             button.setDisable( !p.getActionManager().isEnabled( action, p ) );
             button.setOnAction( a -> p.getActionManager().run( action, p ) );
         } else

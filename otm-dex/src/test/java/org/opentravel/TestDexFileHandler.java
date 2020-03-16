@@ -43,7 +43,7 @@ import java.util.List;
 public class TestDexFileHandler extends AbstractFxTest {
     private static Log log = LogFactory.getLog( TestDexFileHandler.class );
 
-    public static final boolean RUN_HEADLESS = false;
+    public static final boolean RUN_HEADLESS = true;
     final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.
 
     public final static String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector

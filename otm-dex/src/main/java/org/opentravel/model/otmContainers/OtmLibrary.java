@@ -246,6 +246,10 @@ public class OtmLibrary {
         return projectItems.isEmpty() ? "" : projectItems.get( 0 ).getBaseNamespace();
     }
 
+    /**
+     * 
+     * @return namespace / name
+     */
     public String getFullName() {
         return getTL() != null ? getTL().getNamespace() + "/" + getTL().getName() : null;
     }

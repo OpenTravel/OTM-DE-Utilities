@@ -25,7 +25,9 @@ import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 
@@ -35,11 +37,18 @@ public class AssignResourceSubjectAction extends DexRunAction {
     private static Log log = LogFactory.getLog( AssignResourceSubjectAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
-        return (subject.isEditable() && subject instanceof OtmResource);
+        if (subject instanceof OtmResource) {
+            if (subject.isEditable())
+                return true;
+            if (subject.getLibrary() != null && subject.getLibrary().isChainEditable())
+                return subject.getLibrary().getVersionChain().canAssignLaterVersion( (OtmTypeUser) subject );
+        }
+        return false;
     }
 
     private OtmResource resource = null;
     private OtmBusinessObject oldSubject = null;
+    private OtmResource newResource = null; // Non-null if new minor version of resource created to assign subject to.
 
     public AssignResourceSubjectAction() {
         // Constructor for reflection
@@ -56,26 +65,27 @@ public class AssignResourceSubjectAction extends DexRunAction {
             return null;
         if (resource.getActionManager() == null)
             return null;
+        OtmBusinessObject currentSubject = null;
+
+        // If this resource is in an older minor version
+        if (!resource.isEditable() && resource.getLibrary().isChainEditable()) {
+            // Limit selection to minor versions of the subject
+            currentSubject = resource.getSubject();
+            // Create new minor version of resource
+            OtmLibraryMember newLM = resource.getLibrary().getVersionChain().getNewMinorLibraryMember( resource );
+            if (newLM instanceof OtmResource)
+                newResource = resource = (OtmResource) newLM;
+            else {
+                otm.getActionManager().postWarning( "Error creating minor version of resource " + resource );
+                return null;
+            }
+        }
 
         // Get the user's selected business object
-        OtmBusinessObject selection = getUserTypeSelection( resource.getModelManager() );
+        OtmBusinessObject selection = getUserTypeSelection( resource.getModelManager(), currentSubject );
+
         if (selection != null)
             doIt( selection );
-
-        // MemberAndProvidersDAO selected = null;
-        // TypeSelectionContoller controller = TypeSelectionContoller.init();
-        // MemberFilterController filter = controller.getMemberFilterController();
-        // filter.setTypeFilterValue( OtmLibraryMemberType.BUSINESS );
-        //
-        // controller.setManager( resource.getModelManager() );
-        // if (controller.showAndWait( "MSG" ) == Results.OK) {
-        // selected = controller.getSelected();
-        //
-        // if (selected != null && selected.getValue() instanceof OtmBusinessObject)
-        // doIt( selected.getValue() );
-        // else
-        // log.error( "Missing selection from Type Selection Controller" ); // cancel?
-        // }
 
         return get();
 
@@ -87,11 +97,25 @@ public class AssignResourceSubjectAction extends DexRunAction {
      * @return selected business object or null
      */
     public static OtmBusinessObject getUserTypeSelection(OtmModelManager mgr) {
+        return getUserTypeSelection( mgr, null );
+    }
+
+    /**
+     * Get the users business object selection from the type selection controller.
+     * 
+     * @param currentSubject if not null, the selection filter is set to only minor versions of the subject.
+     * 
+     * @return selected business object or null
+     */
+    public static OtmBusinessObject getUserTypeSelection(OtmModelManager mgr, OtmBusinessObject currentSubject) {
         OtmBusinessObject selection = null;
         if (Platform.isFxApplicationThread()) {
             TypeSelectionContoller controller = TypeSelectionContoller.init();
             MemberFilterController filter = controller.getMemberFilterController();
             filter.setTypeFilterValue( OtmLibraryMemberType.BUSINESS );
+
+            if (currentSubject != null)
+                controller.getMemberFilterController().setMinorVersionFilter( currentSubject );
 
             controller.setManager( mgr );
             if (controller.showAndWait( "MSG" ) == Results.OK) {
@@ -124,9 +148,6 @@ public class AssignResourceSubjectAction extends DexRunAction {
 
         if (result != newSubject)
             log.debug( "ERROR setting subject." );
-
-        // // Record action to allow undo. Will validate results and warn user.
-        // resource.getActionManager().push( this );
 
         log.debug( "Set resource subject to " + get() );
         return get();
@@ -170,6 +191,8 @@ public class AssignResourceSubjectAction extends DexRunAction {
         log.debug( "Undo-ing change" );
         if (oldSubject != null && oldSubject != resource.setAssignedType( oldSubject ))
             resource.getActionManager().postWarning( "Error undoing change." );
+        if (newResource != null && newResource.getLibrary() != null)
+            newResource.getLibrary().delete( newResource );
 
         return get();
     }

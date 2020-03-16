@@ -216,11 +216,6 @@ public class OtmVersionChain {
         if (newProperty instanceof OtmTypeUser)
             newTypeUser = (OtmTypeUser) newProperty;
 
-        // // Find matching type user
-        // for (OtmTypeUser u : newMinorLibraryMember.getDescendantsTypeUsers())
-        // if (u.getName().equals( subject.getName() ))
-        // newTypeUser = u;
-
         return newTypeUser;
     }
 

@@ -219,9 +219,10 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     private void postTitle(OtmObject obj) {
         objectImageView.setImage( ImageManager.getImage( obj.getIconType() ) );
         if (obj instanceof OtmResource)
-            resourceDetailsPane.setText( obj.getOwningMember().getName() );
+            resourceDetailsPane.setText( obj.getOwningMember().getName() + " in " + obj.getLibrary().getFullName() );
         else
-            resourceDetailsPane.setText( obj.getObjectTypeName() + "   in " + obj.getOwningMember().getName() );
+            resourceDetailsPane
+                .setText( obj.getObjectTypeName() + "   in " + obj.getOwningMember().getNameWithPrefix() );
     }
 
     private void postName(OtmObject obj) {

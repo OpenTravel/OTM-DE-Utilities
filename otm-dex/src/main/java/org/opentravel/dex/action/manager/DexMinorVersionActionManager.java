@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 /**
@@ -87,7 +88,15 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
     // add enum value, , service operation
     // assign type to later version of current type
     private boolean isAllowedInMinor(DexActions action, OtmObject subject) {
+        if (action == null)
+            return false;
         switch (action) {
+            case ASSIGNSUBJECT:
+                if (subject instanceof OtmTypeUser) {
+                    if (subject.getLibrary() != null && subject.getLibrary().isChainEditable())
+                        return subject.getLibrary().getVersionChain().canAssignLaterVersion( (OtmTypeUser) subject );
+                }
+                return false;
             case DESCRIPTIONCHANGE:
             case DEPRECATIONCHANGE:
             case EXAMPLECHANGE:
