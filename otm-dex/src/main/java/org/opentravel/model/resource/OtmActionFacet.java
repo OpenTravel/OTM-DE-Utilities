@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
-import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -46,11 +45,6 @@ import java.util.Collection;
 import java.util.List;
 
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.Tooltip;
 
 /**
@@ -65,29 +59,8 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     private static final String TOOLTIP =
         "            Action facets describe the message payload for RESTful action requests and responses.  In addition to their own payload, they provide basic information about how the resource's business object should be referenced in the message.";
 
-    private static final String REFERENCE_FACET_LABEL = "Reference Facet";
-
-    private static final String REFERENCE_FACET_TOOLTIP =
-        "Specifies the name of the business object facet to be referenced in the message.  If the Reference Type value is None this value will be ignored. ";
-
-    private static final String REPEAT_COUNT_LABEL = "Repeat Count";
-
-    private static final String REPEAT_COUNT_TOOLTIP =
-        "Specifies the maximum number of times that the business object reference should repeat in the message. Best practices state that this string value should contain a positive number that is greater than or equal to 1. ";
-
-    private static final String REFERENCE_TYPE_LABEL = "Reference Type";
-
-
-    private static final String REFERENCE_TYPE_TOOLTIP = "Reference type";
-
-    // public static final String SUBGRP = "Substitution Group";
-
-    private static final String BASE_PAYLOAD_LABEL = "Base Payload";
-
-    private static final String BASE_PAYLOAD_TOOLTIP =
-        " Optional reference to a core or choice object that indicates the basic structure of the message payload. If the 'referenceType' value is NONE, this will indicate the entirity of the message structure.  For reference type values other than NONE, the message structure will include all elements of the base payload, plus reference(s) to the owning resource's business ";
-
     private static final int DEFAULT_REPEAT_COUNT = 1000;
+    private final OtmActionFacetFieldManager fieldsMgr = new OtmActionFacetFieldManager( this );
 
     public enum BuildTemplate {
         REQUEST, RESPONSE, LIST
@@ -162,23 +135,6 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         return obj instanceof OtmLibraryMember ? (OtmLibraryMember) obj : null;
     }
 
-    private Node getRemoveBasePayloadNode() {
-        Button button = new Button( "-Remove-" );
-        button.setDisable( !isEditable() || getBasePayload() == null );
-        button.setOnAction( a -> getActionManager().run( DexActions.REMOVEAFBASEPAYLOAD, this ) );
-        return button;
-    }
-
-    private Node getBasePayloadNode() {
-        String name = OtmResource.NONE;
-        if (getBasePayload() != null)
-            name = getBasePayload().getNameWithPrefix();
-        Button button = new Button( name );
-        button.setDisable( !isEditable() );
-        button.setOnAction( a -> getActionManager().run( DexActions.TYPECHANGE, this ) );
-        // button.setOnAction( a -> log.debug( "Base Payload Button selected" ) );
-        return button;
-    }
 
     // @Override
     public Collection<OtmObject> getChildrenHierarchy() {
@@ -189,15 +145,8 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
 
     @Override
     public List<DexEditField> getFields() {
-        List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, BASE_PAYLOAD_LABEL, BASE_PAYLOAD_TOOLTIP, getBasePayloadNode() ) );
-        fields.add( new DexEditField( 0, 2, null, "Remove base payload.", getRemoveBasePayloadNode() ) );
-        fields.add( new DexEditField( 1, 0, REFERENCE_TYPE_LABEL, REFERENCE_TYPE_TOOLTIP, getReferenceTypeNode() ) );
-        fields.add( new DexEditField( 2, 0, REFERENCE_FACET_LABEL, REFERENCE_FACET_TOOLTIP, getReferenceFacetNode() ) );
-        fields.add( new DexEditField( 3, 0, REPEAT_COUNT_LABEL, REPEAT_COUNT_TOOLTIP, getRepeatCountNode() ) );
-        return fields;
+        return fieldsMgr.getFields();
     }
-    // FIXME - repeat count needs to support typing in values
 
     @Override
     public Icons getIconType() {
@@ -231,104 +180,16 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         getTL().setReferenceRepeat( value );
     }
 
-    /**
-     * List of facet names on subject and entry for the substitution group
-     * 
-     * @return list of facets on the subject business object
-     */
-    private ObservableList<String> getReferenceFacetCandidates() {
-        ObservableList<String> candidates = FXCollections.observableArrayList();
-        if (getOwningMember() != null)
-            getOwningMember().getSubjectFacets().forEach( f -> candidates.add( f.getName() ) );
-        candidates.add( OtmResource.SUBGROUP );
-        return candidates;
-    }
-
-
     public String getReferenceFacetName() {
-        return getTL().getReferenceFacetName() != null ? getTL().getReferenceFacetName() : "";
-    }
-
-    private Node getReferenceFacetNode() {
-        StringProperty selection = null;
-        if (!getReferenceFacetName().isEmpty())
-            selection = getActionManager().add( DexActions.SETAFREFERENCEFACET, getReferenceFacetName(), this );
-        else
-            selection = getActionManager().add( DexActions.SETAFREFERENCEFACET, OtmResource.SUBGROUP, this );
-        return DexEditField.makeComboBox( getReferenceFacetCandidates(), selection );
-
-        // String selection = OtmResource.SUBGROUP;
-        // if (!getReferenceFacetName().isEmpty())
-        // selection = getReferenceFacetName();
-        // ComboBox<String> box = DexEditField.makeComboBox( getReferenceFacetCandidates(), selection, this );
-        // box.setOnAction( a -> log.debug( "Reference Facet Selected" ) );
-        // return box;
+        return getTL().getReferenceFacetName() != null ? getTL().getReferenceFacetName() : OtmResource.SUBGROUP;
     }
 
     public TLReferenceType getReferenceType() {
         return getTL().getReferenceType() != null ? getTL().getReferenceType() : TLReferenceType.NONE;
     }
 
-    /**
-     * @return all TL Modeled strings or for abstract resources just the first string (none)
-     */
-    public ObservableList<String> getReferenceTypeCandidates() {
-        ObservableList<String> candidates = FXCollections.observableArrayList();
-        if (getOwningMember().isAbstract())
-            candidates.add( TLReferenceType.values()[0].toString() );
-        else
-            for (TLReferenceType value : TLReferenceType.values())
-                candidates.add( value.toString() );
-        return candidates;
-    }
-
-    private Node getReferenceTypeNode() {
-        StringProperty selection = null;
-        if (getReferenceType() != null)
-            selection = getActionManager().add( DexActions.SETAFREFERENCETYPE, getReferenceTypeString(), this );
-        else
-            selection =
-                getActionManager().add( DexActions.SETAFREFERENCETYPE, TLReferenceType.values()[0].toString(), this );
-        return DexEditField.makeComboBox( getReferenceTypeCandidates(), selection );
-
-        // String selection = TLReferenceType.values()[0].toString();
-        // if (getReferenceType() != null)
-        // selection = getReferenceType().toString();
-        // ComboBox<String> box = DexEditField.makeComboBox( getReferenceTypeCandidates(), selection, this );
-        // box.setOnAction( a -> log.debug( "Type Selected" ) );
-        // return box;
-    }
-
     public String getReferenceTypeString() {
         return getReferenceType() != null ? getReferenceType().toString() : "";
-    }
-
-    private Node getRepeatCountNode() {
-        Spinner<Integer> spinner = new Spinner<>( 0, 10000, getRepeatCount() ); // min, max, init
-        spinner.setDisable( !isEditable() );
-        spinner.setEditable( isEditable() );
-        spinner.getEditor().setOnAction( a -> spinnerListener( spinner ) );
-        spinner.focusedProperty().addListener( (o, old, newV) -> spinnerListener( spinner ) );
-        return spinner;
-    }
-
-    /**
-     * Handle focus change and typing <Enter>. If value changed, run action.
-     * 
-     * @param spinner
-     */
-    private void spinnerListener(Spinner<Integer> spinner) {
-        if (spinner != null) {
-            // If they type, the editor will access the value
-            int value = Integer.parseInt( spinner.getEditor().getText() );
-            if (spinner.getValue() != value)
-                spinner.getValueFactory().setValue( value );
-
-            // If the value changed, run the action
-            if (spinner.getValue() != getRepeatCount()) {
-                getActionManager().run( DexActions.SETAFREFERENCEFACETCOUNT, this, spinner.getValue() );
-            }
-        }
     }
 
     /**
@@ -397,8 +258,19 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     }
 
     public String setReferenceFacetName(String name) {
-        getTL().setReferenceFacetName( name );
-        // log.debug( "Set reference facet to " + name );
+        // getTL().setReferenceFacetName( name );
+        log.debug( "Set reference facet to " + name );
+        if (name.equals( OtmResource.SUBGROUP ))
+            getTL().setReferenceFacetName( null );
+        else
+            for (OtmObject f : getOwningMember().getSubjectFacets()) {
+                if (name.equals( f.getName() )) {
+                    if (f instanceof OtmFacet)
+                        setReferenceFacet( (OtmFacet<?>) f );
+                    else if (f instanceof OtmContextualFacet)
+                        setReferenceFacet( (OtmContextualFacet) f );
+                }
+            }
         return getReferenceFacetName();
     }
 
@@ -412,11 +284,20 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         String name = "";
         if (facet == null)
             name = null;
-        // name = OtmResource.SUBGROUP;
         else
             name = ResourceCodegenUtils.getActionFacetReferenceName( facet.getTL() );
         getTL().setReferenceFacetName( name );
-        // log.debug( "Setting reference facet name to: " + name );
+        log.debug( "Setting reference facet name to: " + name );
+    }
+
+    public void setReferenceFacet(OtmContextualFacet facet) {
+        String name = "";
+        if (facet == null)
+            name = null;
+        else
+            name = ResourceCodegenUtils.getActionFacetReferenceName( facet.getTL() );
+        getTL().setReferenceFacetName( name );
+        log.debug( "Setting reference facet name to: " + name );
     }
 
     public TLReferenceType setReferenceType(TLReferenceType type) {

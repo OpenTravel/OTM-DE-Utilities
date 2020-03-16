@@ -158,11 +158,6 @@ public class AssignResourceSubjectAction extends DexRunAction {
         return resource.getSubject();
     }
 
-    // @Override
-    // public ValidationFindings getVetoFindings() {
-    // return null;
-    // }
-
     @Override
     public boolean isValid() {
         return true;
