@@ -265,7 +265,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
     public String setReferenceFacetName(String name) {
         // getTL().setReferenceFacetName( name );
         log.debug( "Set reference facet to " + name );
-        if (name.equals( OtmResource.SUBGROUP ))
+        if (name == null || name.equals( OtmResource.SUBGROUP ))
             getTL().setReferenceFacetName( null );
         else
             for (OtmObject f : getOwningMember().getSubjectFacets()) {
