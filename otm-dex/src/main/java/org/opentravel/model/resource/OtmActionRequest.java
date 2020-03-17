@@ -19,10 +19,8 @@ package org.opentravel.model.resource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
-import org.opentravel.common.DexMimeTypeHandler;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
-import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -30,17 +28,11 @@ import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
 import org.opentravel.schemacompiler.model.TLMimeType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.Tooltip;
 
 /**
@@ -54,43 +46,11 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
 
     private static final String TOOLTIP = "Specifies the characteristics and payload for a REST Action request.";
 
-    private static final String MIME_LABEL = "Mime Types";
-
-    private static final String MIME_TOOLTIP =
-        "Specifies the message MIME type for a REST request. Only XML and JSON types are supported by the OTM model.";
-
-    private static final String PAYLOAD_LABEL = "Payload Type";
-
-    private static final String PAYLOAD_TOOLTIP =
-        "Name of the action facet that specifies the payload (if any) for the request.";
-
-    private static final String PATH_LABEL = "Path Template";
-
-    private static final String PATH_TOOLTIP =
-        "Specifies the path for this action relative to the base path of the owning resource.  The path template must contain a reference to all path parameters specified in the request's parameter group.";
-
-    private static final String METHOD_LABEL = "HTTP Method";
-
-    private static final String METHOD_TOOLTIP = "Specify the HTTP method for a REST action request.";
-
-    private static final String PARAMETERS_LABEL = "Parameters";
-
-    private static final String PARAMETERS_TOOLTIP =
-        "Name of the parameter group that provides the URL and header parameters (if any) for the request.";
-
-    private static final String PATH_DEFAULT_LABEL = "Default";
-    private static final String PATH_DEFAULT_TOOLTIP = "Reset to default path for action request.";
-
     public static final String NO_PARAMETERS = "NONE";
     public static final String NO_PAYLOAD = "NONE";
 
-    private StringProperty pathProperty;
-
-    public static MenuButton makeMenuButton(List<String> values, OtmObject object) {
-        MenuButton mb = new MenuButton();
-        values.forEach( v -> mb.getItems().add( new CheckMenuItem( v ) ) );
-        return mb;
-    }
+    StringProperty pathProperty;
+    private OtmActionRequestFieldManager fieldMgr = new OtmActionRequestFieldManager( this );
 
     /**
      * Create action request from the passed tl request. Assure tl request has owner and add to parent.
@@ -120,22 +80,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
 
     @Override
     public List<DexEditField> getFields() {
-        List<DexEditField> fields = new ArrayList<>();
-        fields.add( new DexEditField( 0, 0, PAYLOAD_LABEL, PAYLOAD_TOOLTIP, getPayloadNode() ) );
-        fields.add( new DexEditField( 1, 0, PARAMETERS_LABEL, PARAMETERS_TOOLTIP, getParametersNode() ) );
-        fields.add( new DexEditField( 2, 0, METHOD_LABEL, METHOD_TOOLTIP, getMethodNode() ) );
-        fields.add( new DexEditField( 3, 0, MIME_LABEL, MIME_TOOLTIP, getMimeNode() ) );
-        fields.add( new DexEditField( 4, 0, PATH_LABEL, PATH_TOOLTIP, getPathNode() ) );
-        fields.add( new DexEditField( 4, 2, null, PATH_DEFAULT_TOOLTIP, getDefaultPathNode() ) );
-
-        return fields;
-    }
-
-    private Node getDefaultPathNode() {
-        Button button = new Button( PATH_DEFAULT_LABEL );
-        button.setDisable( !isEditable() );
-        button.setOnAction( e -> pathProperty.set( getPathTemplateDefault() ) );
-        return button;
+        return fieldMgr.getFields();
     }
 
     @Override
@@ -152,19 +97,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     public ObservableList<String> getMethodCandidates() {
-        ObservableList<String> candidates = FXCollections.observableArrayList();
-        for (TLHttpMethod m : TLHttpMethod.values())
-            candidates.add( m.toString() );
-        return candidates;
-    }
-
-    private Node getMethodNode() {
-        StringProperty selection = getActionManager().add( DexActions.SETREQUESTMETHOD, getMethodString(), this );
-        return DexEditField.makeComboBox( getMethodCandidates(), selection );
-    }
-
-    private Node getMimeNode() {
-        return new DexMimeTypeHandler( this ).makeMimeTypeBox();
+        return fieldMgr.getMethodCandidates();
     }
 
     public List<TLMimeType> getMimeTypes() {
@@ -200,16 +133,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     public ObservableList<String> getParameterGroupCandidates() {
-        ObservableList<String> groups = FXCollections.observableArrayList();
-        groups.add( "NONE" );
-        getOwningMember().getParameterGroups().forEach( pg -> groups.add( pg.getName() ) );
-        return groups;
-    }
-
-    private Node getParametersNode() {
-        StringProperty selection =
-            getActionManager().add( DexActions.SETREQUESTPARAMETERGROUP, getParamGroupName(), this );
-        return DexEditField.makeComboBox( getParameterGroupCandidates(), selection );
+        return fieldMgr.getParameterGroupCandidates();
     }
 
     public OtmParameterGroup getParamGroup() {
@@ -226,12 +150,6 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     @Override
     public OtmAction getParent() {
         return (OtmAction) parent;
-    }
-
-    private Node getPathNode() {
-        // log.debug( "Parent URL: " + getParent().getEndpointURL() );
-        pathProperty = getActionManager().add( DexActions.SETREQUESTPATH, getPathTemplate(), this );
-        return DexEditField.makeTextField( pathProperty );
     }
 
     /**
@@ -286,11 +204,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
     }
 
     public ObservableList<String> getPayloadCandidates() {
-        ObservableList<String> actionFacets = FXCollections.observableArrayList();
-        actionFacets.add( NO_PARAMETERS );
-        if (getMethod() == null || !getMethod().equals( TLHttpMethod.GET ))
-            getOwningMember().getActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
-        return actionFacets;
+        return fieldMgr.getPayloadCandidates();
     }
 
     /**
@@ -301,12 +215,6 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
         if (getPayloadActionFacet() != null && getPayloadActionFacet().getRequestPayload() != null)
             name = getPayloadActionFacet().getRequestPayload().getName();
         return name;
-    }
-
-    private Node getPayloadNode() {
-        StringProperty selection =
-            getActionManager().add( DexActions.SETREQUESTPAYLOAD, getPayloadActionFacetName(), this );
-        return DexEditField.makeComboBox( getPayloadCandidates(), selection );
     }
 
     @Override
@@ -337,8 +245,6 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
 
     public TLHttpMethod setMethod(TLHttpMethod method) {
         getTL().setHttpMethod( method );
-        // if (method != null)
-        // log.debug( "Set method to " + getMethod() );
         // if set to GET then payload must be NONE
         if (method != null && method.equals( TLHttpMethod.GET ))
             setPayloadType( null );
@@ -394,51 +300,11 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
             StringBuilder path = new StringBuilder( basePath );
             if (addParameters)
                 path.append( DexParentRefsEndpointMap.getContribution( getParamGroup() ) );
-            // if (addParameters && getParamGroup() != null && getParamGroup().isIdGroup()) {
-            // if (!getParamGroup().getParameters().isEmpty())
-            // path.append( "/" );
-            // // Add these parameters
-            // for (OtmParameter p : getParamGroup().getParameters()) {
-            // path.append( "{" );
-            // path.append( p.getName() );
-            // path.append( "}" );
-            // }
-            // }
             getTL().setPathTemplate( path.toString() );
         }
         // log.debug( "Set path template to: " + getTL().getPathTemplate() );
         return getTL().getPathTemplate();
     }
-
-    // /**
-    // * Create string starting with /. If the parameter group is an ID group, append all path parameters
-    // *
-    // * @return
-    // */
-    // public String makeTemplateFromParamGroup() {
-    // return DexParentRefsEndpointMap.getPathParameterContributions( getParamGroup() );
-    //// StringBuilder path = new StringBuilder();
-    //// // if (getParamGroup() != null && getParamGroup().isIdGroup()) {
-    //// // if (!getParamGroup().getParameters().isEmpty())
-    //// // path.append( "/" );
-    //// // // Add these parameters
-    //// // for (OtmParameter p : getParamGroup().getParameters()) {
-    //// // path.append( "{" );
-    //// // path.append( p.getName() );
-    //// // path.append( "}" );
-    //// // }
-    //// // }
-    //// String separator = "/";
-    //// if (getParamGroup() != null && getParamGroup().isIdGroup()) {
-    //// for (OtmParameter param : getParamGroup().getParameters()) {
-    //// if (param.isPathParam())
-    //// path.append( separator + param.getPathContribution() );
-    //// }
-    //// } else
-    //// path.append( separator );
-    ////
-    //// return path.toString();
-    // }
 
     /**
      * Set the payload from owner's action facet with the passed {@link OtmActionFacet#getName()} value. *

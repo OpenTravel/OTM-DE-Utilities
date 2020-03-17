@@ -92,7 +92,7 @@ public class TestResourceActions {
         List<OtmParameterGroup> groups = resource.getParameterGroups();
         assertTrue( "Given:", !groups.isEmpty() );
 
-        // When - action is done with subject
+        // When - action is done with subject. Action removes parameter groups as well.
         actionMgr.run( DexActions.ASSIGNSUBJECT, resource, otherBO );
         assertTrue( resource.getSubject() == otherBO );
         for (OtmObject child : resource.getChildren())
