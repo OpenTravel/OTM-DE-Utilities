@@ -36,6 +36,42 @@ import javafx.application.Platform;
 public class AssignResourceSubjectAction extends DexRunAction {
     private static Log log = LogFactory.getLog( AssignResourceSubjectAction.class );
 
+    /**
+     * Get the users business object selection from the type selection controller.
+     * 
+     * @return selected business object or null
+     */
+    public static OtmBusinessObject getUserTypeSelection(OtmModelManager mgr) {
+        return getUserTypeSelection( mgr, null );
+    }
+
+    /**
+     * Get the users business object selection from the type selection controller.
+     * 
+     * @param currentSubject if not null, the selection filter is set to only minor versions of the subject.
+     * 
+     * @return selected business object or null
+     */
+    public static OtmBusinessObject getUserTypeSelection(OtmModelManager mgr, OtmBusinessObject currentSubject) {
+        OtmBusinessObject selection = null;
+        if (Platform.isFxApplicationThread()) {
+            TypeSelectionContoller controller = TypeSelectionContoller.init();
+            MemberFilterController filter = controller.getMemberFilterController();
+            filter.setTypeFilterValue( OtmLibraryMemberType.BUSINESS );
+
+            if (currentSubject != null)
+                controller.getMemberFilterController().setMinorVersionFilter( currentSubject );
+
+            controller.setManager( mgr );
+            if (controller.showAndWait( "MSG" ) == Results.OK) {
+                MemberAndProvidersDAO selected = controller.getSelected();
+                if (selected != null && selected.getValue() instanceof OtmBusinessObject)
+                    selection = (OtmBusinessObject) selected.getValue();
+            }
+        }
+        return selection;
+    }
+
     public static boolean isEnabled(OtmObject subject) {
         if (subject instanceof OtmResource) {
             if (subject.isEditable())
@@ -47,7 +83,9 @@ public class AssignResourceSubjectAction extends DexRunAction {
     }
 
     private OtmResource resource = null;
+
     private OtmBusinessObject oldSubject = null;
+
     private OtmResource newResource = null; // Non-null if new minor version of resource created to assign subject to.
 
     public AssignResourceSubjectAction() {
@@ -92,42 +130,6 @@ public class AssignResourceSubjectAction extends DexRunAction {
     }
 
     /**
-     * Get the users business object selection from the type selection controller.
-     * 
-     * @return selected business object or null
-     */
-    public static OtmBusinessObject getUserTypeSelection(OtmModelManager mgr) {
-        return getUserTypeSelection( mgr, null );
-    }
-
-    /**
-     * Get the users business object selection from the type selection controller.
-     * 
-     * @param currentSubject if not null, the selection filter is set to only minor versions of the subject.
-     * 
-     * @return selected business object or null
-     */
-    public static OtmBusinessObject getUserTypeSelection(OtmModelManager mgr, OtmBusinessObject currentSubject) {
-        OtmBusinessObject selection = null;
-        if (Platform.isFxApplicationThread()) {
-            TypeSelectionContoller controller = TypeSelectionContoller.init();
-            MemberFilterController filter = controller.getMemberFilterController();
-            filter.setTypeFilterValue( OtmLibraryMemberType.BUSINESS );
-
-            if (currentSubject != null)
-                controller.getMemberFilterController().setMinorVersionFilter( currentSubject );
-
-            controller.setManager( mgr );
-            if (controller.showAndWait( "MSG" ) == Results.OK) {
-                MemberAndProvidersDAO selected = controller.getSelected();
-                if (selected != null && selected.getValue() instanceof OtmBusinessObject)
-                    selection = (OtmBusinessObject) selected.getValue();
-            }
-        }
-        return selection;
-    }
-
-    /**
      * This action will get the data from the user via modal dialog
      * 
      * @return
@@ -136,6 +138,8 @@ public class AssignResourceSubjectAction extends DexRunAction {
     public Object doIt(Object data) {
         if (!(data instanceof OtmBusinessObject))
             return doIt();
+        if (data == resource.getSubject())
+            return null;
 
         if (resource.getActionManager() == null)
             return null;
@@ -159,6 +163,11 @@ public class AssignResourceSubjectAction extends DexRunAction {
     }
 
     @Override
+    public OtmResource getSubject() {
+        return resource;
+    }
+
+    @Override
     public boolean isValid() {
         return true;
     }
@@ -169,11 +178,6 @@ public class AssignResourceSubjectAction extends DexRunAction {
             return false;
         resource = (OtmResource) subject;
         return true;
-    }
-
-    @Override
-    public OtmResource getSubject() {
-        return resource;
     }
 
     @Override

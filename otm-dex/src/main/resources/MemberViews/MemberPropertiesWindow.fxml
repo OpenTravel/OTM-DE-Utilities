@@ -12,6 +12,7 @@
            <items>
               <fx:include fx:id="memberDetails" source="MemberDetails.fxml" />
               <fx:include fx:id="memberPropertiesTreeTable" source="MemberPropertiesTreeTable.fxml" VBox.vgrow="ALWAYS" />
+              <fx:include fx:id="propertyDetails" source="PropertyDetails.fxml" />
            </items>
         </SplitPane>
    </center>

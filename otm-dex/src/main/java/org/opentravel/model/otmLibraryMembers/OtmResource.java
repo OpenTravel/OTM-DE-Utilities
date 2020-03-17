@@ -913,6 +913,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
                     setBasePath( DexParentRefsEndpointMap.PATH_SEPERATOR );
             }
         }
+        // Check impact of change and Make changes undo-able
+
         return getAssignedType();
     }
 

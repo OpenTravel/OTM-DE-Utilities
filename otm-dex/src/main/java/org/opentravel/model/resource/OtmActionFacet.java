@@ -290,6 +290,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         log.debug( "Setting reference facet name to: " + name );
     }
 
+    // TODO - there has to be a better way to code this to have same code run in both cases
     public void setReferenceFacet(OtmContextualFacet facet) {
         String name = "";
         if (facet == null)

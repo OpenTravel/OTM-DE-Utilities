@@ -67,11 +67,9 @@ public abstract class DexTabControllerBase implements DexTabController {
     }
 
     public void launchWindow(ActionEvent e, StandaloneWindowControllerBase wc) {
-        if (wc == null || e == null)
+        if (wc == null || e == null || !(e.getSource() instanceof MenuItem))
             return;
-        if (e.getSource() instanceof MenuItem) {
-            ((MenuItem) e.getSource()).setDisable( true );
-        }
+        ((MenuItem) e.getSource()).setDisable( true );
         wc.configure( mainController, (MenuItem) e.getSource() );
         // wc.configure( mainController, null );
         wc.show( wc.getTitle() );
