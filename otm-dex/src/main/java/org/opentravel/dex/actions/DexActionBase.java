@@ -19,7 +19,6 @@ package org.opentravel.dex.actions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.events.DexChangeEvent;
-import org.opentravel.dex.events.DexEvent;
 import org.opentravel.model.OtmObject;
 
 public abstract class DexActionBase {
@@ -38,6 +37,19 @@ public abstract class DexActionBase {
 
     public void setType(DexActions type) {
         this.actionType = type;
+    }
+
+    /**
+     * Post a warning dialog to inform the user of consequences of their action.
+     * 
+     * @param title
+     * @param reason
+     */
+    protected void postWarning(String reason) {
+        getSubject().getActionManager().postWarning( reason );
+        // DialogBoxContoller dbc = DialogBoxContoller.init();
+        // if (dbc != null)
+        // dbc.show( title, reason );
     }
 
     // Override if the action has specific sub-type of OtmObject as its subject.

@@ -336,6 +336,25 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         return setReferenceFacet( f );
     }
 
+    /**
+     * Try to find and set reference facet by matching the passed facet from a different business object.
+     * 
+     * @param value is the facet to attempt to match. If null, the current reference facet is used.
+     * @return facet if found or null
+     */
+    public OtmObject setReferenceFacetMatching(OtmObject value) {
+        if (value == null)
+            value = getReferenceFacet();
+        for (OtmObject c : getFacetCandidates()) {
+            if (value.getClass() == c.getClass()) {
+                log.debug( "Matching class found: " + c );
+                setReferenceFacet( c );
+                return c;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void delete(OtmObject param) {
         if (param.getTL() instanceof TLParameter)

@@ -26,14 +26,17 @@ import org.junit.Test;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestResource;
+import org.opentravel.model.resource.OtmParameterGroup;
 import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 /**
  * Verifies the functions of the <code>UserSettings</code> class.
@@ -85,13 +88,21 @@ public class TestResourceActions {
 
         OtmBusinessObject otherBO = TestBusiness.buildOtm( staticModelManager, "OtherBO" );
         OtmBusinessObject originalSubject = resource.getSubject();
+        // Given - the original set of parameter groups
+        List<OtmParameterGroup> groups = resource.getParameterGroups();
+        assertTrue( "Given:", !groups.isEmpty() );
 
         // When - action is done with subject
         actionMgr.run( DexActions.ASSIGNSUBJECT, resource, otherBO );
         assertTrue( resource.getSubject() == otherBO );
+        for (OtmObject child : resource.getChildren())
+            assertTrue( "Must not have parameter group child.", !(child instanceof OtmParameterGroup) );
+        assertTrue( "Must not have parameter groups.", resource.getParameterGroups().isEmpty() );
+        assertTrue( "Must not have TL parameter groups.", resource.getTL().getParamGroups().isEmpty() );
 
         actionMgr.undo();
         assertTrue( resource.getSubject() == originalSubject );
+        assertTrue( "Must have parameter groups.", resource.getParameterGroups().size() == groups.size() );
 
         log.debug( "Set Subject Test complete." );
     }

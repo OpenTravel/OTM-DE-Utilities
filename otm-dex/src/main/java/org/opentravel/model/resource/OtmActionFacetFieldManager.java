@@ -108,7 +108,7 @@ public class OtmActionFacetFieldManager {
     /**
      * @return all TL Modeled strings or for abstract resources just the first string (none)
      */
-    private ObservableList<String> getReferenceTypeCandidates() {
+    protected ObservableList<String> getReferenceTypeCandidates() {
         ObservableList<String> candidates = FXCollections.observableArrayList();
         if (af.getOwningMember().isAbstract())
             candidates.add( TLReferenceType.values()[0].toString() );

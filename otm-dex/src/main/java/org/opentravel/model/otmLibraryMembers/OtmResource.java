@@ -676,6 +676,10 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return this;
     }
 
+    /**
+     * 
+     * @return list of the parameter group facades for the ParamGroups on the tlResource
+     */
     public List<OtmParameterGroup> getParameterGroups() {
         List<OtmParameterGroup> groups = new ArrayList<>();
         getTL().getParamGroups().forEach( pg -> {
@@ -859,7 +863,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
             else if (tlChild instanceof TLActionFacet)
                 getTL().removeActionFacet( (TLActionFacet) tlChild );
             else
-                log.debug( "Can't remove " + child + " from " + this );
+                log.debug( "Can't remove tl " + child + " from " + this );
+            children.remove( child );
         }
     }
 
@@ -918,6 +923,14 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return getAssignedType();
     }
 
+    public List<OtmResourceChild> getInvalidChildren() {
+        List<OtmResourceChild> errors = new ArrayList<>();
+        for (OtmObject c : getChildren()) {
+            if (!c.isValid( true ) && c instanceof OtmResourceChild)
+                errors.add( (OtmResourceChild) c );
+        }
+        return errors;
+    }
 
     /**
      * Set the base path on this resource then refresh the object.

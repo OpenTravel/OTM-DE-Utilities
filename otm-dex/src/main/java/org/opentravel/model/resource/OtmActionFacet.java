@@ -45,6 +45,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Tooltip;
 
 /**
@@ -188,6 +189,10 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         return getTL().getReferenceType() != null ? getTL().getReferenceType() : TLReferenceType.NONE;
     }
 
+    public ObservableList<String> getReferenceTypeCandidates() {
+        return fieldsMgr.getReferenceTypeCandidates();
+    }
+
     public String getReferenceTypeString() {
         return getReferenceType() != null ? getReferenceType().toString() : "";
     }
@@ -280,26 +285,32 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
      * 
      * @param facet
      */
-    public void setReferenceFacet(OtmFacet<?> facet) {
+    public void setReferenceFacet(OtmObject facet) {
+        TLFacet tlf = null;
+        if (facet instanceof OtmFacet)
+            tlf = ((OtmFacet<?>) facet).getTL();
+        else if (facet instanceof OtmContextualFacet)
+            tlf = ((OtmContextualFacet) facet).getTL();
+
         String name = "";
-        if (facet == null)
+        if (tlf == null)
             name = null;
         else
-            name = ResourceCodegenUtils.getActionFacetReferenceName( facet.getTL() );
+            name = ResourceCodegenUtils.getActionFacetReferenceName( tlf );
         getTL().setReferenceFacetName( name );
         log.debug( "Setting reference facet name to: " + name );
     }
 
-    // TODO - there has to be a better way to code this to have same code run in both cases
-    public void setReferenceFacet(OtmContextualFacet facet) {
-        String name = "";
-        if (facet == null)
-            name = null;
-        else
-            name = ResourceCodegenUtils.getActionFacetReferenceName( facet.getTL() );
-        getTL().setReferenceFacetName( name );
-        log.debug( "Setting reference facet name to: " + name );
-    }
+    // // FIXED - there has to be a better way to code this to have same code run in both cases
+    // public void setReferenceFacet(OtmContextualFacet facet) {
+    // String name = "";
+    // if (facet == null)
+    // name = null;
+    // else
+    // name = ResourceCodegenUtils.getActionFacetReferenceName( facet.getTL() );
+    // getTL().setReferenceFacetName( name );
+    // log.debug( "Setting reference facet name to: " + name );
+    // }
 
     public TLReferenceType setReferenceType(TLReferenceType type) {
         if (type == null)

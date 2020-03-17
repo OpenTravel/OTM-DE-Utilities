@@ -24,12 +24,17 @@ import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.model.resource.OtmParameterGroup;
+import org.opentravel.schemacompiler.model.TLParamGroup;
+
+import java.util.List;
 
 import javafx.application.Platform;
 
@@ -83,10 +88,9 @@ public class AssignResourceSubjectAction extends DexRunAction {
     }
 
     private OtmResource resource = null;
-
     private OtmBusinessObject oldSubject = null;
-
     private OtmResource newResource = null; // Non-null if new minor version of resource created to assign subject to.
+    private List<OtmResourceChild> toBeFixed = null;
 
     public AssignResourceSubjectAction() {
         // Constructor for reflection
@@ -150,6 +154,28 @@ public class AssignResourceSubjectAction extends DexRunAction {
         // Set value into model
         OtmBusinessObject result = resource.setSubject( newSubject );
 
+        toBeFixed = resource.getInvalidChildren();
+        if (!toBeFixed.isEmpty()) {
+            // Parameter group reference facets
+            // Fix those that can be and delete the rest. Save originals for undo. Warn user.
+            // log.debug( "Fix these: " + toBeFixed );
+            postWarning( "Changing the subject required deleting: " + toBeFixed
+                + " \nYou can undo the action or create new parameter groups to have new reference facets. \nAny parameters and action requests using the parameters will also have to be fixed." );
+            for (OtmResourceChild rc : toBeFixed) {
+                resource.delete( rc );
+            }
+            // TODO - try to make corrections and save for undo
+            // if (rc instanceof OtmParameterGroup) {
+            // OtmObject r = ((OtmParameterGroup) rc).setReferenceFacetMatching( null );
+            // // String name = ((OtmParameterGroup) rc).getReferenceFacetName();
+            // // OtmObject r = ((OtmParameterGroup) rc).setReferenceFacetString( name );
+            // if (r == null)
+            // }
+
+            // Now validate to show user any action requests that have errors.
+            resource.isValid( true );
+        }
+
         if (result != newSubject)
             log.debug( "ERROR setting subject." );
 
@@ -192,6 +218,14 @@ public class AssignResourceSubjectAction extends DexRunAction {
             resource.getActionManager().postWarning( "Error undoing change." );
         if (newResource != null && newResource.getLibrary() != null)
             newResource.getLibrary().delete( newResource );
+
+        if (!toBeFixed.isEmpty())
+            for (OtmResourceChild c : toBeFixed) {
+                if (c instanceof OtmParameterGroup) {
+                    resource.getTL().addParamGroup( (TLParamGroup) c.getTL() );
+                    resource.add( c );
+                }
+            }
 
         return get();
     }

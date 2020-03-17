@@ -54,7 +54,9 @@ public class SetParameterGroupFacetAction extends DexStringAction {
     }
 
     protected void set(String value) {
-        getSubject().setReferenceFacetString( value );
+        OtmObject result = getSubject().setReferenceFacetString( value );
+        if (result == null)
+            postWarning( "Could not set reference facet to: " + value );
     }
 
     /**
