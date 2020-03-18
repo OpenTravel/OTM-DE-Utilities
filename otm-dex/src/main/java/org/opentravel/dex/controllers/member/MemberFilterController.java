@@ -34,6 +34,7 @@ import org.opentravel.schemacompiler.model.BuiltInLibrary;
 
 import java.util.TreeMap;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -251,6 +252,9 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         editableButton.setOnAction( e -> setEditableOnly() );
         latestButton.setOnAction( e -> setLatestOnly() );
         builtInsButton.setOnAction( e -> setBuiltIns() );
+
+        // Get focus after the scene is set
+        Platform.runLater( () -> memberNameFilter.requestFocus() );
     }
 
     private void configMemberTypeChoice() {

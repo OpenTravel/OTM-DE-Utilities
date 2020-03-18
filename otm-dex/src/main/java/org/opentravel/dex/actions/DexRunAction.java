@@ -32,7 +32,7 @@ import javafx.beans.value.ObservableValue;
  *
  */
 public abstract class DexRunAction extends DexActionBase implements DexAction<Object> {
-    private static Log log = LogFactory.getLog( DexRunAction.class );
+    public static Log log = LogFactory.getLog( DexRunAction.class );
 
     public DexRunAction() {
         super();
@@ -45,7 +45,7 @@ public abstract class DexRunAction extends DexActionBase implements DexAction<Ob
      * Perform the action using supplied data.
      * 
      * @param data to apply to the action
-     * @return
+     * @return the value from get(). If null, the action was canceled and not added to queue.
      */
     public abstract Object doIt(Object data);
 

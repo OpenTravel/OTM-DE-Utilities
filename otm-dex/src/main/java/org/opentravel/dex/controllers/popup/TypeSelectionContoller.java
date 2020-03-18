@@ -156,7 +156,6 @@ public class TypeSelectionContoller extends DexPopupControllerBase {
 
         memberTreeTableController.post( modelManager );
         memberTreeTableController.setOnMouseClicked( this::mouseClick );
-
     }
 
 }

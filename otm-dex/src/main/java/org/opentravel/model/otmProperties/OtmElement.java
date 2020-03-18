@@ -29,6 +29,7 @@ import org.opentravel.model.OtmTypeUserUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLProperty;
+import org.opentravel.schemacompiler.model.TLPropertyOwner;
 import org.opentravel.schemacompiler.model.TLPropertyType;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -123,6 +124,26 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
     @Override
     public boolean isManditory() {
         return getTL().isMandatory();
+    }
+
+    /**
+     * @return true if position changed
+     */
+    public boolean moveDown() {
+        int i = ((TLPropertyOwner) getParent().getTL()).getElements().indexOf( this.getTL() );
+        getTL().moveDown();
+        getParent().refresh();
+        return i != ((TLPropertyOwner) getParent().getTL()).getElements().indexOf( this.getTL() );
+    }
+
+    /**
+     * @return true if position changed
+     */
+    public boolean moveUp() {
+        int i = ((TLPropertyOwner) getParent().getTL()).getElements().indexOf( this.getTL() );
+        getTL().moveUp();
+        getParent().refresh();
+        return i != ((TLPropertyOwner) getParent().getTL()).getElements().indexOf( this.getTL() );
     }
 
     /**

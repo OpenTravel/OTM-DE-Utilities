@@ -23,6 +23,7 @@ import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.actions.DeprecationChangeAction;
 import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.actions.MoveElementAction;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.popup.TextAreaEditorContoller;
@@ -214,6 +215,17 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
         return button;
     }
 
+    private Button postButton(ObservableList<Node> list, DexActions action, OtmProperty p, Object value, String label) {
+        Button button = new Button( label );
+        if (action != null && p != null && p.getActionManager() != null) {
+            button.setDisable( !p.getActionManager().isEnabled( action, p ) );
+            button.setOnAction( a -> p.getActionManager().run( action, p, value ) );
+        } else
+            button.setDisable( true );
+        list.add( button );
+        return button;
+    }
+
     private void postButtons(OtmProperty p) {
         ObservableList<Node> list = propertyButtons.getButtons();
         if (list != null) {
@@ -229,8 +241,8 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
                     p.setDeprecation( "" );
                     p.deprecationProperty().set( "Deprecated" );
                 } );
-            postButton( list, null, p, "Move Up" );
-            postButton( list, null, p, "Move Down" );
+            postButton( list, DexActions.MOVEELEMENT, p, MoveElementAction.MoveDirection.UP, "Move Up" );
+            postButton( list, DexActions.MOVEELEMENT, p, MoveElementAction.MoveDirection.DOWN, "Move Down" );
         }
     }
 

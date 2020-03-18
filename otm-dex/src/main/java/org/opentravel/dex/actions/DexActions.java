@@ -55,6 +55,7 @@ public enum DexActions {
     DELETEPROPERTY(DeletePropertyAction.class, OtmObjectChangeEvent.class),
     SETREPEATCOUNT(SetRepeatCountAction.class, OtmObjectModifiedEvent.class),
     PROPERTYROLECHANGE(PropertyRoleChangeAction.class, OtmObjectModifiedEvent.class),
+    MOVEELEMENT(MoveElementAction.class, OtmObjectChangeEvent.class),
     //
     ADDRESOURCECHILD(AddResourceChildAction.class, DexResourceChangeEvent.class),
     ADDRESOURCEPARAMETER(AddResourceParameterAction.class, DexResourceChangeEvent.class),

@@ -50,6 +50,7 @@ public class OtmPropertyFactory {
         // NO-OP - only static methods
     }
 
+    @SuppressWarnings("unchecked")
     public static OtmAttribute<TLAttribute> create(TLAttribute tlAttribute, OtmPropertyOwner parent) {
         OtmAttribute<TLAttribute> attribute;
 
@@ -58,39 +59,33 @@ public class OtmPropertyFactory {
             ((TLAttributeOwner) parent.getTL()).addAttribute( tlAttribute );
 
         OtmObject otm = OtmModelElement.get( tlAttribute );
-        // if (otm instanceof OtmAttribute) {
-        // attribute = (OtmAttribute) otm;
-        // if (parent != null)
-        // parent.add( otm );
-        // } else {
+        if ((otm instanceof OtmAttribute && parent != null && ((OtmProperty) otm).getParent() == parent)) {
+            parent.add( otm );
+            return (OtmAttribute<TLAttribute>) otm;
+        }
+
         if (tlAttribute.isReference())
             attribute = new OtmIdReferenceAttribute<>( tlAttribute, parent );
         else
             attribute = new OtmAttribute<>( tlAttribute, parent );
-        // }
         return attribute;
     }
 
+    // Note: will not reuse facade for contextual facets unless contextual facet and not contributor is passed as
+    // parent.
     @SuppressWarnings("unchecked")
     public static OtmElement<TLProperty> create(TLProperty tlProperty, OtmPropertyOwner parent) {
         // Set the TL owner if not set.
         if (tlProperty.getOwner() == null && parent != null && parent.getTL() instanceof TLPropertyOwner)
             ((TLPropertyOwner) parent.getTL()).addElement( tlProperty );
 
+        OtmObject otm = OtmModelElement.get( tlProperty );
+        if ((otm instanceof OtmProperty && parent != null && ((OtmProperty) otm).getParent() == parent)) {
+            parent.add( otm );
+            return (OtmElement<TLProperty>) otm;
+        }
+
         OtmElement<TLProperty> property = null;
-        // OtmObject otm = OtmModelElement.get( tlProperty );
-        // if (otm instanceof OtmProperty) {
-        // // The TL was already modeled.
-        // // Used for contributed facets with ContributedFacet as parent.
-        // if (parent instanceof OtmContributedFacet
-        // && ((OtmProperty) otm).getParent() != ((OtmContributedFacet) parent).getContributor())
-        // log.debug( "Needs CF parent set" );
-        // // Used for inherited properties with parent == null
-        // property = (OtmElement<TLProperty>) otm;
-        // if (parent != null)
-        // parent.add( otm );
-        // } else {
-        // The TL was not modeled. Create new property.
         if (tlProperty.isReference())
             property = new OtmIdReferenceElement<>( tlProperty, parent );
         else
@@ -99,23 +94,23 @@ public class OtmPropertyFactory {
         return property;
     }
 
+    @SuppressWarnings("unchecked")
     public static OtmIndicator<TLIndicator> create(TLIndicator tlIndicator, OtmPropertyOwner parent) {
         // Set the TL owner if not set.
         if (tlIndicator.getOwner() == null && parent != null && parent.getTL() instanceof TLIndicatorOwner)
             ((TLIndicatorOwner) parent.getTL()).addIndicator( tlIndicator );
 
+        OtmObject otm = OtmModelElement.get( tlIndicator );
+        if ((otm instanceof OtmIndicator && parent != null && ((OtmProperty) otm).getParent() == parent)) {
+            parent.add( otm );
+            return (OtmIndicator<TLIndicator>) otm;
+        }
+
         OtmIndicator<TLIndicator> indicator = null;
-        // OtmObject otm = OtmModelElement.get( tlIndicator );
-        // if (otm instanceof OtmIndicator) {
-        // indicator = (OtmIndicator<TLIndicator>) otm;
-        // if (parent != null)
-        // parent.add( otm );
-        // } else {
         if (tlIndicator.isPublishAsElement())
             indicator = new OtmIndicatorElement<>( tlIndicator, parent );
         else
             indicator = new OtmIndicator<>( tlIndicator, parent );
-        // }
         return indicator;
     }
 
