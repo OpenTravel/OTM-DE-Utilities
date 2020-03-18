@@ -232,7 +232,7 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
             propertyButtons.setVisible( true );
             list.clear();
             postButton( list, DexActions.TYPECHANGE, p, "Change Type" );
-            postButton( list, null, p, "Copy" );
+            postButton( list, DexActions.COPYPROPERTY, p, "Copy" );
             postButton( list, DexActions.DELETEPROPERTY, p, "Delete" );
 
             Button button = postButton( list, DexActions.DEPRECATIONCHANGE, p, "Deprecate" );

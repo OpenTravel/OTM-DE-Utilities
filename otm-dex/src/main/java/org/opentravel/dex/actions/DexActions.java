@@ -52,6 +52,7 @@ public enum DexActions {
     DELETEALIAS(DeleteAliasAction.class, OtmObjectChangeEvent.class),
     // Properties
     ADDPROPERTY(AddPropertyAction.class, OtmObjectChangeEvent.class),
+    COPYPROPERTY(CopyPropertyAction.class, OtmObjectChangeEvent.class),
     DELETEPROPERTY(DeletePropertyAction.class, OtmObjectChangeEvent.class),
     SETREPEATCOUNT(SetRepeatCountAction.class, OtmObjectModifiedEvent.class),
     PROPERTYROLECHANGE(PropertyRoleChangeAction.class, OtmObjectModifiedEvent.class),
