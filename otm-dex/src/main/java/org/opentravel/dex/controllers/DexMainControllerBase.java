@@ -192,7 +192,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
             if (e == null)
                 getDialogBoxController().show( "", title );
             else {
-                log.debug( title + e.getLocalizedMessage() );
+                log.debug( title + " " + e.getLocalizedMessage() );
                 if (e.getCause() == null)
                     getDialogBoxController().show( title, e.getLocalizedMessage() );
                 else

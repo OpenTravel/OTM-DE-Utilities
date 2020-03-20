@@ -80,7 +80,11 @@ public class ListSubnamespacesTask extends DexTaskBase<NamespacesDAO> implements
         for (String childNS : parentDAO.getRepository().listNamespaceChildren( parentDAO.getFullPath() )) {
             nsData = new NamespacesDAO( childNS, parentDAO.getFullPath(), parentDAO.getRepository() );
             namespaceMap.put( nsData.getFullPath(), nsData );
-            get( nsData ); // recurse
+            try {
+                get( nsData ); // recurse
+            } catch (RepositoryException e) {
+                log.error( "Repository Error: " + e.getLocalizedMessage() );
+            }
         }
     }
 }

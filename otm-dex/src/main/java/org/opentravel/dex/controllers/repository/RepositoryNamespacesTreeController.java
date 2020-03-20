@@ -26,6 +26,8 @@ import org.opentravel.dex.events.DexRepositoryNamespaceSelectionEvent;
 import org.opentravel.dex.events.DexRepositorySelectionEvent;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.repository.ListSubnamespacesTask;
+import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryPermission;
+import org.opentravel.schemacompiler.repository.RemoteRepository;
 import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
@@ -185,6 +187,23 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
 
         mainController.postStatus( "Loading root namespaces" );
         // currentFilter = parentController.getRepositorySearchFilter();
+        if (repository instanceof RemoteRepository) {
+            String url = ((RemoteRepository) repository).getEndpointUrl();
+            RepositoryPermission auth = null;
+            try {
+                auth = repository.getUserAuthorization( url );
+            } catch (RepositoryException e) {
+                log.warn( "Exception: Tried to access repository they are not authorized for." );
+                mainController.postError( e, "Not Authorized." );
+                return; // Not authorized.
+            }
+            if (auth == null || auth == auth.NONE) {
+                log.warn( "Tried to access repository they are not authorized for." );
+                mainController.postError( null, "Not Authorized." );
+                return; // Not authorized.
+            }
+        }
+        // selectedRemoteRepository.getUserAuthorization( selectedRemoteRepository.getEndpointUrl() );
 
         // Get the root namespaces in real time
         try {
