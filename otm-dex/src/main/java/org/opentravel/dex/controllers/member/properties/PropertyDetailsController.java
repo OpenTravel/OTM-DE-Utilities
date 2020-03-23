@@ -102,7 +102,7 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
     public void clear() {
         // When posting updated filter results, do not clear the filters.
         if (!ignoreClear) {
-            log.debug( "Clearing property details." );
+            // log.debug( "Clearing property details." );
             postedData = null;
             propertyButtons.getButtons().clear();
             objectImageView.setImage( null );
@@ -120,7 +120,7 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        log.debug( "Event received: " + event.getClass().getSimpleName() );
+        // log.debug( "Event received: " + event.getClass().getSimpleName() );
         if (event instanceof DexPropertySelectionEvent)
             handleEvent( (DexPropertySelectionEvent) event );
         else if (event instanceof DexFacetSelectionEvent)
@@ -147,7 +147,7 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
 
     @Override
     public void post(OtmObject obj) {
-        log.debug( "Posting object " + obj );
+        // log.debug( "Posting object " + obj );
         clear();
         if (obj == null)
             return;
@@ -170,7 +170,7 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
      * @param property
      */
     public void post(OtmProperty property) {
-        log.debug( "Posting property " + property );
+        // log.debug( "Posting property " + property );
         if (property == null) {
             clear();
             return;
@@ -189,7 +189,7 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
 
 
     public void post(OtmSimpleObject property) {
-        log.debug( "TO DO - Posting simple object " + property );
+        // log.debug( "Posting simple object " + property );
         postedData = property;
         propertyGrid.getChildren().clear();
         postTitle( property );
@@ -323,7 +323,7 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
 
     @Override
     public void refresh() {
-        log.debug( "Refreshing property details." );
+        // log.debug( "Refreshing property details." );
         post( postedData );
     }
 

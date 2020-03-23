@@ -46,10 +46,13 @@ public class LibrariesTabController extends DexTabControllerBase {
 
     @Override
     public String getDialogTitle() {
-        return null;
+        return LibrariesWindowController.DIALOG_TITLE;
     }
 
+    @Override
     public void launchWindow(ActionEvent e) {
-        // No-op
+        LibrariesWindowController w = LibrariesWindowController.init();
+        super.launchWindow( e, w );
     }
+
 }

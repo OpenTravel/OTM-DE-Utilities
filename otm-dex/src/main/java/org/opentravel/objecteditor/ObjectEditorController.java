@@ -65,6 +65,8 @@ public class ObjectEditorController extends DexMainControllerBase {
     private ResourcesTabController resourcesTabController;
     @FXML
     private SearchWindowController searchWindowController;
+    // @FXML
+    // private LibraryWindowController libraryWindowController;
     @FXML
     private SearchTabController searchTabController;
 
@@ -144,7 +146,8 @@ public class ObjectEditorController extends DexMainControllerBase {
         whereUsedTabController.configure( this );
         searchTabController.configure( this );
 
-        // Add menu items for tab controllers that can be non-modal windows
+        // Add menu items for tab controllers that can also be launched in separate views windows
+        menuBarWithProjectController.addViewItem( librariesTabController );
         menuBarWithProjectController.addViewItem( memberPropertiesTabController );
         menuBarWithProjectController.addViewItem( repositoryTabController );
         menuBarWithProjectController.addViewItem( resourcesTabController );
