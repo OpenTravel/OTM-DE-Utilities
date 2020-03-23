@@ -263,7 +263,6 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
         TextField txt = new TextField( obj.descriptionProperty().get() );
         txt.setDisable( obj.descriptionProperty() instanceof ReadOnlyStringWrapper );
         txt.setOnAction( a -> setProperty( a, obj.descriptionProperty() ) );
-
         DexEditField field =
             new DexEditField( currentRow++, 0, "Description", "Describe what this property contains.", txt );
         postField( field, obj, obj.descriptionProperty() );
@@ -271,12 +270,11 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
 
     private void postExample(OtmProperty property) {
         if (property.getExample() != null && !property.getExample().isEmpty()) {
-            TextField txt = new TextField( property.descriptionProperty().get() );
-            txt.setDisable( property.descriptionProperty() instanceof ReadOnlyStringWrapper );
-            txt.setOnAction( a -> setProperty( a, property.descriptionProperty() ) );
-
-            DexEditField field = new DexEditField( currentRow++, 0, "Example", "Provide an example of this data field.",
-                new TextField( property.getExample() ) );
+            TextField txt = new TextField( property.exampleProperty().get() );
+            txt.setDisable( property.exampleProperty() instanceof ReadOnlyStringWrapper );
+            txt.setOnAction( a -> setProperty( a, property.exampleProperty() ) );
+            DexEditField field =
+                new DexEditField( currentRow++, 0, "Example", "Provide an example of this data field.", txt );
             postField( field, property, property.exampleProperty() );
         }
     }

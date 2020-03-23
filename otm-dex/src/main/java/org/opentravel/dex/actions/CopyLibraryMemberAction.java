@@ -26,6 +26,8 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import java.util.List;
 
+import javafx.application.Platform;
+
 /**
  * Make a copy of a library member.
  */
@@ -66,13 +68,15 @@ public class CopyLibraryMemberAction extends DexRunAction {
         if (candidates.size() == 1)
             return doIt( candidates.get( 0 ) );
 
-        // log.debug( "select library for the library member copy." );
-        SelectLibraryDialogController controller = SelectLibraryDialogController.init();
-        controller.setModelManager( otm.getModelManager() );
-        if (controller.showAndWait( "New copy of Library Member" ) == Results.OK)
-            doIt( controller.getSelected() );
-        else
-            log.error( "Invalid selection or cancel." );
+        if (Platform.isFxApplicationThread()) {
+            // log.debug( "select library for the library member copy." );
+            SelectLibraryDialogController controller = SelectLibraryDialogController.init();
+            controller.setModelManager( otm.getModelManager() );
+            if (controller.showAndWait( "New copy of Library Member" ) == Results.OK)
+                doIt( controller.getSelected() );
+            else
+                log.error( "Invalid selection or cancel." );
+        }
         return get();
     }
 

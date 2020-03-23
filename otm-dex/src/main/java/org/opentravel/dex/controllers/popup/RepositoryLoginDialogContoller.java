@@ -179,7 +179,7 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
 
     public void doTest() {
         log.debug( "Test: " + loginUser.getText() + " : " + loginPassword.getText() );
-        testResults.setText( "Testing" );
+        testResults.setText( "Starting Test..." );
 
         String user = loginUser.getText();
         String pwd = loginPassword.getText();

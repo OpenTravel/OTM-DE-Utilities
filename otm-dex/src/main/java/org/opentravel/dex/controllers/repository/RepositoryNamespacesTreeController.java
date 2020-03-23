@@ -183,10 +183,8 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
         }
         super.post( repository ); // clear view and hold onto repo
         // log.debug( "Post namespaces in the repository: " + repository.getDisplayName() );
-        root = repositoryNamespacesTree.getRoot();
 
-        mainController.postStatus( "Loading root namespaces" );
-        // currentFilter = parentController.getRepositorySearchFilter();
+        mainController.postStatus( "Checking authorization to access " + repository.getDisplayName() );
         if (repository instanceof RemoteRepository) {
             String url = ((RemoteRepository) repository).getEndpointUrl();
             RepositoryPermission auth = null;
@@ -203,16 +201,17 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
                 return; // Not authorized.
             }
         }
-        // selectedRemoteRepository.getUserAuthorization( selectedRemoteRepository.getEndpointUrl() );
 
         // Get the root namespaces in real time
+        root = repositoryNamespacesTree.getRoot();
+        mainController.postStatus( "Loading root namespaces in " + repository.getDisplayName() );
         try {
             for (String rootNS : repository.listRootNamespaces()) {
                 TreeItem<NamespacesDAO> item = new TreeItem<>( new NamespacesDAO( rootNS, null, repository ) );
                 item.setExpanded( false );
                 root.getChildren().add( item );
                 namespaceMap.put( rootNS, item );
-                // Get sub-namespaces in background thread
+                // Get sub-namespaces in background threads
                 new ListSubnamespacesTask( item.getValue(), this::handleTaskComplete,
                     mainController.getStatusController() ).go();
             }
@@ -227,12 +226,8 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
         if (event == null || !(event.getTarget() instanceof ListSubnamespacesTask))
             return;
         ListSubnamespacesTask task = (ListSubnamespacesTask) event.getTarget();
-        if (task == null) {
-            log.error( "Missing task." );
-            return;
-        }
-        if (task.getErrorException() != null) {
-            mainController.postError( task.getErrorException(), "Error listing namespaces." );
+        if (task == null || task.getErrorException() != null) {
+            mainController.postError( task.getErrorException(), "Error listing namespace." );
             return;
         }
         // log.debug( "Handling sub-namespace task results" );
@@ -310,13 +305,4 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
     private boolean isSelected(TreeItem<NamespacesDAO> item) {
         return filterController == null || filterController.isSelected( item.getValue().getFullPath() );
     }
-
-    // /**
-    // * Provide this controller a filter.
-    // *
-    // * @param repositorySearchController
-    // */
-    // public void setFilter(RepositorySearchController repositorySearchController) {
-    // filterController = repositorySearchController;
-    // }
 }
