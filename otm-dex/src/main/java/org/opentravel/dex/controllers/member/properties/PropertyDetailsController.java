@@ -27,6 +27,7 @@ import org.opentravel.dex.actions.MoveElementAction;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.popup.TextAreaEditorContoller;
+import org.opentravel.dex.events.DexFacetSelectionEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.DexNavigationEvent;
@@ -67,8 +68,9 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
     private static final EventType[] publishedEvents = {OtmObjectModifiedEvent.OBJECT_MODIFIED};
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents = {DexPropertySelectionEvent.PROPERTY_SELECTED,
-        DexMemberSelectionEvent.MEMBER_SELECTED, DexMemberSelectionEvent.RESOURCE_SELECTED,
-        OtmObjectModifiedEvent.OBJECT_MODIFIED, DexModelChangeEvent.MODEL_CHANGED, OtmObjectChangeEvent.OBJECT_CHANGED};
+        DexFacetSelectionEvent.FACET_SELECTED, DexMemberSelectionEvent.MEMBER_SELECTED,
+        DexMemberSelectionEvent.RESOURCE_SELECTED, OtmObjectModifiedEvent.OBJECT_MODIFIED,
+        DexModelChangeEvent.MODEL_CHANGED, OtmObjectChangeEvent.OBJECT_CHANGED};
     /**
      * FXML Java FX Nodes this controller is dependent upon
      */
@@ -121,6 +123,8 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
         log.debug( "Event received: " + event.getClass().getSimpleName() );
         if (event instanceof DexPropertySelectionEvent)
             handleEvent( (DexPropertySelectionEvent) event );
+        else if (event instanceof DexFacetSelectionEvent)
+            post( ((DexFacetSelectionEvent) event).get() );
         else if (event instanceof DexMemberSelectionEvent
             && ((DexMemberSelectionEvent) event).getMember() instanceof OtmSimpleObject)
             post( ((DexNavigationEvent) event).getMember() );
@@ -144,14 +148,16 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
     @Override
     public void post(OtmObject obj) {
         log.debug( "Posting object " + obj );
-        if (obj == null) {
-            clear();
+        clear();
+        if (obj == null)
             return;
-        }
+
         if (obj instanceof OtmProperty)
             post( (OtmProperty) obj );
         else if (obj instanceof OtmSimpleObject)
             post( (OtmSimpleObject) obj );
+        else
+            postTitle( obj );
     }
 
 
@@ -309,7 +315,7 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
     private void postTitle(OtmObject obj) {
         if (obj != null && obj.getOwningMember() != null) {
             objectImageView.setImage( ImageManager.getImage( obj.getIconType() ) );
-            propertyDetailsPane.setText( "Details of " + obj.getName() + " " + obj.getObjectTypeName() + "   in "
+            propertyDetailsPane.setText( "Details of " + obj.getObjectTypeName() + "  " + obj.getName() + "   in "
                 + obj.getOwningMember().getNameWithPrefix() );
         } else
             propertyDetailsPane.setText( "Details" );

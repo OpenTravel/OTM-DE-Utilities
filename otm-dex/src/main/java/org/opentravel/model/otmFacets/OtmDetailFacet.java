@@ -42,9 +42,4 @@ public class OtmDetailFacet extends OtmFacet<TLFacet> {
                 "Tried to create detail facet from wrong facet type: " + tl.getFacetType() );
     }
 
-    // @Override
-    // public TLFacet getTL() {
-    // return tlObject;
-    // }
-
 }

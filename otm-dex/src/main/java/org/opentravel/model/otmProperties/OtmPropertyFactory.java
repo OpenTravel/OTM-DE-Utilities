@@ -183,4 +183,8 @@ public class OtmPropertyFactory {
         }
         return p;
     }
+
+    public static String getObjectName(OtmProperty property) {
+        return property.getPropertyType().label();
+    }
 }

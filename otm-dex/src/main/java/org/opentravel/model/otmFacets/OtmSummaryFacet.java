@@ -21,13 +21,13 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
-import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLFacetType;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Abstract OTM Node for Facets.
@@ -63,21 +63,41 @@ public class OtmSummaryFacet extends OtmFacet<TLFacet> {
         } );
         if (getParent() instanceof OtmChildrenOwner) {
             // Get the parent's detail and contextual facets
-            getParent().getChildren().forEach( c -> {
-                if (c instanceof OtmDetailFacet)
-                    hierarchy.add( c );
-                if (c instanceof OtmContextualFacet)
-                    log.debug( "How to handle?" );
-                if (c instanceof OtmContributedFacet) {
-                    c = ((OtmContributedFacet) c).getContributor();
-                    if (c != null)
-                        hierarchy.add( c );
-                }
-            } );
+            addFacets( getParent().getChildren(), hierarchy );
+            // getParent().getChildren().forEach( c -> {
+            // if (c instanceof OtmDetailFacet)
+            // hierarchy.add( c );
+            // // if (c instanceof OtmContextualFacet)
+            // // log.debug( "How to handle?" );
+            // else if (c instanceof OtmContributedFacet) {
+            // c = ((OtmContributedFacet) c).getContributor();
+            // if (c != null && !(c instanceof OtmQueryFacet))
+            // hierarchy.add( c );
+            // }
+            // } );
             // Get any inherited facets from the parent
-            getParent().getInheritedChildren().forEach( hierarchy::add );
+            addFacets( getParent().getInheritedChildren(), hierarchy );
+            // getParent().getInheritedChildren().forEach( hierarchy::add );
         }
         return hierarchy;
+
     }
 
+    /**
+     * Add detail and non-query facets to hierarchy list
+     * 
+     * @param kids
+     * @param hierarchy
+     */
+    private void addFacets(List<OtmObject> kids, Collection<OtmObject> hierarchy) {
+        kids.forEach( c -> {
+            if (c instanceof OtmDetailFacet)
+                hierarchy.add( c );
+            else if (c instanceof OtmContributedFacet) {
+                c = ((OtmContributedFacet) c).getContributor();
+                if (c != null && !(c instanceof OtmQueryFacet))
+                    hierarchy.add( c );
+            }
+        } );
+    }
 }

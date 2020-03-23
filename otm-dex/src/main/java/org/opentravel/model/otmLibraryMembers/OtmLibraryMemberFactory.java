@@ -125,27 +125,5 @@ public class OtmLibraryMemberFactory {
         if (member instanceof OtmUpdateFacet)
             return "Update Facet";
         return OtmLibraryMemberType.getLabel( member );
-        // if (member instanceof OtmBusinessObject)
-        // return "Business Object";
-        // if (member instanceof OtmChoiceObject)
-        // return "Choice Object";
-        // if (member instanceof OtmCore)
-        // return "Core Object";
-        // if (member instanceof OtmValueWithAttributes)
-        // return "Value With Attributes";
-        // if (member instanceof OtmSimpleObject)
-        // return "Simple Object";
-        // if (member instanceof OtmEnumerationClosed)
-        // return "Closed Enumeration";
-        // if (member instanceof OtmEnumerationOpen)
-        // return "Open Enumeration";
-        // if (member instanceof OtmCustomFacet)
-        // return "Custom Facet";
-        // if (member instanceof OtmChoiceFacet)
-        // return "Choice Facet";
-        // if (member instanceof OtmQueryFacet)
-        // return "Query Facet";
-        //
-        // return member.getClass().getSimpleName();
     }
 }

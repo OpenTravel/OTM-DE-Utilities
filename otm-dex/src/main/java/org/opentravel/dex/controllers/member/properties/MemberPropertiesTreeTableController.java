@@ -26,6 +26,7 @@ import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.events.DexFacetSelectionEvent;
 import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
@@ -35,9 +36,13 @@ import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.dex.events.OtmObjectReplacedEvent;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
+import org.opentravel.model.otmFacets.OtmFacet;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
@@ -58,8 +63,9 @@ import javafx.scene.layout.VBox;
 public class MemberPropertiesTreeTableController extends DexIncludedControllerBase<OtmLibraryMember> {
     private static Log log = LogFactory.getLog( MemberPropertiesTreeTableController.class );
 
-    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED,
-        DexModelChangeEvent.MODEL_CHANGED, DexPropertySelectionEvent.PROPERTY_SELECTED};
+    private static final EventType[] publishedEvents =
+        {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED,
+            DexFacetSelectionEvent.FACET_SELECTED, DexPropertySelectionEvent.PROPERTY_SELECTED};
 
     private static final EventType[] subscribedEvents =
         {DexMemberDeleteEvent.MEMBER_DELETED, OtmObjectReplacedEvent.OBJECT_REPLACED,
@@ -82,7 +88,6 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
     protected TreeTableColumn<PropertiesDAO,String> exampleCol;
     protected TreeTableColumn<PropertiesDAO,String> descCol;
-
     protected TreeTableColumn<PropertiesDAO,String> deprecatedCol;
     protected TreeTableColumn<PropertiesDAO,String> otherDocCol;
 
@@ -121,14 +126,16 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         setColumnProps( exampleCol, true, true, false, 0, "example" );
         // setColumnProps( exampleCol, false, false, false, 0 );
 
+        // Documentation Column - spans
         TreeTableColumn<PropertiesDAO,String> documentationCol = new TreeTableColumn<>( "Documentation" );
         // Description Column
         descCol = new TreeTableColumn<>( "Description" );
-        setColumnProps( descCol, true, true, false, 150, "description" );
+        setColumnProps( descCol, true, true, false, -150, "description" );
+        // setColumnProps( descCol, true, true, false, 150, "description" );
         // Deprecation Column
         deprecatedCol = new TreeTableColumn<>( "Deprecation" );
         setColumnProps( deprecatedCol, true, true, false, 50, "deprecation" );
-        documentationCol.getColumns().addAll( descCol, deprecatedCol );
+        documentationCol.getColumns().addAll( deprecatedCol, descCol );
         // Other
         // otherDocCol = new TreeTableColumn<>( "Other" );
         // setColumnProps( otherDocCol, false, false, false, 0 );
@@ -160,6 +167,26 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         valCol.setCellFactory( c -> new ValidationPropertiesTreeTableCellFactory() );
 
         table.getColumns().addAll( nameCol, valCol, typeCol, roleCol, constraintCol, exampleCol, documentationCol );
+        // Bind column width to table width
+        bindWidth( table, descCol );
+        // descCol.prefWidthProperty().bind( table.widthProperty().subtract( tableWidth( table, descCol ) ) );
+    }
+
+    protected void bindWidth(TreeTableView<PropertiesDAO> table, TreeTableColumn<PropertiesDAO,?> col) {
+        double width = 0;
+        for (TreeTableColumn<PropertiesDAO,?> c : table.getColumns())
+            if (c != col && c.isVisible()) {
+                width += c.widthProperty().doubleValue();
+                // If column visibility changes, recompute width
+                c.visibleProperty().addListener( new ChangeListener<Boolean>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldVisibility,
+                        Boolean newVisibility) {
+                        bindWidth( table, col );
+                    }
+                } );
+            }
+        col.prefWidthProperty().bind( table.widthProperty().subtract( width ) );
     }
 
     @Override
@@ -190,18 +217,11 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
         // Layout the table
         initializeTable( propertiesTable );
-
     }
 
     private void disableEditing() {
-        nameCol.setEditable( false );
-        descCol.setEditable( false );
-        typeCol.setEditable( false );
-        roleCol.setEditable( false );
-        minCol.setEditable( false );
-        maxCol.setEditable( false );
-        exampleCol.setEditable( false );
-        deprecatedCol.setEditable( false );
+        for (TreeTableColumn<PropertiesDAO,?> col : propertiesTable.getColumns())
+            col.setEditable( false );
     }
 
     @Override
@@ -294,6 +314,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
         // Define Columns and cell content providers
         buildColumns( table );
+
     }
 
     @Override
@@ -323,6 +344,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
             obj = item.getValue().getValue();
             actionManager = obj.getActionManager();
         }
+        log.debug( "Selection: " + obj + " " + obj.getClass().getSimpleName() );
         if (actionManager != null) {
             nameCol.setEditable( actionManager.isEnabled( DexActions.NAMECHANGE, obj ) );
             descCol.setEditable( actionManager.isEnabled( DexActions.DESCRIPTIONCHANGE, obj ) );
@@ -337,6 +359,8 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         }
         if (obj instanceof OtmProperty)
             fireEvent( new DexPropertySelectionEvent( (OtmProperty) obj ) );
+        if (obj instanceof OtmFacet || obj instanceof OtmContextualFacet)
+            fireEvent( new DexFacetSelectionEvent( obj ) );
         // postObjectStatus( obj );
     }
 

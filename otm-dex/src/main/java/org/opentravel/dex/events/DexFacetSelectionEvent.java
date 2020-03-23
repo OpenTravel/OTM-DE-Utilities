@@ -18,36 +18,31 @@ package org.opentravel.dex.events;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.OtmObject;
 
 import javafx.event.EventType;
 
 /**
- * OTM DEX navigation event for signaling when a property has been selected.
+ * OTM DEX navigation event for signaling when a facet has been selected.
  * 
  * @author dmh
  *
  */
-public class DexPropertySelectionEvent extends DexNavigationEvent {
-    private static Log log = LogFactory.getLog( DexPropertySelectionEvent.class );
+public class DexFacetSelectionEvent extends DexNavigationEvent {
+    private static Log log = LogFactory.getLog( DexFacetSelectionEvent.class );
     private static final long serialVersionUID = 20190409L;
 
-    public static final EventType<DexPropertySelectionEvent> PROPERTY_SELECTED =
-        new EventType<>( DEX_ALL, "PROPERTY_SELECTED" );
+    public static final EventType<DexFacetSelectionEvent> FACET_SELECTED = new EventType<>( DEX_ALL, "FACET_SELECTED" );
 
-    protected OtmProperty property = null;
+    // Could be contextual facet; contextual facets do not extend facet.
+    protected OtmObject facet = null;
 
-    public OtmProperty getProperty() {
-        return property;
+    public DexFacetSelectionEvent(OtmObject otm) {
+        super( FACET_SELECTED );
+        facet = otm;
     }
 
-
-    public DexPropertySelectionEvent(OtmProperty otm) {
-        super( PROPERTY_SELECTED );
-        property = otm;
-    }
-
-    public OtmProperty get() {
-        return property;
+    public OtmObject get() {
+        return facet;
     }
 }

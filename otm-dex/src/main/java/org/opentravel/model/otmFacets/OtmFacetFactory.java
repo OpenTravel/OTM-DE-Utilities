@@ -130,4 +130,16 @@ public class OtmFacetFactory {
 
         return facet;
     }
+
+    public static String getObjectName(OtmFacet<?> member) {
+        if (member instanceof OtmDetailFacet)
+            return "Detail Facet";
+        if (member instanceof OtmIdFacet)
+            return "ID Facet";
+        if (member instanceof OtmSharedFacet)
+            return "Shared Facet";
+        if (member instanceof OtmSummaryFacet)
+            return "Summary Facet";
+        return member.getClass().getSimpleName();
+    }
 }

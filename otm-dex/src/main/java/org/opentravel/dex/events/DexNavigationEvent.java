@@ -18,7 +18,6 @@ package org.opentravel.dex.events;
 
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.otmProperties.OtmProperty;
 
 import javafx.event.EventType;
 import javafx.scene.control.TreeItem;
@@ -36,14 +35,9 @@ public abstract class DexNavigationEvent extends DexEvent {
     private static final long serialVersionUID = 20190826L;
 
     protected OtmLibraryMember member = null;
-    protected OtmProperty property = null;
 
     public OtmLibraryMember getMember() {
         return member;
-    }
-
-    public OtmProperty getProperty() {
-        return property;
     }
 
     /**

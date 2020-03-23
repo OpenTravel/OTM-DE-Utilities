@@ -96,6 +96,12 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
     }
 
     @Override
+    public String getObjectTypeName() {
+        return OtmPropertyFactory.getObjectName( this );
+    }
+
+
+    @Override
     public String toString() {
         return getName();
     }

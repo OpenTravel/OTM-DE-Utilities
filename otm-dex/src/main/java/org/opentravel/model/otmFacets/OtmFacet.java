@@ -78,10 +78,13 @@ public abstract class OtmFacet<T extends TLFacet> extends OtmAbstractFacet<TLFac
     }
 
     @Override
+    public String getObjectTypeName() {
+        return OtmFacetFactory.getObjectName( this );
+    }
+
+    @Override
     public TLFacet getTL() {
         return (TLFacet) tlObject;
     }
-
-
 
 }

@@ -135,6 +135,12 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
                 ch.add( c );
             if (c instanceof OtmAlias)
                 ch.add( c );
+            if (c instanceof OtmContributedFacet && ((OtmContributedFacet) c).getContributor() instanceof OtmQueryFacet)
+                ch.add( c );
+        } );
+        getInheritedChildren().forEach( c -> {
+            if (c instanceof OtmContributedFacet && ((OtmContributedFacet) c).getContributor() instanceof OtmQueryFacet)
+                ch.add( c );
         } );
         return ch;
     }
