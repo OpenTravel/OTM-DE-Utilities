@@ -18,6 +18,8 @@ package org.opentravel.dex.controllers.library;
 
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabControllerBase;
+import org.opentravel.dex.controllers.library.usage.ProvidersTreeController;
+import org.opentravel.dex.controllers.library.usage.UsersTreeController;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -33,6 +35,10 @@ public class LibrariesTabController extends DexTabControllerBase {
     /** FXML Java FX Nodes this controller is dependent upon */
     @FXML
     private LibrariesTreeTableController librariesTreeTableController;
+    @FXML
+    private UsersTreeController usersTreeController;
+    @FXML
+    private ProvidersTreeController providersTreeController;
 
     public LibrariesTabController() {
         // No-op
@@ -41,6 +47,8 @@ public class LibrariesTabController extends DexTabControllerBase {
     @Override
     public void configure(DexMainController mainController) {
         includedControllers.add( librariesTreeTableController );
+        includedControllers.add( usersTreeController );
+        includedControllers.add( providersTreeController );
         super.configure( mainController );
     }
 

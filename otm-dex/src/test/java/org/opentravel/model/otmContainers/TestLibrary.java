@@ -26,12 +26,16 @@ import org.junit.Test;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
+import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestCore;
+import org.opentravel.model.otmLibraryMembers.TestLibraryMemberBase;
+import org.opentravel.model.otmLibraryMembers.TestOtmSimple;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.model.otmProperties.TestElement;
 import org.opentravel.schemacompiler.model.TLLibrary;
@@ -39,7 +43,10 @@ import org.opentravel.schemacompiler.version.VersionSchemeException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -71,7 +78,7 @@ public class TestLibrary {
     public void testWhereUsedWhenDeleted() {
         // Given - a library
         DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
         OtmLibrary lib = TestLibrary.buildOtm( mgr, "Namespace1", "p1", "Library1" );
         addOneOfEach( lib );
 
@@ -102,7 +109,7 @@ public class TestLibrary {
     @Test
     public void testAddAndDelete() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
         NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
-        OtmModelManager mgr = new OtmModelManager( null, null );
+        OtmModelManager mgr = new OtmModelManager( null, null, null );
         OtmLibrary lib = mgr.add( new TLLibrary() );
 
         for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
@@ -124,6 +131,56 @@ public class TestLibrary {
 
             // log.debug( "Added and removed: " + member );
         }
+    }
+
+    @Test
+    public void testGetProviders() {
+        // Given - action and model managers
+        DexFullActionManager fullMgr = new DexFullActionManager( null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
+        // Given - a subject library that uses types, base types, contextual facets
+        OtmLibrary subjectLib = TestLibrary.buildOtm( mgr, "NamespaceS1", "s1", "LibraryS1" );
+        addOneOfEach( subjectLib );
+        TestLibraryMemberBase.buildOneOfEachWithProperties( mgr, subjectLib );
+
+        // Given - a provider library that provides types, base types, contextual facets
+        OtmLibrary providerLib = TestLibrary.buildOtm( mgr, "NamespaceP1", "p1", "LibraryP1" );
+        OtmLibrary providerLib2 = TestLibrary.buildOtm( mgr, "NamespaceP2", "p2", "LibraryP2" );
+        OtmSimpleObject[] simples = new OtmSimpleObject[3];
+        simples[0] = TestOtmSimple.buildOtm( providerLib );
+        simples[0].setName( "Simple0" );
+        simples[1] = TestOtmSimple.buildOtm( providerLib2 );
+        simples[1].setName( "Simple1" );
+        simples[2] = TestOtmSimple.buildOtm( providerLib2 );
+        simples[2].setName( "Simple2" );
+
+        // Given - make assignments
+        int i = 0;
+        for (OtmLibraryMember m : subjectLib.getMembers())
+            for (OtmTypeUser u : m.getDescendantsTypeUsers()) {
+                OtmTypeProvider r = u.setAssignedType( simples[i++ % 3] );
+                log.debug( "Assigned " + simples[(i - 1) % 3] + " to " + u + " resulting in " + r );
+            }
+
+        // When - getProviders
+        Map<OtmLibrary,List<OtmLibraryMember>> map = subjectLib.getProviderMap( false );
+        Set<OtmLibrary> keys = map.keySet();
+        Collection<List<OtmLibraryMember>> values = map.values();
+        // Then
+        assertTrue( !keys.isEmpty() );
+        assertTrue( !values.isEmpty() );
+        assertTrue( map.keySet().contains( providerLib ) );
+        assertTrue( map.keySet().contains( providerLib2 ) );
+        assertTrue( map.get( providerLib2 ).contains( simples[1] ) );
+        assertTrue( map.get( providerLib2 ).contains( simples[2] ) );
+
+        // When - sorted
+        map = subjectLib.getProviderMap( true );
+        keys = map.keySet();
+        values = map.values();
+        // Then
+        assertTrue( !keys.isEmpty() );
+        assertTrue( !values.isEmpty() );
     }
 
     @Test

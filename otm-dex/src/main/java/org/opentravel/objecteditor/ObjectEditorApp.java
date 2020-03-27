@@ -60,13 +60,14 @@ public class ObjectEditorApp extends AbstractOTMApplication {
     public void start(Stage primaryStage) {
         super.start( primaryStage );
         ((ObjectEditorController) getController()).setStage( primaryStage );
-        primaryStage.getScene().getStylesheets().add( "DavesViper.css" );
 
+        // String size = ((UserSettings) getUserSettings()).getDisplaySize();
+        // DexStyleSheetHandler.setStyleSheet( primaryStage, size );
 
         if (getController().getRepositoryManager() == null)
             throw new IllegalStateException( "Repository manager not available." );
-
     }
+
 
     @Override
     protected String getMainWindowFxmlLocation() {

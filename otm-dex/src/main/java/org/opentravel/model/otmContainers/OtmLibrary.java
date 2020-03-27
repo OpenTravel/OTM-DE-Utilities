@@ -24,6 +24,7 @@ import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmServiceObject;
@@ -45,7 +46,10 @@ import org.opentravel.schemacompiler.version.VersionSchemeException;
 import org.opentravel.schemacompiler.version.VersionSchemeFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * OTM Object for libraries. Does <b>NOT</b> provide access to members.
@@ -53,7 +57,7 @@ import java.util.List;
  * @author Dave Hollander
  * 
  */
-public class OtmLibrary {
+public class OtmLibrary implements Comparable<OtmLibrary> {
     private static Log log = LogFactory.getLog( OtmLibrary.class );
 
     protected OtmModelManager mgr;
@@ -81,6 +85,11 @@ public class OtmLibrary {
         this.mgr = mgr;
         projectItems.add( pi );
         tlLib = pi.getContent();
+    }
+
+    @Override
+    public int compareTo(OtmLibrary o) {
+        return getName().compareTo( o.getName() );
     }
 
     /**
@@ -606,4 +615,74 @@ public class OtmLibrary {
         findings = TLModelCompileValidator.validateModelElement( getTL(), true );
     }
 
+    /**
+     * Get a provider map. The keys are each library that provides types to this library. The values are an array of
+     * library members that provide the types.
+     * 
+     * @return new map.
+     */
+    public Map<OtmLibrary,List<OtmLibraryMember>> getProviderMap(boolean sort) {
+        Map<OtmLibrary,List<OtmLibraryMember>> providerMap = new TreeMap<>();
+        for (OtmLibraryMember m : getMembers()) {
+            if (m instanceof OtmTypeUser)
+                addToMap( (OtmTypeUser) m, providerMap );
+            for (OtmTypeUser u : m.getDescendantsTypeUsers()) {
+                // For each user, get the provider's owner and add to map
+                addToMap( u, providerMap );
+            }
+        }
+        if (sort)
+            providerMap.values().forEach( l -> l.sort( null ) );
+        return providerMap;
+    }
+
+    private void addToMap(OtmTypeUser user, Map<OtmLibrary,List<OtmLibraryMember>> map) {
+        if (user != null && map != null && user.getAssignedType() != null) {
+            OtmLibraryMember owner = user.getAssignedType().getOwningMember();
+            if (owner.getLibrary() == this)
+                return;
+
+            List<OtmLibraryMember> mList = map.get( owner.getLibrary() );
+            if (mList != null) {
+                if (!mList.contains( user.getOwningMember() ))
+                    mList.add( user.getOwningMember() );
+            } else {
+                mList = new ArrayList<>();
+                mList.add( user.getOwningMember() );
+                map.put( owner.getLibrary(), mList );
+            }
+        }
+    }
+
+    /**
+     * Get a users map. The keys are each library that uses types from this library. The values are an array of library
+     * members that use the types.
+     * 
+     * @return new map.
+     */
+    public Map<OtmLibrary,List<OtmLibraryMember>> getUsersMap(boolean sort) {
+        Map<OtmLibrary,List<OtmLibraryMember>> usersMap = new HashMap<>();
+        // for (OtmLibraryMember m : getMembers()) {
+        //
+        // }
+        getMembers().forEach( m -> {
+            m.getDescendantsTypeProviders().forEach( p -> {
+                if (p != null) {
+                    List<OtmLibraryMember> users = p.getOwningMember().getWhereUsed();
+                    users.forEach( u -> {
+                        List<OtmLibraryMember> mList = usersMap.get( p.getLibrary() );
+                        if (mList != null) {
+                            if (!mList.contains( p.getOwningMember() ))
+                                usersMap.get( p.getLibrary() ).add( p.getOwningMember() );
+                        } else {
+                            mList = new ArrayList<>();
+                            mList.add( p.getOwningMember() );
+                            usersMap.put( p.getLibrary(), mList );
+                        }
+                    } );
+                }
+            } );
+        } );
+        return usersMap;
+    }
 }

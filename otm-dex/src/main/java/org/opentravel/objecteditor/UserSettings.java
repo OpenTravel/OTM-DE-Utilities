@@ -37,9 +37,9 @@ import java.util.Properties;
  * <ol>
  * <li>Define field
  * <li>Add getter and setter
- * <li>Add load()
- * <li>Add save()
- * <li>Add default()
+ * <li>Add {@link #load(Properties)}
+ * <li>Add {@link #save(Properties)}
+ * <li>Add {@link #getDefaultSettings()}
  */
 public class UserSettings extends AbstractUserSettings {
 
@@ -133,6 +133,15 @@ public class UserSettings extends AbstractUserSettings {
 
     public String getExampleContext() {
         return exampleContext;
+    }
+
+
+    public String getDisplaySize() {
+        return displaySize;
+    }
+
+    public void setDisplaySize(String size) {
+        displaySize = size;
     }
 
     /**
@@ -229,6 +238,7 @@ public class UserSettings extends AbstractUserSettings {
     private int exampleMaxDepth;
     private boolean suppressOptionalFields = false;
     private String lastRepositoryId = "";
+    private String displaySize = "Normal";
 
 
     public String getLastRepositoryId() {
@@ -323,6 +333,7 @@ public class UserSettings extends AbstractUserSettings {
         settings.setExampleMaxDepth( 3 );
         settings.setSuppressOptionalFields( false );
 
+        settings.setDisplaySize( "Normal" );
         return settings;
     }
 
@@ -360,6 +371,8 @@ public class UserSettings extends AbstractUserSettings {
         setExampleContext( settingsProps.getProperty( "exampleContext" ) );
         setExampleMaxRepeat( Integer.parseInt( settingsProps.getProperty( "exampleMaxRepeat" ) ) );
         setExampleMaxDepth( Integer.parseInt( settingsProps.getProperty( "exampleMaxDepth" ) ) );
+
+        setDisplaySize( settingsProps.getProperty( "displaySize" ) );
 
         // setLastModelFile( (modelFile == null) ? null : new File( modelFile ) );
         super.load( settingsProps );
@@ -402,6 +415,8 @@ public class UserSettings extends AbstractUserSettings {
         settingsProps.put( "exampleMaxRepeat", exampleMaxRepeat + "" );
         settingsProps.put( "exampleMaxDepth", exampleMaxDepth + "" );
         settingsProps.put( "suppressOptionalFields", Boolean.toString( suppressOptionalFields ) );
+
+        settingsProps.put( "displaySize", displaySize );
 
         super.save( settingsProps );
     }

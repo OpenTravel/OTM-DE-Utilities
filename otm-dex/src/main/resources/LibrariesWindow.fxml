@@ -2,16 +2,23 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.TreeTableView?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane fx:id="librariesWindow" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" prefHeight="800.0" prefWidth="1280.0" fx:controller="org.opentravel.dex.controllers.library.LibrariesWindowController">
+<BorderPane fx:id="librariesWindow" xmlns="http://javafx.com/javafx/9.0.1" 
+    xmlns:fx="http://javafx.com/fxml/1" prefHeight="800.0" prefWidth="1280.0" 
+    fx:controller="org.opentravel.dex.controllers.library.LibrariesWindowController">
 <center>
-	<fx:include fx:id="librariesTreeTable" source="LibrariesTreeTable.fxml" VBox.vgrow="ALWAYS" />
+        <SplitPane fx:id="facetTabVbox" dividerPositions="0.8, 0.2" orientation="VERTICAL" BorderPane.alignment="CENTER">
+           <items>
+               <fx:include fx:id="librariesTreeTable" source="LibrariesTreeTable.fxml" />
+               <SplitPane orientation="HORIZONTAL" prefHeight="160.0" prefWidth="200.0">
+                   <items>
+                   <fx:include fx:id="usersTree" source="libraryWhereUsedViews/LWU_UsersTree.fxml" />
+                   <fx:include fx:id="providersTree" source="libraryWhereUsedViews/LWU_ProvidersTree.fxml" />
+              </items>
+            </SplitPane>
+           </items>
+        </SplitPane>
 </center>
-<!--  VBox fx:id="libraries" >
-    <children>
-	<fx:include fx:id="librariesTreeTable" source="LibrariesTreeTable.fxml" VBox.vgrow="ALWAYS" />
-    </children>
- </VBox -->
 </BorderPane>

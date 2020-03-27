@@ -70,7 +70,7 @@ public abstract class StandaloneWindowControllerBase extends DexPopupControllerB
                 throw new IllegalStateException( "Error creating resources window controller." );
         } catch (IOException e1) {
             throw new IllegalStateException(
-                "Error loading search window. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
+                "Error loading window. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
         }
         positionStage( dialogStage );
         return controller;
@@ -95,6 +95,8 @@ public abstract class StandaloneWindowControllerBase extends DexPopupControllerB
         launchedFromMenuItem = menuItem; // Remember so it can be enabled on close
         includedControllers.forEach( c -> mc.addIncludedController( c ) );
         mc.getEventSubscriptionManager().configureEventHandlers();
+
+        mc.applyStyleSheet( dialogStage );
         // log.debug( "Stand alone window configured." );
     }
 

@@ -17,6 +17,8 @@
 package org.opentravel.dex.controllers.library;
 
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.controllers.library.usage.ProvidersTreeController;
+import org.opentravel.dex.controllers.library.usage.UsersTreeController;
 import org.opentravel.dex.controllers.popup.StandaloneWindowControllerBase;
 
 import javafx.fxml.FXML;
@@ -47,6 +49,10 @@ public class LibrariesWindowController extends StandaloneWindowControllerBase {
      */
     @FXML
     private LibrariesTreeTableController librariesTreeTableController;
+    @FXML
+    private UsersTreeController usersTreeController;
+    @FXML
+    private ProvidersTreeController providersTreeController;
 
     public LibrariesWindowController() {
         // No-op
@@ -55,6 +61,8 @@ public class LibrariesWindowController extends StandaloneWindowControllerBase {
     @Override
     public void configure(DexMainController mc, MenuItem menuItem) {
         includedControllers.add( librariesTreeTableController );
+        includedControllers.add( usersTreeController );
+        includedControllers.add( providersTreeController );
         super.configure( mc, menuItem );
     }
 

@@ -22,6 +22,7 @@ import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.OtmEventUser;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.application.common.events.OtmEventSubscriptionManager;
+import org.opentravel.common.DexStyleSheetHandler;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
@@ -61,6 +62,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
 
     // preferences
     protected UserSettings userSettings;
+    protected DexStyleSheetHandler styleSheetHandler = null;
 
     protected List<DexIncludedController<?>> includedControllers = new ArrayList<>();
 
@@ -101,6 +103,28 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         if (controller instanceof OtmEventUser)
             eventManager.register( (OtmEventUser) controller );
         this.eventManager = eventManager;
+    }
+
+    @Override
+    public String getStyleSheet() {
+        if (styleSheetHandler == null)
+            styleSheetHandler = new DexStyleSheetHandler( getUserSettings() );
+        return styleSheetHandler.getLabel();
+    }
+
+
+    @Override
+    public void applyStyleSheet(Stage stage) {
+        if (styleSheetHandler == null)
+            styleSheetHandler = new DexStyleSheetHandler( getUserSettings() );
+        styleSheetHandler.apply( stage );
+    }
+
+    @Override
+    public void setStyleSheet(String selector) {
+        if (styleSheetHandler == null)
+            styleSheetHandler = new DexStyleSheetHandler( getUserSettings() );
+        styleSheetHandler.setStyleSheet( selector, getStage() );
     }
 
     @Override

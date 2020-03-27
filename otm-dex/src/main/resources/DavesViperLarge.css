@@ -3,17 +3,17 @@
 }
 .label{
     -fx-text-fill: #181818;
-    -fx-font-size: 12pt
+    -fx-font-size: 14pt
 }
 .text{
     -fx-text-fill: #984818;
-    -fx-font-size: 10pt
+    -fx-font-size: 12pt
 }
 .text-input{
-    -fx-font-size: 10pt	
+    -fx-font-size: 12pt	
 }
 .text-field{
-    -fx-font-size: 10pt	
+    -fx-font-size: 12pt	
 }
 
 .bold-label{
@@ -31,7 +31,7 @@
 }
 /** pseudo class overrides menu-button */
 .menu-button:openvertically .label {
-    -fx-font-size: 10pt;
+    -fx-font-size: 12pt;
     -fx-font-style: oblique;
 }
 .toggle-button .text {

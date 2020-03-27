@@ -24,8 +24,6 @@ import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 
-import java.util.Set;
-
 import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -273,22 +271,23 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
 
             // create cells for libraries in a namespace. Latest at top, older ones under it.
             for (String baseNS : modelMgr.getBaseNamespaces()) {
+                LibraryDAO.createNSItems( baseNS, modelMgr, root, editableOnlyFilter );
                 // log.debug( "Posting base namespace: " + baseNS );
-                TreeItem<LibraryDAO> latestItem = null;
-                OtmLibrary latest = null;
-                Set<OtmLibrary> libs = modelMgr.getLibraryChain( baseNS );
-                for (OtmLibrary lib : libs)
-                    if (lib != null && lib.isLatestVersion()) {
-                        if (!editableOnlyFilter || lib.isEditable())
-                            latestItem = new LibraryDAO( lib ).createTreeItem( root );
-                        latest = lib;
-                    }
-                // Put 1st item at root, all rest under it.
-                if (latest != null)
-                    for (OtmLibrary lib : libs)
-                        if (lib != latest)
-                            if (!editableOnlyFilter || lib.isEditable())
-                                new LibraryDAO( lib ).createTreeItem( latestItem );
+                // TreeItem<LibraryDAO> latestItem = null;
+                // OtmLibrary latest = null;
+                // Set<OtmLibrary> libs = modelMgr.getLibraryChain( baseNS );
+                // for (OtmLibrary lib : libs)
+                // if (lib != null && lib.isLatestVersion()) {
+                // if (!editableOnlyFilter || lib.isEditable())
+                // latestItem = new LibraryDAO( lib ).createTreeItem( root );
+                // latest = lib;
+                // }
+                // // Put 1st item at root, all rest under it.
+                // if (latest != null)
+                // for (OtmLibrary lib : libs)
+                // if (lib != latest)
+                // if (!editableOnlyFilter || lib.isEditable())
+                // new LibraryDAO( lib ).createTreeItem( latestItem );
             }
         }
         // ignoreEvents = false;

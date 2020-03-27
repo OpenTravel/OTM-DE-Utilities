@@ -186,9 +186,6 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
             } else {
                 OtmProperty property = getProperty( object );
                 OtmPropertyOwner propertyOwner = getPropertyOwner( object );
-                // DexActionManager am = propertyOwner != null ? propertyOwner.getActionManager() : null;
-                // log.debug( "Property = " + property + "\tOwner = " + property + " " + am.getClass().getSimpleName()
-                // );
 
                 addMenu.setDisable( !am.isEnabled( DexActions.ADDPROPERTY, propertyOwner ) );
                 changeType.setDisable( !am.isEnabled( DexActions.TYPECHANGE, property ) );
@@ -198,7 +195,13 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
             }
         }
 
+        // 3/26/2020 - WORKS
         // Set style
+        // int fontSize = 18;
+        // for (Node n : tc.lookupAll( ".text" )) {
+        // n.setStyle( "-fx-font-size: " + Integer.toString( fontSize ) + "pt;" );
+        // log.debug( "Set font size on " + n );
+        // }
         tc.setEditable( object.isEditable() );
         tc.pseudoClassStateChanged( INHERITED, newTreeItem.getValue().isInherited() );
         tc.pseudoClassStateChanged( EDITABLE, object.isEditable() );

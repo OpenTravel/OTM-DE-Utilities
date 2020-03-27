@@ -32,6 +32,13 @@ public interface OtmProperty extends OtmObject {
 
 
     /**
+     * Copy content from property to this one.
+     * 
+     * @param oldProperty
+     */
+    public void clone(OtmProperty property);
+
+    /**
      * @return FX property for examples
      */
     public StringProperty exampleProperty();
@@ -43,8 +50,6 @@ public interface OtmProperty extends OtmObject {
     public OtmLibraryMember getOwningMember();
 
     public OtmPropertyOwner getParent();
-
-    public OtmPropertyOwner setParent(OtmPropertyOwner parent);
 
     public OtmPropertyType getPropertyType();
 
@@ -62,12 +67,7 @@ public interface OtmProperty extends OtmObject {
      */
     public abstract void setManditory(boolean value);
 
-    public String toString();
+    public OtmPropertyOwner setParent(OtmPropertyOwner parent);
 
-    /**
-     * Copy content from property to this one.
-     * 
-     * @param oldProperty
-     */
-    public void clone(OtmProperty property);
+    public String toString();
 }

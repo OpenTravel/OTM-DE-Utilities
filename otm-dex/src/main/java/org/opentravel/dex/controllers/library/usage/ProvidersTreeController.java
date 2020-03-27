@@ -1,0 +1,237 @@
+/**
+ * Copyright (C) 2014 OpenTravel Alliance (info@opentravel.org)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.opentravel.dex.controllers.library.usage;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.opentravel.application.common.events.AbstractOtmEvent;
+import org.opentravel.dex.controllers.DexController;
+import org.opentravel.dex.controllers.DexDAO;
+import org.opentravel.dex.controllers.DexIncludedControllerBase;
+import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.events.DexEvent;
+import org.opentravel.dex.events.DexLibrarySelectionEvent;
+import org.opentravel.dex.events.DexMemberSelectionEvent;
+import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.OtmObjectChangeEvent;
+import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+
+import javafx.event.EventType;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
+
+/**
+ * Manage tree for libraries that use subject library. (3rd, right hand column).
+ * 
+ * @author dmh
+ *
+ */
+public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrary> implements DexController {
+    private static Log log = LogFactory.getLog( ProvidersTreeController.class );
+
+    /*
+     * FXML injected
+     */
+    @FXML
+    TreeView<LibraryAndMembersDAO> providersTree;
+    @FXML
+    private VBox providersVBox;
+    @FXML
+    private Label columnLabel;
+
+    TreeItem<LibraryAndMembersDAO> root; // Root of the navigation tree. Is displayed.
+    private boolean ignoreEvents = false;
+
+    // All event types listened to by this controller's handlers
+    private static final EventType[] subscribedEvents = {DexLibrarySelectionEvent.LIBRARY_SELECTED,
+        DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED, OtmObjectChangeEvent.OBJECT_CHANGED,
+        DexMemberSelectionEvent.TYPE_USER_SELECTED};
+    private static final EventType[] publishedEvents =
+        {DexMemberSelectionEvent.MEMBER_SELECTED, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED};
+
+    /**
+     * Construct a member tree table controller that can publish and receive events.
+     */
+    public ProvidersTreeController() {
+        super( subscribedEvents, publishedEvents );
+    }
+
+    @Override
+    public void checkNodes() {
+        if (providersVBox == null)
+            throw new IllegalStateException( "TypeProvidersTreeController's Member Where Used is null." );
+        if (providersTree == null)
+            throw new IllegalStateException( "Type Users Tree view is null." );
+    }
+
+    /**
+     * {@inheritDoc} Remove all items from the member tree.
+     */
+    @Override
+    public void clear() {
+        postedData = null;
+        providersTree.getRoot().getChildren().clear();
+    }
+
+    /**
+     * Configure the controller for use by main controller.
+     */
+    @Override
+    public void configure(DexMainController parent) {
+        super.configure( parent );
+        // log.debug("Configuring Member Tree Table.");
+        configure( parent.getModelManager() );
+    }
+
+    /**
+     * Configure controller for use by non-main controllers.
+     * 
+     * @param modelMgr must not be null
+     * @param editable sets tree editing enables
+     */
+    private void configure(OtmModelManager modelMgr) {
+        if (modelMgr == null)
+            throw new IllegalArgumentException(
+                "Model manager is null. Must configure member tree with model manager." );
+
+        eventPublisherNode = providersVBox;
+
+        // Set the hidden root item
+        root = new TreeItem<>();
+        root.setExpanded( true ); // Startout fully expanded
+
+        // Set up the TreeTable
+        providersTree.setRoot( getRoot() );
+        providersTree.setShowRoot( false );
+        providersTree.setEditable( false );
+
+        // Add listeners and event handlers
+        providersTree.getSelectionModel().selectedItemProperty()
+            .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
+        providersTree.setOnMouseClicked( this::doubleClick );
+
+        // Enable context menus at the row level and add change listener for for applying style
+        // FIXME providersTree.setCellFactory( (TreeView<LibraryAndMembersDAO> p) -> new TypeProviderCellFactory( this )
+        // );
+
+        // log.debug("Where used table configured.");
+        refresh();
+    }
+
+    public void doubleClick(MouseEvent click) {
+        if (click.getClickCount() == 2) {
+            // Broadcast a broader event type than single click
+            memberSelectionListener( providersTree.getSelectionModel().getSelectedItem(),
+                DexMemberSelectionEvent.MEMBER_SELECTED );
+        }
+    }
+
+    public TreeItem<LibraryAndMembersDAO> getRoot() {
+        return root;
+    }
+
+    @Override
+    public DexDAO<?> getSelection() {
+        if (providersTree.getSelectionModel().getSelectedItem() != null)
+            return providersTree.getSelectionModel().getSelectedItem().getValue();
+        return null;
+    }
+
+    private void handleEvent(DexMemberSelectionEvent event) {
+        if (event.getEventType() == DexMemberSelectionEvent.MEMBER_SELECTED)
+            post( event.getMember().getLibrary() );
+        else if (event.getEventType() == DexMemberSelectionEvent.TYPE_USER_SELECTED) {
+            providersTree.getSelectionModel().clearSelection();
+        }
+    }
+
+    @Override
+    public void handleEvent(AbstractOtmEvent event) {
+        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
+        if (!ignoreEvents && event != null && event.getEventType() != null) {
+            if (event instanceof DexLibrarySelectionEvent)
+                post( ((DexLibrarySelectionEvent) event).getLibrary() );
+            else if (event instanceof DexMemberSelectionEvent)
+                handleEvent( (DexMemberSelectionEvent) event );
+            else if (event instanceof OtmObjectChangeEvent)
+                refresh();
+            else if (event instanceof DexModelChangeEvent)
+                refresh();
+            else
+                refresh();
+        }
+    }
+
+    /**
+     * Listener for selected library members in the tree table.
+     *
+     * @param item
+     */
+    private void memberSelectionListener(TreeItem<LibraryAndMembersDAO> item) {
+        memberSelectionListener( item, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED );
+    }
+
+    private void memberSelectionListener(TreeItem<LibraryAndMembersDAO> item,
+        EventType<DexMemberSelectionEvent> eventType) {
+        if (item == null || eventPublisherNode == null)
+            return; // Nothing to do
+        // log.debug( "Selection Listener: " + item.getValue() );
+        OtmLibraryMember member = null;
+        if (item.getValue() != null && item.getValue().getValue() instanceof OtmLibraryMember)
+            member = (OtmLibraryMember) item.getValue().getValue();
+        if (!ignoreEvents) {
+            ignoreEvents = true;
+            if (member != null) {
+                DexEvent event = new DexMemberSelectionEvent( member, eventType );
+                fireEvent( event );
+                // fireEvent(new DexMemberSelectionEvent( member, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED ) );
+            }
+            ignoreEvents = false;
+        }
+    }
+
+    /**
+     * Get the library members from the model manager and put them into a cleared tree.
+     * 
+     * @param modelMgr
+     */
+    @Override
+    public void post(OtmLibrary library) {
+        if (library == null || library == postedData)
+            return;
+        super.post( library );
+        getRoot().getChildren().clear();
+        if (columnLabel != null)
+            columnLabel.setText( "Providers of types to " + library.getName() );
+        // log.debug( "Posting type providers to: " + member );
+        LibraryAndMembersDAO.createChildrenItems( library.getProviderMap( true ), getRoot() );
+    }
+
+    @Override
+    public void refresh() {
+        OtmLibrary lib = postedData;
+        postedData = null;
+        post( lib );
+        ignoreEvents = false;
+    }
+}

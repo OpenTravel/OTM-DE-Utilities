@@ -17,6 +17,7 @@
 package org.opentravel.dex.controllers;
 
 import org.opentravel.application.common.events.OtmEventSubscriptionManager;
+import org.opentravel.common.DexStyleSheetHandler;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmModelManager;
@@ -129,6 +130,27 @@ public interface DexMainController extends DexController {
      * @param actionManager
      */
     public void updateActionManagerDisplay(DexActionManager actionManager);
+
+    /**
+     * Apply the currently selected style sheet to the passed stage.
+     * 
+     * @param stage
+     */
+    public void applyStyleSheet(Stage stage);
+
+    /**
+     * Set the user selected application style sheet. Saves selection in user settings and applies to stage.
+     * 
+     * @param selector {@link DexStyleSheetHandler.Selector#labels()}
+     */
+    public void setStyleSheet(String selector);
+
+    /**
+     * Get the user selected application style sheet selector label.
+     * 
+     * @returns selector label {@link DexStyleSheetHandler.Selector#labels()}
+     */
+    public String getStyleSheet();
 
     // /**
     // * @deprecated - use updateActionManagerDisplay(actionManager)

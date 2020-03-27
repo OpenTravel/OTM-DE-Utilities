@@ -217,6 +217,16 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
         // Layout the table
         initializeTable( propertiesTable );
+
+        // 3/26/2020 - doesn't really work ... only does the empty table node
+        // To update, choose some node that's an ancestor of all your nodes which have the "my-view" style class (it
+        // sounds like your tab pane will work, but in general you could just use the root node of the scene) and do
+        // int fontSize = 18;
+        // for (Node n : memberProperties.lookupAll( ".text" )) {
+        // n.setStyle( "-fx-font-size: " + Integer.toString( fontSize ) + "pt;" );
+        // log.debug( "Set font size on " + n );
+        // }
+
     }
 
     private void disableEditing() {

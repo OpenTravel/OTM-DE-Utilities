@@ -155,7 +155,6 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         setTitle( title );
         popupStage.setTitle( title );
         this.popupStage = popupStage;
-
         popupStage.setOnHidden( this::doClose );
     }
 

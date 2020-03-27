@@ -655,7 +655,6 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
                 }
     }
 
-
     /**
      * Used by actions to allow editing on incomplete members.
      */

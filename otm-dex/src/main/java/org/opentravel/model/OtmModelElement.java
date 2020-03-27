@@ -53,7 +53,7 @@ import javafx.scene.image.ImageView;
  * @author Dave Hollander
  * 
  */
-public abstract class OtmModelElement<T extends TLModelElement> implements OtmObject {
+public abstract class OtmModelElement<T extends TLModelElement> implements OtmObject, Comparable<OtmObject> {
     private static Log log = LogFactory.getLog( OtmModelElement.class );
 
     private static final String NONAMESPACE = "no-namespace-for-for-this-object";
@@ -79,6 +79,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
                 }
         return null;
     }
+
 
     protected T tlObject;
 
@@ -434,6 +435,17 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     public void clearNameProperty() {
         nameProperty = null;
         nameEditingProperty = null;
+    }
+
+    @Override
+    public int compareTo(OtmObject o) {
+        if (o == null)
+            return 1;
+        if (getName() == null)
+            return -1;
+        if (getName().equals( o.getName() ))
+            return getNamespace().compareTo( o.getNamespace() );
+        return getName().compareTo( o.getName() );
     }
 
     @Override

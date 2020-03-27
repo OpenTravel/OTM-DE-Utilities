@@ -88,6 +88,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     @FXML
     private Menu viewsMenu;
     @FXML
+    private Menu displaySizeMenu;
+    @FXML
     private Label projectLabel;
     @FXML
     public MenuItem doCloseItem;
@@ -239,6 +241,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         setUndoAction( e -> undoAction() );
 
         updateNavigationButtons();
+        setDisplaySizeMenu();
     }
 
     private DialogBoxContoller getDialogBox(UserSettings settings) {
@@ -252,6 +255,22 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     public void undoAction(ActionEvent e) {
         // log.debug( "Close menu item selected." );
         dialogBox.show( "Undo", "Not Implemented" );
+    }
+
+    @FXML
+    public void setDisplaySize(ActionEvent e) {
+        if (e.getSource() instanceof MenuItem) {
+            MenuItem item = (MenuItem) e.getSource();
+            getMainController().setStyleSheet( item.getText() );
+            setDisplaySizeMenu();
+        }
+    }
+
+    private void setDisplaySizeMenu() {
+        // TODO - use labels to create menu entries
+        // disable currently selected size
+        String selector = getMainController().getStyleSheet();
+        displaySizeMenu.getItems().forEach( i -> i.setDisable( i.getText().equals( selector ) ) );
     }
 
     public void setUndoAction(EventHandler<ActionEvent> handler) {

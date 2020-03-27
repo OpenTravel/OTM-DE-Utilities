@@ -34,8 +34,7 @@ import org.opentravel.schemacompiler.model.TLModelElement;
  * @author Dave Hollander
  * 
  */
-public abstract class OtmResourceChildBase<C> extends OtmModelElement<TLModelElement>
-    implements Comparable<OtmResourceChild> {
+public abstract class OtmResourceChildBase<C> extends OtmModelElement<TLModelElement> {
     private static Log log = LogFactory.getLog( OtmResourceChildBase.class );
 
     protected OtmResource owner = null;
@@ -62,10 +61,10 @@ public abstract class OtmResourceChildBase<C> extends OtmModelElement<TLModelEle
             ((OtmChildrenOwner) parent).add( this );
     }
 
-    @Override
-    public int compareTo(OtmResourceChild o) {
-        return getName() != null && o != null ? this.getName().compareTo( o.getName() ) : 1;
-    }
+    // @Override
+    // public int compareTo(OtmResourceChild o) {
+    // return getName() != null && o != null ? this.getName().compareTo( o.getName() ) : 1;
+    // }
 
     // @Override
     // public boolean equals(OtmResourceChild o) {

@@ -8,7 +8,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.member.MemberFilterController">
+<VBox xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" 
+	fx:controller="org.opentravel.dex.controllers.member.MemberFilterController">
    <children>
       <HBox fx:id="memberFilter" styleClass="tab-menu-bar" stylesheets="@DavesViper.css">
          <children>

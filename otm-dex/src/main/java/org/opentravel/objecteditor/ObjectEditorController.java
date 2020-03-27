@@ -18,6 +18,7 @@ package org.opentravel.objecteditor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.DexStyleSheetHandler;
 import org.opentravel.dex.controllers.DexMainControllerBase;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.controllers.MenuBarWithProjectController;
@@ -29,7 +30,6 @@ import org.opentravel.dex.controllers.member.usage.WhereUsedTabController;
 import org.opentravel.dex.controllers.repository.RepositoryTabController;
 import org.opentravel.dex.controllers.resources.ResourcesTabController;
 import org.opentravel.dex.controllers.search.SearchTabController;
-import org.opentravel.dex.controllers.search.SearchWindowController;
 
 import java.awt.Dimension;
 
@@ -63,12 +63,13 @@ public class ObjectEditorController extends DexMainControllerBase {
     private RepositoryTabController repositoryTabController;
     @FXML
     private ResourcesTabController resourcesTabController;
-    @FXML
-    private SearchWindowController searchWindowController;
     // @FXML
-    // private LibraryWindowController libraryWindowController;
+    // private SearchWindowController searchWindowController;
+    // @FXML
+    // private LibraryWhereUsedTabController libraryWhereUsedTabController;
     @FXML
     private SearchTabController searchTabController;
+
 
     @Override
     public void checkNodes() {
@@ -106,6 +107,9 @@ public class ObjectEditorController extends DexMainControllerBase {
             userSettings = getUserSettings();
         else
             userSettings = UserSettings.load();
+
+        DexStyleSheetHandler styleSheetHandler = new DexStyleSheetHandler( getUserSettings() );
+        styleSheetHandler.apply( stage );
 
         // Set the stage size based on user preferences
         Dimension size = userSettings.getWindowSize();
@@ -145,9 +149,11 @@ public class ObjectEditorController extends DexMainControllerBase {
         librariesTabController.configure( this );
         whereUsedTabController.configure( this );
         searchTabController.configure( this );
+        // libraryWhereUsedTabController.configure( this );
 
         // Add menu items for tab controllers that can also be launched in separate views windows
         menuBarWithProjectController.addViewItem( librariesTabController );
+        // menuBarWithProjectController.addViewItem( libraryWhereUsedTabController );
         menuBarWithProjectController.addViewItem( memberPropertiesTabController );
         menuBarWithProjectController.addViewItem( repositoryTabController );
         menuBarWithProjectController.addViewItem( resourcesTabController );

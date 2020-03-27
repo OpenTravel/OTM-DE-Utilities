@@ -42,6 +42,13 @@
                 <Menu mnemonicParsing="false" text="Edit" />
                 <Menu fx:id="viewsMenu" mnemonicParsing="false" text="Views">
                   <items>
+	                <Menu fx:id="displaySizeMenu" mnemonicParsing="false" text="Display Size">
+	                  <items>
+	                    <MenuItem fx:id="smallDisplay" mnemonicParsing="false" onAction="#setDisplaySize" text="Small" />
+	                    <MenuItem fx:id="normalDisplay" mnemonicParsing="false" onAction="#setDisplaySize" text="Medium" />
+	                    <MenuItem fx:id="largeDisplay" mnemonicParsing="false" onAction="#setDisplaySize" text="Large" />
+    	              </items>
+    	            </Menu>
                     <MenuItem fx:id="webMenuItem" mnemonicParsing="false" onAction="#launchWebRepoWindow" text="Repository Web View" />
                   </items>
                 </Menu>

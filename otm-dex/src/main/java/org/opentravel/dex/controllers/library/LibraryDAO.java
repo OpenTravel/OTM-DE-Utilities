@@ -20,7 +20,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexDAO;
+import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
+
+import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -29,6 +32,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 
@@ -140,11 +144,42 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
 
     @Override
     public String toString() {
-        return library.toString();
+        return library.getName() + " - " + library.getVersion();
+        // return library.toString();
     }
 
     public StringProperty versionProperty() {
         return new SimpleStringProperty( library.getTL().getVersion() );
+    }
+
+    /**
+     * Get the set of libraries in the base namespace from the model manager, create tree items for each and add to
+     * parent's children.
+     * 
+     * @param baseNamespace
+     * @param modelMgr
+     * @param parent
+     * @param editableOnly
+     */
+    public static void createNSItems(String baseNamespace, OtmModelManager modelMgr, TreeItem<LibraryDAO> parent,
+        boolean editableOnly) {
+        log.debug( "Creating items for base namespace: " + baseNamespace );
+        TreeItem<LibraryDAO> latestItem = null;
+        OtmLibrary latest = null;
+        Set<OtmLibrary> libs = modelMgr.getLibraryChain( baseNamespace );
+        for (OtmLibrary lib : libs)
+            if (lib != null && lib.isLatestVersion()) {
+                if (!editableOnly || lib.isEditable())
+                    latestItem = new LibraryDAO( lib ).createTreeItem( parent );
+                latest = lib;
+            }
+        // Put 1st item at root, all rest under it.
+        if (latest != null)
+            for (OtmLibrary lib : libs)
+                if (lib != latest)
+                    if (!editableOnly || lib.isEditable())
+                        new LibraryDAO( lib ).createTreeItem( latestItem );
+
     }
 
     /**
@@ -162,6 +197,13 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
             TreeItem<LibraryDAO> item = new TreeItem<>( this );
             item.setExpanded( false );
             parent.getChildren().add( item );
+
+            // Decorate if possible
+            ImageView graphic = ImageManager.get( library.getIconType() );
+            item.setGraphic( graphic );
+            Tooltip toolTip = new Tooltip();
+            toolTip.setText( "FIXME" );
+            Tooltip.install( graphic, toolTip );
             return item;
         }
         return null;
