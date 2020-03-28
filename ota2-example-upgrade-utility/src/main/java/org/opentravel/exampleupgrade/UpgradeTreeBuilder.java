@@ -1556,10 +1556,10 @@ public class UpgradeTreeBuilder {
 
             switch (extensionPointType) {
                 case SUMMARY:
-                    elementName = SchemaDependency.getExtensionPointSummaryElement().toQName();
+                    elementName = SchemaDependency.getExtensionPointElement().toQName();
                     break;
                 case SHARED:
-                    elementName = SchemaDependency.getExtensionPointSharedElement().toQName();
+                    elementName = SchemaDependency.getExtensionPointElement().toQName();
                     break;
                 default:
                     elementName = SchemaDependency.getExtensionPointElement().toQName();
