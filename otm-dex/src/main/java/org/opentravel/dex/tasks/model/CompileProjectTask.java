@@ -74,7 +74,7 @@ public class CompileProjectTask extends DexTaskBase<OtmProject> implements DexTa
     }
 
     @Override
-    public void doIT() {
+    public void doIT() throws Exception {
         if (targetFile != null && userSettings != null) {
             findings = compile( targetFile, selectedProject, userSettings );
         }
@@ -117,8 +117,10 @@ public class CompileProjectTask extends DexTaskBase<OtmProject> implements DexTa
      * @param targetFolder
      * @param userSettings
      * @return
+     * @throws Exception
      */
-    public static ValidationFindings compile(File targetFolder, OtmProject project, UserSettings userSettings) {
+    public static ValidationFindings compile(File targetFolder, OtmProject project, UserSettings userSettings)
+        throws Exception {
         ValidationFindings lastCompileFindings = new ValidationFindings();
         CompileAllCompilerTask codegenTask = new CompileAllCompilerTask();
         setOptions( codegenTask, userSettings );
@@ -126,9 +128,13 @@ public class CompileProjectTask extends DexTaskBase<OtmProject> implements DexTa
         try {
             lastCompileFindings = codegenTask.compileOutput( project.getTL() );
         } catch (final SchemaCompilerException e) {
-            log.debug( "Error: Could not compile - " + e.getMessage() );
+            // log.debug( "Error: Could not compile - " + e.getMessage() );
+            // log.debug( "Error: Could not compile localized - " + e.getLocalizedMessage() );
+            // log.debug( "Error: Could not compile cause - " + e.getCause() );
+            throw (new Exception( "Could not compile - " + e.getMessage() ));
         } catch (final Exception e) {
-            log.debug( "Error: Could not compile , unknown error occurred - " + e.getMessage() );
+            // log.debug( "Error: Could not compile , unknown error occurred - " + e.getMessage() );
+            throw (new Exception( "Could not compile - " + e.getMessage() ));
         }
         for (String s : lastCompileFindings.getAllValidationMessages( FindingMessageFormat.DEFAULT ))
             log.debug( s );

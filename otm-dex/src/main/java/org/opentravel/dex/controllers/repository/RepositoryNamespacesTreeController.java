@@ -195,7 +195,7 @@ public class RepositoryNamespacesTreeController extends DexIncludedControllerBas
                 mainController.postError( e, "Not Authorized." );
                 return; // Not authorized.
             }
-            if (auth == null || auth == auth.NONE) {
+            if (auth == null || auth == RepositoryPermission.NONE) {
                 log.warn( "Tried to access repository they are not authorized for." );
                 mainController.postError( null, "Not Authorized." );
                 return; // Not authorized.
