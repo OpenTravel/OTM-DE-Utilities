@@ -616,8 +616,12 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     /**
-     * Get a provider map. The keys are each library that provides types to this library. The values are an array of
-     * library members that provide the types.
+     * Get a provider map.
+     * <p>
+     * The keys are each provider library -- libraries containing types assigned to type-users in this library.
+     * <p>
+     * The values are an array of this library's members that use the provided the types. Each value is a member that
+     * uses types from the provider library.
      * 
      * @return new map.
      */
@@ -636,6 +640,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         return providerMap;
     }
 
+    // Entry: user's assignedType's library : user's owning member
     private void addToMap(OtmTypeUser user, Map<OtmLibrary,List<OtmLibraryMember>> map) {
         if (user != null && map != null && user.getAssignedType() != null) {
             OtmLibraryMember owner = user.getAssignedType().getOwningMember();
@@ -655,16 +660,16 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     /**
-     * Get a users map. The keys are each library that uses types from this library. The values are an array of library
-     * members that use the types.
+     * Get a users map.
+     * <p>
+     * The keys are each library that uses types from this library.
+     * <p>
+     * The values are an array of library members that use the types.
      * 
      * @return new map.
      */
     public Map<OtmLibrary,List<OtmLibraryMember>> getUsersMap(boolean sort) {
         Map<OtmLibrary,List<OtmLibraryMember>> usersMap = new HashMap<>();
-        // for (OtmLibraryMember m : getMembers()) {
-        //
-        // }
         getMembers().forEach( m -> {
             m.getDescendantsTypeProviders().forEach( p -> {
                 if (p != null) {

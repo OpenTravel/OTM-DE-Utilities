@@ -439,7 +439,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     @Override
     public int compareTo(OtmObject o) {
-        if (o == null)
+        if (o == null || o.getName() == null)
             return 1;
         if (getName() == null)
             return -1;
