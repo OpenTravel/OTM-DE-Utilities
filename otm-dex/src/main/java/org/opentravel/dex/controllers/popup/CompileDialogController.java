@@ -219,7 +219,7 @@ public class CompileDialogController extends DexPopupControllerBase implements T
 
     @FXML
     public void doCompile(ActionEvent e) {
-        log.debug( "Do compile." );
+        // log.debug( "Do compile." );
 
         if (selectedProject == null)
             return;
@@ -295,7 +295,7 @@ public class CompileDialogController extends DexPopupControllerBase implements T
 
     @FXML
     public void selectTargetDirectory(ActionEvent e) {
-        log.debug( "File selection dialog." );
+        // log.debug( "File selection dialog." );
         // Let user choose
         String initialDir = CompileProjectTask.getCompileDirectoryPath( selectedProject );
         DexFileHandler fh = new DexFileHandler();
@@ -305,7 +305,7 @@ public class CompileDialogController extends DexPopupControllerBase implements T
 
     @FXML
     public void selectProject(ActionEvent e) {
-        log.debug( "TODO - project selection." );
+        // log.debug( "TODO - project selection." );
         if (e != null && e.getTarget() instanceof ChoiceBox) {
             selectedProject = ((ChoiceBox<OtmProject>) e.getTarget()).getValue();
             post( selectedProject );
@@ -365,7 +365,7 @@ public class CompileDialogController extends DexPopupControllerBase implements T
     }
 
     private void post(ValidationFindings findings) {
-        log.debug( "Posting findings: " + findings );
+        // log.debug( "Posting findings: " + findings );
         resultsPane.setExpanded( true );
         if (findings == null) {
             ValidationFinding ok = new ValidationFinding( selectedProject.getTL().getModel(), FindingType.WARNING,
@@ -418,9 +418,6 @@ public class CompileDialogController extends DexPopupControllerBase implements T
      */
     @Override
     public void handleTaskComplete(WorkerStateEvent event) {
-        if (event.getEventType().getName().equals( WorkerStateEvent.WORKER_STATE_FAILED.toString() )) {
-            log.debug( "FAILED" );
-        }
         ValidationFindings findings = null;
         if (event.getSource() instanceof CompileProjectTask) {
             String err = ((CompileProjectTask) event.getSource()).getErrorMsg();
@@ -429,7 +426,7 @@ public class CompileDialogController extends DexPopupControllerBase implements T
                     new ValidationFinding( selectedProject.getTL().getModel(), FindingType.ERROR, err, null );
                 findings = new ValidationFindings();
                 findings.addFinding( error );
-                log.debug( err );
+                // log.debug( err );
             } else
                 findings = ((CompileProjectTask) event.getSource()).getFindings();
         }
@@ -439,6 +436,6 @@ public class CompileDialogController extends DexPopupControllerBase implements T
         resultsPane.setExpanded( true );
         compileButton.setDisable( false );
         resultsTableView.setDisable( false );
-        log.debug( "Compile task complete." );
+        // log.debug( "Compile task complete." );
     }
 }

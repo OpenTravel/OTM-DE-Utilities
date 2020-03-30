@@ -406,7 +406,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         nameEditingProperty = null;
         validationImageProperty = null;
         validationProperty = null;
-        log.debug( "Refreshed " + getName() );
+        // log.debug( "Refreshed " + getName() );
     }
 
     @Override

@@ -675,14 +675,16 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
                 if (p != null) {
                     List<OtmLibraryMember> users = p.getOwningMember().getWhereUsed();
                     users.forEach( u -> {
-                        List<OtmLibraryMember> mList = usersMap.get( p.getLibrary() );
-                        if (mList != null) {
-                            if (!mList.contains( p.getOwningMember() ))
-                                usersMap.get( p.getLibrary() ).add( p.getOwningMember() );
-                        } else {
-                            mList = new ArrayList<>();
-                            mList.add( p.getOwningMember() );
-                            usersMap.put( p.getLibrary(), mList );
+                        if (u.getLibrary() != this) {
+                            List<OtmLibraryMember> mList = usersMap.get( u.getLibrary() );
+                            if (mList != null) {
+                                if (!mList.contains( u.getOwningMember() ))
+                                    usersMap.get( u.getLibrary() ).add( u.getOwningMember() );
+                            } else {
+                                mList = new ArrayList<>();
+                                mList.add( u.getOwningMember() );
+                                usersMap.put( u.getLibrary(), mList );
+                            }
                         }
                     } );
                 }

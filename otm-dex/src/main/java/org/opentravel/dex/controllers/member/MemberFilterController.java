@@ -213,7 +213,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     private void fireFilterChangeEvent() {
         if (eventPublisherNode != null) {
             ignoreClear = true; // Set just in case event handler does a clear
-            // log.debug("Ready to fire controller level Filter Change event.");
+            // log.debug( "Ready to fire controller level Filter Change event." );
             eventPublisherNode.fireEvent( new DexFilterChangeEvent( this, memberFilter ) );
             ignoreClear = false;
         } else if (popupController != null) {
@@ -317,7 +317,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     // }
 
     public void librarySelectionHandler(DexLibrarySelectionEvent event) {
-        if (event != null && event.getLibrary() != null) {
+        if (event != null && event.getLibrary() != null && !event.getLibrary().getName().equals( libraryFilter )) {
             libraryFilter = event.getLibrary().getName();
             ignoreClear = true;
             librarySelector.getSelectionModel().select( event.getLibrary().getName() );
@@ -387,7 +387,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         String selection = ALLLIBS;
         if (librarySelector.getSelectionModel().getSelectedItem() != null) {
             selection = librarySelector.getSelectionModel().getSelectedItem();
-            if (librarySelector.getSelectionModel().getSelectedItem().equals( ALLLIBS )) {
+            if (selection.equals( ALLLIBS )) {
                 clear();
                 fireFilterChangeEvent();
             } else {
@@ -400,7 +400,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
 
     private void setLibraryFilter(OtmLibrary lib) {
         ignoreClear = true;
-        if (lib != null) {
+        if (lib != null && !libraryFilter.equals( lib.getName() )) {
             libraryFilter = lib.getName();
             librarySelector.getSelectionModel().select( lib.getName() );
             fireFilterChangeEvent();

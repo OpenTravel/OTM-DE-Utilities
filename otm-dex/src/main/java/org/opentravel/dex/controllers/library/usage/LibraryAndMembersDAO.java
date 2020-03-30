@@ -95,11 +95,14 @@ public class LibraryAndMembersDAO implements DexDAO<OtmObject> {
 
     @Override
     public String toString() {
-        // return otmObject != null ? otmObject.getPrefix() + ":" + otmObject.toString() : "";
         if (member instanceof OtmAbstractDisplayFacet)
             return member.toString();
-        return member != null && library != null
-            ? member.getName() + " uses types from " + library.getPrefix() + " : " + library.getName() : "";
+        if (member != null) {
+            if (library != null)
+                return member.getName() + " uses types from " + library.getPrefix() + " : " + library.getName();
+            return member.getName();
+        }
+        return "";
     }
 
     public StringProperty versionProperty() {
@@ -165,6 +168,20 @@ public class LibraryAndMembersDAO implements DexDAO<OtmObject> {
     }
 
     /**
+     * Create children items without library added to member's DAO
+     * 
+     * @param map - map of library keys with array of library members to display under library
+     * @param parent - tree item of parent
+     */
+    public static void createChildrenItemsNoLib(Map<OtmLibrary,List<OtmLibraryMember>> map,
+        TreeItem<LibraryAndMembersDAO> parent) {
+        map.keySet().forEach( k -> {
+            TreeItem<LibraryAndMembersDAO> libItem = new LibraryAndMembersDAO( k ).createTreeItem( parent );
+            map.get( k ).forEach( m -> new LibraryAndMembersDAO( m ).createTreeItem( libItem ) );
+        } );
+    }
+
+    /**
      * @param item
      */
     public void createChildrenItems(TreeItem<LibraryAndMembersDAO> item) {
@@ -178,7 +195,6 @@ public class LibraryAndMembersDAO implements DexDAO<OtmObject> {
                 if (mgr == null)
                     return;
                 mgr.getMembers( lib ).forEach( m -> new LibraryAndMembersDAO( m ).createTreeItem( item ) );
-                // TODO item.getChildren().sort( null );
             }
         }
     }

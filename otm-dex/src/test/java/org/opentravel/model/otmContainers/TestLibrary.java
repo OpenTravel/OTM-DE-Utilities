@@ -182,6 +182,7 @@ public class TestLibrary {
         assertTrue( !keys.isEmpty() );
         assertTrue( !values.isEmpty() );
     }
+    // TODO - add usersMap test
 
     @Test
     public void testVersionFromNS() throws VersionSchemeException {

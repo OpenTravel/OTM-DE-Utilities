@@ -23,11 +23,9 @@ import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexLibrarySelectionEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
-import org.opentravel.dex.events.OtmObjectChangeEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -37,11 +35,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 /**
- * Manage tree for libraries that use subject library. (3rd, right hand column).
+ * Manage tree for libraries that use subject library.
  * 
  * @author dmh
  *
@@ -63,11 +60,9 @@ public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrar
     private boolean ignoreEvents = false;
 
     // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents = {DexLibrarySelectionEvent.LIBRARY_SELECTED,
-        DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED, OtmObjectChangeEvent.OBJECT_CHANGED,
-        DexMemberSelectionEvent.TYPE_USER_SELECTED};
-    private static final EventType[] publishedEvents =
-        {DexMemberSelectionEvent.MEMBER_SELECTED, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED};
+    private static final EventType[] subscribedEvents =
+        {DexLibrarySelectionEvent.LIBRARY_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
 
     /**
      * Construct a member tree table controller that can publish and receive events.
@@ -128,7 +123,6 @@ public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrar
         // Add listeners and event handlers
         providersTree.getSelectionModel().selectedItemProperty()
             .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
-        providersTree.setOnMouseClicked( this::doubleClick );
 
         // Enable context menus at the row level and add change listener for for applying style
         // FIXME providersTree.setCellFactory( (TreeView<LibraryAndMembersDAO> p) -> new TypeProviderCellFactory( this )
@@ -136,14 +130,6 @@ public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrar
 
         // log.debug("Where used table configured.");
         refresh();
-    }
-
-    public void doubleClick(MouseEvent click) {
-        if (click.getClickCount() == 2) {
-            // Broadcast a broader event type than single click
-            memberSelectionListener( providersTree.getSelectionModel().getSelectedItem(),
-                DexMemberSelectionEvent.MEMBER_SELECTED );
-        }
     }
 
     public TreeItem<LibraryAndMembersDAO> getRoot() {
@@ -157,24 +143,12 @@ public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrar
         return null;
     }
 
-    private void handleEvent(DexMemberSelectionEvent event) {
-        if (event.getEventType() == DexMemberSelectionEvent.MEMBER_SELECTED)
-            post( event.getMember().getLibrary() );
-        else if (event.getEventType() == DexMemberSelectionEvent.TYPE_USER_SELECTED) {
-            providersTree.getSelectionModel().clearSelection();
-        }
-    }
-
     @Override
     public void handleEvent(AbstractOtmEvent event) {
         // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents && event != null && event.getEventType() != null) {
             if (event instanceof DexLibrarySelectionEvent)
                 post( ((DexLibrarySelectionEvent) event).getLibrary() );
-            else if (event instanceof DexMemberSelectionEvent)
-                handleEvent( (DexMemberSelectionEvent) event );
-            else if (event instanceof OtmObjectChangeEvent)
-                refresh();
             else if (event instanceof DexModelChangeEvent)
                 refresh();
             else
@@ -188,26 +162,18 @@ public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrar
      * @param item
      */
     private void memberSelectionListener(TreeItem<LibraryAndMembersDAO> item) {
-        memberSelectionListener( item, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED );
-    }
-
-    private void memberSelectionListener(TreeItem<LibraryAndMembersDAO> item,
-        EventType<DexMemberSelectionEvent> eventType) {
-        if (item == null || eventPublisherNode == null)
+        if (item == null || eventPublisherNode == null || ignoreEvents)
             return; // Nothing to do
+
         // log.debug( "Selection Listener: " + item.getValue() );
         OtmLibraryMember member = null;
         if (item.getValue() != null && item.getValue().getValue() instanceof OtmLibraryMember)
             member = (OtmLibraryMember) item.getValue().getValue();
-        if (!ignoreEvents) {
-            ignoreEvents = true;
-            if (member != null) {
-                DexEvent event = new DexMemberSelectionEvent( member, eventType );
-                fireEvent( event );
-                // fireEvent(new DexMemberSelectionEvent( member, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED ) );
-            }
-            ignoreEvents = false;
-        }
+
+        ignoreEvents = true;
+        if (member != null)
+            fireEvent( new DexMemberSelectionEvent( member, DexMemberSelectionEvent.MEMBER_SELECTED ) );
+        ignoreEvents = false;
     }
 
     /**
@@ -220,7 +186,7 @@ public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrar
         if (library == null || library == postedData)
             return;
         super.post( library );
-        getRoot().getChildren().clear();
+
         if (columnLabel != null)
             columnLabel.setText( "Providers of types to " + library.getName() );
         // log.debug( "Posting type providers to: " + member );

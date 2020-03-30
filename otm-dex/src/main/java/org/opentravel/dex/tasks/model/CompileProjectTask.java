@@ -26,7 +26,6 @@ import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.task.CompileAllCompilerTask;
 import org.opentravel.schemacompiler.util.SchemaCompilerException;
-import org.opentravel.schemacompiler.validate.FindingMessageFormat;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.io.File;
@@ -136,9 +135,9 @@ public class CompileProjectTask extends DexTaskBase<OtmProject> implements DexTa
             // log.debug( "Error: Could not compile , unknown error occurred - " + e.getMessage() );
             throw (new Exception( "Could not compile - " + e.getMessage() ));
         }
-        for (String s : lastCompileFindings.getAllValidationMessages( FindingMessageFormat.DEFAULT ))
-            log.debug( s );
-        log.debug( "Compiled " + project.getName() + " into " + targetFolder.getPath() );
+        // for (String s : lastCompileFindings.getAllValidationMessages( FindingMessageFormat.DEFAULT ))
+        // log.debug( s );
+        // log.debug( "Compiled " + project.getName() + " into " + targetFolder.getPath() );
         return lastCompileFindings;
     }
 
