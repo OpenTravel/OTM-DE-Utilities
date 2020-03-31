@@ -86,6 +86,7 @@ public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrar
     public void clear() {
         postedData = null;
         providersTree.getRoot().getChildren().clear();
+        columnLabel.setText( "" );
     }
 
     /**

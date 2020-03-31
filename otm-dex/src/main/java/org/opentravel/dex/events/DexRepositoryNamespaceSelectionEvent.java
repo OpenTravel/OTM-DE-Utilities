@@ -55,7 +55,7 @@ public class DexRepositoryNamespaceSelectionEvent extends DexEvent {
 
     public DexRepositoryNamespaceSelectionEvent(Object source, NamespacesDAO item) {
         super( source, null, REPOSITORY_NS_SELECTED );
-        log.debug( "DexEvent source/target constructor ran." );
+        // log.debug( "DexEvent source/target constructor ran." );
 
         this.namespace = item;
     }

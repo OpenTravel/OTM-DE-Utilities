@@ -409,7 +409,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
      * @param listener
      */
     private void configureProjectComboBox(ObservableList<String> projectList, EventHandler<ActionEvent> listener) {
-        log.debug( "Setting combo." );
+        // log.debug( "Setting combo." );
         projectList.sort( null );
         projectCombo.setItems( projectList );
         projectCombo.setOnAction( listener );

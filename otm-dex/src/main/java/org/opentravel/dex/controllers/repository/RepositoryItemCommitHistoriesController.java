@@ -110,7 +110,7 @@ public class RepositoryItemCommitHistoriesController extends DexIncludedControll
 
     @Override
     public void initialize() {
-        log.debug( "Initializing repository library table view." );
+        // log.debug( "Initializing repository library table view." );
 
         this.historyTable = commitHistoriesTable;
         if (historyTable == null)

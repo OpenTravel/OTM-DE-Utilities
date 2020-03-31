@@ -78,7 +78,7 @@ public abstract class StandaloneWindowControllerBase extends DexPopupControllerB
 
 
     public StandaloneWindowControllerBase() {
-        log.debug( "Repository Window Controller constructed." );
+        // log.debug( "Repository Window Controller constructed." );
     }
 
     @Override

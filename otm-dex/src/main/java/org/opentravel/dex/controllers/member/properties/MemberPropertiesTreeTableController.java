@@ -236,7 +236,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
     @Override
     public void handleEvent(AbstractOtmEvent e) {
-        log.debug( "event handler: " + e.getClass().getSimpleName() );
+        // log.debug( "event handler: " + e.getClass().getSimpleName() );
         if (e instanceof DexMemberSelectionEvent)
             handleEvent( (DexMemberSelectionEvent) e );
         else if (e instanceof DexModelChangeEvent)
@@ -279,19 +279,20 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     }
 
     private void handleEvent(OtmObjectReplacedEvent e) {
-        if (e.getOrginalObject().getOwningMember() == e.getReplacementObject().getOwningMember())
-            log.error( "BAD HERE" );
+        // if (e.getOrginalObject().getOwningMember() == e.getReplacementObject().getOwningMember())
+        // log.error( "BAD HERE" );
         OtmPropertyOwner parent = null;
         if (e.getOrginalObject() instanceof OtmProperty)
             parent = ((OtmProperty) e.getOrginalObject()).getParent();
 
         post( e.get().getOwningMember() );
 
-        if (e.getOrginalObject() instanceof OtmProperty && parent != ((OtmProperty) e.getOrginalObject()).getParent())
-            log.debug( "CHANGED PARENT. OOPS." );
-
-        if (e.getOrginalObject().getOwningMember() == e.getReplacementObject().getOwningMember())
-            log.error( "BAD HERE" );
+        // if (e.getOrginalObject() instanceof OtmProperty && parent != ((OtmProperty)
+        // e.getOrginalObject()).getParent())
+        // log.debug( "CHANGED PARENT. OOPS." );
+        //
+        // if (e.getOrginalObject().getOwningMember() == e.getReplacementObject().getOwningMember())
+        // log.error( "BAD HERE" );
     }
 
     public void handleMaxEdit(TreeTableColumn.CellEditEvent<PropertiesDAO,String> event) {
@@ -354,7 +355,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
             obj = item.getValue().getValue();
             actionManager = obj.getActionManager();
         }
-        log.debug( "Selection: " + obj + " " + obj.getClass().getSimpleName() );
+        // log.debug( "Selection: " + obj + " " + obj.getClass().getSimpleName() );
         if (actionManager != null) {
             nameCol.setEditable( actionManager.isEnabled( DexActions.NAMECHANGE, obj ) );
             descCol.setEditable( actionManager.isEnabled( DexActions.DESCRIPTIONCHANGE, obj ) );

@@ -78,7 +78,7 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
     public StringProperty nameProperty() {
         StringProperty np = new SimpleStringProperty( library.getName() );
         np.addListener( (o, v, n) -> {
-            log.debug( "Name change request: " + n );
+            // log.debug( "Name change request: " + n );
             library.getTL().setName( n );
         } );
         return np;
@@ -93,7 +93,7 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
         else
             sp = new ReadOnlyStringWrapper( library.getTL().getNamespace() );
         sp.addListener( (o, v, n) -> {
-            log.debug( "Namespace change request: " + n );
+            // log.debug( "Namespace change request: " + n );
             library.getTL().setNamespace( n );
         } );
         return sp;
@@ -104,7 +104,7 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
         if (library.isEditable() && library.isUnmanaged()) {
             sp = new SimpleStringProperty( library.getPrefix() );
             sp.addListener( (o, v, n) -> {
-                log.debug( "Prefix change request: " + n );
+                // log.debug( "Prefix change request: " + n );
                 library.getTL().setPrefix( n );
             } );
         } else
@@ -163,7 +163,7 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
      */
     public static void createNSItems(String baseNamespace, OtmModelManager modelMgr, TreeItem<LibraryDAO> parent,
         boolean editableOnly) {
-        log.debug( "Creating items for base namespace: " + baseNamespace );
+        // log.debug( "Creating items for base namespace: " + baseNamespace );
         TreeItem<LibraryDAO> latestItem = null;
         OtmLibrary latest = null;
         Set<OtmLibrary> libs = modelMgr.getLibraryChain( baseNamespace );

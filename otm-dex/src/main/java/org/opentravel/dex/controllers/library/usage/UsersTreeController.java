@@ -83,6 +83,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibrary> i
     public void clear() {
         postedData = null;
         usersTree.getRoot().getChildren().clear();
+        columnLabel.setText( "" );
     }
 
     /**

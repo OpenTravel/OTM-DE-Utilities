@@ -178,14 +178,14 @@ public class NamespaceLibrariesTreeTableController extends DexIncludedController
     @Override
     public void post(NamespacesDAO nsNode) {
         super.post( nsNode );
-        log.debug( "Posting new namespace node: " + nsNode );
+        // log.debug( "Posting new namespace node: " + nsNode );
         currentNamespaceDAO = nsNode;
         // Clear the table
         clear();
 
         if (nsNode == null || nsNode.getFullPath() == null || nsNode.getFullPath().isEmpty()) {
             // throw new IllegalArgumentException( "Missing repository and namespace." );
-            log.debug( "Skipping post - nsNode or full path is missing." );
+            // log.debug( "Skipping post - nsNode or full path is missing." );
             return;
         }
         // Display the namespace and permission

@@ -118,7 +118,6 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
 
         // Start out sorted on names
         nameColumn.setSortType( SortType.ASCENDING );
-        librariesTreeTable.getSortOrder().add( nameColumn );
     }
 
     @Override
@@ -257,6 +256,8 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
                 LibraryDAO.createNSItems( baseNS, modelMgr, root, editableOnlyFilter );
             }
         }
+        librariesTreeTable.getSortOrder().add( nameColumn );
+
         // log.debug( "Posted library tree." );
     }
 
