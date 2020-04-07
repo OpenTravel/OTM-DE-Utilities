@@ -17,7 +17,7 @@
 
 <TitledPane fx:id="memberDetails" text="Member Details" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.member.MemberDetailsController">
    <content>
-      <GridPane hgap="5.0" styleClass="tab-menu-bar" stylesheets="@../DavesViper.css" vgap="5.0" GridPane.columnSpan="2147483647" VBox.vgrow="ALWAYS">
+      <GridPane fx:id="memberGridPane" hgap="5.0" styleClass="tab-menu-bar" stylesheets="@../DavesViper.css" vgap="5.0" GridPane.columnSpan="2147483647" VBox.vgrow="ALWAYS">
         <columnConstraints>
             <ColumnConstraints halignment="RIGHT" hgrow="NEVER" maxWidth="120" minWidth="100.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />

@@ -83,6 +83,9 @@
 .tree-cell:editable {
     -fx-font-weight: bold ;
 }
+.tree-cell:deprecate {
+    -fx-font-weight: lighter ;
+}
 .tree-cell:inherited {
     -fx-background-color: #f0f0f0;
 	-fx-font-style: italic ;
@@ -108,6 +111,18 @@
 	-fx-font-style: italic ;
     -fx-text-fill: #603030;
 }
+
+.tree-table-row-cell:editableanddeprecated {
+	-fx-font-style: oblique ;
+	-fx-font-weight: bold ;
+	-fx-text-fill: #DD3030 ;
+}
+/* I can't get the text color to change (4/3/2020) */
+.tree-table-row-cell:deprecate {
+	-fx-font-style: oblique ;
+	-fx-font-weight: lighter ;
+	-fx-dark-text-color: red ;
+ }
 .split-pane {
 	-fx-padding: 2px
 }

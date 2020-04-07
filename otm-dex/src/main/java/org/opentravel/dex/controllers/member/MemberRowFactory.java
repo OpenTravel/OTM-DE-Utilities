@@ -47,6 +47,8 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
 
     private final ContextMenu memberMenu = new ContextMenu();
     private static final PseudoClass EDITABLE = PseudoClass.getPseudoClass( "editable" );
+    private static final PseudoClass DEPRECATED = PseudoClass.getPseudoClass( "deprecate" );
+    private static final PseudoClass EDITANDDEPRECATED = PseudoClass.getPseudoClass( "editableanddeprecated" );
     private DexIncludedController<?> controller;
 
     Menu newMenu = null;
@@ -54,6 +56,7 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
     MenuItem validateItem = null;
     MenuItem copyItem = null;
     MenuItem addAliasItem = null;
+    MenuItem deprecateItem = null;
 
     public MemberRowFactory(DexIncludedController<?> controller) {
         this.controller = controller;
@@ -62,6 +65,8 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         copyItem = addItem( memberMenu, "Add Alias", e -> addAlias() );
         copyItem = addItem( memberMenu, "Copy", e -> copyMember() );
         deleteItem = addItem( memberMenu, "Delete", e -> deleteMember() );
+        deprecateItem = addItem( memberMenu, "Deprecate", e -> deprecateMember() );
+
         newMenu = new Menu( "New" );
         // Create sub-menu for new objects
         for (OtmLibraryMemberType type : OtmLibraryMemberType.values())
@@ -100,6 +105,14 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         super.updateTreeItem( getTreeItem().getParent() );
     }
 
+    private void deprecateMember() {
+        OtmObject obj = getValue();
+        if (obj != null) {
+            // Invoke action by setting a new value into the FX property
+            obj.deprecationProperty().set( "Deprecated" );
+        }
+    }
+
     private void addAlias() {
         OtmObject obj = getValue();
         if (obj instanceof OtmContributedFacet)
@@ -124,8 +137,8 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         OtmObject obj = getValue();
         if (obj instanceof OtmObject) {
             obj.isValid( true );
-            if (obj.getFindings() != null)
-                log.debug( "Validate " + obj + " finding count: " + obj.getFindings().count() );
+            // if (obj.getFindings() != null)
+            // log.debug( "Validate " + obj + " finding count: " + obj.getFindings().count() );
         }
         controller.refresh();
     }
@@ -170,9 +183,11 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
     private void setCSSClass(TreeTableRow<MemberAndProvidersDAO> tc, TreeItem<MemberAndProvidersDAO> newTreeItem) {
         OtmObject obj = getSelectedObject( newTreeItem );
         if (obj != null) {
-            tc.pseudoClassStateChanged( EDITABLE, newTreeItem.getValue().isEditable() );
+            setStateChanged( tc, obj.isDeprecated(), obj.isEditable() );
+            // log.debug( obj.getNameWithPrefix() + " deprecated ? " + obj.isDeprecated() );
 
             newMenu.setDisable( !obj.getModelManager().hasEditableLibraries() );
+            deprecateItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DEPRECATIONCHANGE, obj ) );
             deleteItem.setDisable( true );
             // TODO - confirm that there will never be contributed facet then remove from code
             if ((obj instanceof OtmLibraryMember || obj instanceof OtmContributedFacet)
@@ -180,6 +195,19 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
                 deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETELIBRARYMEMBER, obj ) );
             if (obj instanceof OtmAlias && obj.getActionManager() != null)
                 deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETEALIAS, obj ) );
+        }
+
+    }
+
+    private void setStateChanged(TreeTableRow<MemberAndProvidersDAO> tc, boolean deprecated, boolean editable) {
+        if (deprecated && editable) {
+            tc.pseudoClassStateChanged( EDITANDDEPRECATED, true );
+            tc.pseudoClassStateChanged( DEPRECATED, false );
+            tc.pseudoClassStateChanged( EDITABLE, false );
+        } else {
+            tc.pseudoClassStateChanged( EDITANDDEPRECATED, false );
+            tc.pseudoClassStateChanged( DEPRECATED, deprecated );
+            tc.pseudoClassStateChanged( EDITABLE, editable );
         }
     }
 }

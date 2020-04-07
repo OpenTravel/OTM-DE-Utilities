@@ -17,6 +17,7 @@
 package org.opentravel.model.otmFacets;
 
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 
@@ -51,6 +52,11 @@ public class OtmEmptyTableFacet extends OtmAbstractDisplayFacet {
     }
 
     @Override
+    public DexActionManager getActionManager() {
+        return modelManager.getActionManager( false );
+    }
+
+    @Override
     public OtmModelManager getModelManager() {
         return modelManager;
     }
@@ -69,6 +75,14 @@ public class OtmEmptyTableFacet extends OtmAbstractDisplayFacet {
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
         return Collections.emptyList();
+    }
+
+    /**
+     * @see org.opentravel.model.OtmObject#isDeprecated()
+     */
+    @Override
+    public boolean isDeprecated() {
+        return false;
     }
 
 }

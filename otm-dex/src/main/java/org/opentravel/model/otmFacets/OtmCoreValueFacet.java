@@ -54,4 +54,12 @@ public class OtmCoreValueFacet extends OtmAbstractDisplayFacet {
     public Collection<OtmObject> getChildrenHierarchy() {
         return Collections.emptyList();
     }
+
+    /**
+     * @see org.opentravel.model.OtmObject#isDeprecated()
+     */
+    @Override
+    public boolean isDeprecated() {
+        return false;
+    }
 }

@@ -631,6 +631,9 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
             if (m instanceof OtmTypeUser)
                 addToMap( (OtmTypeUser) m, providerMap );
             for (OtmTypeUser u : m.getDescendantsTypeUsers()) {
+                // Check for owners being contextual facets. Skip these.
+                if (u.getOwningMember() != m && u.getOwningMember() instanceof OtmContextualFacet)
+                    continue;
                 // For each user, get the provider's owner and add to map
                 addToMap( u, providerMap );
             }

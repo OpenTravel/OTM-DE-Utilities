@@ -254,6 +254,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         OtmLibrary library = getSelected();
         if (library == null)
             return;
+        // TEST error handling
         library.save();
     }
 

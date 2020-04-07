@@ -126,6 +126,17 @@
 	-fx-font-style: italic ;
 	-fx-font-weight: normal ;
 }
+.tree-table-row-cell:editableanddeprecated {
+	-fx-font-style: oblique ;
+	-fx-font-weight: bold ;
+	-fx-text-fill: #DD3030 ;
+}
+/* I can't get the text color to change (4/3/2020) */
+.tree-table-row-cell:deprecate {
+	-fx-font-style: oblique ;
+	-fx-font-weight: lighter ;
+	-fx-dark-text-color: red ;
+ }
 .tree-table-row-cell:divider {
     -fx-background-color: #9ccfe2;
     -fx-text-fill: #FFFFFF;

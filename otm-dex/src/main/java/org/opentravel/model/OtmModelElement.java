@@ -172,6 +172,16 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     }
 
     @Override
+    public boolean isDeprecated() {
+        if (getTL() instanceof TLDocumentationOwner) {
+            TLDocumentation doc = ((TLDocumentationOwner) getTL()).getDocumentation();
+            if (doc != null && doc.getDeprecations() != null && !doc.getDeprecations().isEmpty())
+                return true;
+        }
+        return false;
+    }
+
+    @Override
     public String setDeprecation(String deprecation) {
         if (getTL() instanceof TLDocumentationOwner) {
             TLDocumentation doc = ((TLDocumentationOwner) getTL()).getDocumentation();

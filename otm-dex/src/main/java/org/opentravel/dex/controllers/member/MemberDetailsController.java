@@ -22,6 +22,7 @@ import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
+import org.opentravel.dex.actions.DeprecationChangeAction;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -50,6 +51,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 
 /**
  * Controller for library member details controller.
@@ -72,6 +74,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
      */
     @FXML
     private TitledPane memberDetails;
+    @FXML
+    private GridPane memberGridPane;
     @FXML
     private TextField memberName;
     @FXML
@@ -111,6 +115,12 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
 
     private boolean ignoreClear = false;
 
+    private Label deprecationLabel;
+
+    private TextField deprecationField;
+
+    private Button deprecationButton;
+
     // All event types fired by this controller.
     private static final EventType[] publishedEvents = {};
 
@@ -130,6 +140,8 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     public void checkNodes() {
         if (!(memberDetails instanceof TitledPane))
             throw new IllegalStateException( "Member Details not injected by FXML." );
+        if (!(memberGridPane instanceof GridPane))
+            throw new IllegalStateException( "Member grid not injected by FXML." );
         if (objectLabel == null)
             throw new IllegalStateException( "Object label not injected by FXML." );
         if (!(libraryName instanceof TextField))
@@ -314,6 +326,49 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             post( editminor );
         else
             post( editreadonly );
+
+        // If deprecated, add a row
+        postDeprecation( member );
+    }
+
+    private void postDeprecation(OtmLibraryMember member) {
+        // memberDescription.setEditable( member.isEditable() );
+        // memberDescription.setText( member.descriptionProperty().get() );
+        // memberDescription.setOnAction( e -> member.descriptionProperty().set( memberDescription.getText() ) );
+        // descriptionEditButton.setDisable( !member.isEditable() );
+        // descriptionEditButton
+        // .setOnAction( ae -> TextAreaEditorContoller.init().showAndWait( member.descriptionProperty() ) );
+
+        if (member.isDeprecated()) {
+            int row = 4;
+            if (deprecationLabel == null) {
+                deprecationLabel = new Label( "Deprecation" );
+                memberGridPane.add( deprecationLabel, 0, row );
+            }
+            if (deprecationField == null) {
+                deprecationField = new TextField( "" );
+                GridPane.setConstraints( deprecationField, 1, row, 3, 1 );
+                memberGridPane.add( deprecationField, 1, row );
+            }
+            deprecationField.setEditable( DeprecationChangeAction.isEnabled( member ) );
+            deprecationField.setOnAction( e -> member.deprecationProperty().set( deprecationField.getText() ) );
+            deprecationField.setText( member.getDeprecation() );
+
+            if (deprecationButton == null) {
+                deprecationButton = new Button( "Edit" );
+                memberGridPane.add( deprecationButton, 4, row );
+            }
+            deprecationButton.setDisable( !DeprecationChangeAction.isEnabled( member ) );
+            deprecationButton
+                .setOnAction( ae -> TextAreaEditorContoller.init().showAndWait( member.deprecationProperty() ) );
+        } else {
+            memberGridPane.getChildren().remove( deprecationLabel );
+            memberGridPane.getChildren().remove( deprecationField );
+            memberGridPane.getChildren().remove( deprecationButton );
+            deprecationLabel = null;
+            deprecationButton = null;
+            deprecationField = null;
+        }
     }
 
     private void post(RadioButton button) {

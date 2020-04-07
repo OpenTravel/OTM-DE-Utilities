@@ -59,6 +59,11 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
         setName( name );
     }
 
+    // FUTURE - how to add documentation to ???
+    // public void junk() {
+    // String docPath = DocumentationPathBuilder.buildPath( getTL());
+    //
+    // }
 
     /**
      * {@inheritDoc}

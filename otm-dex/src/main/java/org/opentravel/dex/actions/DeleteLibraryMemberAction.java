@@ -72,7 +72,7 @@ public class DeleteLibraryMemberAction extends DexRunAction {
 
             // Delete from TL library and model manager
             memberLibrary.delete( (OtmLibraryMember) otm );
-            log.debug( "Deleted library member: " + deletedMember );
+            // log.debug( "Deleted library member: " + deletedMember );
         } else
             return null;
 
@@ -136,7 +136,7 @@ public class DeleteLibraryMemberAction extends DexRunAction {
         for (Entry<OtmTypeUser,OtmTypeProvider> entry : typeUsers.entrySet())
             entry.getKey().setAssignedType( entry.getValue() );
 
-        log.debug( "Undo delete of " + get() );
+        // log.debug( "Undo delete of " + get() );
         return get();
     }
 }

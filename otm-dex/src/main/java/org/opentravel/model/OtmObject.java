@@ -71,7 +71,16 @@ public interface OtmObject {
      */
     public DexActionManager getActionManager();
 
+    /**
+     * 
+     * @return the deprecation string from documentation or empty string
+     */
     public String getDeprecation();
+
+    /**
+     * @return true if deprecation string is not null and not empty.
+     */
+    boolean isDeprecated();
 
     /**
      * @return new list of all descendants if any
@@ -299,6 +308,7 @@ public interface OtmObject {
      * @return a string wrapper around existing finding counts.
      */
     public StringProperty validationProperty();
+
 
 
 }

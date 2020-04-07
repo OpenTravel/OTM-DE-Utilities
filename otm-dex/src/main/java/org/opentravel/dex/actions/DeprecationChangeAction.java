@@ -16,14 +16,23 @@
 
 package org.opentravel.dex.actions;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 public class DeprecationChangeAction extends DexStringAction {
-    // private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+    private static Log log = LogFactory.getLog( DeprecationChangeAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
-        return subject.isEditable();
+        // log.debug(
+        // subject.getName() + " Editable? " + subject.isEditable() + " " + subject.getLibrary().isChainEditable() );
+        return subject.getLibrary().isChainEditable();
     }
+
+    // New OTM created in a minor version of the library
+    private OtmLibraryMember newLibraryMember = null;
 
     public DeprecationChangeAction() {
         // Constructor for reflection
@@ -36,6 +45,19 @@ public class DeprecationChangeAction extends DexStringAction {
 
     @Override
     protected void set(String value) {
+        // Create a minor version if the subject is in an older library in editable chain
+        //
+        OtmLibrary subjectLibrary = otm.getLibrary();
+        if (subjectLibrary != null && !subjectLibrary.isEditable() && subjectLibrary.isChainEditable()) {
+            // Get the latest library in the chain that is editable
+            newLibraryMember =
+                subjectLibrary.getVersionChain().getNewMinorLibraryMember( getSubject().getOwningMember() );
+            if (newLibraryMember == null)
+                return;
+            otm = newLibraryMember;
+            // FIXME - undo
+        }
+
         otm.setDeprecation( value );
     }
 

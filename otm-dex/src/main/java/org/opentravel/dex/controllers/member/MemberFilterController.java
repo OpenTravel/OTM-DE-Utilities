@@ -400,7 +400,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
 
     private void setLibraryFilter(OtmLibrary lib) {
         ignoreClear = true;
-        if (lib != null && !libraryFilter.equals( lib.getName() )) {
+        if (lib != null && !lib.getName().equals( libraryFilter )) {
             libraryFilter = lib.getName();
             librarySelector.getSelectionModel().select( lib.getName() );
             fireFilterChangeEvent();

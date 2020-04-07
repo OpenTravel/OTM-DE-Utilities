@@ -40,7 +40,8 @@ public class OtmLibraryDisplayFacet extends OtmAbstractDisplayFacet {
     public OtmLibraryDisplayFacet(OtmLibrary library) {
         super( null );
         this.library = library;
-        this.modelManager = library.getModelManager();
+        if (library != null)
+            this.modelManager = library.getModelManager();
     }
 
     public OtmLibrary getLibrary() {

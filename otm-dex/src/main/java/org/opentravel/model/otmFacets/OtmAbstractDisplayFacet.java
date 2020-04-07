@@ -58,6 +58,7 @@ import javafx.scene.image.ImageView;
 public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     private static Log log = LogFactory.getLog( OtmAbstractDisplayFacet.class );
 
+    // Will be null for some sub-types
     private OtmPropertyOwner parent;
 
     public OtmAbstractDisplayFacet(OtmPropertyOwner parent) {
@@ -66,17 +67,18 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public OtmObject add(OtmObject child) {
-        return parent.add( child );
+        return parent != null ? parent.add( child ) : null;
     }
 
     @Override
     public OtmProperty add(TLModelElement tl) {
-        return parent.add( tl );
+        return parent != null ? parent.add( tl ) : null;
     }
 
     @Override
     public void delete(OtmObject property) {
-        parent.delete( property );
+        if (parent != null)
+            parent.delete( property );
     }
 
     @Override
@@ -86,7 +88,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public DexActionManager getActionManager() {
-        return parent.getActionManager();
+        return parent != null ? parent.getActionManager() : null;
     }
 
     /**
@@ -94,15 +96,18 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
      */
     @Override
     public List<OtmObject> getChildren() {
-        return parent.getChildren();
+        return parent != null ? parent.getChildren() : Collections.emptyList();
     }
 
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
-        Collection<OtmObject> hierarchy = new ArrayList<>();
-        parent.getInheritedChildren().forEach( hierarchy::add );
-        parent.getChildren().forEach( hierarchy::add );
-        return hierarchy;
+        if (parent != null) {
+            Collection<OtmObject> hierarchy = new ArrayList<>();
+            parent.getInheritedChildren().forEach( hierarchy::add );
+            parent.getChildren().forEach( hierarchy::add );
+            return hierarchy;
+        }
+        return Collections.emptyList();
     }
 
     @Override
@@ -148,7 +153,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public List<OtmObject> getInheritedChildren() {
-        return parent.getInheritedChildren();
+        return parent != null ? parent.getInheritedChildren() : Collections.emptyList();
     }
 
     @Override
@@ -176,7 +181,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public String getNamespace() {
-        return parent.getNamespace();
+        return parent != null ? parent.getNamespace() : "";
     }
 
     public OtmPropertyOwner getParent() {
@@ -220,12 +225,17 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public String getDeprecation() {
-        return getParent().getDeprecation();
+        return getParent() != null ? getParent().getDeprecation() : null;
+    }
+
+    @Override
+    public boolean isDeprecated() {
+        return false;
     }
 
     @Override
     public Tooltip getTooltip() {
-        return getParent().getTooltip();
+        return parent != null ? getParent().getTooltip() : null;
     }
 
     @Override
@@ -241,7 +251,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public boolean isValid() {
-        return getParent().isValid();
+        return parent != null ? getParent().isValid() : false;
     }
 
     @Override
@@ -369,7 +379,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public String getNameWithPrefix() {
-        return getOwningMember().getPrefix() + ":" + getName();
+        return getOwningMember() != null ? getOwningMember().getPrefix() + ":" + getName() : getName();
     }
 
     @Override

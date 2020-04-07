@@ -125,7 +125,7 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
     @Override
     public StringProperty baseTypeProperty() {
         if (getBaseType() != null) {
-            return new ReadOnlyStringWrapper( getBaseTypeName() );
+            return new ReadOnlyStringWrapper( getBaseTypeNameWithPrefix() );
         }
         return super.baseTypeProperty();
     }
@@ -173,6 +173,10 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
     @Override
     public String getBaseTypeName() {
         return getBaseType() != null ? getBaseType().getName() : "";
+    }
+
+    public String getBaseTypeNameWithPrefix() {
+        return getBaseType() != null ? getBaseType().getNameWithPrefix() : "";
     }
 
     /**
