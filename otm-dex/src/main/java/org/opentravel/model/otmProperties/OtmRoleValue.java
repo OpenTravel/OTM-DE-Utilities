@@ -37,21 +37,6 @@ public class OtmRoleValue extends OtmValueProperty implements OtmProperty {
             parent.add( this );
     }
 
-    // /**
-    // * {@inheritDoc}
-    // * <p>
-    // * No rules applied
-    // */
-    // @Override
-    // public String fixName(String name) {
-    // return name;
-    // }
-    //
-    // @Override
-    // public Icons getIconType() {
-    // return ImageManager.Icons.ENUMERATION_VALUE;
-    // }
-
     @Override
     public TLRole getTL() {
         return (TLRole) tlObject;
@@ -62,14 +47,8 @@ public class OtmRoleValue extends OtmValueProperty implements OtmProperty {
         getTL().setName( name );
         nameProperty().set( getName() ); // may not fire otm name change listener
         isValid( true );
-        log.debug( "Set name to: " + getName() );
         return getName();
     }
-
-    // @Override
-    // public OtmCore getOwningMember() {
-    // return parent.getOwningMember();
-    // }
 
     @Override
     public String getName() {
@@ -81,25 +60,10 @@ public class OtmRoleValue extends OtmValueProperty implements OtmProperty {
         return parent;
     }
 
-    // @Override
-    // public OtmPropertyType getPropertyType() {
-    // return OtmPropertyType.ENUMVALUE;
-    // }
-    //
-    // @Override
-    // public boolean isManditory() {
-    // return false;
-    // }
-    //
-    // @Override
-    // public void setManditory(boolean value) {
-    // // No-op
-    // }
-
     @Override
     public void clone(OtmProperty property) {
         TLRole newTL = new TLRole();
         newTL.setName( getTL().getName() );
-        OtmRoleValue clone = new OtmRoleValue( newTL, getParent() );
+        new OtmRoleValue( newTL, getParent() );
     }
 }

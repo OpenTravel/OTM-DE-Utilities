@@ -49,7 +49,6 @@ public class OtmEnumerationValue extends OtmValueProperty {
         getTL().setLiteral( name );
         nameProperty().set( getName() ); // may not fire otm name change listener
         isValid( true );
-        log.debug( "Set name to: " + getName() );
         return getName();
     }
 
@@ -81,6 +80,7 @@ public class OtmEnumerationValue extends OtmValueProperty {
     public void clone(OtmProperty property) {
         TLEnumValue newTL = new TLEnumValue();
         newTL.setLiteral( getTL().getLiteral() );
-        OtmEnumerationValue clone = new OtmEnumerationValue( newTL, getParent() );
+        // Create clone added to parent
+        new OtmEnumerationValue( newTL, getParent() );
     }
 }

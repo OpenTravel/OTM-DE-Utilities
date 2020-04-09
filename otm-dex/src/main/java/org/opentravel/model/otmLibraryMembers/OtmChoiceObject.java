@@ -163,25 +163,17 @@ public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
         if (tlFacet.getFacetType() == TLFacetType.CHOICE) {
             getTL().removeChoiceFacet( tlFacet );
         }
-
-        //
-        // super.delete( child );
-        // if (child instanceof OtmContributedFacet)
-        // child = ((OtmContributedFacet) child).getContributor();
-        // if (child == null)
-        // return;
-        // if (child.getTL() instanceof TLContextualFacet)
-        // getTL().removeChoiceFacet( (TLContextualFacet) child.getTL() );
-        // remove( child );
     }
 
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
         Collection<OtmObject> ch = new ArrayList<>();
         children.forEach( c -> {
-            if (c instanceof OtmSharedFacet)
-                ch.add( c );
             if (c instanceof OtmAlias)
+                ch.add( c );
+        } );
+        children.forEach( c -> {
+            if (c instanceof OtmSharedFacet)
                 ch.add( c );
         } );
         return ch;

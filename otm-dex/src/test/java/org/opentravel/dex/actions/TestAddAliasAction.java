@@ -47,7 +47,7 @@ public class TestAddAliasAction {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
+        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
         lib = staticModelManager.add( new TLLibrary() );
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
@@ -93,20 +93,25 @@ public class TestAddAliasAction {
         // When - For each library member type, add then remove alias
         for (OtmLibraryMember lm : staticModelManager.getMembers( lib )) {
             // Given - the action
-            AddAliasAction action = getAction( lm );
+            // AddAliasAction action = getAction( lm );
 
             // Skip those that are not enabled and do not return an action
-            if (action == null)
+            if (!AddAliasAction.isEnabled( lm ))
                 continue; // Not all library members can have aliases
 
             // When - executed
-            Object a = action.doIt();
+            // Object a = action.doIt();
+            Object a = lm.getActionManager().run( DexActions.ADDALIAS, lm );
             // Then
+            // FIXME - alias has right TLAlias but is not the child of lm
             assertTrue( "Must have an alias.", a instanceof OtmAlias );
             assertTrue( lm.getChildren().contains( a ) );
+            // Then - queue is larger
+            log.debug( "Last Action: " + lm.getActionManager().getLastActionName() );
+            assertTrue( "Action queue must have action.", lm.getActionManager().getLastAction() != null );
 
             // When - undone
-            action.undoIt();
+            lm.getActionManager().getLastAction().undoIt();
             // Then
             assertTrue( "Must not have  alias.", !lm.getChildren().contains( a ) );
         }

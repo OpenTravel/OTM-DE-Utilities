@@ -150,6 +150,9 @@ public enum OtmPropertyType {
      */
     public static OtmProperty build(OtmPropertyType propertyType, OtmPropertyOwner owner) {
         OtmProperty property = null;
+        if (propertyType == OtmPropertyType.ROLEVALUE && !(owner instanceof OtmRoleEnumeration))
+            return null;
+
         TLModelElement tl = buildTL( propertyType );
         if (owner instanceof OtmAbstractDisplayFacet)
             owner = ((OtmAbstractDisplayFacet) owner).getParent();

@@ -37,7 +37,7 @@ import javafx.fxml.FXML;
 import javafx.stage.Stage;
 
 /**
- * Main controller for OtmObjecEditorLayout.fxml (1 FXML = 1Controller).
+ * Main controller for OtmObjecEditorLayout.fxml.
  * 
  * @author dmh
  *
@@ -63,10 +63,6 @@ public class ObjectEditorController extends DexMainControllerBase {
     private RepositoryTabController repositoryTabController;
     @FXML
     private ResourcesTabController resourcesTabController;
-    // @FXML
-    // private SearchWindowController searchWindowController;
-    // @FXML
-    // private LibraryWhereUsedTabController libraryWhereUsedTabController;
     @FXML
     private SearchTabController searchTabController;
 
@@ -100,7 +96,7 @@ public class ObjectEditorController extends DexMainControllerBase {
     @Override
     public void setStage(Stage stage) {
         super.setStage( stage );
-        log.debug( "Object Editor Controller - Setting Stage" );
+        // log.debug( "Object Editor Controller - Setting Stage" );
 
         // Get the user preferences, Override with the instance from the abstract main controller
         if (getUserSettings() instanceof UserSettings)
@@ -115,9 +111,6 @@ public class ObjectEditorController extends DexMainControllerBase {
         Dimension size = userSettings.getWindowSize();
         stage.setHeight( size.height );
         stage.setWidth( size.width );
-        // userSettings.windowPosition
-        // double x = stage.getX();
-        // double y = stage.getY();
 
         stage.widthProperty().addListener( (observable, oldValue, newValue) -> {
             // log.debug("Width changed!! - new = " + newValue);
@@ -149,11 +142,9 @@ public class ObjectEditorController extends DexMainControllerBase {
         librariesTabController.configure( this );
         whereUsedTabController.configure( this );
         searchTabController.configure( this );
-        // libraryWhereUsedTabController.configure( this );
 
         // Add menu items for tab controllers that can also be launched in separate views windows
         menuBarWithProjectController.addViewItem( librariesTabController );
-        // menuBarWithProjectController.addViewItem( libraryWhereUsedTabController );
         menuBarWithProjectController.addViewItem( memberPropertiesTabController );
         menuBarWithProjectController.addViewItem( repositoryTabController );
         menuBarWithProjectController.addViewItem( resourcesTabController );

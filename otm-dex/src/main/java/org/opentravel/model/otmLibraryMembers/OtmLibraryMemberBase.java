@@ -542,8 +542,15 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         assert children.isEmpty();
         // Must do aliases first so facet aliases will have a parent
         // Aliases from contextual facets come from the member where injected (contributed)
-        if (getTL() instanceof TLAliasOwner && !(this instanceof OtmContextualFacet))
-            ((TLAliasOwner) getTL()).getAliases().forEach( t -> new OtmAlias( t, this ) );
+        if (getTL() instanceof TLAliasOwner && !(this instanceof OtmContextualFacet)) {
+            ((TLAliasOwner) getTL()).getAliases().forEach( t -> {
+                OtmObject obj = OtmModelElement.get( t );
+                if (obj == null)
+                    new OtmAlias( t, this );
+                else
+                    children.add( obj );
+            } );
+        }
 
         if (getTL() instanceof TLFacetOwner)
             for (TLFacet tlFacet : ((TLFacetOwner) getTL()).getAllFacets()) {

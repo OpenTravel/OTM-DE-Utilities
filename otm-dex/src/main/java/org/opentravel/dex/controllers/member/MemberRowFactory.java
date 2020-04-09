@@ -62,7 +62,7 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         this.controller = controller;
 
         // Create Context menu
-        copyItem = addItem( memberMenu, "Add Alias", e -> addAlias() );
+        addAliasItem = addItem( memberMenu, "Add Alias", e -> addAlias() );
         copyItem = addItem( memberMenu, "Copy", e -> copyMember() );
         deleteItem = addItem( memberMenu, "Delete", e -> deleteMember() );
         deprecateItem = addItem( memberMenu, "Deprecate", e -> deprecateMember() );
@@ -115,10 +115,9 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
 
     private void addAlias() {
         OtmObject obj = getValue();
-        if (obj instanceof OtmContributedFacet)
+        if (obj == null || obj instanceof OtmContributedFacet)
             return;
-        if (obj instanceof OtmLibraryMember)
-            obj.getActionManager().run( DexActions.ADDALIAS, (OtmLibraryMember) obj );
+        obj.getActionManager().run( DexActions.ADDALIAS, (OtmLibraryMember) obj );
         super.updateTreeItem( getTreeItem().getParent() );
     }
 
@@ -186,6 +185,7 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
             setStateChanged( tc, obj.isDeprecated(), obj.isEditable() );
             // log.debug( obj.getNameWithPrefix() + " deprecated ? " + obj.isDeprecated() );
 
+            addAliasItem.setDisable( !obj.getActionManager().isEnabled( DexActions.ADDALIAS, obj ) );
             newMenu.setDisable( !obj.getModelManager().hasEditableLibraries() );
             deprecateItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DEPRECATIONCHANGE, obj ) );
             deleteItem.setDisable( true );

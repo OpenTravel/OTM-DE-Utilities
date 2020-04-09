@@ -155,7 +155,7 @@ public class OtmPropertyFactory {
         else if (tl instanceof TLRole && parent instanceof OtmRoleEnumeration)
             p = OtmPropertyFactory.create( (TLRole) tl, (OtmRoleEnumeration) parent );
         else {
-            log.debug( "unknown/not-implemented property type: " + tl.getClass().getSimpleName() );
+            log.warn( "unknown/not-implemented property type: " + tl.getClass().getSimpleName() );
             return null;
         }
         // log.debug( "Created property " + p.getName() + " of owner " + p.getOwningMember().getName() + " inherited? "

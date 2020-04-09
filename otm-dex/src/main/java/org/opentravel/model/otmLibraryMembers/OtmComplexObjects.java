@@ -72,18 +72,6 @@ public abstract class OtmComplexObjects<T extends TLComplexTypeBase> extends Otm
         return null;
     }
 
-    // /**
-    // * {@inheritDoc}
-    // * <p>
-    // * Use the extension class on the complex object to find the extends entity.
-    // */
-    // @Override
-    // public OtmObject getBaseType() {
-    // if (getTL().getExtension() != null)
-    // return OtmModelElement.get( (TLModelElement) getTL().getExtension().getExtendsEntity() );
-    // return null;
-    // }
-
     @Override
     public String getName() {
         return getTL().getLocalName();

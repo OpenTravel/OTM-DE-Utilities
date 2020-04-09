@@ -386,6 +386,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
                 // Post an empty row to allow row factory to add menu items
                 createTreeItem( new OtmEmptyTableFacet( currentModelMgr ), root );
             }
+
             try {
                 memberTree.sort();
             } catch (Exception e) {

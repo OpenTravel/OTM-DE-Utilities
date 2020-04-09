@@ -136,9 +136,11 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
     public Collection<OtmObject> getChildrenHierarchy() {
         Collection<OtmObject> ch = new ArrayList<>();
         children.forEach( c -> {
-            if (c instanceof OtmIdFacet)
-                ch.add( c );
             if (c instanceof OtmAlias)
+                ch.add( c );
+        } );
+        children.forEach( c -> {
+            if (c instanceof OtmIdFacet)
                 ch.add( c );
             if (c instanceof OtmContributedFacet && ((OtmContributedFacet) c).getContributor() instanceof OtmQueryFacet)
                 ch.add( c );

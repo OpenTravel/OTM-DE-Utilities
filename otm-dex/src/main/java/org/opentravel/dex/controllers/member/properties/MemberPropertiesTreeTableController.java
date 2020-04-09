@@ -236,7 +236,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
     @Override
     public void handleEvent(AbstractOtmEvent e) {
-        // log.debug( "event handler: " + e.getClass().getSimpleName() );
+        log.debug( "event handler: " + e.getClass().getSimpleName() );
         if (e instanceof DexMemberSelectionEvent)
             handleEvent( (DexMemberSelectionEvent) e );
         else if (e instanceof DexModelChangeEvent)
@@ -268,6 +268,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     }
 
     private void handleEvent(OtmObjectChangeEvent e) {
+        clear();
         if (e.get() instanceof OtmLibraryMember)
             post( (OtmLibraryMember) e.get() );
         else

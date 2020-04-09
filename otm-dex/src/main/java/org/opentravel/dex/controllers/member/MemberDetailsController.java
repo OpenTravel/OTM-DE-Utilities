@@ -327,18 +327,11 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         else
             post( editreadonly );
 
-        // If deprecated, add a row
+        // If deprecated, add a row. Otherwise, remove it.
         postDeprecation( member );
     }
 
     private void postDeprecation(OtmLibraryMember member) {
-        // memberDescription.setEditable( member.isEditable() );
-        // memberDescription.setText( member.descriptionProperty().get() );
-        // memberDescription.setOnAction( e -> member.descriptionProperty().set( memberDescription.getText() ) );
-        // descriptionEditButton.setDisable( !member.isEditable() );
-        // descriptionEditButton
-        // .setOnAction( ae -> TextAreaEditorContoller.init().showAndWait( member.descriptionProperty() ) );
-
         if (member.isDeprecated()) {
             int row = 4;
             if (deprecationLabel == null) {

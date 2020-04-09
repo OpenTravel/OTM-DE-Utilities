@@ -16,18 +16,14 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 public class DeprecationChangeAction extends DexStringAction {
-    private static Log log = LogFactory.getLog( DeprecationChangeAction.class );
+    // private static Log log = LogFactory.getLog( DeprecationChangeAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
-        // log.debug(
-        // subject.getName() + " Editable? " + subject.isEditable() + " " + subject.getLibrary().isChainEditable() );
         return subject.getLibrary().isChainEditable();
     }
 

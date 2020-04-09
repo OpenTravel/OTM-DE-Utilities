@@ -202,9 +202,6 @@ public abstract class DexActionManagerBase implements DexActionManager {
             ignore = false;
             log.warn( "Action vetoed!" );
             // Possible enhancement - if warnings, post them and allow undo option in dialog.
-
-            // if (mainController != null)
-            // action.getSubject().getModelManager().startValidatingAndResolvingTasks();
             return;
         }
 
@@ -220,23 +217,18 @@ public abstract class DexActionManagerBase implements DexActionManager {
             event.set( action.getSubject() );
             action.isValid();
             mainController.publishEvent( event );
+            log.debug( "Action manager threw event: " + event.toString() );
         }
-        // BAD HERE
         action.isValid();
 
         // Let the user know what happened
         if (mainController != null) {
             mainController.updateActionManagerDisplay( this );
-            // mainController.updateActionQueueSize( getQueueSize() );
             mainController.postStatus( "Performed action: " + action.toString() );
         }
         // Let the action update the action appropriate validation status
         action.isValid();
-        // action.getSubject().getOwningMember().isValid( true ); // Force the owner to refresh its findings.
-        // action.getSubject().isValid( true ); // Force the subject to refresh its findings.
 
-        // if (mainController != null)
-        // action.getSubject().getModelManager().startValidatingAndResolvingTasks();
         // log.debug( "Put action on queue: " + action.getClass().getSimpleName() );
     }
 
