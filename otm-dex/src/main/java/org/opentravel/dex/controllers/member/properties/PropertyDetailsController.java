@@ -35,8 +35,10 @@ import org.opentravel.dex.events.DexPropertySelectionEvent;
 import org.opentravel.dex.events.OtmObjectChangeEvent;
 import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmFacets.OtmVWAValueFacet;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
 import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.schemacompiler.model.TLExampleOwner;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -156,8 +158,10 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
             post( (OtmProperty) obj );
         else if (obj instanceof OtmSimpleObject)
             post( (OtmSimpleObject) obj );
-        else
+        else {
             postTitle( obj );
+            postExample( obj );
+        }
     }
 
 
@@ -274,14 +278,24 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
         postField( field, obj, obj.descriptionProperty() );
     }
 
+    private void postExample(OtmObject obj) {
+        if (obj instanceof OtmVWAValueFacet)
+            postExample( obj.getOwningMember(), ((OtmVWAValueFacet) obj).exampleProperty() );
+    }
+
     private void postExample(OtmProperty property) {
-        if (property.getExample() != null && !property.getExample().isEmpty()) {
-            TextField txt = new TextField( property.exampleProperty().get() );
-            txt.setDisable( property.exampleProperty() instanceof ReadOnlyStringWrapper );
-            txt.setOnAction( a -> setProperty( a, property.exampleProperty() ) );
+        postExample( property, property.exampleProperty() );
+    }
+
+    private void postExample(OtmObject obj, StringProperty stringProperty) {
+        if (obj.getTL() instanceof TLExampleOwner) {
+            // if (property.getExample() != null && !property.getExample().isEmpty()) {
+            TextField txt = new TextField( stringProperty.get() );
+            txt.setDisable( stringProperty instanceof ReadOnlyStringWrapper );
+            txt.setOnAction( a -> setProperty( a, stringProperty ) );
             DexEditField field =
                 new DexEditField( currentRow++, 0, "Example", "Provide an example of this data field.", txt );
-            postField( field, property, property.exampleProperty() );
+            postField( field, obj, stringProperty );
         }
     }
 

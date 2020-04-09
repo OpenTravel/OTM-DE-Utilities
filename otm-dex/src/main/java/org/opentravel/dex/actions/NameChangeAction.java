@@ -21,6 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -38,6 +40,8 @@ public class NameChangeAction extends DexStringAction {
     public static boolean isEnabled(OtmObject subject) {
         if (subject == null || !subject.isRenameable())
             return false;
+        if (subject instanceof OtmActionFacet || subject instanceof OtmResource)
+            return subject.isEditable(); // Resource and AF are type users but not name controlled
         if (subject instanceof OtmTypeUser && ((OtmTypeUser) subject).getAssignedType() != null
             && ((OtmTypeUser) subject).getAssignedType().isNameControlled())
             return false;

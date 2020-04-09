@@ -25,6 +25,8 @@ import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import java.util.Collection;
 import java.util.Collections;
 
+import javafx.beans.property.StringProperty;
+
 /**
  * @author Dave Hollander
  * 
@@ -39,6 +41,10 @@ public class OtmVWAValueFacet extends OtmAbstractDisplayFacet {
     @Override
     public String getName() {
         return "Value";
+    }
+
+    public StringProperty exampleProperty() {
+        return ((OtmValueWithAttributes) getOwningMember()).exampleProperty();
     }
 
     public String getValueType() {

@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
@@ -65,6 +66,7 @@ import javafx.beans.property.StringProperty;
 public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttributes>
     implements OtmTypeProvider, OtmChildrenOwner, OtmTypeUser, OtmPropertyOwner {
     private static Log log = LogFactory.getLog( OtmValueWithAttributes.class );
+    private StringProperty exampleProperty;
 
     public OtmValueWithAttributes(String name, OtmModelManager mgr) {
         super( new TLValueWithAttributes(), mgr );
@@ -159,6 +161,12 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
             return new ReadOnlyStringWrapper( "" );
     }
 
+    public StringProperty exampleProperty() {
+        if (exampleProperty == null && getActionManager() != null) {
+            exampleProperty = getActionManager().add( DexActions.EXAMPLECHANGE, getExample(), this );
+        }
+        return exampleProperty;
+    }
 
     public void delete(OtmProperty property) {
         if (property.getTL() instanceof TLIndicator)

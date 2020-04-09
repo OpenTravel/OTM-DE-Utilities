@@ -695,4 +695,11 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         } );
         return usersMap;
     }
+
+    /**
+     * Refresh each member
+     */
+    public void refresh() {
+        getMembers().forEach( m -> m.refresh() );
+    }
 }

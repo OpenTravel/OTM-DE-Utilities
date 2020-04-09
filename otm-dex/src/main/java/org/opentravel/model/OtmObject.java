@@ -309,6 +309,4 @@ public interface OtmObject {
      */
     public StringProperty validationProperty();
 
-
-
 }

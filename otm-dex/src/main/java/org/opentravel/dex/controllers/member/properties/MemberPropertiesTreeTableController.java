@@ -36,6 +36,8 @@ import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.dex.events.OtmObjectReplacedEvent;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
+import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
+import org.opentravel.model.otmFacets.OtmEmptyTableFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -85,7 +87,6 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     protected TreeTableColumn<PropertiesDAO,String> typeCol;
     protected TreeTableColumn<PropertiesDAO,String> minCol;
     protected TreeTableColumn<PropertiesDAO,Integer> maxCol;
-
     protected TreeTableColumn<PropertiesDAO,String> exampleCol;
     protected TreeTableColumn<PropertiesDAO,String> descCol;
     protected TreeTableColumn<PropertiesDAO,String> deprecatedCol;
@@ -124,24 +125,17 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         // Example Column
         exampleCol = new TreeTableColumn<>( "Example" );
         setColumnProps( exampleCol, true, true, false, 0, "example" );
-        // setColumnProps( exampleCol, false, false, false, 0 );
 
         // Documentation Column - spans
         TreeTableColumn<PropertiesDAO,String> documentationCol = new TreeTableColumn<>( "Documentation" );
         // Description Column
         descCol = new TreeTableColumn<>( "Description" );
         setColumnProps( descCol, true, true, false, -150, "description" );
-        // setColumnProps( descCol, true, true, false, 150, "description" );
+
         // Deprecation Column
         deprecatedCol = new TreeTableColumn<>( "Deprecation" );
         setColumnProps( deprecatedCol, true, true, false, 50, "deprecation" );
         documentationCol.getColumns().addAll( deprecatedCol, descCol );
-        // Other
-        // otherDocCol = new TreeTableColumn<>( "Other" );
-        // setColumnProps( otherDocCol, false, false, false, 0 );
-        // documentationCol.getColumns().addAll( descCol, deprecatedCol, otherDocCol );
-        // setColumnProps( descCol, true, true, false, 0 );
-        // setColumnProps( deprecatedCol, false, false, false, 0 );
 
         // Repeat: min and max Column
         minCol = new TreeTableColumn<>( "min" );
@@ -236,7 +230,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
     @Override
     public void handleEvent(AbstractOtmEvent e) {
-        log.debug( "event handler: " + e.getClass().getSimpleName() );
+        // log.debug( "event handler: " + e.getClass().getSimpleName() );
         if (e instanceof DexMemberSelectionEvent)
             handleEvent( (DexMemberSelectionEvent) e );
         else if (e instanceof DexModelChangeEvent)
@@ -280,20 +274,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     }
 
     private void handleEvent(OtmObjectReplacedEvent e) {
-        // if (e.getOrginalObject().getOwningMember() == e.getReplacementObject().getOwningMember())
-        // log.error( "BAD HERE" );
-        OtmPropertyOwner parent = null;
-        if (e.getOrginalObject() instanceof OtmProperty)
-            parent = ((OtmProperty) e.getOrginalObject()).getParent();
-
         post( e.get().getOwningMember() );
-
-        // if (e.getOrginalObject() instanceof OtmProperty && parent != ((OtmProperty)
-        // e.getOrginalObject()).getParent())
-        // log.debug( "CHANGED PARENT. OOPS." );
-        //
-        // if (e.getOrginalObject().getOwningMember() == e.getReplacementObject().getOwningMember())
-        // log.error( "BAD HERE" );
     }
 
     public void handleMaxEdit(TreeTableColumn.CellEditEvent<PropertiesDAO,String> event) {
@@ -336,6 +317,11 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         if (member != null)
             new PropertiesDAO( member, this ).createChildrenItems( root, null );
 
+        // If no properties, post an empty row to allow row factory to add menu items
+        if (root.getChildren().isEmpty() && member instanceof OtmPropertyOwner) {
+            OtmObject child = new OtmEmptyTableFacet( member.getModelManager(), (OtmPropertyOwner) member );
+            new PropertiesDAO( child, this, root ).createTreeItem( root, null );
+        }
     }
 
     /**
@@ -372,7 +358,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         }
         if (obj instanceof OtmProperty)
             fireEvent( new DexPropertySelectionEvent( (OtmProperty) obj ) );
-        if (obj instanceof OtmFacet || obj instanceof OtmContextualFacet)
+        if (obj instanceof OtmFacet || obj instanceof OtmContextualFacet || obj instanceof OtmAbstractDisplayFacet)
             fireEvent( new DexFacetSelectionEvent( obj ) );
         // postObjectStatus( obj );
     }

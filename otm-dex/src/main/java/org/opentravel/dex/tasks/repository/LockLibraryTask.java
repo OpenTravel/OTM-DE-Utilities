@@ -81,6 +81,7 @@ public class LockLibraryTask extends DexTaskBase<OtmLibrary> {
     public void doIT() throws RepositoryException {
         if (proj != null) {
             proj.getTL().getProjectManager().lock( proj.getProjectItem( library.getTL() ) );
+            library.refresh();
         }
     }
 

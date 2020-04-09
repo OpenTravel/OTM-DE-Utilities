@@ -217,7 +217,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
             event.set( action.getSubject() );
             action.isValid();
             mainController.publishEvent( event );
-            log.debug( "Action manager threw event: " + event.toString() );
+            // log.debug( "Action manager threw event: " + event.toString() );
         }
         action.isValid();
 

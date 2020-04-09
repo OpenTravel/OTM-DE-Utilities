@@ -197,11 +197,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     }
 
     public void handleEvent(OtmObjectReplacedEvent event) {
-        // if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
-        // log.error( "BAD HERE" );
         post( event.get().getOwningMember() );
-        // if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
-        // log.error( "BAD HERE" );
     }
 
     public void handleEvent(DexMemberDeleteEvent event) {
