@@ -335,6 +335,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         postedData = member;
         if (member != null)
             new PropertiesDAO( member, this ).createChildrenItems( root, null );
+
     }
 
     /**

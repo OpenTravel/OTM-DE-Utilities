@@ -20,6 +20,7 @@ import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmPropertyOwner;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -36,6 +37,11 @@ public class OtmEmptyTableFacet extends OtmAbstractDisplayFacet {
 
     public OtmEmptyTableFacet(OtmModelManager modelManager) {
         super( null );
+        this.modelManager = modelManager;
+    }
+
+    public OtmEmptyTableFacet(OtmModelManager modelManager, OtmPropertyOwner parent) {
+        super( parent );
         this.modelManager = modelManager;
     }
 

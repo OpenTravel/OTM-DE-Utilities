@@ -375,17 +375,17 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         if (modelMgr != null && memberTree != null) {
             currentModelMgr = modelMgr;
             clear();
+
             // Get the filter to use if needed
             if (filter == null && getMainController() instanceof ObjectEditorController)
                 filter = ((ObjectEditorController) getMainController()).getMemberFilterController();
 
             // create cells for members
-            // Collection<OtmLibraryMember> members = currentModelMgr.getMembers();
             currentModelMgr.getMembers().forEach( m -> createTreeItem( m, root ) );
-            if (root.getChildren().isEmpty()) {
-                // Post an empty row to allow row factory to add menu items
+
+            // If no members, post an empty row to allow row factory to add menu items
+            if (root.getChildren().isEmpty())
                 createTreeItem( new OtmEmptyTableFacet( currentModelMgr ), root );
-            }
 
             try {
                 memberTree.sort();

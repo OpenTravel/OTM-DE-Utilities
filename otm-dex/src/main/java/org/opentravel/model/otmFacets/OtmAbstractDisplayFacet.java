@@ -210,7 +210,7 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
 
     @Override
     public StringProperty descriptionProperty() {
-        return getParent().descriptionProperty();
+        return getParent() != null ? getParent().descriptionProperty() : new ReadOnlyStringWrapper( getDescription() );
     }
 
     @Override

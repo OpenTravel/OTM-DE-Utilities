@@ -28,9 +28,11 @@ import org.opentravel.dex.controllers.DexFilter;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCoreValueFacet;
+import org.opentravel.model.otmFacets.OtmEmptyTableFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmFacets.OtmVWAValueFacet;
 import org.opentravel.model.otmProperties.OtmElement;
@@ -174,12 +176,17 @@ public class PropertiesDAO implements DexDAO<OtmObject> {
                     // If the item was filtered out, continue using the parent for the tree item
                     if (item == null)
                         item = parent;
-                    // TO DO - sort order
                     new PropertiesDAO( child, getController(), item ).createChildrenItems( item, filter );
                 }
             }
-        }
 
+            // If no properties, post an empty row to allow row factory to add menu items
+            if (parent.getChildren().isEmpty() && element instanceof OtmPropertyOwner) {
+                OtmObject child = new OtmEmptyTableFacet( member.getModelManager(), (OtmPropertyOwner) element );
+                new PropertiesDAO( child, getController(), parent ).createTreeItem( parent, filter );
+            }
+
+        }
     }
 
     /**

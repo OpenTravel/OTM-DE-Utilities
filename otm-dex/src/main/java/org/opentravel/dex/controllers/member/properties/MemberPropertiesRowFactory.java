@@ -185,9 +185,11 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
                 deleteItem.setDisable( !am.isEnabled( DexActions.DELETEALIAS, getAlias( object ) ) );
             } else {
                 OtmProperty property = getProperty( object );
-                OtmPropertyOwner propertyOwner = getPropertyOwner( object );
 
-                addMenu.setDisable( !am.isEnabled( DexActions.ADDPROPERTY, propertyOwner ) );
+                OtmPropertyOwner propertyOwner = getPropertyOwner( object );
+                if (propertyOwner != null)
+                    addMenu.setDisable(
+                        !propertyOwner.getActionManager().isEnabled( DexActions.ADDPROPERTY, propertyOwner ) );
                 changeType.setDisable( !am.isEnabled( DexActions.TYPECHANGE, property ) );
                 deleteItem.setDisable( !am.isEnabled( DexActions.DELETEPROPERTY, property ) );
                 // enable/disable each property type menu item
@@ -195,13 +197,6 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
             }
         }
 
-        // 3/26/2020 - WORKS
-        // Set style
-        // int fontSize = 18;
-        // for (Node n : tc.lookupAll( ".text" )) {
-        // n.setStyle( "-fx-font-size: " + Integer.toString( fontSize ) + "pt;" );
-        // log.debug( "Set font size on " + n );
-        // }
         tc.setEditable( object.isEditable() );
         tc.pseudoClassStateChanged( INHERITED, newTreeItem.getValue().isInherited() );
         tc.pseudoClassStateChanged( EDITABLE, object.isEditable() );

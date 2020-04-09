@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmFacets.OtmLibraryDisplayFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyType;
@@ -38,6 +39,8 @@ public class AddPropertyAction extends DexRunAction {
      * @return
      */
     public static boolean isEnabled(OtmObject subject) {
+        if (subject instanceof OtmLibraryDisplayFacet)
+            log.debug( "HERE" );
         if (subject.getLibrary() == null)
             return false;
         // boolean isEditable = subject.getLibrary().isChainEditable();
