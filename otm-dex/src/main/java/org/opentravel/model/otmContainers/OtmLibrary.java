@@ -701,5 +701,6 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
      */
     public void refresh() {
         getMembers().forEach( m -> m.refresh() );
+        // getMembers().forEach( OtmLibraryMember::refresh );
     }
 }

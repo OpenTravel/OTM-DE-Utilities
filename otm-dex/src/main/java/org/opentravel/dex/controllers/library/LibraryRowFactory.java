@@ -136,7 +136,11 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     }
 
     private void refreshView() {
-        controller.refresh();
+        if (controller != null) {
+            controller.refresh();
+            if (controller.getMainController() != null && controller.getMainController().getModelManager() != null)
+                controller.getMainController().getModelManager().startValidatingAndResolvingTasks();
+        }
     }
 
     private void addToProject(ActionEvent e) {
