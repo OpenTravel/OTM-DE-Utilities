@@ -19,7 +19,6 @@ package org.opentravel.model;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
-import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.otmContainers.OtmLibrary;
@@ -27,16 +26,13 @@ import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.schemacompiler.event.ModelElementListener;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLModelElement;
-import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
-import org.opentravel.schemacompiler.validate.compile.TLModelCompileValidator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -53,7 +49,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     private static final String NONAMESPACE = "no-namespace-for-for-this-object";
     private static final String NONAME = "no-name-for-for-this-object";
-    private static final String EXAMPLE_CONTEXT = "Example";
 
     /**
      * Utility to <i>get</i> the OTM facade object that wraps the TL Model object. Uses the listener added to all TL
@@ -77,25 +72,13 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
 
     public static ValidationFindings isValid(TLModelElement tl) {
-        if (tl == null)
-            throw new IllegalStateException( "Tried to validation with null TL object." );
-        ValidationFindings sFindings = null;
-        boolean deep = false;
-        try {
-            sFindings = TLModelCompileValidator.validateModelElement( tl, deep );
-        } catch (Exception e) {
-            sFindings = null;
-            // log.debug( "Validation on " + tl.getValidationIdentity() + " threw error: " + e.getLocalizedMessage() );
-        }
-        // log.debug(sFindings != null ? sFindings.count() + " sFindings found" : " null" + " findings found.");
-        return sFindings;
+        return OtmValidationHandler.isValid( tl );
     }
 
     protected T tlObject;
     // leave empty if object can have children but does not or has not been modeled yet.
     // leave null if the element can not have children.
     protected List<OtmObject> children = new ArrayList<>();
-    private ValidationFindings findings = null;
 
     // Inherited children can not be inflated until after the model completes initial loading.
     // Use lazy inflation on the getter.
@@ -104,10 +87,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     protected StringProperty nameProperty;
     protected StringProperty nameEditingProperty;
     private OtmDocHandler docHandler;
-    private StringProperty validationProperty;
-
-    private ObjectProperty<ImageView> validationImageProperty;
-
+    private OtmValidationHandler validationHandler;
     private boolean expanded = false;
 
     /**
@@ -121,6 +101,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         tlObject = tl;
         addListener();
         docHandler = new OtmDocHandler( this );
+        validationHandler = new OtmValidationHandler( this );
     }
 
     /**
@@ -213,12 +194,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     @Override
     public ValidationFindings getFindings() {
-        // return isValid( getTL() );
-        if (findings == null) {
-            isValid( true );
-            // log.debug( "Getting findings for " + this );
-        }
-        return findings;
+        return validationHandler.getFindings();
     }
 
     @Override
@@ -259,7 +235,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         return getClass().getSimpleName();
     }
 
-
     @Override
     public String getPrefix() {
         return getOwningMember() != null && getOwningMember().getLibrary() != null
@@ -280,15 +255,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     @Override
     public String getValidationFindingsAsString() {
-        String msg = "Validation Findings: \n";
-        String f = ValidationUtils.getMessagesAsString( getFindings() );
-        if (isInherited())
-            msg += "Not validated here because it is inherited.";
-        else if (!f.isEmpty())
-            msg += f;
-        else
-            msg += "No warnings or errors.";
-        return msg;
+        return validationHandler.getValidationFindingsAsString();
     }
 
     @Override
@@ -318,30 +285,12 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     @Override
     public boolean isValid() {
-        return isValid( false );
+        return validationHandler.isValid( false );
     }
 
     @Override
     public boolean isValid(boolean refresh) {
-        if (getTL() == null)
-            throw new IllegalStateException( "Tried to validation with null TL object." );
-
-        // Inherited objects should not be validated
-        if (isInherited())
-            return true;
-
-        if (findings == null || refresh) {
-            findings = isValid( getTL() );
-            if (validationProperty != null)
-                validationProperty.setValue( ValidationUtils.getCountsString( findings ) );
-            if (validationImageProperty() != null)
-                validationImageProperty().setValue( validationImage() );
-        }
-        // log.debug( "Validated " + this + " resulted in " + findings.count() + " findings." );
-        // if (findings != null && findings.count() > 0)
-        // log.debug( this + "findings: " + findings.count() + " findings found" );
-        // Model change events make the image and tool tip update
-        return findings == null || findings.isEmpty();
+        return validationHandler.isValid( refresh );
     }
 
     @Override
@@ -367,15 +316,13 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     @Override
     public void refresh() {
         docHandler.refresh();
-        findings = null;
+        validationHandler.refresh();
         if (children != null)
             children.clear();
         if (inheritedChildren != null)
             inheritedChildren.clear();
         nameProperty = null;
         nameEditingProperty = null;
-        validationImageProperty = null;
-        validationProperty = null;
         // log.debug( "Refreshed " + getName() );
     }
 
@@ -422,30 +369,16 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     @Override
     public ImageView validationImage() {
-        if (isInherited())
-            return null;
-
-        // isValid();
-        if (findings != null) {
-            if (findings.hasFinding( FindingType.ERROR ))
-                return ImageManager.get( ImageManager.Icons.V_ERROR );
-            if (findings.hasFinding( FindingType.WARNING ))
-                return ImageManager.get( ImageManager.Icons.V_WARN );
-        }
-        return ImageManager.get( ImageManager.Icons.V_OK );
+        return validationHandler.validationImage();
     }
 
     @Override
     public ObjectProperty<ImageView> validationImageProperty() {
-        if (validationImageProperty == null)
-            validationImageProperty = new SimpleObjectProperty<>( validationImage() );
-        return validationImageProperty;
+        return validationHandler.validationImageProperty();
     }
 
     @Override
     public StringProperty validationProperty() {
-        if (validationProperty == null)
-            validationProperty = new ReadOnlyStringWrapper( ValidationUtils.getCountsString( getFindings() ) );
-        return validationProperty;
+        return validationHandler.validationProperty();
     }
 }

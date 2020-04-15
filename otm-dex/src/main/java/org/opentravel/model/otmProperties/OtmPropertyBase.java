@@ -57,11 +57,6 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
         setManditory( source.isManditory() );
     }
 
-    // @Override
-    // public StringProperty exampleProperty() {
-    // return super.exampleProperty();
-    // }
-
     @Override
     public String getNamespace() {
         return getOwningMember().getNamespace();
