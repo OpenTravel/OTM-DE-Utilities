@@ -198,11 +198,18 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     }
 
     /**
-     * @return
+     * @return the library DAO associated with the selected item
      */
-    public LibraryDAO getSelectedItem() {
+    private LibraryDAO getSelectedItem() {
         return librariesTreeTable.getSelectionModel().getSelectedItem() != null
             ? librariesTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
+    }
+
+    /**
+     * @return the currently selected library or null
+     */
+    public OtmLibrary getSelectedLibrary() {
+        return getSelectedItem() != null ? getSelectedItem().getValue() : null;
     }
 
     @Override

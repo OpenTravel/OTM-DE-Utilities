@@ -46,11 +46,13 @@ public interface OtmObject {
     void clearNameProperty();
 
     /**
+     * @see DexActionManager#add(org.opentravel.dex.actions.DexActions, String, OtmObject)
      * @return FX property for deprecation or null
      */
     public StringProperty deprecationProperty();
 
     /**
+     * @see DexActionManager#add(org.opentravel.dex.actions.DexActions, String, OtmObject)
      * @return FX property for description
      */
     public StringProperty descriptionProperty();
@@ -72,15 +74,9 @@ public interface OtmObject {
     public DexActionManager getActionManager();
 
     /**
-     * 
      * @return the deprecation string from documentation or empty string
      */
     public String getDeprecation();
-
-    /**
-     * @return true if deprecation string is not null and not empty.
-     */
-    boolean isDeprecated();
 
     /**
      * @return new list of all descendants if any
@@ -170,6 +166,11 @@ public interface OtmObject {
     public String getValidationFindingsAsString();
 
     /**
+     * @return true if deprecation string is not null and not empty.
+     */
+    boolean isDeprecated();
+
+    /**
      * Is this object fully editable? Also see {@link OtmLibraryMember#isEditableMinor()}
      * 
      * @return true if this object is editable
@@ -217,11 +218,14 @@ public interface OtmObject {
      * Get the FX observable property for this name. Intended for use where the name could be edited if enabled. Use
      * {@link #nameProperty()} if the name is simply for display.
      * <p>
-     * If editable, returns a simple string property with a listener assigned by the object's action manager. If not
-     * editable a read-only property is returned.
+     * The editing property may not contain the full name of the object. For example, contextual and extension point
+     * facets the TL getName() used here is different than TL localName. Objects whose name has contributions from other
+     * objects must override this method to create a property that has only the editable portion of the name.
      * <p>
-     * Objects whose name has contributions from other objects must override this method to create a property that has
-     * only the editable portion of the name.
+     * If the object is editable, return a simple string property with a listener assigned by the object's action
+     * manager. If not editable a read-only property is returned.
+     * 
+     * @see DexActionManager#add(org.opentravel.dex.actions.DexActions, String, OtmObject)
      * 
      * @return a string property (never null)
      */
@@ -245,6 +249,7 @@ public interface OtmObject {
      * If editable, returns a simple string property with a listener assigned by the object's action manager. If not
      * editable a read-only property is returned.
      * 
+     * @see DexActionManager#add(org.opentravel.dex.actions.DexActions, String, OtmObject)
      * @return a FX string property (never null)
      */
     public StringProperty nameProperty();

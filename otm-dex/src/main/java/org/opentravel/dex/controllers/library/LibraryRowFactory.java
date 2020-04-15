@@ -62,7 +62,6 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
 
     private final ContextMenu contextMenu = new ContextMenu();
     private MenuItem lockLibrary;
-    // private MenuItem unlockLibrary;
     private MenuItem commitLibrary = new MenuItem( "Commit and Unlock" );
     private MenuItem projectAdd;
     private MenuItem projectRemove;
@@ -95,10 +94,8 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
 
         versionMenu = new Menu( "Version" );
         versionMenu.getItems().addAll( major, minor );
-        // versionMenu.getItems().addAll( major, minor, patch );
 
         lockLibrary.setOnAction( e -> lockLibrary() );
-        // unlockLibrary.setOnAction( e -> unlockLibrary() );
         commitLibrary.setOnAction( e -> commitLibrary() );
         projectAdd.setOnAction( this::addToProject );
         projectRemove.setOnAction( this::removeLibrary );
@@ -130,45 +127,79 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         }
     }
 
+    private void addToProject(ActionEvent e) {
+        OtmLibrary library = getSelected();
+        if (library != null) {
+            new DexProjectHandler().addToProject( library );
+            controller.refresh();
+        }
+    }
+
+    private void commitLibrary() {
+        UnlockAndCommitLibraryDialogController uldc = UnlockAndCommitLibraryDialogController.init();
+        uldc.showAndWait( "" );
+        String remarks = uldc.getCommitRemarks();
+        TaskRequested task = uldc.getTask();
+        RepositoryResultHandler resultHandler = new RepositoryResultHandler( mainController );
+        switch (task) {
+            case Cancel:
+                break;
+            case UnlockOnly:
+                new UnlockLibraryTask( getSelected(), false, remarks, resultHandler, statusController ).go();
+                break;
+            case CommitAndUnlock:
+                new UnlockLibraryTask( getSelected(), true, remarks, resultHandler, statusController ).go();
+                break;
+            case CommitOnly:
+                new CommitLibraryTask( getSelected(), remarks, resultHandler, statusController ).go();
+                break;
+        }
+    }
+
     private void configureManageMenu(RepositoryManager repoMgr) {
         manage.getItems().add( new MenuItem( ManageLibraryTask.LOCAL_REPO ) );
         repoMgr.listRemoteRepositories().forEach( r -> manage.getItems().add( new MenuItem( r.getId() ) ) );
     }
 
-    private void refreshView() {
-        if (controller != null) {
-            controller.refresh();
-            if (controller.getMainController() != null && controller.getMainController().getModelManager() != null)
-                controller.getMainController().getModelManager().startValidatingAndResolvingTasks();
-        }
-    }
-
-    private void addToProject(ActionEvent e) {
-        OtmLibrary library = null;
-        if (controller.getSelectedItem() != null && controller.getSelectedItem().getValue() != null)
-            library = controller.getSelectedItem().getValue();
-        if (library == null)
-            return;
-        new DexProjectHandler().addToProject( library );
-        controller.refresh();
-    }
-
     private OtmLibrary getSelected() {
-        OtmLibrary library = null;
-        if (controller.getSelectedItem() != null && controller.getSelectedItem().getValue() != null)
-            library = controller.getSelectedItem().getValue();
-        return library;
+        return controller != null ? controller.getSelectedLibrary() : null;
     }
 
     /**
      * Lock a library
      */
     private void lockLibrary() {
-        // log.debug( "Lock in Row Factory. " + controller.getSelectedItem().getValue().hashCode() );
         OtmLibrary lib = getSelected();
         if (lib != null)
             new LockLibraryTask( lib, new RepositoryResultHandler( mainController ), statusController, controller,
                 modelManager ).go();
+    }
+
+    /**
+     * Promote a library state
+     */
+    private void manageLibrary(ActionEvent e) {
+        OtmLibrary lib = getSelected();
+        if (lib != null) {
+            if (ManageLibraryTask.isEnabled( lib )) {
+                e.getSource();
+                if (e.getTarget() instanceof MenuItem) {
+                    String repoId = ((MenuItem) e.getTarget()).getText();
+                    new ManageLibraryTask( repoId, lib, new RepositoryResultHandler( mainController ), mainController )
+                        .go();
+                }
+            } else {
+                postReason( "Can not manage library.", ManageLibraryTask.getReason( lib ) );
+            }
+        }
+        // FIXME - repository view does not show the new library
+        // TODO - include namespace compatibility in isEnabled and present reason if appropriate
+    }
+
+    private void postReason(String action, String reason) {
+        DialogBoxContoller dbc = DialogBoxContoller.init();
+        if (dbc != null)
+            dbc.show( action, reason );
     }
 
     /**
@@ -195,54 +226,13 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     }
 
     /**
-     * Promote a library state
+     * Refresh the controller and start validation and type resolving tasks
      */
-    private void manageLibrary(ActionEvent e) {
-        OtmLibrary lib = getSelected();
-        if (lib != null) {
-            // log.debug( "manage " + lib + " in Row Factory. " + controller.getSelectedItem().getValue() );
-
-            if (ManageLibraryTask.isEnabled( lib )) {
-                e.getSource();
-                if (e.getTarget() instanceof MenuItem) {
-                    String repoId = ((MenuItem) e.getTarget()).getText();
-                    new ManageLibraryTask( repoId, lib, new RepositoryResultHandler( mainController ), mainController )
-                        .go();
-                }
-            } else {
-                postReason( "Can not manage library.", ManageLibraryTask.getReason( lib ) );
-            }
-        }
-        // FIXME - repository view does not show the new library
-        // TODO - include namespace compatibility in isEnabled and present reason if appropriate
-    }
-
-    private void postReason(String action, String reason) {
-        DialogBoxContoller dbc = DialogBoxContoller.init();
-        if (dbc != null)
-            dbc.show( action, reason );
-    }
-
-    /**
-     * Create new version of a library
-     */
-    private void versionLibrary(ActionEvent e) {
-        OtmLibrary lib = getSelected();
-        // log.debug( "Version " + lib + " in Row Factory. " + controller.getSelectedItem().getValue().hashCode() );
-        VersionLibraryTask.VersionType type = null;
-        if (e.getTarget() == major)
-            type = VersionType.MAJOR;
-        else if (e.getTarget() == minor)
-            type = VersionType.MINOR;
-        else if (e.getTarget() == patch)
-            type = VersionType.PATCH;
-
-        if (VersionLibraryTask.isEnabled( lib )) {
-            if (type != null)
-                new VersionLibraryTask( type, lib, new RepositoryResultHandler( mainController ), statusController,
-                    controller, modelManager ).go();
-        } else {
-            postReason( "Can not version library.", VersionLibraryTask.getReason( lib ) );
+    private void refreshView() {
+        if (controller != null) {
+            controller.refresh();
+            if (modelManager != null)
+                modelManager.startValidatingAndResolvingTasks();
         }
     }
 
@@ -251,21 +241,18 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         if (library == null)
             return;
         new DexProjectHandler().removeLibrary( library );
-        controller.refresh();
+        refreshView();
     }
 
     private void saveLibrary() {
         OtmLibrary library = getSelected();
-        if (library == null)
-            return;
-        // TEST error handling
-        library.save();
+        if (library != null)
+            library.save();
     }
 
     /**
      * @param tc
      * @param newTreeItem
-     * @return
      * @return
      */
     private void setCSSClass(TreeTableRow<LibraryDAO> tc, TreeItem<LibraryDAO> newTreeItem) {
@@ -274,11 +261,10 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
             if (library != null && library.getModelManager() != null) {
                 lockLibrary.setDisable( !library.canBeLocked() );
                 commitLibrary.setDisable( !library.canBeUnlocked() );
-                // whereUsed.setDisable( true );
                 projectAdd.setDisable( !library.getModelManager().hasProjects() );
                 projectRemove.setDisable( library.getProjects().isEmpty() );
                 //
-                boolean versionEnabled = VersionLibraryTask.isEnabled( library );
+                // boolean versionEnabled = VersionLibraryTask.isEnabled( library );
                 patch.setDisable( !VersionLibraryTask.isEnabled( library ) );
                 minor.setDisable( !VersionLibraryTask.isEnabled( library ) );
                 major.setDisable( !VersionLibraryTask.isEnabled( library ) );
@@ -304,28 +290,26 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         }
     }
 
-    private void commitLibrary() {
-        // log.debug(
-        // "Commit library in Row Factory. " + controller.getSelectedItem().getValue().getClass().hashCode() );
-        UnlockAndCommitLibraryDialogController uldc = UnlockAndCommitLibraryDialogController.init();
-        uldc.showAndWait( "" );
-        String remarks = uldc.getCommitRemarks();
-        TaskRequested task = uldc.getTask();
-        switch (task) {
-            case Cancel:
-                break;
-            case UnlockOnly:
-                new UnlockLibraryTask( controller.getSelectedItem().getValue(), false, remarks,
-                    new RepositoryResultHandler( mainController ), mainController.getStatusController() ).go();
-                break;
-            case CommitAndUnlock:
-                new UnlockLibraryTask( controller.getSelectedItem().getValue(), true, remarks,
-                    new RepositoryResultHandler( mainController ), mainController.getStatusController() ).go();
-                break;
-            case CommitOnly:
-                new CommitLibraryTask( controller.getSelectedItem().getValue(), remarks,
-                    new RepositoryResultHandler( mainController ), mainController.getStatusController() ).go();
-                break;
+    /**
+     * Create new version of a library
+     */
+    private void versionLibrary(ActionEvent e) {
+        OtmLibrary lib = getSelected();
+        // log.debug( "Version " + lib + " in Row Factory. " + controller.getSelectedItem().getValue().hashCode() );
+        VersionLibraryTask.VersionType type = null;
+        if (e.getTarget() == major)
+            type = VersionType.MAJOR;
+        else if (e.getTarget() == minor)
+            type = VersionType.MINOR;
+        else if (e.getTarget() == patch)
+            type = VersionType.PATCH;
+
+        if (VersionLibraryTask.isEnabled( lib )) {
+            if (type != null)
+                new VersionLibraryTask( type, lib, new RepositoryResultHandler( mainController ), statusController,
+                    controller, modelManager ).go();
+        } else {
+            postReason( "Can not version library.", VersionLibraryTask.getReason( lib ) );
         }
     }
 }

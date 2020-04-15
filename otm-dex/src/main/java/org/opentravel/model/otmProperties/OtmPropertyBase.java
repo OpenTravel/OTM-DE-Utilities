@@ -38,7 +38,10 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
     private StringProperty exampleProperty;
 
     /**
-     * @param tl property owner
+     * Create a property. Set the TL model element it encapsulates. Add to owner.
+     * 
+     * @param tl model element to encapsulate
+     * @param property owner, can be null
      */
     public OtmPropertyBase(T tl, OtmPropertyOwner parent) {
         super( tl );
@@ -72,12 +75,23 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
     }
 
     @Override
+    public String getObjectTypeName() {
+        return OtmPropertyFactory.getObjectName( this );
+    }
+
+    @Override
     public OtmLibraryMember getOwningMember() {
         return parent.getOwningMember();
     }
 
+    @Override
     public OtmPropertyOwner getParent() {
         return parent;
+    }
+
+    @Override
+    public OtmPropertyType getPropertyType() {
+        return OtmPropertyType.getType( this );
     }
 
     @Override
@@ -86,18 +100,10 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
         super.refresh();
     }
 
+    @Override
     public OtmPropertyOwner setParent(OtmPropertyOwner parent) {
         this.parent = parent;
         return parent;
-    }
-
-    public OtmPropertyType getPropertyType() {
-        return OtmPropertyType.getType( this );
-    }
-
-    @Override
-    public String getObjectTypeName() {
-        return OtmPropertyFactory.getObjectName( this );
     }
 
 

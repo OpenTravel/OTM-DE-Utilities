@@ -16,6 +16,7 @@
 
 package org.opentravel.model.otmProperties;
 
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -39,7 +40,8 @@ public interface OtmProperty extends OtmObject {
     public void clone(OtmProperty property);
 
     /**
-     * @return FX property for examples
+     * @see DexActionManager#add(org.opentravel.dex.actions.DexActions, String, OtmObject)
+     * @return FX string property with action handler for example value
      */
     public StringProperty exampleProperty();
 
@@ -51,6 +53,9 @@ public interface OtmProperty extends OtmObject {
 
     public OtmPropertyOwner getParent();
 
+    /**
+     * @return the property type enumeration for this property
+     */
     public OtmPropertyType getPropertyType();
 
     public boolean isEditable();
@@ -67,6 +72,12 @@ public interface OtmProperty extends OtmObject {
      */
     public abstract void setManditory(boolean value);
 
+    /**
+     * Set the parent of the property.
+     * 
+     * @param parent
+     * @return the parent
+     */
     public OtmPropertyOwner setParent(OtmPropertyOwner parent);
 
     public String toString();

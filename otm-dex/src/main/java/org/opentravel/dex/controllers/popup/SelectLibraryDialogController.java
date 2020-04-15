@@ -19,10 +19,8 @@ package org.opentravel.dex.controllers.popup;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.library.LibrariesTreeTableController;
-import org.opentravel.dex.controllers.library.LibraryDAO;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
-import org.opentravel.objecteditor.UserSettings;
 
 import java.io.IOException;
 
@@ -102,18 +100,12 @@ public class SelectLibraryDialogController extends DexPopupControllerBase {
     @FXML
     Button dialogButtonOK;
 
-    // private File projFile = null;
     private OtmModelManager modelMgr;
-    private String resultText;
-    private UserSettings userSettings;
-
-    // public String getResultText() {
-    // return resultText;
-    // }
+    // private String resultText;
+    // private UserSettings userSettings;
 
     public OtmLibrary getSelected() {
-        LibraryDAO item = librariesTreeTableController.getSelectedItem();
-        return item != null ? item.getValue() : null;
+        return librariesTreeTableController != null ? librariesTreeTableController.getSelectedLibrary() : null;
     }
 
     @Override

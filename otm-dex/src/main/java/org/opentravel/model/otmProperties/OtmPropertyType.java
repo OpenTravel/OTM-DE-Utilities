@@ -35,6 +35,12 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 
+/**
+ * Enumerated class with all property types, their label, and java class.
+ * <p>
+ * Methods include getters for instance, label and class and builders of TL and OTM objects for each type. Also has
+ * property type aware methods for JavaFX menu and menu items.
+ */
 public enum OtmPropertyType {
     ATTRIBUTE("Attribute", OtmAttribute.class),
     INDICATOR("Indicator", OtmIndicator.class),
@@ -65,14 +71,15 @@ public enum OtmPropertyType {
     }
 
     /**
-     * Get the type associated with the property
-     * 
-     * @return
+     * @return the enumerated type associated with the property
      */
     public static OtmPropertyType getType(OtmProperty p) {
         return p != null ? getType( p.getClass() ) : null;
     }
 
+    /**
+     * @return the enumerated type associated with the java class
+     */
     public static OtmPropertyType getType(Class<?> propertyClass) {
         for (OtmPropertyType type : values())
             if (type.propertyClass == propertyClass)
@@ -80,6 +87,9 @@ public enum OtmPropertyType {
         return null;
     }
 
+    /**
+     * @return the enumerated type associated with the label
+     */
     public static OtmPropertyType getType(String label) {
         for (OtmPropertyType type : values())
             if (type.label == label)
