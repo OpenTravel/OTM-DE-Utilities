@@ -269,7 +269,7 @@ public interface OtmObject {
      */
     public String setDeprecation(String deprecation);
 
-    public void setDescription(String description);
+    public String setDescription(String description);
 
     /**
      * Set the example value. Even though the TL maintains a list, the facades only use the first item.

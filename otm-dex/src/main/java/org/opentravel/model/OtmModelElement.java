@@ -26,11 +26,6 @@ import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.schemacompiler.event.ModelElementListener;
 import org.opentravel.schemacompiler.model.NamedEntity;
-import org.opentravel.schemacompiler.model.TLDocumentation;
-import org.opentravel.schemacompiler.model.TLDocumentationItem;
-import org.opentravel.schemacompiler.model.TLDocumentationOwner;
-import org.opentravel.schemacompiler.model.TLExample;
-import org.opentravel.schemacompiler.model.TLExampleOwner;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
@@ -81,22 +76,36 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     }
 
 
-    protected T tlObject;
+    public static ValidationFindings isValid(TLModelElement tl) {
+        if (tl == null)
+            throw new IllegalStateException( "Tried to validation with null TL object." );
+        ValidationFindings sFindings = null;
+        boolean deep = false;
+        try {
+            sFindings = TLModelCompileValidator.validateModelElement( tl, deep );
+        } catch (Exception e) {
+            sFindings = null;
+            // log.debug( "Validation on " + tl.getValidationIdentity() + " threw error: " + e.getLocalizedMessage() );
+        }
+        // log.debug(sFindings != null ? sFindings.count() + " sFindings found" : " null" + " findings found.");
+        return sFindings;
+    }
 
+    protected T tlObject;
     // leave empty if object can have children but does not or has not been modeled yet.
     // leave null if the element can not have children.
     protected List<OtmObject> children = new ArrayList<>();
     private ValidationFindings findings = null;
+
     // Inherited children can not be inflated until after the model completes initial loading.
     // Use lazy inflation on the getter.
     protected List<OtmObject> inheritedChildren = null;
-
     // JavaFX Properties
     protected StringProperty nameProperty;
     protected StringProperty nameEditingProperty;
-    private StringProperty descriptionProperty;
-    private StringProperty deprecationProperty;
+    private OtmDocHandler docHandler;
     private StringProperty validationProperty;
+
     private ObjectProperty<ImageView> validationImageProperty;
 
     private boolean expanded = false;
@@ -111,6 +120,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
             throw new IllegalArgumentException( "Must have a tl element to create facade." );
         tlObject = tl;
         addListener();
+        docHandler = new OtmDocHandler( this );
     }
 
     /**
@@ -124,19 +134,34 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     }
 
     @Override
-    public StringProperty descriptionProperty() {
-        if (descriptionProperty == null && getActionManager() != null) {
-            descriptionProperty = getActionManager().add( DexActions.DESCRIPTIONCHANGE, getDescription(), this );
-        }
-        return descriptionProperty;
+    public void clearNameProperty() {
+        nameProperty = null;
+        nameEditingProperty = null;
+    }
+
+    @Override
+    public int compareTo(OtmObject o) {
+        if (o == null || o.getName() == null)
+            return 1;
+        if (getName() == null)
+            return -1;
+        if (getName().equals( o.getName() ))
+            return getNamespace().compareTo( o.getNamespace() );
+        return getName().compareTo( o.getName() );
     }
 
     @Override
     public StringProperty deprecationProperty() {
-        if (deprecationProperty == null && getActionManager() != null) {
-            deprecationProperty = getActionManager().add( DexActions.DEPRECATIONCHANGE, getDeprecation(), this );
-        }
-        return deprecationProperty;
+        return docHandler.deprecationProperty();
+    }
+
+    @Override
+    public StringProperty descriptionProperty() {
+        return docHandler.descriptionProperty();
+    }
+
+    public StringProperty exampleProperty() {
+        return docHandler.exampleProperty();
     }
 
     /**
@@ -155,65 +180,8 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     }
 
     @Override
-    public OtmModelManager getModelManager() {
-        if (getOwningMember() != null)
-            return getOwningMember().getModelManager();
-        return null;
-    }
-
-    @Override
     public String getDeprecation() {
-        if (getTL() instanceof TLDocumentationOwner) {
-            TLDocumentation doc = ((TLDocumentationOwner) getTL()).getDocumentation();
-            if (doc != null && doc.getDeprecations() != null && !doc.getDeprecations().isEmpty())
-                return doc.getDeprecations().get( 0 ).getText();
-        }
-        return "";
-    }
-
-    @Override
-    public boolean isDeprecated() {
-        if (getTL() instanceof TLDocumentationOwner) {
-            TLDocumentation doc = ((TLDocumentationOwner) getTL()).getDocumentation();
-            if (doc != null && doc.getDeprecations() != null && !doc.getDeprecations().isEmpty())
-                return true;
-        }
-        return false;
-    }
-
-    @Override
-    public String setDeprecation(String deprecation) {
-        if (getTL() instanceof TLDocumentationOwner) {
-            TLDocumentation doc = ((TLDocumentationOwner) getTL()).getDocumentation();
-            if (doc != null) {
-                // Remove any deprecation
-                List<TLDocumentationItem> list = new ArrayList<>( doc.getDeprecations() );
-                // list.forEach( d -> doc.removeDeprecation( d ) );
-                list.forEach( doc::removeDeprecation );
-            }
-            // Set deprecation if not null or empty
-            if (deprecation != null && !deprecation.isEmpty()) {
-                if (doc == null) {
-                    // Create new documentation object
-                    doc = new TLDocumentation();
-                    ((TLDocumentationOwner) getTL()).setDocumentation( doc );
-                }
-                TLDocumentationItem docItem = new TLDocumentationItem();
-                docItem.setText( deprecation );
-                doc.addDeprecation( docItem );
-            }
-        }
-        return getDeprecation();
-    }
-
-    @Override
-    public String getDescription() {
-        if (getTL() instanceof TLDocumentationOwner) {
-            TLDocumentation doc = ((TLDocumentationOwner) getTL()).getDocumentation();
-            if (doc != null)
-                return doc.getDescription();
-        }
-        return "";
+        return docHandler.getDeprecation();
     }
 
     @Override
@@ -234,30 +202,13 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     }
 
     @Override
-    public String getExample() {
-        if (getTL() instanceof TLExampleOwner) {
-            List<TLExample> exs = ((TLExampleOwner) getTL()).getExamples();
-            if (exs != null && !exs.isEmpty())
-                return exs.get( 0 ).getValue();
-        }
-        return "";
+    public String getDescription() {
+        return docHandler.getDescription();
     }
 
     @Override
-    public String setExample(String value) {
-        if (getTL() instanceof TLExampleOwner) {
-            // Remove any existing examples
-            List<TLExample> examples = new ArrayList<>( ((TLExampleOwner) getTL()).getExamples() );
-            examples.forEach( ((TLExampleOwner) getTL())::removeExample );
-            // If value is not null and not empty
-            if (value != null && !value.isEmpty()) {
-                TLExample tlEx = new TLExample();
-                tlEx.setValue( value );
-                tlEx.setContext( EXAMPLE_CONTEXT );
-                ((TLExampleOwner) getTL()).addExample( tlEx );
-            }
-        }
-        return getExample();
+    public String getExample() {
+        return docHandler.getExample();
     }
 
     @Override
@@ -281,18 +232,25 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     }
 
     @Override
+    public OtmModelManager getModelManager() {
+        if (getOwningMember() != null)
+            return getOwningMember().getModelManager();
+        return null;
+    }
+
+    @Override
     public String getName() {
         return tlObject instanceof NamedEntity ? ((NamedEntity) tlObject).getLocalName() : NONAME;
     }
 
     @Override
-    public String getNameWithPrefix() {
-        return getPrefix() + ":" + getName();
+    public String getNamespace() {
+        return tlObject instanceof NamedEntity ? ((NamedEntity) tlObject).getNamespace() : NONAMESPACE;
     }
 
     @Override
-    public String getNamespace() {
-        return tlObject instanceof NamedEntity ? ((NamedEntity) tlObject).getNamespace() : NONAMESPACE;
+    public String getNameWithPrefix() {
+        return getPrefix() + ":" + getName();
     }
 
     // Should be overridden
@@ -334,8 +292,8 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     }
 
     @Override
-    public boolean isInherited() {
-        return false; // Override for classes that can be inherited (facets, properties)
+    public boolean isDeprecated() {
+        return docHandler.isDeprecated();
     }
 
     @Override
@@ -344,13 +302,18 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     }
 
     @Override
-    public void setExpanded(boolean flag) {
-        expanded = flag;
+    public boolean isExpanded() {
+        return expanded;
     }
 
     @Override
-    public boolean isExpanded() {
-        return expanded;
+    public boolean isInherited() {
+        return false; // Override for classes that can be inherited (facets, properties)
+    }
+
+    @Override
+    public boolean isRenameable() {
+        return true;
     }
 
     @Override
@@ -381,19 +344,17 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         return findings == null || findings.isEmpty();
     }
 
-    public static ValidationFindings isValid(TLModelElement tl) {
-        if (tl == null)
-            throw new IllegalStateException( "Tried to validation with null TL object." );
-        ValidationFindings sFindings = null;
-        boolean deep = false;
-        try {
-            sFindings = TLModelCompileValidator.validateModelElement( tl, deep );
-        } catch (Exception e) {
-            sFindings = null;
-            // log.debug( "Validation on " + tl.getValidationIdentity() + " threw error: " + e.getLocalizedMessage() );
-        }
-        // log.debug(sFindings != null ? sFindings.count() + " sFindings found" : " null" + " findings found.");
-        return sFindings;
+    @Override
+    public StringProperty nameEditingProperty() {
+        if (nameEditingProperty == null)
+            nameEditingProperty = setNameProperty( getName() );
+        return nameEditingProperty;
+    }
+
+    @Override
+    public StringProperty nameEditingProperty(String editableName) {
+        nameEditingProperty = setNameProperty( editableName );
+        return nameEditingProperty;
     }
 
     @Override
@@ -405,8 +366,7 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     @Override
     public void refresh() {
-        deprecationProperty = null;
-        descriptionProperty = null;
+        docHandler.refresh();
         findings = null;
         if (children != null)
             children.clear();
@@ -420,10 +380,30 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     }
 
     @Override
-    public StringProperty nameEditingProperty() {
-        if (nameEditingProperty == null)
-            nameEditingProperty = setNameProperty( getName() );
-        return nameEditingProperty;
+    public String setDeprecation(String deprecation) {
+        return docHandler.setDeprecation( deprecation );
+    }
+
+    @Override
+    public String setDescription(String description) {
+        return docHandler.setDescription( description );
+    }
+
+    @Override
+    public String setExample(String value) {
+        return docHandler.setExample( value );
+    }
+
+    @Override
+    public void setExpanded(boolean flag) {
+        expanded = flag;
+    }
+
+    @Override
+    public String setName(String name) {
+        // NO-OP unless overridden
+        // isValid(true);
+        return getName();
     }
 
     private StringProperty setNameProperty(String value) {
@@ -433,56 +413,6 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         else
             property = new ReadOnlyStringWrapper( value );
         return property;
-    }
-
-    @Override
-    public StringProperty nameEditingProperty(String editableName) {
-        nameEditingProperty = setNameProperty( editableName );
-        return nameEditingProperty;
-    }
-
-    @Override
-    public void clearNameProperty() {
-        nameProperty = null;
-        nameEditingProperty = null;
-    }
-
-    @Override
-    public int compareTo(OtmObject o) {
-        if (o == null || o.getName() == null)
-            return 1;
-        if (getName() == null)
-            return -1;
-        if (getName().equals( o.getName() ))
-            return getNamespace().compareTo( o.getNamespace() );
-        return getName().compareTo( o.getName() );
-    }
-
-    @Override
-    public boolean isRenameable() {
-        return true;
-    }
-
-    @Override
-    public void setDescription(String description) {
-        if (getTL() instanceof TLDocumentationOwner) {
-            TLDocumentation doc = ((TLDocumentationOwner) getTL()).getDocumentation();
-            if (doc == null) {
-                doc = new TLDocumentation();
-                ((TLDocumentationOwner) getTL()).setDocumentation( doc );
-            }
-            doc.setDescription( description );
-        }
-        // ModelEvents are only thrown when the documentation element changes.
-        if (descriptionProperty != null)
-            descriptionProperty.setValue( description );
-    }
-
-    @Override
-    public String setName(String name) {
-        // NO-OP unless overridden
-        // isValid(true);
-        return getName();
     }
 
     @Override

@@ -260,8 +260,8 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
     }
 
     @Override
-    public void setDescription(String description) {
-        getParent().setDescription( description );
+    public String setDescription(String description) {
+        return getParent().setDescription( description );
     }
 
     @Override

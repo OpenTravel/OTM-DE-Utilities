@@ -16,14 +16,11 @@
 
 package org.opentravel.model.otmProperties;
 
-import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.TLModelElement;
-
-import javafx.beans.property.StringProperty;
 
 /**
  * Abstract base class for all OTM properties.
@@ -35,7 +32,6 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
     implements OtmProperty {
 
     private OtmPropertyOwner parent;
-    private StringProperty exampleProperty;
 
     /**
      * Create a property. Set the TL model element it encapsulates. Add to owner.
@@ -61,13 +57,10 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
         setManditory( source.isManditory() );
     }
 
-    @Override
-    public StringProperty exampleProperty() {
-        if (exampleProperty == null && getActionManager() != null) {
-            exampleProperty = getActionManager().add( DexActions.EXAMPLECHANGE, getExample(), this );
-        }
-        return exampleProperty;
-    }
+    // @Override
+    // public StringProperty exampleProperty() {
+    // return super.exampleProperty();
+    // }
 
     @Override
     public String getNamespace() {
@@ -92,12 +85,6 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
     @Override
     public OtmPropertyType getPropertyType() {
         return OtmPropertyType.getType( this );
-    }
-
-    @Override
-    public void refresh() {
-        exampleProperty = null;
-        super.refresh();
     }
 
     @Override
