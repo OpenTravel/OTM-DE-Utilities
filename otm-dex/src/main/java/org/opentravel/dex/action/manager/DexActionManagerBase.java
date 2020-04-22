@@ -63,21 +63,9 @@ public abstract class DexActionManagerBase implements DexActionManager {
     // Controller for accessing GUI controls
     protected DexMainController mainController = null;
 
-    public DexMainController getMainController() {
-        return mainController;
-    }
-
-    /**
-     * Set the main controller used for pop-up warning dialogs and status
-     * 
-     * @param controller
-     */
-    public void setMainController(DexMainController mainController) {
-        this.mainController = mainController;
-    }
-
     // Queue for holding actions that were successful
     private final Deque<DexAction<?>> queue = new ArrayDeque<>();
+
     protected boolean ignore;
 
     /**
@@ -85,7 +73,11 @@ public abstract class DexActionManagerBase implements DexActionManager {
      */
     public DexActionManagerBase() {}
 
-
+    /**
+     * Action manager that can update status and display queue size and contents.
+     * 
+     * @param mainController for access to status and queue, can be null.
+     */
     public DexActionManagerBase(DexMainController mainController) {
         this.mainController = mainController;
     }
@@ -100,6 +92,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
             property = new ReadOnlyBooleanWrapper( currentValue );
         return property;
     }
+
 
     @Override
     public StringProperty add(DexActions action, String currentValue, OtmObject subject) {
@@ -148,13 +141,17 @@ public abstract class DexActionManagerBase implements DexActionManager {
     }
 
     @Override
+    public DexAction getLastAction() {
+        return queue.peek() != null ? queue.peek() : null;
+    }
+
+    @Override
     public String getLastActionName() {
         return queue.peek() != null ? queue.peek().getClass().getSimpleName() : "";
     }
 
-    @Override
-    public DexAction getLastAction() {
-        return queue.peek() != null ? queue.peek() : null;
+    public DexMainController getMainController() {
+        return mainController;
     }
 
     @Override
@@ -163,15 +160,15 @@ public abstract class DexActionManagerBase implements DexActionManager {
     }
 
     @Override
-    public void postWarning(String warning) {
-        if (mainController != null)
-            mainController.postError( null, warning );
-    }
-
-    @Override
     public void postStatus(String status) {
         if (mainController != null)
             mainController.postStatus( status );
+    }
+
+    @Override
+    public void postWarning(String warning) {
+        if (mainController != null)
+            mainController.postError( null, warning );
     }
 
     @Override
@@ -318,6 +315,15 @@ public abstract class DexActionManagerBase implements DexActionManager {
             log.warn( "Failed to set listener on " + action + " because: " + e.getLocalizedMessage() );
         }
         return null;
+    }
+
+    /**
+     * Set the main controller used for pop-up warning dialogs and status
+     * 
+     * @param controller
+     */
+    public void setMainController(DexMainController mainController) {
+        this.mainController = mainController;
     }
 
     @Override

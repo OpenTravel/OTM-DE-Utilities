@@ -23,7 +23,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
+import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
@@ -39,6 +41,7 @@ import org.opentravel.model.otmLibraryMembers.TestOtmSimple;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.model.otmProperties.TestElement;
 import org.opentravel.schemacompiler.model.TLLibrary;
+import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -47,6 +50,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleStringProperty;
 
 /**
  *
@@ -185,6 +191,51 @@ public class TestLibrary {
     // TODO - add usersMap test
 
     @Test
+    public void testGetActionManager() {
+
+    }
+
+    @Test
+    public void testRefresh() {
+        // assure resource gets refreshed and when done they name property is null
+        DexActionManager actionMgr = new DexFullActionManager( null );
+        OtmModelManager mgr = new OtmModelManager( actionMgr, null, null );
+        OtmLibrary lib = TestLibrary.buildOtm( mgr );
+        addOneOfEach( lib );
+        assertTrue( "Given", lib.isEditable() );
+
+        // Action manager is not used...library status is for isEditable()
+        for (OtmLibraryMember m : mgr.getMembers( lib )) {
+            assertTrue( "Given", m.isEditable() );
+            assertTrue( "Given", m.nameProperty() instanceof SimpleStringProperty );
+            // log.debug( "Member: " + m.getName() + " type = " + m.getObjectTypeName() );
+        }
+
+        // When - library is forced to be not editable
+        ((TLLibrary) lib.getTL()).setStatus( TLLibraryStatus.FINAL );
+        assertTrue( "Must be read only action manager.", lib.getActionManager() instanceof DexReadOnlyActionManager );
+        lib.refresh();
+        // Then
+        for (OtmLibraryMember m : mgr.getMembers( lib )) {
+            log.debug( "Read-only Member: " + m.getName() + " type = " + m.getObjectTypeName() );
+            assertTrue( "Given", !m.isEditable() );
+            assertTrue( "Given", m.getActionManager() instanceof DexReadOnlyActionManager );
+            assertTrue( "Refresh must change property class.", m.nameProperty() instanceof ReadOnlyStringWrapper );
+        }
+
+        // When - library is forced to be editable
+        ((TLLibrary) lib.getTL()).setStatus( TLLibraryStatus.DRAFT );
+        assertTrue( "Must be full action manager.", lib.getActionManager() instanceof DexFullActionManager );
+        lib.refresh();
+        // Then
+        for (OtmLibraryMember m : mgr.getMembers( lib )) {
+            assertTrue( "Given", m.isEditable() );
+            assertFalse( "Refresh must change property class.", m.nameProperty() instanceof ReadOnlyStringWrapper );
+            log.debug( "Editable Member: " + m.getName() + " type = " + m.getObjectTypeName() );
+        }
+    }
+
+    @Test
     public void testVersionFromNS() throws VersionSchemeException {
         List<String> namespaces = new ArrayList<>();
         namespaces.add( "http://example.com/foo/v0" );
@@ -194,7 +245,7 @@ public class TestLibrary {
         namespaces.add( "http://example.com/foo/v1_0_0" );
         namespaces.add( "http://example.com/foo/v1_0_2" );
 
-        OtmModelManager mgr = new OtmModelManager( null, null );
+        OtmModelManager mgr = new OtmModelManager( null, null, null );
         OtmLibrary lib = TestLibrary.buildOtm( mgr );
 
         for (String ns : namespaces) {

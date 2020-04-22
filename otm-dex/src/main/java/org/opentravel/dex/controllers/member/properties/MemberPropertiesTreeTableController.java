@@ -262,7 +262,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     }
 
     private void handleEvent(OtmObjectChangeEvent e) {
-        clear();
+        // clear();
         if (e.get() instanceof OtmLibraryMember)
             post( (OtmLibraryMember) e.get() );
         else

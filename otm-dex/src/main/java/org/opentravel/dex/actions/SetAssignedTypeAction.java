@@ -33,16 +33,20 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmProperties.OtmIdAttribute;
 import org.opentravel.model.resource.OtmActionFacet;
+import org.opentravel.schemacompiler.codegen.util.XsdCodegenUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
+
+import javax.xml.namespace.QName;
 
 public class SetAssignedTypeAction extends DexRunAction {
     private static Log log = LogFactory.getLog( SetAssignedTypeAction.class );
 
-    private static final String VETO1 = "org.opentravel.schemacompiler.TLProperty.name.ELEMENT_REF_NAME_MISMATCH";
+    // 4/22/2020 - veto1 is still valid, the name will have to change to get rid of warning
+    // private static final String VETO1 = "org.opentravel.schemacompiler.TLProperty.name.ELEMENT_REF_NAME_MISMATCH";
     private static final String VETO2 = ".OBSOLETE_TYPE_REFERENCE";
     private static final String VETO3 = ".ILLEGAL_REFERENCE";
-    private static final String[] VETOKEYS = {VETO1, VETO2, VETO3};
+    private static final String[] VETOKEYS = {VETO2, VETO3};
 
     public static boolean isEnabled(OtmObject subject) {
         // Id is a type user but can't be changed.
@@ -169,6 +173,12 @@ public class SetAssignedTypeAction extends DexRunAction {
             newProvider = (OtmTypeProvider) data;
             // Set value into model
             getSubject().setAssignedType( newProvider );
+            if (newProvider.isNameControlled()) {
+                // String newName = XsdCodegenUtils.getGlobalTypeName( (NamedEntity) newProvider.getTL() );
+                QName newQName = XsdCodegenUtils.getGlobalElementName( (NamedEntity) newProvider.getTL() );
+                if (newQName != null)
+                    getSubject().setName( newQName.getLocalPart() );
+            }
         }
         return get();
     }

@@ -487,6 +487,11 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return whereUsed;
     }
 
+    /**
+     * {@inheritDoc} Library members return the edit-ability of their library.
+     * 
+     * @see org.opentravel.model.OtmModelElement#isEditable()
+     */
     @Override
     public boolean isEditable() {
         return getLibrary() != null && getLibrary().isEditable();

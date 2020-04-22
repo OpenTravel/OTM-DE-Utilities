@@ -38,6 +38,11 @@ import java.lang.reflect.Method;
 public class DexFullActionManager extends DexActionManagerBase {
     private static Log log = LogFactory.getLog( DexFullActionManager.class );
 
+    /**
+     * Full editing action manager that can update status and display queue size and contents.
+     * 
+     * @param mainController for access to status and queue, can be null.
+     */
     public DexFullActionManager(DexMainController mainController) {
         super( mainController );
     }

@@ -26,17 +26,17 @@ import java.lang.reflect.InvocationTargetException;
 
 // TODO - contextual facets
 public enum OtmLibraryMemberType {
+    RESOURCE("Resource", OtmResource.class),
     BUSINESS("Business", OtmBusinessObject.class),
+    CUSTOM("Custom Facet", OtmCustomFacet.class),
+    QUERY("Query Facet", OtmQueryFacet.class),
     CHOICE("Choice", OtmChoiceObject.class),
+    CHOICEFACET("Choice Facet", OtmChoiceFacet.class),
     CORE("Core", OtmCore.class),
     VWA("Value With Attributes", OtmValueWithAttributes.class),
     SIMPLE("Simple", OtmSimpleObject.class),
     ENUMERATIONOPEN("Open Enumeration", OtmEnumerationOpen.class),
     ENUMERATIONCLOSED("Closed Enumeration", OtmEnumerationClosed.class),
-    RESOURCE("Resource", OtmResource.class),
-    CHOICEFACET("Choice Facet", OtmChoiceFacet.class),
-    CUSTOM("Custom Facet", OtmCustomFacet.class),
-    QUERY("Query Facet", OtmQueryFacet.class),
     EXTENSIONPOINTFACET("Extension Point", OtmExtensionPointFacet.class),
     SERVICE("Service", OtmServiceObject.class);
 
