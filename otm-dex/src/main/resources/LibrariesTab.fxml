@@ -14,8 +14,8 @@
                <fx:include fx:id="librariesTreeTable" source="LibrariesTreeTable.fxml" />
                <SplitPane orientation="HORIZONTAL" prefHeight="160.0" prefWidth="200.0">
                    <items>
-                   <fx:include fx:id="usersTree" source="libraryWhereUsedViews/LWU_UsersTree.fxml" />
-                   <fx:include fx:id="providersTree" source="libraryWhereUsedViews/LWU_ProvidersTree.fxml" />
+                   <fx:include fx:id="usersTree" source="LibraryWhereUsedViews/LWU_UsersTree.fxml" />
+                   <fx:include fx:id="providersTree" source="LibraryWhereUsedViews/LWU_ProvidersTree.fxml" />
               </items>
             </SplitPane>
            </items>

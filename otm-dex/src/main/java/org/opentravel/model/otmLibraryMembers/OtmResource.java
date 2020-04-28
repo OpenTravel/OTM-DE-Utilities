@@ -825,6 +825,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      */
     @Override
     public void refresh() {
+        super.refresh();
         refresh( false );
     }
 

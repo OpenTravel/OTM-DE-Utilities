@@ -221,7 +221,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     /**
      * Get Read-only, Minor or Full action manager. To determine which manager to return, consider
      * <ul>
-     * <li>managed or unmanaged - when unmanaged always return the full action manager from model manager
+     * <li>managed or unmanaged - when unmanaged, use isEditable() to return the action manager from model manager
      * <li>library version
      * <li>library status
      * <li>if the member is new to the chain and editable library
@@ -232,7 +232,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
      */
     public DexActionManager getActionManager(OtmLibraryMember member) {
         if (isUnmanaged())
-            return getModelManager().getActionManager( true );
+            return getModelManager().getActionManager( isEditable() );
         if (isMajorVersion() && isEditable())
             return getModelManager().getActionManager( true );
         if (isChainEditable()) {
@@ -482,10 +482,12 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     /**
-     * A library is editable if any associated project item state is Managed_WIP -OR- unmanaged. Regardless of action
-     * manager.
+     * A library is editable regardless of action manager.
      * 
-     * @return
+     * @return false if TLLibraryStatus is not DRAFT. Else, return true if any associated project item state is
+     *         Managed_WIP -OR- unmanaged.
+     * 
+     * 
      */
     public boolean isEditable() {
         // log.debug( getName() + " State = " + getState().toString() + " Status = " + getStatus() );
