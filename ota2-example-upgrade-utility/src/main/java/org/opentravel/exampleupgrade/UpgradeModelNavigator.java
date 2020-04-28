@@ -17,7 +17,7 @@
 package org.opentravel.exampleupgrade;
 
 import org.opentravel.schemacompiler.codegen.example.ExampleGeneratorOptions;
-import org.opentravel.schemacompiler.codegen.example.ExtensionPointRegistry;
+import org.opentravel.schemacompiler.codegen.util.ExtensionPointRegistry;
 import org.opentravel.schemacompiler.codegen.util.FacetCodegenUtils;
 import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
 import org.opentravel.schemacompiler.codegen.util.ResourceCodegenUtils;
@@ -248,7 +248,7 @@ public class UpgradeModelNavigator extends AbstractNavigator<NamedEntity> {
      */
     private void navigateFacetMembers(TLFacet facet) {
         Map<TLFacetType,List<TLExtensionPointFacet>> facetExtensionsByType =
-            extensionPointRegistry.getExtensionPoints( facet );
+            extensionPointRegistry.getAllExtensionPoints( facet );
         Set<TLFacetType> processedExtensionPointTypes = new HashSet<>();
         String previousFacetIdentity = null;
 
