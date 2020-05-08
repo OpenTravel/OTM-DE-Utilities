@@ -26,14 +26,13 @@ import org.junit.Test;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.model.resource.OtmParameterGroup;
-import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -41,7 +40,7 @@ import java.util.List;
 /**
  * Verifies the functions of the <code>UserSettings</code> class.
  */
-public class TestResourceActions {
+public class TestAssignResourceSubjectAction {
     private static Log log = LogFactory.getLog( TestDexActionManager.class );
 
     private static OtmModelManager staticModelManager = null;
@@ -52,13 +51,12 @@ public class TestResourceActions {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
-        lib = staticModelManager.add( new TLLibrary() );
+        lib = TestLibrary.buildOtm();
+        staticModelManager = lib.getModelManager();
+        actionMgr = lib.getActionManager();
         assertTrue( lib.isEditable() );
-        assertTrue( lib.getActionManager() instanceof DexFullActionManager );
-
-        actionMgr = staticModelManager.getActionManager( true );
-        assertNotNull( actionMgr );
+        assertTrue( actionMgr instanceof DexFullActionManager );
+        assertNotNull( staticModelManager );
 
         resource = TestResource.buildFullOtm( "TheObject", "theSubject", staticModelManager );
         lib.add( resource );
@@ -73,32 +71,33 @@ public class TestResourceActions {
     }
 
     @Test
-    public void testConstructors() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
+    public void testGetAction() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
 
         DexAction<?> action = DexActions.getAction( DexActions.ASSIGNSUBJECT, resource, resource.getActionManager() );
         assertNotNull( action );
+        assertTrue( action instanceof AssignResourceSubjectAction );
 
         log.debug( "Done." );
     }
 
     @Test
-    public void testAssignSubjectAction()
-        throws ExceptionInInitializerError, InstantiationException, IllegalAccessException, NoSuchMethodException,
-        SecurityException, IllegalArgumentException, InvocationTargetException {
+    public void testDoAndUndo() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
+        NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
 
         OtmBusinessObject otherBO = TestBusiness.buildOtm( staticModelManager, "OtherBO" );
         OtmBusinessObject originalSubject = resource.getSubject();
         // Given - the original set of parameter groups
         List<OtmParameterGroup> groups = resource.getParameterGroups();
-        assertTrue( "Given:", !groups.isEmpty() );
+        assertTrue( "Given", !groups.isEmpty() );
 
-        // When - action is done with subject. Action removes parameter groups as well.
+        // When - action is done with subject.
         actionMgr.run( DexActions.ASSIGNSUBJECT, resource, otherBO );
         assertTrue( resource.getSubject() == otherBO );
-        for (OtmObject child : resource.getChildren())
-            assertTrue( "Must not have parameter group child.", !(child instanceof OtmParameterGroup) );
-        assertTrue( "Must not have parameter groups.", resource.getParameterGroups().isEmpty() );
-        assertTrue( "Must not have TL parameter groups.", resource.getTL().getParamGroups().isEmpty() );
+        // Action used to remove parameter groups as well.
+        // for (OtmObject child : resource.getChildren())
+        // assertTrue( "Must not have parameter group child.", !(child instanceof OtmParameterGroup) );
+        // assertTrue( "Must not have parameter groups.", resource.getParameterGroups().isEmpty() );
+        // assertTrue( "Must not have TL parameter groups.", resource.getTL().getParamGroups().isEmpty() );
 
         actionMgr.undo();
         assertTrue( resource.getSubject() == originalSubject );

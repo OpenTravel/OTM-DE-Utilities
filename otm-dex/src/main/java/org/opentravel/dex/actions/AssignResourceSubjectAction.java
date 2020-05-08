@@ -159,11 +159,14 @@ public class AssignResourceSubjectAction extends DexRunAction {
             // Parameter group reference facets
             // Fix those that can be and delete the rest. Save originals for undo. Warn user.
             // log.debug( "Fix these: " + toBeFixed );
-            postWarning( "Changing the subject required deleting: " + toBeFixed
-                + " \nYou can undo the action or create new parameter groups to have new reference facets. \nAny parameters and action requests using the parameters will also have to be fixed." );
-            for (OtmResourceChild rc : toBeFixed) {
-                resource.delete( rc );
-            }
+            // postWarning( "Changing the subject required deleting: " + toBeFixed
+            // + " \nYou can undo the action or create new parameter groups to have new reference facets. \nAny
+            // parameters and action requests using the parameters will also have to be fixed." );
+            // for (OtmResourceChild rc : toBeFixed) {
+            // resource.delete( rc );
+            // }
+            postWarning( "Changing the subject invalidated: " + toBeFixed
+                + " \nYou can undo the action or correct parameter groups to have new reference facets. \nAny parameters and action requests using the parameters will also have to be fixed." );
             // TODO - try to make corrections and save for undo
             // if (rc instanceof OtmParameterGroup) {
             // OtmObject r = ((OtmParameterGroup) rc).setReferenceFacetMatching( null );

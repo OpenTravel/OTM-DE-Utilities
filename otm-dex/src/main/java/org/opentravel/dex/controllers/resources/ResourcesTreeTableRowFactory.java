@@ -63,6 +63,7 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
     private MenuItem deleteItem = null;
     private MenuItem addResource = null;
     private MenuItem validateResource = null;
+    private MenuItem refreshItem = null;
 
     private DexIncludedController<?> controller;
 
@@ -104,6 +105,8 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         // validate
         resourceMenu.getItems().add( new SeparatorMenuItem() );
         validateResource = addItem( "Validate", e -> validateResource() );
+        //
+        refreshItem = addItem( "Refresh", e -> refresh( null ) );
 
         // Add the menu to the factory
         setContextMenu( resourceMenu );
@@ -167,10 +170,7 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         if (obj instanceof OtmResource)
             obj.getActionManager().run( DexActions.DELETELIBRARYMEMBER, (OtmResource) obj );
         else if (obj instanceof OtmResourceChild)
-            parent = obj.getActionManager().run( DexActions.DELETERESOURCECHILD, obj );
-        // // Update display
-        // if (parent instanceof OtmObject)
-        // super.updateTreeItem( getTreeItem().getParent() ); // needed to apply stylesheet to new item
+            obj.getActionManager().run( DexActions.DELETERESOURCECHILD, obj );
     }
 
     private Object addChild(TLModelElement tlChild) {
@@ -209,8 +209,8 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
             TreeItem<ResourcesDAO> item =
                 new ResourcesDAO( (OtmObject) newObject ).createTreeItem( getTreeItem().getParent() );
             super.updateTreeItem( item ); // needed to apply stylesheet to new item
-        }
-
+        } else
+            controller.refresh();
     }
 
     /**

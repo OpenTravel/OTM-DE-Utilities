@@ -208,9 +208,9 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
             else if (contains( inheritedChildren, child ))
                 return null;
 
-            if (!child.isInherited())
+            if (!child.isInherited()) {
                 children.add( child );
-            else
+            } else
                 inheritedChildren.add( child );
             return (OtmResourceChild) child;
         }

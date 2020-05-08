@@ -47,4 +47,5 @@ public interface OtmResourceChild extends OtmObject {
      * @return resource or resourceChild parent
      */
     public OtmObject getParent();
+
 }

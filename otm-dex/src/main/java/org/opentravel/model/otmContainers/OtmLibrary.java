@@ -124,6 +124,8 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
                 // Sanity check
                 if (member.getTlLM().getOwningLibrary() != getTL())
                     log.warn( "Member does not have correct owning library." );
+                if (member.getLibrary() != this)
+                    log.warn( "Newly added member does not have correct library." );
                 return member;
             } catch (IllegalArgumentException e) {
                 log.warn( "Exception: " + e.getLocalizedMessage() );

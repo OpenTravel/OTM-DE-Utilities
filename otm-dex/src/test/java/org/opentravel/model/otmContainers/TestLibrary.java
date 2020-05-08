@@ -33,15 +33,18 @@ import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestCore;
 import org.opentravel.model.otmLibraryMembers.TestLibraryMemberBase;
 import org.opentravel.model.otmLibraryMembers.TestOtmSimple;
+import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.model.otmProperties.TestElement;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
+import org.opentravel.schemacompiler.repository.RepositoryItemState;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -124,7 +127,12 @@ public class TestLibrary {
             // When added
             lib.add( member );
             // Then - add works
-            // assertTrue(lib.contains( member ));
+            if (type != OtmLibraryMemberType.EXTENSIONPOINTFACET) {
+                // FIXME - why not extension points?
+                assertTrue( lib.contains( member ) );
+                assertTrue( member.getLibrary() == lib );
+            }
+
             assertTrue( mgr.contains( member.getTlLM() ) );
             assertTrue( mgr.getMembers().contains( member ) );
             assertTrue( lib.getTL().getNamedMembers().contains( member.getTL() ) );
@@ -135,8 +143,41 @@ public class TestLibrary {
             assertFalse( mgr.getMembers().contains( member ) );
             assertFalse( lib.getTL().getNamedMembers().contains( member.getTL() ) );
 
-            // log.debug( "Added and removed: " + member );
+            log.debug( "Added and removed: " + member );
         }
+    }
+
+    @Test
+    public void testResourceTestBuilders() {
+        // Given - action and model managers
+        DexFullActionManager fullMgr = new DexFullActionManager( null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
+        // Given - a subject library that uses types, base types, contextual facets
+        OtmLibrary lib = TestLibrary.buildOtm( mgr, "NamespaceS1", "s1", "LibraryS1" );
+        String pathString = "http://example.com/test";
+        String subjectName = "TestResource";
+
+        OtmResource r = null;
+        // todo r = TestResource.buildBaseOtm( resource, mgr );
+
+        r = TestResource.buildOtm( mgr );
+        OtmLibraryMember result = lib.add( r );
+        assertTrue( result == r );
+        assertTrue( lib.contains( r ) );
+        assertTrue( r.getLibrary() == lib );
+        lib.delete( r );
+
+        r = TestResource.buildFullOtm( pathString, subjectName + "b", mgr );
+        result = lib.add( r );
+        assertTrue( result == r );
+        assertTrue( lib.contains( r ) );
+        assertTrue( r.getLibrary() == lib );
+        lib.delete( r );
+
+        r = TestResource.buildFullOtm( pathString, subjectName + "c", lib, mgr );
+        assertTrue( lib.contains( r ) );
+        assertTrue( r.getLibrary() == lib );
+
     }
 
     @Test
@@ -264,7 +305,23 @@ public class TestLibrary {
     /** ****************************************************** **/
 
     /**
+     * Create new ModelManager and Full Action Manager. Then create a TL_library and OtmLibrary named "LibraryName" in
+     * example.com namespace.
+     * <p>
+     * Assure library is: editable, DRAFT, MANAGED_WIP or UNMANAGED, and manager can find it
+     * 
+     * @param mgr
+     * @return
+     */
+    public static OtmLibrary buildOtm() {
+        OtmLibrary lib = TestLibrary.buildOtm( new OtmModelManager( new DexFullActionManager( null ), null, null ) );
+        return lib;
+    }
+
+    /**
      * Create a TL_library and OtmLibrary named "LibraryName" in example.com namespace
+     * <p>
+     * Assure library is: editable, DRAFT, MANAGED_WIP or UNMANAGED, and manager can find it
      * 
      * @param mgr
      * @return
@@ -274,7 +331,13 @@ public class TestLibrary {
         tlLib.setName( "LibraryName" );
         tlLib.setPrefix( "pre" );
         tlLib.setNamespace( "http://example.com/ns/v0" );
-        return mgr.add( tlLib );
+        OtmLibrary lib = mgr.add( tlLib );
+        assertTrue( "Given", lib.isEditable() );
+        assertTrue( "Given - model manager must be able to find the library.", mgr.get( lib.getTL() ) == lib );
+        assertTrue( "Given", lib.getStatus() == TLLibraryStatus.DRAFT );
+        assertTrue( "Given",
+            lib.getState() == RepositoryItemState.MANAGED_WIP || lib.getState() == RepositoryItemState.UNMANAGED );
+        return lib;
     }
 
     public static OtmLibrary buildOtm(OtmModelManager mgr, String namespace, String prefix, String name) {
