@@ -106,6 +106,7 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         resourceMenu.getItems().add( new SeparatorMenuItem() );
         validateResource = addItem( "Validate", e -> validateResource() );
         //
+        resourceMenu.getItems().add( new SeparatorMenuItem() );
         refreshItem = addItem( "Refresh", e -> refresh( null ) );
 
         // Add the menu to the factory

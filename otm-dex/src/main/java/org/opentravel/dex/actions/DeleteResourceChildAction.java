@@ -61,10 +61,15 @@ public class DeleteResourceChildAction extends DexRunAction {
                 ((OtmParameterGroup) parent).delete( otm );
             else if (parent instanceof OtmAction && otm instanceof OtmActionResponse)
                 ((OtmAction) parent).delete( otm );
-
-            // // Record action to allow undo. Will validate results and warn user.
-            // otm.getActionManager().push( this );
         }
+        // Sanity Check
+        // if (otm instanceof TLParamGroup) {
+        // assertTrue( "child TL must have owner", ((TLParamGroup) child.getTL()).getOwner() == tlOwner );
+        // } else if (otm instanceof TLActionFacet) {
+        // assertTrue( "child TL must have owner", ((TLActionFacet) child.getTL()).getOwningResource() == tlOwner );
+        // } else if (otm instanceof TLAction) {
+        // assertTrue( "child TL must have owner", ((TLAction) child.getTL()).getOwner() == tlOwner );
+        // }
         return parent;
     }
 
@@ -83,7 +88,8 @@ public class DeleteResourceChildAction extends DexRunAction {
         if (otm instanceof OtmResourceChild) {
             OtmObject parent = ((OtmResourceChild) otm).getParent();
             if (parent instanceof OtmResource)
-                ((OtmResource) parent).add( (OtmResourceChild) otm );
+                ((OtmResource) parent).add( otm.getTL() );
+            // ((OtmResource) parent).add( (OtmResourceChild) otm );
             else if (parent instanceof OtmParameterGroup && otm instanceof OtmParameter)
                 ((OtmParameterGroup) parent).add( (OtmParameter) otm );
             else if (parent instanceof OtmAction && otm instanceof OtmActionResponse)

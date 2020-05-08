@@ -226,12 +226,15 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      * @return
      */
     public OtmAction add(TLAction tlAction) {
-        OtmAction action = null;
+        OtmAction action = (OtmAction) OtmModelElement.get( tlAction );;
         if (tlAction != null && !getTL().getActions().contains( tlAction )) {
             getTL().addAction( tlAction );
             if (tlAction.getRequest() == null)
                 tlAction.setRequest( new TLActionRequest() );
-            action = new OtmAction( tlAction, this );
+            if (action == null)
+                action = new OtmAction( tlAction, this );
+            else
+                add( action );
             // log.debug( "Added action to " + this );
             refresh( true );
         }
@@ -245,10 +248,13 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      * @return
      */
     public OtmActionFacet add(TLActionFacet tlAction) {
-        OtmActionFacet action = null;
+        OtmActionFacet action = (OtmActionFacet) OtmModelElement.get( tlAction );
         if (tlAction != null && !getTL().getActionFacets().contains( tlAction )) {
             getTL().addActionFacet( tlAction );
-            action = new OtmActionFacet( tlAction, this );
+            if (action == null)
+                action = new OtmActionFacet( tlAction, this );
+            else
+                add( action );
             // log.debug( "Added action facet to " + this );
             refresh( true );
         }
@@ -256,7 +262,14 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     public OtmResourceChild add(TLModelElement tlChild) {
-        // log.debug( "Add " + tlChild.getClass().getSimpleName() + " to " + this + " not supported yet." );
+        if (tlChild instanceof TLAction)
+            add( (TLAction) tlChild );
+        else if (tlChild instanceof TLActionFacet)
+            add( (TLActionFacet) tlChild );
+        else if (tlChild instanceof TLParamGroup)
+            add( (TLParamGroup) tlChild );
+        else
+            log.warn( "Tried to add unsupported toChild " + tlChild.getClass().getSimpleName() + " to " + this );
         return null; // Not supported (yet).
     }
 
@@ -267,10 +280,13 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      * @return
      */
     public OtmParameterGroup add(TLParamGroup tlGroup) {
-        OtmParameterGroup group = null;
+        OtmParameterGroup group = (OtmParameterGroup) OtmModelElement.get( tlGroup );;
         if (tlGroup != null && !getTL().getParamGroups().contains( tlGroup )) {
             getTL().addParamGroup( tlGroup );
-            group = new OtmParameterGroup( tlGroup, this );
+            if (group == null)
+                group = new OtmParameterGroup( tlGroup, this );
+            else
+                add( group );
             // log.debug( "Added parameter group to " + this );
             refresh( true );
         }

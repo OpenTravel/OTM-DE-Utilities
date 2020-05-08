@@ -33,7 +33,11 @@ import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestResource;
+import org.opentravel.schemacompiler.model.TLAction;
+import org.opentravel.schemacompiler.model.TLActionFacet;
 import org.opentravel.schemacompiler.model.TLLibrary;
+import org.opentravel.schemacompiler.model.TLParamGroup;
+import org.opentravel.schemacompiler.model.TLResource;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,7 +77,22 @@ public class TestDeleteResourceChildAction {
 
 
     @Test
-    public void testDoIt() {
+    public void testDoAndUndoOnParamGroupChildren() {
+        // TODO
+    }
+
+    @Test
+    public void testDoAndUndoOnParentRefChildren() {
+        // TODO
+    }
+
+    @Test
+    public void testDoAndUndoOnActionChildren() {
+        // TODO
+    }
+
+    @Test
+    public void testDoAndUndoOnResourceChildren() {
         // Givens
         OtmLibrary lib = TestLibrary.buildOtm( new OtmModelManager( new DexFullActionManager( null ), null, null ) );
         OtmModelManager mgr = lib.getModelManager();
@@ -101,13 +120,29 @@ public class TestDeleteResourceChildAction {
             DexAction<?> lastAction = actionManager.getLastAction();
             assertTrue( "Action must be in queue.", actionManager.getQueueSize() == 1 );
             assertTrue( "Action must be in queue.", lastAction instanceof DeleteResourceChildAction );
+            checkOwner( (OtmResourceChild) child, null );
 
             // When un-done
             actionManager.undo();
             assertTrue( "Undo must add child to resource.", resource.getChildren().contains( child ) );
             assertTrue( ((OtmResourceChild) child).getParent() == resource );
+            checkOwner( (OtmResourceChild) child, resource.getTL() );
         }
     }
 
-
+    public void checkOwner(OtmResourceChild child, TLResource tlOwner) {
+        if (child.getTL() instanceof TLParamGroup) {
+            assertTrue( "child TL must have owner", ((TLParamGroup) child.getTL()).getOwner() == tlOwner );
+            if (tlOwner != null)
+                assertTrue( "Owner must have child.", tlOwner.getParamGroups().contains( child.getTL() ) );
+        } else if (child.getTL() instanceof TLActionFacet) {
+            assertTrue( "child TL must have owner", ((TLActionFacet) child.getTL()).getOwningResource() == tlOwner );
+            if (tlOwner != null)
+                assertTrue( "Owner must have child.", tlOwner.getActionFacets().contains( child.getTL() ) );
+        } else if (child.getTL() instanceof TLAction) {
+            assertTrue( "child TL must have owner", ((TLAction) child.getTL()).getOwner() == tlOwner );
+            if (tlOwner != null)
+                assertTrue( "Owner must have child.", tlOwner.getActions().contains( child.getTL() ) );
+        }
+    }
 }
