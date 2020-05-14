@@ -19,11 +19,7 @@ package org.opentravel.dex.actions;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
-import org.opentravel.schemacompiler.model.TLAction;
-import org.opentravel.schemacompiler.model.TLActionFacet;
 import org.opentravel.schemacompiler.model.TLModelElement;
-import org.opentravel.schemacompiler.model.TLParamGroup;
-import org.opentravel.schemacompiler.model.TLResourceParentRef;
 
 /**
  * Actions that add a resource child to a resource.
@@ -61,15 +57,15 @@ public class AddResourceChildAction extends DexRunAction {
 
     public OtmResourceChild doIt(OtmResource resource, TLModelElement tlChild) {
         if (resource != null && tlChild != null) {
-            // newChild = resource.add( tlChild );
-            if (tlChild instanceof TLResourceParentRef)
-                newChild = resource.add( (TLResourceParentRef) tlChild, null );
-            else if (tlChild instanceof TLParamGroup)
-                newChild = resource.add( (TLParamGroup) tlChild );
-            else if (tlChild instanceof TLAction)
-                newChild = resource.add( (TLAction) tlChild );
-            else if (tlChild instanceof TLActionFacet)
-                newChild = resource.add( (TLActionFacet) tlChild );
+            newChild = resource.add( tlChild );
+            // if (tlChild instanceof TLResourceParentRef)
+            // newChild = resource.add( (TLResourceParentRef) tlChild, null );
+            // else if (tlChild instanceof TLParamGroup)
+            // newChild = resource.add( (TLParamGroup) tlChild );
+            // else if (tlChild instanceof TLAction)
+            // newChild = resource.add( (TLAction) tlChild );
+            // else if (tlChild instanceof TLActionFacet)
+            // newChild = resource.add( (TLActionFacet) tlChild );
             resource.setExpanded( true );
             newChild.setExpanded( true );
         }

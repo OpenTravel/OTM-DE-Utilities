@@ -38,6 +38,7 @@ public interface DexTask {
      * <p>
      * This method implements the actual task written as if it was going to run in the GUI thread. On error
      * implementations must throw an exception containing the string description to be shown to the user.
+     * 
      */
     public abstract void doIT() throws Exception;
 

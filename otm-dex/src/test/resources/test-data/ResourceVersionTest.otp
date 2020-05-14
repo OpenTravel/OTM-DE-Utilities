@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<otp:Project xmlns="http://www.w3.org/2001/XMLSchema" xmlns:otp="http://www.OpenTravel.org/ns/OTA2/Project_v01_00">
+    <otp:projectId>ResourceVersionTest</otp:projectId>
+    <otp:name>ResourceVersionTest</otp:name>
+    <otp:description>Resource Version Test</otp:description>
+    <otp:defaultContextId>ResourceVersionTest</otp:defaultContextId>
+    <otp:ManagedProjectItem defaultItem="true">
+        <otp:Repository>Opentravel</otp:Repository>
+        <otp:BaseNamespace>http://www.opentravel.org/Sandbox/Test</otp:BaseNamespace>
+        <otp:Filename>ResourceVersions_1_0_0.otm</otp:Filename>
+        <otp:Version>1.0.0</otp:Version>
+    </otp:ManagedProjectItem>
+    <otp:RepositoryReferences>
+        <otp:RepositoryRef repositoryId="Opentravel">http://opentravelmodel.net</otp:RepositoryRef>
+    </otp:RepositoryReferences>
+</otp:Project>

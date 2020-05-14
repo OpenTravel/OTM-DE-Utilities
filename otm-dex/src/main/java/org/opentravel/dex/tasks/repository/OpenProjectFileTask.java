@@ -22,6 +22,7 @@ import org.opentravel.common.DexFileHandler;
 import org.opentravel.common.OpenProjectProgressMonitor;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTaskBase;
+import org.opentravel.dex.tasks.DexTaskException;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.OtmModelManager;
 
@@ -62,12 +63,12 @@ public class OpenProjectFileTask extends DexTaskBase<File> {
 
     // Make sure only one thread is opening project at a time to prevent concurrency errors
     @Override
-    public synchronized void doIT() {
+    public synchronized void doIT() throws DexTaskException {
         // log.debug( "Opening " + taskData.getName() );
         DexFileHandler fileHandler = new DexFileHandler();
         boolean result = fileHandler.openProject( taskData, modelMgr, new OpenProjectProgressMonitor( status ) );
         if (!result) // get string from file handler
-            throw new IllegalStateException( fileHandler.getErrorMessage() );
+            throw new DexTaskException( fileHandler.getErrorMessage() );
     }
 
 }

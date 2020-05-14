@@ -3,7 +3,7 @@
     <otp:projectId>http://www.opentravel.org/Sandbox</otp:projectId>
     <otp:name>TestProject2v</otp:name>
     <otp:description></otp:description>
-    <otp:ManagedProjectItem>
+    <otp:ManagedProjectItem defaultItem="true">
         <otp:Repository>Opentravel</otp:Repository>
         <otp:BaseNamespace>http://www.opentravel.org/Sandbox</otp:BaseNamespace>
         <otp:Filename>VersionTest_0_1_0.otm</otp:Filename>

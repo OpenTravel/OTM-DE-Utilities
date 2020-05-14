@@ -54,6 +54,7 @@ import org.opentravel.schemacompiler.model.TLResource;
 import org.opentravel.schemacompiler.model.TLResourceParentRef;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -225,7 +226,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      * @param tlGroup
      * @return
      */
-    public OtmAction add(TLAction tlAction) {
+    private OtmAction add(TLAction tlAction) {
         OtmAction action = (OtmAction) OtmModelElement.get( tlAction );;
         if (tlAction != null && !getTL().getActions().contains( tlAction )) {
             getTL().addAction( tlAction );
@@ -247,7 +248,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      * @param tlGroup
      * @return
      */
-    public OtmActionFacet add(TLActionFacet tlAction) {
+    private OtmActionFacet add(TLActionFacet tlAction) {
         OtmActionFacet action = (OtmActionFacet) OtmModelElement.get( tlAction );
         if (tlAction != null && !getTL().getActionFacets().contains( tlAction )) {
             getTL().addActionFacet( tlAction );
@@ -262,15 +263,18 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     public OtmResourceChild add(TLModelElement tlChild) {
+        OtmResourceChild newChild = null;
         if (tlChild instanceof TLAction)
-            add( (TLAction) tlChild );
+            newChild = add( (TLAction) tlChild );
         else if (tlChild instanceof TLActionFacet)
-            add( (TLActionFacet) tlChild );
+            newChild = add( (TLActionFacet) tlChild );
         else if (tlChild instanceof TLParamGroup)
-            add( (TLParamGroup) tlChild );
+            newChild = add( (TLParamGroup) tlChild );
+        else if (tlChild instanceof TLResourceParentRef)
+            newChild = add( (TLResourceParentRef) tlChild, null );
         else
             log.warn( "Tried to add unsupported toChild " + tlChild.getClass().getSimpleName() + " to " + this );
-        return null; // Not supported (yet).
+        return newChild;
     }
 
     /**
@@ -279,7 +283,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      * @param tlGroup
      * @return
      */
-    public OtmParameterGroup add(TLParamGroup tlGroup) {
+    private OtmParameterGroup add(TLParamGroup tlGroup) {
         OtmParameterGroup group = (OtmParameterGroup) OtmModelElement.get( tlGroup );;
         if (tlGroup != null && !getTL().getParamGroups().contains( tlGroup )) {
             getTL().addParamGroup( tlGroup );
@@ -293,16 +297,16 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return group;
     }
 
-    /**
-     * Add theTL parent reference to TL and Otm resource, set its path and parent if present
-     * 
-     * @param parent the parent resource to reference (not owner)
-     * @return
-     */
-    public OtmParentRef add(TLResourceParentRef tlParentRef) {
-        return add( tlParentRef, null );
-        // TODO - unused
-    }
+    // /**
+    // * Add theTL parent reference to TL and Otm resource, set its path and parent if present
+    // *
+    // * @param parent the parent resource to reference (not owner)
+    // * @return
+    // */
+    // public OtmParentRef add(TLResourceParentRef tlParentRef) {
+    // return add( tlParentRef, null );
+    // // TODO - unused
+    // }
 
     /**
      * Create a parentRef and set its path template.
@@ -338,18 +342,19 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return parentRef;
     }
 
-    /**
-     * Add the passed group to the TL resource, child list and set group's parent.
-     * 
-     * @param group
-     */
-    public void addParameterGroup(OtmParameterGroup group) {
-        if (group != null) {
-            getTL().addParamGroup( group.getTL() );
-            add( group ); // Add to children list
-            group.setParent( this );
-        }
-    }
+    // /**
+    // * Add the passed group to the TL resource, child list and set group's parent.
+    // *
+    // * @param group
+    // */
+    // @Deprecated
+    // public void addParameterGroup(OtmParameterGroup group) {
+    // if (group != null) {
+    // getTL().addParamGroup( group.getTL() );
+    // add( group ); // Add to children list
+    // group.setParent( this );
+    // }
+    // }
 
     /** ************************************** */
     /**
@@ -394,20 +399,20 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
 
-    /**
-     * Create a TL parent reference, set its path and parent if present, add to TL and Otm resource
-     * <p>
-     * 
-     * @deprecated - pass a null TL to add(TL, Parent)
-     * 
-     * @param parent the parent resource to reference (not owner)
-     * @return
-     */
-    @Deprecated
-    public OtmParentRef createParentRef(OtmResource parent) {
-        return add( new TLResourceParentRef(), parent );
-        // TODO - only used in tests
-    }
+    // /**
+    // * Create a TL parent reference, set its path and parent if present, add to TL and Otm resource
+    // * <p>
+    // *
+    // * @deprecated - use {@link TestParentRef#buildOtm(OtmResource, OtmResource)}
+    // *
+    // * @param parent the parent resource to reference (not owner)
+    // * @return
+    // */
+    // @Deprecated
+    // public OtmParentRef createParentRef(OtmResource parent) {
+    // return add( new TLResourceParentRef(), parent );
+    // // TODO - only used in tests
+    // }
 
     /**
      * Get the list of action facets from the TL object and return their OtmActionFacet facades.
@@ -758,9 +763,11 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      */
     public List<OtmObject> getSubjectFacets() {
         List<OtmObject> facets = null;
+        Collection<OtmObject> candidates = getSubject().getChildren();
+        candidates.addAll( getSubject().getInheritedChildren() );
         if (getSubject() != null) {
             facets = new ArrayList<>();
-            for (OtmObject object : getSubject().getChildren()) {
+            for (OtmObject object : candidates) {
                 if (object instanceof OtmFacet) {
                     if (object instanceof OtmContributedFacet)
                         object = ((OtmContributedFacet) object).getContributor();

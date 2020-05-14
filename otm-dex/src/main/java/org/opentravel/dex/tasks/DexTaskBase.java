@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 
+import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
@@ -42,6 +43,7 @@ public abstract class DexTaskBase<T> extends Task<String> implements DexTask {
     private StringBuilder errorBuilder = null;
     protected StringBuilder msgBuilder = null;
     private DexStatusController statusController = null;
+    protected DialogBoxContoller dbc = null;
 
     private Exception errorException = null;
 
@@ -118,6 +120,8 @@ public abstract class DexTaskBase<T> extends Task<String> implements DexTask {
         if (statusController != null)
             statusController.start( this );
         Thread lt = new Thread( this );
+        if (Platform.isFxApplicationThread())
+            dbc = DialogBoxContoller.init(); // Prepare a dialog box if task needs it
         lt.setDaemon( true );
         lt.start();
     }
@@ -146,10 +150,10 @@ public abstract class DexTaskBase<T> extends Task<String> implements DexTask {
                 errorBuilder.append( e.getLocalizedMessage() );
                 result = errorBuilder.toString(); // Signal business error via result
                 updateMessage( errorBuilder.toString() );
+                // dbc.close();
                 failed();
                 log.warn( errorBuilder.toString() );
             }
-
         updateProgress( progressMax, progressMax );
         // log.debug(" Task done. ");
         return result;
@@ -178,7 +182,9 @@ public abstract class DexTaskBase<T> extends Task<String> implements DexTask {
         updateMessage( "Failed!" );
         if (statusController != null)
             statusController.finish( this );
-        DialogBoxContoller dbc = DialogBoxContoller.init();
+        // TEST - use global dbc
+        if (dbc == null)
+            dbc = DialogBoxContoller.init();
         dbc.show( "Failed", errorBuilder != null ? errorBuilder.toString() : "" );
     }
 

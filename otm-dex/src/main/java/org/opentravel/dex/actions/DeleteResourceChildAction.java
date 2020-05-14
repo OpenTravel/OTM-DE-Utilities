@@ -33,7 +33,6 @@ import org.opentravel.model.resource.OtmParameterGroup;
  */
 public class DeleteResourceChildAction extends DexRunAction {
     // private static Log log = LogFactory.getLog( AddResourceChildAction.class );
-    // private OtmObject parent = null;
 
     public static boolean isEnabled(OtmObject otm) {
         if (otm instanceof OtmResourceChild) {
@@ -62,14 +61,6 @@ public class DeleteResourceChildAction extends DexRunAction {
             else if (parent instanceof OtmAction && otm instanceof OtmActionResponse)
                 ((OtmAction) parent).delete( otm );
         }
-        // Sanity Check
-        // if (otm instanceof TLParamGroup) {
-        // assertTrue( "child TL must have owner", ((TLParamGroup) child.getTL()).getOwner() == tlOwner );
-        // } else if (otm instanceof TLActionFacet) {
-        // assertTrue( "child TL must have owner", ((TLActionFacet) child.getTL()).getOwningResource() == tlOwner );
-        // } else if (otm instanceof TLAction) {
-        // assertTrue( "child TL must have owner", ((TLAction) child.getTL()).getOwner() == tlOwner );
-        // }
         return parent;
     }
 
@@ -98,14 +89,6 @@ public class DeleteResourceChildAction extends DexRunAction {
         }
         return null;
     }
-
-    // /**
-    // * @see org.opentravel.dex.actions.DexAction#getVetoFindings()
-    // */
-    // @Override
-    // public ValidationFindings getVetoFindings() {
-    // return null;
-    // }
 
     /**
      * @see org.opentravel.dex.actions.DexAction#isValid()

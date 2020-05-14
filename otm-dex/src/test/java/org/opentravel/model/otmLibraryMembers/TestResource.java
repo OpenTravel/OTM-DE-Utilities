@@ -25,8 +25,12 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
+import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.model.resource.OtmActionRequest;
@@ -48,6 +52,7 @@ import org.opentravel.schemacompiler.model.TLParamGroup;
 import org.opentravel.schemacompiler.model.TLResource;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -68,6 +73,49 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
 
         exposedObject = TestBusiness.buildOtm( staticModelManager );
     }
+
+    @Test
+    public void testGetSubjectFacets() {
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bbo = TestBusiness.buildOtm( lib, "BaseBo" );
+        OtmContextualFacet cf = TestCustomFacet.buildOtm( lib.getModelManager(), bbo );
+        OtmBusinessObject ebo = TestBusiness.buildOtm( lib, "ExtendedBo" );
+        ebo.setBaseType( bbo );
+        assertTrue( "Given", ebo.getBaseType() == bbo );
+        // Remove all custom facets from extended business object.
+        Collection<OtmContributedFacet> cfs = new ArrayList<>( ebo.getChildrenContributedFacets() );
+        cfs.forEach( c -> ebo.delete( c ) );
+        assertTrue( "Given: must not have custom facets.", !hasCustomFacet( ebo.getChildren() ) );
+
+        // When - resource assigned base object
+        OtmResource r = buildFullOtm( "http://example.com", "TestResource", lib, lib.getModelManager() );
+        r.setSubject( bbo );
+        List<OtmObject> subjectFacets = r.getSubjectFacets();
+        assertTrue( "Given", !subjectFacets.isEmpty() );
+        assertTrue( "Must have contributed facets.", hasCustomFacet( subjectFacets ) );
+
+        // When - resource created with extended BO
+        OtmResource r2 = buildFullOtm( "http://example.com", "TestResource2", lib, lib.getModelManager() );
+        r2.setSubject( ebo );
+        // Then
+        subjectFacets = r2.getSubjectFacets();
+        assertTrue( "Given", !subjectFacets.isEmpty() );
+        assertTrue( "Must have contributed facets.", hasCustomFacet( subjectFacets ) );
+    }
+
+    /**
+     * @param subjectFacets
+     * @param result
+     * @return
+     */
+    private boolean hasCustomFacet(List<OtmObject> subjectFacets) {
+        boolean result = false;
+        for (OtmObject f : subjectFacets)
+            if (f instanceof OtmCustomFacet)
+                result = true;
+        return result;
+    }
+
 
     @Test
     public void testBuildResource() {
@@ -124,16 +172,24 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         OtmParameterGroup group2 = new OtmParameterGroup( new TLParamGroup(), null );
 
         // When - one group is added
-        r.addParameterGroup( group1 );
+        addParameterGroup( r, group1 );
         assertTrue( r.getParameterGroups().size() == groupCount + 1 );
         assertTrue( r.getParameterGroups().contains( group1 ) );
         assertTrue( group1.getOwningMember() == r );
         groupCount++;
 
         // When - one group is added
-        r.addParameterGroup( group2 );
+        addParameterGroup( r, group2 );
         assertTrue( r.getParameterGroups().size() == groupCount + 1 );
         groupCount++;
+    }
+
+    public void addParameterGroup(OtmResource r, OtmParameterGroup group) {
+        if (group != null) {
+            r.getTL().addParamGroup( group.getTL() );
+            r.add( group ); // Add to children list
+            group.setParent( r );
+        }
     }
 
     @Test
@@ -162,7 +218,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         assertTrue( staticModelManager.getResources( false ).contains( parent ) );
 
         // When - parent ref is added
-        OtmParentRef parentRef = resource.createParentRef( parent );
+        OtmParentRef parentRef = TestParentRef.buildOtm( resource, parent );
         assertTrue( parent.getAllSubResources().contains( resource ) );
 
         // Then - the parent ref check is OK
@@ -179,9 +235,9 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         OtmResource parent3 = buildOtm( staticModelManager );
 
         // When - parent ref is added
-        OtmParentRef parentRef3 = parent2.createParentRef( parent3 );
-        OtmParentRef parentRef2 = parent1.createParentRef( parent2 );
-        OtmParentRef parentRef1 = resource.createParentRef( parent1 );
+        OtmParentRef parentRef3 = TestParentRef.buildOtm( parent2, parent3 );
+        OtmParentRef parentRef2 = TestParentRef.buildOtm( parent1, parent2 );
+        OtmParentRef parentRef1 = TestParentRef.buildOtm( resource, parent1 );
 
         assertTrue( resource.getParentRefs().size() == 1 );
         assertTrue( parent1.getParentRefs().size() == 1 );
@@ -207,9 +263,9 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         OtmResource parent3 = buildOtm( staticModelManager );
 
         // When - parent ref is added
-        OtmParentRef parentRef1 = resource.createParentRef( parent1 );
-        OtmParentRef parentRef2 = resource.createParentRef( parent2 );
-        OtmParentRef parentRef3 = resource.createParentRef( parent3 );
+        OtmParentRef parentRef1 = TestParentRef.buildOtm( resource, parent1 );
+        OtmParentRef parentRef2 = TestParentRef.buildOtm( resource, parent2 );
+        OtmParentRef parentRef3 = TestParentRef.buildOtm( resource, parent3 );
 
         // Then - 3 parent refs
         assertTrue( resource.getParentRefs().size() == 3 );
@@ -317,7 +373,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         parentR.getTL().setFirstClass( true );
         OtmParameterGroup idGroup = TestParamGroup.buildIdGroup( parentR );
 
-        OtmParentRef parentRef = r.createParentRef( parentR );
+        OtmParentRef parentRef = TestParentRef.buildOtm( r, parentR );
         parentRef.getTL().setParentParamGroup( idGroup.getTL() );
         parentRef.getTL().setPathTemplate( null ); // do NOT use the override
 
@@ -375,6 +431,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         OtmActionFacet af = TestActionFacet.buildOtm( resource );
         TestAction.buildFullOtm( resource, af );
 
+        resource.setName( subjectName + "Resource" );
         return resource;
     }
 

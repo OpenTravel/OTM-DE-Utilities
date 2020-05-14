@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:Library
+    xmlns:ns2="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06 OTA2_LibraryModel_v1.6.0.xsd">
+    
+    <ns2:VersionScheme>OTA2</ns2:VersionScheme>
+    <ns2:Status>Draft</ns2:Status>
+    <ns2:Namespace>http://www.opentravel.org/Sandbox/Test/v1</ns2:Namespace>
+    <ns2:Prefix>pf1</ns2:Prefix>
+    <ns2:Name>ResourceVersions</ns2:Name>
+    <ns2:Import namespace="http://www.w3.org/2001/XMLSchema" prefix="xsd"/>
+    
+    <ns2:BusinessObject name="Facility" notExtendable="false">
+        <ns2:Aliases/>
+        <ns2:ID>
+            <ns2:Attribute name="id" referenceRepeat="0" type="xsd:ID"/>
+        </ns2:ID>
+        <ns2:Summary>
+            <ns2:Element name="E00" repeat="0" type="xsd:string"/>
+        </ns2:Summary>
+        <ns2:Detail/>
+    </ns2:BusinessObject>
+    <ns2:ContextualFacet facetNamespace="" facetOwner="Facility"
+        name="Golf" notExtendable="false" type="Custom">
+        <ns2:Element name="G1" repeat="0" type="xsd:string"/>
+    </ns2:ContextualFacet>
+    <ns2:ContextualFacet facetNamespace="" facetOwner="Facility"
+        name="Hotel" notExtendable="false" type="Custom">
+        <ns2:Element name="H1" repeat="0" type="xsd:string"/>
+    </ns2:ContextualFacet>
+    <ns2:Resource abstract="false" basePath="/"
+        businessObjectRef="Facility" firstClass="true" name="FacilityResource">
+        <ns2:ParamGroup facetName="Facility_ID" idGroup="true" name="Identifier">
+            <ns2:Parameter fieldName="id" location="Path"/>
+        </ns2:ParamGroup>
+        <ns2:ActionFacet label="FacilityRequest" referenceRepeat="0" referenceType="Required"/>
+        <ns2:Action actionId="Get" common="false">
+            <ns2:ActionRequest httpMethod="GET" mimeTypes=""
+                paramGroup="Identifier" pathTemplate="/Facilitys/{id}"/>
+            <ns2:ActionResponse mimeTypes="" payloadType="" statusCodes="200"/>
+        </ns2:Action>
+    </ns2:Resource>
+    
+</ns2:Library>

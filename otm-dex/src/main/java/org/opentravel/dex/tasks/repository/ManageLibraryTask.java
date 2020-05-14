@@ -18,8 +18,10 @@ package org.opentravel.dex.tasks.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.tasks.DexTaskBase;
+import org.opentravel.dex.tasks.DexTaskException;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
@@ -32,9 +34,9 @@ import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItemState;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
-import org.opentravel.schemacompiler.saver.LibrarySaveException;
-import org.opentravel.schemacompiler.validate.ValidationException;
-import org.opentravel.schemacompiler.version.VersionSchemeException;
+import org.opentravel.schemacompiler.validate.ValidationFindings;
+
+import javafx.application.Platform;
 
 /**
  * A JavaFX task for Managing Otm Libraries in a repository
@@ -89,10 +91,8 @@ public class ManageLibraryTask extends DexTaskBase<OtmLibrary> {
             errorMsg = "State is already managed. " + lib;
         else if (lib.getModelManager().getManagingProject( lib ) == null)
             errorMsg = "Managing project for the library is missing.";
-
-        // else if (lib.getStatus() != TLLibraryStatus.FINAL)
-        // errorMsg = "Status is not final. " + lib;
-        // log.debug( "Is versioning enabled? " + errorMsg );
+        else if (checkUrl( lib ) != null)
+            errorMsg = "Invalid Namespace. Note, namespace must end with version (e.g. xxx/v1). \n" + checkUrl( lib );
         return errorMsg == null;
     }
 
@@ -121,20 +121,62 @@ public class ManageLibraryTask extends DexTaskBase<OtmLibrary> {
         return repo;
     }
 
+    private static final String VETO =
+        "org.opentravel.schemacompiler.TLLibrary.namespace.INVALID_NAMESPACE_FOR_VERSION_SCHEME";
+    private static final String[] VETOKEYS = {VETO};
+
+    private static String checkUrl(OtmLibrary lib) {
+        ValidationFindings rFindings = null;
+        if (lib != null) {
+            // In spite of java-doc, getVersionIdentifier will supply default version scheme if not on URL
+            // VersionScheme vs = VersionSchemeFactory.getInstance().getVersionScheme( lib.getTL().getVersionScheme() );
+            // vId = vs.getVersionIdentifier( lib.getTL().getNamespace() );
+            // log.debug( "Version ID = " + vId + " for library uri: " + lib.getTL().getNamespace() );
+            lib.validate();
+            rFindings = ValidationUtils.getRelevantFindings( VETOKEYS, lib.getFindings() );
+            // log.debug( ValidationUtils.getMessagesAsString( lib.getFindings() ) );
+        }
+        return ValidationUtils.hasErrors( rFindings ) ? ValidationUtils.getMessagesAsString( rFindings ) : null;
+    }
+
+    /**
+     * 1. pass in DBC 2. return DBC 3. Implement catch and taskException
+     * 
+     * @see org.opentravel.dex.tasks.DexTaskBase#doIT()
+     */
     @Override
-    public void doIT() throws RepositoryException, VersionSchemeException, ValidationException, LibrarySaveException,
-        PublishWithLocalDependenciesException {
+    public void doIT() throws DexTaskException {
         log.debug( "Manage library task: " + library );
+
+        // test URL for version scheme (must end in /vX)
+        String relevantFindingMessages = checkUrl( library );
+        if (relevantFindingMessages != null) {
+            Platform.runLater( () -> dbc.show( "Warning", relevantFindingMessages ) );
+            return;
+        }
+        log.debug( "Version scheme is OK" );
+
 
         if (proj != null && repository != null && library != null) {
             log.debug( "Manage library: " + library + " in " + repository.getDisplayName() );
 
-            // Manage the library in the repository
-            ProjectManager pm = proj.getTL().getProjectManager();
-            ProjectItem item = library.getProjectItem();
-            pm.publish( item, repository );
-        } else
-            throw new RepositoryException( "Missing project, repository or library information." );
-    }
+            if (dbc != null)
+                Platform.runLater( () -> dbc.show( "Task", "Please wait." ) );
 
+            // Manage the library in the repository
+            try {
+                ProjectManager pm = proj.getTL().getProjectManager();
+                ProjectItem item = library.getProjectItem();
+                pm.publish( item, repository );
+                // VersionSchemeException| ValidationException| LibrarySaveException|
+            } catch (IllegalArgumentException | RepositoryException | PublishWithLocalDependenciesException e) {
+                if (dbc != null)
+                    Platform.runLater( () -> dbc.close() );
+                throw new DexTaskException( e );
+            }
+            if (dbc != null)
+                Platform.runLater( () -> dbc.close() );
+        } else
+            throw new DexTaskException( "Missing project, repository or library information." );
+    }
 }

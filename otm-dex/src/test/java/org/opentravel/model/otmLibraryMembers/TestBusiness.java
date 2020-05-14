@@ -53,7 +53,7 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         subject = buildOtm( staticModelManager );
         baseObject = buildOtm( staticModelManager );
         baseObject.setName( "BaseBO" );

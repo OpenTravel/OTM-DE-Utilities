@@ -42,7 +42,7 @@ public class TestParentRef<L extends TestOtmResourceBase<OtmParentRef>> extends 
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         baseObject = TestBusiness.buildOtm( staticModelManager );
         testResource = TestResource.buildOtm( staticModelManager );
 
@@ -57,7 +57,7 @@ public class TestParentRef<L extends TestOtmResourceBase<OtmParentRef>> extends 
         OtmResource r = TestResource.buildFullOtm( "bar", "Bar", staticModelManager );
 
         // Given one is the parent and one is owner of parent ref
-        OtmParentRef pr = r.createParentRef( p );
+        OtmParentRef pr = buildOtm( r, p );
         check( pr, r, p );
     }
 
@@ -114,7 +114,7 @@ public class TestParentRef<L extends TestOtmResourceBase<OtmParentRef>> extends 
         OtmResource p = TestResource.buildFullOtm( "/foo", "Foo", staticModelManager );
         OtmResource r = TestResource.buildFullOtm( "bar", "Bar", staticModelManager );
         // Given one is the parent and one is owner of parent ref
-        OtmParentRef pr = r.createParentRef( p );
+        OtmParentRef pr = buildOtm( r, p );
         check( pr, r, p );
 
         final String s1 = "HowAboutThis";
@@ -144,7 +144,7 @@ public class TestParentRef<L extends TestOtmResourceBase<OtmParentRef>> extends 
         OtmResource p = TestResource.buildFullOtm( "/foo", "Foo", staticModelManager );
         OtmResource r = TestResource.buildFullOtm( "bar", "Bar", staticModelManager );
         // Given one is the parent and one is owner of parent ref
-        OtmParentRef pr = r.createParentRef( p );
+        OtmParentRef pr = buildOtm( r, p );
         check( pr, r, p );
 
         // When set to null
@@ -161,7 +161,7 @@ public class TestParentRef<L extends TestOtmResourceBase<OtmParentRef>> extends 
         OtmResource p = TestResource.buildFullOtm( "/foo", "Foo", staticModelManager );
         OtmResource r = TestResource.buildFullOtm( "bar", "Bar", staticModelManager );
         // Given one is the parent and one is owner of parent ref
-        OtmParentRef pr = r.createParentRef( p );
+        OtmParentRef pr = buildOtm( r, p );
         check( pr, r, p );
 
 
@@ -182,7 +182,8 @@ public class TestParentRef<L extends TestOtmResourceBase<OtmParentRef>> extends 
 
     public static OtmParentRef buildOtm(OtmResource owner, OtmResource parent) {
         // OtmParentRef pr = new OtmParentRef( buildTL(), owner );
-        return owner.createParentRef( parent );
+        // return owner.createParentRef( parent );
+        return owner.add( new TLResourceParentRef(), parent );
         // return pr;
     }
 
