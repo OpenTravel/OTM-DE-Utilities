@@ -19,27 +19,24 @@ package org.opentravel.dex.tasks.repository;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTaskBase;
+import org.opentravel.dex.tasks.DexTaskException;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
-import org.opentravel.schemacompiler.loader.LibraryLoaderException;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.ProjectManager;
-import org.opentravel.schemacompiler.repository.PublishWithLocalDependenciesException;
 import org.opentravel.schemacompiler.repository.Repository;
-import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryItemState;
-import org.opentravel.schemacompiler.saver.LibrarySaveException;
 import org.opentravel.schemacompiler.validate.FindingMessageFormat;
 import org.opentravel.schemacompiler.validate.FindingType;
-import org.opentravel.schemacompiler.validate.ValidationException;
 import org.opentravel.schemacompiler.version.MajorVersionHelper;
 import org.opentravel.schemacompiler.version.MinorVersionHelper;
-import org.opentravel.schemacompiler.version.VersionSchemeException;
+
+import javafx.application.Platform;
 
 /**
  * A JavaFX task for Promoting Otm Libraries (Under Review, Final, Obsolete)
@@ -126,43 +123,54 @@ public class VersionLibraryTask extends DexTaskBase<OtmLibrary> {
     }
 
     @Override
-    public void doIT() throws RepositoryException, VersionSchemeException, ValidationException, LibrarySaveException,
-        PublishWithLocalDependenciesException, LibraryLoaderException {
+    public void doIT() throws DexTaskException {
+        // public void doIT() throws RepositoryException, VersionSchemeException, ValidationException,
+        // LibrarySaveException,
+        // PublishWithLocalDependenciesException, LibraryLoaderException {
 
         if (isEnabled( library ) && proj != null && type != null) {
             // log.debug( type + "Version with project item: " + proj.getProjectItem( library.getTL() ) );
+            if (dbc != null)
+                Platform.runLater( () -> dbc.show( "Version Library Task", "Please wait." ) );
+            try {
+                // Create a version in local files
+                TLLibrary tlNewLibrary = null;
+                switch (type) {
+                    case MAJOR:
+                        MajorVersionHelper vh = new MajorVersionHelper( proj.getTL() );
+                        tlNewLibrary = vh.createNewMajorVersion( (TLLibrary) library.getTL() );
+                        break;
+                    case MINOR:
+                        // Minor - must create from latest minor not the patch.
+                        MinorVersionHelper minorVH = new MinorVersionHelper( proj.getTL() );
+                        tlNewLibrary = minorVH.createNewMinorVersion( (TLLibrary) library.getTL() );
+                        break;
+                    case PATCH:
+                        // UNTESTED
+                        // PatchVersionHelper patchVH = new PatchVersionHelper( proj.getTL() );
+                        // tlNewLibrary = patchVH.createNewPatchVersion( (TLLibrary) library.getTL() );
+                        break;
+                }
 
-            // Create a version in local files
-            TLLibrary tlNewLibrary = null;
-            switch (type) {
-                case MAJOR:
-                    MajorVersionHelper vh = new MajorVersionHelper( proj.getTL() );
-                    tlNewLibrary = vh.createNewMajorVersion( (TLLibrary) library.getTL() );
-                    break;
-                case MINOR:
-                    // Minor - must create from latest minor not the patch.
-                    MinorVersionHelper minorVH = new MinorVersionHelper( proj.getTL() );
-                    tlNewLibrary = minorVH.createNewMinorVersion( (TLLibrary) library.getTL() );
-                    break;
-                case PATCH:
-                    // UNTESTED
-                    // PatchVersionHelper patchVH = new PatchVersionHelper( proj.getTL() );
-                    // tlNewLibrary = patchVH.createNewPatchVersion( (TLLibrary) library.getTL() );
-                    break;
+                if (tlNewLibrary != null) {
+                    // Manage the library in the repository
+                    ProjectManager pm = proj.getTL().getProjectManager();
+                    Repository repo = library.getProjectItem().getRepository();
+                    ProjectItem item = proj.getProjectItem( tlNewLibrary );
+                    pm.publish( item, repo );
+
+                    // Add to project and model
+                    proj.getTL().getProjectManager().addManagedProjectItem( item, proj.getTL() );
+                    library.getModelManager().addProjects();
+                }
+                // log.debug( "Version library task complete. " );
+            } catch (Exception e) {
+                if (dbc != null)
+                    Platform.runLater( () -> dbc.close() );
+                throw new DexTaskException( e );
             }
-
-            if (tlNewLibrary != null) {
-                // Manage the library in the repository
-                ProjectManager pm = proj.getTL().getProjectManager();
-                Repository repo = library.getProjectItem().getRepository();
-                ProjectItem item = proj.getProjectItem( tlNewLibrary );
-                pm.publish( item, repo );
-
-                // Add to project and model
-                proj.getTL().getProjectManager().addManagedProjectItem( item, proj.getTL() );
-                library.getModelManager().addProjects();
-            }
-            // log.debug( "Version library task complete. " );
+            if (dbc != null)
+                Platform.runLater( () -> dbc.close() );
         }
     }
 

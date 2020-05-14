@@ -161,7 +161,7 @@ public class ManageLibraryTask extends DexTaskBase<OtmLibrary> {
             log.debug( "Manage library: " + library + " in " + repository.getDisplayName() );
 
             if (dbc != null)
-                Platform.runLater( () -> dbc.show( "Task", "Please wait." ) );
+                Platform.runLater( () -> dbc.show( "Manage Library Task", "Please wait." ) );
 
             // Manage the library in the repository
             try {
