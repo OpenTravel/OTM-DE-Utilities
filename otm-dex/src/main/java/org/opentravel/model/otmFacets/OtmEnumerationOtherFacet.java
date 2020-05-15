@@ -16,8 +16,6 @@
 
 package org.opentravel.model.otmFacets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmProperties.OtmEnumerationImpliedValue;
@@ -32,7 +30,7 @@ import java.util.List;
  * 
  */
 public class OtmEnumerationOtherFacet extends OtmAbstractDisplayFacet {
-    private static Log log = LogFactory.getLog( OtmEnumerationOtherFacet.class );
+    // private static Log log = LogFactory.getLog( OtmEnumerationOtherFacet.class );
 
     private static final String OTHER = "Extension";
     private Collection<OtmObject> kids = new ArrayList<>();
@@ -42,24 +40,10 @@ public class OtmEnumerationOtherFacet extends OtmAbstractDisplayFacet {
         new OtmEnumerationImpliedValue( this );
     }
 
-    /**
-     * @see org.opentravel.model.otmFacets.OtmAbstractDisplayFacet#isExpanded()
-     */
-    @Override
-    public boolean isExpanded() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
     @Override
     public OtmObject add(OtmObject child) {
         kids.add( child );
         return child;
-    }
-
-    @Override
-    public String getName() {
-        return OTHER;
     }
 
     /**
@@ -76,6 +60,16 @@ public class OtmEnumerationOtherFacet extends OtmAbstractDisplayFacet {
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
         return kids;
+    }
+
+    @Override
+    public String getName() {
+        return OTHER;
+    }
+
+    @Override
+    public boolean isExpanded() {
+        return false;
     }
 
 

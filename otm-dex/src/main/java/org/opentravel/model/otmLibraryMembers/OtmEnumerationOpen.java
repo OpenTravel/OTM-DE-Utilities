@@ -39,18 +39,13 @@ import java.util.Collection;
 public class OtmEnumerationOpen extends OtmEnumeration<TLOpenEnumeration> {
     private static Log log = LogFactory.getLog( OtmEnumerationOpen.class );
 
-    public OtmEnumerationOpen(TLOpenEnumeration tlo, OtmModelManager mgr) {
-        super( tlo, mgr );
-    }
-
     public OtmEnumerationOpen(String name, OtmModelManager mgr) {
         super( new TLOpenEnumeration(), mgr );
         setName( name );
     }
 
-    @Override
-    public Icons getIconType() {
-        return ImageManager.Icons.ENUMERATION_OPEN;
+    public OtmEnumerationOpen(TLOpenEnumeration tlo, OtmModelManager mgr) {
+        super( tlo, mgr );
     }
 
     @Override
@@ -59,6 +54,11 @@ public class OtmEnumerationOpen extends OtmEnumeration<TLOpenEnumeration> {
         hierarchy.add( new OtmEnumerationOtherFacet( (OtmPropertyOwner) this ) );
         hierarchy.addAll( super.getChildrenHierarchy() );
         return hierarchy;
+    }
+
+    @Override
+    public Icons getIconType() {
+        return ImageManager.Icons.ENUMERATION_OPEN;
     }
 
 }

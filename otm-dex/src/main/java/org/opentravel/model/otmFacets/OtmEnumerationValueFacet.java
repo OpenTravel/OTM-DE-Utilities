@@ -16,8 +16,6 @@
 
 package org.opentravel.model.otmFacets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmPropertyOwner;
 
 /**
@@ -25,7 +23,7 @@ import org.opentravel.model.OtmPropertyOwner;
  * 
  */
 public class OtmEnumerationValueFacet extends OtmAbstractDisplayFacet {
-    private static Log log = LogFactory.getLog( OtmEnumerationValueFacet.class );
+    // private static Log log = LogFactory.getLog( OtmEnumerationValueFacet.class );
 
     public OtmEnumerationValueFacet(OtmPropertyOwner parent) {
         super( parent );
@@ -35,10 +33,5 @@ public class OtmEnumerationValueFacet extends OtmAbstractDisplayFacet {
     public String getName() {
         return "Values";
     }
-
-    // @Override
-    // public Collection<OtmObject> getChildrenHierarchy() {
-    // return Collections.emptyList();
-    // }
 
 }

@@ -16,8 +16,6 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
@@ -49,15 +47,10 @@ import java.util.List;
 // NOTE - member filter depends on sub-types starting with this class name!
 public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
     extends OtmLibraryMemberBase<TLAbstractEnumeration> implements OtmObject, OtmPropertyOwner {
-    private static Log log = LogFactory.getLog( OtmEnumeration.class );
+    // private static Log log = LogFactory.getLog( OtmEnumeration.class );
 
     public OtmEnumeration(E tlo, OtmModelManager mgr) {
         super( tlo, mgr );
-    }
-
-    @Override
-    public E getTL() {
-        return (E) tlObject;
     }
 
     @Override
@@ -67,91 +60,6 @@ public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
             return (OtmEnumerationValue) child;
         }
         return null;
-    }
-
-    /**
-    * 
-    */
-    @Override
-    public OtmEnumeration<?> getBaseType() {
-        return (OtmEnumeration<?>) super.getBaseType();
-    }
-
-    @Override
-    public List<OtmTypeProvider> getUsedTypes() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public String setName(String name) {
-        getTL().setName( name );
-        isValid( true );
-        return getName();
-    }
-
-    @Override
-    public OtmEnumeration<E> getOwningMember() {
-        return this;
-    }
-
-    @Override
-    public boolean isNameControlled() {
-        return false;
-    }
-
-    // /**
-    // * Does NOT add to backing TL Enumeration
-    // *
-    // * @param child
-    // */
-    // private void add(OtmEnumerationValue child) {
-    // if (child != null)
-    // children.add( child );
-    // }
-    //
-    // private void addInherited(OtmEnumerationValue child) {
-    // if (inheritedChildren == null)
-    // inheritedChildren = new ArrayList<>();
-    // if (child != null)
-    // inheritedChildren.add( child );
-    // }
-
-    @Override
-    public void modelChildren() {
-        for (TLEnumValue ev : getTL().getValues())
-            new OtmEnumerationValue( ev, (OtmEnumeration<TLAbstractEnumeration>) this );
-    }
-
-    @Override
-    public Collection<OtmObject> getChildrenHierarchy() {
-        Collection<OtmObject> hierarchy = new ArrayList<>();
-        hierarchy.add( new OtmEnumerationValueFacet( (OtmPropertyOwner) this ) );
-        return hierarchy;
-    }
-
-    @Override
-    public void modelInheritedChildren() {
-        if (inheritedChildren == null)
-            inheritedChildren = new ArrayList<>();
-        else
-            inheritedChildren.clear(); // force re-compute
-
-        if (getTL().getExtension() != null) {
-            OtmEnumeration<?> base = getBaseType();
-            if (base instanceof OtmEnumeration) {
-                // Create new facades to the existing TLValues and add to inherited list
-                for (TLEnumValue v : ((TLAbstractEnumeration) base.getTL()).getValues()) {
-                    // Use the factory so it does not get added to this enumeration as a child
-                    OtmProperty p = OtmPropertyFactory.create( v, null );
-                    inheritedChildren.add( p );
-                    p.setParent( this );
-                    // New facade's parent must NOT be tlValue's owning enumeration to be inherited
-                    // add(p);
-                }
-            }
-            // ((TLAbstractEnumeration) base.getTL()).getValues().forEach(
-            // v -> addInherited( new OtmEnumerationValue( v, (OtmEnumeration<TLAbstractEnumeration>) this ) ) );
-        }
     }
 
     @Override
@@ -171,9 +79,78 @@ public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
             getTL().removeValue( (TLEnumValue) property.getTL() );
     }
 
+    /**
+    * 
+    */
+    @Override
+    public OtmEnumeration<?> getBaseType() {
+        return (OtmEnumeration<?>) super.getBaseType();
+    }
+
+    @Override
+    public Collection<OtmObject> getChildrenHierarchy() {
+        Collection<OtmObject> hierarchy = new ArrayList<>();
+        hierarchy.add( new OtmEnumerationValueFacet( (OtmPropertyOwner) this ) );
+        return hierarchy;
+    }
+
+    @Override
+    public OtmEnumeration<E> getOwningMember() {
+        return this;
+    }
+
+    @Override
+    public E getTL() {
+        return (E) tlObject;
+    }
+
+    @Override
+    public List<OtmTypeProvider> getUsedTypes() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public boolean isNameControlled() {
+        return false;
+    }
+
+    @Override
+    public void modelChildren() {
+        for (TLEnumValue ev : getTL().getValues())
+            new OtmEnumerationValue( ev, (OtmEnumeration<TLAbstractEnumeration>) this );
+    }
+
+    @Override
+    public void modelInheritedChildren() {
+        if (inheritedChildren == null)
+            inheritedChildren = new ArrayList<>();
+        else
+            inheritedChildren.clear(); // force re-compute
+
+        if (getTL().getExtension() != null) {
+            OtmEnumeration<?> base = getBaseType();
+            if (base instanceof OtmEnumeration) {
+                // Create new facades to the existing TLValues and add to inherited list
+                for (TLEnumValue v : ((TLAbstractEnumeration) base.getTL()).getValues()) {
+                    // Use the factory so it does not get added to this enumeration as a child
+                    OtmProperty p = OtmPropertyFactory.create( v, null );
+                    inheritedChildren.add( p );
+                    p.setParent( this );
+                }
+            }
+        }
+    }
+
     @Override
     public void remove(OtmObject property) {
         children.remove( property );
+    }
+
+    @Override
+    public String setName(String name) {
+        getTL().setName( name );
+        isValid( true );
+        return getName();
     }
 
 }

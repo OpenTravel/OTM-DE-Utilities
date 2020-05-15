@@ -44,9 +44,6 @@ public class TestEnumerationOpen extends TestOtmLibraryMemberBase<OtmEnumeration
     @BeforeClass
     public static void beforeClass() {
         staticModelManager = new OtmModelManager( null, null, null );
-        // subject = buildOtm( staticModelManager );
-        // baseObject = buildOtm( staticModelManager );
-        // baseObject.setName( "BaseBO" );
     }
 
     @Before
@@ -79,25 +76,21 @@ public class TestEnumerationOpen extends TestOtmLibraryMemberBase<OtmEnumeration
         assertTrue( "Must have only 2 children.", ch.size() == 2 );
 
         // Check the facets
-        for (OtmObject c : ch) {
-
-            assertTrue( c instanceof OtmAbstractDisplayFacet );
-            OtmAbstractDisplayFacet adf = (OtmAbstractDisplayFacet) c;
-            // List<OtmObject> kids = adf.getChildren();
-            // assertTrue( !kids.isEmpty() );
+        for (OtmObject cf : ch) {
+            assertTrue( cf instanceof OtmAbstractDisplayFacet );
+            OtmAbstractDisplayFacet adf = (OtmAbstractDisplayFacet) cf;
             assertTrue( adf.getParent() == subject );
 
-            if (c instanceof OtmEnumerationOtherFacet) {
-                OtmEnumerationOtherFacet eof = (OtmEnumerationOtherFacet) c;
-                // kids = eof.getChildren(); // gets parent's children
+            if (cf instanceof OtmEnumerationOtherFacet) {
+                OtmEnumerationOtherFacet eof = (OtmEnumerationOtherFacet) cf;
                 assertTrue( eof.getChildren().isEmpty() );
                 assertTrue( eof.getChildrenHierarchy().size() == 1 );
                 for (OtmObject k : eof.getChildrenHierarchy()) {
                     assertTrue( "Child must NOT be editable.", !k.isEditable() );
                     assertTrue( k instanceof OtmEnumerationImpliedValue );
                 }
-            } else if (c instanceof OtmEnumerationValueFacet) {
-                OtmEnumerationValueFacet evf = (OtmEnumerationValueFacet) c;
+            } else if (cf instanceof OtmEnumerationValueFacet) {
+                OtmEnumerationValueFacet evf = (OtmEnumerationValueFacet) cf;
                 assertTrue( evf.getChildrenHierarchy().size() == LITERALCOUNT );
                 for (OtmObject k : evf.getChildren())
                     assertTrue( "Child must be editable.", k.isEditable() );

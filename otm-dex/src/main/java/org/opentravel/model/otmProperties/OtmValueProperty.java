@@ -38,6 +38,11 @@ public abstract class OtmValueProperty extends OtmModelElement<TLModelElement> i
         super( tl );
     }
 
+    @Override
+    public StringProperty exampleProperty() {
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      * <p>
@@ -46,11 +51,6 @@ public abstract class OtmValueProperty extends OtmModelElement<TLModelElement> i
     @Override
     public String fixName(String name) {
         return name;
-    }
-
-    @Override
-    public StringProperty exampleProperty() {
-        return null;
     }
 
     @Override
@@ -83,10 +83,4 @@ public abstract class OtmValueProperty extends OtmModelElement<TLModelElement> i
         // NO-OP
         return null;
     }
-    // @Override
-    // public void clone(OtmProperty property) {
-    // TLRole newTL = new TLRole();
-    // newTL.setName( getTL().getName() );
-    // OtmValueProperty clone = new OtmValueProperty( newTL, getParent() );
-    // }
 }

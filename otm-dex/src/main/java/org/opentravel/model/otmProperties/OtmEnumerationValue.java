@@ -16,8 +16,6 @@
 
 package org.opentravel.model.otmProperties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmFacets.OtmEnumerationOtherFacet;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
@@ -29,9 +27,8 @@ import org.opentravel.schemacompiler.model.TLEnumValue;
  *
  */
 public class OtmEnumerationValue extends OtmValueProperty {
-    private static Log log = LogFactory.getLog( OtmEnumerationValue.class );
+    // private static Log log = LogFactory.getLog( OtmEnumerationValue.class );
 
-    // private OtmEnumeration<TLAbstractEnumeration> parent;
     private OtmPropertyOwner parent;
 
     public OtmEnumerationValue(TLEnumValue value, OtmEnumeration<TLAbstractEnumeration> parent) {
@@ -49,16 +46,13 @@ public class OtmEnumerationValue extends OtmValueProperty {
     }
 
     @Override
-    public TLEnumValue getTL() {
-        return (TLEnumValue) tlObject;
-    }
-
-    @Override
-    public String setName(String name) {
-        getTL().setLiteral( name );
-        nameProperty().set( getName() ); // may not fire otm name change listener
-        isValid( true );
-        return getName();
+    public void clone(OtmProperty property) {
+        if (parent instanceof OtmEnumeration) {
+            TLEnumValue newTL = new TLEnumValue();
+            newTL.setLiteral( getTL().getLiteral() );
+            // Create clone added to parent
+            new OtmEnumerationValue( newTL, (OtmEnumeration<TLAbstractEnumeration>) getParent() );
+        }
     }
 
     @Override
@@ -73,31 +67,29 @@ public class OtmEnumerationValue extends OtmValueProperty {
     }
 
     @Override
+    public TLEnumValue getTL() {
+        return (TLEnumValue) tlObject;
+    }
+
+    @Override
     public boolean isInherited() {
         if (getTL() == null || getParent() == null)
             return false;
         return getTL().getOwningEnum() != getParent().getTL();
     }
 
-    // @Override
-    // public boolean isEditable() {
-    // return getParent() != null && getParent().isEditable();
-    // }
+    @Override
+    public String setName(String name) {
+        getTL().setLiteral( name );
+        nameProperty().set( getName() ); // may not fire otm name change listener
+        isValid( true );
+        return getName();
+    }
 
     @Override
     public OtmPropertyOwner setParent(OtmPropertyOwner parent) {
         if (parent instanceof OtmEnumeration)
             this.parent = parent;
         return parent;
-    }
-
-    @Override
-    public void clone(OtmProperty property) {
-        if (parent instanceof OtmEnumeration) {
-            TLEnumValue newTL = new TLEnumValue();
-            newTL.setLiteral( getTL().getLiteral() );
-            // Create clone added to parent
-            new OtmEnumerationValue( newTL, (OtmEnumeration<TLAbstractEnumeration>) getParent() );
-        }
     }
 }

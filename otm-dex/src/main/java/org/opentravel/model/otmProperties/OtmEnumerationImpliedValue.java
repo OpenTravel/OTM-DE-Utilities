@@ -16,8 +16,6 @@
 
 package org.opentravel.model.otmProperties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmFacets.OtmEnumerationOtherFacet;
 import org.opentravel.schemacompiler.model.TLEnumValue;
@@ -31,10 +29,11 @@ import javafx.scene.control.Tooltip;
  *
  */
 public class OtmEnumerationImpliedValue extends OtmValueProperty {
-    private static Log log = LogFactory.getLog( OtmEnumerationImpliedValue.class );
+
+    // private static Log log = LogFactory.getLog( OtmEnumerationImpliedValue.class );
 
     private OtmPropertyOwner parent;
-    private static String OTHER = "Other_";
+    private static final String OTHER = "Other_";
 
     public OtmEnumerationImpliedValue(OtmEnumerationOtherFacet parent) {
         super( new TLEnumValue() ); // this TL value will never be added to TLModel.
@@ -43,7 +42,6 @@ public class OtmEnumerationImpliedValue extends OtmValueProperty {
             parent.add( this );
     }
 
-
     @Override
     public TLEnumValue getTL() {
         return (TLEnumValue) tlObject;
@@ -51,9 +49,6 @@ public class OtmEnumerationImpliedValue extends OtmValueProperty {
 
     @Override
     public String setName(String name) {
-        // getTL().setLiteral( name );
-        // nameProperty().set( getName() ); // may not fire otm name change listener
-        // isValid( true );
         return getName();
     }
 
@@ -62,7 +57,6 @@ public class OtmEnumerationImpliedValue extends OtmValueProperty {
         return OTHER;
     }
 
-    // public OtmEnumeration<TLAbstractEnumeration> getParent() {
     @Override
     public OtmPropertyOwner getParent() {
         return parent;
@@ -70,27 +64,19 @@ public class OtmEnumerationImpliedValue extends OtmValueProperty {
 
     @Override
     public boolean isInherited() {
-        // if (getTL() == null || getParent() == null)
         return false;
-        // return getTL().getOwningEnum() != getParent().getTL();
     }
 
     /**
      * {@inheritDoc} Literal on open enum facet is not editable
-     * 
-     * @see org.opentravel.model.OtmModelElement#isEditable()
      */
     @Override
     public boolean isEditable() {
-        // if (getParent() == null || getParent() instanceof OtmEnumerationOtherFacet)
         return false;
-        // return getParent().isEditable();
     }
 
     @Override
     public OtmPropertyOwner setParent(OtmPropertyOwner parent) {
-        // if (parent instanceof OtmEnumeration)
-        // this.parent = parent;
         return parent;
     }
 
@@ -116,11 +102,6 @@ public class OtmEnumerationImpliedValue extends OtmValueProperty {
 
     @Override
     public void clone(OtmProperty property) {
-        // if (parent instanceof OtmEnumeration) {
-        // TLEnumValue newTL = new TLEnumValue();
-        // newTL.setLiteral( getTL().getLiteral() );
-        // // Create clone added to parent
-        // new OtmEnumerationImpliedValue( newTL, (OtmEnumeration<TLAbstractEnumeration>) getParent() );
-        // }
+        // NO-OP
     }
 }
