@@ -24,7 +24,7 @@ public class DeprecationChangeAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( DeprecationChangeAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
-        return subject.getLibrary().isChainEditable();
+        return subject.isEditable() && subject.getLibrary().isChainEditable();
     }
 
     // New OTM created in a minor version of the library

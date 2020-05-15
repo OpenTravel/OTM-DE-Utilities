@@ -21,7 +21,13 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmPropertyOwner;
+import org.opentravel.model.otmFacets.OtmEnumerationOtherFacet;
 import org.opentravel.schemacompiler.model.TLOpenEnumeration;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * OTM Object Node for Simple objects.
@@ -45,6 +51,14 @@ public class OtmEnumerationOpen extends OtmEnumeration<TLOpenEnumeration> {
     @Override
     public Icons getIconType() {
         return ImageManager.Icons.ENUMERATION_OPEN;
+    }
+
+    @Override
+    public Collection<OtmObject> getChildrenHierarchy() {
+        Collection<OtmObject> hierarchy = new ArrayList<>();
+        hierarchy.add( new OtmEnumerationOtherFacet( (OtmPropertyOwner) this ) );
+        hierarchy.addAll( super.getChildrenHierarchy() );
+        return hierarchy;
     }
 
 }

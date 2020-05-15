@@ -37,6 +37,10 @@ import java.util.List;
 
 /**
  * OTM Object open and closed enumerations.
+ * <p>
+ * As with the TL Enumeration, children are the values.
+ * <p>
+ * ChildrenHierarchy() will return abstract display facets.
  * 
  * @author Dave Hollander
  * @param <T>
@@ -85,58 +89,32 @@ public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
         return getName();
     }
 
-    // @Override
-    // public OtmLibrary getLibrary() {
-    // return mgr.get(getTL().getOwningLibrary());
-    // }
-
     @Override
     public OtmEnumeration<E> getOwningMember() {
         return this;
     }
-
-    // @Override
-    // public String getLibraryName() {
-    // String libName = "";
-    // if (getTL().getOwningLibrary() != null)
-    // libName = getTL().getOwningLibrary().getName();
-    // return libName;
-    // }
-
-    // @Override
-    // public boolean isEditable() {
-    // OtmLibrary ol = null;
-    // if (mgr != null || getTL() != null)
-    // ol = mgr.get(getTL().getOwningLibrary());
-    // return ol != null && ol.isEditable();
-    // }
 
     @Override
     public boolean isNameControlled() {
         return false;
     }
 
-    // @Override
-    // public boolean isExpanded() {
-    // return true;
+    // /**
+    // * Does NOT add to backing TL Enumeration
+    // *
+    // * @param child
+    // */
+    // private void add(OtmEnumerationValue child) {
+    // if (child != null)
+    // children.add( child );
     // }
-
-    /**
-     * Does NOT add to backing TL Enumeration
-     * 
-     * @param child
-     */
-    private void add(OtmEnumerationValue child) {
-        if (child != null)
-            children.add( child );
-    }
-
-    private void addInherited(OtmEnumerationValue child) {
-        if (inheritedChildren == null)
-            inheritedChildren = new ArrayList<>();
-        if (child != null)
-            inheritedChildren.add( child );
-    }
+    //
+    // private void addInherited(OtmEnumerationValue child) {
+    // if (inheritedChildren == null)
+    // inheritedChildren = new ArrayList<>();
+    // if (child != null)
+    // inheritedChildren.add( child );
+    // }
 
     @Override
     public void modelChildren() {

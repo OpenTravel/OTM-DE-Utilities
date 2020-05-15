@@ -34,8 +34,6 @@ import javafx.beans.property.StringProperty;
 public abstract class OtmValueProperty extends OtmModelElement<TLModelElement> implements OtmProperty {
     // private static Log log = LogFactory.getLog( OtmValueProperty.class );
 
-    // private OtmRoleEnumeration parent;
-
     public OtmValueProperty(TLModelElement tl) {
         super( tl );
     }
@@ -60,19 +58,9 @@ public abstract class OtmValueProperty extends OtmModelElement<TLModelElement> i
         return ImageManager.Icons.ENUMERATION_VALUE;
     }
 
-    // @Override
-    // public abstract String getName();
-    //
-    // @Override
-    // public abstract String setName(String name);
-    //
-    // @Override
-    // public abstract OtmPropertyOwner getParent();
-
-
     @Override
     public OtmLibraryMember getOwningMember() {
-        return getParent().getOwningMember();
+        return getParent() != null ? getParent().getOwningMember() : null;
     }
 
     @Override
