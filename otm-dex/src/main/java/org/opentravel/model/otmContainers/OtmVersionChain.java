@@ -229,6 +229,8 @@ public class OtmVersionChain {
     // but both libraries MUST belong to the same major version chain
     // Is there a newer minor version of this type provider?
     public boolean canAssignLaterVersion(OtmTypeUser subject) {
+        if (subject == null || subject.getAssignedType() == null)
+            return false;
         return !isLatestVersion( subject.getAssignedType().getOwningMember() );
     }
 

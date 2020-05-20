@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.common.ValidationUtils;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
@@ -31,10 +32,12 @@ import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
+import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmActionResponse;
+import org.opentravel.model.resource.OtmParameter;
 import org.opentravel.model.resource.OtmParameterGroup;
 import org.opentravel.model.resource.OtmParentRef;
 import org.opentravel.model.resource.RestStatusCodes;
@@ -49,6 +52,8 @@ import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
 import org.opentravel.schemacompiler.model.TLMimeType;
 import org.opentravel.schemacompiler.model.TLParamGroup;
+import org.opentravel.schemacompiler.model.TLParameter;
+import org.opentravel.schemacompiler.model.TLReferenceType;
 import org.opentravel.schemacompiler.model.TLResource;
 
 import java.util.ArrayList;
@@ -100,7 +105,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         // Then
         subjectFacets = r2.getSubjectFacets();
         assertTrue( "Given", !subjectFacets.isEmpty() );
-        assertTrue( "Must have contributed facets.", hasCustomFacet( subjectFacets ) );
+        assertTrue( "Must have custom facets.", hasCustomFacet( subjectFacets ) );
     }
 
     /**
@@ -108,7 +113,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
      * @param result
      * @return
      */
-    private boolean hasCustomFacet(List<OtmObject> subjectFacets) {
+    public static boolean hasCustomFacet(List<OtmObject> subjectFacets) {
         boolean result = false;
         for (OtmObject f : subjectFacets)
             if (f instanceof OtmCustomFacet)
@@ -126,6 +131,13 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         assertTrue( !r.getChildren().isEmpty() );
     }
 
+    @Test
+    public void testBuildValidResource() {
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmResource resource =
+            TestResource.buildFullValidOtm( "http://example.com", "TestResource", lib, lib.getModelManager() );
+        assertTrue( ": ", resource != null );
+    }
 
     @Override
     @Test
@@ -348,6 +360,17 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         // No parent Ref
         return tlr;
     }
+    // TestResource [DEBUG] A facet reference is required for all parameter groups.
+    // At least one parameter must be declared or inherited for a parameter group.
+    // A facet reference is required for all parameter groups.
+    // ** At least one parameter must be declared or inherited for a parameter group.
+    // A field reference is required for all parameters.
+    // A field reference is required for all parameters.
+    // The action facet reference type field is a required value.
+    // The action facet reference type field is a required value.
+    // At least one response must be declared or inherited for a resource action.
+    // The path template is not properly formatted: "http://example.com"
+    // The specified MIME type(s) will be ignored since the an action facet is not referenced.
 
     /**
      * Create 1st class resource with its own Subject, ID parameter group and make it a parent to the passed resource.
@@ -406,6 +429,33 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
     }
 
     /**
+     * Resource and constructed subject are placed into the passed library.
+     * 
+     * @param pathString
+     * @param subjectName
+     * @param lib
+     * @param modelManager
+     * @return
+     */
+    public static OtmResource buildFullValidOtm(String pathString, String subjectName, OtmLibrary lib,
+        OtmModelManager mgr) {
+        OtmResource r = buildFullOtm( pathString, subjectName, mgr );
+        lib.add( r );
+        assertTrue( r.getLibrary() == lib );
+        lib.add( r.getSubject() );
+        if (lib.isEditable())
+            assertTrue( r.isEditable() );
+        else
+            assertTrue( !r.isEditable() );
+
+        r.isValid( true );
+        log.debug( "Validation Results.\n" + ValidationUtils.getMessagesAsString( r.getFindings() ) );
+        assertTrue( "Must be valid.", r.isValid() );
+
+        return r;
+    }
+
+    /**
      * Build a fully structured resource with:
      * <ul>
      * <li>subject
@@ -421,19 +471,56 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
      */
     public static OtmResource buildFullOtm(String pathString, String subjectName, OtmModelManager mgr) {
         OtmResource resource = TestResource.buildOtm( mgr );
-        resource.setBasePath( pathString );
+        resource.setName( subjectName + "Resource" );
         resource.setFirstClass( true );
 
         OtmBusinessObject testBO = TestBusiness.buildOtm( mgr );
         testBO.setName( subjectName );
         resource.setAssignedType( testBO );
 
-        OtmActionFacet af = TestActionFacet.buildOtm( resource );
-        TestAction.buildFullOtm( resource, af );
+        // Update parameter group for the BO
+        OtmParameterGroup pg = resource.getParameterGroups().get( 0 );
+        pg.setReferenceFacet( testBO.getIdFacet() );
+        pg.setIdGroup( true );
+        OtmParameter param = pg.add( new TLParameter() );
+        param.setFieldRef( (OtmProperty) testBO.getIdFacet().getChildren().get( 0 ) );
+        assertTrue( "Given: one parameter group.", resource.getParameterGroups().size() == 1 );
 
-        resource.setName( subjectName + "Resource" );
+        // Action Facets
+        OtmActionFacet af = null;
+        if (!resource.getActionFacets().isEmpty())
+            af = resource.getActionFacets().get( 0 );
+        else
+            af = TestActionFacet.buildOtm( resource );
+        af.setReferenceFacet( testBO.getIdFacet() );
+        af.setReferenceType( TLReferenceType.OPTIONAL );
+        assertTrue( "Given: must have reference facet.", af.getReferenceFacet() != null );
+        assertTrue( "Given: one action facet.", resource.getActionFacets().size() == 1 );
+        assertTrue( af.isValid() );
+
+        // Actions
+        List<OtmAction> actions = resource.getActions();
+        for (OtmAction a : actions)
+            resource.delete( a );
+        OtmAction action = TestAction.buildFullOtm( resource, af );
+        OtmActionRequest req = action.getRequest();
+        String defaultTemplate = req.getPathTemplateDefault();
+        req.setPathTemplate( defaultTemplate, true );
+        req.setMimeTypes( null );
+        assertTrue( "Given: action must have response.", !action.getResponses().isEmpty() );
+        assertTrue( "Given: one action.", resource.getActions().size() == 1 );
+        log.debug( ValidationUtils.getMessagesAsString( action.getFindings() ) );
+        assertTrue( action.isValid() );
+
+        // resource.getBasePath()
+        // How to get the default base path?
+        resource.setBasePath( pathString + "/{idAttr_Testbo}" );
+        resource.setBasePath( "/" );
+
+        assertTrue( "Given: one parameter group.", resource.getParameterGroups().size() == 1 );
         return resource;
     }
+
 
     /**
      * Build an abstract base resource with common actions, 1 action facet and action response for each status code.

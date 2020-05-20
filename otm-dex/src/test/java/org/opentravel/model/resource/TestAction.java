@@ -395,7 +395,11 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
         OtmAction action = TestAction.buildOtm( resource );
         assertTrue( resource.getActions().contains( action ) );
         assertTrue( action.getRequest() != null );
-        OtmParameterGroup group1 = TestParamGroup.buildOtm( resource );
+        OtmParameterGroup group1 = null;
+        if (!resource.getParameterGroups().isEmpty())
+            group1 = resource.getParameterGroups().get( 0 );
+        if (group1 == null)
+            group1 = TestParamGroup.buildOtm( resource );
         action.getRequest().setParamGroup( group1 );
         // To do - assumes group contains a path and query parameter
         return action;
@@ -412,7 +416,10 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
      */
     public static OtmAction buildFullOtm(OtmResource resource, OtmActionFacet af) {
         OtmAction action = buildFullOtm( resource );
+        for (OtmActionResponse res : action.getResponses())
+            action.delete( res );
         action.add( TestActionResponse.buildOtm( action, af ) );
+        // printResponses( action );
         return action;
     }
 }

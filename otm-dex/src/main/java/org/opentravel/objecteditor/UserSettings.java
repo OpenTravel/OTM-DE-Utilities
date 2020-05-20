@@ -156,7 +156,8 @@ public class UserSettings extends AbstractUserSettings {
     }
 
     public void setDefaultRequestPayload(OtmObject payload) {
-        setDefaultRequestPayload( payload.getNameWithPrefix() );
+        if (payload != null)
+            setDefaultRequestPayload( payload.getNameWithPrefix() );
     }
 
     /**

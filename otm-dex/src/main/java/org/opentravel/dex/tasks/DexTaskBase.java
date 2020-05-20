@@ -143,17 +143,18 @@ public abstract class DexTaskBase<T> extends Task<String> implements DexTask {
         if (taskData != null)
             try {
                 doIT();
-                updateMessage( "Done." );
             } catch (Exception e) {
                 errorException = e;
                 errorBuilder = new StringBuilder( getClass().getSimpleName() + " Error: \n" );
                 errorBuilder.append( e.getLocalizedMessage() );
                 result = errorBuilder.toString(); // Signal business error via result
                 updateMessage( errorBuilder.toString() );
-                // dbc.close();
+                if (dbc != null)
+                    dbc.close();
                 failed();
                 log.warn( errorBuilder.toString() );
             }
+        updateMessage( "Done." );
         updateProgress( progressMax, progressMax );
         // log.debug(" Task done. ");
         return result;

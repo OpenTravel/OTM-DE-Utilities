@@ -149,7 +149,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     public void setDefaultRequestPayload(OtmTypeProvider payload) {
         defaultRequestPayload = payload;
-        if (getModelManager().getUserSettings() != null) {
+        if (payload != null && getModelManager().getUserSettings() != null) {
             getModelManager().getUserSettings().setDefaultRequestPayload( payload );
             getModelManager().getUserSettings().save();
         }

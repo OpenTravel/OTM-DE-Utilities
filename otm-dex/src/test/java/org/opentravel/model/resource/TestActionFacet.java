@@ -131,6 +131,11 @@ public class TestActionFacet<L extends TestOtmResourceBase<OtmActionFacet>>
 
     public static OtmActionFacet buildOtm(OtmResource testResource) {
         OtmActionFacet af = new OtmActionFacet( buildTL( testResource.getTL() ), testResource );
+
+        if (testResource.getSubject() != null) {
+            af.setReferenceFacet( testResource.getSubject().getIdFacet() );
+            assertTrue( "Given: must have reference facet.", af.getReferenceFacet() != null );
+        }
         return af;
     }
 

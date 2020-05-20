@@ -25,6 +25,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractOTMApplication;
+import org.opentravel.common.ValidationUtils;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.TestOtmModelManager;
@@ -35,6 +36,7 @@ import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmFacets.TestFacet;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
+import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
 import org.opentravel.schemacompiler.model.TLAttribute;
@@ -63,7 +65,89 @@ public class TestInheritance extends AbstractFxTest {
     public static void setupTests() throws Exception {
         setupWorkInProcessArea( TestOtmModelManager.class );
         repoManager = repositoryManager.get();
-        mgr = new OtmModelManager( null, repoManager );
+        mgr = new OtmModelManager( null, repoManager, null );
+    }
+
+    /**
+     * Uses {@link TestResource#hasCustomFacets()}
+     * 
+     * @throws VersionSchemeException
+     */
+    @Test
+    public void testResourceActionFacets() throws VersionSchemeException {
+        mgr.clear();
+        if (!TestDexFileHandler.loadVersionProject( mgr ))
+            return; // No editable libraries
+
+        OtmLibrary minorLibrary = TestVersionChain.getMinorInChain( mgr );
+        assertTrue( "Given", minorLibrary != null );
+        assertTrue( "Given", minorLibrary.isEditable() );
+        assertTrue( "Given - minor is empty.", mgr.getMembers( minorLibrary ).isEmpty() );
+
+        OtmLibrary majorLibrary = minorLibrary.getVersionChain().getMajor();
+        assertTrue( "Given", majorLibrary != null );
+        assertTrue( "Given", !majorLibrary.isEditable() );
+        List<OtmLibraryMember> members = majorLibrary.getMembers();
+        assertTrue( "Given - major is not empty.", !members.isEmpty() );
+        OtmBusinessObject bo = null;
+        for (OtmLibraryMember member : members) {
+            if (member instanceof OtmBusinessObject)
+                bo = (OtmBusinessObject) member;
+        }
+        assertTrue( "Given - business object must be found.", bo != null );
+        assertTrue( "Business object must be valid.", bo.isValid( true ) );
+
+        // Given - a minor version of the business object
+        OtmBusinessObject minorBO = (OtmBusinessObject) bo.createMinorVersion( minorLibrary );
+        assertTrue( "Must have a minor business object.", minorBO != null );
+
+        // Given - a resource in the minor library
+        OtmResource resource = TestResource.buildFullOtm( "http://example.com", "TestResource", minorLibrary, mgr );
+        resource.setSubject( bo );
+        assertTrue( "Given: ", resource.getSubject() == bo );
+        resource.isValid( true );
+        // log.debug( ValidationUtils.getMessagesAsString( resource.getFindings() ) );
+        // assertTrue( "Must be valid.", resource.isValid() );
+
+        // Given - BO must have custom facets
+        OtmContextualFacet cf = TestCustomFacet.buildOtm( mgr, bo );
+        minorLibrary.add( cf );
+        assertTrue( "Given: ", cf.getWhereContributed().getOwningMember() == bo );
+        // FIXME - move test into BO and allow for contributed facets
+        // TestBusiness.
+        // assertTrue( "Given: ", TestResource.hasCustomFacet( bo.getChildren() ) );
+
+        List<OtmObject> baseBoFacets = resource.getSubjectFacets();
+        resource.setSubject( minorBO );
+        List<OtmObject> minorBoFacets = resource.getSubjectFacets();
+        OtmCustomFacet mcf = null;
+        for (OtmObject f : minorBoFacets)
+            if (f instanceof OtmCustomFacet)
+                mcf = (OtmCustomFacet) f;
+        assertTrue( "Must have custom facet.", mcf != null );
+        assertTrue( "Must have facets from minor bo.", !minorBoFacets.isEmpty() );
+        assertTrue( "Must have custom facet.", TestResource.hasCustomFacet( minorBoFacets ) );
+
+        // When - action facet is assigned the custom facet.
+        OtmActionFacet af = resource.getActionFacets().get( 0 );
+        af.setReferenceFacet( mcf );
+        // Then
+        minorBO.refresh();
+        List<OtmObject> ik = minorBO.getInheritedChildren();
+        List<OtmObject> minorBoFacets2 = resource.getSubjectFacets();
+        assertTrue( "Must have facets from minor bo.", !minorBoFacets2.isEmpty() );
+        assertTrue( "Must have custom facet.", TestResource.hasCustomFacet( minorBoFacets2 ) );
+
+        // Then - resource is still valid
+        resource.isValid( true );
+        log.debug( "Validation Results\n" + ValidationUtils.getMessagesAsString( resource.getFindings() ) );
+        assertTrue( "Must be valid.", resource.isValid( true ) );
+
+        // TODO
+        // Test if minor version of BO has inherited custom facets.
+        // Then create resource that uses BO and assure it has custom subject facets
+        // Then set resource to minor version of BO
+        // Assure it has custom facets in subjectFacets list
     }
 
     @Ignore
@@ -200,6 +284,7 @@ public class TestInheritance extends AbstractFxTest {
 
     @Test
     public void testInheritanceInMinorVersion() throws VersionSchemeException {
+        mgr.clear();
         if (!TestDexFileHandler.loadVersionProject( mgr ))
             return; // No editable libraries
 
