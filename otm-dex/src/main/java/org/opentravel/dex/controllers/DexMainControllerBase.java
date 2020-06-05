@@ -83,13 +83,28 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         log.debug( "Constructing controller." );
     }
 
+    // @Override
+    // public void addIncludedController(DexIncludedController<?> controller) {
+    // addIncludedController( controller, getEventSubscriptionManager() );
+    // }
+
+    // // FIXME - only used by repository viewer
+    // @Deprecated
+    // @Override
+    // public void addIncludedController(DexIncludedController<?> controller, OtmEventSubscriptionManager eventManager)
+    // {
+    // addIncludedController( controller, eventManager, 0 );
+    // }
+
     @Override
-    public void addIncludedController(DexIncludedController<?> controller) {
-        addIncludedController( controller, getEventSubscriptionManager() );
+    public void addIncludedController(DexIncludedController<?> controller, int viewGroupId) {
+        addIncludedController( controller, getEventSubscriptionManager(), viewGroupId );
     }
 
     @Override
-    public void addIncludedController(DexIncludedController<?> controller, OtmEventSubscriptionManager eventManager) {
+    public void addIncludedController(DexIncludedController<?> controller, OtmEventSubscriptionManager eventManager,
+        int viewGroupId) {
+
         if (controller == null)
             throw new IllegalStateException( "Tried to add null Included controller" );
         if (eventManager == null)
@@ -97,7 +112,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
 
         controller.checkNodes();
         includedControllers.add( controller );
-        controller.configure( this );
+        controller.configure( this, viewGroupId );
 
         // // Register any published event types
         if (controller instanceof OtmEventUser)

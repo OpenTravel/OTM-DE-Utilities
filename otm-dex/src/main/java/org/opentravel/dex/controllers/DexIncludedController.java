@@ -50,9 +50,12 @@ public interface DexIncludedController<T> extends DexController {
      * This method should retrieve all of the resources it needs from the parent such as the stage or image and model
      * managers.
      * 
-     * @param parent
+     * @param mainController
+     * @param viewGroupId an integer assigned to the tab or window this instance of the controller is displayed in
      */
-    public void configure(DexMainController parent);
+    // public void configure(DexMainController mainController);
+
+    public void configure(DexMainController mainController, int viewGroupId);
 
     /**
      * @return

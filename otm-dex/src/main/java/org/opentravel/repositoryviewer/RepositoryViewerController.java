@@ -97,19 +97,19 @@ public class RepositoryViewerController extends DexMainControllerBase implements
         checkNodes();
 
         // Hide the project combo
-        addIncludedController( menuBarWithProjectController, eventManager );
+        addIncludedController( menuBarWithProjectController, eventManager, 0 );
         menuBarWithProjectController.showCombo( false );
         menuBarController = menuBarWithProjectController; // Make available to base class
 
-        addIncludedController( dexStatusController, eventManager );
+        addIncludedController( dexStatusController, eventManager, 0 );
         statusController = dexStatusController; // make available to base class
 
         // Set up the repository selection
-        addIncludedController( repositorySelectionController, eventManager );
-        addIncludedController( repositoryNamespacesTreeController, eventManager );
-        addIncludedController( namespaceLibrariesTreeTableController, eventManager );
+        addIncludedController( repositorySelectionController, eventManager, 0 );
+        addIncludedController( repositoryNamespacesTreeController, eventManager, 0 );
+        addIncludedController( namespaceLibrariesTreeTableController, eventManager, 0 );
         // No set up needed, but add to list
-        addIncludedController( repositoryItemCommitHistoriesController, eventManager );
+        addIncludedController( repositoryItemCommitHistoriesController, eventManager, 0 );
 
         eventManager.configureEventHandlers();
         setMainController( this );

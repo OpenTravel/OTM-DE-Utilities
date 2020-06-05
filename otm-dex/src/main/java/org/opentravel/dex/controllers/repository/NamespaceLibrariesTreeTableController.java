@@ -114,8 +114,8 @@ public class NamespaceLibrariesTreeTableController extends DexIncludedController
     }
 
     @Override
-    public void configure(DexMainController main) {
-        super.configure( main );
+    public void configure(DexMainController main, int viewGroupId) {
+        super.configure( main, viewGroupId );
         eventPublisherNode = nsLibrariesTreeTableView;
 
         // Super.configure assures tree view is not null

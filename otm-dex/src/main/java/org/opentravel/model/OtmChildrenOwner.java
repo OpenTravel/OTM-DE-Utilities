@@ -96,7 +96,7 @@ public interface OtmChildrenOwner extends OtmObject {
     public Collection<OtmTypeProvider> getDescendantsTypeProviders();
 
     /**
-     * @return list containing all descendants that are type users or empty list.
+     * @return live list containing all descendants that are type users or empty list.
      */
     public Collection<OtmTypeUser> getDescendantsTypeUsers();
 

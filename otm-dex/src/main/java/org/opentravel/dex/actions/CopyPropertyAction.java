@@ -19,6 +19,7 @@ package org.opentravel.dex.actions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyFactory;
 import org.opentravel.schemacompiler.model.LibraryElement;
@@ -34,12 +35,26 @@ public class CopyPropertyAction extends DexRunAction {
     /**
      * Any OTM object that uses the intended model manager and an editable library.
      * 
-     * @param subject
-     * @return
+     * @param subject is the property that will be copied. The copy will be added to the subject's parent.
+     * @return true if the subject is an editable property
      */
     public static boolean isEnabled(OtmObject subject) {
         if (subject instanceof OtmProperty)
             return subject.isEditable();
+        return false;
+    }
+
+    /**
+     * Any OTM object that uses the intended model manager and an editable library.
+     * 
+     * @param subject is the property that will be copied. The copy will be added to the subject's parent.
+     * @return true if the subject is an editable property
+     */
+    public static boolean isEnabled(OtmObject subject, OtmObject newParent) {
+        if (newParent == null)
+            return false;
+        if (subject instanceof OtmProperty)
+            return newParent instanceof OtmPropertyOwner && newParent.isEditable();
         return false;
     }
 
@@ -59,13 +74,21 @@ public class CopyPropertyAction extends DexRunAction {
     }
 
     /**
-     * {@inheritDoc} Copy the property and add new property to parent.
+     * {@inheritDoc} Copy the property and add new property to passed parent.
      * 
      * @return
      */
     @Override
     public Object doIt(Object data) {
-        return doIt();
+        newProperty = null;
+        if (getSubject() instanceof OtmProperty && data instanceof OtmPropertyOwner) {
+            LibraryElement newTL = getSubject().getTL().cloneElement();
+            if (newTL instanceof TLModelElement)
+                newProperty = OtmPropertyFactory.create( (TLModelElement) newTL, ((OtmPropertyOwner) data) );
+        }
+        return newProperty;
+
+        // return doIt();
     }
 
 

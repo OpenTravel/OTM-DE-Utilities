@@ -16,6 +16,8 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
+import static org.junit.Assert.assertTrue;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
@@ -69,6 +71,7 @@ public class TestOtmSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
     public static OtmSimpleObject buildOtm(OtmLibrary lib) {
         OtmSimpleObject simple = buildOtm( lib.getModelManager() );
         lib.add( simple );
+        assertTrue( "Given", lib.getMembers().contains( simple ) );
         return simple;
     }
 

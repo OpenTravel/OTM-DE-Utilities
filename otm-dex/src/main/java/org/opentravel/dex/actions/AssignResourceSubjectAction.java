@@ -87,6 +87,10 @@ public class AssignResourceSubjectAction extends DexRunAction {
         return false;
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject ) && value instanceof OtmBusinessObject;
+    }
+
     private OtmResource resource = null;
     private OtmBusinessObject oldSubject = null;
     private OtmResource newResource = null; // Non-null if new minor version of resource created to assign subject to.

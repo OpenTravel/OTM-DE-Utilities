@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -34,6 +35,9 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableRow;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 
 /**
  * Row factory for the members tree table. Controls context menu and CSS style.
@@ -77,6 +81,26 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
 
         // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
+
+        /*
+         * Set up Drag-n-drop
+         */
+        // drag was detected, start drag-and-drop gesture with object name on drag board
+        setOnDragDetected( event -> {
+            if (event == null)
+                return;
+            OtmObject obj = getSelectedObject( getTreeItem() );
+            Dragboard db = null;
+            if (obj instanceof OtmTypeProvider) {
+                db = startDragAndDrop( TransferMode.LINK );
+                String objId = obj.getOwningMember().getNameWithPrefix();
+                ClipboardContent content = new ClipboardContent();
+                content.putString( objId );
+                db.setContent( content );
+                log.debug( "onDragDetected: dragging " + objId );
+            }
+            event.consume();
+        } );
     }
 
     // TODO - create utils class with statics for row factories

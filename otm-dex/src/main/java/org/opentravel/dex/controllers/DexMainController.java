@@ -48,14 +48,19 @@ public interface DexMainController extends DexController {
      * @see DexIncludedController#configure(DexMainController)
      * 
      * @param controller
+     * @param viewGroupId
      */
-    void addIncludedController(DexIncludedController<?> controller);
+    void addIncludedController(DexIncludedController<?> controller, int viewGroupId);
 
     /**
-     * @deprecated Use method with just the controller
+     * Use this method for controllers that are not part of a tab or window group.
+     * 
+     * {@link #addIncludedController(DexIncludedController, int)}
+     * 
+     * @param eventManager
      */
-    @Deprecated
-    void addIncludedController(DexIncludedController<?> controller, OtmEventSubscriptionManager eventManager);
+    void addIncludedController(DexIncludedController<?> controller, OtmEventSubscriptionManager eventManager,
+        int viewGroupId);
 
     /**
      * @return

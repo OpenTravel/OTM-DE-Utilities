@@ -44,11 +44,11 @@ public class MemberPropertiesTabController extends DexTabControllerBase {
     }
 
     @Override
-    public void configure(DexMainController mainController) {
+    public void configure(DexMainController mainController, int viewGroupId) {
         includedControllers.add( memberPropertiesTreeTableController );
         includedControllers.add( memberDetailsController );
         includedControllers.add( propertyDetailsController );
-        super.configure( mainController );
+        super.configure( mainController, viewGroupId );
     }
 
     @Override
@@ -59,7 +59,7 @@ public class MemberPropertiesTabController extends DexTabControllerBase {
     @Override
     public void launchWindow(ActionEvent e) {
         MemberPropertiesWindowController w = MemberPropertiesWindowController.init();
-        super.launchWindow( e, w );
+        super.launchWindow( e, w, getViewGroupId() + 100 );
     }
 
 }

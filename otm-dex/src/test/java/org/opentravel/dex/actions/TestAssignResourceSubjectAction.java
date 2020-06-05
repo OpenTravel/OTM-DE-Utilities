@@ -89,6 +89,8 @@ public class TestAssignResourceSubjectAction {
         // Given - the original set of parameter groups
         List<OtmParameterGroup> groups = resource.getParameterGroups();
         assertTrue( "Given", !groups.isEmpty() );
+        assertTrue( "Action must be enabled.", AssignResourceSubjectAction.isEnabled( resource ) );
+        assertTrue( "Action must be enabled.", AssignResourceSubjectAction.isEnabled( resource, otherBO ) );
 
         // When - action is done with subject.
         actionMgr.run( DexActions.ASSIGNSUBJECT, resource, otherBO );

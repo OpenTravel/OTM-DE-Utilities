@@ -49,11 +49,11 @@ public class SearchTabController extends DexTabControllerBase {
     }
 
     @Override
-    public void configure(DexMainController mainController) {
+    public void configure(DexMainController mainController, int viewGroupId) {
         includedControllers.add( repositorySelectionController );
         includedControllers.add( searchQueryController );
         includedControllers.add( searchResultsController );
-        super.configure( mainController );
+        super.configure( mainController, viewGroupId );
     }
 
     @Override
@@ -63,6 +63,6 @@ public class SearchTabController extends DexTabControllerBase {
 
     public void launchWindow(ActionEvent e) {
         SearchWindowController w = SearchWindowController.init();
-        super.launchWindow( e, w );
+        super.launchWindow( e, w, getViewGroupId() + 100 );
     }
 }

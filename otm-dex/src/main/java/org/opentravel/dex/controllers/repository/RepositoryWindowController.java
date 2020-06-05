@@ -59,13 +59,13 @@ public class RepositoryWindowController extends StandaloneWindowControllerBase {
     }
 
     @Override
-    public void configure(DexMainController mc, MenuItem menuItem) {
+    public void configure(DexMainController mc, MenuItem menuItem, int viewGroupId) {
         includedControllers.add( repositorySelectionController );
         includedControllers.add( repositoryNamespacesTreeController );
         includedControllers.add( namespaceLibrariesTreeTableController );
         includedControllers.add( repositoryItemCommitHistoriesController );
         includedControllers.add( repositoryItemWebViewController );
-        super.configure( mc, menuItem );
+        super.configure( mc, menuItem, viewGroupId );
     }
 
     @Override

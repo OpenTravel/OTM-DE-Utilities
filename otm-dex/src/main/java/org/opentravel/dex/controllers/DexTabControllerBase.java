@@ -36,6 +36,7 @@ public abstract class DexTabControllerBase implements DexTabController {
 
     protected List<DexIncludedController<?>> includedControllers = new ArrayList<>();
     protected DexMainController mainController;
+    protected int viewGroupId = 0; // Assigned by main controller on configuration.
 
     public DexTabControllerBase() {
         // log.debug( "Tab Controller constructed." );
@@ -57,21 +58,31 @@ public abstract class DexTabControllerBase implements DexTabController {
         // no-op
     }
 
-    /**
-     * @param primaryStage
-     */
+    // @Deprecated
+    // @Override
+    // public void configure(DexMainController mc) {
+    // configure( mc, 0 );
+    // // this.mainController = mc;
+    // // includedControllers.forEach( mc::addIncludedController );
+    // }
+
     @Override
-    public void configure(DexMainController mc) {
+    public void configure(DexMainController mc, int viewGroupId) {
         this.mainController = mc;
-        includedControllers.forEach( mc::addIncludedController );
+        for (DexIncludedController<?> ic : includedControllers)
+            mc.addIncludedController( ic, viewGroupId );
+        this.viewGroupId = viewGroupId;
     }
 
-    public void launchWindow(ActionEvent e, StandaloneWindowControllerBase wc) {
+    public int getViewGroupId() {
+        return viewGroupId;
+    }
+
+    public void launchWindow(ActionEvent e, StandaloneWindowControllerBase wc, int viewGroupId) {
         if (wc == null || e == null || !(e.getSource() instanceof MenuItem))
             return;
         ((MenuItem) e.getSource()).setDisable( true );
-        wc.configure( mainController, (MenuItem) e.getSource() );
-        // wc.configure( mainController, null );
+        wc.configure( mainController, (MenuItem) e.getSource(), viewGroupId );
         wc.show( wc.getTitle() );
     }
 

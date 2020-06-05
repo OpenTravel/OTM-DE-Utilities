@@ -114,8 +114,8 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
     }
 
     @Override
-    public void configure(DexMainController mainController) {
-        super.configure( mainController );
+    public void configure(DexMainController mainController, int viewGroupId) {
+        super.configure( mainController, viewGroupId );
         eventPublisherNode = propertyDetailsPane;
     }
 

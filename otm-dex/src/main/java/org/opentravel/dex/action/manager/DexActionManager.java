@@ -116,6 +116,19 @@ public interface DexActionManager {
     public boolean isEnabled(DexActions action, OtmObject subject);
 
     /**
+     * Is the action enabled for the subject and target?
+     * <p>
+     * If the type of action manager supports editing and the target is editable then it returns the result of the
+     * action's static isEnabled() method.
+     * 
+     * @param action
+     * @param subject
+     * @param target if null, returns result of {@link #isEnabled(action, subject)}
+     * @return true if action can be performed
+     */
+    public boolean isEnabled(DexActions action, OtmObject subject, OtmObject target);
+
+    /**
      * If the controller has been set, use it to post the status message.
      * 
      * @param status

@@ -222,8 +222,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     }
 
     @Override
-    public void configure(DexMainController mainController) {
-        super.configure( mainController );
+    public void configure(DexMainController mainController, int viewGroupId) {
+        super.configure( mainController, viewGroupId );
         eventPublisherNode = menuToolBar;
         modelMgr = mainController.getModelManager();
         userSettings = mainController.getUserSettings();
@@ -385,7 +385,9 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     private HashMap<String,File> projectMap = new HashMap<>();
 
     public void configureProjectCombo() {
-        File initialDirectory = userSettings.getLastProjectFolder();
+        File initialDirectory = null;
+        if (userSettings != null)
+            initialDirectory = userSettings.getLastProjectFolder();
         configureProjectCombo( initialDirectory );
     }
 

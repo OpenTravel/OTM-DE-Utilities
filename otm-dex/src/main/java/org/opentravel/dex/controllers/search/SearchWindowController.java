@@ -56,11 +56,11 @@ public class SearchWindowController extends StandaloneWindowControllerBase {
     }
 
     @Override
-    public void configure(DexMainController mc, MenuItem menuItem) {
+    public void configure(DexMainController mc, MenuItem menuItem, int viewGroupId) {
         includedControllers.add( repositorySelectionController );
         includedControllers.add( searchQueryController );
         includedControllers.add( searchResultsController );
-        super.configure( mc, menuItem );
+        super.configure( mc, menuItem, viewGroupId );
     }
 
     @Override

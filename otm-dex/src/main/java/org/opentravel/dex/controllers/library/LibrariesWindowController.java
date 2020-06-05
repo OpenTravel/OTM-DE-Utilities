@@ -59,11 +59,11 @@ public class LibrariesWindowController extends StandaloneWindowControllerBase {
     }
 
     @Override
-    public void configure(DexMainController mc, MenuItem menuItem) {
+    public void configure(DexMainController mc, MenuItem menuItem, int viewGroupId) {
         includedControllers.add( librariesTreeTableController );
         includedControllers.add( usersTreeController );
         includedControllers.add( providersTreeController );
-        super.configure( mc, menuItem );
+        super.configure( mc, menuItem, viewGroupId );
     }
 
     @Override

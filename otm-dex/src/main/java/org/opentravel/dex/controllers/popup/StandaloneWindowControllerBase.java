@@ -43,6 +43,7 @@ public abstract class StandaloneWindowControllerBase extends DexPopupControllerB
     private static Log log = LogFactory.getLog( StandaloneWindowControllerBase.class );
 
     protected static Stage dialogStage;
+    protected int viewGroupId = 0;
     protected List<DexIncludedController<?>> includedControllers = new ArrayList<>();
 
     /**
@@ -91,13 +92,28 @@ public abstract class StandaloneWindowControllerBase extends DexPopupControllerB
         } );
     }
 
-    public void configure(DexMainController mc, MenuItem menuItem) {
+    // @Deprecated
+    // public void configure(DexMainController mc, MenuItem menuItem) {
+    // launchedFromMenuItem = menuItem; // Remember so it can be enabled on close
+    // includedControllers.forEach( c -> mc.addIncludedController( c ) );
+    // mc.getEventSubscriptionManager().configureEventHandlers();
+    //
+    // mc.applyStyleSheet( dialogStage );
+    // // log.debug( "Stand alone window configured." );
+    // }
+
+    public void configure(DexMainController mc, MenuItem menuItem, int viewGroupId) {
         launchedFromMenuItem = menuItem; // Remember so it can be enabled on close
-        includedControllers.forEach( c -> mc.addIncludedController( c ) );
+        includedControllers.forEach( c -> mc.addIncludedController( c, viewGroupId ) );
         mc.getEventSubscriptionManager().configureEventHandlers();
 
         mc.applyStyleSheet( dialogStage );
         // log.debug( "Stand alone window configured." );
+        this.viewGroupId = viewGroupId;
+    }
+
+    public int getViewGroupId() {
+        return viewGroupId;
     }
 
     @Override

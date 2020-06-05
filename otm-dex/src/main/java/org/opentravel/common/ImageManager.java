@@ -74,7 +74,9 @@ public class ImageManager {
         V_ERROR("/icons/error_st_obj.gif"),
         V_WARN("/icons/warning_st_obj.gif"),
         VWA("/icons/VWA.gif"),
-        XSD_SIMPLE("/icons/XSDSimpleType.gif");
+        XSD_SIMPLE("/icons/XSDSimpleType.gif"),
+        LOCK("/icons/lock.png"),
+        UNLOCK("icons/unlock.png");
         private String label; // User displayed value
 
         Icons(String label) {

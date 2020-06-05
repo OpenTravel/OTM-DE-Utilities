@@ -102,6 +102,20 @@ public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
     }
 
     /**
+     * Create a core object with the passed name in the library and model manager.
+     * 
+     * @param library
+     * @param name
+     * @return
+     */
+    public static OtmCore buildOtm(OtmLibrary lib, String name) {
+        OtmCore core = buildOtm( lib );
+        core.setName( name );
+        assertTrue( "BuildOTM Given", lib.getMembers().contains( core ) );
+        return core;
+    }
+
+    /**
      * @param lib
      * @return
      */

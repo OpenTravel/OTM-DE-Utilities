@@ -111,8 +111,8 @@ public class SearchQueryController extends DexIncludedControllerBase<OtmLibraryM
     }
 
     @Override
-    public void configure(DexMainController parent) {
-        super.configure( parent );
+    public void configure(DexMainController parent, int viewGroupId) {
+        super.configure( parent, viewGroupId );
         eventPublisherNode = searchQueryVBox;
         doSearch.setDisable( true );
 

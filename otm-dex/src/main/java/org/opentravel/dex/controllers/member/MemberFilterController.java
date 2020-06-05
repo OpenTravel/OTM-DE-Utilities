@@ -165,8 +165,8 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     }
 
     @Override
-    public void configure(DexMainController mainController) {
-        super.configure( mainController );
+    public void configure(DexMainController mainController, int viewGroupId) {
+        super.configure( mainController, viewGroupId );
         configure( mainController.getModelManager() );
         eventPublisherNode = memberFilter;
     }

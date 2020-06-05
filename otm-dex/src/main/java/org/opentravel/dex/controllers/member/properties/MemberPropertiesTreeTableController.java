@@ -26,6 +26,7 @@ import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.events.DexEventLockEvent;
 import org.opentravel.dex.events.DexFacetSelectionEvent;
 import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
@@ -73,7 +74,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         {DexMemberDeleteEvent.MEMBER_DELETED, OtmObjectReplacedEvent.OBJECT_REPLACED,
             OtmObjectChangeEvent.OBJECT_CHANGED, OtmObjectModifiedEvent.OBJECT_MODIFIED,
             DexMemberSelectionEvent.TYPE_USER_SELECTED, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED,
-            DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+            DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED, DexEventLockEvent.EVENT_LOCK};
 
     @FXML
     protected TreeTableView<PropertiesDAO> propertiesTable;
@@ -202,8 +203,8 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     }
 
     @Override
-    public void configure(DexMainController parent) {
-        super.configure( parent );
+    public void configure(DexMainController parent, int viewGroupId) {
+        super.configure( parent, viewGroupId );
         eventPublisherNode = propertiesTable;
 
         propertiesTable.getSelectionModel().selectedItemProperty()
@@ -211,6 +212,8 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
 
         // Layout the table
         initializeTable( propertiesTable );
+
+        // Drag-n-drop handled in the row factory
 
         // 3/26/2020 - doesn't really work ... only does the empty table node
         // To update, choose some node that's an ancestor of all your nodes which have the "my-view" style class (it
@@ -221,7 +224,16 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
         // log.debug( "Set font size on " + n );
         // }
 
+
     }
+
+
+    // private OtmObject getSelectedObject() {
+    // TreeItem<PropertiesDAO> item = propertiesTable.getSelectionModel().getSelectedItem();
+    // if (item != null && item.getValue() != null && item.getValue().getValue() != null)
+    // return item.getValue().getValue();
+    // return null;
+    // }
 
     private void disableEditing() {
         for (TreeTableColumn<PropertiesDAO,?> col : propertiesTable.getColumns())
@@ -231,18 +243,22 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     @Override
     public void handleEvent(AbstractOtmEvent e) {
         // log.debug( "event handler: " + e.getClass().getSimpleName() );
-        if (e instanceof DexMemberSelectionEvent)
-            handleEvent( (DexMemberSelectionEvent) e );
-        else if (e instanceof DexModelChangeEvent)
-            handleEvent( (DexModelChangeEvent) e );
-        else if (e instanceof OtmObjectChangeEvent)
+        if (e instanceof OtmObjectChangeEvent)
             handleEvent( (OtmObjectChangeEvent) e );
-        else if (e instanceof OtmObjectReplacedEvent)
-            handleEvent( (OtmObjectReplacedEvent) e );
-        else if (e instanceof OtmObjectModifiedEvent)
-            handleEvent( (OtmObjectModifiedEvent) e );
-        else if (e instanceof DexMemberDeleteEvent)
-            handleEvent( (DexMemberDeleteEvent) e );
+        else if (e instanceof DexEventLockEvent)
+            handleEvent( (DexEventLockEvent) e );
+        else if (!eventsLocked) {
+            if (e instanceof DexMemberSelectionEvent)
+                handleEvent( (DexMemberSelectionEvent) e );
+            else if (e instanceof DexModelChangeEvent)
+                handleEvent( (DexModelChangeEvent) e );
+            else if (e instanceof OtmObjectReplacedEvent)
+                handleEvent( (OtmObjectReplacedEvent) e );
+            else if (e instanceof OtmObjectModifiedEvent)
+                handleEvent( (OtmObjectModifiedEvent) e );
+            else if (e instanceof DexMemberDeleteEvent)
+                handleEvent( (DexMemberDeleteEvent) e );
+        }
     }
 
     private void handleEvent(DexMemberDeleteEvent e) {
@@ -276,6 +292,14 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     private void handleEvent(OtmObjectReplacedEvent e) {
         post( e.get().getOwningMember() );
     }
+
+    // private void handleEvent(DexEventLockEvent event) {
+    // // Only react to events with the same view group ID as this controller instance was configured with.
+    // // log.debug( "Group " + getViewGroupId() + " received lock event " + event.get() + " for group "
+    // // + event.getViewGroup() );
+    // if (event.getViewGroup() == getViewGroupId())
+    // eventsLocked = event.get();
+    // }
 
     public void handleMaxEdit(TreeTableColumn.CellEditEvent<PropertiesDAO,String> event) {
         if (event != null && event.getTreeTablePosition() != null) {

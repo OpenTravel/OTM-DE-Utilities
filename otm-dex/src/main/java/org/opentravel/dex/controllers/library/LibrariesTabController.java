@@ -44,13 +44,23 @@ public class LibrariesTabController extends DexTabControllerBase {
         // No-op
     }
 
+    // @Deprecated
+    // @Override
+    // public void configure(DexMainController mainController) {
+    // includedControllers.add( librariesTreeTableController );
+    // includedControllers.add( usersTreeController );
+    // includedControllers.add( providersTreeController );
+    // super.configure( mainController );
+    // }
+
     @Override
-    public void configure(DexMainController mainController) {
+    public void configure(DexMainController mc, int viewGroupId) {
         includedControllers.add( librariesTreeTableController );
         includedControllers.add( usersTreeController );
         includedControllers.add( providersTreeController );
-        super.configure( mainController );
+        super.configure( mc, viewGroupId );
     }
+
 
     @Override
     public String getDialogTitle() {
@@ -60,7 +70,7 @@ public class LibrariesTabController extends DexTabControllerBase {
     @Override
     public void launchWindow(ActionEvent e) {
         LibrariesWindowController w = LibrariesWindowController.init();
-        super.launchWindow( e, w );
+        super.launchWindow( e, w, getViewGroupId() + 100 );
     }
 
 }

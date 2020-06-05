@@ -122,6 +122,12 @@ public enum DexActions {
      */
     public static DexAction<?> getAction(DexActions action, OtmObject subject, DexActionManager actionManager)
         throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
+        return getAction( action, subject, null, actionManager );
+    }
+
+    public static DexAction<?> getAction(DexActions action, OtmObject subject, OtmObject target,
+        DexActionManager actionManager)
+        throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
 
         if (subject == null)
             throw new IllegalArgumentException( "Missing subject." );
@@ -137,7 +143,7 @@ public enum DexActions {
 
         // Create handler to return
         DexAction<?> handler = null;
-        if (actionManager.isEnabled( action, subject )) {
+        if (actionManager.isEnabled( action, subject, target )) {
             handler = action.actionClass.newInstance();
             // do not return the handler if the subject can't be set
             if (!handler.setSubject( subject ))

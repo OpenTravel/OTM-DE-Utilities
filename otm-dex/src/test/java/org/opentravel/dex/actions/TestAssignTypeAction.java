@@ -35,11 +35,13 @@ import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
+import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestCore;
 import org.opentravel.model.otmLibraryMembers.TestEnumerationClosed;
+import org.opentravel.model.otmLibraryMembers.TestOtmSimple;
 import org.opentravel.model.otmLibraryMembers.TestValueWithAttributes;
 import org.opentravel.model.otmLibraryMembers.TestXsdSimple;
 import org.opentravel.model.otmProperties.OtmProperty;
@@ -136,20 +138,14 @@ public class TestAssignTypeAction {
     @Test
     public void testAssignToNewProperty() {
         DexFullActionManager am = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( am, null );
+        OtmModelManager mgr = new OtmModelManager( am, null, null );
         lib = TestLibrary.buildOtm( mgr );
-        OtmCore core = TestCore.buildOtm( mgr, "TestCore" );
-        OtmFacet facet = core.getSummary();
-        lib.add( core );
-        mgr.add( core );
+        OtmCore core = TestCore.buildOtm( lib, "TestCore" );
+        OtmFacet<?> facet = core.getSummary();
 
         // Given - objects to assign
-        OtmEnumeration<?> closedEnum = TestEnumerationClosed.buildOtm( mgr );
-        lib.add( closedEnum );
-        mgr.add( closedEnum );
-        OtmXsdSimple simple = TestXsdSimple.buildOtm( mgr );
-        lib.add( simple );
-        mgr.add( simple );
+        OtmEnumeration<?> closedEnum = TestEnumerationClosed.buildOtm( lib );
+        OtmSimpleObject simple = TestOtmSimple.buildOtm( lib );
 
         // Given - a newly created Attribute property
         Object result = am.run( DexActions.ADDPROPERTY, facet, OtmPropertyType.ATTRIBUTE );
@@ -159,8 +155,10 @@ public class TestAssignTypeAction {
         assertTrue( "Given - the property has no assigned type.", property.getAssignedTLType() == null );
         assertTrue( "Given - the property has no assigned type.", property.getAssignedType() == null );
 
+        assertTrue( "The action must be enabled.", SetAssignedTypeAction.isEnabled( property ) );
+        assertTrue( "The action must be enabled.", SetAssignedTypeAction.isEnabled( property, closedEnum ) );
 
-        // When - changed
+        // When - type is changed
         am.run( DexActions.TYPECHANGE, property, closedEnum );
         assertTrue( "Then - the property has assigned type.", property.getAssignedType() == closedEnum );
         assertTrue( "Then - vwa has property in where used list.", closedEnum.getWhereUsed().contains( core ) );

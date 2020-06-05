@@ -23,6 +23,7 @@ import org.opentravel.common.cellfactories.ValidationMemberTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.events.DexEventLockEvent;
 import org.opentravel.dex.events.DexFilterChangeEvent;
 import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
@@ -88,6 +89,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     MemberFilterController filter = null;
 
     private boolean ignoreEvents = false;
+    private boolean eventsLocked = false;
     // By default, the tree is editable. Setting this to false will prevent edits.
     private boolean treeEditingEnabled = true;
 
@@ -160,12 +162,20 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             memberTree.getRoot().getChildren().clear();
     }
 
-    /**
-     * Configure the controller for use by main controller.
-     */
+    // /**
+    // * Configure the controller for use by main controller.
+    // */
+    // @Override
+    // public void configure(DexMainController parent) {
+    // configure( parent, 0 );
+    // // log.debug("Configuring Member Tree Table.");
+    // // eventPublisherNode = memberTreeController;
+    // // configure( parent.getModelManager(), treeEditingEnabled );
+    // }
+
     @Override
-    public void configure(DexMainController parent) {
-        super.configure( parent );
+    public void configure(DexMainController parent, int viewGroupId) {
+        super.configure( parent, viewGroupId );
         // log.debug("Configuring Member Tree Table.");
         eventPublisherNode = memberTreeController;
         configure( parent.getModelManager(), treeEditingEnabled );
@@ -281,7 +291,9 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     @Override
     public void handleEvent(AbstractOtmEvent event) {
         // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
-        if (!ignoreEvents) {
+        if (event instanceof DexEventLockEvent)
+            handleEvent( (DexEventLockEvent) event );
+        else if (!ignoreEvents && !eventsLocked) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
             else if (event instanceof DexFilterChangeEvent)
@@ -298,6 +310,12 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
                 refresh();
         }
     }
+
+    // private void handleEvent(DexEventLockEvent event) {
+    // // TODO - only react to members of same parent as source
+    // Object source = event.getSource();
+    // eventsLocked = event.get();
+    // }
 
     private void handleEvent(OtmObjectReplacedEvent event) {
         if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())

@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.OtmEventUser;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.events.DexEvent;
+import org.opentravel.dex.events.DexEventLockEvent;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,6 +54,14 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
     protected List<EventType<? extends AbstractOtmEvent>> subscribedEventTypes = null;
     // source FX Node for events fired from this controller. None fired if null.
     protected Node eventPublisherNode = null;
+
+    /**
+     * When true, events should be ignored except Event Lock ({@link DexEventLockEvent}) events.
+     * <p>
+     * See {@link #handleEvent(DexEventLockEvent)}
+     */
+    protected boolean eventsLocked = false;
+    private int viewGroupId; // used to link multiple controllers to share behaviors such as lock.
 
     public DexIncludedControllerBase() {
         // log.debug( "Constructing included controller." );
@@ -106,6 +115,20 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
         // override
     }
 
+    /**
+     * Set the eventsLocked flag.
+     * <p>
+     * Only react to events with the same view group ID used when configuring this controller instance.
+     * 
+     * @param event
+     */
+    protected void handleEvent(DexEventLockEvent event) {
+        // log.debug( "Group " + getViewGroupId() + " received lock event " + event.get() + " for group "
+        // + event.getViewGroup() );
+        if (event.getViewGroup() == getViewGroupId())
+            eventsLocked = event.get();
+    }
+
     @Override
     public void setEventHandler(EventType<? extends AbstractOtmEvent> type, EventHandler<AbstractOtmEvent> handler) {
         if (type == null || handler == null)
@@ -126,10 +149,18 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
      * @see org.opentravel.dex.controllers.DexIncludedController#configure(org.opentravel.dex.controllers.DexMainController)
      */
     @Override
-    public void configure(DexMainController parent) {
+    public void configure(DexMainController mc, int viewGroupId) {
         checkNodes();
-        this.mainController = parent;
-        // log.debug( "Main controller set." );
+        this.mainController = mc;
+        this.viewGroupId = viewGroupId;
+        // log.debug( "Controller configured: "+getClass().getSimpleName() );
+    }
+
+    /**
+     * @return the id of the view group assigned when this controller was configured.
+     */
+    public int getViewGroupId() {
+        return viewGroupId;
     }
 
     // Only use to fire events from Undo actions

@@ -93,8 +93,8 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
      * Configure the controller for use by main controller.
      */
     @Override
-    public void configure(DexMainController parent) {
-        super.configure( parent );
+    public void configure(DexMainController parent, int viewGroupId) {
+        super.configure( parent, viewGroupId );
         // log.debug("Configuring Type Users Tree.");
         configure( parent.getModelManager() );
     }

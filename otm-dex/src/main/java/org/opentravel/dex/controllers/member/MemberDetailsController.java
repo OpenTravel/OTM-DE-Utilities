@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.ImageManager;
+import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.actions.DeprecationChangeAction;
@@ -27,6 +28,7 @@ import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.popup.TextAreaEditorContoller;
+import org.opentravel.dex.events.DexEventLockEvent;
 import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
@@ -108,21 +110,22 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     private RadioButton editminor;
     @FXML
     private RadioButton editfull;
+    @FXML
+    private Button lockButton;
 
 
     // private OtmModelManager modelMgr;
     private OtmLibraryMember selectedMember;
-
+    private boolean eventLock = false;
     private boolean ignoreClear = false;
-
     private Label deprecationLabel;
-
     private TextField deprecationField;
-
     private Button deprecationButton;
 
+    // private int viewGroup = 1;
+
     // All event types fired by this controller.
-    private static final EventType[] publishedEvents = {};
+    private static final EventType[] publishedEvents = {DexEventLockEvent.EVENT_LOCK};
 
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
@@ -163,17 +166,21 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
     }
 
     @Override
-    public void configure(DexMainController mainController) {
-        super.configure( mainController );
+    public void configure(DexMainController mainController, int viewGroupId) {
+        super.configure( mainController, viewGroupId );
         eventPublisherNode = memberDetails;
 
         editfull.setTooltip( new Tooltip( TIP_FULLEDIT ) );
         editminor.setTooltip( new Tooltip( TIP_MINOREDIT ) );
         editreadonly.setTooltip( new Tooltip( TIP_READONLYEDIT ) );
+        postEventLock();
+        lockButton.setOnAction( e -> changeEventLock() );
     }
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
+        if (eventLock)
+            return;
         // log.debug( "Received event: " + event.getClass().getSimpleName() + ":" + event.getEventType() );
         if (event instanceof DexMemberSelectionEvent)
             handleEvent( (DexMemberSelectionEvent) event );
@@ -313,6 +320,9 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
             assignedTypeName.setText( "" );
         }
 
+
+        postEventLock();
+
         editfull.setDisable( true );
         editreadonly.setDisable( true );
         editminor.setDisable( true );
@@ -325,6 +335,27 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
 
         // If deprecated, add a row. Otherwise, remove it.
         postDeprecation( member );
+    }
+
+    private void postEventLock() {
+        if (eventLock) {
+            lockButton.setGraphic( new ImageView( ImageManager.getImage( Icons.UNLOCK ) ) );
+            lockButton.setText( "Unlock" );
+            lockButton.setTooltip( new Tooltip( "UnLock to allow display to change." ) );
+        } else {
+            lockButton.setGraphic( new ImageView( ImageManager.getImage( Icons.LOCK ) ) );
+            lockButton.setText( "Lock" );
+            lockButton.setTooltip( new Tooltip( "Lock to prevent display from changing." ) );
+        }
+    }
+
+    private void changeEventLock() {
+        if (eventLock)
+            eventLock = false;
+        else
+            eventLock = true;
+        postEventLock();
+        fireEvent( new DexEventLockEvent( eventLock, getViewGroupId() ) );
     }
 
     private void postDeprecation(OtmLibraryMember member) {

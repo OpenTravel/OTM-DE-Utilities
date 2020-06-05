@@ -159,6 +159,19 @@ public abstract class DexActionManagerBase implements DexActionManager {
         return queue.size();
     }
 
+    /**
+     * Override if two parameter isEnabled() actions are supported.
+     * 
+     * @see org.opentravel.dex.action.manager.DexActionManager#isEnabled(org.opentravel.dex.actions.DexActions,
+     *      org.opentravel.model.OtmObject, org.opentravel.model.OtmObject)
+     */
+    @Override
+    public boolean isEnabled(DexActions action, OtmObject subject, OtmObject target) {
+        if (target == null)
+            return isEnabled( action, subject );
+        return false;
+    }
+
     @Override
     public void postStatus(String status) {
         if (mainController != null)
@@ -242,7 +255,10 @@ public abstract class DexActionManagerBase implements DexActionManager {
             return null;
 
         try {
-            actionHandler = DexActions.getAction( action, subject, this );
+            if (value instanceof OtmObject)
+                actionHandler = DexActions.getAction( action, subject, (OtmObject) value, this );
+            else
+                actionHandler = DexActions.getAction( action, subject, this );
             if (actionHandler instanceof DexRunAction) {
                 result = ((DexRunAction) actionHandler).doIt( value );
             } else {

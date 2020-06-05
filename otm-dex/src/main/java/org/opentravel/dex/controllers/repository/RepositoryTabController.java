@@ -52,13 +52,13 @@ public class RepositoryTabController extends DexTabControllerBase {
      * @param primaryStage
      */
     @Override
-    public void configure(DexMainController mc) {
+    public void configure(DexMainController mc, int viewGroupId) {
         includedControllers.add( repositorySelectionController );
         includedControllers.add( repositoryNamespacesTreeController );
         includedControllers.add( namespaceLibrariesTreeTableController );
         includedControllers.add( repositoryItemCommitHistoriesController );
         includedControllers.add( repositoryItemWebViewController );
-        super.configure( mc );
+        super.configure( mc, viewGroupId );
     }
 
     @Override
@@ -68,7 +68,7 @@ public class RepositoryTabController extends DexTabControllerBase {
 
     public void launchWindow(ActionEvent e) {
         RepositoryWindowController w = RepositoryWindowController.init();
-        super.launchWindow( e, w );
+        super.launchWindow( e, w, getViewGroupId() + 100 );
     }
 
 }

@@ -112,8 +112,8 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     }
 
     @Override
-    public void configure(DexMainController mainController) {
-        super.configure( mainController );
+    public void configure(DexMainController mainController, int viewGroupId) {
+        super.configure( mainController, viewGroupId );
         eventPublisherNode = resourceDetailsPane;
         // eventManager = mainController.getEventSubscriptionManager();
     }

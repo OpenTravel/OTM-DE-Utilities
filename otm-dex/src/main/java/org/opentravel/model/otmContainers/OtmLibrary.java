@@ -46,6 +46,7 @@ import org.opentravel.schemacompiler.version.VersionSchemeException;
 import org.opentravel.schemacompiler.version.VersionSchemeFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +94,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     /**
-     * Add the TL member to the Tl library and model manager.
+     * Adds member to this library by adding the TL member to the TL library and model manager.
      * <p>
      * Note: will not add second member if one with the same name already is in TL library
      * <p>
@@ -634,7 +635,8 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         for (OtmLibraryMember m : getMembers()) {
             if (m instanceof OtmTypeUser)
                 addToMap( (OtmTypeUser) m, providerMap );
-            for (OtmTypeUser u : m.getDescendantsTypeUsers()) {
+            Collection<OtmTypeUser> users = new ArrayList<>( m.getDescendantsTypeUsers() );
+            for (OtmTypeUser u : users) {
                 // Check for owners being contextual facets. Skip these.
                 if (u.getOwningMember() != m && u.getOwningMember() instanceof OtmContextualFacet)
                     continue;

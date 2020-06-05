@@ -138,16 +138,15 @@ public class MemberDetailsPopupController extends DexPopupControllerBase {
 
     @Override
     protected void setup(String message) {
-        super.setStage( dialogTitle, dialogStage );
-        postHelp( helpText, dialogHelp );
-        cancelButton.setOnAction( e -> doCancel() );
-
-        selectButton.setText( "OK" );
-        selectButton.setOnAction( e -> doOK() );
-
-        memberDetailsController.configure( null );
-
-        memberDetailsController.post( currentMember );
+        // super.setStage( dialogTitle, dialogStage );
+        // postHelp( helpText, dialogHelp );
+        // cancelButton.setOnAction( e -> doCancel() );
+        //
+        // selectButton.setText( "OK" );
+        // selectButton.setOnAction( e -> doOK() );
+        //
+        // memberDetailsController.configure( null );
+        // memberDetailsController.post( currentMember );
     }
 
 }

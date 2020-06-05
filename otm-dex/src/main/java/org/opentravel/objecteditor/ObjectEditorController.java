@@ -127,21 +127,30 @@ public class ObjectEditorController extends DexMainControllerBase {
         stage.setX( userSettings.getWindowPosition().getX() );
         stage.setY( userSettings.getWindowPosition().getY() );
 
-        // Set up menu bar and show the project combo
-        addIncludedController( menuBarWithProjectController, eventManager );
+        // included controllers - controllers without a parent tab or window
+        // * Add to controller list
+        // * set their event manager
+        // * retain for base class getter
+        //
+        int viewGroupId = 1; // unique value assigned to all view groups.
+
+        addIncludedController( menuBarWithProjectController, eventManager, viewGroupId++ );
         menuBarWithProjectController.showCombo( true );
         menuBarController = menuBarWithProjectController; // Make available to base class
 
         // Setup status controller
-        addIncludedController( dexStatusController, eventManager );
+        addIncludedController( dexStatusController, eventManager, viewGroupId++ );
         statusController = dexStatusController; // Make available to base class
 
+        // Tab controllers
+        // Configure them. They will include their controllers.
+
         // Tab controllers are not in the included controllers list
-        repositoryTabController.configure( this ); // TODO - this is slow!
-        resourcesTabController.configure( this );
-        librariesTabController.configure( this );
-        whereUsedTabController.configure( this );
-        searchTabController.configure( this );
+        repositoryTabController.configure( this, viewGroupId++ ); // TODO - this is slow!
+        resourcesTabController.configure( this, viewGroupId++ );
+        librariesTabController.configure( this, viewGroupId++ );
+        whereUsedTabController.configure( this, viewGroupId++ );
+        searchTabController.configure( this, viewGroupId++ );
 
         // Add menu items for tab controllers that can also be launched in separate views windows
         menuBarWithProjectController.addViewItem( librariesTabController );
@@ -151,14 +160,17 @@ public class ObjectEditorController extends DexMainControllerBase {
         menuBarWithProjectController.addViewItem( searchTabController );
 
         // Include controllers that are not in tabs
-        addIncludedController( memberFilterController, eventManager );
+        addIncludedController( memberFilterController, eventManager, viewGroupId++ );
         memberTreeTableController.setFilter( memberFilterController );
-        addIncludedController( memberTreeTableController, eventManager );
+        addIncludedController( memberTreeTableController, eventManager, viewGroupId++ );
 
-        memberPropertiesTabController.configure( this );
+        memberPropertiesTabController.configure( this, viewGroupId );
 
         // Now that all controller's event requirements are known
         eventManager.configureEventHandlers();
+
+        // FIXME - remove configure() and addIncludedController without viewGroupId
+        // FIXME - pass viewGroupId to windows
 
         setMainController( this );
 

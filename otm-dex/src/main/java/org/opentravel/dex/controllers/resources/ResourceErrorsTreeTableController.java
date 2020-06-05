@@ -144,8 +144,8 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
      * Configure the controller for use by main controller.
      */
     @Override
-    public void configure(DexMainController parent) {
-        super.configure( parent );
+    public void configure(DexMainController parent, int viewGroupId) {
+        super.configure( parent, viewGroupId );
         // log.debug("Configuring Member Tree Table.");
         configure( parent.getModelManager(), treeEditingEnabled );
     }

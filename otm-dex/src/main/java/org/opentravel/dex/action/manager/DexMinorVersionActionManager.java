@@ -72,6 +72,7 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
             return actionManager.isEnabled( action, subject );
         return false;
     }
+    // TODO - implement two param isEnabled for drag-n-drop on minor
 
     // From language specification document
     // 1. Any new term can be defined
@@ -100,6 +101,7 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
             case DESCRIPTIONCHANGE:
             case DEPRECATIONCHANGE:
             case EXAMPLECHANGE:
+            case COPYLIBRARYMEMBER:
             case ADDPROPERTY:
                 return true;
             default:

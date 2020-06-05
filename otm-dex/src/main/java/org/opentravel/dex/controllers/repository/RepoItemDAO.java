@@ -170,7 +170,7 @@ public class RepoItemDAO implements DexDAO<RepositoryItem>, TaskResultHandlerI {
 
         // Create authenticator
         URI baseUri = URI.create( rn );
-        log.debug( "Creating authenticator for " + baseUri.toString() );
+        // log.debug( "Creating authenticator for " + baseUri.toString() );
         Authenticator.setDefault( new Authenticator() {
 
             @Override

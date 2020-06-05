@@ -90,8 +90,8 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibrary> i
      * Configure the controller for use by main controller.
      */
     @Override
-    public void configure(DexMainController parent) {
-        super.configure( parent );
+    public void configure(DexMainController parent, int viewGroupId) {
+        super.configure( parent, viewGroupId );
         eventPublisherNode = usersTree;
         configure( parent.getModelManager() );
     }

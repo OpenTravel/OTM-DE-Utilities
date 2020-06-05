@@ -92,7 +92,7 @@ public class AssignedTypePropertiesTreeTableCellFactory extends TreeTableCell<Pr
         if (assignedType != null)
             lm = ((OtmModelElement<?>) assignedType).getOwningMember();
         if (controller != null && event.getButton().equals( MouseButton.PRIMARY ) && event.getClickCount() == 2) {
-            log.debug( "Double click selection: " );
+            // log.debug( "Double click selection: " );
             if (lm != null)
                 // controller.assignedTypeSelectionListener(lm);
                 controller.fireEvent( new DexMemberSelectionEvent( lm ) );

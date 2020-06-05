@@ -46,13 +46,13 @@ public class ResourcesTabController extends DexTabControllerBase {
     }
 
     @Override
-    public void configure(DexMainController mainController) {
+    public void configure(DexMainController mainController, int viewGroupId) {
         this.mainController = mainController;
         includedControllers.add( resourcesTreeTableController );
         includedControllers.add( resourceDetailsController );
         includedControllers.add( resourceActionsTreeTableController );
         includedControllers.add( resourceErrorsTreeTableController );
-        super.configure( mainController );
+        super.configure( mainController, viewGroupId );
     }
 
     @Override
@@ -62,7 +62,7 @@ public class ResourcesTabController extends DexTabControllerBase {
 
     public void launchWindow(ActionEvent e) {
         ResourcesWindowController w = ResourcesWindowController.init();
-        super.launchWindow( e, w );
+        super.launchWindow( e, w, getViewGroupId() + 100 );
     }
 
 }

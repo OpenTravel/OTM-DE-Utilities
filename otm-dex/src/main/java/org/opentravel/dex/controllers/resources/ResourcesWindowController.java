@@ -57,12 +57,12 @@ public class ResourcesWindowController extends StandaloneWindowControllerBase {
     }
 
     @Override
-    public void configure(DexMainController mainController, MenuItem menuItem) {
+    public void configure(DexMainController mainController, MenuItem menuItem, int viewGroupId) {
         includedControllers.add( resourcesTreeTableController );
         includedControllers.add( resourceDetailsController );
         includedControllers.add( resourceActionsTreeTableController );
         includedControllers.add( resourceErrorsTreeTableController );
-        super.configure( mainController, menuItem );
+        super.configure( mainController, menuItem, viewGroupId );
     }
 
     @Override

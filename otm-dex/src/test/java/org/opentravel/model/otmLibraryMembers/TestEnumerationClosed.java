@@ -93,16 +93,29 @@ public class TestEnumerationClosed extends TestOtmLibraryMemberBase<OtmEnumerati
     }
 
     /** ****************************************************** **/
+    /**
+     * Create a closed enumeration with 3 values and add to library and model manager.
+     * 
+     * @param lib
+     * @return
+     */
     public static OtmEnumerationClosed buildOtm(OtmLibrary lib) {
-        OtmEnumerationClosed otc = buildOtm( lib.getModelManager() );
-        lib.add( otc );
-        return otc;
+        OtmEnumerationClosed oec = buildOtm( lib.getModelManager() );
+        lib.add( oec );
+        assertTrue( "Given", lib.getMembers().contains( oec ) );
+        return oec;
     }
 
+    /**
+     * Create closed enumeration and set its model manager. Is <b>not</b> added to model.
+     * 
+     * @param mgr
+     * @return
+     */
     public static OtmEnumerationClosed buildOtm(OtmModelManager mgr) {
-        OtmEnumerationClosed otc = new OtmEnumerationClosed( buildTL(), mgr );
-        assertNotNull( otc );
-        return otc;
+        OtmEnumerationClosed oec = new OtmEnumerationClosed( buildTL(), mgr );
+        assertNotNull( oec );
+        return oec;
     }
 
 

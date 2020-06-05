@@ -49,11 +49,11 @@ public class WhereUsedTabController extends DexTabControllerBase {
     }
 
     @Override
-    public void configure(DexMainController mainController) {
+    public void configure(DexMainController mainController, int viewGroupId) {
         includedControllers.add( typeUsersTreeController );
         includedControllers.add( usersTreeController );
         includedControllers.add( typeProvidersTreeController );
-        super.configure( mainController );
+        super.configure( mainController, viewGroupId );
     }
 
     @Override

@@ -19,13 +19,18 @@ package org.opentravel.dex.controllers.member.properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
+import org.opentravel.dex.actions.CopyPropertyAction;
 import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.actions.SetAssignedTypeAction;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
 import org.opentravel.model.otmFacets.OtmAlias;
+import org.opentravel.model.otmFacets.OtmFacet;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyType;
 
@@ -35,6 +40,9 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableRow;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 
 /**
  * @author dmh
@@ -48,6 +56,7 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
     private static final PseudoClass DIVIDER = PseudoClass.getPseudoClass( "divider" );
     private MemberPropertiesTreeTableController controller;
 
+    private static final String PROPERTY_DIVIDER = "#";
     private final ContextMenu contextMenu = new ContextMenu();
     private Menu addMenu;
     private MenuItem deleteItem;
@@ -65,11 +74,6 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
         changeType = new MenuItem( "Change Assigned Type" );
         validateItem = new MenuItem( "Validate" );
 
-        // MenuItem upObject = new MenuItem( "Move Up (Future)" );
-        // MenuItem downObject = new MenuItem( "Move Down (Future)" );
-        // SeparatorMenuItem separator = new SeparatorMenuItem();
-        // contextMenu.getItems().addAll( addMenu, deleteProperty, changeType, separator, upObject, downObject );
-
         contextMenu.getItems().addAll( addMenu, deleteItem, changeType, validateItem );
         setContextMenu( contextMenu );
 
@@ -79,6 +83,98 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
 
         // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
+
+        /*
+         * Set up Drag-n-drop
+         */
+        // drag was detected, start drag-and-drop gesture with object name on drag board
+        setOnDragDetected( event -> {
+            if (event == null)
+                return;
+            OtmObject obj = getObject();
+            Dragboard db = null;
+            if (obj != null) {
+                if (obj instanceof OtmTypeProvider)
+                    db = startDragAndDrop( TransferMode.LINK );
+                else
+                    db = startDragAndDrop( TransferMode.COPY );
+                String objId = obj.getOwningMember().getNameWithPrefix() + PROPERTY_DIVIDER + obj.getName();
+                ClipboardContent content = new ClipboardContent();
+                content.putString( objId );
+                db.setContent( content );
+                log.debug( "onDragDetected: copy object " + objId );
+            }
+            event.consume();
+        } );
+
+        // Control transfer model based on source data dragged over this target
+        setOnDragOver( event -> {
+            if (event == null)
+                return;
+            OtmObject source = getDraggedObject( event.getDragboard() );
+            OtmObject target = getObject();
+            if (target != null && source != null) {
+                // log.debug( "dragOverDetected: copy object " + source + " to " + target );
+                // LINK If source is type provider and target can be assigned the type
+                if (source instanceof OtmTypeProvider && target instanceof OtmTypeUser
+                    && SetAssignedTypeAction.isEnabled( target ))
+                    event.acceptTransferModes( TransferMode.LINK );
+                // COPY if target is a facet and copy enabled
+                else if (target instanceof OtmFacet
+                    && CopyPropertyAction.isEnabled( source, (OtmPropertyOwner) target ))
+                    event.acceptTransferModes( TransferMode.COPY );
+                else
+                    event.acceptTransferModes( TransferMode.NONE );
+            }
+            event.consume();
+        } );
+
+        // Data dropped. Get source from drag board and use it on this target
+        setOnDragDropped( event -> {
+            if (event == null)
+                return;
+            OtmObject target = getObject();
+            OtmObject source = getDraggedObject( event.getDragboard() );
+            boolean success = false;
+            if (source != null && target != null) {
+                // log.debug( event.getAcceptedTransferMode() + " the property: " + source + " to " + target );
+                if (event.getAcceptedTransferMode() == TransferMode.COPY)
+                    target.getActionManager().run( DexActions.COPYPROPERTY, source, target );
+                else if (event.getAcceptedTransferMode() == TransferMode.LINK)
+                    target.getActionManager().run( DexActions.TYPECHANGE, target, source );
+
+                controller.refresh();
+                success = true;
+            }
+            // let the source know whether the string was successfully transferred and used
+            event.setDropCompleted( success );
+            event.consume();
+        } );
+    }
+
+    private OtmObject getDraggedObject(Dragboard db) {
+        if (db == null)
+            return null;
+        String objId = db.getString();
+        OtmObject obj = null;
+        OtmLibraryMember owner = null;
+        if (controller.getMainController() != null && controller.getMainController().getModelManager() != null) {
+            String ownerId = objId;
+            String propertyId = "";
+            if (objId.contains( PROPERTY_DIVIDER )) {
+                ownerId = objId.substring( 0, objId.indexOf( PROPERTY_DIVIDER ) );
+                propertyId = objId.substring( objId.indexOf( PROPERTY_DIVIDER ) + 1, objId.length() );
+            }
+            owner = controller.getMainController().getModelManager().getMember( ownerId );
+            obj = owner;
+            if (owner != null && !propertyId.isEmpty()) {
+                for (OtmObject o : owner.getDescendants())
+                    if (o.getName().equals( propertyId ))
+                        obj = o;
+            }
+        }
+        // log.debug( "Dragged object is: " + obj );
+        return obj;
     }
 
     /**
@@ -93,7 +189,6 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
             owner.getActionManager().run( DexActions.ADDPROPERTY, owner, type );
             controller.refresh();
         }
-        // log.debug( "add in Properties Row Factory." );
     }
 
     private void changeAssignedType() {

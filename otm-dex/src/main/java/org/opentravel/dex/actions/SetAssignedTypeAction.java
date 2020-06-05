@@ -48,6 +48,11 @@ public class SetAssignedTypeAction extends DexRunAction {
     private static final String VETO3 = ".ILLEGAL_REFERENCE";
     private static final String[] VETOKEYS = {VETO2, VETO3};
 
+    /**
+     * 
+     * @param subject the type user to assign a type to
+     * @return true if editable and a type user
+     */
     public static boolean isEnabled(OtmObject subject) {
         // Id is a type user but can't be changed.
         if (subject instanceof OtmIdAttribute)
@@ -59,6 +64,11 @@ public class SetAssignedTypeAction extends DexRunAction {
         if (subject.getLibrary() != null && subject.getLibrary().isChainEditable())
             return subject.getLibrary().getVersionChain().canAssignLaterVersion( (OtmTypeUser) subject );
         return false;
+    }
+
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        // TODO - test for compatibility of value to subject type user
+        return isEnabled( subject );
     }
 
     private OtmTypeUser user = null;
@@ -148,7 +158,7 @@ public class SetAssignedTypeAction extends DexRunAction {
     }
 
     /**
-     * This action will get the data from the user via modal dialog
+     * This action will use the passed data as the type provider
      * 
      * @return
      */

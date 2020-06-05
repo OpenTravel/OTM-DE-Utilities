@@ -59,6 +59,7 @@ public interface OtmPropertyOwner extends OtmChildrenOwner {
      */
     public OtmProperty add(TLModelElement tlChild);
 
+    // TODO - why is getActionManager() here?
     /**
      * @return
      */

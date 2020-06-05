@@ -34,15 +34,33 @@ public interface DexTabController {
      */
     public void checkNodes();
 
+    // /**
+    // * @deprecated - pass in a view group id
+    // */
+    // @Deprecated
+    // public void configure(DexMainController mainController);
+
     /**
-     * Add included controllers to main controller.
+     * Add included controllers to main controller. Sub-types add the controllers in the tab to the included controllers
+     * list, then call super.config() which will
+     * {@link DexMainController#addIncludedController(DexIncludedController, int)} add the controllers to the main
+     * controller
+     * 
+     * @param mc
+     * @param viewGroupId is an identifier assigned by main controller used for controls such as lock.
      */
-    public void configure(DexMainController mainController);
+    void configure(DexMainController mc, int viewGroupId);
 
     /**
      * Does this tab have a stand alone dialog defined? If so, return its title. If not, return null.
      */
     public String getDialogTitle();
+
+    /**
+     * 
+     * @return the group id value assigned to this controller by the main controller.
+     */
+    public int getViewGroupId();
 
     /**
      * Used by FXML when controller is loaded.
@@ -56,5 +74,6 @@ public interface DexTabController {
      * @param e action event whose source is the menu item to be disabled and enabled on window close
      */
     public void launchWindow(ActionEvent e);
+
 
 }
