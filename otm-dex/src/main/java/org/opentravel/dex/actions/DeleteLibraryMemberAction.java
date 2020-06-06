@@ -46,6 +46,11 @@ public class DeleteLibraryMemberAction extends DexRunAction {
         return subject instanceof OtmLibraryMember && subject.isEditable();
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
+
     private OtmLibraryMember deletedMember = null;
     // Contextual facets need the name of the contributed owner
     private String deletedMemberName = "";

@@ -38,6 +38,10 @@ public class AddResourceResponseAction extends DexRunAction {
         return otm instanceof OtmAction && otm.isEditable();
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     public AddResourceResponseAction() {
         super();
     }

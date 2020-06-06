@@ -44,6 +44,10 @@ public class DeleteAliasAction extends DexRunAction {
         return otm.isEditable();
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     private OtmAlias deletedAlias = null;
 
     public DeleteAliasAction() {

@@ -50,6 +50,10 @@ public class NewLibraryMemberAction extends DexRunAction {
         return true;
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     private OtmLibraryMember newMember = null;
 
     public NewLibraryMemberAction() {

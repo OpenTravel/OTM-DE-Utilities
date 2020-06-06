@@ -43,6 +43,10 @@ public class DeletePropertyAction extends DexRunAction {
         return otm.isEditable();
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     private OtmProperty deletedProperty = null;
 
     public DeletePropertyAction() {

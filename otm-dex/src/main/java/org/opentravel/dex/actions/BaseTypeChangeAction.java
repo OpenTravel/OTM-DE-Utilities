@@ -54,6 +54,10 @@ public class BaseTypeChangeAction extends DexRunAction {
         return false;
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     private OtmObject oldBaseType;
 
     public BaseTypeChangeAction() {

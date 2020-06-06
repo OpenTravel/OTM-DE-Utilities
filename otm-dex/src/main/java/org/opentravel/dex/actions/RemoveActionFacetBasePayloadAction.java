@@ -38,6 +38,10 @@ public class RemoveActionFacetBasePayloadAction extends DexRunAction {
         return subject instanceof OtmActionFacet && ((OtmActionFacet) subject).getBasePayload() != null;
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     private OtmLibraryMember oldPayload = null;
 
     public RemoveActionFacetBasePayloadAction() {

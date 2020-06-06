@@ -45,6 +45,10 @@ public class AddPropertyAction extends DexRunAction {
         return subject instanceof OtmPropertyOwner && subject.getLibrary().isChainEditable();
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     private OtmProperty newProperty = null;
     private OtmPropertyOwner newPropertyOwner = null;
 

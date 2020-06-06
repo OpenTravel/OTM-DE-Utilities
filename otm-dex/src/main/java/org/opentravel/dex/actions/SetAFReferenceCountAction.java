@@ -33,6 +33,10 @@ public class SetAFReferenceCountAction extends DexRunAction {
         return false;
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     protected SetAFReferenceCountAction() {}
 
     protected Integer get() {

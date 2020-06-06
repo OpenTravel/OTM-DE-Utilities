@@ -45,6 +45,10 @@ public class DeleteResourceChildAction extends DexRunAction {
         return otm.isEditable();
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     public DeleteResourceChildAction() {
         super();
     }

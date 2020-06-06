@@ -43,6 +43,10 @@ public class SetLibraryAction extends DexRunAction {
         return subject.getModelManager().hasEditableLibraries( subject.getLibrary() );
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     private OtmLibrary oldLibrary = null;
 
     public SetLibraryAction() {

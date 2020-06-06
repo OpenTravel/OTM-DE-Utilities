@@ -47,6 +47,10 @@ public class CopyLibraryMemberAction extends DexRunAction {
         return false;
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     private OtmLibraryMember newMember = null;
 
     // private OtmLibrary oldLibrary = null;

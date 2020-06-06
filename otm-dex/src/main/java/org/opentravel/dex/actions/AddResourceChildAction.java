@@ -37,6 +37,10 @@ public class AddResourceChildAction extends DexRunAction {
         return otm instanceof OtmResource && otm.isEditable();
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     public AddResourceChildAction() {
         super();
     }

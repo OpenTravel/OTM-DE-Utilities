@@ -34,6 +34,10 @@ public class SetMimeTypesAction extends DexRunAction {
         return (subject.isEditable() && subject instanceof OtmActionRequest || subject instanceof OtmActionResponse);
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     private OtmObject object = null;
     private MimeTypeMap oldMap = null;
 

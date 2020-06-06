@@ -32,6 +32,10 @@ public class SetRestStatusCodesAction extends DexRunAction {
         return (subject.isEditable() && subject instanceof OtmActionResponse);
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     private OtmObject object = null;
     private RestStatusCodesMap oldMap = null;
 

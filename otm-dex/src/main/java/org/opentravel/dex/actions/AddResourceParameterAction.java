@@ -38,6 +38,11 @@ public class AddResourceParameterAction extends DexRunAction {
         return otm instanceof OtmParameterGroup && otm.isEditable();
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
+
     public AddResourceParameterAction() {
         super();
     }

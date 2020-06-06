@@ -34,6 +34,10 @@ public class SetRepeatCountAction extends DexRunAction {
         return subject instanceof OtmElement && subject.isEditable();
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     private int oldCount = 0;
 
     public SetRepeatCountAction() {

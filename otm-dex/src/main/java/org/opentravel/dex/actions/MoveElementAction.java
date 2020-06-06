@@ -45,6 +45,10 @@ public class MoveElementAction extends DexRunAction {
         return otm.isEditable();
     }
 
+    public static boolean isEnabled(OtmObject subject, OtmObject value) {
+        return isEnabled( subject );
+    }
+
     private OtmElement<?> movedElement = null;
     private MoveDirection direction;
 
