@@ -164,6 +164,7 @@ public interface DexActionManager {
      * 
      * @param actionType what action to perform
      * @param subject OTM object to act upon
+     * @return action specific result from doIT()
      */
     public Object run(DexActions actionType, OtmObject subject);
 
@@ -179,6 +180,7 @@ public interface DexActionManager {
      * @param subject OTM object to act upon
      * @param data passed to the actions's doIt() method used to modify the subject, may be null if action will run
      *        dialog to get data
+     * @return action specific result from doIT()
      */
     public Object run(DexActions actionType, OtmObject subject, Object data);
 

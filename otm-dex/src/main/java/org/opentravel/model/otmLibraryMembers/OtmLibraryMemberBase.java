@@ -101,13 +101,17 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     public void addAlias(TLAlias tla) {
         if (tla.getOwningEntity() instanceof TLFacet) {
             String baseName = tla.getLocalName().substring( 0, tla.getName().lastIndexOf( '_' ) );
-
             children.forEach( c -> {
                 if (c instanceof OtmAlias && c.getName().equals( baseName ))
                     ((OtmAlias) c).add( tla );
             } );
         } else if (getTL() instanceof TLAliasOwner) {
-            ((TLAliasOwner) getTL()).addAlias( tla );
+            try {
+                ((TLAliasOwner) getTL()).addAlias( tla );
+            } catch (UnsupportedOperationException e) {
+                log.warn( "Add alias failed. " + e.getLocalizedMessage() );
+                return;
+            }
             new OtmAlias( tla, this );
         }
     }

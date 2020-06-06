@@ -29,6 +29,7 @@ import org.opentravel.model.otmFacets.OtmAbstractFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyFactory;
+import org.opentravel.schemacompiler.model.TLAlias;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeOwner;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
@@ -103,6 +104,10 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         return null;
     }
 
+    @Override
+    public void addAlias(TLAlias tla) {
+        // NO-OP
+    }
     // public OtmContextualFacet addCF(OtmContextualFacet child) {
     // if (children == null)
     // children = new ArrayList<>();

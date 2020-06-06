@@ -35,7 +35,7 @@ public class AddAliasAction extends DexRunAction {
      * Enabled for any editable OTM object whose TL is an TLAliasOwner and not a contextual facet.
      * 
      * @param subject
-     * @return
+     * @return true for editable TLAliasOwners
      */
     public static boolean isEnabled(OtmObject subject) {
         if (subject == null || !(subject.getTL() instanceof TLAliasOwner))

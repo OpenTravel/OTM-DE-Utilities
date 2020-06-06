@@ -33,6 +33,12 @@ import org.opentravel.schemacompiler.model.TLAliasOwner;
 public class DeleteAliasAction extends DexRunAction {
     private static Log log = LogFactory.getLog( DeleteAliasAction.class );
 
+    /**
+     * Can the passed alias be deleted?
+     * 
+     * @param the alias to be deleted
+     * @return must be alias and editable to be true
+     */
     public static boolean isEnabled(OtmObject otm) {
         if (otm instanceof OtmAlias) {
             if (otm.getOwningMember() == null)
