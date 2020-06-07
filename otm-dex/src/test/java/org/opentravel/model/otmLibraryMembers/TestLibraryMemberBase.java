@@ -270,12 +270,6 @@ public class TestLibraryMemberBase {
         assertTrue( "Given", lib.isEditable() );
         assertTrue( "Given", mgr != null );
 
-        for (OtmLibraryMember lm : lib.getMembers()) {
-            assertTrue( lm.isEditable() );
-            for (OtmObject d : lm.getDescendants())
-                assertTrue( d.isEditable() );
-        }
-
         // Build one of each library member type
         TestLibrary.addOneOfEach( lib );
         // assertTrue( "Given", lib.isValid() );
@@ -292,12 +286,6 @@ public class TestLibraryMemberBase {
                     TestOtmPropertiesBase.buildOneOfEach2( (OtmPropertyOwner) child );
         }
         // assertTrue( "Given", lib.isValid() );
-        // Test
-        for (OtmLibraryMember lm : lib.getMembers()) {
-            assertTrue( lm.isEditable() );
-            for (OtmObject d : lm.getDescendants())
-                assertTrue( d.isEditable() );
-        }
     }
 
 

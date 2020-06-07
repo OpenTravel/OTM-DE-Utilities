@@ -375,13 +375,14 @@ public class TestLibrary {
             try {
                 OtmLibraryMember member =
                     OtmLibraryMemberType.buildMember( value, "TestObj" + i++, lib.getModelManager() );
-                lib.add( member );
+                OtmLibraryMember result = lib.add( member );
                 // Checks
-                if (lib.isEditable())
+                if (lib.isEditable() && result != null) {
                     assertTrue( member.isEditable() );
-                assertTrue( member.getTlLM().getOwningLibrary() == lib.getTL() );
-                // if (member instanceof OtmContextualFacet)
-                // log.debug( "Here" );
+                    assertTrue( member.getTlLM().getOwningLibrary() == lib.getTL() );
+                    // if (member instanceof OtmContextualFacet)
+                    // log.debug( "Here" );
+                }
             } catch (ExceptionInInitializerError e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
