@@ -200,6 +200,23 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
         // No-Op
     }
 
+    @Override
+    public void delete(OtmObject property) {
+        if (getContributor() != null)
+            getContributor().delete( property );
+        else
+            log.warn( "Could not delete property." );
+    }
+
+    @Override
+    public void remove(OtmObject property) {
+        if (getContributor() != null)
+            getContributor().remove( property );
+        else
+            log.warn( "Could not remove property." );
+    }
+
+
     /**
      * Simply set the contributor field.
      * 

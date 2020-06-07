@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.schemacompiler.model.TLListFacet;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -38,6 +39,16 @@ public class OtmListFacet<T extends TLListFacet> extends OtmAbstractFacet<TLList
     public OtmListFacet(T tl, OtmLibraryMember parent) {
         super( tl );
         this.parent = parent;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * False
+     */
+    @Override
+    public boolean canAdd(OtmProperty property) {
+        return false;
     }
 
     public DexActionManager getActionManger() {

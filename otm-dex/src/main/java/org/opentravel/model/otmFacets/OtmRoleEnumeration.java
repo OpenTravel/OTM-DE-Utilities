@@ -69,6 +69,18 @@ public class OtmRoleEnumeration extends OtmModelElement<TLRoleEnumeration>
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * True for role values.
+     */
+    @Override
+    public boolean canAdd(OtmProperty property) {
+        return property instanceof OtmRoleValue;
+    }
+
+
+
+    /**
      * @param child
      */
     private OtmProperty add(TLRole child) {

@@ -22,6 +22,8 @@ import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmOperation;
+import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.schemacompiler.model.TLFacet;
 
 import java.util.Collection;
@@ -45,6 +47,17 @@ public class OtmOperationFacet extends OtmAbstractFacet<TLFacet> {
         super( tl );
         this.parent = parent;
     }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * True for all elements, attributes and indicators
+     */
+    @Override
+    public boolean canAdd(OtmProperty property) {
+        return property instanceof OtmPropertyBase<?>;
+    }
+
 
     @Override
     public List<OtmObject> getChildren() {

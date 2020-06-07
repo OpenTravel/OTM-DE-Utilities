@@ -70,6 +70,17 @@ public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
         return parent != null ? parent.add( child ) : null;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * True for parent can add
+     */
+    @Override
+    public boolean canAdd(OtmProperty property) {
+        return parent != null ? parent.canAdd( property ) : false;
+    }
+
+
     @Override
     public OtmProperty add(TLModelElement tl) {
         return parent != null ? parent.add( tl ) : null;

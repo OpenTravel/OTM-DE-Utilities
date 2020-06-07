@@ -72,6 +72,17 @@ public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
         return newValue;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * True for enumeration values
+     */
+    @Override
+    public boolean canAdd(OtmProperty property) {
+        return property instanceof OtmEnumerationValue;
+    }
+
+
     @Override
     public void delete(OtmObject property) {
         remove( property );

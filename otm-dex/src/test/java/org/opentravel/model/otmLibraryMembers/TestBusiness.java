@@ -28,7 +28,6 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
-import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.schemacompiler.model.LibraryElement;
 import org.opentravel.schemacompiler.model.LibraryMember;
@@ -159,7 +158,7 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
 
     /** ****************************************************** **/
     /**
-     * Build business object with attribute and element in ID and Summary facets.
+     * Build business object with attribute and element in ID and Summary facets. *
      * 
      * @param mgr
      * @param name
@@ -169,11 +168,25 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
         BoName = name; // set global static
         OtmBusinessObject bo = buildOtm( lib.getModelManager() );
         lib.add( bo );
+
+        for (OtmContributedFacet cf : bo.getChildrenContributedFacets()) {
+            assertTrue( cf.getContributor() != null );
+            lib.add( cf.getContributor() );
+            assertTrue( lib.contains( cf.getContributor() ) );
+        }
+        assertTrue( bo != null );
+        assertTrue( bo.getLibrary() == lib );
+        assertTrue( bo.isEditable() );
+        assertTrue( bo.getActionManager() == lib.getActionManager() );
+        assertTrue( lib.getModelManager().getMembers().contains( bo ) );
+
         return bo;
     }
 
     /**
      * Build business object with attribute and element in ID and Summary facets.
+     * <p>
+     * <b>Note: </b>Contextual facet will not have a library.
      * 
      * @param mgr
      * @param name
@@ -197,19 +210,24 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
         return null;
     }
 
+    /**
+     * <p>
+     * <b>Note: </b>Contextual facet will not have a library.
+     * 
+     * @param mgr
+     * @return
+     */
     public static OtmBusinessObject buildOtm(OtmModelManager mgr) {
         OtmBusinessObject bo = new OtmBusinessObject( buildTL(), mgr );
         assertNotNull( bo );
         mgr.add( bo );
 
-        // TestCustomFacet.buildOtm( staticModelManager );
         assertTrue( bo.getChildren().size() > 2 );
         assertTrue( bo.getSummary().getChildren().size() == 2 );
         assertTrue( "Must have identity listener.", OtmModelElement.get( bo.getTL() ) == bo );
 
-        OtmCustomFacet cf = TestCustomFacet.buildOtm( mgr );
+        OtmContextualFacet cf = TestCustomFacet.buildOtm( mgr, bo );
         cf.setName( "SomeCustom" );
-        bo.add( cf );
 
         return bo;
     }

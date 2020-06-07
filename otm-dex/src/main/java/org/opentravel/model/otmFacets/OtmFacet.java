@@ -26,6 +26,8 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmAttribute;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.model.otmProperties.OtmIndicator;
+import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.schemacompiler.model.TLFacet;
 
 /**
@@ -43,6 +45,16 @@ public abstract class OtmFacet<T extends TLFacet> extends OtmAbstractFacet<TLFac
     public OtmFacet(T tl, OtmLibraryMember parent) {
         super( tl );
         this.parent = parent;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * True for all elements, attributes and indicators
+     */
+    @Override
+    public boolean canAdd(OtmProperty property) {
+        return property instanceof OtmPropertyBase<?>;
     }
 
     /**

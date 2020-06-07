@@ -26,6 +26,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmFacets.OtmAbstractFacet;
 import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.model.otmProperties.OtmPropertyFactory;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAttribute;
@@ -110,6 +111,17 @@ public class OtmExtensionPointFacet extends OtmLibraryMemberBase<TLExtensionPoin
         }
         return null;
     }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * True for all elements, attributes and indicators
+     */
+    @Override
+    public boolean canAdd(OtmProperty property) {
+        return property instanceof OtmPropertyBase<?>;
+    }
+
 
     @Override
     public StringProperty baseTypeProperty() {

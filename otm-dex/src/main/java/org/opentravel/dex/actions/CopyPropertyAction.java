@@ -54,7 +54,8 @@ public class CopyPropertyAction extends DexRunAction {
         if (newParent == null)
             return false;
         if (subject instanceof OtmProperty)
-            return newParent instanceof OtmPropertyOwner && newParent.isEditable();
+            return newParent instanceof OtmPropertyOwner && newParent.isEditable()
+                && ((OtmPropertyOwner) newParent).canAdd( (OtmProperty) subject );
         return false;
     }
 
@@ -80,6 +81,9 @@ public class CopyPropertyAction extends DexRunAction {
      */
     @Override
     public Object doIt(Object data) {
+        if (data == null)
+            return doIt();
+
         newProperty = null;
         if (getSubject() instanceof OtmProperty && data instanceof OtmPropertyOwner) {
             LibraryElement newTL = getSubject().getTL().cloneElement();
@@ -87,8 +91,6 @@ public class CopyPropertyAction extends DexRunAction {
                 newProperty = OtmPropertyFactory.create( (TLModelElement) newTL, ((OtmPropertyOwner) data) );
         }
         return newProperty;
-
-        // return doIt();
     }
 
 
@@ -134,7 +136,8 @@ public class CopyPropertyAction extends DexRunAction {
         if (get() != null && get().getParent() != null) {
             get().getParent().delete( get() );
             newProperty = null;
-        }
+        } else
+            log.warn( "Error undoing copy property." );
         // log.debug( "Undo copy." );
         return get();
     }

@@ -31,6 +31,8 @@ import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.OtmTypeUserUtils;
 import org.opentravel.model.otmFacets.OtmVWAAttributeFacet;
 import org.opentravel.model.otmFacets.OtmVWAValueFacet;
+import org.opentravel.model.otmProperties.OtmAttribute;
+import org.opentravel.model.otmProperties.OtmIndicator;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyFactory;
 import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
@@ -117,6 +119,17 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
 
         return OtmPropertyFactory.create( tl, this );
     }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * True for attributes and indicators
+     */
+    @Override
+    public boolean canAdd(OtmProperty property) {
+        return property instanceof OtmAttribute<?> || property instanceof OtmIndicator<?>;
+    }
+
 
     /**
      * {@inheritDoc}

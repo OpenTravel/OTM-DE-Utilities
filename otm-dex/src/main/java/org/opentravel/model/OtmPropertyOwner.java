@@ -59,6 +59,14 @@ public interface OtmPropertyOwner extends OtmChildrenOwner {
      */
     public OtmProperty add(TLModelElement tlChild);
 
+    /**
+     * Return true if this owner can add properties of the passed type.
+     * 
+     * @param property
+     * @return
+     */
+    public boolean canAdd(OtmProperty property);
+
     // TODO - why is getActionManager() here?
     /**
      * @return

@@ -27,6 +27,7 @@ import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
@@ -315,7 +316,19 @@ public class TestLibrary {
      */
     public static OtmLibrary buildOtm() {
         OtmLibrary lib = TestLibrary.buildOtm( new OtmModelManager( new DexFullActionManager( null ), null, null ) );
+
         return lib;
+    }
+
+    /**
+     * Assure library contents are editable.
+     */
+    public static void checkContentsAreEditable(OtmLibrary lib) {
+        for (OtmLibraryMember lm : lib.getMembers()) {
+            assertTrue( lm.isEditable() );
+            for (OtmObject d : lm.getDescendants())
+                assertTrue( d.isEditable() );
+        }
     }
 
     /**
@@ -363,6 +376,12 @@ public class TestLibrary {
                 OtmLibraryMember member =
                     OtmLibraryMemberType.buildMember( value, "TestObj" + i++, lib.getModelManager() );
                 lib.add( member );
+                // Checks
+                if (lib.isEditable())
+                    assertTrue( member.isEditable() );
+                assertTrue( member.getTlLM().getOwningLibrary() == lib.getTL() );
+                // if (member instanceof OtmContextualFacet)
+                // log.debug( "Here" );
             } catch (ExceptionInInitializerError e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -379,6 +398,9 @@ public class TestLibrary {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+        }
+        // Attach the contextual facets
+        for (OtmLibraryMember m : lib.getMembers()) {
         }
     }
 }
