@@ -140,6 +140,8 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
 
     @Override
     public void checkNodes() {
+        if (dialogStage == null)
+            throw new IllegalStateException( "Missing stage." );
         if (newLibraryDialog == null || dialogTitleLabel == null || dialogHelp == null || dialogButtonCancel == null
             || dialogButtonOK == null || resultsArea == null)
             throw new IllegalStateException( "Missing injected field." );
@@ -315,7 +317,7 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
     @Override
     protected void setup(String message) {
         super.setStage( dialogTitle, dialogStage );
-        checkNodes();
+        // checkNodes();
 
         dialogButtonCancel.setOnAction( e -> doCancel() );
         dialogButtonOK.setOnAction( e -> doOK() );

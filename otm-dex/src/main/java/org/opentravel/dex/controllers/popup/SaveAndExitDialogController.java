@@ -159,7 +159,7 @@ public class SaveAndExitDialogController extends DexPopupControllerBase {
     @Override
     protected void setup(String message) {
         super.setStage( dialogTitle, dialogStage );
-        checkNodes();
+        // checkNodes();
     }
 
     /**

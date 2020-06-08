@@ -71,6 +71,8 @@ public class MemberDetailsPopupController extends DexPopupControllerBase {
 
             // get the controller from loader.
             controller = loader.getController();
+            // controller.popupStage = dialogStage;
+
             if (!(controller instanceof MemberDetailsPopupController))
                 throw new IllegalStateException( "Error creating member details dialog controller." );
         } catch (IOException e1) {
@@ -79,16 +81,6 @@ public class MemberDetailsPopupController extends DexPopupControllerBase {
         }
 
         positionStage( dialogStage );
-        // // Put the new stage on top of the primary stage
-        // Stage primaryStage = DexMainControllerBase.getStageStatic();
-        // if (primaryStage != null) {
-        // // // Calculate the center position of the parent Stage
-        // double centerXPosition = primaryStage.getX() + primaryStage.getWidth() / 2d;
-        // double centerYPosition = primaryStage.getY() + primaryStage.getHeight() / 2d;
-        // dialogStage.setX( centerXPosition - 400 );
-        // dialogStage.setY( centerYPosition - 150 );
-        // }
-
         return controller;
     }
 
@@ -138,15 +130,15 @@ public class MemberDetailsPopupController extends DexPopupControllerBase {
 
     @Override
     protected void setup(String message) {
-        // super.setStage( dialogTitle, dialogStage );
-        // postHelp( helpText, dialogHelp );
-        // cancelButton.setOnAction( e -> doCancel() );
+        super.setStage( dialogTitle, dialogStage );
+        postHelp( helpText, dialogHelp );
+        cancelButton.setOnAction( e -> doCancel() );
+
+        selectButton.setText( "OK" );
+        selectButton.setOnAction( e -> doOK() );
         //
-        // selectButton.setText( "OK" );
-        // selectButton.setOnAction( e -> doOK() );
-        //
-        // memberDetailsController.configure( null );
-        // memberDetailsController.post( currentMember );
+        memberDetailsController.configure( null, 0 );
+        memberDetailsController.post( currentMember );
     }
 
 }

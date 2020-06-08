@@ -85,6 +85,9 @@ public class WebViewDialogController extends DexPopupControllerBase {
 
     @Override
     public void checkNodes() {
+        if (dialogStage == null)
+            throw new IllegalStateException( "Missing stage." );
+
         if (webView == null)
             throw new IllegalStateException( "Missing injected web view." );
     }
@@ -114,7 +117,7 @@ public class WebViewDialogController extends DexPopupControllerBase {
     @Override
     protected void setup(String message) {
         super.setStage( dialogTitle, dialogStage );
-        checkNodes();
+        // checkNodes();
 
         webEngine = webView.getEngine();
     }

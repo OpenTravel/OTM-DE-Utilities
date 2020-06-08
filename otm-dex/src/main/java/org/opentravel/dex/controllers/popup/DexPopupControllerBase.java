@@ -143,7 +143,7 @@ public abstract class DexPopupControllerBase implements DexPopupController {
     }
 
     /**
-     * Provides the base class access to the controller's stage. Sets stage, stage title and Checks the fx nodes.
+     * Provides the base class access to the controller's stage. Sets stage, stage title, and Checks the fx nodes.
      * 
      * @param title
      * @param popupStage
@@ -188,7 +188,11 @@ public abstract class DexPopupControllerBase implements DexPopupController {
     @Override
     public Results showAndWait(String message) {
         setup( message );
-        popupStage.showAndWait();
+        if (popupStage == null)
+            log.warn( "Could not show pop-up window, null stage." );
+        else {
+            popupStage.showAndWait();
+        }
         return result;
     }
 

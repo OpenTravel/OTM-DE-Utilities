@@ -80,6 +80,9 @@ public class UnlockAndCommitLibraryDialogController extends DexPopupControllerBa
 
     @Override
     public void checkNodes() {
+        if (dialogStage == null)
+            throw new IllegalStateException( "Missing stage." );
+
         if (dialogBox == null || dialogTitleLabel == null || dialogHelp == null || dialogText == null
             || unlockOnlyButton == null || dialogButtonCancel == null || dialogButtonOK == null)
             throw new IllegalStateException( "Missing injected field." );
@@ -121,7 +124,7 @@ public class UnlockAndCommitLibraryDialogController extends DexPopupControllerBa
     @Override
     protected void setup(String message) {
         super.setStage( dialogTitle, dialogStage );
-        checkNodes();
+        // checkNodes();
 
         dialogButtonCancel.setOnAction( e -> doCancel() );
         dialogButtonOK.setOnAction( e -> doOK() );

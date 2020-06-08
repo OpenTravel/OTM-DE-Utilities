@@ -110,6 +110,9 @@ public class SelectLibraryDialogController extends DexPopupControllerBase {
 
     @Override
     public void checkNodes() {
+        if (dialogStage == null)
+            throw new IllegalStateException( "Missing stage." );
+
         if (librariesTreeTableController == null || dialogTitleLabel == null || dialogHelp == null
             || dialogButtonCancel == null || dialogButtonOK == null)
             throw new IllegalStateException( "Missing injected field." );
@@ -161,7 +164,7 @@ public class SelectLibraryDialogController extends DexPopupControllerBase {
     @Override
     protected void setup(String message) {
         super.setStage( dialogTitle, dialogStage );
-        checkNodes();
+        // checkNodes();
         librariesTreeTableController.configure( modelMgr, true );
         librariesTreeTableController.setOnMouseClicked( this::mouseClick );
 
