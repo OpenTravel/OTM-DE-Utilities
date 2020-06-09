@@ -133,6 +133,9 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
 
     @Override
     public void delete(OtmObject property) {
+        remove( property ); // do first since it may have to model children from the tl
+        if (property == null)
+            return;
         if (getTL() instanceof TLAttributeOwner && property.getTL() instanceof TLAttribute)
             ((TLAttributeOwner) getTL()).removeAttribute( ((TLAttribute) property.getTL()) );
         else if (getTL() instanceof TLIndicatorOwner && property.getTL() instanceof TLIndicator)
@@ -141,8 +144,8 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
             ((TLPropertyOwner) getTL()).removeProperty( ((TLProperty) property.getTL()) );
         else
             log.warn( "Invalid delete TL property owner and TL property pair." );
-        remove( property );
         refresh();
+        // log.debug( "Deleted " + property + " from" + this + " with " + getChildren().size() + " kids." );
     }
 
     /**
@@ -404,12 +407,13 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
 
     @Override
     public void remove(OtmObject property) {
-        if (children.contains( property ))
-            children.remove( property );
-        else if (inheritedChildren != null && inheritedChildren.contains( property ))
-            inheritedChildren.remove( property );
-        else
-            log.warn( "Could not remove property." );
+        if (property != null)
+            if (getChildren() != null && children.contains( property ))
+                children.remove( property );
+            else if (getInheritedChildren() != null && inheritedChildren.contains( property ))
+                inheritedChildren.remove( property );
+            else
+                log.warn( "Could not remove property." );
     }
 
     // @Override

@@ -213,7 +213,15 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
         // Given an empty facet
         OtmFacet<?> facet = choice.getShared();
         List<OtmObject> kids = new ArrayList<>( facet.getChildren() );
+        int i = 1;
+        for (OtmObject k : kids) {
+            assertTrue( "Given", k instanceof OtmProperty );
+            assertTrue( facet.getChildren().contains( k ) );
+            k.setName( "p" + i++ );
+            // facet.delete( (OtmProperty) k );
+        }
         kids.forEach( k -> facet.delete( (OtmProperty) k ) );
+
         // Given - a simple type to assign
         OtmXsdSimple simple = TestXsdSimple.buildOtm( staticModelManager );
 
