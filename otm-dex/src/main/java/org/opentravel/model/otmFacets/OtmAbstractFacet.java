@@ -133,7 +133,6 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
 
     @Override
     public void delete(OtmObject property) {
-        remove( property ); // do first since it may have to model children from the tl
         if (property == null)
             return;
         if (getTL() instanceof TLAttributeOwner && property.getTL() instanceof TLAttribute)
@@ -144,6 +143,7 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
             ((TLPropertyOwner) getTL()).removeProperty( ((TLProperty) property.getTL()) );
         else
             log.warn( "Invalid delete TL property owner and TL property pair." );
+        remove( property ); // if children is empty, the deleted TL will not be modeled and this remove will do nothing
         refresh();
         // log.debug( "Deleted " + property + " from" + this + " with " + getChildren().size() + " kids." );
     }
@@ -412,8 +412,6 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
                 children.remove( property );
             else if (getInheritedChildren() != null && inheritedChildren.contains( property ))
                 inheritedChildren.remove( property );
-            else
-                log.warn( "Could not remove property." );
     }
 
     // @Override

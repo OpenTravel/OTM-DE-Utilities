@@ -84,7 +84,7 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
     @Test
     public void testBuilder() {
         // Given - a model manager with full range of actions
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
+        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
         OtmChoiceObject choice = TestChoice.buildOtm( staticModelManager );
         OtmFacet<?> facet = choice.getShared();
 
@@ -105,7 +105,7 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
     @Test
     public void testDelete() {
         // Given - a model manager with full range of actions
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
+        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
         OtmChoiceObject choice = TestChoice.buildOtm( staticModelManager );
         OtmFacet<?> facet = choice.getShared();
         for (OtmPropertyType type : OtmPropertyType.values())
@@ -120,7 +120,7 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
     // Property constructors rely on being able to add to TL even if it was already there
     @Test
     public void testMultipleTLAdds() {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
+        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
         OtmChoiceObject choice = TestChoice.buildOtm( staticModelManager );
         OtmFacet<?> facet = choice.getShared();
         TLFacet tlFacet = facet.getTL();
@@ -208,7 +208,7 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
 
     @Test
     public void testCloneTypeAssignments() {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
+        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
         OtmChoiceObject choice = TestChoice.buildOtm( staticModelManager );
         // Given an empty facet
         OtmFacet<?> facet = choice.getShared();

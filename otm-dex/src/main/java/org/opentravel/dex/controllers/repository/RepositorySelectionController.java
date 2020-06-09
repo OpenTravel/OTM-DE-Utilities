@@ -53,7 +53,7 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
     @FXML
     private Label repositoryUser;
     @FXML
-    private Button addRepository;
+    private Button addRepository; // Repository Login button
 
     private RepositoryManager repositoryManager;
 
@@ -73,8 +73,10 @@ public class RepositorySelectionController extends DexIncludedControllerBase<Rep
         RepositoryLoginDialogContoller loginDialogController = RepositoryLoginDialogContoller.init( repositoryManager );
 
         if (loginDialogController.showAndWait( "" ) == Results.OK) {
-            repositorySelectionChanged(); // update user field
-            // repositoryChoice.getSelectionModel().select(loginDialogController.getLoginRepoID());
+            String repo = loginDialogController.getLoginRepoID();
+            if (!repo.isEmpty())
+                repositoryChoice.getSelectionModel().select( repo );
+            repositorySelectionChanged(); // update
         }
     }
 

@@ -307,7 +307,7 @@ public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
     }
 
     public String getLoginRepoID() {
-        return loginRepoID.getText();
+        return selectedRemoteRepository != null ? selectedRemoteRepository.getId() : "";
     }
 
     @Override
