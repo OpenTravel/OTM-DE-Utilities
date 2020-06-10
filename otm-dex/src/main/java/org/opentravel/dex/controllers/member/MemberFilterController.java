@@ -285,7 +285,9 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             return false;
         if (libraryFilter != null && !member.getLibrary().getName().startsWith( libraryFilter ))
             return false;
-        if (textFilterValue != null && !member.getName().toLowerCase().startsWith( textFilterValue ))
+        // 6/10/2020 - changed to contains
+        // if (textFilterValue != null && !member.getName().toLowerCase().startsWith( textFilterValue ))
+        if (textFilterValue != null && !member.getName().toLowerCase().contains( textFilterValue ))
             return false;
         if (latestVersionOnly && !member.isLatestVersion())
             return false;

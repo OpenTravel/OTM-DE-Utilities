@@ -101,8 +101,6 @@ public class SelectLibraryDialogController extends DexPopupControllerBase {
     Button dialogButtonOK;
 
     private OtmModelManager modelMgr;
-    // private String resultText;
-    // private UserSettings userSettings;
 
     public OtmLibrary getSelected() {
         return librariesTreeTableController != null ? librariesTreeTableController.getSelectedLibrary() : null;
@@ -131,31 +129,6 @@ public class SelectLibraryDialogController extends DexPopupControllerBase {
         }
     }
 
-    // /**
-    // * @see org.opentravel.dex.controllers.popup.DexPopupControllerBase#doOK()
-    // */
-    // @Override
-    // public void doOK() {
-    //
-    // if (getSelected() == null || !getSelected().isEditable()) {
-    // // postResults( "No Editable library selected.");
-    // super.doCancel();
-    // }
-    // log.debug( "Selected: " + getSelected() );
-    // super.doOK(); // all OK - close window
-    // }
-
-
-    // /**
-    // *
-    // * @param manager used to create project
-    // * @param initialProjectFolder used in user file selection dialog
-    // */
-    // public void configure(OtmModelManager manager, UserSettings settings) {
-    // // TODO - the settings should be abstracted for Dex applications
-    // this.modelMgr = manager;
-    // this.userSettings = settings;
-    // }
 
     public void setModelManager(OtmModelManager mgr) {
         this.modelMgr = mgr;
