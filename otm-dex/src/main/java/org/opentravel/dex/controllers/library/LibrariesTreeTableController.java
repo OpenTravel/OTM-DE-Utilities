@@ -53,6 +53,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     private static final String VERSIONLABEL = "Version";
     private static final String EDITABLELABEL = "Editable";
     private static final String STATUSLABEL = "Status";
+    private static final String SIZELABEL = "Members";
     private static final String REFERENCELABEL = "References";
     private static final String STATELABEL = "State";
     private static final String LOCKEDLABEL = "Locked-by";
@@ -109,12 +110,15 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         TreeTableColumn<LibraryDAO,Boolean> readonlyColumn = new TreeTableColumn<>( READONLYLABEL );
         readonlyColumn.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,Boolean>( "readonly" ) );
 
+        TreeTableColumn<LibraryDAO,Integer> sizeColumn = new TreeTableColumn<>( SIZELABEL );
+        sizeColumn.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,Integer>( "reference" ) );
+        sizeColumn.setPrefWidth( 100 );
         TreeTableColumn<LibraryDAO,Integer> refColumn = new TreeTableColumn<>( REFERENCELABEL );
-        refColumn.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,Integer>( "reference" ) );
+        refColumn.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,Integer>( "size" ) );
         refColumn.setPrefWidth( 100 );
 
         librariesTreeTable.getColumns().addAll( nameColumn, prefixColumn, namespaceColumn, versionColumn, statusColumn,
-            stateColumn, lockedColumn, projectsColumn, refColumn, readonlyColumn, editColumn );
+            stateColumn, lockedColumn, projectsColumn, sizeColumn, refColumn, readonlyColumn, editColumn );
 
         // Start out sorted on names
         nameColumn.setSortType( SortType.ASCENDING );

@@ -51,11 +51,13 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
 
     protected OtmLibrary library;
     String editable = "False";
+    int size = 0; // can be static because model change events creates new DAOs.
 
     public LibraryDAO(OtmLibrary library) {
         this.library = library;
         if (library == null)
             throw new IllegalArgumentException( "No library provided to Project-Library DAO" );
+        size = library.getMembers().size();
     }
 
     public StringProperty editProperty() {
@@ -118,6 +120,10 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
 
     public IntegerProperty referenceProperty() {
         return new SimpleIntegerProperty( library.getTL().getReferenceCount() );
+    }
+
+    public IntegerProperty sizeProperty() {
+        return new SimpleIntegerProperty( size );
     }
 
     public StringProperty statusProperty() {
