@@ -54,6 +54,7 @@ public class LibraryAndMembersDAO implements DexDAO<OtmObject> {
     public LibraryAndMembersDAO(OtmLibrary library) {
         this.library = library;
         member = new OtmLibraryDisplayFacet( library );
+        // log.debug( "DAO created for library " + library.getName() );
     }
 
     public LibraryAndMembersDAO(OtmLibraryMember member) {

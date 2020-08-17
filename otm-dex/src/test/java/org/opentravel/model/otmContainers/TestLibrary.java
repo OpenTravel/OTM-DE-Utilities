@@ -181,11 +181,23 @@ public class TestLibrary {
 
     }
 
+    /**
+     * Set assigned type and if successful and list is non-null, add the user's owning member to the list.
+     */
+    private void setProvider(OtmTypeUser u, OtmTypeProvider p, List<OtmLibraryMember> list) {
+        OtmTypeProvider r = u.setAssignedType( p );
+        if (list != null && r != null && u.getLibrary() != p.getLibrary()) {
+            if (!list.contains( u.getOwningMember() ))
+                list.add( u.getOwningMember() );
+        }
+    }
+
     @Test
     public void testGetProviders() {
         // Given - action and model managers
         DexFullActionManager fullMgr = new DexFullActionManager( null );
         OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
+
         // Given - a subject library that uses types, base types, contextual facets
         OtmLibrary subjectLib = TestLibrary.buildOtm( mgr, "NamespaceS1", "s1", "LibraryS1" );
         addOneOfEach( subjectLib );
@@ -199,36 +211,62 @@ public class TestLibrary {
         simples[0].setName( "Simple0" );
         simples[1] = TestOtmSimple.buildOtm( providerLib2 );
         simples[1].setName( "Simple1" );
-        simples[2] = TestOtmSimple.buildOtm( providerLib2 );
+        simples[2] = TestOtmSimple.buildOtm( subjectLib );
         simples[2].setName( "Simple2" );
 
-        // Given - make assignments
+        // Given - make assignments and keep an array of user's members assigned to providerLib2
+        List<OtmLibraryMember> providerLib2Users = new ArrayList<>();
+        OtmSimpleObject simple;
         int i = 0;
-        for (OtmLibraryMember m : subjectLib.getMembers())
-            for (OtmTypeUser u : m.getDescendantsTypeUsers()) {
-                OtmTypeProvider r = u.setAssignedType( simples[i++ % 3] );
-                log.debug( "Assigned " + simples[(i - 1) % 3] + " to " + u + " resulting in " + r );
+        for (OtmLibraryMember m : subjectLib.getMembers()) {
+            if (m instanceof OtmTypeUser) {
+                simple = simples[i++ % 3];
+                if (simple.getLibrary() == providerLib2)
+                    setProvider( (OtmTypeUser) m, simple, providerLib2Users );
+                else
+                    setProvider( (OtmTypeUser) m, simple, null );
             }
+            for (OtmTypeUser u : m.getDescendantsTypeUsers()) {
+                simple = simples[i++ % 3];
+                if (simple.getLibrary() == providerLib2)
+                    setProvider( u, simple, providerLib2Users );
+                else
+                    setProvider( u, simple, null );
+                log.debug( "Assigned " + simple + " to " + u );
+            }
+        }
 
-        // When - getProviders
+        // When - getProviders unsorted
         Map<OtmLibrary,List<OtmLibraryMember>> map = subjectLib.getProviderMap( false );
+
+        // Then - library key and value sets are not empty and contain the provider libraries
         Set<OtmLibrary> keys = map.keySet();
-        Collection<List<OtmLibraryMember>> values = map.values();
-        // Then
         assertTrue( !keys.isEmpty() );
-        assertTrue( !values.isEmpty() );
         assertTrue( map.keySet().contains( providerLib ) );
         assertTrue( map.keySet().contains( providerLib2 ) );
-        // assertTrue( map.get( providerLib2 ).contains( simples[1] ) );
-        // assertTrue( map.get( providerLib2 ).contains( simples[2] ) );
+        Collection<List<OtmLibraryMember>> valueSet = map.values();
+        assertTrue( !valueSet.isEmpty() );
 
         // When - sorted
         map = subjectLib.getProviderMap( true );
         keys = map.keySet();
-        values = map.values();
+        valueSet = map.values();
+
         // Then
         assertTrue( !keys.isEmpty() );
+        assertTrue( !valueSet.isEmpty() );
+
+        // Then -
+        List<OtmLibraryMember> values = map.get( providerLib2 );
         assertTrue( !values.isEmpty() );
+        // Then - all providerLib2Users must be in the value set
+        for (OtmLibraryMember u : providerLib2Users)
+            assertTrue( values.contains( u ) );
+        // Then - all values must be in providerLib2Users
+        for (OtmLibraryMember u : values)
+            assertTrue( providerLib2Users.contains( u ) );
+
+        // TODO - is this finding dependencies in Resources?
     }
     // TODO - add usersMap test
 

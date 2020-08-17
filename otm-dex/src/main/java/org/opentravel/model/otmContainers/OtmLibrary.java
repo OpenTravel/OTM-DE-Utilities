@@ -631,10 +631,19 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
      * @return new map.
      */
     public Map<OtmLibrary,List<OtmLibraryMember>> getProviderMap(boolean sort) {
+
+        // FIXME - this should be created in background by constructor and updated on refresh
+        // Testing does not show this to be the problem!
+        // Is OK with both for loops (inner and outer) commented out, no delay
+        log.debug( "Starting getting provider map for " + this );
         Map<OtmLibrary,List<OtmLibraryMember>> providerMap = new TreeMap<>();
         for (OtmLibraryMember m : getMembers()) {
+            // If the member is a type user, add it
             if (m instanceof OtmTypeUser)
                 addToMap( (OtmTypeUser) m, providerMap );
+            // FIXME --- WTF!!!!
+            // Testing delay happens even when this for loop is commented out
+            // If the member has type users, add all the libraries a property uses
             Collection<OtmTypeUser> users = new ArrayList<>( m.getDescendantsTypeUsers() );
             for (OtmTypeUser u : users) {
                 // Check for owners being contextual facets. Skip these.
@@ -646,24 +655,30 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         }
         if (sort)
             providerMap.values().forEach( l -> l.sort( null ) );
+        log.debug( "Done getting provider map for " + this );
         return providerMap;
     }
 
     // Entry: user's assignedType's library : user's owning member
     private void addToMap(OtmTypeUser user, Map<OtmLibrary,List<OtmLibraryMember>> map) {
-        if (user != null && map != null && user.getAssignedType() != null) {
-            OtmLibraryMember owner = user.getAssignedType().getOwningMember();
-            if (owner.getLibrary() == this)
+        if (user != null && map != null && user.getOwningMember() != null && user.getAssignedType() != null) {
+
+            OtmLibrary assignedLibrary = null;
+            OtmLibraryMember assignedMember = user.getAssignedType().getOwningMember();
+            if (assignedMember != null)
+                assignedLibrary = assignedMember.getLibrary();
+
+            if (assignedLibrary == null || assignedLibrary == this)
                 return;
 
-            List<OtmLibraryMember> mList = map.get( owner.getLibrary() );
+            List<OtmLibraryMember> mList = map.get( assignedLibrary );
             if (mList != null) {
                 if (!mList.contains( user.getOwningMember() ))
                     mList.add( user.getOwningMember() );
             } else {
                 mList = new ArrayList<>();
                 mList.add( user.getOwningMember() );
-                map.put( owner.getLibrary(), mList );
+                map.put( assignedLibrary, mList );
             }
         }
     }

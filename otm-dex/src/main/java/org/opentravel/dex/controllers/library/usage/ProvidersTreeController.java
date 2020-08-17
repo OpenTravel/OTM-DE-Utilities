@@ -191,7 +191,10 @@ public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrar
         if (columnLabel != null)
             columnLabel.setText( "Providers of types to " + library.getName() );
         // log.debug( "Posting type providers to: " + member );
+
+        // FIXME getting the providerMap can be a long process, making the GUI unresponsive
         LibraryAndMembersDAO.createChildrenItems( library.getProviderMap( true ), getRoot() );
+        log.debug( "Posted providers of types to " + library.getName() );
     }
 
     @Override
