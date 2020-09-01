@@ -61,7 +61,7 @@ public class UsersManager {
     }
 
     protected void addAssigned(OtmLibraryMember user) {
-        assignedTypes = add( user, assignedTypes, "Uses as Assigned Type" );
+        assignedTypes = add( user, assignedTypes, "Uses member as Assigned Type" );
     }
 
     protected void addBase(OtmLibraryMember user) {

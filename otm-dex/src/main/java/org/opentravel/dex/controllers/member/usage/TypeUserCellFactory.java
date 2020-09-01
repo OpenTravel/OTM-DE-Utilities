@@ -19,7 +19,9 @@ package org.opentravel.dex.controllers.member.usage;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.controllers.member.properties.PropertiesDAO;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmProperties.OtmElement;
 
 import javafx.css.PseudoClass;
 import javafx.scene.control.TreeCell;
@@ -58,7 +60,20 @@ public final class TypeUserCellFactory extends TreeCell<PropertiesDAO> {
                 setText( null );
                 // setGraphic(textField);
             } else {
-                setText( item.getValue().getNameWithPrefix() );
+                // 9/1/2020 - changed from prefix to name with cardinality
+                if (item.getValue() instanceof OtmLibraryMember)
+                    setText( item.getValue().getNameWithPrefix() );
+                else if (item.getValue() instanceof OtmTypeUser) {
+                    String txt = item.getValue().getName() + "   [";
+                    if (item.getValue() instanceof OtmElement<?>)
+                        txt += (((OtmElement<?>) item.getValue()).getCardinality());
+                    String typeName = "missing*";
+                    if (((OtmTypeUser) item.getValue()).getAssignedType() != null)
+                        typeName = ((OtmTypeUser) item.getValue()).getAssignedType().getName();
+                    setText( " " + txt + " " + typeName + " ]" );
+                } else
+                    setText( item.getValue().getName() );
+
                 ImageView graphic = ImageManager.get( item.getValue() );
                 setGraphic( graphic );
                 // if (!getTreeItem().isLeaf() && getTreeItem().getParent() != null) {

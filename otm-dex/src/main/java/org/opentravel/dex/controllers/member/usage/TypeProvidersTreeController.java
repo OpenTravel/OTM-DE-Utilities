@@ -282,13 +282,13 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
         if (item.getValue() != null && item.getValue().getValue() instanceof OtmLibraryMember)
             member = (OtmLibraryMember) item.getValue().getValue();
         if (!ignoreEvents) {
-            ignoreEvents = true;
+            // ignoreEvents = true;
             if (member != null) {
                 DexEvent event = new DexMemberSelectionEvent( member, eventType );
                 fireEvent( event );
                 // fireEvent(new DexMemberSelectionEvent( member, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED ) );
             }
-            ignoreEvents = false;
+            // ignoreEvents = false;
         }
     }
 

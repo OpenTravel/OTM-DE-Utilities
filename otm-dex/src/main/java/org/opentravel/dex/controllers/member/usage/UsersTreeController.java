@@ -25,6 +25,7 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -38,6 +39,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 /**
@@ -67,7 +70,8 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED,
         DexModelChangeEvent.MODEL_CHANGED, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED};
-    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.TYPE_USER_SELECTED};
+    private static final EventType[] publishedEvents =
+        {DexMemberSelectionEvent.MEMBER_SELECTED, DexMemberSelectionEvent.TYPE_USER_SELECTED};
 
     /**
      * Construct a member tree table controller that can publish and receive events.
@@ -127,6 +131,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
         usersTree.getSelectionModel().select( 0 );
         usersTree.getSelectionModel().selectedItemProperty()
             .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
+        usersTree.setOnMouseClicked( this::mouseClick );
 
         // Enable context menus at the row level and add change listener for for applying style
         usersTree.setCellFactory( (TreeView<MemberAndUsersDAO> p) -> new UserCellFactory( this ) );
@@ -134,6 +139,29 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
         // log.debug("Where used table configured.");
         refresh();
     }
+
+    // TODO - make this a reusable method.
+    private void mouseClick(MouseEvent event) {
+        // this fires after the member selection listener
+        if (event.getButton().equals( MouseButton.PRIMARY ) && event.getClickCount() == 2) {
+            TreeItem<MemberAndUsersDAO> item = usersTree.getSelectionModel().getSelectedItem();
+            OtmObject obj = null;
+            if (item != null)
+                obj = item.getValue().getValue();
+            if (obj != null) {
+                OtmLibraryMember member = null;
+                if (obj instanceof OtmLibraryMember)
+                    member = (OtmLibraryMember) obj;
+                else
+                    member = obj.getOwningMember();
+
+                log.debug( "Double Click on: " + member );
+                if (member != null)
+                    fireEvent( new DexMemberSelectionEvent( member, DexMemberSelectionEvent.MEMBER_SELECTED ) );
+            }
+        }
+    }
+
 
     /**
      * For the member, get all members that use this member or any of its descendants as types.

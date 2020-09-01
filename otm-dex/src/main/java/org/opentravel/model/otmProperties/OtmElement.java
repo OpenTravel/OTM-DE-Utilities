@@ -78,6 +78,22 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
         return OtmTypeUserUtils.getAssignedType( this );
     }
 
+    /**
+     * @return cardinality in format (0..2) or (1..*)
+     */
+    public String getCardinality() {
+        String nc = "";
+        if (isManditory())
+            nc += "  (1..";
+        else
+            nc += " (0..";
+        if (getRepeatCount() == 0)
+            nc += "*)";
+        else
+            nc += getRepeatCount() + ")";
+        return nc;
+    }
+
     @Override
     public Icons getIconType() {
         return ImageManager.Icons.ELEMENT;
