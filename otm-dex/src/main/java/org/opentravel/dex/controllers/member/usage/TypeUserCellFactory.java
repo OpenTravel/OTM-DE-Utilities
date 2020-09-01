@@ -54,26 +54,22 @@ public final class TypeUserCellFactory extends TreeCell<PropertiesDAO> {
             pseudoClassStateChanged( DIVIDER, false );
         } else {
             if (isEditing()) {
-                // if (textField != null) {
-                // textField.setText(getString());
-                // }
                 setText( null );
-                // setGraphic(textField);
             } else {
-                // 9/1/2020 - changed from prefix to name with cardinality
+                // 9/1/2020 - changed from name with prefix name to cardinality with type
+                String txt = item.getValue().getName();
                 if (item.getValue() instanceof OtmLibraryMember)
-                    setText( item.getValue().getNameWithPrefix() );
+                    txt = item.getValue().getNameWithPrefix();
                 else if (item.getValue() instanceof OtmTypeUser) {
-                    String txt = item.getValue().getName() + "   [";
+                    txt += "   [";
                     if (item.getValue() instanceof OtmElement<?>)
                         txt += (((OtmElement<?>) item.getValue()).getCardinality());
-                    String typeName = "missing*";
+                    String typeName = "*missing*";
                     if (((OtmTypeUser) item.getValue()).getAssignedType() != null)
                         typeName = ((OtmTypeUser) item.getValue()).getAssignedType().getName();
-                    setText( " " + txt + " " + typeName + " ]" );
-                } else
-                    setText( item.getValue().getName() );
-
+                    txt += " " + typeName + " ]";
+                }
+                setText( txt );
                 ImageView graphic = ImageManager.get( item.getValue() );
                 setGraphic( graphic );
                 // if (!getTreeItem().isLeaf() && getTreeItem().getParent() != null) {

@@ -25,12 +25,12 @@ import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
-import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.events.OtmObjectChangeEvent;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmNamespaceFacet;
@@ -279,17 +279,11 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
             return; // Nothing to do
         // log.debug( "Selection Listener: " + item.getValue() );
         OtmLibraryMember member = null;
-        if (item.getValue() != null && item.getValue().getValue() instanceof OtmLibraryMember)
-            member = (OtmLibraryMember) item.getValue().getValue();
-        if (!ignoreEvents) {
-            // ignoreEvents = true;
-            if (member != null) {
-                DexEvent event = new DexMemberSelectionEvent( member, eventType );
-                fireEvent( event );
-                // fireEvent(new DexMemberSelectionEvent( member, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED ) );
-            }
-            // ignoreEvents = false;
-        }
+        if (item.getValue() != null && item.getValue().getValue() instanceof OtmObject)
+            member = item.getValue().getValue().getOwningMember();
+
+        if (!ignoreEvents && member != null)
+            fireEvent( new DexMemberSelectionEvent( member, eventType ) );
     }
 
     /**

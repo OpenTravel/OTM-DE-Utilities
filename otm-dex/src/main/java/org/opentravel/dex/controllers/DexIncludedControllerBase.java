@@ -194,19 +194,6 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
         // log.debug( "Initializing controller." );
     }
 
-    // // TODO - make this a reusable method.
-    // public DexDAO<?> mouseClick(MouseEvent event, TreeView tree) {
-    // // this fires after the member selection listener
-    // Object item = null;
-    // if (event.getButton().equals( MouseButton.PRIMARY ) && event.getClickCount() == 2) {
-    // log.debug( "Double click selection: " );
-    // // + tree.getSelectionModel().getSelectedItem().getValue().nameProperty().toString() );
-    //
-    // item = tree.getSelectionModel().getSelectedItem();
-    // }
-    // return item instanceof DexDAO ? (DexDAO<?>) item : null;
-    // }
-
     @Override
     public void post(C businessData) {
         clear(); // Clear the view
