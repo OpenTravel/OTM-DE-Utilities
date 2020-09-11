@@ -517,6 +517,9 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     // FIXME - clear version chain when new library added
+    /**
+     * @return existing or new version chain for this library
+     */
     public OtmVersionChain getVersionChain() {
         if (versionChain == null)
             versionChain = new OtmVersionChain( this );
@@ -724,6 +727,15 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         log.debug( this.getFullName() + " refreshed" );
         // getMembers().forEach( m -> m.refresh() );
         getMembers().forEach( OtmLibraryMember::refresh );
+        versionChain = null;
+    }
+
+    /**
+     * Refresh each member
+     */
+    // FIXME - for some reason refreshing the members causes tests to fail
+    public void refreshVersionChain() {
+        log.debug( this.getFullName() + " refreshed" );
         versionChain = null;
     }
 }

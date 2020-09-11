@@ -237,7 +237,7 @@ public class TestOtmModelManager extends AbstractFxTest {
     @Test
     public void testContains() {
         // Given a project that uses the OpenTravel repository
-        OtmModelManager mgr = new OtmModelManager( null, repoManager );
+        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
 
         // When the project is loaded and added to the model manager
         TestDexFileHandler.loadAndAddManagedProject( mgr );
@@ -255,7 +255,7 @@ public class TestOtmModelManager extends AbstractFxTest {
     @Test
     public void testGetPredefinedTypes() {
         // Given
-        OtmModelManager mgr = new OtmModelManager( null, null );
+        OtmModelManager mgr = new OtmModelManager( null, null, null );
         mgr.addBuiltInLibraries( new TLModel() );
         OtmXsdSimple id = mgr.getIdType();
         assertNotNull( id );
@@ -297,6 +297,9 @@ public class TestOtmModelManager extends AbstractFxTest {
         pm.getAllProjectItems().forEach( pi -> {
             assertTrue( "Must contain the tlLibrary in project item.", mgr.contains( pi.getContent() ) );
             pi.getContent().getNamedMembers().forEach( lm -> {
+                log.debug( "Testing " + lm.getLocalName() );
+                if (!mgr.contains( (OtmLibraryMember) OtmModelElement.get( (TLModelElement) lm ) ))
+                    log.warn( "Error detected" );
                 assertTrue( "Must contain each named member.", mgr.contains( lm ) );
                 assertTrue( "Must contain Otm object from named member.",
                     mgr.contains( (OtmLibraryMember) OtmModelElement.get( (TLModelElement) lm ) ) );

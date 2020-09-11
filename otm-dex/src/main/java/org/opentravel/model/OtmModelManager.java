@@ -443,8 +443,7 @@ public class OtmModelManager implements TaskResultHandlerI {
         OtmLibrary lib = libraries.get( absLibrary );
         if (lib != null) {
             // Could be a minor version which will require refreshing the chain
-            if (lib.getVersionChain() != null && lib.getVersionChain().getMajor() != null)
-                lib.getVersionChain().getMajor().refresh();
+            lib.getVersionChain().refresh();
         } else
             log.error( "Failed to find newly added library." );
     }

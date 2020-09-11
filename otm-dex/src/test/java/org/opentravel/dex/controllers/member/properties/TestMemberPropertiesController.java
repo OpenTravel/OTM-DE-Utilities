@@ -122,7 +122,7 @@ public class TestMemberPropertiesController extends AbstractFxTest {
 
     @Test
     public void testPropertiesDAO_MinorTypeUsers() throws VersionSchemeException {
-        OtmModelManager mgr = new OtmModelManager( new DexFullActionManager( null ), repoManager );
+        OtmModelManager mgr = new OtmModelManager( new DexFullActionManager( null ), repoManager, null );
         // Given - vesioned project
         if (!TestDexFileHandler.loadVersionProject( mgr ))
             return; // No editable libraries

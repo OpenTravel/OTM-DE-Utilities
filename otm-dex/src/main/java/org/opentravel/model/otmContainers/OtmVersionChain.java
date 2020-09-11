@@ -34,7 +34,9 @@ import org.opentravel.schemacompiler.version.VersionSchemeException;
 import java.util.List;
 
 /**
- * OTM Version Chain. Utilities for accessing libraries with the same name, namespace and major version number.
+ * OTM Version Chain.
+ * <p>
+ * Utilities for accessing libraries with the same name, namespace and major version number.
  * 
  * @author Dave Hollander
  * 
@@ -45,20 +47,25 @@ public class OtmVersionChain {
     List<OtmLibrary> libraries;
     String baseNSwithName;
 
+    /**
+     * Get the chain from the model manager.
+     * 
+     * @param library
+     */
     public OtmVersionChain(OtmLibrary library) {
         libraries = library.getModelManager().getVersionChain( library );
         baseNSwithName = library.getNameWithBasenamespace();
 
         // Verify - comment out when not debugging/testing
-        for (OtmLibrary lib : libraries) {
-            assert lib.getNameWithBasenamespace().equals( baseNSwithName );
-            try {
-                assert lib.getMajorVersion() == library.getMajorVersion();
-            } catch (VersionSchemeException e) {
-                log.debug( "Version Scheme exception creating version chain. " + e.getLocalizedMessage() );
-                assert false; // Error
-            }
-        }
+        // for (OtmLibrary lib : libraries) {
+        // assert lib.getNameWithBasenamespace().equals( baseNSwithName );
+        // try {
+        // assert lib.getMajorVersion() == library.getMajorVersion();
+        // } catch (VersionSchemeException e) {
+        // log.debug( "Version Scheme exception creating version chain. " + e.getLocalizedMessage() );
+        // assert false; // Error
+        // }
+        // }
     }
 
     public OtmLibrary getEditable() {
@@ -267,5 +274,12 @@ public class OtmVersionChain {
         }
 
         return true;
+    }
+
+    /**
+     * Clear the version chain from all libraries in this chain.
+     */
+    public void refresh() {
+        libraries.forEach( OtmLibrary::refreshVersionChain );
     }
 }
