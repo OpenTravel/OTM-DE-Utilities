@@ -440,6 +440,13 @@ public class OtmModelManager implements TaskResultHandlerI {
             // Model and Add newly discovered library to the libraries and baseNS maps
             add( pi, getVersionChainFactory() );
         }
+        OtmLibrary lib = libraries.get( absLibrary );
+        if (lib != null) {
+            // Could be a minor version which will require refreshing the chain
+            if (lib.getVersionChain() != null && lib.getVersionChain().getMajor() != null)
+                lib.getVersionChain().getMajor().refresh();
+        } else
+            log.error( "Failed to find newly added library." );
     }
 
     /**

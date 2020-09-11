@@ -160,7 +160,9 @@ public abstract class DexPopupControllerBase implements DexPopupController {
 
     @Override
     public void setTitle(String title) {
-        this.title = title;
+        this.title = " ";
+        if (title != null)
+            this.title = title;
     }
 
     /**

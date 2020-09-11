@@ -130,8 +130,8 @@ public class VersionLibraryTask extends DexTaskBase<OtmLibrary> {
 
         if (isEnabled( library ) && proj != null && type != null) {
             // log.debug( type + "Version with project item: " + proj.getProjectItem( library.getTL() ) );
-            if (dbc != null)
-                Platform.runLater( () -> dbc.show( "Version Library Task", "Please wait." ) );
+            if (dialogBoxController != null)
+                Platform.runLater( () -> dialogBoxController.show( "Version Library Task", "Please wait." ) );
             try {
                 // Create a version in local files
                 TLLibrary tlNewLibrary = null;
@@ -162,15 +162,17 @@ public class VersionLibraryTask extends DexTaskBase<OtmLibrary> {
                     // Add to project and model
                     proj.getTL().getProjectManager().addManagedProjectItem( item, proj.getTL() );
                     library.getModelManager().addProjects();
+                    // Add projects will refresh libraries and end task handler will refresh main controller
                 }
                 // log.debug( "Version library task complete. " );
             } catch (Exception e) {
-                if (dbc != null)
-                    Platform.runLater( () -> dbc.close() );
+                // Close "please wait" dialog if shown
+                if (dialogBoxController != null)
+                    Platform.runLater( () -> dialogBoxController.close() );
                 throw new DexTaskException( e );
             }
-            if (dbc != null)
-                Platform.runLater( () -> dbc.close() );
+            if (dialogBoxController != null)
+                Platform.runLater( () -> dialogBoxController.close() );
         }
     }
 

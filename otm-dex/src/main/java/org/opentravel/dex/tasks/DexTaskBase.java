@@ -43,7 +43,7 @@ public abstract class DexTaskBase<T> extends Task<String> implements DexTask {
     private StringBuilder errorBuilder = null;
     protected StringBuilder msgBuilder = null;
     private DexStatusController statusController = null;
-    protected DialogBoxContoller dbc = null;
+    protected DialogBoxContoller dialogBoxController = null;
 
     private Exception errorException = null;
 
@@ -121,7 +121,7 @@ public abstract class DexTaskBase<T> extends Task<String> implements DexTask {
             statusController.start( this );
         Thread lt = new Thread( this );
         if (Platform.isFxApplicationThread())
-            dbc = DialogBoxContoller.init(); // Prepare a dialog box if task needs it
+            dialogBoxController = DialogBoxContoller.init(); // Prepare a dialog box if task needs it
         lt.setDaemon( true );
         lt.start();
     }
@@ -148,11 +148,16 @@ public abstract class DexTaskBase<T> extends Task<String> implements DexTask {
                 errorBuilder = new StringBuilder( getClass().getSimpleName() + " Error: \n" );
                 errorBuilder.append( e.getLocalizedMessage() );
                 result = errorBuilder.toString(); // Signal business error via result
-                updateMessage( errorBuilder.toString() );
-                if (dbc != null)
-                    dbc.close();
+                if (result == null)
+                    result = "Unknown exception performing Dex Task";
+
+                log.warn( "Dex Task Exception - updating task message with: " + result );
+                updateMessage( result );
+
+                // Close the "please wait" dialog if shown
+                if (dialogBoxController != null)
+                    dialogBoxController.close();
                 failed();
-                log.warn( errorBuilder.toString() );
             }
         updateMessage( "Done." );
         updateProgress( progressMax, progressMax );
@@ -184,9 +189,9 @@ public abstract class DexTaskBase<T> extends Task<String> implements DexTask {
         if (statusController != null)
             statusController.finish( this );
         // TEST - use global dbc
-        if (dbc == null)
-            dbc = DialogBoxContoller.init();
-        dbc.show( "Failed", errorBuilder != null ? errorBuilder.toString() : "" );
+        if (dialogBoxController == null)
+            dialogBoxController = DialogBoxContoller.init();
+        dialogBoxController.show( "Failed", errorBuilder != null ? errorBuilder.toString() : "" );
     }
 
     public String getErrorMsg() {

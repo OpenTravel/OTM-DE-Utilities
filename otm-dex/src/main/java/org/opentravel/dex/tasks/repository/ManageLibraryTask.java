@@ -151,17 +151,19 @@ public class ManageLibraryTask extends DexTaskBase<OtmLibrary> {
         // test URL for version scheme (must end in /vX)
         String relevantFindingMessages = checkUrl( library );
         if (relevantFindingMessages != null) {
-            Platform.runLater( () -> dbc.show( "Warning", relevantFindingMessages ) );
+            Platform.runLater( () -> dialogBoxController.show( "Warning", relevantFindingMessages ) );
             return;
         }
         log.debug( "Version scheme is OK" );
 
+        // FIXME
+        // project item is null for new libraries trying to be managed in local repository
 
-        if (proj != null && repository != null && library != null) {
+        if (proj != null && repository != null && library != null && library.getProjectItem() != null) {
             log.debug( "Manage library: " + library + " in " + repository.getDisplayName() );
 
-            if (dbc != null)
-                Platform.runLater( () -> dbc.show( "Manage Library Task", "Please wait." ) );
+            if (dialogBoxController != null)
+                Platform.runLater( () -> dialogBoxController.show( "Manage Library Task", "Please wait." ) );
 
             // Manage the library in the repository
             try {
@@ -170,12 +172,12 @@ public class ManageLibraryTask extends DexTaskBase<OtmLibrary> {
                 pm.publish( item, repository );
                 // VersionSchemeException| ValidationException| LibrarySaveException|
             } catch (IllegalArgumentException | RepositoryException | PublishWithLocalDependenciesException e) {
-                if (dbc != null)
-                    Platform.runLater( () -> dbc.close() );
+                if (dialogBoxController != null)
+                    Platform.runLater( () -> dialogBoxController.close() );
                 throw new DexTaskException( e );
             }
-            if (dbc != null)
-                Platform.runLater( () -> dbc.close() );
+            if (dialogBoxController != null)
+                Platform.runLater( () -> dialogBoxController.close() );
         } else
             throw new DexTaskException( "Missing project, repository or library information." );
     }

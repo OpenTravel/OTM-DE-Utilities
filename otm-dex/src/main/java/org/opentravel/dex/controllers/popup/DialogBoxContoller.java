@@ -146,6 +146,8 @@ public class DialogBoxContoller extends DexPopupControllerBase {
 
     @Override
     public void show(String message) {
+        if (message == null)
+            message = " ";
         super.show( message );
 
         dialogButtonClose.setOnAction( e -> close() );

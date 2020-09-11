@@ -46,10 +46,14 @@ public class RepositoryResultHandler implements TaskResultHandlerI {
         this.mainController = parentController;
     }
 
+    // FIXME
+    // Value can be null if the task has not been updated. Message is set in a background thread.
     @Override
     public void handleTaskComplete(WorkerStateEvent event) {
         if (event != null && event.getTarget() instanceof Task) {
             Object data = ((Task<?>) event.getTarget()).getValue();
+            // Post a waring dialog if the task has string value
+            log.debug( event.getTarget().getClass().getSimpleName() + " task complete. " );
             if (data instanceof String && (!((String) data).isEmpty())) {
                 DialogBoxContoller dbc = DialogBoxContoller.init();
                 if (dbc != null)
