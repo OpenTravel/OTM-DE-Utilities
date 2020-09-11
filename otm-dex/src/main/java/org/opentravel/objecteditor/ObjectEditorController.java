@@ -66,7 +66,6 @@ public class ObjectEditorController extends DexMainControllerBase {
     @FXML
     private SearchTabController searchTabController;
 
-
     @Override
     public void checkNodes() {
         if (!(repositoryTabController instanceof RepositoryTabController))
@@ -142,9 +141,7 @@ public class ObjectEditorController extends DexMainControllerBase {
         addIncludedController( dexStatusController, eventManager, viewGroupId++ );
         statusController = dexStatusController; // Make available to base class
 
-        // Tab controllers
-        // Configure them. They will include their controllers.
-
+        // Tab controllers - They will include the controllers in that tab.
         // Tab controllers are not in the included controllers list
         repositoryTabController.configure( this, viewGroupId++ ); // TODO - this is slow!
         resourcesTabController.configure( this, viewGroupId++ );
