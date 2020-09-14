@@ -286,6 +286,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     }
 
     private void handleEvent(OtmObjectModifiedEvent e) {
+        log.debug( "Object modified event, subject is: " + e.getObject() );
         refresh();
     }
 

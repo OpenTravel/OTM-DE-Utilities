@@ -113,7 +113,7 @@ public class AddPropertyAction extends DexRunAction {
         // Validate the parent - adding a property could change validation status
         if (newProperty != null && newProperty.getOwningMember() != null)
             newProperty.getOwningMember().isValid( true );
-        return newProperty != null ? newProperty.isValid() : false;
+        return newProperty != null && newProperty.isValid();
     }
 
     @Override

@@ -297,9 +297,9 @@ public class TestOtmModelManager extends AbstractFxTest {
         pm.getAllProjectItems().forEach( pi -> {
             assertTrue( "Must contain the tlLibrary in project item.", mgr.contains( pi.getContent() ) );
             pi.getContent().getNamedMembers().forEach( lm -> {
-                log.debug( "Testing " + lm.getLocalName() );
-                if (!mgr.contains( (OtmLibraryMember) OtmModelElement.get( (TLModelElement) lm ) ))
-                    log.warn( "Error detected" );
+                // log.debug( "Testing " + lm.getLocalName() );
+                // if (!mgr.contains( (OtmLibraryMember) OtmModelElement.get( (TLModelElement) lm ) ))
+                // log.warn( "Error detected" );
                 assertTrue( "Must contain each named member.", mgr.contains( lm ) );
                 assertTrue( "Must contain Otm object from named member.",
                     mgr.contains( (OtmLibraryMember) OtmModelElement.get( (TLModelElement) lm ) ) );

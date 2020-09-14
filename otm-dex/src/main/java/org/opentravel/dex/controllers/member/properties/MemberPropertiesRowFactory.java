@@ -185,9 +185,14 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
     private void addProperty(OtmPropertyType type) {
         // Get a valid owner as the subject
         OtmPropertyOwner owner = getPropertyOwner( getObject() );
+
         if (owner != null) {
-            owner.getActionManager().run( DexActions.ADDPROPERTY, owner, type );
-            controller.refresh();
+            Object ret = owner.getActionManager().run( DexActions.ADDPROPERTY, owner, type );
+            if (ret instanceof OtmObject) {
+                log.debug( "Add property action returned: " + ret );
+                controller.post( ((OtmObject) ret).getOwningMember() );
+            } else
+                controller.refresh();
         }
     }
 
