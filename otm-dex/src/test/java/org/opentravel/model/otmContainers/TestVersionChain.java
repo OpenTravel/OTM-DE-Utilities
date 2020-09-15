@@ -205,7 +205,8 @@ public class TestVersionChain extends AbstractFxTest {
             if (vlm != null) {
                 // Post Checks
                 assertTrue( vlm != null );
-                if (!(vlm instanceof OtmValueWithAttributes) && !(vlm instanceof OtmSimpleObject)) // FIXME
+                // FIXME - VWA will have same parent type as member's parent type
+                if (!(vlm instanceof OtmValueWithAttributes) && !(vlm instanceof OtmSimpleObject))
                     assertTrue( vlm.getBaseType() == member );
                 assertTrue( vlm.getName().equals( member.getName() ) );
                 assertTrue( ((LibraryMember) vlm.getTL()).getOwningLibrary() == latestLib.getTL() );

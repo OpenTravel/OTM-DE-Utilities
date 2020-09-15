@@ -23,11 +23,14 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyFactory;
 import org.opentravel.schemacompiler.model.LibraryElement;
 import org.opentravel.schemacompiler.model.LibraryMember;
+import org.opentravel.schemacompiler.model.TLAbstractEnumeration;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
 
@@ -165,7 +168,8 @@ public class OtmVersionChain {
      * subject and editable. The latest version of the subject's owning member will be used to make the minor version.
      * 
      * @param subject
-     * @return a property owner in the new object with the matching name or null
+     * @return a property owner in the new object with the matching name or null if the minor version could not be
+     *         created or error
      */
     public OtmLibraryMember getNewMinorLibraryMember(OtmLibraryMember subject) {
         OtmLibrary subjectLibrary = subject.getLibrary();
@@ -197,9 +201,19 @@ public class OtmVersionChain {
         return newMinorLibraryMember;
     }
 
+    /**
+     * 
+     * @param subject
+     * @return
+     */
     public OtmPropertyOwner getNewMinorPropertyOwner(OtmPropertyOwner subject) {
         OtmLibraryMember newMinorLibraryMember = getNewMinorLibraryMember( subject.getOwningMember() );
         OtmPropertyOwner newPropertyOwner = null;
+        // VWA does not have descendant property owners, it is the property owner
+        if (newMinorLibraryMember instanceof OtmValueWithAttributes)
+            newPropertyOwner = (OtmValueWithAttributes) newMinorLibraryMember;
+        if (newMinorLibraryMember instanceof OtmEnumeration)
+            newPropertyOwner = (OtmEnumeration<?>) newMinorLibraryMember;
         if (newMinorLibraryMember != null) {
             // Find matching propertyOwner
             for (OtmPropertyOwner p : newMinorLibraryMember.getDescendantsPropertyOwners())
