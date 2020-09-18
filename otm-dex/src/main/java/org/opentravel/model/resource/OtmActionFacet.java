@@ -264,7 +264,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
 
     public String setReferenceFacetName(String name) {
         // getTL().setReferenceFacetName( name );
-        log.debug( "Set reference facet to " + name );
+        // log.debug( "Set reference facet to " + name );
         if (name == null || name.equals( OtmResource.SUBGROUP ))
             getTL().setReferenceFacetName( null );
         else
@@ -298,7 +298,7 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
         else
             name = ResourceCodegenUtils.getActionFacetReferenceName( tlf );
         getTL().setReferenceFacetName( name );
-        log.debug( "Setting reference facet name to: " + name );
+        // log.debug( "Setting reference facet name to: " + name );
     }
 
     // // FIXED - there has to be a better way to code this to have same code run in both cases

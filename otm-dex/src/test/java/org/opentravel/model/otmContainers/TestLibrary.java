@@ -291,17 +291,14 @@ public class TestLibrary {
             // log.debug( "Member: " + m.getName() + " type = " + m.getObjectTypeName() );
         }
 
-        // When - library is forced to be not editable
+        // When - library is forced to be not editable then refreshed
         ((TLLibrary) lib.getTL()).setStatus( TLLibraryStatus.FINAL );
-        assertTrue( "Must be read only action manager.", lib.getActionManager() instanceof DexReadOnlyActionManager );
         lib.refresh();
-        // DexActionManager ma = lib.getActionManager(); // Will be full because unmanaged
         assertTrue( "Must be read only action manager.", lib.getActionManager() instanceof DexReadOnlyActionManager );
         // Then
         for (OtmLibraryMember m : mgr.getMembers( lib )) {
-            log.debug( "Read-only Member: " + m.getName() + " type = " + m.getObjectTypeName() );
+            log.debug( "Read-only tests for Member: " + m.getName() + " type = " + m.getObjectTypeName() );
             assertTrue( "Given", !m.isEditable() );
-            // ma = m.getActionManager(); // Will be full because unmanaged
             assertTrue( "Given", m.getActionManager() instanceof DexReadOnlyActionManager );
             assertTrue( "Refresh must change property class.", m.nameProperty() instanceof ReadOnlyStringWrapper );
         }

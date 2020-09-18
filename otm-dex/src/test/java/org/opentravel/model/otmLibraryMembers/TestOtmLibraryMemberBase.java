@@ -150,6 +150,17 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
     }
 
     @Test
+    public void testRefresh() {
+        if (subject instanceof OtmLibraryMember)
+            ((OtmLibraryMember) subject).refresh();
+    }
+
+    public void testRefresh(OtmLibraryMember member) {
+        member.refresh();
+        log.debug( "Testing refresh of " + subject );
+    }
+
+    @Test
     public void testTypeUser() {
         if (subject instanceof OtmTypeUser)
             testTypeUser( (OtmTypeUser) subject );

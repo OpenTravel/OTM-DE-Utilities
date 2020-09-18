@@ -30,7 +30,6 @@ import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyFactory;
 import org.opentravel.schemacompiler.model.LibraryElement;
 import org.opentravel.schemacompiler.model.LibraryMember;
-import org.opentravel.schemacompiler.model.TLAbstractEnumeration;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
 
@@ -202,20 +201,26 @@ public class OtmVersionChain {
     }
 
     /**
+     * Create a new minor version of the owning member and VWA and enumerations will be returned, otherwise returns the
+     * facet with matching name.
      * 
      * @param subject
-     * @return
+     * @return property owner or null on error or facet not found.
      */
     public OtmPropertyOwner getNewMinorPropertyOwner(OtmPropertyOwner subject) {
+
+        // Create minor version of owning member
         OtmLibraryMember newMinorLibraryMember = getNewMinorLibraryMember( subject.getOwningMember() );
+
+        // Find the property owner to return
         OtmPropertyOwner newPropertyOwner = null;
-        // VWA does not have descendant property owners, it is the property owner
+        // VWA and Enum do not have descendant property owners, they are the property owner
         if (newMinorLibraryMember instanceof OtmValueWithAttributes)
             newPropertyOwner = (OtmValueWithAttributes) newMinorLibraryMember;
-        if (newMinorLibraryMember instanceof OtmEnumeration)
+        else if (newMinorLibraryMember instanceof OtmEnumeration)
             newPropertyOwner = (OtmEnumeration<?>) newMinorLibraryMember;
-        if (newMinorLibraryMember != null) {
-            // Find matching propertyOwner
+        // Find name matching propertyOwner
+        else if (newMinorLibraryMember != null) {
             for (OtmPropertyOwner p : newMinorLibraryMember.getDescendantsPropertyOwners())
                 if (p.getName().equals( subject.getName() ))
                     newPropertyOwner = p;
@@ -294,6 +299,7 @@ public class OtmVersionChain {
      * Clear the version chain from all libraries in this chain.
      */
     public void refresh() {
-        libraries.forEach( OtmLibrary::refreshVersionChain );
+        // libraries.forEach( OtmLibrary::refreshVersionChain );
+        libraries.forEach( OtmLibrary::refresh );
     }
 }

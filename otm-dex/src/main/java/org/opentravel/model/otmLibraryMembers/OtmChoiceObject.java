@@ -115,6 +115,18 @@ public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
 
 
     @Override
+    public void refresh() {
+        for (OtmContributedFacet contrib : getChildrenContributedFacets()) {
+            // Do not refresh if the contributed facets are not modeled yet.
+            if (contrib.getContributor() == null) {
+                // log.debug( "ERROR - missing contributor." );
+                return;
+            }
+        }
+        super.refresh();
+    }
+
+    @Override
     public String setName(String name) {
         getTL().setName( name );
         isValid( true );

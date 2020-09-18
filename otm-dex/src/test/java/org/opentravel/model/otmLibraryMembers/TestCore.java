@@ -23,12 +23,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmProperties.OtmIdAttribute;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLCoreObject;
 import org.opentravel.schemacompiler.model.TLProperty;
+
+import javafx.beans.property.ReadOnlyStringWrapper;
 
 /**
  * Verifies the functions of the <code>UserSettings</code> class.
@@ -58,7 +61,12 @@ public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
         assertNotNull( core.getDetailList() );
     }
 
-
+    @Override
+    public void testRefresh() {
+        log.debug( "Testing core refresh." );
+        if (subject.getActionManager() instanceof DexReadOnlyActionManager)
+            assertTrue( "Must have read only name property.", subject.nameProperty() instanceof ReadOnlyStringWrapper );
+    }
 
     /** ****************************************************** **/
 

@@ -134,7 +134,7 @@ public class TestProject extends AbstractFxTest {
         repoManager = controller.getRepositoryManager();
 
         // Given a project that uses the OpenTravel repository
-        OtmModelManager mgr = new OtmModelManager( null, repoManager );
+        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
 
         File projectFile = null;
         String name = "testProj";

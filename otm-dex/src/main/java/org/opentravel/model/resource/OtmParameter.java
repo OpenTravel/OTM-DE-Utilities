@@ -275,7 +275,7 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
 
     public TLParamLocation setLocation(TLParamLocation location) {
         getTL().setLocation( location );
-        log.debug( "Set loction to " + location );
+        // log.debug( "Set loction to " + location );
         return getLocation();
     }
 

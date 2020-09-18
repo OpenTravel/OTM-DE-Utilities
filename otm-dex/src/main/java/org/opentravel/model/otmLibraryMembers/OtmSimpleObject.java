@@ -110,7 +110,7 @@ public class OtmSimpleObject extends OtmSimpleObjects<TLSimple> implements OtmTy
         if (type instanceof TLAttributeType)
             getTL().setParentType( (TLAttributeType) type );
         assignedTypeProperty = null;
-        log.debug( "Set assigned TL type" );
+        // log.debug( "Set assigned TL type" );
         return getAssignedTLType();
     }
 

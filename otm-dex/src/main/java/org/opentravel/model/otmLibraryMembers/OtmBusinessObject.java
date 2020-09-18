@@ -212,4 +212,18 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
         // getTL().removeUpdateFacet( (TLContextualFacet) child.getTL() );
         // }
     }
+
+    @Override
+    public void refresh() {
+        // log.debug( "Business object refresh: " + this );
+        // Do not refresh if the contributed facets are not modeled yet.
+        for (OtmContributedFacet contrib : getChildrenContributedFacets()) {
+            if (contrib.getContributor() == null) {
+                // log.debug( "ERROR - missing contributor." );
+                return;
+            }
+        }
+        super.refresh();
+        // log.debug( "Business object refreshed" );
+    }
 }

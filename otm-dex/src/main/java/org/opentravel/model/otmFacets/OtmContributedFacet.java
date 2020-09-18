@@ -64,6 +64,13 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
      */
     public OtmContributedFacet(TLContextualFacet tl, OtmLibraryMember parent) {
         super( tl, parent );
+
+        // If the contextual facet has been modeled, set its contributor
+        OtmObject obj = OtmModelElement.get( tl );
+        if (obj instanceof OtmContextualFacet) {
+            setContributor( (OtmContextualFacet) obj );
+            ((OtmContextualFacet) obj).setWhereContributed( this );
+        }
     }
 
     /**

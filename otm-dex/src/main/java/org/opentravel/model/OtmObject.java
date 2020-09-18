@@ -257,6 +257,9 @@ public interface OtmObject {
     /**
      * Remove any cached values. These include FX properties, children lists, validation results and other lazy
      * evaluated lists.
+     * <p>
+     * <b>Note: </b>Refresh will remove children including Contributed facets. Those will get recreated via lazy
+     * evaluation but maybe be different instances.
      */
     public void refresh();
 

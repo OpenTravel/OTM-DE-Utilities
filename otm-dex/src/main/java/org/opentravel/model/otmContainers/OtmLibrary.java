@@ -735,7 +735,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
      */
     // FIXME - for some reason refreshing the members causes tests to fail
     public void refreshVersionChain() {
-        log.debug( this.getFullName() + " refreshed" );
+        log.debug( this.getFullName() + " version chain refreshed" );
         versionChain = null;
     }
 }

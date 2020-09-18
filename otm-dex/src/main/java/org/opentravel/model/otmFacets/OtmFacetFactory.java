@@ -116,6 +116,12 @@ public class OtmFacetFactory {
             case CUSTOM:
             case UPDATE:
             case QUERY:
+                // if (OtmModelElement.get( tlFacet ) == null) {
+                // log.debug( "Facet factory passed an unmodeled facet: " + tlFacet.getNamespace() + " : "
+                // + tlFacet.getLocalName() );
+                // log.debug( " parent: " + parent.getNamespace() + " : "
+                // + parent.getName() );
+                // }
                 if (parent instanceof OtmLibraryMember && tlFacet instanceof TLContextualFacet)
                     facet = new OtmContributedFacet( (TLContextualFacet) tlFacet, parent );
                 break;

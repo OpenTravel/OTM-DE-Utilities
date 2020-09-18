@@ -26,10 +26,13 @@ import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLProperty;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -42,10 +45,44 @@ public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         subject = buildOtm( staticModelManager );
         baseObject = buildOtm( staticModelManager );
         baseObject.setName( "BaseCH" );
+    }
+
+    @Override
+    public void testRefresh() {
+        // Given: choice subject and facet names before refresh to test
+        // Refresh will remove children including Contributed facets. Those will get recreated via lazy evaluation.
+        Collection<String> facetNames = new ArrayList<>();
+        for (OtmContributedFacet cf : subject.getChildrenContributedFacets()) {
+            TestContextualFacet.testContributedFacet( cf, cf.getContributor(), subject );
+            facetNames.add( cf.getName() );
+        }
+
+        // When
+        super.testRefresh( subject );
+
+        // Then
+        for (OtmContributedFacet contrib : subject.getChildrenContributedFacets()) {
+            log.debug( "Testing choice facet: " + contrib );
+            OtmLibraryMember lm = contrib.getOwningMember();
+            assertTrue( "Must still have subject as owner.", lm == subject );
+
+            OtmContextualFacet contributor = contrib.getContributor();
+            assertTrue( "Must have contributor.", contributor != null );
+
+            // List<OtmObject> children = lm.getChildren();
+            // There is a contributed facet, but it is a new one
+            assertTrue( "Library member has contributor child with same name.",
+                facetNames.contains( contrib.getName() ) );
+
+            OtmContextualFacet cf = contrib.getContributor();
+            assertTrue( "Contextual facet knows where it is contributed.", cf.getWhereContributed() == contrib );
+
+            TestContextualFacet.testContributedFacet( contrib, contributor, lm );
+        }
     }
 
     @Test

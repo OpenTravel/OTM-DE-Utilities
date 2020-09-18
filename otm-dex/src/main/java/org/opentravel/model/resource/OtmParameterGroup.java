@@ -321,7 +321,7 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         } else
             getTL().setFacetRef( null );
 
-        log.debug( "Set reference facet to " + getReferenceFacet() );
+        // log.debug( "Set reference facet to " + getReferenceFacet() );
         return getReferenceFacet();
     }
 
@@ -347,7 +347,7 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
             value = getReferenceFacet();
         for (OtmObject c : getFacetCandidates()) {
             if (value.getClass() == c.getClass()) {
-                log.debug( "Matching class found: " + c );
+                // log.debug( "Matching class found: " + c );
                 setReferenceFacet( c );
                 return c;
             }

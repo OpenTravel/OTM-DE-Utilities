@@ -46,7 +46,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * test class the otm library member base class.
+ * test class for methods in the otm library member base class.
  */
 public class TestLibraryMemberBase {
 
@@ -58,7 +58,7 @@ public class TestLibraryMemberBase {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         // log.debug( "Model manager created." );
     }
 
@@ -138,7 +138,7 @@ public class TestLibraryMemberBase {
     @Test
     public void getPropertiesWhereUsed() {
         DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
         OtmLibrary lib = TestLibrary.buildOtm( mgr );
         // buildOneOfEachWithProperties( mgr, lib );
         assertTrue( "Given", lib.isEditable() );
@@ -155,13 +155,15 @@ public class TestLibraryMemberBase {
 
         Map<OtmTypeUser,OtmTypeProvider> properties = core.getPropertiesWhereUsed();
         assertTrue( "Must have type user properties.", !properties.isEmpty() );
+
+        // FIXME - test to assure resources are included
     }
 
     @Test
     public void testOneOfEachWithProperties() {
         // Givens
         DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
         OtmLibrary lib = TestLibrary.buildOtm( mgr );
         assertTrue( "Given", lib.isEditable() );
 

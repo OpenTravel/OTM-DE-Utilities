@@ -334,7 +334,7 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
             getTL().setParentType( null );
         else if (type instanceof TLAttributeType)
             getTL().setParentType( (TLAttributeType) type );
-        log.debug( "Set assigned TL type" );
+        // log.debug( "Set assigned TL type" );
         return getAssignedTLType();
     }
 

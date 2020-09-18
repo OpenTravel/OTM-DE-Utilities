@@ -484,7 +484,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             whereUsed.addAll( mgr.findUsersOf( this ) );
             whereUsed.addAll( mgr.findSubtypesOf( this ) ); // base types
             // FIXME - get resources when they expose this library member
-            //
+
+            // Will re-populate children using modelChildren()
             getDescendantsTypeProviders().forEach( p -> whereUsed.addAll( mgr.findUsersOf( p ) ) );
             // log.debug( "Created Where Used List " + whereUsed.size() + " for : " + this.getNameWithPrefix() );
         }
@@ -606,6 +607,12 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return new ReadOnlyStringWrapper( getPrefix() );
     }
 
+    // Can't do this or contextual facet will not be able to override
+    // @Override
+    // public TLLibraryMember getTL() {
+    // return getTL();
+    // }
+
     /**
      * {@inheritDoc} Null out member providers and where used lists.
      */
@@ -614,7 +621,6 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         super.refresh();
         membersProviders = null; // Created by getDescendantsTypeProviders
         getWhereUsed( true );
-        // memberTypeUsers = null; // Created by getDescendantsTypeUsers.
     }
 
     @Override

@@ -316,6 +316,15 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         }
     }
 
+    /**
+     * Simply set the whereContributed field. This should not be used except by OtmContributedFacet constructor.
+     * 
+     * @param contribitor
+     */
+    public void setWhereContributed(OtmContributedFacet contribitor) {
+        this.whereContributed = contribitor;
+    }
+
     /*
      * See if the model manager has the owning entity by name. If so, create and set contributed facet.
      */
