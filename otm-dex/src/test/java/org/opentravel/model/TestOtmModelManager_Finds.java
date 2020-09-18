@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.popup;
+package org.opentravel.model;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,57 +24,60 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractOTMApplication;
-import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.objecteditor.ObjectEditorApp;
+import org.opentravel.schemacompiler.model.TLModel;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
 
 /**
- * Verifies the functions of the <code>SelectProjectDialog</code>
+ * Verifies the functions of the <code>Otm Model Manager</code>.
  */
-public class TestSelectProjectDialog extends AbstractFxTest {
+// @Ignore
+public class TestOtmModelManager_Finds extends AbstractFxTest {
+    // public class TestOtmModelManager_Gets extends AbstractFxTest {
+    private static Log log = LogFactory.getLog( TestOtmModelManager_Finds.class );
 
-    private static Log log = LogFactory.getLog( TestOtmModelManager.class );
+    public static final boolean RUN_HEADLESS = true;
+    final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.
 
-    public static final boolean RUN_HEADLESS = false;
-    final int WATCH_TIME = 5000; // How long to sleep so we can see what is happening. Can be 0.
-
-    final String FXID_PROJECTLIST = "#projectList";
-    final String FXID_LIBTREETABLE = "#librariesTreeTable";
+    final static String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector
+    final static String FILE_TESTOPENTRAVELREPO = "TestOpenTravelRepo.otp";
+    final static String FILE_TESTLOCAL = "TestLocalFiles.otp";
 
     @BeforeClass
     public static void setupTests() throws Exception {
-        setupWorkInProcessArea( TestSelectProjectDialog.class );
+        setupWorkInProcessArea( TestOtmModelManager_Finds.class );
         repoManager = repositoryManager.get();
     }
 
     @Test
-    public void testSelectProjectSetup() {
-        testSetup();
+    public void testFindSubtypesOf() {
+        // Given
+        OtmModelManager mgr = new OtmModelManager( null, null, null );
+        mgr.addBuiltInLibraries( new TLModel() );
+
+        // TODO
     }
 
-    public OtmModelManager testSetup() {
-        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
-        // Givens - 2 projects and library that does not belong to project
-        // Load first and second projects
-        TestDexFileHandler.loadAndAddManagedProject( mgr );
-        TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
 
-        assertTrue( mgr.getUserProjects().size() == 2 );
-        int libraryCount = mgr.getLibraries().size();
-        assertTrue( libraryCount > 0 );
-
-        // Library
-        TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLIBRARYNOTINPROJECT, mgr );
-        mgr.add();
-        assertTrue( mgr.getLibraries().size() > libraryCount );
-        libraryCount = mgr.getLibraries().size();
-        return mgr;
-    }
-
+    /**
+     * get(abstractLibrary) get(otmLibrary) get(String) get(TLLibrary)
+     */
     @Test
-    public void testCancelButton() {}
+    public void testFindUsersOf() {
+        // Given a project that uses local library files
+        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+        TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
+        TestDexFileHandler.loadAndAddManagedProject( mgr );
+        TLModel tlModel = mgr.getTlModel();
+        assertNotNull( tlModel );
+
+        // Then
+        // TODO
+
+        log.debug( "Tested findUsersOf() on " + mgr.getLibraries().size() + " libraries." );
+    }
+
 
     /**
      * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
@@ -85,17 +88,18 @@ public class TestSelectProjectDialog extends AbstractFxTest {
     }
 
     /**
-     * Configure headless/normal mode for TestFX execution.
-     */
-    static {
-        TestFxMode.setHeadless( RUN_HEADLESS );
-    }
-
-    /**
      * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
      */
     @Override
     protected String getBackgroundTaskNodeQuery() {
         return "#libraryText";
     }
+
+    /**
+     * Configure headless/normal mode for TestFX execution.
+     */
+    static {
+        TestFxMode.setHeadless( RUN_HEADLESS );
+    }
 }
+

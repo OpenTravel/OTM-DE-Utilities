@@ -731,11 +731,11 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     /**
-     * Refresh each member
+     * Refresh (null out) just the version chain field
      */
-    // FIXME - for some reason refreshing the members causes tests to fail
+    // TODO - for some reason refreshing the members causes tests to fail
     public void refreshVersionChain() {
-        log.debug( this.getFullName() + " version chain refreshed" );
+        // log.debug( this.getFullName() + " version chain refreshed" );
         versionChain = null;
     }
 }

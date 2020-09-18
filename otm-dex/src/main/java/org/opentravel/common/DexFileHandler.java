@@ -139,34 +139,20 @@ public class DexFileHandler extends AbstractMainWindowController {
         return System.getProperty( "user.home" );
     }
 
-    // /**
-    // * Open library or project file using library model loader. Results in an updated model.
-    // * <p>
-    // * To open a project and receive the project manager, use
-    // * {@link #openProject(File, TLModel, OpenProjectProgressMonitor)}
-    // *
-    // * @param selectedFile
-    // */
-    // public ValidationFindings openFile(File selectedFile, OtmModelManager modelManager,
-    // OpenProjectProgressMonitor monitor) {
-    // findings = null;
-    // if (selectedFile != null && selectedFile.canRead()) {
-    // if (selectedFile.getName().endsWith( PROJECT_FILE_EXTENSION ))
-    // openProject( selectedFile, modelManager, monitor );
-    // else if (selectedFile.getName().endsWith( LIBRARY_FILE_EXTENSION ))
-    // findings = openLibrary( selectedFile, modelManager.getTlModel(), monitor );
-    // }
-    // return findings;
-    // }
-
+    /**
+     * Open the library.
+     * 
+     * @param selectedFile library to open
+     * @param modelManager only used to get the tlModel
+     * @param monitor updated if not null
+     * @return validation findings if successful or else null
+     */
     public ValidationFindings openLibrary(File selectedFile, OtmModelManager modelManager,
         OpenProjectProgressMonitor monitor) {
-        return openLibrary( selectedFile, modelManager.getTlModel(), monitor );
-    }
+        if (modelManager == null || modelManager.getTlModel() == null)
+            return null;
+        TLModel libraryModel = modelManager.getTlModel();
 
-    // TODO - change users then embed in openLIbrary
-    @Deprecated
-    public ValidationFindings openLibrary(File selectedFile, TLModel libraryModel, OpenProjectProgressMonitor monitor) {
         if (selectedFile == null)
             return null;
         if (!selectedFile.canRead()) {
@@ -193,21 +179,22 @@ public class DexFileHandler extends AbstractMainWindowController {
     }
 
     /**
-     * Open the passed file using the project manager associated with the model manager.
+     * Open the passed file using the project manager.
      * <p>
      * Does <b>not</b> load into the model manager.
      * 
-     * @deprecated - use {@link #OpenProject} which adds project to model manager
+     * @see {@link DexFileHandler#openProject(File, OtmModelManager, OpenProjectProgressMonitor)}
+     * 
      * @param selectedProjectFile name must end with the PROJECT_FILE_EXTENSION
-     * @param mgr
+     * @param manager - project manager, use OtmModelManager::getProjectManager()
      * @param monitor
      * @return
      */
-    @Deprecated
-    public boolean openProjectOLD(File selectedProjectFile, OtmModelManager mgr, OpenProjectProgressMonitor monitor) {
+    public boolean openProject(File selectedProjectFile, ProjectManager manager, OpenProjectProgressMonitor monitor) {
+        if (selectedProjectFile == null || manager == null)
+            return false;
+
         if (selectedProjectFile.getName().endsWith( PROJECT_FILE_EXTENSION )) {
-            // Use project manager from TLModel
-            ProjectManager manager = mgr.getProjectManager();
             try {
                 manager.loadProject( selectedProjectFile, findings, monitor );
             } catch (Exception e) {
@@ -223,51 +210,45 @@ public class DexFileHandler extends AbstractMainWindowController {
      * Open the passed file using the project manager associated with the model manager. If successful, load projects
      * into the model manager.
      * <p>
-     * If the result is false indicating an error, the error can be retrieved using {@link #getErrorMessage()}
      * 
      * @param selectedProjectFile name must end with the PROJECT_FILE_EXTENSION
      * @param mgr
      * @param monitor
-     * @return
+     * @return true or false indicating an error, the error can be retrieved using {@link #getErrorMessage()}
      */
     public boolean openProject(File selectedProjectFile, OtmModelManager mgr, OpenProjectProgressMonitor monitor) {
-        if (selectedProjectFile.getName().endsWith( PROJECT_FILE_EXTENSION )) {
-            // Use project manager from TLModel
-            ProjectManager manager = mgr.getProjectManager();
-            try {
-                manager.loadProject( selectedProjectFile, findings, monitor );
-            } catch (Exception e) {
-                errorMessage = "Error Opening Project: " + e.getLocalizedMessage();
-                log.error( errorMessage );
-                manager.closeAll(); // This is the error message i want to show
-                return false;
-            }
+        if (mgr == null || mgr.getProjectManager() == null)
+            return false;
+
+        if (openProject( selectedProjectFile, mgr.getProjectManager(), monitor )) {
             mgr.addProjects();
-        }
-        return true;
+            return true;
+        } else
+            return false;
     }
 
-    @Deprecated
-    public ProjectManager openProject(File selectedProjectFile, TLModel tlModel, OpenProjectProgressMonitor monitor) {
-        // Use project manager from TLModel
-        ProjectManager manager = null;
-        if (selectedProjectFile.getName().endsWith( ".otp" )) {
-            if (tlModel != null)
-                manager = new ProjectManager( tlModel );
-            else
-                manager = new ProjectManager( false );
-            // Findings are created in back ground task - is there any way to use these instead?
-            findings = new ValidationFindings();
-            try {
-                manager.loadProject( selectedProjectFile, findings, monitor );
-                // } catch (LibraryLoaderException | RepositoryException | NullPointerException e) {
-                // log.error( "Error opening project: " + e.getLocalizedMessage() );
-            } catch (Exception e) {
-                log.error( "Error Opening Project: " + e.getLocalizedMessage() );
-            }
-        }
-        return manager;
-    }
+    // @Deprecated
+    // public ProjectManager openProject(File selectedProjectFile, TLModel tlModel, OpenProjectProgressMonitor monitor)
+    // {
+    // // Use project manager from TLModel
+    // ProjectManager manager = null;
+    // if (selectedProjectFile.getName().endsWith( ".otp" )) {
+    // if (tlModel != null)
+    // manager = new ProjectManager( tlModel );
+    // else
+    // manager = new ProjectManager( false );
+    // // Findings are created in back ground task - is there any way to use these instead?
+    // findings = new ValidationFindings();
+    // try {
+    // manager.loadProject( selectedProjectFile, findings, monitor );
+    // // } catch (LibraryLoaderException | RepositoryException | NullPointerException e) {
+    // // log.error( "Error opening project: " + e.getLocalizedMessage() );
+    // } catch (Exception e) {
+    // log.error( "Error Opening Project: " + e.getLocalizedMessage() );
+    // }
+    // }
+    // return manager;
+    // }
 
     public static String saveLibraries(List<OtmLibrary> libraries) {
         if (libraries == null || libraries.isEmpty())

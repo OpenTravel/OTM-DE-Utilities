@@ -32,7 +32,6 @@ import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
 import org.opentravel.model.otmLibraryMembers.TestContextualFacet;
 import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.model.LibraryMember;
@@ -75,7 +74,7 @@ public class TestOtmModelManager extends AbstractFxTest {
      * @return
      */
     public static OtmModelManager buildModelManager(DexActionManager actionManager) {
-        OtmModelManager mgr = new OtmModelManager( actionManager, repoManager );
+        OtmModelManager mgr = new OtmModelManager( actionManager, repoManager, null );
         mgr.addBuiltInLibraries( new TLModel() );
         return mgr;
     }
@@ -100,77 +99,13 @@ public class TestOtmModelManager extends AbstractFxTest {
         return users;
     }
 
-    /** ******************************************************************* **/
-    // // MOVED to TestProject
-    // @Test
-    // public void testAddingVersionedProject() throws Exception {
-    //
-    // // Given a project that uses the OpenTravel repository
-    // OtmModelManager mgr = new OtmModelManager( new DexFullActionManager( null ), repoManager );
-    // boolean editable = TestDexFileHandler.loadVersionProject( mgr );
-    // assertNotNull( mgr.getActionManager( true ) );
-    //
-    // String BASENS0 = "http://www.opentravel.org/Sandbox/Test/VersionTest_Unmanaged";
-    // // String BASENS1 = "http://www.opentravel.org/Sandbox/Test/v1";
-    // //
-    // OtmLibrary latestLib = null;
-    // int highestMajor = 0;
-    // for (OtmLibrary lib : mgr.getLibraries()) {
-    // if (lib.isBuiltIn())
-    // continue;
-    // log.debug( "Library " + lib + " opened." );
-    // log.debug( "Is latest? " + lib.isLatestVersion() );
-    // log.debug( "Is minor? " + lib.isMinorVersion() );
-    // log.debug( "Version number " + lib.getMajorVersion() + " " + lib.getMinorVersion() );
-    // log.debug( "Is editable? " + lib.isEditable() );
-    // // DexActionManager am = lib.getActionManager();
-    // log.debug( "What action manager? " + lib.getActionManager().getClass().getSimpleName() );
-    //
-    // // List<OtmLibrary> chain = mgr.getVersionChain( lib );
-    // log.debug( "Version chain contains " + mgr.getVersionChain( lib ).size() + " libraries" );
-    // log.debug( "" );
-    //
-    // if (lib.getMajorVersion() > highestMajor)
-    // highestMajor = lib.getMajorVersion();
-    // if (lib.isLatestVersion())
-    // latestLib = lib;
-    // }
-    //
-    // //
-    // // Test adding properties to object in latest major
-    // //
-    // // Get the latest library and make sure we can add properties to the objects
-    // assertTrue( "Given: Library in repository must be editable.", latestLib.isEditable() );
-    // OtmLibraryMember vlm = null;
-    // for (OtmLibraryMember member : mgr.getMembers( latestLib.getVersionChain().getMajor() )) {
-    // assertTrue( "This must be chain editable: ", member.getLibrary().isChainEditable() );
-    // vlm = member.createMinorVersion( latestLib );
-    // log.debug( "Created minor version of " + member );
-    // // Services are not versioned
-    // if (vlm == null)
-    // assertTrue( !(member.getTL() instanceof Versioned) );
-    // else {
-    // // Post Checks
-    // assertTrue( vlm != null );
-    // if (!(vlm instanceof OtmValueWithAttributes) && !(vlm instanceof OtmSimpleObject)) // FIXME
-    // assertTrue( vlm.getBaseType() == member );
-    // assertTrue( vlm.getName().equals( member.getName() ) );
-    // assertTrue( ((LibraryMember) vlm.getTL()).getOwningLibrary() == latestLib.getTL() );
-    // assertTrue( vlm.getLibrary() == latestLib );
-    // }
-    //
-    // }
-    // }
 
     @Test
     public void testAddingManagedProject() throws Exception {
 
         // Given a project that uses the OpenTravel repository
-        OtmModelManager mgr = new OtmModelManager( null, repoManager );
-        TestDexFileHandler.loadManagedProject( mgr );
-
-        // When the project is added to the model manager
-        mgr.addProjects();
+        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+        TestDexFileHandler.loadAndAddManagedProject( mgr );
 
         //
         for (OtmLibrary lib : mgr.getLibraries())
@@ -197,9 +132,8 @@ public class TestOtmModelManager extends AbstractFxTest {
     @Test
     public void testClose() throws Exception {
         // Given - project added to the model manager
-        OtmModelManager mgr = new OtmModelManager( null, repoManager );
-        TestDexFileHandler.loadManagedProject( mgr );
-        mgr.addProjects();
+        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+        TestDexFileHandler.loadAndAddManagedProject( mgr );
         mapTests( mgr );
 
         // Given assertions
@@ -231,8 +165,8 @@ public class TestOtmModelManager extends AbstractFxTest {
         assertNotNull( mgr.getEmptyType() );
 
         // When - loaded again
-        TestDexFileHandler.loadManagedProject( mgr );
-        mgr.addProjects();
+        TestDexFileHandler.loadAndAddManagedProject( mgr );
+        // mgr.addProjects();
         assertTrue( mgr.getBaseNamespaces().size() == baseNSCount );
     }
 
@@ -255,36 +189,29 @@ public class TestOtmModelManager extends AbstractFxTest {
     }
 
     @Test
-    public void testGetPredefinedTypes() {
-        // Given
-        OtmModelManager mgr = new OtmModelManager( null, null, null );
-        mgr.addBuiltInLibraries( new TLModel() );
-        OtmXsdSimple id = mgr.getIdType();
-        assertNotNull( id );
-        OtmXsdSimple empty = mgr.getEmptyType();
-        assertNotNull( empty );
-    }
-
-    @Test
     public void testAddingLibrariesToEmptyModel() {
-        OtmModelManager mgr = new OtmModelManager( null, repoManager );
-        TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr.getTlModel() );
+        // Given a model manager and TL Model with library loaded
+        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+        TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr );
+        assertTrue( "Given: no user libraries in model manager yet.", mgr.getUserLibraries().isEmpty() );
 
-        // int initialMemberCount = mgr.getMembers().size();
-        log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
-            + " members." );
-        mgr.getTlModel().getUserDefinedLibraries().forEach( tlLib -> mgr.add( tlLib ) );
-        log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
-            + " members." );
-        assertTrue( !mgr.getLibraries().isEmpty() );
+        // When - libraries are added to model manager
+        mgr.getTlModel().getUserDefinedLibraries().forEach( tlLib -> {
+            OtmLibrary newLib = mgr.add( tlLib );
+            assertTrue( newLib != null );
+        } );
+
+        // Then - there will be user libraries
+        assertTrue( !mgr.getUserLibraries().isEmpty() );
     }
 
     @Test
-    public void testAddingLibrariesModel() {
+    public void testAddingLibrariesToModel() {
         OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
         TestDexFileHandler.loadUnmanagedProject( mgr );
+
         int initialMemberCount = mgr.getMembers().size();
-        TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr.getTlModel() );
+        TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr );
 
         // int initialMemberCount = mgr.getMembers().size();
         log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
@@ -304,9 +231,9 @@ public class TestOtmModelManager extends AbstractFxTest {
                 OtmLibraryMember otm = (OtmLibraryMember) OtmModelElement.get( (TLModelElement) lm );
                 if (otm == null)
                     log.debug( "ERROR - missing otm from listener on a " + lm.getClass().getSimpleName() );
-                // assertTrue( "Must have Otm object from listener.", otm != null );
-                // assertTrue( "Must contain Otm object from named member.", mgr.contains( otm ) );
-                //
+                assertTrue( "Must have Otm object from listener.", otm != null );
+                assertTrue( "Must contain Otm object from named member.", mgr.contains( otm ) );
+
                 if (!mgr.contains( lm ))
                     log.warn( "Error detected" );
                 assertTrue( "Must contain each named member.", mgr.contains( lm ) );
@@ -337,7 +264,7 @@ public class TestOtmModelManager extends AbstractFxTest {
     @Test
     public void testAddingUnmangedProject() throws Exception {
 
-        OtmModelManager mgr = new OtmModelManager( null, repoManager );
+        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
         TLModel tlModel = mgr.getTlModel();
         assertNotNull( tlModel );
 
@@ -367,7 +294,7 @@ public class TestOtmModelManager extends AbstractFxTest {
     // ?? Where do file open, object specific tests belong?
     @Test
     public void testOpenedContextualFacets() {
-        OtmModelManager mgr = new OtmModelManager( null, repoManager );
+        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
         // Given a project that uses local library files
         TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
         for (OtmLibrary lib : mgr.getLibraries())
@@ -389,6 +316,30 @@ public class TestOtmModelManager extends AbstractFxTest {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Test hasEditableLibraries() hasEditableLibraries(library) hasProjects()
+     */
+    @Test
+    public void testHas() {
+        // Given an empty model manager
+        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+        assertTrue( mgr.hasProjects() == false );
+        assertTrue( mgr.hasEditableLibraries() == false );
+
+        // Given a project that uses local library files
+        TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
+        TestDexFileHandler.loadAndAddManagedProject( mgr );
+        TLModel tlModel = mgr.getTlModel();
+        assertNotNull( tlModel );
+
+        assertTrue( mgr.hasProjects() == true );
+        assertTrue( mgr.hasEditableLibraries() == true );
+        for (OtmLibrary lib : mgr.getLibraries()) {
+            mgr.hasEditableLibraries( lib ); // NPE check
+            mgr.isLatest( lib ); // NPE check
         }
     }
 

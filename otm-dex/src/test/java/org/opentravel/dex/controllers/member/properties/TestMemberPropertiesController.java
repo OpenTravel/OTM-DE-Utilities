@@ -66,7 +66,7 @@ public class TestMemberPropertiesController extends AbstractFxTest {
     }
 
     public OtmModelManager testSetup() {
-        OtmModelManager mgr = new OtmModelManager( null, repoManager );
+        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
         // Givens - 2 projects and library that does not belong to project
         // Load first and second projects
         TestDexFileHandler.loadAndAddManagedProject( mgr );
@@ -77,7 +77,7 @@ public class TestMemberPropertiesController extends AbstractFxTest {
         assertTrue( libraryCount > 0 );
 
         // Library
-        TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLIBRARYNOTINPROJECT, mgr.getTlModel() );
+        TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLIBRARYNOTINPROJECT, mgr );
         mgr.add();
         assertTrue( mgr.getLibraries().size() > libraryCount );
         libraryCount = mgr.getLibraries().size();
@@ -86,7 +86,7 @@ public class TestMemberPropertiesController extends AbstractFxTest {
 
     @Test
     public void testPropertiesDAO_MinorMembers() {
-        OtmModelManager mgr = new OtmModelManager( new DexFullActionManager( null ), repoManager );
+        OtmModelManager mgr = new OtmModelManager( new DexFullActionManager( null ), repoManager, null );
         // Givens - projects
         if (!TestDexFileHandler.loadVersionProject( mgr ))
             return; // No editable libraries

@@ -299,7 +299,7 @@ public class OtmVersionChain {
      * Clear the version chain from all libraries in this chain.
      */
     public void refresh() {
-        // libraries.forEach( OtmLibrary::refreshVersionChain );
-        libraries.forEach( OtmLibrary::refresh );
+        libraries.forEach( OtmLibrary::refreshVersionChain );
+        // libraries.forEach( OtmLibrary::refresh );
     }
 }

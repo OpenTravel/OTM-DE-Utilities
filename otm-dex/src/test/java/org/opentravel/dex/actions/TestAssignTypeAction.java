@@ -63,7 +63,7 @@ public class TestAssignTypeAction {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
+        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
         lib = staticModelManager.add( new TLLibrary() );
         assertTrue( lib.isEditable() );
         // DexActionManager am = lib.getActionManager();

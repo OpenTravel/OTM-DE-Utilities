@@ -59,7 +59,7 @@ public class TestDexActionManager {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
+        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
         lib = staticModelManager.add( new TLLibrary() );
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
@@ -166,7 +166,7 @@ public class TestDexActionManager {
     @Test
     public void testNameChangeAction() {
         DexFullActionManager am = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( am, null );
+        OtmModelManager mgr = new OtmModelManager( am, null, null );
         assertTrue( am.getQueueSize() == 0 );
         lib = mgr.add( new TLLibrary() );
 

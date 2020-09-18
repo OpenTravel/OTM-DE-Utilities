@@ -160,26 +160,6 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
                     fields.add( (OtmProperty) field );
             }
         }
-        // for (OtmObject candidate : getParent().getReferenceFacet().getDescendants())
-        // log.debug( "Check this out." );
-        // // Old way
-        // OtmChildrenOwner facet = null;
-        // if (getParent() != null && getParent().getReferenceFacet() instanceof OtmChildrenOwner)
-        // facet = (OtmChildrenOwner) getParent().getReferenceFacet();
-        // if (facet != null) {
-        // for (OtmObject candidate : facet.getChildren())
-        // if (candidate instanceof OtmProperty) {
-        // // FIXME - only simple fields
-        // // if ( ((OtmProperty)candidate).isField()
-        // fields.add( (OtmProperty) candidate );
-        // }
-        // for (OtmObject candidate : facet.getInheritedChildren())
-        // if (candidate instanceof OtmProperty) {
-        // // FIXME - only simple fields
-        // // if ( ((OtmProperty)candidate).isField()
-        // fields.add( (OtmProperty) candidate );
-        // }
-        // }
         return fields;
     }
 

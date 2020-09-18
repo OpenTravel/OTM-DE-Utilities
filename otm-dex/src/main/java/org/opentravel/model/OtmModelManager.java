@@ -584,6 +584,18 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
     /**
+     * @return just user libraries, not built-in
+     */
+    public List<OtmLibrary> getUserLibraries() {
+        List<OtmLibrary> libList = new ArrayList<>();
+        libraries.values().forEach( lib -> {
+            if (lib.getTL() instanceof TLLibrary)
+                libList.add( lib );
+        } );
+        return libList;
+    }
+
+    /**
      * 
      * @param baseNamespace
      * @return If the namespace is managed, the set contains all the <b>managed</b> libraries in base namespace
@@ -610,7 +622,7 @@ public class OtmModelManager implements TaskResultHandlerI {
      * Get all libraries in the base namespace with the same major version
      * 
      * @param baseNamespace
-     * @return
+     * @return List with libraries in that library's chain
      */
     public List<OtmLibrary> getVersionChain(OtmLibrary library) {
         List<OtmLibrary> versionChain = new ArrayList<>();

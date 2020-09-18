@@ -361,19 +361,20 @@ public class TestInheritance extends AbstractFxTest {
         }
     }
 
-    public void getUnmanagedProject() {
-        TestDexFileHandler.loadUnmanagedProject( mgr );
-        int initialMemberCount = mgr.getMembers().size();
-        TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr.getTlModel() );
-
-        // int initialMemberCount = mgr.getMembers().size();
-        log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
-            + " members." );
-        mgr.getTlModel().getUserDefinedLibraries().forEach( tlLib -> mgr.add( tlLib ) );
-        log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
-            + " members." );
-        assertTrue( mgr.getMembers().size() > initialMemberCount );
-    }
+    // // Unused. Not sure the logic is correct.
+    // public void getUnmanagedProject() {
+    // TestDexFileHandler.loadUnmanagedProject( mgr );
+    // int initialMemberCount = mgr.getMembers().size();
+    // TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr.getTlModel() );
+    //
+    // // int initialMemberCount = mgr.getMembers().size();
+    // log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
+    // + " members." );
+    // mgr.getTlModel().getUserDefinedLibraries().forEach( tlLib -> mgr.add( tlLib ) );
+    // log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
+    // + " members." );
+    // assertTrue( mgr.getMembers().size() > initialMemberCount );
+    // }
 
 
     /**
