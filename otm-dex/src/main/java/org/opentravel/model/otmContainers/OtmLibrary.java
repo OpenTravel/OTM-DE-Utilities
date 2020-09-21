@@ -24,6 +24,7 @@ import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmProjectManager;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -367,6 +368,10 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         return mgr;
     }
 
+    public OtmProjectManager getProjectManager() {
+        return mgr != null ? mgr.getOtmProjectManager() : null;
+    }
+
     public String getName() {
         return getTL() != null ? getTL().getName() : "";
     }
@@ -404,7 +409,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
      */
     public List<String> getProjectNames() {
         List<String> names = new ArrayList<>();
-        getModelManager().getProjects( getTL() ).forEach( p -> names.add( p.getName() ) );
+        getProjectManager().getProjects( getTL() ).forEach( p -> names.add( p.getName() ) );
         names.sort( null );
         return names;
     }
@@ -412,7 +417,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     public List<OtmProject> getProjects() {
         List<OtmProject> projects = new ArrayList<>();
         if (projectItems != null)
-            getProjectNames().forEach( pn -> projects.add( getModelManager().getProject( pn ) ) );
+            getProjectNames().forEach( pn -> projects.add( getProjectManager().getProject( pn ) ) );
         return projects;
     }
 

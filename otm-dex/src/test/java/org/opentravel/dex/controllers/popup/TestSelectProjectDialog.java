@@ -61,7 +61,7 @@ public class TestSelectProjectDialog extends AbstractFxTest {
         TestDexFileHandler.loadAndAddManagedProject( mgr );
         TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
 
-        assertTrue( mgr.getUserProjects().size() == 2 );
+        assertTrue( mgr.getProjects().size() == 2 );
         int libraryCount = mgr.getLibraries().size();
         assertTrue( libraryCount > 0 );
 

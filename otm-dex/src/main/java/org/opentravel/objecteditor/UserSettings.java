@@ -19,6 +19,7 @@ package org.opentravel.objecteditor;
 import org.opentravel.application.common.AbstractUserSettings;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmContainers.OtmProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -42,6 +45,10 @@ import java.util.Properties;
  * <li>Add {@link #getDefaultSettings()}
  */
 public class UserSettings extends AbstractUserSettings {
+
+    private static final int EXAMPLE_MAX_REPEAT = 3;
+    private static final int EXAMPLE_MAX_DEPTH = 3;
+
 
     public String getServiceEndpointUrl() {
         return serviceEndpointUrl;
@@ -198,6 +205,15 @@ public class UserSettings extends AbstractUserSettings {
         this.exampleMaxRepeat = exampleMaxRepeat;
     }
 
+    public void setExampleMaxRepeat(String exampleMaxRepeatString) {
+        try {
+            if (exampleMaxRepeatString != null && !exampleMaxRepeatString.isEmpty())
+                this.exampleMaxRepeat = Integer.parseInt( exampleMaxRepeatString );
+        } catch (NumberFormatException e) {
+            exampleMaxRepeat = EXAMPLE_MAX_REPEAT;
+        }
+    }
+
     public int getExampleMaxDepth() {
         return exampleMaxDepth;
     }
@@ -206,9 +222,20 @@ public class UserSettings extends AbstractUserSettings {
         this.exampleMaxDepth = exampleMaxDepth;
     }
 
+    public void setExampleMaxDepth(String exampleMaxDepthString) {
+        try {
+            if (exampleMaxDepthString != null && !exampleMaxDepthString.isEmpty())
+                this.exampleMaxDepth = Integer.parseInt( exampleMaxDepthString );
+        } catch (NumberFormatException e) {
+            exampleMaxDepth = EXAMPLE_MAX_DEPTH;
+        }
+    }
+
     private static final String USER_SETTINGS_FILE = "/.ota2/.dex-settings.properties";
     private static final String PROJECT_DIRECTORY_LABEL = "lastProjectFolder";
     private static final String HIDE_PROJECT_OPEN_DIALOG = "hideOpenProjectDialog";
+    private static final String PROJECT_ARRAY_LABEL = "recentlyUsedProject";
+    private static final int MAX_PROJECTS = 9;
 
     private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
     private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
@@ -240,6 +267,8 @@ public class UserSettings extends AbstractUserSettings {
     private boolean suppressOptionalFields = false;
     private String lastRepositoryId = "";
     private String displaySize = "Normal";
+
+    private List<String> recentProjects = new ArrayList<>();
 
 
     public String getLastRepositoryId() {
@@ -312,6 +341,9 @@ public class UserSettings extends AbstractUserSettings {
         // settings.setRepeatCount( 2 );
         // settings.setLastModelFile( new File( userHomeDirectory + "/dummy-file.otm" ) );
         settings.setLastProjectFolder( new File( userHomeDirectory ) );
+        // Nothing to do for recentProjects - it is an empty array
+        settings.setRecentProject( null );
+
         settings.setHideOpenProjectDialog( false );
         settings.setLastRepositoryId( "" );
         settings.defaultMimeTypes = "APPLICATION_JSON;APPLICATION_XML";
@@ -330,8 +362,8 @@ public class UserSettings extends AbstractUserSettings {
         settings.setGenerateExamples( true );
         settings.setGenerateMaxDetailsForExamples( true );
         settings.setExampleContext( "example.com" );
-        settings.setExampleMaxRepeat( 3 );
-        settings.setExampleMaxDepth( 3 );
+        settings.setExampleMaxRepeat( EXAMPLE_MAX_REPEAT );
+        settings.setExampleMaxDepth( EXAMPLE_MAX_DEPTH );
         settings.setSuppressOptionalFields( false );
 
         settings.setDisplaySize( "Normal" );
@@ -346,6 +378,7 @@ public class UserSettings extends AbstractUserSettings {
         // String modelFile = settingsProps.getProperty( "lastModelFile" );
         String projectFolder = settingsProps.getProperty( PROJECT_DIRECTORY_LABEL );
         setLastProjectFolder( (projectFolder == null) ? null : new File( projectFolder ) );
+        loadRecentlyUsedProjects( settingsProps );
 
         String hideOpenProjectDialog = settingsProps.getProperty( HIDE_PROJECT_OPEN_DIALOG );
         setHideOpenProjectDialog( Boolean.valueOf( hideOpenProjectDialog ) );
@@ -370,13 +403,75 @@ public class UserSettings extends AbstractUserSettings {
         setResourceBaseUrl( settingsProps.getProperty( "resourceBaseUrl" ) );
         setServiceEndpointUrl( settingsProps.getProperty( "serviceEndpointUrl" ) );
         setExampleContext( settingsProps.getProperty( "exampleContext" ) );
-        setExampleMaxRepeat( Integer.parseInt( settingsProps.getProperty( "exampleMaxRepeat" ) ) );
-        setExampleMaxDepth( Integer.parseInt( settingsProps.getProperty( "exampleMaxDepth" ) ) );
+        setExampleMaxRepeat( settingsProps.getProperty( "exampleMaxRepeat" ) );
+        setExampleMaxDepth( settingsProps.getProperty( "exampleMaxDepth" ) );
 
         setDisplaySize( settingsProps.getProperty( "displaySize" ) );
 
         // setLastModelFile( (modelFile == null) ? null : new File( modelFile ) );
         super.load( settingsProps );
+    }
+
+    /**
+     * Load strings from settings into recentProjects array
+     * 
+     * @param settingsProps
+     */
+    private void loadRecentlyUsedProjects(Properties settingsProps) {
+        String project = "";
+        for (int i = 0; i < MAX_PROJECTS; i++) {
+            project = settingsProps.getProperty( PROJECT_ARRAY_LABEL + i );
+            if (project != null)
+                recentProjects.add( project );
+        }
+    }
+
+    /**
+     * Save strings in recentProjects array into settings
+     * 
+     * @param settingsProps
+     */
+    private void saveRecentlyUsedProjects(Properties settingsProps) {
+        String project = "";
+        if (recentProjects.isEmpty())
+            return;
+        for (int i = 0; i < recentProjects.size(); i++) {
+            project = recentProjects.get( i );
+            if (!project.isEmpty())
+                settingsProps.put( PROJECT_ARRAY_LABEL + i, project );
+        }
+    }
+
+    // TODO - how to assure least recently used order?
+    // List maintains insertion order
+    /**
+     * Set the project's absolute path into the top of the recentProjects array.
+     * 
+     * @param project
+     */
+    public void setRecentProject(OtmProject project) {
+        // Get a string for the project
+        if (project != null && project.getTL() != null && project.getTL().getProjectFile() != null) {
+            String pf = project.getTL().getProjectFile().getAbsolutePath();
+            if (recentProjects.contains( pf ))
+                recentProjects.remove( pf ); // It will get added at front
+            while (recentProjects.size() >= MAX_PROJECTS)
+                recentProjects.remove( MAX_PROJECTS - 1 ); // remove from end
+            if (recentProjects.size() < MAX_PROJECTS)
+                recentProjects.add( 0, pf ); // set to front
+        }
+    }
+
+    /**
+     * Get Files from the saved absolute paths
+     * 
+     * @return
+     */
+    public List<File> getRecentProjects() {
+        List<File> files = new ArrayList<>();
+        for (String pf : recentProjects)
+            files.add( new File( pf ) );
+        return files;
     }
 
     /**
@@ -389,17 +484,19 @@ public class UserSettings extends AbstractUserSettings {
         // defaultValues.getLastModelFile().getAbsolutePath() : this.lastModelFile.getAbsolutePath();
         String projectFolder = (this.lastProjectFile == null) ? defaultValues.getLastProjectFolder().getAbsolutePath()
             : this.lastProjectFile.getAbsolutePath();
-        settingsProps.put( "lastRepositoryId", lastRepositoryId );
+        putString( settingsProps, "lastRepositoryId", lastRepositoryId );
+
+        saveRecentlyUsedProjects( settingsProps );
 
         // settingsProps.put( "repeatCount", repeatCount + "" );
         // settingsProps.put( "lastModelFile", modelFile );
-        settingsProps.put( PROJECT_DIRECTORY_LABEL, projectFolder );
+        putString( settingsProps, PROJECT_DIRECTORY_LABEL, projectFolder );
         settingsProps.put( HIDE_PROJECT_OPEN_DIALOG, Boolean.toString( hideProjectOpenDialog ) );
 
         // Resource Defaults
-        settingsProps.put( "defaultMimeTypes", defaultMimeTypes );
-        settingsProps.put( "defaultResponsePayload", defaultResponsePayload );
-        settingsProps.put( "defaultRequestPayload", defaultRequestPayload );
+        putString( settingsProps, "defaultMimeTypes", defaultMimeTypes );
+        putString( settingsProps, "defaultResponsePayload", defaultResponsePayload );
+        putString( settingsProps, "defaultRequestPayload", defaultRequestPayload );
 
         // Compiler Options
         settingsProps.put( "compileSchemas", Boolean.toString( compileSchemas ) );
@@ -407,19 +504,27 @@ public class UserSettings extends AbstractUserSettings {
         settingsProps.put( "compileServices", Boolean.toString( compileServices ) );
         settingsProps.put( "compileSwagger", Boolean.toString( compileSwagger ) );
         settingsProps.put( "compileHtml", Boolean.toString( compileHtml ) );
-        settingsProps.put( "resourceBaseUrl", resourceBaseUrl );
-        settingsProps.put( "serviceEndpointUrl", serviceEndpointUrl );
-        settingsProps.put( "suppressOtmExtensions", Boolean.toString( suppressOtmExtensions ) );
+        putString( settingsProps, "resourceBaseUrl", resourceBaseUrl );
+        putString( settingsProps, "serviceEndpointUrl", serviceEndpointUrl );
+        putString( settingsProps, "suppressOtmExtensions", Boolean.toString( suppressOtmExtensions ) );
         settingsProps.put( "generateExamples", Boolean.toString( generateExamples ) );
         settingsProps.put( "generateMaxDetailsForExamples", Boolean.toString( generateMaxDetailsForExamples ) );
-        settingsProps.put( "exampleContext", exampleContext );
+        putString( settingsProps, "exampleContext", exampleContext );
         settingsProps.put( "exampleMaxRepeat", exampleMaxRepeat + "" );
         settingsProps.put( "exampleMaxDepth", exampleMaxDepth + "" );
         settingsProps.put( "suppressOptionalFields", Boolean.toString( suppressOptionalFields ) );
 
-        settingsProps.put( "displaySize", displaySize );
+        putString( settingsProps, "displaySize", displaySize );
 
         super.save( settingsProps );
+    }
+
+    private void putString(Properties settingsProps, String key, String value) {
+        if (key == null)
+            return;
+        if (value == null)
+            value = "";
+        settingsProps.put( key, value );
     }
 
     /**

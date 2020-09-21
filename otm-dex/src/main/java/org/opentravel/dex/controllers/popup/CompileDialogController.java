@@ -349,7 +349,7 @@ public class CompileDialogController extends DexPopupControllerBase implements T
 
     private void post(OtmModelManager mgr) {
         if (mgr != null) {
-            ObservableList<OtmProject> projList = FXCollections.observableList( mgr.getUserProjects() );
+            ObservableList<OtmProject> projList = FXCollections.observableList( mgr.getProjects() );
             projectChoiceBox.setItems( projList );
             if (!projList.isEmpty())
                 projectChoiceBox.getSelectionModel().select( 0 );

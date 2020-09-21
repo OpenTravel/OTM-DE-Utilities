@@ -86,8 +86,8 @@ public class DexEventDispatcher implements EventDispatcher {
     @Override
     public Event dispatchEvent(Event event, EventDispatchChain tail) {
         if (event instanceof DexEvent) {
+            // log.debug( "Using my dispatcher on my event: " + event.getClass().getSimpleName() );
             if (event instanceof DexNavigationEvent && !ignoreNext) {
-                log.debug( "Using my dispatcher on my event: " + event.getClass().getSimpleName() );
                 navQueue.add( (DexNavigationEvent) event );
                 navUndoneQueue.clear();
                 // log.debug( "Pushed " + ((DexNavigationEvent) event).getMember() + " onto nav queue." );

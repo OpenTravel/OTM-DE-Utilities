@@ -125,7 +125,7 @@ public class SelectProjectDialogController extends DexPopupControllerBase {
 
         // Add items to the project list widget
         if (projects == null && modelManager != null)
-            projects = modelManager.getUserProjects();
+            projects = modelManager.getProjects();
         if (projects != null)
             projects.forEach( p -> projectList.getItems().add( p ) );
     }

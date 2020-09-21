@@ -327,7 +327,7 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         //
         projectField.setEditable( false );
         projectField.setDisable( true ); // Grey it out
-        if (!modelMgr.hasProjects()) {
+        if (!modelMgr.getOtmProjectManager().hasProjects()) {
             postResults( "Must have a project for the new library." );
             dialogButtonOK.setDisable( true );
         }

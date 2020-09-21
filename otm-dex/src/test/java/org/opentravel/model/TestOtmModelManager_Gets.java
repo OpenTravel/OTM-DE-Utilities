@@ -232,14 +232,14 @@ public class TestOtmModelManager_Gets extends AbstractFxTest {
         assertFalse( projects.isEmpty() );
 
         for (OtmProject p : projects)
-            assertTrue( mgr.getProject( p.getName() ) == p );
+            assertTrue( mgr.getOtmProjectManager().getProject( p.getName() ) == p );
 
         for (AbstractLibrary aLib : mgr.getTlModel().getAllLibraries())
-            assertFalse( mgr.getProjects( aLib ).isEmpty() );
+            assertFalse( mgr.getOtmProjectManager().getProjects( aLib ).isEmpty() );
         for (OtmLibrary lib : mgr.getLibraries())
-            assertFalse( mgr.getProjects( lib.getTL() ).isEmpty() );
+            assertFalse( mgr.getOtmProjectManager().getProjects( lib.getTL() ).isEmpty() );
 
-        assertFalse( mgr.getUserProjects().isEmpty() );
+        assertFalse( mgr.getProjects().isEmpty() );
     }
 
     /**

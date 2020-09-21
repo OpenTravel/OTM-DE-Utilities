@@ -139,7 +139,8 @@ public class OtmProject {
      */
     public void close() {
         getTL().getProjectManager().closeProject( getTL() );
-        modelManager.close( this );
+        modelManager.getOtmProjectManager().close( this );
+        // modelManager.close( this );
     }
 
     /**

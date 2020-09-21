@@ -16,7 +16,6 @@
 
 package org.opentravel.model.otmContainers;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
@@ -28,8 +27,8 @@ import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmProjectManager;
 import org.opentravel.objecteditor.ObjectEditorApp;
-import org.opentravel.schemacompiler.model.TLModel;
 import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.RemoteRepository;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
@@ -132,36 +131,35 @@ public class TestProject extends AbstractFxTest {
     public void testNewProject() throws Exception {
         DexMainController controller = (DexMainController) application.getController();
         repoManager = controller.getRepositoryManager();
-
         // Given a project that uses the OpenTravel repository
         OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+        OtmProjectManager projMgr = mgr.getOtmProjectManager();
 
+        // Given - the call parameters
         File projectFile = null;
         String name = "testProj";
         String defaultContextId = "testContext";
         String projectId = "testProjId";
         String description = "some description";
+        OtmProject p = null;
+
+        // When - missing project file
         try {
-            OtmProject p = mgr.newProject( projectFile, name, defaultContextId, projectId, description );
+            p = projMgr.newProject( projectFile, name, defaultContextId, projectId, description );
         } catch (Exception e) {
-            log.debug( "Caught the expected exception." );
+            log.debug( "Caught the expected exception. Project file must not be null." );
         }
 
-        // Get a temporary file
+        // When - temporary project file supplied
         try {
             projectFile = TestDexFileHandler.getTempFile( "tProj.otp", "testNewProject" );
         } catch (Exception e) {
             log.debug( "Error creating temp project file." );
         }
-        // if (!projFile.createNewFile()) {
-        // log.error( "Error creating temporary file." );
-        // }
-        // log.debug( "Created Temporary File: " + projFile.getCanonicalPath() );
-        OtmProject p = null;
         try {
-            p = mgr.newProject( projectFile, name, defaultContextId, projectId, description );
+            p = projMgr.newProject( projectFile, name, defaultContextId, projectId, description );
         } catch (Exception e) {
-            log.debug( "Error creating project." );
+            log.debug( "Unexpected error creating project." );
         }
         assertTrue( p != null );
 
@@ -174,7 +172,7 @@ public class TestProject extends AbstractFxTest {
         p.close();
         // Re-open
         new DexFileHandler().openProject( projectFile, mgr, null );
-        p = mgr.getProject( name );
+        p = mgr.getOtmProjectManager().getProject( name );
 
         // Get a repo item to open
         // TODO - make this into a static utility
@@ -227,32 +225,33 @@ public class TestProject extends AbstractFxTest {
         //
     }
 
-    @Test
-    public void testAddingUnmangedProject() throws Exception {
-
-        OtmModelManager mgr = new OtmModelManager( null, repoManager );
-        TLModel tlModel = mgr.getTlModel();
-        assertNotNull( tlModel );
-
-        // Given a project that uses local library files
-        TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
-        assertTrue( "Must have project items.", !mgr.getProjectManager().getAllProjectItems().isEmpty() );
-
-        // Then - expect at least one project
-        Collection<OtmProject> p = mgr.getProjects();
-        assertTrue( mgr.getUserProjects().size() == 1 );
-        assertTrue( mgr.getProjects().size() == 2 );
-
-        // Then - Expect 6 libraries and 70 members
-        assertTrue( mgr.getLibraries().size() > 2 );
-        assertTrue( !mgr.getMembers().isEmpty() );
-        log.debug( "Read " + mgr.getMembers().size() + " members." );
-
-        // Then - assure each base namespace has an non-empty set. Library view lists libraries by baseNS.
-        assertNotNull( mgr.getBaseNamespaces() );
-        assertTrue( !mgr.getBaseNamespaces().isEmpty() ); // There should be base namespaces
-        mgr.getBaseNamespaces().forEach( b -> assertTrue( !mgr.getLibraryChain( b ).isEmpty() ) );
-    }
+    // // Exact duplicate of TestOtmModelManager. No callers.
+    // @Test
+    // public void testAddingUnmangedProject() throws Exception {
+    //
+    // OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+    // TLModel tlModel = mgr.getTlModel();
+    // assertNotNull( tlModel );
+    //
+    // // Given a project that uses local library files
+    // TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
+    // assertTrue( "Must have project items.", !mgr.getProjectManager().getAllProjectItems().isEmpty() );
+    //
+    // // Then - expect at least one project
+    // Collection<OtmProject> p = mgr.getProjects();
+    // assertTrue( mgr.getUserProjects().size() == 1 );
+    // assertTrue( mgr.getProjects().size() == 2 );
+    //
+    // // Then - Expect 6 libraries and 70 members
+    // assertTrue( mgr.getLibraries().size() > 2 );
+    // assertTrue( !mgr.getMembers().isEmpty() );
+    // log.debug( "Read " + mgr.getMembers().size() + " members." );
+    //
+    // // Then - assure each base namespace has an non-empty set. Library view lists libraries by baseNS.
+    // assertNotNull( mgr.getBaseNamespaces() );
+    // assertTrue( !mgr.getBaseNamespaces().isEmpty() ); // There should be base namespaces
+    // mgr.getBaseNamespaces().forEach( b -> assertTrue( !mgr.getLibraryChain( b ).isEmpty() ) );
+    // }
 
 
     /**

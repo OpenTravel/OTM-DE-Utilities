@@ -47,8 +47,8 @@ import org.opentravel.schemacompiler.repository.impl.RemoteRepositoryClient;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -120,6 +120,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     private UserSettings userSettings;
     private Repository selectedRepository = null;
     private DexEventDispatcher eventDispatcher;
+    private boolean ignoreEvents = false;
 
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
@@ -343,7 +344,13 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     void doNewProject(ActionEvent e) {
         NewProjectDialogController npdc = NewProjectDialogController.init();
         npdc.configure( modelMgr, userSettings );
-        npdc.showAndWait( "" );
+        Results results = npdc.showAndWait( "" );
+        if (results == Results.OK) {
+            fireEvent( new DexModelChangeEvent( modelMgr ) );
+        }
+        ignoreEvents = true;
+        configureProjectCombo();
+        ignoreEvents = false;
     }
 
     @FXML
@@ -359,6 +366,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         if (event.getTarget() instanceof MenuItem) {
             File selectedFile = fileHandler.fileChooser( stage, userSettings );
             // Update Combo in menu bar
+            // TODO - what if the a project was opened? wrong configure param?
             if (selectedFile != null)
                 configureProjectCombo( selectedFile.getParentFile() );
             // Run the task
@@ -382,13 +390,14 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         }
     }
 
-    private HashMap<String,File> projectMap = new HashMap<>();
+    private Map<String,File> projectMap;
 
     public void configureProjectCombo() {
-        File initialDirectory = null;
-        if (userSettings != null)
-            initialDirectory = userSettings.getLastProjectFolder();
-        configureProjectCombo( initialDirectory );
+        projectMap = modelMgr.getOtmProjectManager().getRecentProjects();
+        ObservableList<String> projectList = FXCollections.observableArrayList( projectMap.keySet() );
+        projectCombo.setItems( projectList );
+        projectCombo.setOnAction( this::projectComboSelectionListener );
+        log.debug( "Configured project combo with " + projectList.size() + " items." );
     }
 
     public void configureProjectCombo(File initialDirectory) {
@@ -397,25 +406,27 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
             for (File file : fileHandler.getProjectList( initialDirectory )) {
                 projectMap.put( file.getName(), file );
             }
-            ObservableList<String> projectList = FXCollections.observableArrayList( projectMap.keySet() );
-            configureProjectComboBox( projectList, this::projectComboSelectionListener );
+            // configureProjectCombo();
+            // ObservableList<String> projectList = FXCollections.observableArrayList( projectMap.keySet() );
+            // configureProjectComboBox( projectList, this::projectComboSelectionListener );
         }
     }
 
-    /**
-     * Configure the combo box with a list and listener.
-     * <p>
-     * Usage: menuBarWithProjectController.configureProjectMenuButton(projectList, this::projectComboSelectionListener);
-     * 
-     * @param projectList
-     * @param listener
-     */
-    private void configureProjectComboBox(ObservableList<String> projectList, EventHandler<ActionEvent> listener) {
-        // log.debug( "Setting combo." );
-        projectList.sort( null );
-        projectCombo.setItems( projectList );
-        projectCombo.setOnAction( listener );
-    }
+    // /**
+    // * Configure the combo box with a list and listener.
+    // * <p>
+    // * Usage: menuBarWithProjectController.configureProjectMenuButton(projectList,
+    // this::projectComboSelectionListener);
+    // *
+    // * @param projectList
+    // * @param listener
+    // */
+    // private void configureProjectComboBox(ObservableList<String> projectList, EventHandler<ActionEvent> listener) {
+    // // log.debug( "Setting combo." );
+    // projectList.sort( null );
+    // projectCombo.setItems( projectList );
+    // projectCombo.setOnAction( listener );
+    // }
 
     // FUTURE
     // public void addViewItems(List<DexIncludedController<?>> controllers) {
@@ -438,7 +449,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     public void projectComboSelectionListener(Event e) {
         // log.debug( "project selection event" );
-        if (e.getTarget() instanceof ComboBox)
+        if (!ignoreEvents && e.getTarget() instanceof ComboBox)
             openFile( projectMap.get( ((ComboBox<?>) e.getTarget()).getValue() ) );
     }
 
@@ -483,6 +494,9 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
                 dialogBox.close();
             fireEvent( new DexModelChangeEvent( modelMgr ) );
             mainController.refresh();
+            ignoreEvents = true;
+            configureProjectCombo();
+            ignoreEvents = false;
         }
     }
 

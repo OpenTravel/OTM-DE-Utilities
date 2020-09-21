@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmProjectManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.model.TLModel;
@@ -187,9 +188,18 @@ public class TestDexFileHandler extends AbstractFxTest {
     public static void loadAndAddManagedProject(OtmModelManager modelManager) {
         File repoProject = new File( wipFolder.get(), "/" + FILE_TESTOPENTRAVELREPO );
         assertNotNull( repoProject );
+
         new DexFileHandler().openProject( repoProject, modelManager, null );
-        // assertTrue( "Must have project items.", !modelManager.getProjectManager().getAllProjectItems().isEmpty() );
+
         assertTrue( "Must have project items.", modelManager.getProjectManager().getAllProjectItems().size() > 1 );
+
+        // TODO - where do these tests belong?
+        OtmProjectManager pMgr = modelManager.getOtmProjectManager();
+        assertTrue( modelManager.getProjects().size() > 0 );
+        assertTrue( pMgr.getProjects().size() > 0 );
+        if (modelManager.getUserSettings() != null)
+            assertTrue( pMgr.getRecentlyUsedProjectFileNames().size() > 0 );
+
         // log.debug( "Model now has " + modelManager.getTlModel().getAllLibraries().size() + " libraries." );
         // log.debug( "Model now has " + modelManager.getTlModel().getUserDefinedLibraries().size() + " user libraries."
         // );

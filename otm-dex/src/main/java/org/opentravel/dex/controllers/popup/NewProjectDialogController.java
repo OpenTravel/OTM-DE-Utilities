@@ -208,8 +208,8 @@ public class NewProjectDialogController extends DexPopupControllerBase {
         // Use model manager to create the project using the file and data.
         OtmProject newProject = null;
         try {
-            newProject = modelMgr.newProject( projFile, nameField.getText(), contextIdField.getText(),
-                idField.getText(), descriptionField.getText() );
+            newProject = modelMgr.getOtmProjectManager().newProject( projFile, nameField.getText(),
+                contextIdField.getText(), idField.getText(), descriptionField.getText() );
         } catch (Exception er) {
             postResults( "Could not create new project in model. " + er.getLocalizedMessage() );
             projFile.delete();

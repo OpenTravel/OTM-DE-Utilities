@@ -118,7 +118,7 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
             return;
 
         // Find out which project the want to add the repository item (library) to.
-        OtmProject oProject = new DexProjectHandler().selectOneProject( mm.getUserProjects() );
+        OtmProject oProject = new DexProjectHandler().selectOneProject( mm.getProjects() );
         if (oProject != null)
             try {
                 ProjectItem pi = mm.getProjectManager().addManagedProjectItem( repoItem, oProject.getTL() );

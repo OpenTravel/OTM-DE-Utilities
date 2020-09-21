@@ -43,7 +43,7 @@ public class DexProjectHandler {
      * @param library
      */
     public void addToProject(OtmLibrary library) {
-        List<OtmProject> projects = library.getModelManager().getUserProjects();
+        List<OtmProject> projects = library.getModelManager().getProjects();
 
         // Remove projects the library is already in
         library.getProjects().forEach( p -> projects.remove( p ) );
@@ -62,7 +62,7 @@ public class DexProjectHandler {
      * @return user selected project or null
      */
     public OtmProject selectProject(OtmModelManager modelManager) {
-        List<OtmProject> projects = modelManager.getUserProjects();
+        List<OtmProject> projects = modelManager.getProjects();
         SelectProjectDialogController spdc = SelectProjectDialogController.init();
         spdc.setProjectList( projects );
         spdc.showAndWait( "" );

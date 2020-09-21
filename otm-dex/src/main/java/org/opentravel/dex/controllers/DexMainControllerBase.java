@@ -201,6 +201,10 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         return mainController != null ? mainController.getStatusController() : null;
     }
 
+    /**
+     * 
+     * @see org.opentravel.dex.controllers.DexMainController#getUserSettings()
+     */
     @Override
     public UserSettings getUserSettings() {
         if (userSettings == null)

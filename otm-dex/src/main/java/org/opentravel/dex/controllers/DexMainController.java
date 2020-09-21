@@ -95,7 +95,9 @@ public interface DexMainController extends DexController {
     public DexStatusController getStatusController();
 
     /**
-     * @return
+     * Get the DEX user settings. Load from properties file if needed.
+     * 
+     * @return user settings or null
      */
     public UserSettings getUserSettings();
 
