@@ -333,6 +333,20 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         return resource;
     }
 
+    /**
+     * @param lib
+     * @param name
+     * @return
+     */
+    public static OtmLibraryMember buildOtm(OtmLibrary lib, String name) {
+        OtmResource resource = buildOtm( lib.getModelManager() );
+        resource.setName( name );
+        lib.add( resource );
+        assertTrue( lib.contains( resource ) );
+        return resource;
+    }
+
+
     public static final String BASEPATH = "/SomeBasePath";
 
     public static TLResource buildTL() {

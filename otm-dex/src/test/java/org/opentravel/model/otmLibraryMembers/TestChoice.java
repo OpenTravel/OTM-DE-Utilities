@@ -155,4 +155,5 @@ public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
         tlch.setName( CH_NAME );
         return tlch;
     }
+
 }

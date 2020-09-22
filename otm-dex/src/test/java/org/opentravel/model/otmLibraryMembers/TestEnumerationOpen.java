@@ -102,6 +102,18 @@ public class TestEnumerationOpen extends TestOtmLibraryMemberBase<OtmEnumeration
 
     public static int LITERALCOUNT = 3; // How many literals created by builders
 
+    /**
+     * @param library
+     * @param name
+     * @return
+     */
+    public static OtmEnumerationOpen buildOtm(OtmLibrary library, String name) {
+        OtmEnumerationOpen oe = buildOtm( library.getModelManager() );
+        library.add( oe );
+        oe.setName( name );
+        return oe;
+    }
+
     public static OtmEnumerationOpen buildOtm(OtmModelManager mgr) {
         OtmEnumerationOpen oto = new OtmEnumerationOpen( buildTL(), mgr );
         assertNotNull( oto );
@@ -123,5 +135,6 @@ public class TestEnumerationOpen extends TestOtmLibraryMemberBase<OtmEnumeration
         tle.setLiteral( literal );
         return tle;
     }
+
 
 }

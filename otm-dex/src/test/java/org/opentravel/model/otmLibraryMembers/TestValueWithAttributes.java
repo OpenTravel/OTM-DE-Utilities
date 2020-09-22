@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeType;
 import org.opentravel.schemacompiler.model.TLValueWithAttributes;
@@ -58,6 +59,20 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
     }
 
     /** ******************************************************** **/
+
+    /**
+     * @param lib
+     * @param name
+     * @return
+     */
+    public static OtmValueWithAttributes buildOtm(OtmLibrary lib, String name) {
+        assertTrue( lib.isEditable() );
+        OtmValueWithAttributes vwa = buildOtm( lib.getModelManager() );
+        vwa.setName( name );
+        lib.add( vwa );
+        assertTrue( lib.contains( vwa ) );
+        return vwa;
+    }
 
     /**
      * @param mgr
@@ -130,4 +145,6 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
         base = vwa.getBaseType();
         assertTrue( base == baseVwa );
     }
+
+
 }

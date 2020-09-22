@@ -56,6 +56,20 @@ public class TestOtmSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
 
     /** ****************************************************** **/
 
+    /**
+     * @param lib
+     * @param name
+     * @return
+     */
+    public static OtmSimpleObject buildOtm(OtmLibrary lib, String name) {
+        assertTrue( lib.isEditable() );
+        OtmSimpleObject s = buildOtm( lib.getModelManager() );
+        s.setName( name );
+        lib.add( s );
+        assertTrue( lib.contains( s ) );
+        return s;
+    }
+
     public static OtmSimpleObject buildOtm(OtmModelManager mgr) {
         OtmSimpleObject simple = new OtmSimpleObject( buildTL(), mgr );
         simple.setAssignedType( TestXsdSimple.buildOtm( mgr ) );
@@ -86,4 +100,6 @@ public class TestOtmSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
         simple.setName( "Simple" );
         return simple;
     }
+
+
 }

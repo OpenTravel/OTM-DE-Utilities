@@ -107,6 +107,17 @@ public class TestEnumerationClosed extends TestOtmLibraryMemberBase<OtmEnumerati
     }
 
     /**
+     * @param library
+     * @param name
+     * @return
+     */
+    public static OtmEnumerationClosed buildOtm(OtmLibrary library, String name) {
+        OtmEnumerationClosed ce = buildOtm( library );
+        ce.setName( name );
+        return ce;
+    }
+
+    /**
      * Create closed enumeration and set its model manager. Is <b>not</b> added to model.
      * 
      * @param mgr
@@ -134,5 +145,6 @@ public class TestEnumerationClosed extends TestOtmLibraryMemberBase<OtmEnumerati
         tle.setLiteral( literal );
         return tle;
     }
+
 
 }

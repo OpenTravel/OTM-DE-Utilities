@@ -82,7 +82,7 @@ public class TestAssignTypeAction {
     public void testMultipleAssignments() {
         // Given - action manager with an empty queue
         DexFullActionManager am = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( am, null );
+        OtmModelManager mgr = new OtmModelManager( am, null, null );
         lib = mgr.add( new TLLibrary() );
         assertTrue( am.getQueueSize() == 0 );
 
