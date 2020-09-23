@@ -48,6 +48,8 @@ public class OtmVersionChain {
 
     List<OtmLibrary> libraries;
     String baseNSwithName;
+    private String prefix;
+    private String name;
 
     /**
      * Get the chain from the model manager.
@@ -57,7 +59,14 @@ public class OtmVersionChain {
     public OtmVersionChain(OtmLibrary library) {
         libraries = library.getModelManager().getVersionChain( library );
         baseNSwithName = library.getNameWithBasenamespace();
+        name = library.getName();
 
+        prefix = getBasePrefix( library.getPrefix() );
+        try {
+            prefix += "-" + Integer.toString( library.getMajorVersion() );
+        } catch (Exception e) {
+            // NO-OP
+        }
         // Verify - comment out when not debugging/testing
         // for (OtmLibrary lib : libraries) {
         // assert lib.getNameWithBasenamespace().equals( baseNSwithName );
@@ -68,6 +77,15 @@ public class OtmVersionChain {
         // assert false; // Error
         // }
         // }
+    }
+
+    private String getBasePrefix(String prefix) {
+        String result = prefix;
+        int dash = prefix.indexOf( '-' );
+        if (dash > 0)
+            result = prefix.substring( 0, dash );
+        // log.debug( prefix + " became " + result );
+        return result;
     }
 
     public OtmLibrary getEditable() {
@@ -82,6 +100,10 @@ public class OtmVersionChain {
             if (!lib.isMinorVersion())
                 return lib;
         return null;
+    }
+
+    public String getPrefix() {
+        return prefix;
     }
 
     /**

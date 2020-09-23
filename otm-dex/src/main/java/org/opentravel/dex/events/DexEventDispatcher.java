@@ -19,6 +19,7 @@ package org.opentravel.dex.events;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.model.OtmObject;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -85,19 +86,26 @@ public class DexEventDispatcher implements EventDispatcher {
 
     @Override
     public Event dispatchEvent(Event event, EventDispatchChain tail) {
-        if (event instanceof DexEvent) {
-            // log.debug( "Using my dispatcher on my event: " + event.getClass().getSimpleName() );
-            if (event instanceof DexNavigationEvent && !ignoreNext) {
-                navQueue.add( (DexNavigationEvent) event );
-                navUndoneQueue.clear();
-                // log.debug( "Pushed " + ((DexNavigationEvent) event).getMember() + " onto nav queue." );
+        if (event instanceof DexEvent)
+            if (!ignoreNext) {
+                log.debug(
+                    "Using my dispatcher on my event: " + event.getClass().getSimpleName() + " Ignore? " + ignoreNext );
+                if (event instanceof DexChangeEvent) {
+                    OtmObject otm = ((DexChangeEvent) event).getOtmObject();
+                    if (otm != null) {
+                        otm.getModelManager().handleEvent( (DexChangeEvent) event );
+                    }
+                } else if (event instanceof DexNavigationEvent) {
+                    navQueue.add( (DexNavigationEvent) event );
+                    navUndoneQueue.clear();
+                    // log.debug( "Pushed " + ((DexNavigationEvent) event).getMember() + " onto nav queue." );
+                }
+                ignoreNext = false;
+                // Add code here if the event is to be handled outside of the dispatch chain
+                // event.consume();
+                // some event filter and business logic ...
+                // return event;
             }
-            ignoreNext = false;
-            // Add code here if the event is to be handled outside of the dispatch chain
-            // event.consume();
-            // some event filter and business logic ...
-            // return event;
-        }
         return originalDispatcher != null ? originalDispatcher.dispatchEvent( event, tail ) : event;
     }
 }

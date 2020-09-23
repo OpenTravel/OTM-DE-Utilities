@@ -24,8 +24,12 @@ import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexLibrarySelectionEvent;
+import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
+import org.opentravel.dex.events.OtmObjectChangeEvent;
+import org.opentravel.dex.events.OtmObjectModifiedEvent;
+import org.opentravel.dex.events.OtmObjectReplacedEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -61,7 +65,10 @@ public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrar
 
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents =
-        {DexLibrarySelectionEvent.LIBRARY_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+        {OtmObjectChangeEvent.OBJECT_CHANGED, OtmObjectModifiedEvent.OBJECT_MODIFIED,
+            OtmObjectReplacedEvent.OBJECT_REPLACED, DexMemberDeleteEvent.MEMBER_DELETED,
+            DexLibrarySelectionEvent.LIBRARY_SELECTED, DexModelChangeEvent.MODEL_CHANGED};
+
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
 
     /**
@@ -187,12 +194,16 @@ public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrar
         if (library == null || library == postedData)
             return;
         super.post( library );
+        log.debug( "Posting providers of types to " + library.getName() );
 
         if (columnLabel != null)
             columnLabel.setText( "Providers of types to " + library.getName() );
         // log.debug( "Posting type providers to: " + member );
 
-        // FIXME getting the providerMap can be a long process, making the GUI unresponsive
+        // FIXME
+        // Minor versions are not displayed here or in users tree correctly.
+        //
+
         LibraryAndMembersDAO.createChildrenItems( library.getProviderMap( true ), getRoot() );
         log.debug( "Posted providers of types to " + library.getName() );
     }

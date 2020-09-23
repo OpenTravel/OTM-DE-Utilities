@@ -23,6 +23,7 @@ import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
+import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.model.TypeResolverTask;
 import org.opentravel.dex.tasks.model.ValidateModelManagerItemsTask;
@@ -710,6 +711,13 @@ public class OtmModelManager implements TaskResultHandlerI {
      */
     public TLModel getTlModel() {
         return tlModel;
+    }
+
+    public void handleEvent(DexChangeEvent e) {
+        // WARNING - This runs often so keep this light weight or put into a background task.
+        //
+        // Something has happened, let the libraries know
+        getLibraries().forEach( OtmLibrary::refreshMaps );
     }
 
     @Override

@@ -67,6 +67,8 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     protected AbstractLibrary tlLib;
     protected OtmVersionChain versionChain = null;
     protected ValidationFindings findings;
+    protected Map<OtmLibrary,List<OtmLibraryMember>> providerMap = null;
+    protected Map<OtmLibrary,List<OtmLibraryMember>> usersMap = null;
 
     /**
      * Should only be called by OtmModelManager. See {@link OtmModelManager#add(AbstractLibrary)}
@@ -384,6 +386,13 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         return getTL().getPrefix();
     }
 
+    public String getVersionChainName() {
+        if (versionChain != null)
+            return versionChain.getPrefix() + ".* : " + getName();
+        else
+            return getPrefix() + " : " + getName();
+    }
+
     /**
      * @see #getManagingProject()
      * @return the project item for this library in the managing project
@@ -639,17 +648,19 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
      * @return new map.
      */
     public Map<OtmLibrary,List<OtmLibraryMember>> getProviderMap(boolean sort) {
+        // if (providerMap != null)
+        // return providerMap;
+        // TESTME - lazy evaluation
 
         // FIXME - this should be created in background by constructor and updated on refresh
         // Testing does not show this to be the problem!
         // Is OK with both for loops (inner and outer) commented out, no delay
         log.debug( "Starting getting provider map for " + this );
-        Map<OtmLibrary,List<OtmLibraryMember>> providerMap = new TreeMap<>();
+        providerMap = new TreeMap<>();
         for (OtmLibraryMember m : getMembers()) {
             // If the member is a type user, add it
             if (m instanceof OtmTypeUser)
                 addToMap( (OtmTypeUser) m, providerMap );
-            // FIXME --- WTF!!!!
             // Testing delay happens even when this for loop is commented out
             // If the member has type users, add all the libraries a property uses
             Collection<OtmTypeUser> users = new ArrayList<>( m.getDescendantsTypeUsers() );
@@ -667,26 +678,45 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         return providerMap;
     }
 
-    // Entry: user's assignedType's library : user's owning member
+    /**
+     * Add user's owner to the list associated with its library in the map.
+     * <p>
+     * Map Entry = user's assignedType's library : list of < user's owning members>
+     * 
+     * @param user whose owning member will be added to the list for the assigned type's library
+     * @param map of libraries and list of user-owners
+     */
     private void addToMap(OtmTypeUser user, Map<OtmLibrary,List<OtmLibraryMember>> map) {
-        if (user != null && map != null && user.getOwningMember() != null && user.getAssignedType() != null) {
+        log.debug( "Adding " + user + " to map." );
 
+        if (user != null && map != null && user.getOwningMember() != null && user.getAssignedType() != null) {
+            // if (user.getName() != null && user.getName().equals( "Newcore" ))
+            // log.debug( "HERE" );
+
+            // Determine what library map key to use
             OtmLibrary assignedLibrary = null;
             OtmLibraryMember assignedMember = user.getAssignedType().getOwningMember();
             if (assignedMember != null)
                 assignedLibrary = assignedMember.getLibrary();
 
-            if (assignedLibrary == null || assignedLibrary == this)
-                return;
+            // Library key compare is just on name, not name with version
+            if (assignedLibrary != null && assignedLibrary != this) {
 
-            List<OtmLibraryMember> mList = map.get( assignedLibrary );
-            if (mList != null) {
-                if (!mList.contains( user.getOwningMember() ))
+                // OtmVersionChain chain = assignedLibrary.getVersionChain();
+                // log.debug( "Version chain = " + chain.getFullName() + " " + chain.getName() );
+                //
+                // Get the list from the map for the library of the assigned type
+                List<OtmLibraryMember> mList = map.get( assignedLibrary );
+                if (mList != null) {
+                    // Add the user's owner to the list
+                    if (!mList.contains( user.getOwningMember() ))
+                        mList.add( user.getOwningMember() );
+                } else {
+                    // Create new entry in the map and add the library and list containing user's owner
+                    mList = new ArrayList<>();
                     mList.add( user.getOwningMember() );
-            } else {
-                mList = new ArrayList<>();
-                mList.add( user.getOwningMember() );
-                map.put( assignedLibrary, mList );
+                    map.put( assignedLibrary, mList );
+                }
             }
         }
     }
@@ -701,7 +731,11 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
      * @return new map.
      */
     public Map<OtmLibrary,List<OtmLibraryMember>> getUsersMap(boolean sort) {
-        Map<OtmLibrary,List<OtmLibraryMember>> usersMap = new HashMap<>();
+        if (usersMap != null)
+            return usersMap;
+
+        log.debug( "Starting getting users map for " + this );
+        usersMap = new HashMap<>();
         getMembers().forEach( m -> {
             m.getDescendantsTypeProviders().forEach( p -> {
                 if (p != null) {
@@ -732,13 +766,22 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         log.debug( this.getFullName() + " refreshed" );
         // getMembers().forEach( m -> m.refresh() );
         getMembers().forEach( OtmLibraryMember::refresh );
-        versionChain = null;
+        refreshMaps();
+        refreshVersionChain();
+    }
+
+    /**
+     * Refresh (null out) just the provider and user maps
+     */
+    public void refreshMaps() {
+        providerMap = null;
+        usersMap = null;
+        log.debug( "Maps cleared from " + this );
     }
 
     /**
      * Refresh (null out) just the version chain field
      */
-    // TODO - for some reason refreshing the members causes tests to fail
     public void refreshVersionChain() {
         // log.debug( this.getFullName() + " version chain refreshed" );
         versionChain = null;

@@ -60,7 +60,8 @@ public class OtmLibraryDisplayFacet extends OtmAbstractDisplayFacet {
 
     @Override
     public String getName() {
-        return library.getPrefix() + " - " + library.getName();
+        return library.getVersionChainName();
+        // return library.getPrefix() + " - " + library.getName();
     }
 
     @Override

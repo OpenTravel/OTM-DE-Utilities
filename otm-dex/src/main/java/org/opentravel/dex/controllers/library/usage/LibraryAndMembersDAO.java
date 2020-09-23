@@ -100,7 +100,8 @@ public class LibraryAndMembersDAO implements DexDAO<OtmObject> {
             return member.toString();
         if (member != null) {
             if (library != null)
-                return member.getName() + " uses types from " + library.getPrefix() + " : " + library.getName();
+                return member.getName() + " uses types from " + library.getVersionChainName();
+            // return member.getName() + " uses types from " + library.getPrefix() + " : " + library.getName();
             return member.getName();
         }
         return "";

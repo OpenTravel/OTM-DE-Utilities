@@ -209,6 +209,13 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
             ? librariesTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
     }
 
+    private void setSelectedItem(OtmLibrary lib) {
+        // for (TreeItem<LibraryDAO> item : librariesTreeTable.getRoot().getChildren()) {
+        // if (item.getValue().getValue() == lib)
+        // librariesTreeTable.getSelectionModel().select( item );
+        // }
+    }
+
     /**
      * @return the currently selected library or null
      */
@@ -221,6 +228,8 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         // log.debug( "HandleEvent received: " + event.getSource().getClass().getSimpleName() );
         if (event instanceof DexModelChangeEvent)
             post( ((DexModelChangeEvent) event).getModelManager() );
+        if (event instanceof DexLibrarySelectionEvent)
+            setSelectedItem( ((DexLibrarySelectionEvent) event).getLibrary() );
     }
 
     /**
@@ -231,13 +240,14 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     private void librarySelectionListener(TreeItem<LibraryDAO> item) {
         if (ignore || item == null || item.getValue() == null || item.getValue().getValue() == null)
             return;
+        log.debug( "ignore = " + ignore + "\n" );
 
         OtmLibrary lib = null;
         if (item.getValue().getValue() instanceof OtmLibrary)
             lib = item.getValue().getValue();
         setEditing( lib != null && lib.isEditable() && lib.isUnmanaged() );
+        log.debug( "library selection listener, library = " + lib );
 
-        // log.debug( "library selection listener = " + lib + " ignore = " + ignore );
         ignore = true;
         fireEvent( new DexLibrarySelectionEvent( libraries, item ) );
         ignore = false;

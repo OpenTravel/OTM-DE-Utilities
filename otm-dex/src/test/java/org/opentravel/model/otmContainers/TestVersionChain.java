@@ -69,6 +69,20 @@ public class TestVersionChain extends AbstractFxTest {
 
 
     /** ******************************************************************* **/
+    // private static final String[] prefixes = {"foo", "foo-1", "foo-1.1.1"};
+    //
+    // @Test
+    // public void testVersionName() {
+    //
+    // for (String prefix : prefixes) {
+    // String result = prefix;
+    // int dash = prefix.indexOf( "-" );
+    // if (dash > 0)
+    // result = prefix.substring( 0, dash );
+    // log.debug( prefix + " became " + result );
+    // }
+    // }
+
     @Test
     public void testAddingVersionedProject() throws Exception {
 

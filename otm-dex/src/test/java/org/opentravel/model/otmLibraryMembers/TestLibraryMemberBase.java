@@ -106,7 +106,7 @@ public class TestLibraryMemberBase {
             String memberName = member.getName();
             // When - deleted from library
             lib.delete( member );
-            log.debug( "Deleted library member: " + memberName );
+            // log.debug( "Deleted library member: " + memberName );
 
             assertFalse( mgr.contains( member.getTlLM() ) );
             assertFalse( mgr.getMembers().contains( member ) );

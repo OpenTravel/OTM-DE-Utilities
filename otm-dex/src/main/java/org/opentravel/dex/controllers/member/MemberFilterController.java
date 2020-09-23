@@ -397,7 +397,8 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             }
         }
         librarySelector.setValue( selection );
-        memberFilter.fireEvent( new DexLibrarySelectionEvent( libraryMap2.get( selection ) ) );
+        // if (!ignoreClear)
+        // memberFilter.fireEvent( new DexLibrarySelectionEvent( libraryMap2.get( selection ) ) );
     }
 
     private void setLibraryFilter(OtmLibrary lib) {

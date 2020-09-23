@@ -35,6 +35,10 @@ public abstract class DexChangeEvent extends DexEvent {
 
     protected transient OtmObject otmObject = null;
 
+    public OtmObject getOtmObject() {
+        return otmObject;
+    }
+
     /**
      * Filter change event with no subject.
      */
