@@ -33,6 +33,9 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
+import java.util.List;
+import java.util.Map;
+
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -145,7 +148,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibrary> i
     @Override
     public void handleEvent(AbstractOtmEvent event) {
         if (!ignoreEvents && event != null && event.getEventType() != null) {
-            log.debug( "Users tree received: " + event.getEventType() );
+            // log.debug( "Users tree received: " + event.getEventType() );
             if (event instanceof DexLibrarySelectionEvent)
                 post( ((DexLibrarySelectionEvent) event).getLibrary() );
             else if (event instanceof DexModelChangeEvent)
@@ -180,14 +183,16 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibrary> i
         if (library == null || library == postedData)
             return;
         super.post( library );
-        log.debug( "Posting library users." );
+        // log.debug( "Posting library users." );
 
         if (columnLabel != null)
             columnLabel.setText( "Users of " + library.getPrefix() + " : " + library.getName() );
 
-        // FIXME getting the usersMap can be a long process, making the GUI unresponsive
-        LibraryAndMembersDAO.createChildrenItemsNoLib( library.getUsersMap( true ), getRoot() );
-        log.debug( "Posted library users." );
+        Map<OtmLibrary,List<OtmLibraryMember>> map = library.getUsersMap();
+        LibraryAndMembersDAO.createChildrenItemsNoLib( map, getRoot() );
+
+        usersTree.requestFocus();
+        // log.debug( "Posted library users." );
     }
 
     @Override

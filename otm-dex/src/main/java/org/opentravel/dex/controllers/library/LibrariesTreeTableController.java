@@ -220,16 +220,17 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
      * @return the currently selected library or null
      */
     public OtmLibrary getSelectedLibrary() {
-        return getSelectedItem() != null ? getSelectedItem().getValue() : null;
+        LibraryDAO item = getSelectedItem();
+        return item != null ? item.getValue() : null;
     }
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        // log.debug( "HandleEvent received: " + event.getSource().getClass().getSimpleName() );
+        // log.debug( "HandleEvent received: " + event.getClass().getSimpleName() );
         if (event instanceof DexModelChangeEvent)
             post( ((DexModelChangeEvent) event).getModelManager() );
-        if (event instanceof DexLibrarySelectionEvent)
-            setSelectedItem( ((DexLibrarySelectionEvent) event).getLibrary() );
+        // if (event instanceof DexLibrarySelectionEvent)
+        // setSelectedItem( ((DexLibrarySelectionEvent) event).getLibrary() );
     }
 
     /**
@@ -240,17 +241,23 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     private void librarySelectionListener(TreeItem<LibraryDAO> item) {
         if (ignore || item == null || item.getValue() == null || item.getValue().getValue() == null)
             return;
-        log.debug( "ignore = " + ignore + "\n" );
+        // log.debug( "\n" );
+        // log.debug( "Library selection listener. Ignore = " + ignore );
 
         OtmLibrary lib = null;
         if (item.getValue().getValue() instanceof OtmLibrary)
             lib = item.getValue().getValue();
         setEditing( lib != null && lib.isEditable() && lib.isUnmanaged() );
-        log.debug( "library selection listener, library = " + lib );
+        // log.debug( "library selection listener, library = " + lib );
 
         ignore = true;
-        fireEvent( new DexLibrarySelectionEvent( libraries, item ) );
+        fireEvent( new DexLibrarySelectionEvent( lib ) );
         ignore = false;
+
+        // lag problem - sometimes the tree does not move to the selection.
+        // Requesting focus in the user and provider controllers then getting it back cures the problem.
+        librariesTreeTable.requestFocus();
+        // log.debug( "done - library selection listener " + librariesTreeTable.isFocused() );
     }
 
     private void setEditing(boolean editable) {

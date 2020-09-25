@@ -237,7 +237,7 @@ public class TestLibrary {
         }
 
         // When - getProviders unsorted
-        Map<OtmLibrary,List<OtmLibraryMember>> map = subjectLib.getProviderMap( false );
+        Map<OtmLibrary,List<OtmLibraryMember>> map = subjectLib.getProvidersMap();
 
         // Then - library key and value sets are not empty and contain the provider libraries
         Set<OtmLibrary> keys = map.keySet();
@@ -248,7 +248,7 @@ public class TestLibrary {
         assertTrue( !valueSet.isEmpty() );
 
         // When - sorted
-        map = subjectLib.getProviderMap( true );
+        map = subjectLib.getProvidersMap();
         keys = map.keySet();
         valueSet = map.values();
 

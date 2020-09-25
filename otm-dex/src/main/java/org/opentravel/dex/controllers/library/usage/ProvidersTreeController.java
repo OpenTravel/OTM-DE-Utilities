@@ -194,18 +194,15 @@ public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrar
         if (library == null || library == postedData)
             return;
         super.post( library );
-        log.debug( "Posting providers of types to " + library.getName() );
+        // log.debug( "Posting providers of types to " + library.getName() );
 
         if (columnLabel != null)
             columnLabel.setText( "Providers of types to " + library.getName() );
         // log.debug( "Posting type providers to: " + member );
 
-        // FIXME
-        // Minor versions are not displayed here or in users tree correctly.
-        //
-
-        LibraryAndMembersDAO.createChildrenItems( library.getProviderMap( true ), getRoot() );
-        log.debug( "Posted providers of types to " + library.getName() );
+        LibraryAndMembersDAO.createChildrenItems( library.getProvidersMap(), getRoot() );
+        providersTree.requestFocus();
+        // log.debug( "Posted providers of types to " + library.getName() );
     }
 
     @Override

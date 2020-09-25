@@ -61,12 +61,17 @@ public class OtmVersionChain {
         baseNSwithName = library.getNameWithBasenamespace();
         name = library.getName();
 
-        prefix = getBasePrefix( library.getPrefix() );
-        try {
-            prefix += "-" + Integer.toString( library.getMajorVersion() );
-        } catch (Exception e) {
-            // NO-OP
-        }
+        prefix = getPrefix( library );
+
+        // If there is more than one library in the minor version chain, change the prefix
+        // if (library.getVersionChain() != null && library.getVersionChain().libraries.size() > 1)
+        // prefix = getBasePrefix( library.getPrefix() );
+        // try {
+        // prefix += "-" + Integer.toString( library.getMajorVersion() );
+        // } catch (Exception e) {
+        // // NO-OP
+        // }
+
         // Verify - comment out when not debugging/testing
         // for (OtmLibrary lib : libraries) {
         // assert lib.getNameWithBasenamespace().equals( baseNSwithName );
@@ -79,14 +84,30 @@ public class OtmVersionChain {
         // }
     }
 
-    private String getBasePrefix(String prefix) {
-        String result = prefix;
-        int dash = prefix.indexOf( '-' );
+    public int size() {
+        return libraries.size();
+    }
+
+    private String getPrefix(OtmLibrary library) {
+        if (library == null)
+            return "";
+        String result = library.getPrefix();
+        // If there is more than one library in the minor version chain, change the prefix
+        int dash = result.indexOf( '-' );
         if (dash > 0)
-            result = prefix.substring( 0, dash );
-        // log.debug( prefix + " became " + result );
+            result = result.substring( 0, dash );
+        try {
+            result += "-" + Integer.toString( library.getMajorVersion() );
+            result += ".*";
+        } catch (Exception e) {
+            // NO-OP
+        }
         return result;
     }
+    // private String getBasePrefix(String prefix) {
+    // // log.debug( prefix + " became " + result );
+    // return result;
+    // }
 
     public OtmLibrary getEditable() {
         for (OtmLibrary lib : libraries)

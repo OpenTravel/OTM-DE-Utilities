@@ -24,8 +24,9 @@ import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmModelMapsManager;
 import org.opentravel.model.OtmProjectManager;
-import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmServiceObject;
@@ -47,11 +48,8 @@ import org.opentravel.schemacompiler.version.VersionSchemeException;
 import org.opentravel.schemacompiler.version.VersionSchemeFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * OTM Object for libraries. Does <b>NOT</b> provide access to members.
@@ -370,6 +368,47 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         return mgr;
     }
 
+    /**
+     * Get a users map.
+     * <p>
+     * The keys are each library that uses types from this library.
+     * <p>
+     * The values are an array of this library's members that use the key library types.
+     * 
+     * @see {@link OtmModelMapsManager#getUsersMap(OtmLibrary, boolean)}
+     * 
+     * @return new map.
+     */
+    public Map<OtmLibrary,List<OtmLibraryMember>> getUsersMap() {
+        // Lazy eval
+        if (getModelManager() == null || getModelManager().getMapManager() == null)
+            return null;
+        if (usersMap == null)
+            usersMap = getModelManager().getMapManager().getUsersMap( this, false );
+        return usersMap;
+    }
+
+    /**
+     * Get a provider map.
+     * <p>
+     * The keys are each provider library -- libraries containing types assigned to type-users in this library.
+     * <p>
+     * The values are an array of this library's members that use the provided the types. Each value is a member that
+     * uses types from the provider library.
+     * 
+     * @see {@link OtmModelMapsManager#getProvidersMap(OtmLibrary, boolean)}
+     * @return new map.
+     */
+    public Map<OtmLibrary,List<OtmLibraryMember>> getProvidersMap() {
+        // lazy evaluation
+        if (getModelManager() == null || getModelManager().getMapManager() == null)
+            return null;
+        if (providerMap == null)
+            providerMap = getModelManager().getMapManager().getProvidersMap( this, false );
+        return providerMap;
+    }
+
+
     public OtmProjectManager getProjectManager() {
         return mgr != null ? mgr.getOtmProjectManager() : null;
     }
@@ -387,8 +426,8 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     public String getVersionChainName() {
-        if (versionChain != null)
-            return versionChain.getPrefix() + ".* : " + getName();
+        if (versionChain != null && versionChain.size() > 1)
+            return versionChain.getPrefix() + " : " + getName();
         else
             return getPrefix() + " : " + getName();
     }
@@ -638,126 +677,22 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     /**
-     * Get a provider map.
-     * <p>
-     * The keys are each provider library -- libraries containing types assigned to type-users in this library.
-     * <p>
-     * The values are an array of this library's members that use the provided the types. Each value is a member that
-     * uses types from the provider library.
+     * Get all type providers in this library.
      * 
-     * @return new map.
+     * @return new list that can be empty
      */
-    public Map<OtmLibrary,List<OtmLibraryMember>> getProviderMap(boolean sort) {
-        // if (providerMap != null)
-        // return providerMap;
-        // TESTME - lazy evaluation
-
-        // FIXME - this should be created in background by constructor and updated on refresh
-        // Testing does not show this to be the problem!
-        // Is OK with both for loops (inner and outer) commented out, no delay
-        log.debug( "Starting getting provider map for " + this );
-        providerMap = new TreeMap<>();
-        for (OtmLibraryMember m : getMembers()) {
-            // If the member is a type user, add it
-            if (m instanceof OtmTypeUser)
-                addToMap( (OtmTypeUser) m, providerMap );
-            // Testing delay happens even when this for loop is commented out
-            // If the member has type users, add all the libraries a property uses
-            Collection<OtmTypeUser> users = new ArrayList<>( m.getDescendantsTypeUsers() );
-            for (OtmTypeUser u : users) {
-                // Check for owners being contextual facets. Skip these.
-                if (u.getOwningMember() != m && u.getOwningMember() instanceof OtmContextualFacet)
-                    continue;
-                // For each user, get the provider's owner and add to map
-                addToMap( u, providerMap );
-            }
+    // FIXME - add to junit tests
+    public List<OtmTypeProvider> getProviders() {
+        List<OtmTypeProvider> providers = new ArrayList<>();
+        for (OtmLibraryMember member : getMembers()) {
+            if (member instanceof OtmTypeProvider)
+                providers.add( (OtmTypeProvider) member );
+            providers.addAll( member.getDescendantsTypeProviders() );
         }
-        if (sort)
-            providerMap.values().forEach( l -> l.sort( null ) );
-        log.debug( "Done getting provider map for " + this );
-        return providerMap;
+        return providers;
     }
 
-    /**
-     * Add user's owner to the list associated with its library in the map.
-     * <p>
-     * Map Entry = user's assignedType's library : list of < user's owning members>
-     * 
-     * @param user whose owning member will be added to the list for the assigned type's library
-     * @param map of libraries and list of user-owners
-     */
-    private void addToMap(OtmTypeUser user, Map<OtmLibrary,List<OtmLibraryMember>> map) {
-        log.debug( "Adding " + user + " to map." );
 
-        if (user != null && map != null && user.getOwningMember() != null && user.getAssignedType() != null) {
-            // if (user.getName() != null && user.getName().equals( "Newcore" ))
-            // log.debug( "HERE" );
-
-            // Determine what library map key to use
-            OtmLibrary assignedLibrary = null;
-            OtmLibraryMember assignedMember = user.getAssignedType().getOwningMember();
-            if (assignedMember != null)
-                assignedLibrary = assignedMember.getLibrary();
-
-            // Library key compare is just on name, not name with version
-            if (assignedLibrary != null && assignedLibrary != this) {
-
-                // OtmVersionChain chain = assignedLibrary.getVersionChain();
-                // log.debug( "Version chain = " + chain.getFullName() + " " + chain.getName() );
-                //
-                // Get the list from the map for the library of the assigned type
-                List<OtmLibraryMember> mList = map.get( assignedLibrary );
-                if (mList != null) {
-                    // Add the user's owner to the list
-                    if (!mList.contains( user.getOwningMember() ))
-                        mList.add( user.getOwningMember() );
-                } else {
-                    // Create new entry in the map and add the library and list containing user's owner
-                    mList = new ArrayList<>();
-                    mList.add( user.getOwningMember() );
-                    map.put( assignedLibrary, mList );
-                }
-            }
-        }
-    }
-
-    /**
-     * Get a users map.
-     * <p>
-     * The keys are each library that uses types from this library.
-     * <p>
-     * The values are an array of library members that use the types.
-     * 
-     * @return new map.
-     */
-    public Map<OtmLibrary,List<OtmLibraryMember>> getUsersMap(boolean sort) {
-        if (usersMap != null)
-            return usersMap;
-
-        log.debug( "Starting getting users map for " + this );
-        usersMap = new HashMap<>();
-        getMembers().forEach( m -> {
-            m.getDescendantsTypeProviders().forEach( p -> {
-                if (p != null) {
-                    List<OtmLibraryMember> users = p.getOwningMember().getWhereUsed();
-                    users.forEach( u -> {
-                        if (u.getLibrary() != this) {
-                            List<OtmLibraryMember> mList = usersMap.get( u.getLibrary() );
-                            if (mList != null) {
-                                if (!mList.contains( u.getOwningMember() ))
-                                    usersMap.get( u.getLibrary() ).add( u.getOwningMember() );
-                            } else {
-                                mList = new ArrayList<>();
-                                mList.add( u.getOwningMember() );
-                                usersMap.put( u.getLibrary(), mList );
-                            }
-                        }
-                    } );
-                }
-            } );
-        } );
-        return usersMap;
-    }
 
     /**
      * Refresh each member

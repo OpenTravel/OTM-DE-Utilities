@@ -78,7 +78,7 @@ public class OtmModelManager implements TaskResultHandlerI {
 
     // Project Facade
     private OtmProjectManager otmProjectManager;
-
+    private OtmModelMapsManager otmMapManager;
 
     // Map of base namespaces with all managed libraries in that namespace
     private Map<String,VersionChain<TLLibrary>> baseNSManaged = new HashMap<>();
@@ -165,10 +165,13 @@ public class OtmModelManager implements TaskResultHandlerI {
         readOnlyActionManager.setMainController( this.fullActionManager.getMainController() );
         minorActionManager.setMainController( this.fullActionManager.getMainController() );
 
-
+        otmMapManager = new OtmModelMapsManager( this );
         // log.debug( "Model Manager constructor complete." );
     }
 
+    public OtmModelMapsManager getMapManager() {
+        return otmMapManager;
+    }
 
     /**
      * Simply add the member to the maps if it is not already in the map. See {@link OtmLibrary#add(OtmLibraryMember)}

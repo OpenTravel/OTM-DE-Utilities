@@ -390,6 +390,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     @Override
     public void post(OtmModelManager modelMgr) {
         ignoreEvents = true;
+        // log.debug( "Posting member tree." );
         if (modelMgr != null && memberTree != null) {
             currentModelMgr = modelMgr;
             clear();

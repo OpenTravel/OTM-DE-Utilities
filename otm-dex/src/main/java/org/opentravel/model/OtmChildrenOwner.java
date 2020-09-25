@@ -91,12 +91,15 @@ public interface OtmChildrenOwner extends OtmObject {
     /**
      * Get a lazy evaluated list of children and their descendants that are type providers.
      * 
-     * @return list of children or empty list.
+     * @return list of type providers or empty list.
      */
     public Collection<OtmTypeProvider> getDescendantsTypeProviders();
 
     /**
-     * @return live list containing all descendants that are type users or empty list.
+     * Get a live list containing all descendants that are type users or empty list. Does not include the childrenOwner
+     * used in the method invocation.
+     * 
+     * @return live list of type users or empty list.
      */
     public Collection<OtmTypeUser> getDescendantsTypeUsers();
 
