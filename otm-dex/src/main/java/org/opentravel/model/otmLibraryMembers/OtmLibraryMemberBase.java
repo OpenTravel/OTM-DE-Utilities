@@ -336,7 +336,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public synchronized Collection<OtmTypeUser> getDescendantsTypeUsers() {
-        // TODO - shouldn't this be cached?
+        // TODO - should this be cached?
         memberTypeUsers.clear();
         List<OtmObject> children = new ArrayList<>( getChildren() );
         for (OtmObject child : children) {

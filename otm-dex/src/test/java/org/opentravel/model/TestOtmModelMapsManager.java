@@ -25,16 +25,21 @@ import org.junit.Test;
 import org.opentravel.model.otmContainers.OtmBuiltInLibrary;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
+import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
+import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
+import org.opentravel.model.otmLibraryMembers.TestChoice;
 import org.opentravel.model.otmLibraryMembers.TestCore;
 import org.opentravel.model.otmLibraryMembers.TestOtmSimple;
 import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.model.otmProperties.OtmElement;
+import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
+import org.opentravel.schemacompiler.model.TLAlias;
 import org.opentravel.schemacompiler.model.TLProperty;
 
 import java.util.ArrayList;
@@ -206,6 +211,7 @@ public class TestOtmModelMapsManager {
         OtmCore core3T = TestCore.buildOtm( targetLib, "Core3InTargetLib" );
         OtmCore core4T = TestCore.buildOtm( targetLib, "Core4InTargetLib" );
         OtmCore core5T = TestCore.buildOtm( targetLib, "Core5InTargetLib" );
+        OtmCore core6T = TestCore.buildOtm( targetLib, "Core6InTargetLib" );
 
         // /XMLSchema 1.0=[ns1:Core1InTargetLib, ns1:Core2InTargetLib]
         List<OtmLibraryMember> list = new ArrayList<OtmLibraryMember>();
@@ -214,6 +220,7 @@ public class TestOtmModelMapsManager {
         list.add( core3T );
         list.add( core4T );
         list.add( core5T );
+        list.add( core6T );
         for (OtmLibrary l : mgr.getLibraries())
             if (l instanceof OtmBuiltInLibrary && l.getName().equals( "XMLSchema" ))
                 map.put( l, list );
@@ -234,21 +241,29 @@ public class TestOtmModelMapsManager {
         core2T.setAssignedType( core3 );
         providers3.add( core2T );
 
-        // FIXME - this fails, but GUI is correct
-        // // Use a child property as assigned type
-        // OtmChoiceObject core4 = TestChoice.buildOtm( lib2, "Choice4InLib2withAssignedType" );
-        // OtmElement<TLProperty> e2 = new OtmElement<>( new TLProperty(), core4T.getSummary() );
-        // e2.setAssignedType( core4.getShared() );
-        // providers2.add( core4T );
-        //
-        // List<OtmLibraryMember> u = core4.getWhereUsed( false );
-        // log.debug( "" + u );
+        // Use a child property as assigned type
+        OtmChoiceObject choice4 = TestChoice.buildOtm( lib2, "Choice4InLib2WithAssignedType" );
+        OtmElement<TLProperty> e2 = TestOtmPropertiesBase.buildElement( core4T.getSummary() );
+        OtmTypeProvider ret = e2.setAssignedType( choice4.getShared() );
+        providers2.add( core4T );
 
-        // FIXME - this fails in GUI
         // Use a child as base type
-        // OtmCore core5 = TestCore.buildOtm( lib2, "Core5InLib3withBaseType" );
-        // core5T.setBaseType( core5 );
-        // providers2.add( core5T );
+        OtmCore core5 = TestCore.buildOtm( lib2, "Core5InLib2withBaseType" );
+        core5T.setBaseType( core5 );
+        providers2.add( core5T );
+
+        // Use an alias as the type
+        OtmChoiceObject choice6 = TestChoice.buildOtm( lib2, "Choice6InLib2WithAssignedType" );
+        TLAlias tlAlias = new TLAlias();
+        tlAlias.setName( "Alias6" );
+        tlAlias.setOwningEntity( choice6.getTL() );
+        OtmAlias alias6 = new OtmAlias( tlAlias, choice6 );
+        OtmElement<TLProperty> e6 = TestOtmPropertiesBase.buildElement( core6T.getSummary() );
+        e6.setAssignedType( alias6 );
+        providers2.add( core6T );
+        assertTrue( alias6.getOwningMember() == choice6 );
+        assertTrue( e6.getAssignedType() == alias6 );
+
 
         // Use bo in resource
         OtmBusinessObject bo1 = TestBusiness.buildOtm( lib2, "BO1_In_Lib1" );

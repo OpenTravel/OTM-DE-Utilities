@@ -43,6 +43,7 @@ import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLIndicator;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLProperty;
+import org.opentravel.schemacompiler.model.TLPropertyOwner;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -258,6 +259,23 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
         assertTrue( "Must have owning member", otm.getOwningMember() != null );
         assertTrue( "Must have identity listner.", OtmModelElement.get( otm.getTL() ) == otm );
         // log.debug( "Property " + otm.getName() + " OK." );
+    }
+
+    /** *********************** builders ********************/
+    /**
+     * Build a new element in the passed owner
+     * 
+     * @param owner must be facade for TLPropertyOwner
+     * @return element or null
+     */
+    public static OtmElement<TLProperty> buildElement(OtmPropertyOwner owner) {
+        OtmElement<TLProperty> element = null;
+        if (owner.getTL() instanceof TLPropertyOwner) {
+            TLProperty tlp = new TLProperty();
+            ((TLPropertyOwner) owner.getTL()).addElement( tlp );
+            element = new OtmElement<>( tlp, owner );
+        }
+        return element;
     }
 
     /**

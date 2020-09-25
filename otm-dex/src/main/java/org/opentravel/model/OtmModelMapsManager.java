@@ -39,7 +39,8 @@ import javafx.concurrent.WorkerStateEvent;
 public class OtmModelMapsManager implements TaskResultHandlerI {
     private static Log log = LogFactory.getLog( OtmModelMapsManager.class );
 
-    // TODO - make this into a structure
+    // TODO - make this into a handler
+    // // TODO - make this into a structure
     protected Map<OtmLibrary,List<OtmLibraryMember>> providerMap = null;
     protected Map<OtmLibrary,List<OtmLibraryMember>> usersMap = null;
     private OtmModelManager modelMgr;
@@ -117,6 +118,16 @@ public class OtmModelMapsManager implements TaskResultHandlerI {
         }
         usersInTargetLibrary.forEach( u -> addToMap( u, providerMap ) );
 
+        // Add all the users of base types from other libraries.
+        for (OtmLibraryMember m : library.getMembers()) {
+            if (m.getBaseType() != null && m.getBaseType().getLibrary() != library)
+                addToMap( m.getBaseType().getLibrary(), m, providerMap );
+        }
+
+        if (sort)
+            providerMap.values().forEach( l -> l.sort( null ) );
+        // log.debug( "Done getting provider map for " + this );
+        return providerMap;
 
 
         // // If the member is a type user, add it
@@ -134,10 +145,6 @@ public class OtmModelMapsManager implements TaskResultHandlerI {
         // addToMap( u, library, providerMap );
         // }
         // }
-        // if (sort)
-        // providerMap.values().forEach( l -> l.sort( null ) );
-        // log.debug( "Done getting provider map for " + this );
-        return providerMap;
 
         // providerMap = new TreeMap<>();
         // for (OtmLibraryMember m : library.getMembers()) {
@@ -164,54 +171,60 @@ public class OtmModelMapsManager implements TaskResultHandlerI {
     private void addToMap(OtmTypeUser user, Map<OtmLibrary,List<OtmLibraryMember>> map) {
         if (user != null && user.getAssignedType() != null && user.getAssignedType().getLibrary() != null) {
             OtmLibrary key = user.getAssignedType().getLibrary();
-            List<OtmLibraryMember> values = map.get( key );
-            if (values == null)
-                values = new ArrayList<>();
-            if (!values.contains( user.getOwningMember() ))
-                values.add( user.getOwningMember() );
-            map.put( key, values );
+            addToMap( key, user.getOwningMember(), map );
         }
     }
 
-    /**
-     * Add user's owner to the list associated with its library in the map.
-     * <p>
-     * Map Entry = user's assignedType's library : list of < user's owning members>
-     * 
-     * @param user whose owning member will be added to the list for the assigned type's library
-     * @param map of libraries and list of user-owners
-     */
-    private void addToMap(OtmTypeUser user, OtmLibrary library, Map<OtmLibrary,List<OtmLibraryMember>> map) {
-        log.debug( "Adding " + user + " to map." );
-
-        if (user != null && map != null && user.getOwningMember() != null && user.getAssignedType() != null) {
-            // if (user.getName() != null && user.getName().equals( "Newcore" ))
-            // log.debug( "HERE" );
-
-            // Determine what library map key to use
-            OtmLibrary assignedLibrary = null;
-            OtmLibraryMember assignedMember = user.getAssignedType().getOwningMember();
-            if (assignedMember != null)
-                assignedLibrary = assignedMember.getLibrary();
-
-            // Library key compare is just on name, not name with version
-            if (assignedLibrary != null && assignedLibrary != library) {
-
-                // Get the list from the map for the library of the assigned type
-                List<OtmLibraryMember> mList = map.get( assignedLibrary );
-                if (mList != null) {
-                    // Add the user's owner to the list
-                    if (!mList.contains( user.getOwningMember() ))
-                        mList.add( user.getOwningMember() );
-                } else {
-                    // Create new entry in the map and add the library and list containing user's owner
-                    mList = new ArrayList<>();
-                    mList.add( user.getOwningMember() );
-                    map.put( assignedLibrary, mList );
-                }
-            }
-        }
+    private void addToMap(OtmLibrary key, OtmLibraryMember member, Map<OtmLibrary,List<OtmLibraryMember>> map) {
+        List<OtmLibraryMember> values = map.get( key );
+        if (values == null)
+            values = new ArrayList<>();
+        if (!values.contains( member ))
+            values.add( member );
+        map.put( key, values );
     }
+
+
+
+    // /**
+    // * Add user's owner to the list associated with its library in the map.
+    // * <p>
+    // * Map Entry = user's assignedType's library : list of < user's owning members>
+    // *
+    // * @param user whose owning member will be added to the list for the assigned type's library
+    // * @param map of libraries and list of user-owners
+    // */
+    // private void addToMap(OtmTypeUser user, OtmLibrary library, Map<OtmLibrary,List<OtmLibraryMember>> map) {
+    // log.debug( "Adding " + user + " to map." );
+    //
+    // if (user != null && map != null && user.getOwningMember() != null && user.getAssignedType() != null) {
+    // // if (user.getName() != null && user.getName().equals( "Newcore" ))
+    // // log.debug( "HERE" );
+    //
+    // // Determine what library map key to use
+    // OtmLibrary assignedLibrary = null;
+    // OtmLibraryMember assignedMember = user.getAssignedType().getOwningMember();
+    // if (assignedMember != null)
+    // assignedLibrary = assignedMember.getLibrary();
+    //
+    // // Library key compare is just on name, not name with version
+    // if (assignedLibrary != null && assignedLibrary != library) {
+    //
+    // // Get the list from the map for the library of the assigned type
+    // List<OtmLibraryMember> mList = map.get( assignedLibrary );
+    // if (mList != null) {
+    // // Add the user's owner to the list
+    // if (!mList.contains( user.getOwningMember() ))
+    // mList.add( user.getOwningMember() );
+    // } else {
+    // // Create new entry in the map and add the library and list containing user's owner
+    // mList = new ArrayList<>();
+    // mList.add( user.getOwningMember() );
+    // map.put( assignedLibrary, mList );
+    // }
+    // }
+    // }
+    // }
 
     /**
      * @see org.opentravel.dex.tasks.TaskResultHandlerI#handleTaskComplete(javafx.concurrent.WorkerStateEvent)
