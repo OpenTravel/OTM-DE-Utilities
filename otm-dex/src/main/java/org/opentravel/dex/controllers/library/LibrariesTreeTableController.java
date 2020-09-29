@@ -111,10 +111,10 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         readonlyColumn.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,Boolean>( "readonly" ) );
 
         TreeTableColumn<LibraryDAO,Integer> sizeColumn = new TreeTableColumn<>( SIZELABEL );
-        sizeColumn.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,Integer>( "reference" ) );
+        sizeColumn.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,Integer>( "size" ) );
         sizeColumn.setPrefWidth( 100 );
         TreeTableColumn<LibraryDAO,Integer> refColumn = new TreeTableColumn<>( REFERENCELABEL );
-        refColumn.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,Integer>( "size" ) );
+        refColumn.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,Integer>( "reference" ) );
         refColumn.setPrefWidth( 100 );
 
         librariesTreeTable.getColumns().addAll( nameColumn, prefixColumn, namespaceColumn, versionColumn, statusColumn,

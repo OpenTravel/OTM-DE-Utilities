@@ -184,6 +184,8 @@ public class TestDexFileHandler extends AbstractFxTest {
      * 
      * load project that uses the OpenTravel repository and add to model. 27 named objects in 2 libraries. All valid,
      * one warning.
+     * <p>
+     * Note: calling class must extend AbstractFxTest
      */
     public static void loadAndAddManagedProject(OtmModelManager modelManager) {
         File repoProject = new File( wipFolder.get(), "/" + FILE_TESTOPENTRAVELREPO );

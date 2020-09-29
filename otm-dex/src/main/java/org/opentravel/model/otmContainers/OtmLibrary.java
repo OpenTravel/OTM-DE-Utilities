@@ -273,6 +273,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
 
     public List<OtmLibrary> getIncludes() {
         List<OtmLibrary> libs = new ArrayList<>();
+        List<TLInclude> includes = tlLib.getIncludes();
         for (TLInclude include : tlLib.getIncludes()) {
             if (include.getOwningLibrary() != null)
                 libs.add( mgr.get( include.getOwningLibrary() ) );
@@ -698,7 +699,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
      * Refresh each member
      */
     public void refresh() {
-        log.debug( this.getFullName() + " refreshed" );
+        // log.debug( this.getFullName() + " refreshed" );
         // getMembers().forEach( m -> m.refresh() );
         getMembers().forEach( OtmLibraryMember::refresh );
         refreshMaps();
@@ -711,7 +712,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     public void refreshMaps() {
         providerMap = null;
         usersMap = null;
-        log.debug( "Maps cleared from " + this );
+        // log.debug( "Maps cleared from " + this );
     }
 
     /**

@@ -23,6 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.TestDexFileHandler;
+import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
@@ -43,10 +45,13 @@ import org.opentravel.model.otmLibraryMembers.TestOtmSimple;
 import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.model.otmProperties.TestElement;
+import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.repository.RepositoryItemState;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
+import org.opentravel.utilities.testutil.AbstractFxTest;
+import org.opentravel.utilities.testutil.TestFxMode;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -61,16 +66,29 @@ import javafx.beans.property.SimpleStringProperty;
 /**
  *
  */
-public class TestLibrary {
+public class TestLibrary extends AbstractFxTest {
     private static Log log = LogFactory.getLog( TestLibrary.class );
 
+    public static final boolean RUN_HEADLESS = true;
+    final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.
+
+    final static String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector
+    final static String FILE_TESTOPENTRAVELREPO = "TestOpenTravelRepo.otp";
+    final static String FILE_TESTLOCAL = "TestLocalFiles.otp";
+
     @BeforeClass
-    public static void beforeClass() {}
+    public static void setupTests() throws Exception {
+        setupWorkInProcessArea( TestLibrary.class );
+        repoManager = repositoryManager.get();
+        // assertTrue( "Given: ", repositoryManager != null );
+        // assertTrue( "Given: ", repoManager != null );
+        log.debug( "Before class setup tests ran." );
+    }
 
     @Test
     public void testAddMember() {
         DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
 
         OtmLibrary lib1 = TestLibrary.buildOtm( mgr, "Namespace1", "p1", "Library1" );
         // log.debug( "Lib 1 name is: " + lib1.getFullName() );
@@ -81,6 +99,33 @@ public class TestLibrary {
         assertTrue( "Given", member.getLibrary() == lib1 );
 
         // OtmLibrary lib2 = TestLibrary.buildOtm( mgr, "Namespace2", "p2", "Library2" );
+    }
+
+    @Test
+    public void testContainsAbstractLibrary() {
+        // TODO
+        log.debug( "TO DO" );
+    }
+
+    @Test
+    public void testContainsMember() {
+        // TODO
+        log.debug( "TO DO" );
+    }
+
+    @Test
+    public void testIncludes() {
+        // assertTrue( "Given: ", repoManager != null );
+        DexFullActionManager fullMgr = new DexFullActionManager( null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, repoManager, null );
+
+        TestDexFileHandler.loadAndAddManagedProject( mgr );
+        TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
+        // none found in these libraries
+        for (OtmLibrary lib : mgr.getUserLibraries()) {
+            List<OtmLibrary> includes = lib.getIncludes();
+            // log.debug( lib + " includes = " + includes );
+        }
     }
 
     // TODO - test facet set/un-set as assigned type
@@ -111,8 +156,8 @@ public class TestLibrary {
             }
             lib.delete( member );
             // This is OK. Needed for un-delete
-            if (!member.getWhereUsed().isEmpty())
-                log.debug( "Where used lists deleted member " + member );
+            // if (!member.getWhereUsed().isEmpty())
+            // log.debug( "Where used lists deleted member " + member );
         }
     }
 
@@ -144,7 +189,7 @@ public class TestLibrary {
             assertFalse( mgr.getMembers().contains( member ) );
             assertFalse( lib.getTL().getNamedMembers().contains( member.getTL() ) );
 
-            log.debug( "Added and removed: " + member );
+            // log.debug( "Added and removed: " + member );
         }
     }
 
@@ -232,7 +277,7 @@ public class TestLibrary {
                     setProvider( u, simple, providerLib2Users );
                 else
                     setProvider( u, simple, null );
-                log.debug( "Assigned " + simple + " to " + u );
+                // log.debug( "Assigned " + simple + " to " + u );
             }
         }
 
@@ -297,7 +342,7 @@ public class TestLibrary {
         assertTrue( "Must be read only action manager.", lib.getActionManager() instanceof DexReadOnlyActionManager );
         // Then
         for (OtmLibraryMember m : mgr.getMembers( lib )) {
-            log.debug( "Read-only tests for Member: " + m.getName() + " type = " + m.getObjectTypeName() );
+            // log.debug( "Read-only tests for Member: " + m.getName() + " type = " + m.getObjectTypeName() );
             assertTrue( "Given", !m.isEditable() );
             assertTrue( "Given", m.getActionManager() instanceof DexReadOnlyActionManager );
             assertTrue( "Refresh must change property class.", m.nameProperty() instanceof ReadOnlyStringWrapper );
@@ -311,7 +356,7 @@ public class TestLibrary {
         for (OtmLibraryMember m : mgr.getMembers( lib )) {
             assertTrue( "Given", m.isEditable() );
             assertFalse( "Refresh must change property class.", m.nameProperty() instanceof ReadOnlyStringWrapper );
-            log.debug( "Editable Member: " + m.getName() + " type = " + m.getObjectTypeName() );
+            // log.debug( "Editable Member: " + m.getName() + " type = " + m.getObjectTypeName() );
         }
     }
 
@@ -439,4 +484,29 @@ public class TestLibrary {
         for (OtmLibraryMember m : lib.getMembers()) {
         }
     }
+
+    /** **********************************************************************/
+    /**
+     * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
+     */
+    @Override
+    protected Class<? extends AbstractOTMApplication> getApplicationClass() {
+        return ObjectEditorApp.class;
+    }
+
+    /**
+     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
+     */
+    @Override
+    protected String getBackgroundTaskNodeQuery() {
+        return "#libraryText";
+    }
+
+    /**
+     * Configure headless/normal mode for TestFX execution.
+     */
+    static {
+        TestFxMode.setHeadless( RUN_HEADLESS );
+    }
+
 }

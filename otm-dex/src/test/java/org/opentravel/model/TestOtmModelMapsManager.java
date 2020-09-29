@@ -75,7 +75,6 @@ public class TestOtmModelMapsManager {
 
         // When
         // Map<OtmLibrary,List<OtmLibraryMember>> pMap = mapMgr.getUsersMap( userLib, false );
-        // Deprecated - Map<OtmLibrary,List<OtmLibraryMember>> dMap = userLib.getProviderMap( false );
         Map<OtmLibrary,List<OtmLibraryMember>> pMap = userLib.getProvidersMap();
 
         // Then - compare works
