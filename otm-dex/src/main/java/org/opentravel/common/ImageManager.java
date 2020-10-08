@@ -37,25 +37,38 @@ public class ImageManager {
     private static Log log = LogFactory.getLog( ImageManager.class );
 
     public enum Icons {
+        // Navigation
+        NAV_GO("/icons/nav_go.gif"),
+        EXPAND("/icons/expandall.gif"),
+        COLLAPSE("/icons/collapseall.gif"),
+        CLOSE("/icons/close.gif"),
+        // Decorations
+        ERROR("/icons/error.gif"),
+        RUN("/icons/run.gif"),
+        V_OK("/icons/checkmark.png"),
+        V_ERROR("/icons/error_st_obj.gif"),
+        V_WARN("/icons/warning_st_obj.gif"),
+        LOCK("/icons/lock.png"),
+        UNLOCK("icons/unlock.png"),
+        // Otm Objects
         APPLICATION("/icons/alt_window_16.gif"),
         ALIAS("/icons/alias.gif"),
+        ATTRIBUTE("/icons/Attribute.jpg"),
         BUSINESS("/icons/BusinessObject.png"),
+        CORE("/icons/CoreObject.gif"),
+        CHOICE("/icons/Choice.gif"),
         ENUMERATION_OPEN("/icons/EnumerationOpen.gif"),
         ENUMERATION_CLOSED("/icons/EnumerationClosed.gif"),
         ENUMERATION_VALUE("/icons/EnumerationValue.jpg"),
+        FACET("/icons/Facet.gif"),
+        FACET_CONTEXTUAL("/icons/Facet-contextual.gif"),
+        FACET_CONTRIBUTED("/icons/Facet-contributed.gif"),
         ELEMENT("/icons/Element.gif"),
         ELEMENTREF("/icons/ElementRef.gif"),
         IDATTR("/icons/Attribute.jpg"),
         IDREFATTR("/icons/Id_attr_ref.gif"),
         IDREFELE("/icons/Id_ele_ref.gif"),
-        Error("/icons/error.gif"),
         LIBRARY("/icons/library.png"),
-        CORE("/icons/CoreObject.gif"),
-        CHOICE("/icons/Choice.gif"),
-        FACET("/icons/Facet.gif"),
-        FACET_CONTEXTUAL("/icons/Facet-contextual.gif"),
-        FACET_CONTRIBUTED("/icons/Facet-contributed.gif"),
-        ATTRIBUTE("/icons/Attribute.jpg"),
         INDICATOR("/icons/Indicator.gif"),
         INDICATORELEMENT("/icons/IndicatorElement.gif"),
         NAMESPACEFACET("/icons/namespace.gif"),
@@ -67,16 +80,10 @@ public class ImageManager {
         RESOURCE_PARENTREF("/icons/ResourceParentRef.png"),
         RESOURCE_REQUEST("/icons/ResourceRequest.gif"),
         RESOURCE_RESPONSE("/icons/ResourceResponse.gif"),
-        RUN("/icons/run.gif"),
         SERVICE("/icons/Service.gif"),
         SIMPLE("/icons/SimpleObject.gif"),
-        V_OK("/icons/checkmark.png"),
-        V_ERROR("/icons/error_st_obj.gif"),
-        V_WARN("/icons/warning_st_obj.gif"),
         VWA("/icons/VWA.gif"),
-        XSD_SIMPLE("/icons/XSDSimpleType.gif"),
-        LOCK("/icons/lock.png"),
-        UNLOCK("icons/unlock.png");
+        XSD_SIMPLE("/icons/XSDSimpleType.gif");
         private String label; // User displayed value
 
         Icons(String label) {

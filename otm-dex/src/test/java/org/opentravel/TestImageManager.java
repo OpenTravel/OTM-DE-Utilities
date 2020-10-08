@@ -58,7 +58,7 @@ public class TestImageManager extends AbstractFxTest {
         // Then image/imageview is returned.
         ImageView iv1 = ImageManager.get( oec );
         ImageView iv2 = ImageManager.get( Icons.LIBRARY );
-        Image im = ImageManager.getImage( Icons.Error );
+        Image im = ImageManager.getImage( Icons.ERROR );
         assertNotNull( iv1 );
         assertNotNull( iv2 );
         assertNotNull( im );

@@ -22,6 +22,7 @@ import org.opentravel.common.DexStyleSheetHandler;
 import org.opentravel.dex.controllers.DexMainControllerBase;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.controllers.MenuBarWithProjectController;
+import org.opentravel.dex.controllers.graphics.GraphicsTabController;
 import org.opentravel.dex.controllers.library.LibrariesTabController;
 import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.controllers.member.MemberTreeTableController;
@@ -37,7 +38,7 @@ import javafx.fxml.FXML;
 import javafx.stage.Stage;
 
 /**
- * Main controller for OtmObjecEditorLayout.fxml.
+ * Main controller for OtmObjectEditorLayout.fxml.
  * 
  * @author dmh
  *
@@ -65,6 +66,8 @@ public class ObjectEditorController extends DexMainControllerBase {
     private ResourcesTabController resourcesTabController;
     @FXML
     private SearchTabController searchTabController;
+    @FXML
+    private GraphicsTabController graphicsTabController;
 
     @Override
     public void checkNodes() {
@@ -148,6 +151,8 @@ public class ObjectEditorController extends DexMainControllerBase {
         librariesTabController.configure( this, viewGroupId++ );
         whereUsedTabController.configure( this, viewGroupId++ );
         searchTabController.configure( this, viewGroupId++ );
+
+        graphicsTabController.configure( this, viewGroupId++ );
 
         // Add menu items for tab controllers that can also be launched in separate views windows
         menuBarWithProjectController.addViewItem( librariesTabController );

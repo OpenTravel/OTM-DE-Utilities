@@ -56,6 +56,7 @@
 				  <fx:include fx:id="librariesTab" source="LibrariesTab.fxml" />
 				  <fx:include fx:id="repositoryTab" source="RepositoryViews/RepositoryTab.fxml" />
 				  <fx:include fx:id="searchTab" source="SearchViews/SearchTab.fxml" />
+				  <fx:include fx:id="graphicsTab" source="GraphicViews/GraphicsTab.fxml" />
               </tabs>
             </TabPane>
         </items>
