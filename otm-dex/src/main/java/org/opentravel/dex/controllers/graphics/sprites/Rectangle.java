@@ -42,27 +42,11 @@ public class Rectangle {
         public void onRectangleClick(MouseEvent e);
     }
 
-    private double x;
-    private double y;
-    private double width;
-    private double height;
-    private RectangleEventHandler eventHandler = null;
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public double getWidth() {
-        return width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
+    protected double x;
+    protected double y;
+    protected double width;
+    protected double height;
+    protected RectangleEventHandler eventHandler = null;
 
     public Rectangle(double x, double y, double width, double height) {
         this.x = x;
@@ -71,24 +55,14 @@ public class Rectangle {
         this.width = width;
     }
 
-    public double getMaxX() {
-        return x + width;
+    /**
+     * @param x2
+     * @param y2
+     * @return
+     */
+    public boolean contains(double x, double y) {
+        return contains( new Point2D( x, y ) );
     }
-
-    public double getMaxY() {
-        return y + height;
-    }
-
-    public final void setOnMouseClicked(RectangleEventHandler a) {
-        // TEST
-        eventHandler = a;
-    }
-
-    public final void onMouseClicked(MouseEvent e) {
-        if (e != null && eventHandler != null)
-            eventHandler.onRectangleClick( e );
-    }
-
 
     public boolean contains(Point2D point) {
         if (point.getX() < x)
@@ -103,27 +77,64 @@ public class Rectangle {
     }
 
     /**
-     * @param x2
-     * @param y2
-     * @return
-     */
-    public boolean contains(double x, double y) {
-        return contains( new Point2D( x, y ) );
-    }
-
-    /**
      * Draw around the rectangle.
      * 
      * @param gc
      * @param filled
      */
-    public void draw(GraphicsContext gc, boolean filled) {
+    public Rectangle draw(GraphicsContext gc, boolean filled) {
         if (gc != null) {
             if (filled)
                 gc.fillRect( x, y, width, height );
             else
                 gc.strokeRect( x, y, width, height );
         }
+        return this;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public double getMaxX() {
+        return x + width;
+    }
+
+    public double getMaxY() {
+        return y + height;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+
+    public double getY() {
+        return y;
+    }
+
+    public final void onMouseClicked(MouseEvent e) {
+        if (e != null && eventHandler != null)
+            eventHandler.onRectangleClick( e );
+    }
+
+    public void set(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public void set(double x, double y, double width) {
+        set( x, y );
+        this.width = width;
+    }
+
+    public final void setOnMouseClicked(RectangleEventHandler a) {
+        // TEST
+        eventHandler = a;
     }
 
     public String toString() {

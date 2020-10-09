@@ -77,7 +77,8 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     // private GraphicsContext gc;
     private Canvas backgroundCanvas;
     private GraphicsContext backgroundGC;
-    private static final Font DEFAULT_FONT = new Font( "Arial", 14 );
+    // private static final Font DEFAULT_FONT = new Font( "Arial", 14 );
+    private static final Font DEFAULT_FONT = new Font( "Monospaced", 15 );
     private static final Paint DEFAULT_STROKE = Color.BLACK;
     static final Paint DEFAULT_FILL = Color.gray( 0.8 );
 

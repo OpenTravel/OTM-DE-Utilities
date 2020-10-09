@@ -16,50 +16,37 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
-import org.opentravel.model.OtmObject;
-import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
+import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-
-import java.util.List;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.Font;
 
 /**
- * Graphics Display Object (Sprite) for containing OTM business object.
+ * Graphics Display Object (Sprite) for containing OTM choice object.
  * 
  * @author dmh
  * @param <O>
  *
  */
-public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implements DexSprite<OtmLibraryMember> {
+public class ChoiceObjectSprite extends MemberSprite<OtmChoiceObject> implements DexSprite<OtmLibraryMember> {
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
-    public ContextualFacetSprite(OtmContextualFacet member, SpriteManager manager, GraphicsContext paramsGC) {
+    public ChoiceObjectSprite(OtmChoiceObject member, SpriteManager manager, GraphicsContext paramsGC) {
         super( member, manager, paramsGC );
     }
 
     @Override
     public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
+        double width = getBoundaries().getWidth();
+        Rectangle mRect = new Rectangle( 0, 0, 0, 0 );
 
-        // // super.drawMember( gc, font );
-        // double width = getBoundaries().getWidth();
-        // // double height = 0;
-        Rectangle cRect = new Rectangle( 0, 0, 0, 0 );
-        List<OtmObject> kids = getMember().getChildren();
-
-        // cRect = drawFacet( facet, gc, font, x, y, width )
-        //
-        // // Show facets
-        // if (!isCollapsed()) {
+        // Show facets
+        // if (!isCollapsed())
         // mRect = drawFacets( getMember(), gc, font, x, y, width );
-        // // if (mRect.getWidth() > width)
-        // // width = mRect.getWidth();
-        // // height = mRect.getHeight();
-        // }
-        //
-        // // log.debug( "Drew contents into " + mRect );
-        return cRect;
+
+        // log.debug( "Drew contents into " + mRect );
+        return mRect;
     }
 
 }

@@ -17,6 +17,7 @@
 package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.geometry.Point2D;
@@ -79,4 +80,17 @@ public interface DexSprite<O extends OtmObject> {
      * @return found rectangle or null
      */
     public Rectangle find(double x, double y);
+
+    /**
+     * @param rectangle
+     */
+    void add(Rectangle rectangle);
+
+    /**
+     * @param user
+     * @param from
+     * @param x
+     * @param y
+     */
+    void connect(OtmTypeUser user, DexSprite<?> from, double x, double y);
 }

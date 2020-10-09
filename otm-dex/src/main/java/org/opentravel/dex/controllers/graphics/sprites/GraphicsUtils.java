@@ -22,7 +22,6 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
-import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 import javafx.geometry.Point2D;
@@ -39,15 +38,20 @@ import javafx.scene.text.Text;
  *
  */
 public class GraphicsUtils {
-    protected static final double PROPERTY_MARGIN = 2;
-    protected static final double FACET_MARGIN = 4;
-    protected static final double PROPERTY_OFFSET = 10; // left margin
-    protected static final double CONNECTOR_SIZE = 16;
+    protected static final double FACET_MARGIN = 5;
+    protected static final double FACET_OFFSET = 8;
+
     protected static final double MEMBER_MARGIN = 2;
     protected static final double CANVAS_MARGIN = 10;
     protected static final double LABEL_MARGIN = 4;
     private static final double LABEL_OFFSET = 8; // distance from line for text
+
+    protected static final double CONNECTOR_SIZE = 16;
+    protected static final double PROPERTY_MARGIN = 2;
+    protected static final double PROPERTY_OFFSET = 10; // left margin
     private static final double PROPERTY_TYPE_MARGIN = 8; // distance between property name and type
+
+    public static final double MINIMUM_WIDTH = 50;
 
     private static Log log = LogFactory.getLog( GraphicsUtils.class );
 
@@ -61,7 +65,7 @@ public class GraphicsUtils {
 
 
 
-    public static Rectangle drawProperty(OtmProperty p, GraphicsContext gc, Font font, final double x, final double y,
+    public Rectangle drawProperty(OtmProperty p, GraphicsContext gc, Font font, final double x, final double y,
         double width) {
 
         // String label = getLabel( p );
@@ -164,12 +168,13 @@ public class GraphicsUtils {
      * Draw a circle and triangle connector symbol
      */
     public static Point2D drawConnector(GraphicsContext gc, final double x, final double y) {
-        gc.strokeOval( x, y, CONNECTOR_SIZE, CONNECTOR_SIZE );
-        Image link = ImageManager.getImage( ImageManager.Icons.NAV_GO );
-
-        gc.drawImage( link, x, y );
-
-        return new Point2D( x + CONNECTOR_SIZE, y + CONNECTOR_SIZE );
+        if (gc != null) {
+            gc.strokeOval( x, y, CONNECTOR_SIZE, CONNECTOR_SIZE );
+            Image link = ImageManager.getImage( ImageManager.Icons.NAV_GO );
+            gc.drawImage( link, x, y );
+            return new Point2D( x + CONNECTOR_SIZE, y + CONNECTOR_SIZE );
+        }
+        return new Point2D( CONNECTOR_SIZE, CONNECTOR_SIZE );
     }
 
     /**
@@ -189,41 +194,50 @@ public class GraphicsUtils {
 
     public static Rectangle drawLabel(String label, Image image, boolean imageAfterText, GraphicsContext gc, Font font,
         final double x, final double y) {
-        double width = LABEL_MARGIN;
-        double height = LABEL_MARGIN;
 
+        // Compute size, start with start and end margins
+        double width = 2 * LABEL_MARGIN;
+        double height = 2 * LABEL_MARGIN;
+        double imageWidth = 0;
+        double imageHeight = 0;
+
+        // Add size of image
         if (image != null) {
-            width = width + image.getWidth() + LABEL_MARGIN;
-            height = image.getHeight();
+            width += image.getWidth() + LABEL_MARGIN;
+            imageWidth = image.getWidth();
+            imageHeight = image.getHeight();
         }
-        Point2D p = drawString( label, null, font, 0, 0 );
-        if (p.getY() > height)
-            height = p.getY() + 2 * LABEL_MARGIN;
+        // Add size of text area
+        Point2D textSize = drawString( label, null, font, 0, 0 );
+        height += textSize.getY() > imageHeight ? textSize.getY() : imageHeight;
+        width += textSize.getX();
 
         if (gc != null) {
             if (imageAfterText) {
-                gc.strokeText( label, x + LABEL_MARGIN, y + height );
-                gc.drawImage( image, x + p.getX() + LABEL_MARGIN, y + LABEL_MARGIN );
+                gc.strokeText( label, x + LABEL_MARGIN, y + textSize.getY() );
+                if (image != null)
+                    gc.drawImage( image, x + textSize.getX() + LABEL_MARGIN, y + 2 * LABEL_MARGIN );
             } else {
-                gc.drawImage( image, x + LABEL_MARGIN, y + LABEL_MARGIN );
-                gc.strokeText( label, x + width, y + height );
+                if (image != null)
+                    gc.drawImage( image, x + LABEL_MARGIN, y + LABEL_MARGIN );
+                gc.strokeText( label, x + 2 * LABEL_MARGIN + imageWidth, y + textSize.getY() );
             }
         }
-
-        width += p.getX() + LABEL_MARGIN;
-        return new Rectangle( x, y, width, height );
+        Rectangle lRect = new Rectangle( x, y, width, height );
+        // lRect.draw( gc, false );
+        return lRect;
     }
 
-    public static String getLabel(OtmProperty property) {
-        String cardinality = "";
-        if (property instanceof OtmElement)
-            cardinality = Integer.toString( ((OtmElement<?>) property).getRepeatCount() );
-        else if (property instanceof OtmTypeUser && property.isManditory())
-            cardinality = "1";
-
-        String label = property.getName() + "  " + cardinality;
-        return label;
-    }
+    // public static String getLabel(OtmProperty property) {
+    // String cardinality = "";
+    // if (property instanceof OtmElement)
+    // cardinality = Integer.toString( ((OtmElement<?>) property).getRepeatCount() );
+    // else if (property instanceof OtmTypeUser && property.isManditory())
+    // cardinality = "1";
+    //
+    // String label = property.getName() + " " + cardinality;
+    // return label;
+    // }
 
 
 

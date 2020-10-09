@@ -21,13 +21,9 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils.DrawType;
 import org.opentravel.dex.controllers.graphics.sprites.Rectangle.RectangleEventHandler;
-import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.model.otmFacets.OtmContributedFacet;
-import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.otmProperties.OtmProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +54,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
 
     private double x;
     private double y;
-    private M member;
+    protected M member;
     private Canvas canvas;
     private GraphicsContext gc = null;
 
@@ -70,6 +66,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     private SpriteManager manager;
 
     /**
+     * Initialize member sprite. Create canvas and save GC for parameters.
      * 
      * @param member
      * @param paramsGC - source of font and color information ONLY. If null, defaults are used.
@@ -84,6 +81,12 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         canvas = new Canvas( MIN_WIDTH, MIN_HEIGHT );
         gc = canvas.getGraphicsContext2D();
         setGCParams( paramsGC );
+    }
+
+    @Override
+    public void add(Rectangle rectangle) {
+        if (!rectangles.contains( rectangle ))
+            rectangles.add( rectangle );
     }
 
     @Override
@@ -134,11 +137,12 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         setBoundaries( 0, 0 );
 
         // Create Canvas
-        Rectangle canvasR = new Rectangle( 0, 0, boundaries.getWidth() + GraphicsUtils.CANVAS_MARGIN,
+        Rectangle canvasR = new Rectangle( x, y, boundaries.getWidth() + GraphicsUtils.CANVAS_MARGIN,
             boundaries.getHeight() + GraphicsUtils.CANVAS_MARGIN );
         canvas.setHeight( y + canvasR.getHeight() );
         canvas.setWidth( x + canvasR.getWidth() );
-        log.debug( "Sized canvas: " + canvas.getWidth() + " " + canvas.getHeight() );
+        // canvasR.draw( gc, false );
+        log.debug( "Sized canvas: " + canvasR );
 
         drawMember( gc, gc.getFont() );
         manager.updateConnections( this );
@@ -148,8 +152,8 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     /**
      * If width or height are 0 then compute new values
      * 
-     * @param width
-     * @param height
+     * @param width if 0, compute
+     * @param height if 0, compute
      */
     public void setBoundaries(double width, double height) {
         // Use minimum boundaries
@@ -158,6 +162,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         Rectangle ms = drawMember( null, gc.getFont() );
         // Set the true boundaries
         boundaries = new Rectangle( x, y, width == 0 ? ms.getWidth() : width, height == 0 ? ms.getHeight() : height );
+        // boundaries.draw( gc, false );
     }
 
     @Override
@@ -168,14 +173,35 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         render();
     }
 
+    /**
+     * Draw the facets and properties for this member. Start at the passed x, y.
+     * 
+     * @param gc if null, compute size. If not-null, draw within boundaries.
+     * @param font
+     * @param x
+     * @param y
+     * @return rectangle around all contents
+     */
+    public abstract Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y);
+
+    /**
+     * Draw background, label and controls.
+     * 
+     * @param gc
+     * @param font
+     * @return
+     */
     public Rectangle drawMember(GraphicsContext gc, Font font) {
         if (member == null)
             return new Rectangle( 0, 0, 0, 0 );
 
         // Draw background box
         if (gc != null) {
-            boundaries.draw( gc, false ); // Outline
-            boundaries.draw( gc, true ); // Fill
+            Rectangle bRect = new Rectangle( boundaries.getX(), boundaries.getY(),
+                boundaries.getWidth() + FacetRectangle.FACET_MARGIN,
+                boundaries.getHeight() + FacetRectangle.FACET_MARGIN );
+            bRect.draw( gc, false ); // Outline
+            bRect.draw( gc, true ); // Fill
         }
 
         // Draw the name of the object
@@ -189,14 +215,13 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         else
             drawControls( boundaries );
 
-        // Show facets
-        if (!collapsed) {
-            mRect = drawFacets( member, gc, font, boundaries.getX(), mRect.getMaxY(), boundaries.getWidth() );
-            double dx = mRect.getX() - boundaries.getX();
-            if (mRect.getWidth() + dx > width)
-                width = mRect.getWidth() + dx;
-            height += mRect.getHeight();
-        }
+        // Show content (facets, properties, etc)
+        mRect = drawContents( gc, font, boundaries.getX(), mRect.getMaxY() );
+        // mRect.draw( gc, false );
+        if (gc == null && mRect.getWidth() + FacetRectangle.FACET_MARGIN > width)
+            width = mRect.getWidth() + FacetRectangle.FACET_MARGIN;
+        height += mRect.getHeight();
+
 
         // Handler for canvas layer
         if (manager != null) {
@@ -207,7 +232,13 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
             // canvas.setOnMouseClicked( this::mouseClick );
         }
         log.debug( "Refreshed " + member );
-        return new Rectangle( x, y, width, height );
+        mRect = new Rectangle( x, y, width, height );
+        // mRect.draw( gc, false );
+        return mRect;
+    }
+
+    public boolean isCollapsed() {
+        return collapsed;
     }
 
     @Override
@@ -301,59 +332,59 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         return boundaries;
     }
 
-    /**
-     * Draw or compute size of facet.
-     * 
-     * @param facet
-     * @param gc if null, compute size
-     * @param font
-     * @param x
-     * @param y
-     * @param width set if computing size, not drawing
-     * 
-     * @return
-     */
-    public Rectangle drawFacet(OtmFacet<?> facet, GraphicsContext gc, Font font, final double x, final double y,
-        double width) {
-        double height = 0;
-        Rectangle fr = null;
-
-        if (!facet.getChildren().isEmpty()) {
-            // Get the size of the label
-            Rectangle fRect = GraphicsUtils.drawLabel( facet.getName(), facet.getIcon(), gc, font, x, y );
-            height += fRect.getHeight();
-            double py = y + fRect.getHeight() + GraphicsUtils.PROPERTY_MARGIN;
-            if (gc == null && fRect.getWidth() + GraphicsUtils.PROPERTY_MARGIN > width)
-                width = fRect.getWidth() + GraphicsUtils.PROPERTY_MARGIN;
-
-            // Draw each property
-            for (OtmObject c : facet.getChildren()) {
-                if (c instanceof OtmProperty) {
-                    fRect = GraphicsUtils.drawProperty( (OtmProperty) c, gc, font, x, py, width );
-                    height += fRect.getHeight();
-                    py += fRect.getHeight();
-                    // Set width if computing size and not drawing
-                    if (gc == null && fRect.getWidth() > width)
-                        width = fRect.getWidth();
-
-                    if (gc != null) {
-                        if (c instanceof OtmTypeUser)
-                            fRect.setOnMouseClicked( e -> connect( ((OtmTypeUser) c), this, e.getX(), e.getY() ) );
-                        rectangles.add( fRect );
-                    }
-                }
-            }
-            // Draw vertical line
-            if (gc != null) {
-                gc.strokeLine( x + GraphicsUtils.PROPERTY_OFFSET, y + fRect.getHeight() - GraphicsUtils.PROPERTY_MARGIN,
-                    x + GraphicsUtils.PROPERTY_OFFSET,
-                    y + height - GraphicsUtils.PROPERTY_MARGIN - GraphicsUtils.LABEL_MARGIN );
-            }
-        }
-        fr = new Rectangle( x, y, width, height );
-        // log.debug( "Drew/sized facet " + facet.getName() + " into " + fr );
-        return fr;
-    }
+    // /**
+    // * Draw or compute size of facet.
+    // *
+    // * @param facet
+    // * @param gc if null, compute size
+    // * @param font
+    // * @param x
+    // * @param y
+    // * @param width set if computing size, not drawing
+    // *
+    // * @return
+    // */
+    // public Rectangle drawFacet(OtmFacet<?> facet, GraphicsContext gc, Font font, final double x, final double y,
+    // double width) {
+    // double height = 0;
+    // Rectangle fr = null;
+    //
+    // if (!facet.getChildren().isEmpty()) {
+    // // Get the size of the label
+    // Rectangle fRect = GraphicsUtils.drawLabel( facet.getName(), facet.getIcon(), gc, font, x, y );
+    // height += fRect.getHeight();
+    // double py = y + fRect.getHeight() + GraphicsUtils.PROPERTY_MARGIN;
+    // if (gc == null && fRect.getWidth() + GraphicsUtils.PROPERTY_MARGIN > width)
+    // width = fRect.getWidth() + GraphicsUtils.PROPERTY_MARGIN;
+    //
+    // // Draw each property
+    // for (OtmObject c : facet.getChildren()) {
+    // if (c instanceof OtmProperty) {
+    // fRect = GraphicsUtils.drawProperty( (OtmProperty) c, gc, font, x, py, width );
+    // height += fRect.getHeight();
+    // py += fRect.getHeight();
+    // // Set width if computing size and not drawing
+    // if (gc == null && fRect.getWidth() > width)
+    // width = fRect.getWidth();
+    //
+    // if (gc != null) {
+    // if (c instanceof OtmTypeUser)
+    // fRect.setOnMouseClicked( e -> connect( ((OtmTypeUser) c), this, e.getX(), e.getY() ) );
+    // rectangles.add( fRect );
+    // }
+    // }
+    // }
+    // // Draw vertical line
+    // if (gc != null) {
+    // gc.strokeLine( x + GraphicsUtils.PROPERTY_OFFSET, y + fRect.getHeight() - GraphicsUtils.PROPERTY_MARGIN,
+    // x + GraphicsUtils.PROPERTY_OFFSET,
+    // y + height - GraphicsUtils.PROPERTY_MARGIN - GraphicsUtils.LABEL_MARGIN );
+    // }
+    // }
+    // fr = new Rectangle( x, y, width, height );
+    // // log.debug( "Drew/sized facet " + facet.getName() + " into " + fr );
+    // return fr;
+    // }
 
     /**
      * Adds sprite for the member that provides the type then add connection to new sprite.
@@ -361,6 +392,8 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
      * @param user
      * @param column which column to put the new sprite into
      */
+    // TODO - why not pass in the property rectangle?
+    @Override
     public void connect(OtmTypeUser user, DexSprite<?> from, double x, double y) {
         log.debug( "Connecting to " + user );
         if (user != null && user.getAssignedType() instanceof OtmTypeProvider) {
@@ -386,51 +419,59 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     }
 
 
-    public Rectangle drawFacets(OtmLibraryMember member, GraphicsContext gc, Font font, final double x, final double y,
-        double width) {
-
-        // Save to be restored
-        Paint color = null;
-        if (gc != null) {
-            color = gc.getFill();
-            // gc.setFill( Color.gray( 0.95 ) );
-            gc.setFill( Color.ANTIQUEWHITE );
-        }
-
-        Rectangle rect = null;
-        double fx = x + GraphicsUtils.PROPERTY_OFFSET;
-        double fy = y + GraphicsUtils.FACET_MARGIN;
-        double fWidth =
-            width - GraphicsUtils.PROPERTY_OFFSET - GraphicsUtils.PROPERTY_MARGIN - GraphicsUtils.FACET_MARGIN;
-
-        if (!collapsed) {
-            for (OtmObject child : member.getChildren())
-                if (child instanceof OtmFacet && !(child instanceof OtmContributedFacet)
-                    && !((OtmFacet<?>) child).getChildren().isEmpty()) {
-                    // Draw filled box
-                    // size and position
-                    rect = drawFacet( (OtmFacet<?>) child, gc, font, fx, fy, fWidth );
-                    rect.draw( gc, false );
-                    rect.draw( gc, true );
-                    // Draw facet label and properties
-                    rect = drawFacet( (OtmFacet<?>) child, gc, font, fx, fy, fWidth );
-                    double dx = rect.getX() - x + GraphicsUtils.PROPERTY_OFFSET;
-                    if (gc == null && rect.getWidth() + dx > width)
-                        width = rect.getWidth() + dx;
-                    if (gc == null && rect.getWidth() > width)
-                        width = rect.getWidth();
-                    fy += rect.getHeight() + GraphicsUtils.FACET_MARGIN;
-                    fx += 2;
-                    fWidth -= 2;
-                }
-            // Do the contextual facets
-        }
-        if (gc != null)
-            gc.setFill( color );
-
-        // TODO - track rectangle sizes
-        // TODO - aliases
-        // TODO - contributed and contextual facets
-        return new Rectangle( x, y, width, fy - y );
-    }
+    // public Rectangle drawFacets(OtmLibraryMember member, GraphicsContext gc, Font font, final double x, final double
+    // y,
+    // double width) {
+    //
+    // // Save to be restored
+    // Paint color = null;
+    // if (gc != null) {
+    // color = gc.getFill();
+    // // gc.setFill( Color.gray( 0.95 ) );
+    // gc.setFill( Color.ANTIQUEWHITE );
+    // }
+    //
+    // FacetRectangle rect = null;
+    // double fx = x + GraphicsUtils.PROPERTY_OFFSET;
+    // double fy = y + GraphicsUtils.FACET_MARGIN;
+    // double fWidth =
+    // width - GraphicsUtils.PROPERTY_OFFSET - GraphicsUtils.PROPERTY_MARGIN - GraphicsUtils.FACET_MARGIN;
+    //
+    // if (!collapsed) {
+    // for (OtmObject child : member.getChildren())
+    // if (child instanceof OtmFacet && !(child instanceof OtmContributedFacet)
+    // && !((OtmFacet<?>) child).getChildren().isEmpty()) {
+    // // Draw filled box
+    // // size and position
+    // rect = new FacetRectangle( (OtmFacet<?>) child, this, font );
+    // rect.set( fx, fy );
+    // rect.draw( gc, true );
+    //
+    // //
+    // // OLD
+    // //
+    // // rect = drawFacet( (OtmFacet<?>) child, gc, font, fx, fy, fWidth );
+    // // rect.draw( gc, false );
+    // // rect.draw( gc, true );
+    // // // Draw facet label and properties
+    // // rect = drawFacet( (OtmFacet<?>) child, gc, font, fx, fy, fWidth );
+    // double dx = rect.getX() - x + GraphicsUtils.PROPERTY_OFFSET;
+    // if (gc == null && rect.getWidth() + dx > width)
+    // width = rect.getWidth() + dx;
+    // if (gc == null && rect.getWidth() > width)
+    // width = rect.getWidth();
+    // fy += rect.getHeight() + GraphicsUtils.FACET_MARGIN;
+    // fx += 2;
+    // fWidth -= 2;
+    // }
+    // // Do the contextual facets
+    // }
+    // if (gc != null)
+    // gc.setFill( color );
+    //
+    // // TODO - track rectangle sizes
+    // // TODO - aliases
+    // // TODO - contributed and contextual facets
+    // return new Rectangle( x, y, width, fy - y );
+    // }
 }

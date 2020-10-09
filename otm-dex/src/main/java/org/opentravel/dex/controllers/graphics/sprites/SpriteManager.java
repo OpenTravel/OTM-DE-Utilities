@@ -23,6 +23,7 @@ import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
+import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
@@ -66,10 +67,13 @@ public class SpriteManager {
 
     private Paint backgroundColor = Color.gray( 0.95 );
 
-    // public SpriteManager(Pane spritePane, DexIncludedController<?> owner) {
-    // this( spritePane, owner, null );
-    // }
-
+    /**
+     * Initialize the sprite. Create connections canvas and add to pane. Set mouse click handler.
+     * 
+     * @param spritePane
+     * @param owner
+     * @param gc
+     */
     public SpriteManager(Pane spritePane, DexIncludedController<?> owner, GraphicsContext gc) {
         this.spritePane = spritePane;
         parentController = owner;
@@ -97,7 +101,8 @@ public class SpriteManager {
     }
 
     /**
-     * Sprite factory. Adds sprite to list and FX pane's children. Manager determines the location for the sprite.
+     * Uses Sprite factory to adds sprite and related sprites to list and FX pane's children. Manager determines the
+     * location for the sprite.
      * 
      * @param member
      */
@@ -108,9 +113,11 @@ public class SpriteManager {
         DexSprite<?> baseSprite = null;
         if (member.getBaseType() != null) {
             baseSprite = add( (OtmLibraryMember) member.getBaseType(), p.getX(), p.getY() );
-            log.debug( "Added at " + p.getX() + " " + p.getY() + " base sprite: " + member.getBaseType() );
-            p = getNextInColumn( baseSprite.getBoundaries().getX(),
-                baseSprite.getBoundaries().getMaxY() + FACET_OFFSET );
+            if (baseSprite != null) {
+                log.debug( "Added at " + p.getX() + " " + p.getY() + " base sprite: " + member.getBaseType() );
+                p = getNextInColumn( baseSprite.getBoundaries().getX(),
+                    baseSprite.getBoundaries().getMaxY() + FACET_OFFSET );
+            }
         }
 
         DexSprite<?> memberSprite = add( member, p.getX(), p.getY() );
@@ -133,7 +140,9 @@ public class SpriteManager {
             // sprite factory
             if (member instanceof OtmBusinessObject)
                 newSprite = new BusinessObjectSprite( (OtmBusinessObject) member, this, defaultGC );
-            if (member instanceof OtmContextualFacet)
+            else if (member instanceof OtmChoiceObject)
+                newSprite = new ChoiceObjectSprite( (OtmChoiceObject) member, this, defaultGC );
+            else if (member instanceof OtmContextualFacet)
                 newSprite = new ContextualFacetSprite( (OtmContextualFacet) member, this, defaultGC );
 
             if (newSprite != null) {
