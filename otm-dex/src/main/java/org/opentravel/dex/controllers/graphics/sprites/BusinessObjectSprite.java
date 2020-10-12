@@ -16,8 +16,14 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
+import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmFacets.OtmCustomFacet;
+import org.opentravel.model.otmFacets.OtmQueryFacet;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.Font;
@@ -61,49 +67,60 @@ public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> impleme
 
         boolean compute = gc == null;
         FacetRectangle rect = null;
-        double dxID = GraphicsUtils.PROPERTY_OFFSET;
-        double dxSummary = dxID + GraphicsUtils.FACET_OFFSET;
-        double dxDetail = dxSummary + GraphicsUtils.FACET_OFFSET;
+        double dxID = FacetRectangle.ID_OFFSET;
+        double dxSummary = FacetRectangle.SUMMARY_OFFSET;
+        double dxDetail = FacetRectangle.DETAIL_OFFSET;
 
-        double fy = y + GraphicsUtils.FACET_MARGIN;
-        // double fWidth = width - GraphicsUtils.PROPERTY_OFFSET;
-        // width - GraphicsUtils.PROPERTY_OFFSET - GraphicsUtils.PROPERTY_MARGIN - GraphicsUtils.FACET_MARGIN;
+        double fy = y + FacetRectangle.FACET_MARGIN;
 
         if (!isCollapsed()) {
-            // for (OtmObject child : member.getChildren())
-            // if (child instanceof OtmFacet && !(child instanceof OtmContributedFacet)
-            // && !((OtmFacet<?>) child).getChildren().isEmpty()) {
 
-            rect = new FacetRectangle( getMember().getIdFacet(), this, font, width - dxID );
+            rect = new FacetRectangle( getMember().getIdFacet(), this, width - dxID );
             rect.set( x + dxID, fy );
             rect.draw( gc, true );
-            fy += rect.getHeight() + GraphicsUtils.FACET_MARGIN;
+            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
             width = compute && rect.getWidth() > width ? rect.getWidth() + dxID : width;
 
             rect = new FacetRectangle( getMember().getSummary(), this, font, width - dxSummary );
             rect.set( x + dxSummary, fy );
             rect.draw( gc, true );
-            fy += rect.getHeight() + GraphicsUtils.FACET_MARGIN;
+            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
             width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
 
             if (!getMember().getDetail().getChildren().isEmpty()) {
                 rect = new FacetRectangle( getMember().getDetail(), this, font, width - dxDetail );
                 rect.set( x + dxDetail, fy );
                 rect.draw( gc, true );
-                fy += rect.getHeight() + GraphicsUtils.FACET_MARGIN;
+                fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
                 width = compute && rect.getWidth() > width ? rect.getWidth() + dxDetail : width;
             }
-            // double dx = rect.getX() - x + GraphicsUtils.PROPERTY_OFFSET;
-            // if (gc == null && rect.getWidth() + dx > width)
-            // width = rect.getWidth() + dx;
-            // if (gc == null && rect.getWidth() > width)
-            // width = rect.getWidth();
-            // fx += 2;
-            // fWidth -= 2;
-            // }
         }
-        // TODO - contributed and contextual facets
-        Rectangle fRect = new Rectangle( x, y, width + GraphicsUtils.FACET_MARGIN, fy - y );
+        // TEST - contributed and contextual facets
+        List<OtmCustomFacet> customs = new ArrayList<>();
+        List<OtmQueryFacet> queries = new ArrayList<>();
+        for (OtmContributedFacet cf : member.getChildrenContributedFacets())
+            if (cf.getContributor() instanceof OtmCustomFacet)
+                customs.add( (OtmCustomFacet) cf.getContributor() );
+            else if (cf.getContributor() instanceof OtmQueryFacet)
+                queries.add( (OtmQueryFacet) cf.getContributor() );
+
+        for (OtmCustomFacet f : customs) {
+            rect = new FacetRectangle( f, this, width - FacetRectangle.CUSTOM_OFFSET );
+            rect.set( x + FacetRectangle.CUSTOM_OFFSET, fy );
+            rect.draw( gc, true );
+            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+            width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
+        }
+        for (OtmQueryFacet f : queries) {
+            rect = new FacetRectangle( f, this, width - FacetRectangle.QUERY_OFFSET );
+            rect.set( x + FacetRectangle.QUERY_OFFSET, fy );
+            rect.draw( gc, true );
+            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+            width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
+        }
+
+        // Return the enclosing rectangle
+        Rectangle fRect = new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
         // fRect.draw( gc, false );
         return fRect;
     }

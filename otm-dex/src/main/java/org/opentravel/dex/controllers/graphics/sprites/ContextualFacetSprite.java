@@ -16,11 +16,14 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
-import org.opentravel.model.OtmObject;
+import static org.opentravel.dex.controllers.graphics.sprites.MemberSprite.log;
+
+import org.opentravel.model.otmFacets.OtmCustomFacet;
+import org.opentravel.model.otmFacets.OtmQueryFacet;
+import org.opentravel.model.otmFacets.OtmUpdateFacet;
+import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-
-import java.util.List;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.Font;
@@ -41,12 +44,31 @@ public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implem
 
     @Override
     public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
+        boolean compute = gc == null;
+        // double height = 0;
+        double ox = 0;
+        if (member instanceof OtmCustomFacet)
+            ox = FacetRectangle.CUSTOM_OFFSET;
+        else if (member instanceof OtmQueryFacet)
+            ox = FacetRectangle.QUERY_OFFSET;
+        else if (member instanceof OtmChoiceObject)
+            ox = FacetRectangle.CHOICE_OFFSET;
+        else if (member instanceof OtmUpdateFacet)
+            ox = FacetRectangle.UPDATE_OFFSET;
 
-        // // super.drawMember( gc, font );
-        // double width = getBoundaries().getWidth();
-        // // double height = 0;
-        Rectangle cRect = new Rectangle( 0, 0, 0, 0 );
-        List<OtmObject> kids = getMember().getChildren();
+        double fy = y;
+        double width = getBoundaries().getWidth() - ox - FacetRectangle.FACET_MARGIN;
+        double fx = x + ox;
+
+        Rectangle rect = new Rectangle( 0, 0, 0, 0 );
+
+        if (!getMember().getChildren().isEmpty()) {
+            rect = new FacetRectangle( (OtmContextualFacet) member, this, width );
+            rect.set( fx, fy );
+            rect.draw( gc, true );
+            // fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+            width = compute && rect.getWidth() > width ? rect.getWidth() + fx : width;
+        }
 
         // cRect = drawFacet( facet, gc, font, x, y, width )
         //
@@ -58,8 +80,9 @@ public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implem
         // // height = mRect.getHeight();
         // }
         //
-        // // log.debug( "Drew contents into " + mRect );
-        return cRect;
+        Rectangle fRect = new Rectangle( rect.getX(), rect.getY(), width, rect.getHeight() );
+        log.debug( "Drew CF contents into " + fRect );
+        return fRect;
     }
 
 }

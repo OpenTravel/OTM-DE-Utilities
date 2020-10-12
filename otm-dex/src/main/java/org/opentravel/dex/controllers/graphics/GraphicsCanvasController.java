@@ -61,6 +61,10 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     private Pane spritePane;
     @FXML
     private AnchorPane graphicsPane;
+    // @FXML
+    // private ScrollPane scrollPane;
+    // @FXML
+    // private AnchorPane spritePane;
     @FXML
     private VBox graphicsVBox;
     @FXML
@@ -78,7 +82,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     private Canvas backgroundCanvas;
     private GraphicsContext backgroundGC;
     // private static final Font DEFAULT_FONT = new Font( "Arial", 14 );
-    private static final Font DEFAULT_FONT = new Font( "Monospaced", 15 );
+    public static final Font DEFAULT_FONT = new Font( "Monospaced", 15 );
     private static final Paint DEFAULT_STROKE = Color.BLACK;
     static final Paint DEFAULT_FILL = Color.gray( 0.8 );
 

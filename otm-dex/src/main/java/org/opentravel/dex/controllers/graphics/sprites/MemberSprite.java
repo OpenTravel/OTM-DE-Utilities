@@ -47,7 +47,7 @@ import javafx.scene.text.Font;
  */
 public abstract class MemberSprite<M extends OtmLibraryMember>
     implements DexSprite<OtmLibraryMember>, RectangleEventHandler {
-    private static Log log = LogFactory.getLog( MemberSprite.class );
+    protected static Log log = LogFactory.getLog( MemberSprite.class );
 
     private static final double MIN_HEIGHT = 50;
     private static final double MIN_WIDTH = 50;
@@ -332,6 +332,10 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         return boundaries;
     }
 
+    @Override
+    public Font getFont() {
+        return gc.getFont();
+    }
     // /**
     // * Draw or compute size of facet.
     // *

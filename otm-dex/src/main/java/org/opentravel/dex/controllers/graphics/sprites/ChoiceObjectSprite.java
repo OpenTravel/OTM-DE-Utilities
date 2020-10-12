@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
+import org.opentravel.model.otmFacets.OtmChoiceFacet;
+import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
@@ -39,14 +41,44 @@ public class ChoiceObjectSprite extends MemberSprite<OtmChoiceObject> implements
     @Override
     public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
         double width = getBoundaries().getWidth();
-        Rectangle mRect = new Rectangle( 0, 0, 0, 0 );
+        // Rectangle mRect = new Rectangle( 0, 0, 0, 0 );
+
+        boolean compute = gc == null;
+        FacetRectangle rect = null;
+        double dxShared = FacetRectangle.SHARED_OFFSET;
+        // double dxSummary = FacetRectangle.SUMMARY_OFFSET;
+        // double dxDetail = FacetRectangle.DETAIL_OFFSET;
+
+        double fy = y + FacetRectangle.FACET_MARGIN;
 
         // Show facets
         // if (!isCollapsed())
         // mRect = drawFacets( getMember(), gc, font, x, y, width );
+        if (!isCollapsed()) {
 
-        // log.debug( "Drew contents into " + mRect );
-        return mRect;
+            rect = new FacetRectangle( getMember().getShared(), this, width - dxShared );
+            rect.set( x + dxShared, fy );
+            rect.draw( gc, true );
+            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+            width = compute && rect.getWidth() > width ? rect.getWidth() + dxShared : width;
+
+            for (OtmContributedFacet f : member.getChildrenContributedFacets()) {
+                if (f.getContributor() instanceof OtmChoiceFacet) {
+                    rect = new FacetRectangle( f, this, width - FacetRectangle.CHOICE_OFFSET );
+                    rect.set( x + FacetRectangle.CHOICE_OFFSET, fy );
+                    rect.draw( gc, true );
+                    fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+                    width = compute && rect.getWidth() > width ? rect.getWidth() + FacetRectangle.CHOICE_OFFSET : width;
+                }
+            }
+
+
+        }
+        // Return the enclosing rectangle
+        Rectangle sRect = new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
+        log.debug( "Drew choice contents into " + sRect );
+        // fRect.draw( gc, false );
+        return sRect;
     }
 
 }

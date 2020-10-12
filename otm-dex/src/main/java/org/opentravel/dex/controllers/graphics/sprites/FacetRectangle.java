@@ -18,13 +18,18 @@ package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.controllers.graphics.GraphicsCanvasController;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmFacet;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 
+import java.util.List;
+
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -43,6 +48,19 @@ public class FacetRectangle extends Rectangle {
     protected static final double FACET_MARGIN = 5;
     protected static final double FACET_OFFSET = 8;
 
+    // Left Margin offsets per facet type
+    public static final double ID_OFFSET = FACET_OFFSET;
+    public static final double SHARED_OFFSET = ID_OFFSET;
+    public static final double QUERY_OFFSET = ID_OFFSET;
+    public static final double UPDATE_OFFSET = ID_OFFSET;
+    public static final double SUMMARY_OFFSET = ID_OFFSET + FACET_OFFSET;
+    public static final double CHOICE_OFFSET = SUMMARY_OFFSET;
+    public static final double DETAIL_OFFSET = SUMMARY_OFFSET + FACET_OFFSET;
+    public static final double CUSTOM_OFFSET = DETAIL_OFFSET;
+
+    private static final Paint FACET_COLOR = Color.ANTIQUEWHITE;
+
+
     /**
      * Render methods that create rectangles may set the event to run if the implement this interface.
      * <p>
@@ -52,22 +70,63 @@ public class FacetRectangle extends Rectangle {
         public void onRectangleClick(MouseEvent e);
     }
 
-    private static final Paint FACET_COLOR = Color.ANTIQUEWHITE;
 
-    private OtmFacet<?> facet;
+    private OtmFacet<?> facet = null;
+    private OtmContextualFacet cFacet = null;
     private DexSprite<OtmLibraryMember> parent;
     private Font font;
+    private String label;
+    private Image icon;
+    private List<OtmObject> children;
 
     @Deprecated
     public FacetRectangle(double x, double y, double width, double height) {
         super( x, y, width, height );
     }
 
+    // FIXME Remove font from signature
+    @Deprecated
     public FacetRectangle(OtmFacet<?> facet, DexSprite<OtmLibraryMember> parentSprite, Font font, double width) {
         super( 0, 0, width, 0 );
         this.facet = facet;
         this.parent = parentSprite;
+        this.icon = facet.getIcon();
+        this.label = facet.getName();
+        this.children = facet.getChildren();
         this.font = font;
+        // Compute the size
+        draw( null, font );
+    }
+
+    public FacetRectangle(OtmFacet<?> facet, DexSprite<OtmLibraryMember> parentSprite, double width) {
+        super( 0, 0, width, 0 );
+        this.facet = facet;
+        this.parent = parentSprite;
+        this.icon = facet.getIcon();
+        this.label = facet.getName();
+        this.children = facet.getChildren();
+
+        if (parentSprite != null)
+            this.font = parentSprite.getFont();
+        else
+            this.font = GraphicsCanvasController.DEFAULT_FONT;
+        // Compute the size
+        draw( null, font );
+    }
+
+    public FacetRectangle(OtmContextualFacet member, DexSprite<OtmLibraryMember> parentSprite, double width) {
+        super( 0, 0, width, 0 );
+        // this.facet = facet;
+        this.cFacet = member;
+        this.parent = parentSprite;
+        this.icon = member.getIcon();
+        this.label = member.getName();
+        this.children = member.getChildren();
+
+        if (parentSprite != null)
+            this.font = parentSprite.getFont();
+        else
+            this.font = GraphicsCanvasController.DEFAULT_FONT;
         // Compute the size
         draw( null, font );
     }
@@ -100,7 +159,7 @@ public class FacetRectangle extends Rectangle {
         boolean compute = gc == null;
 
         // Label
-        Rectangle lRect = GraphicsUtils.drawLabel( facet.getName(), facet.getIcon(), gc, font, x, y );
+        Rectangle lRect = GraphicsUtils.drawLabel( label, icon, gc, font, x, y );
         // lRect.draw( gc, false );
 
         height = lRect.getHeight();
@@ -110,8 +169,8 @@ public class FacetRectangle extends Rectangle {
         PropertyRectangle pRect = null;
         double py = y + lRect.getHeight();
         double px = x + PropertyRectangle.PROPERTY_OFFSET;
-        if (!facet.getChildren().isEmpty()) {
-            for (OtmObject c : facet.getChildren()) {
+        if (!children.isEmpty()) {
+            for (OtmObject c : children) {
                 if (c instanceof OtmProperty) {
                     pRect = new PropertyRectangle( (OtmProperty) c, parent, font, width );
                     pRect.set( px, py );

@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
-import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
@@ -81,6 +80,8 @@ public class SpriteManager {
         //
         connectionsCanvas = new Canvas( spritePane.getWidth(), spritePane.getHeight() );
         spritePane.getChildren().add( connectionsCanvas );
+        connectionsCanvas.widthProperty().bind( spritePane.widthProperty() );
+        connectionsCanvas.heightProperty().bind( spritePane.heightProperty() );
         connectionsGC = connectionsCanvas.getGraphicsContext2D();
         connectionsGC.setFill( backgroundColor );
         connectionsGC.fillRect( 0, 0, connectionsCanvas.getWidth(), connectionsCanvas.getHeight() );
@@ -150,18 +151,18 @@ public class SpriteManager {
                 add( newSprite );
             }
 
-            // Add related contextual facets if any
-            DexSprite<?> relationS = newSprite;
-            for (OtmContributedFacet cf : member.getChildrenContributedFacets()) {
-                if (cf != null && cf.getContributor() != null) {
-                    // Place new sprite in next column
-                    Point2D p = getNextInColumn( relationS );
-                    relationS = add( cf.getContributor(), p.getX(), p.getY() + FACET_OFFSET );
-                    // Do connection
-                    if (relationS != null)
-                        addAndDraw( new ContributedConnection( relationS, newSprite ) );
-                }
-            }
+            // // Add related contextual facets if any
+            // DexSprite<?> relationS = newSprite;
+            // for (OtmContributedFacet cf : member.getChildrenContributedFacets()) {
+            // if (cf != null && cf.getContributor() != null) {
+            // // Place new sprite in next column
+            // Point2D p = getNextInColumn( relationS );
+            // relationS = add( cf.getContributor(), p.getX(), p.getY() + FACET_OFFSET );
+            // // Do connection
+            // if (relationS != null)
+            // addAndDraw( new ContributedConnection( relationS, newSprite ) );
+            // }
+            // }
         }
         return newSprite;
     }

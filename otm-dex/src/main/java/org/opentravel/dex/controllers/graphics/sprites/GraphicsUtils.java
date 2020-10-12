@@ -38,8 +38,8 @@ import javafx.scene.text.Text;
  *
  */
 public class GraphicsUtils {
-    protected static final double FACET_MARGIN = 5;
-    protected static final double FACET_OFFSET = 8;
+    // protected static final double FACET_MARGIN = 5;
+    // protected static final double FACET_OFFSET = 8;
 
     protected static final double MEMBER_MARGIN = 2;
     protected static final double CANVAS_MARGIN = 10;

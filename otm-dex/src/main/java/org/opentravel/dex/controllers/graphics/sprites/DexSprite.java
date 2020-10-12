@@ -24,6 +24,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 /**
  * Interface for all Otm-DE FX graphics sprites.
@@ -36,9 +37,22 @@ import javafx.scene.paint.Color;
 public interface DexSprite<O extends OtmObject> {
 
     /**
+     * @param rectangle
+     */
+    void add(Rectangle rectangle);
+
+    /**
      * Clear the drawing canvas
      */
     public void clear();
+
+    /**
+     * @param user
+     * @param from
+     * @param x
+     * @param y
+     */
+    void connect(OtmTypeUser user, DexSprite<?> from, double x, double y);
 
     /**
      * Is this point within the bounding box for the sprite?
@@ -48,32 +62,6 @@ public interface DexSprite<O extends OtmObject> {
      */
     public boolean contains(Point2D point);
 
-    public OtmLibraryMember getMember();
-
-    /**
-     * Render the sprite.
-     */
-    public Canvas render();
-
-    public void findAndRunRectangle(MouseEvent e);
-
-    /**
-     * Clear then draw the sprite.
-     */
-    public void refresh();
-
-    public void setBackgroundColor(Color color);
-
-    /**
-     * Simply set the top, left coordinates.
-     */
-    public void set(double x, double y);
-
-    /**
-     * @return
-     */
-    public Rectangle getBoundaries();
-
     /**
      * @param x
      * @param y
@@ -81,16 +69,34 @@ public interface DexSprite<O extends OtmObject> {
      */
     public Rectangle find(double x, double y);
 
-    /**
-     * @param rectangle
-     */
-    void add(Rectangle rectangle);
+    public void findAndRunRectangle(MouseEvent e);
 
     /**
-     * @param user
-     * @param from
-     * @param x
-     * @param y
+     * @return
      */
-    void connect(OtmTypeUser user, DexSprite<?> from, double x, double y);
+    public Rectangle getBoundaries();
+
+    /**
+     * @return the font from the active graphics context
+     */
+    Font getFont();
+
+    public OtmLibraryMember getMember();
+
+    /**
+     * Clear then draw the sprite.
+     */
+    public void refresh();
+
+    /**
+     * Render the sprite.
+     */
+    public Canvas render();
+
+    /**
+     * Simply set the top, left coordinates.
+     */
+    public void set(double x, double y);
+
+    public void setBackgroundColor(Color color);
 }
