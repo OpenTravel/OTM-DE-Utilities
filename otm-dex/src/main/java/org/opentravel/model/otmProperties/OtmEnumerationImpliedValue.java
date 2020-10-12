@@ -67,6 +67,11 @@ public class OtmEnumerationImpliedValue extends OtmValueProperty {
         return false;
     }
 
+    @Override
+    public boolean isAssignedTypeInNamespace() {
+        return false;
+    }
+
     /**
      * {@inheritDoc} Literal on open enum facet is not editable
      */

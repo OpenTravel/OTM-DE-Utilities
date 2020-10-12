@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.graphics.sprites;
+package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.GraphicsCanvasController;
+import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
+import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 import java.util.List;
@@ -45,8 +47,8 @@ import javafx.scene.text.Font;
 public class FacetRectangle extends Rectangle {
     private static Log log = LogFactory.getLog( FacetRectangle.class );
 
-    protected static final double FACET_MARGIN = 5;
-    protected static final double FACET_OFFSET = 8;
+    public static final double FACET_MARGIN = 5;
+    public static final double FACET_OFFSET = 8;
 
     // Left Margin offsets per facet type
     public static final double ID_OFFSET = FACET_OFFSET;
@@ -79,25 +81,6 @@ public class FacetRectangle extends Rectangle {
     private Image icon;
     private List<OtmObject> children;
 
-    @Deprecated
-    public FacetRectangle(double x, double y, double width, double height) {
-        super( x, y, width, height );
-    }
-
-    // FIXME Remove font from signature
-    @Deprecated
-    public FacetRectangle(OtmFacet<?> facet, DexSprite<OtmLibraryMember> parentSprite, Font font, double width) {
-        super( 0, 0, width, 0 );
-        this.facet = facet;
-        this.parent = parentSprite;
-        this.icon = facet.getIcon();
-        this.label = facet.getName();
-        this.children = facet.getChildren();
-        this.font = font;
-        // Compute the size
-        draw( null, font );
-    }
-
     public FacetRectangle(OtmFacet<?> facet, DexSprite<OtmLibraryMember> parentSprite, double width) {
         super( 0, 0, width, 0 );
         this.facet = facet;
@@ -121,6 +104,25 @@ public class FacetRectangle extends Rectangle {
         this.parent = parentSprite;
         this.icon = member.getIcon();
         this.label = member.getName();
+        this.children = member.getChildren();
+
+        if (parentSprite != null)
+            this.font = parentSprite.getFont();
+        else
+            this.font = GraphicsCanvasController.DEFAULT_FONT;
+        // Compute the size
+        draw( null, font );
+    }
+
+    public FacetRectangle(OtmValueWithAttributes member, DexSprite<OtmLibraryMember> parentSprite, double width) {
+        super( 0, 0, width, 0 );
+        // this.facet = facet;
+        // this.cFacet = member;
+        this.parent = parentSprite;
+        this.icon = member.getIcon();
+        this.label = member.getName();
+        this.icon = null;
+        this.label = null;
         this.children = member.getChildren();
 
         if (parentSprite != null)
@@ -157,17 +159,18 @@ public class FacetRectangle extends Rectangle {
 
     private Rectangle draw(GraphicsContext gc, Font font) {
         boolean compute = gc == null;
+        height = 0;
 
         // Label
-        Rectangle lRect = GraphicsUtils.drawLabel( label, icon, gc, font, x, y );
-        // lRect.draw( gc, false );
-
-        height = lRect.getHeight();
-        width = compute && lRect.getWidth() > width ? lRect.getWidth() : width;
+        if (label != null) {
+            Rectangle lRect = GraphicsUtils.drawLabel( label, icon, gc, font, x, y );
+            height = lRect.getHeight();
+            width = compute && lRect.getWidth() > width ? lRect.getWidth() : width;
+        }
 
         // Properties
         PropertyRectangle pRect = null;
-        double py = y + lRect.getHeight();
+        double py = y + height;
         double px = x + PropertyRectangle.PROPERTY_OFFSET;
         if (!children.isEmpty()) {
             for (OtmObject c : children) {
@@ -178,25 +181,17 @@ public class FacetRectangle extends Rectangle {
 
                     height += pRect.getHeight();
                     width = compute && pRect.getWidth() > width ? pRect.getWidth() : width;
-
                     py += pRect.getHeight();
-
-                    if (!compute) {
-                        if (c instanceof OtmTypeUser)
-                            pRect.setOnMouseClicked(
-                                e -> parent.connect( ((OtmTypeUser) c), parent, e.getX(), e.getY() ) );
-                        parent.add( pRect );
-                    }
                 }
             }
             // Draw vertical line
             if (pRect != null && !compute) {
                 px = px + PropertyRectangle.PROPERTY_MARGIN - 1;
                 double ly = y + height - 2 * PropertyRectangle.PROPERTY_MARGIN - 1;
-                gc.strokeLine( px, y + lRect.getHeight(), px, ly );
+                gc.strokeLine( px, y + pRect.getHeight(), px, ly );
             }
         }
-        log.debug( "Drew/sized " + this );
+        // log.debug( "Drew/sized " + this );
         // super.draw( gc, false ); // debug
         return this;
     }

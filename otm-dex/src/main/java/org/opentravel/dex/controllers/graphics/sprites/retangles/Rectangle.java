@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.graphics.sprites;
+package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,7 +24,11 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 
 /**
- * Graphics utility for containing regions.
+ * Graphics utility for containing regions (x, y, width, height). A rectangle does <b>not</b> have a canvas.
+ * <p>
+ * Sub-types have contents that can be drawn into the rectangle. These rectangles will compute their size when
+ * constructed and when drawn with a null GraphicsContext (GC). A rectangle may be mouse click-able if the parent sprite
+ * is passed when constructing the rectangle.
  * 
  * @author dmh
  * @param <O>

@@ -19,12 +19,15 @@ package org.opentravel.dex.controllers.graphics.sprites;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.dex.controllers.graphics.sprites.connections.Connection;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
+import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,6 +146,10 @@ public class SpriteManager {
                 newSprite = new BusinessObjectSprite( (OtmBusinessObject) member, this, defaultGC );
             else if (member instanceof OtmChoiceObject)
                 newSprite = new ChoiceObjectSprite( (OtmChoiceObject) member, this, defaultGC );
+            else if (member instanceof OtmCore)
+                newSprite = new CoreObjectSprite( (OtmCore) member, this, defaultGC );
+            else if (member instanceof OtmValueWithAttributes)
+                newSprite = new VWASprite( (OtmValueWithAttributes) member, this, defaultGC );
             else if (member instanceof OtmContextualFacet)
                 newSprite = new ContextualFacetSprite( (OtmContextualFacet) member, this, defaultGC );
 
@@ -150,19 +157,6 @@ public class SpriteManager {
                 newSprite.set( x, y );
                 add( newSprite );
             }
-
-            // // Add related contextual facets if any
-            // DexSprite<?> relationS = newSprite;
-            // for (OtmContributedFacet cf : member.getChildrenContributedFacets()) {
-            // if (cf != null && cf.getContributor() != null) {
-            // // Place new sprite in next column
-            // Point2D p = getNextInColumn( relationS );
-            // relationS = add( cf.getContributor(), p.getX(), p.getY() + FACET_OFFSET );
-            // // Do connection
-            // if (relationS != null)
-            // addAndDraw( new ContributedConnection( relationS, newSprite ) );
-            // }
-            // }
         }
         return newSprite;
     }
@@ -245,18 +239,6 @@ public class SpriteManager {
     public GraphicsContext getConnectionsGC() {
         return connectionsGC;
     }
-
-    // public Point2D getPrevInColumn(DexSprite<?> sprite) {
-    // Point2D top = new Point2D( 0, 0 );
-    // if (sprite != null) {
-    // DexSprite<?> next = sprite;
-    // do {
-    // top = new Point2D( next.getBoundaries().getX(), next.getBoundaries().getY() - 5 );
-    // next = findSprite( top );
-    // } while (next != null && top.getY() > 0);
-    // }
-    // return new Point2D( top.getX(), top.getY() < 0 ? 0 : top.getY() );
-    // }
 
     public Point2D getNextInColumn(DexSprite<?> sprite) {
         Point2D bottom = new Point2D( 0, 0 );

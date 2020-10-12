@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.graphics.sprites;
+package org.opentravel.dex.controllers.graphics.sprites.connections;
+
+import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
@@ -53,7 +55,7 @@ public abstract class Connection {
      */
     public abstract boolean update(DexSprite<?> sprite, GraphicsContext gc, Paint backgroundColor);
 
-    protected void draw(GraphicsContext gc) {
+    public void draw(GraphicsContext gc) {
         gc.strokeLine( fx, fy, tx, ty );
     }
 

@@ -83,6 +83,17 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
     }
 
     @Override
+    public boolean isAssignedTypeInNamespace() {
+        if (this instanceof OtmTypeUser) {
+            if (((OtmTypeUser) this).getAssignedType() != null
+                && ((OtmTypeUser) this).getAssignedType().getLibrary() != null)
+                return getLibrary().getBaseNamespace()
+                    .equals( ((OtmTypeUser) this).getAssignedType().getLibrary().getBaseNamespace() );
+        }
+        return false;
+    }
+
+    @Override
     public OtmPropertyOwner setParent(OtmPropertyOwner parent) {
         this.parent = parent;
         return parent;

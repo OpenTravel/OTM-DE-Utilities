@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
+import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmFacets.OtmQueryFacet;
@@ -81,14 +83,14 @@ public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> impleme
             fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
             width = compute && rect.getWidth() > width ? rect.getWidth() + dxID : width;
 
-            rect = new FacetRectangle( getMember().getSummary(), this, font, width - dxSummary );
+            rect = new FacetRectangle( getMember().getSummary(), this, width - dxSummary );
             rect.set( x + dxSummary, fy );
             rect.draw( gc, true );
             fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
             width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
 
             if (!getMember().getDetail().getChildren().isEmpty()) {
-                rect = new FacetRectangle( getMember().getDetail(), this, font, width - dxDetail );
+                rect = new FacetRectangle( getMember().getDetail(), this, width - dxDetail );
                 rect.set( x + dxDetail, fy );
                 rect.draw( gc, true );
                 fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
@@ -120,9 +122,10 @@ public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> impleme
         }
 
         // Return the enclosing rectangle
-        Rectangle fRect = new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
+        // Rectangle fRect = new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
         // fRect.draw( gc, false );
-        return fRect;
+        // return fRect;
+        return new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
     }
 
 }

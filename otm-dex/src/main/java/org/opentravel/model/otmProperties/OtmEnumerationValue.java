@@ -72,6 +72,11 @@ public class OtmEnumerationValue extends OtmValueProperty {
     }
 
     @Override
+    public boolean isAssignedTypeInNamespace() {
+        return false;
+    }
+
+    @Override
     public boolean isInherited() {
         if (getTL() == null || getParent() == null)
             return false;

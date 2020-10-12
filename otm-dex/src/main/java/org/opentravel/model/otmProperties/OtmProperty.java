@@ -81,4 +81,9 @@ public interface OtmProperty extends OtmObject {
     public OtmPropertyOwner setParent(OtmPropertyOwner parent);
 
     public String toString();
+
+    /**
+     * @return
+     */
+    public boolean isAssignedTypeInNamespace();
 }

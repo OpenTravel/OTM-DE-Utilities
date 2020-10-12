@@ -56,6 +56,11 @@ public class OtmRoleValue extends OtmValueProperty implements OtmProperty {
     }
 
     @Override
+    public boolean isAssignedTypeInNamespace() {
+        return false;
+    }
+
+    @Override
     public OtmRoleEnumeration getParent() {
         return parent;
     }

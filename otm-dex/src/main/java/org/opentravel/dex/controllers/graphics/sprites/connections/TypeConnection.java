@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.graphics.sprites;
+package org.opentravel.dex.controllers.graphics.sprites.connections;
+
+import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
+import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
@@ -30,7 +35,7 @@ public class TypeConnection extends Connection {
             throw new IllegalArgumentException( "Missing rectangle on connection constructor." );
 
         // Connect to the rectangle's right side
-        fx = propertyRect.getMaxX() - GraphicsUtils.PROPERTY_MARGIN;
+        fx = propertyRect.getMaxX() - PropertyRectangle.PROPERTY_MARGIN;
         offsetX = fx - userSprite.getBoundaries().getX();
         // Connect to connector arrow point
         fy = propertyRect.getMaxY() - GraphicsUtils.CONNECTOR_SIZE / 2;

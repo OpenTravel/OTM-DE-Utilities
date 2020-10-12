@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
-import static org.opentravel.dex.controllers.graphics.sprites.MemberSprite.log;
-
+import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmFacets.OtmQueryFacet;
 import org.opentravel.model.otmFacets.OtmUpdateFacet;
@@ -45,7 +45,7 @@ public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implem
     @Override
     public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
         boolean compute = gc == null;
-        // double height = 0;
+
         double ox = 0;
         if (member instanceof OtmCustomFacet)
             ox = FacetRectangle.CUSTOM_OFFSET;
@@ -66,23 +66,13 @@ public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implem
             rect = new FacetRectangle( (OtmContextualFacet) member, this, width );
             rect.set( fx, fy );
             rect.draw( gc, true );
-            // fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
             width = compute && rect.getWidth() > width ? rect.getWidth() + fx : width;
         }
 
-        // cRect = drawFacet( facet, gc, font, x, y, width )
-        //
-        // // Show facets
-        // if (!isCollapsed()) {
-        // mRect = drawFacets( getMember(), gc, font, x, y, width );
-        // // if (mRect.getWidth() > width)
-        // // width = mRect.getWidth();
-        // // height = mRect.getHeight();
-        // }
-        //
-        Rectangle fRect = new Rectangle( rect.getX(), rect.getY(), width, rect.getHeight() );
-        log.debug( "Drew CF contents into " + fRect );
-        return fRect;
+        // Rectangle fRect = new Rectangle( rect.getX(), rect.getY(), width, rect.getHeight() );
+        // log.debug( "Drew CF contents into " + fRect );
+        // return fRect;
+        return new Rectangle( rect.getX(), rect.getY(), width, rect.getHeight() );
     }
 
 }

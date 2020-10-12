@@ -17,10 +17,9 @@
 package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
-import org.opentravel.model.otmFacets.OtmChoiceFacet;
-import org.opentravel.model.otmFacets.OtmContributedFacet;
-import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
+import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.scene.canvas.GraphicsContext;
@@ -33,39 +32,45 @@ import javafx.scene.text.Font;
  * @param <O>
  *
  */
-public class ChoiceObjectSprite extends MemberSprite<OtmChoiceObject> implements DexSprite<OtmLibraryMember> {
+public class CoreObjectSprite extends MemberSprite<OtmCore> implements DexSprite<OtmLibraryMember> {
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
-    public ChoiceObjectSprite(OtmChoiceObject member, SpriteManager manager, GraphicsContext paramsGC) {
+    public CoreObjectSprite(OtmCore member, SpriteManager manager, GraphicsContext paramsGC) {
         super( member, manager, paramsGC );
     }
 
     @Override
     public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
         boolean compute = gc == null;
-        FacetRectangle rect = null;
+        Rectangle rect = null;
 
-        double dxShared = FacetRectangle.SHARED_OFFSET;
+        double dxSummary = FacetRectangle.SUMMARY_OFFSET;
+        double dxDetail = FacetRectangle.DETAIL_OFFSET;
         double width = getBoundaries().getWidth();
         double fy = y + FacetRectangle.FACET_MARGIN;
+
+        // Show simple type
+        rect = new PropertyRectangle( getMember(), this, width );
+        rect.set( x + dxSummary, fy );
+        rect.draw( gc, true );
+        fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+        width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
 
         // Show facets
         if (!isCollapsed()) {
 
-            rect = new FacetRectangle( getMember().getShared(), this, width - dxShared );
-            rect.set( x + dxShared, fy );
+            rect = new FacetRectangle( getMember().getSummary(), this, width - dxSummary );
+            rect.set( x + dxSummary, fy );
             rect.draw( gc, true );
             fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
-            width = compute && rect.getWidth() > width ? rect.getWidth() + dxShared : width;
+            width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
 
-            for (OtmContributedFacet f : member.getChildrenContributedFacets()) {
-                if (f.getContributor() instanceof OtmChoiceFacet) {
-                    rect = new FacetRectangle( f, this, width - FacetRectangle.CHOICE_OFFSET );
-                    rect.set( x + FacetRectangle.CHOICE_OFFSET, fy );
-                    rect.draw( gc, true );
-                    fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
-                    width = compute && rect.getWidth() > width ? rect.getWidth() + FacetRectangle.CHOICE_OFFSET : width;
-                }
+            if (!getMember().getDetail().getChildren().isEmpty()) {
+                rect = new FacetRectangle( getMember().getDetail(), this, width - dxDetail );
+                rect.set( x + dxDetail, fy );
+                rect.draw( gc, true );
+                fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+                width = compute && rect.getWidth() > width ? rect.getWidth() + dxDetail : width;
             }
         }
         // Return the enclosing rectangle
