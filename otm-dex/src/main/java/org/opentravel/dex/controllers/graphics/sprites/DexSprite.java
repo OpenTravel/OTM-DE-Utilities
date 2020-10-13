@@ -99,5 +99,7 @@ public interface DexSprite<O extends OtmObject> {
      */
     public void set(double x, double y);
 
+    public void set(Font font);
+
     public void setBackgroundColor(Color color);
 }

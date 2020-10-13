@@ -40,6 +40,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
 
 /**
  * Manage a collection of Dex Sprites
@@ -47,19 +48,19 @@ import javafx.scene.paint.Paint;
  * @author dmh
  */
 public class SpriteManager {
-    private static final double COLUMN_START = 10;
-    private static final double COLUMN_WIDTH = 150;
-
-    private static final int FACET_OFFSET = 5;
-    private static final double MINIMUM_SLOT_HEIGHT = 20;
-
     private static Log log = LogFactory.getLog( SpriteManager.class );
 
-    private Pane spritePane;
-    List<DexSprite<?>> activeSprites = new ArrayList<>();
-    DexIncludedController<?> parentController = null;
+    private static final double COLUMN_START = 10;
+    private static final double COLUMN_WIDTH = 150;
+    private static final int FACET_OFFSET = 5;
+    private static final double MINIMUM_SLOT_HEIGHT = 20;
+    private static final String DEFAULT_FONT_NAME = "Monospaced";
 
+    private Pane spritePane;
+    private List<DexSprite<?>> activeSprites = new ArrayList<>();
+    private DexIncludedController<?> parentController = null;
     private DexSprite<?> draggedSprite = null;
+    private int fontSize = 14;
 
     // private Canvas backgroundCanvas;
     private GraphicsContext defaultGC;
@@ -93,6 +94,7 @@ public class SpriteManager {
         //
         spritePane.setOnMouseClicked( this::mouseClick );
     }
+
 
     /**
      * Add the sprite to the list and render into pane
@@ -322,6 +324,7 @@ public class SpriteManager {
             sprite.clear();
             sprite.render();
         }
+        updateConnections();
     }
 
     public void remove(DexSprite<?> sprite) {
@@ -352,11 +355,26 @@ public class SpriteManager {
         refresh();
     }
 
+    /**
+     * Update the font size then redraw the sprites and connections.
+     * 
+     * @param fontSize
+     */
+    public void update(int fontSize) {
+        if (fontSize != this.fontSize) {
+            Font font = new Font( DEFAULT_FONT_NAME, fontSize );
+            for (DexSprite<?> sprite : activeSprites)
+                sprite.set( font );
+            refresh();
+        }
+    }
+
     public void updateConnections() {
         eraseConnections();
         for (Connection c : connections) {
             c.draw( connectionsGC );
         }
+        // FIXME - rectangles may have changed if font changed.
     }
 
     public void updateConnections(DexSprite<?> sprite) {

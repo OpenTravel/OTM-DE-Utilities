@@ -291,6 +291,11 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         gc.setFill( color );
     }
 
+    @Override
+    public void set(Font font) {
+        gc.setFont( font );
+    }
+
     /**
      * Use defaults
      */
