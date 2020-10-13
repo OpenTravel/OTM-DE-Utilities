@@ -62,7 +62,6 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     private GraphicsContext gc = null;
 
     private Rectangle boundaries = null;
-    // private Font propertyFont = new Font( "Arial", 12 );
     private boolean collapsed = false;
 
     private List<Rectangle> rectangles = new ArrayList<>();
@@ -294,6 +293,11 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     @Override
     public void set(Font font) {
         gc.setFont( font );
+    }
+
+    @Override
+    public void setCollapsed(boolean collapsed) {
+        this.collapsed = collapsed;
     }
 
     /**

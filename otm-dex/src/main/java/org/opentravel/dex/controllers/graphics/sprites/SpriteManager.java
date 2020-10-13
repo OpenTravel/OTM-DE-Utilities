@@ -106,6 +106,11 @@ public class SpriteManager {
         spritePane.getChildren().add( sprite.render() );
     }
 
+    public void setCollapsed(boolean collapsed) {
+        activeSprites.forEach( s -> s.setCollapsed( collapsed ) );
+        refresh();
+    }
+
     /**
      * Uses Sprite factory to adds sprite and related sprites to list and FX pane's children. Manager determines the
      * location for the sprite.

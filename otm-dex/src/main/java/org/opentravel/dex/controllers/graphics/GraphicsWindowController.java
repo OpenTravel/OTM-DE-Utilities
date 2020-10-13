@@ -31,14 +31,10 @@ import javafx.scene.control.MenuItem;
  */
 public class GraphicsWindowController extends StandaloneWindowControllerBase {
 
-    public static final String LAYOUT_FILE = "/SearchViews/SearchWindow.fxml";
-    public static final String DIALOG_TITLE = "Search";
+    public static final String LAYOUT_FILE = "/GraphicViews/GraphicsWindow.fxml";
+    public static final String DIALOG_TITLE = "Graphics";
 
     /** ********* FXML Java FX Nodes this controller is dependent upon */
-    // @FXML
-    // private RepositorySelectionController repositorySelectionController;
-    // @FXML
-    // private SearchQueryController searchQueryController;
     @FXML
     private GraphicsCanvasController graphicsCanvasController;
 
@@ -56,8 +52,6 @@ public class GraphicsWindowController extends StandaloneWindowControllerBase {
 
     @Override
     public void configure(DexMainController mc, MenuItem menuItem, int viewGroupId) {
-        // includedControllers.add( repositorySelectionController );
-        // includedControllers.add( searchQueryController );
         includedControllers.add( graphicsCanvasController );
         super.configure( mc, menuItem, viewGroupId );
     }

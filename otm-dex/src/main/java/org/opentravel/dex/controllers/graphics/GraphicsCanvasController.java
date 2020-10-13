@@ -18,26 +18,33 @@ package org.opentravel.dex.controllers.graphics;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.controlsfx.control.ToggleSwitch;
 import org.opentravel.application.common.events.AbstractOtmEvent;
+import org.opentravel.common.ImageManager;
+import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.graphics.sprites.Demos;
+import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SpriteManager;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.geometry.Orientation;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
+import javafx.scene.control.ToolBar;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -60,6 +67,8 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     // private AnchorPane spritePane;
 
     @FXML
+    private ToolBar graphicsToolbar;
+    @FXML
     private AnchorPane graphicsPane;
     // @FXML
     // private ScrollPane scrollPane;
@@ -68,25 +77,25 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     @FXML
     private ColorPicker colorPicker;
     @FXML
-    private Slider slider;
+    private Slider fontSlider;
 
 
-    OtmBusinessObject bo;
-    Pane graphicsRoot;
-    // List<DexSprite> activeSprites = new ArrayList<>();
+    // Pane graphicsRoot;
     DexMainController parentController = null;
 
-    // private GraphicsContext gc;
-    private Canvas backgroundCanvas;
-    private GraphicsContext backgroundGC;
     // private static final Font DEFAULT_FONT = new Font( "Arial", 14 );
     public static final Font DEFAULT_FONT = new Font( "Monospaced", 15 );
     private static final Paint DEFAULT_STROKE = Color.BLACK;
     static final Paint DEFAULT_FILL = Color.gray( 0.8 );
+    boolean isLocked;
 
     // private Color backgroundStrokeColor;
 
     private SpriteManager spriteManager;
+    private ScrollPane scrollPane = null;
+    private Canvas backgroundCanvas;
+    private GraphicsContext backgroundGC;
+    private Canvas doodleCanvas = null;
 
     private boolean ignoreEvents = false;
 
@@ -121,10 +130,18 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
     @Override
     public void post(OtmObject o) {
-        if (!ignoreEvents) {
+        if (!ignoreEvents && !isLocked) {
             log.debug( "Graphics canvas controller posting object: " + o );
-            if (o instanceof OtmLibraryMember)
-                spriteManager.add( ((OtmLibraryMember) o) );
+            if (o instanceof OtmLibraryMember) {
+                DexSprite<?> s = spriteManager.add( ((OtmLibraryMember) o) );
+                if (s != null) {
+                    // Scroll to the new sprite's location
+                    double dx = s.getBoundaries().getX() / backgroundCanvas.getWidth();
+                    double dy = s.getBoundaries().getMaxY() / backgroundCanvas.getHeight();
+                    scrollPane.setVvalue( dy );
+                    scrollPane.setHvalue( dx );
+                }
+            }
         }
     }
 
@@ -141,151 +158,128 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         eventPublisherNode = graphicsPane;
         parentController = parent;
 
-        // Create a new AnchorPane
-        Pane spritePane = new Pane();
-        // Pane spritePane = spriteArea;
-        ScrollPane scrollPane = new ScrollPane( spritePane );
+        createToolBar( graphicsVBox );
 
-        // fxml only has VBox with toolbar
-        graphicsVBox.getChildren().add( scrollPane );
+        Pane spritePane = createSpritePane( graphicsVBox );
+        backgroundCanvas = createCanvas( spritePane );
+        backgroundGC = backgroundCanvas.getGraphicsContext2D();
+        // doodleCanvas = createCanvas( spritePane );
+
+        backgroundGC.setFont( DEFAULT_FONT );
+        backgroundGC.setFill( DEFAULT_FILL );
+        backgroundGC.setStroke( DEFAULT_STROKE );
+        backgroundGC.setLineWidth( 1 );
+
+        spriteManager = new SpriteManager( spritePane, this, backgroundGC );
+
+        log.debug( "Configured graphics canvas." );
+    }
+
+    /**
+     * Create the background canvas and GC.
+     * 
+     * @param spritePane to be parent of canvas
+     */
+    private Canvas createCanvas(Pane spritePane) {
+        Canvas canvas = new Canvas();
+        // bind the dimensions when the user resizes the window.
+        canvas.widthProperty().bind( spritePane.widthProperty() );
+        canvas.heightProperty().bind( spritePane.heightProperty() );
+        spritePane.getChildren().add( canvas );
+        return canvas;
+    }
+
+    private ToolBar createToolBar(VBox parent) {
+        Button clearB = new Button( "Clear" );
+        clearB.setOnAction( this::doClear );
+
+        Button refreshB = new Button( "Refresh" );
+        refreshB.setOnAction( this::doRefresh );
+
+        Separator cSep = new Separator( Orientation.VERTICAL );
+        ToggleSwitch collapseS = new ToggleSwitch( "Collapse" );
+        collapseS.selectedProperty().addListener( (v, o, n) -> doCollapse( n ) );
+
+        Separator lockSep = new Separator( Orientation.VERTICAL );
+        ToggleSwitch lockS = new ToggleSwitch( "Lock" );
+        ImageView lockI = ImageManager.get( Icons.LOCK );
+        lockS.selectedProperty().addListener( (v, o, n) -> doLock( n, lockI ) );
+
+        Separator fontSep = new Separator( Orientation.VERTICAL );
+        Label fontL = new Label( "Font" );
+        Slider fontS = new Slider( 8, 24, 14 ); // Min, max, current
+        fontS.valueProperty().addListener( (v, o, n) -> doFont( n ) );
+
+        // Separator dSep = new Separator( Orientation.VERTICAL );
+        // ToggleSwitch doodleS = new ToggleSwitch( "Draw" );
+        // doodleS.selectedProperty().addListener( (v, o, n) -> doDoodle( n ) );
+
+        ColorPicker colorP = new ColorPicker();
+        colorP.setOnAction( this::doColor );
+
+        ToolBar tb =
+            new ToolBar( clearB, refreshB, cSep, collapseS, lockSep, lockS, lockI, fontSep, fontL, fontS, colorP );
+        parent.getChildren().add( tb );
+        tb.setStyle( "-fx-background-color: #7cafc2" );
+        return tb;
+    }
+
+    /**
+     * Create sprite pane controlled by scroll pane.
+     * <p>
+     * fxml only has VBox with toolbar
+     * 
+     * @param parent
+     * @return
+     */
+    private Pane createSpritePane(VBox parent) {
+        // Create panes and add to parent
+        Pane spritePane = new Pane();
+        scrollPane = new ScrollPane( spritePane );
+        parent.getChildren().add( scrollPane );
+        // Configure sizes
         VBox.setVgrow( scrollPane, Priority.ALWAYS );
         scrollPane.setMaxWidth( Double.MAX_VALUE );
-        scrollPane.setContent( spritePane );
+        return spritePane;
 
-        // spriteArea.getChildren().add( scrollPane );
-
-        // vPane.getChildren().add( scrollPane ); // Scroll has to be child for bars to appear
-
-        // // Pane drawingPane = new Pane();
+        // Other stuff that could be done
         // // drawingPane.setPrefSize( 800, 800 );
+        // scrollPane.setHbarPolicy( ScrollBarPolicy.AS_NEEDED );
+        // scrollPane.setVbarPolicy( ScrollBarPolicy.AS_NEEDED );
         // // drawingPane.setMaxSize( Double.MAX_VALUE, Double.MAX_VALUE );
-        // // ScrollPane scrollPane = new ScrollPane(drawingPane);
         // scrollPane.setPrefSize( vPane.getWidth(), vPane.getHeight() );
         // scrollPane.setMaxSize( Double.MAX_VALUE, Double.MAX_VALUE );
-
         // scrollPane.setViewportBounds( value ); // ???
+        // scrollPane.setPrefViewportWidth(1000);
+        // scrollPane.setPrefViewportHeight(1000);
         // scrollPane.setFitToWidth( true ); // Sizes contents to the scroll bar area
         // scrollPane.setFitToHeight( true );
-
         // scrollPane.setHmax( 3 ); // Sizes the slider control
         // scrollPane.setHvalue( 2 ); // Moves to the right
         // scrollPane.setStyle( "-fx-focus-color: transparent;" );
-
+        // VBox.setVgrow( scrollPane, Priority.ALWAYS );
+        // scrollPane.setMaxWidth( Double.MAX_VALUE );
         // scrollPane.maxWidthProperty().bind( vPane.widthProperty() );
         // scrollPane.maxHeightProperty().bind( vPane.heightProperty() );
         // scrollPane.setPrefSize( vPane.getPrefWidth(), vPane.getPrefHeight() );
         // spritePane.setPrefSize( vPane.getPrefWidth(), vPane.getPrefHeight() );
-
         //
-        // anchorPane.setPrefSize(1920, 1080);
-        // scrollPane.setPrefViewportWidth(1000);
-        // scrollPane.setPrefViewportHeight(1000);
-
         // Fill the AnchorPane with the ScrollPane and set the Anchors to 0.0
-        // That way the ScrollPane will take the full size of the Parent of
-        // the AnchorPane
-        // spritePane.getChildren().add( scrollPane );
-        // spritePane.maxWidthProperty().bind( graphicsVBox.widthProperty() );
-        // spritePane.maxHeightProperty().bind( graphicsVBox.heightProperty() );
         // AnchorPane.setTopAnchor( scrollPane, 0.0 );
         // AnchorPane.setBottomAnchor( scrollPane, 0.0 );
         // AnchorPane.setLeftAnchor( scrollPane, 0.0 );
         // AnchorPane.setRightAnchor( scrollPane, 0.0 );
         // scrollPane.setHbarPolicy( ScrollBarPolicy.ALWAYS );
         // scrollPane.setVbarPolicy( ScrollBarPolicy.ALWAYS );
+    }
 
-        // //Add content ScrollPane
-        // scrollPane.getChildren().add(vb2);
-        // // Create and use the scroll pane
-        // ScrollPane scrollPane = new ScrollPane();
-        // scrollPane.setContent( spritePane );
-        // scrollPane.setPrefSize( 300, 200 );
-        // // scrollPane.setPrefSize( spritePane.getPrefWidth(), spritePane.getPrefHeight() );
-        // scrollPane.setHbarPolicy( ScrollBarPolicy.AS_NEEDED );
-        // scrollPane.setVbarPolicy( ScrollBarPolicy.AS_NEEDED );
-        // graphicsVBox.getChildren().add( scrollPane );
-        // VBox.setVgrow( scrollPane, Priority.ALWAYS );
-        // scrollPane.setMaxWidth( Double.MAX_VALUE );
+    public boolean isLocked() {
+        return isLocked;
+    }
 
-        // If i need to just use scroll bars not panes
-        // GridPane scrollPane = new GridPane();
-        // scrollPane.addColumn(0, canvas, hScroll);
-        // scrollPane.add(vScroll, 1, 0);
-        // ScrollBar vScroll = createScrollBar(Orientation.VERTICAL, 10000, 300);
-        // ScrollBar hScroll = createScrollBar(Orientation.HORIZONTAL, 10000, 300);
-        // public static ScrollBar createScrollBar(Orientation orientation, double fullSize, double canvasSize) {
-        // ScrollBar sb = new ScrollBar();
-        // sb.setOrientation(orientation);
-        // sb.setMax(fullSize - canvasSize);
-        // sb.setVisibleAmount(canvasSize);
-        // return sb;
-        // }
-
-
-        backgroundCanvas = new Canvas();
-        // bind the dimensions when the user resizes the window.
-        backgroundCanvas.widthProperty().bind( spritePane.widthProperty() );
-        backgroundCanvas.heightProperty().bind( spritePane.heightProperty() );
-        backgroundGC = backgroundCanvas.getGraphicsContext2D();
-        // spriteGrid.setRowIndex( backgroundCanvas, 1 );
-        // GridPane.setColumnIndex( backgroundCanvas, 1 );
-        // GridPane.setConstraints( backgroundCanvas, 1, 1 );
-        spritePane.getChildren().add( backgroundCanvas );
-
-        // // For Fun :)
-        // backgroundGC.setFill( Color.GREEN );
-        // backgroundGC.setStroke( Color.BLUE );
-        // backgroundGC.setLineWidth( 5 );
-        // Demos.postSmileyFace( backgroundGC, 20, 20 );
-        //
-        backgroundGC.setFont( DEFAULT_FONT );
-        backgroundGC.setFill( DEFAULT_FILL );
-        backgroundGC.setStroke( DEFAULT_STROKE );
-        backgroundGC.setLineWidth( 1 );
-        spriteManager = new SpriteManager( spritePane, this, backgroundGC );
-
-        //
-
-        // FIXME - Use this to give users a marker for presentations
-        // TODO - put in a layer
-        // Layers are just canvases added to the pane
-        // canvas.setOnMousePressed( e -> {
-        // // gc.beginPath();
-        // // gc.lineTo( e.getX(), e.getY() );
-        // boSprite.set( e.getX(), e.getY() );
-        // Canvas spriteCanvas = boSprite.post( gc, this );
-        // // spriteCanvas.setLayoutX( e.getX() );
-        // // spriteCanvas.setLayoutY( e.getY() );
-        // // gc.drawImage( spriteCanvas, e.getX(), e.getY() );
-        // // graphicsVBox.getChildren().add( spriteCanvas );
-        // graphicsRoot.getChildren().add( spriteCanvas );
-        // log.debug( "Posted sprite." );
-        // // gc.stroke();
-        // // boSprite.set( e.getX(), e.getY() );
-        // // ((MemberSprite) boSprite).drawLines( gc );
-        // // timer.stop();
-        // } );
-
-        slider.valueProperty().addListener( new ChangeListener<Number>() {
-            public void changed(ObservableValue<? extends Number> ov, Number old_val, Number new_val) {
-                doFont( new_val );
-            }
-        } );
-
-        // fontSlider.valueProperty().addListener( v -> doFont( v ) );
-        // TODO - turn this on with a button
-        //
-        // canvas.setOnMouseDragged( e -> {
-        // log.debug( "Do mouse drag " + e.getX() + " " + e.getY() );
-        // log.debug( "Do mouse drag scene " + e.getSceneX() + " " + e.getSceneY() );
-        // // double offsetX = canvas.getParent().getLayoutX();
-        // // log.debug( "offset = " + offsetX );
-        // // log.debug( "Do mouse drag screen" + e.getScreenX() + " " + e.getScreenY() );
-        // // gc.lineTo( e.getX(), e.getY() );
-        // // gc.stroke();
-        // } );
-
-        log.debug( "Configured graphics canvas." );
+    public void doLock(boolean lock, ImageView icon) {
+        // log.debug( "do lock boolean." );
+        isLocked = lock;
     }
 
     public void doFont(Number v) {
@@ -305,36 +299,76 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         }
     }
 
-    @FXML
-    public void doClear() {
+    public void doColor(ActionEvent e) {
+        if (e.getTarget() instanceof ColorPicker && spriteManager != null) {
+            spriteManager.update( ((ColorPicker) e.getTarget()).getValue() );
+        }
+    }
+
+    public void doCollapse(boolean collapse) {
+        // log.debug( "TODO - colapse all." );
+        spriteManager.setCollapsed( collapse );
+    }
+
+
+    // @FXML
+    public void doClear(ActionEvent e) {
         clear();
     }
+    //
+    // @Deprecated
+    // @FXML
+    // public void doLock(ActionEvent e) {
+    // log.debug( "do lock - DEPRECATED." );
+    // Demos.postAnimation( backgroundGC );
+    // }
+    //
+    // @FXML
+    // public void doRefresh() {
+    // log.debug( "do refresh." );
+    // spriteManager.update( Color.gray( 0.9 ) );
+    // }
 
-    @FXML
-    public void doLock() {
-        log.debug( "do lock." );
-        Demos.postAnimation( backgroundGC );
-    }
-
-    @FXML
-    public void doRefresh() {
+    public void doRefresh(ActionEvent e) {
         log.debug( "do refresh." );
         spriteManager.update( Color.gray( 0.9 ) );
-        // spriteManager.refresh();
-
-        // Demos.postDemo( backgroundGC );
-        // Demos.drawLines( backgroundGC, 0, 0 );
-        // Demos.postSmileyFace( backgroundGC, 0, 0 );
     }
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        // log.debug( event.getEventType() + " event received. " );
-        if (event instanceof DexMemberSelectionEvent)
-            post( ((DexMemberSelectionEvent) event).getMember() );
-        else
-            refresh();
+        if (!isLocked) {
+            // log.debug( event.getEventType() + " event received. " );
+            if (event instanceof DexMemberSelectionEvent)
+                post( ((DexMemberSelectionEvent) event).getMember() );
+            else
+                refresh();
+        }
     }
 
-
+    // FUTURE - Mouse pressed is not dispatched to this handler
+    // private void doDoodle(boolean run) {
+    // GraphicsContext dgc = doodleCanvas.getGraphicsContext2D();
+    // if (run) {
+    // log.debug( "Starting doodle." );
+    // dgc.setStroke( Color.GREENYELLOW );
+    // dgc.setStroke( Color.ORANGERED );
+    // dgc.setLineWidth( 4 );
+    // dgc.strokeOval( 100, 100, 60, 60 );
+    // dgc.fillOval( 100, 100, 40, 40 );
+    //
+    // doodleCanvas.setOnMouseClicked( e -> {
+    // log.debug( " doodle click" );
+    // } );
+    // doodleCanvas.setOnMousePressed( e -> {
+    // log.debug( " doodle point" );
+    // dgc.beginPath();
+    // dgc.lineTo( e.getX(), e.getY() );
+    // // graphicsContext.moveTo(event.getX(), event.getY());
+    // dgc.stroke();
+    // } );
+    // } else {
+    // dgc.setStroke( DEFAULT_STROKE );
+    // dgc.setLineWidth( 1 );
+    // }
+    // }
 }

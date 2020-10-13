@@ -160,6 +160,7 @@ public class ObjectEditorController extends DexMainControllerBase {
         menuBarWithProjectController.addViewItem( repositoryTabController );
         menuBarWithProjectController.addViewItem( resourcesTabController );
         menuBarWithProjectController.addViewItem( searchTabController );
+        menuBarWithProjectController.addViewItem( graphicsTabController );
 
         // Include controllers that are not in tabs
         addIncludedController( memberFilterController, eventManager, viewGroupId++ );

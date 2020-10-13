@@ -9,21 +9,23 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="graphicsPane" minWidth="150.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.graphics.GraphicsCanvasController">
+<AnchorPane fx:id="graphicsPane" minWidth="150.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" 
+	xmlns:fx="http://javafx.com/fxml/1" stylesheets="@DavesViper.css" 
+	fx:controller="org.opentravel.dex.controllers.graphics.GraphicsCanvasController">
    <children>
       <VBox fx:id="graphicsVBox" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <ToolBar prefHeight="40.0">
+            <!--   ToolBar fx:id="graphicsToolbar" prefHeight="40.0">
               <items>
-                <Button mnemonicParsing="false" onAction="#doClear" text="Clear" />
+                < Button mnemonicParsing="false" onAction="#doClear" text="Clear" />
                   <Button layoutX="10.0" layoutY="12.0" mnemonicParsing="false" onAction="#doLock" text="Lock" />
                   <Button layoutX="10.0" layoutY="12.0" mnemonicParsing="false" onAction="#doRefresh" text="Refresh" />
                   <ToggleButton fx:id="collapseButton" mnemonicParsing="false" text="Collapse" />
                   <ColorPicker fx:id="colorPicker" onAction="#doColor" />
-                  <Label fx:id="fontSlider" text="Font Size" />
-                  <Slider fx:id="slider" blockIncrement="2.0" max="24.0" min="8.0" showTickMarks="true" snapToTicks="true" value="12.0" />
-              </items>
-            </ToolBar>
+                  <Label fx:id="fontLabel" text="Font Size" />
+                  <Slider fx:id="fontSlider" blockIncrement="2.0" max="24.0" min="8.0" showTickMarks="true" snapToTicks="true" value="12.0" />
+              </items -->
+            <!-- ToolBar fx:id="graphicsToolBar" styleClass="tab-menu-bar" stylesheets="@DavesViper.css"/ -->
             <!--  programmatically insert the scrollPane and spritePane -->
             <!--  Pane fx:id="spriteArea" VBox.vgrow="ALWAYS" / -->
          </children>

@@ -25,6 +25,9 @@
     -fx-background-color: #D0D0D0;
 }
 */
+.tool-bar:graphics {
+    -fx-background-color: #7cafc2;
+}
 .tab-menu-bar {
     -fx-font-style: normal;
     -fx-background-color: #7cafc2;

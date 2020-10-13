@@ -18,7 +18,6 @@ package org.opentravel.dex.controllers.graphics;
 
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexTabControllerBase;
-import org.opentravel.dex.controllers.search.SearchWindowController;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -32,16 +31,8 @@ import javafx.fxml.FXML;
 public class GraphicsTabController extends DexTabControllerBase {
 
     /** *********** FXML Java FX Nodes this controller is dependent upon */
-    // @FXML
-    // private RepositorySelectionController repositorySelectionController;
-    // @FXML
-    // private SearchQueryController searchQueryController;
     @FXML
     private GraphicsCanvasController graphicsCanvasController;
-    // @FXML
-    // private Tab searchTab;
-    // @FXML
-    // private VBox whereUsedTabVbox;
 
     public GraphicsTabController() {
         // No-op
@@ -49,19 +40,17 @@ public class GraphicsTabController extends DexTabControllerBase {
 
     @Override
     public void configure(DexMainController mainController, int viewGroupId) {
-        // includedControllers.add( repositorySelectionController );
-        // includedControllers.add( searchQueryController );
         includedControllers.add( graphicsCanvasController );
         super.configure( mainController, viewGroupId );
     }
 
     @Override
     public String getDialogTitle() {
-        return SearchWindowController.DIALOG_TITLE;
+        return GraphicsWindowController.DIALOG_TITLE;
     }
 
     public void launchWindow(ActionEvent e) {
         GraphicsWindowController w = GraphicsWindowController.init();
-        super.launchWindow( e, w, getViewGroupId() + 150 );
+        super.launchWindow( e, w, getViewGroupId() + 160 );
     }
 }

@@ -102,4 +102,9 @@ public interface DexSprite<O extends OtmObject> {
     public void set(Font font);
 
     public void setBackgroundColor(Color color);
+
+    /**
+     * @param collapsed
+     */
+    void setCollapsed(boolean collapsed);
 }
