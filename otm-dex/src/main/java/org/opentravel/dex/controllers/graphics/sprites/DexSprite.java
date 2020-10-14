@@ -20,6 +20,7 @@ import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmProperties.OtmProperty;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
@@ -53,7 +54,7 @@ public interface DexSprite<O extends OtmObject> {
      * @param x
      * @param y
      */
-    void connect(OtmTypeUser user, DexSprite<?> from, double x, double y);
+    public DexSprite<?> connect(OtmTypeUser user, DexSprite<?> from, double x, double y);
 
     /**
      * Is this point within the bounding box for the sprite?
@@ -69,6 +70,14 @@ public interface DexSprite<O extends OtmObject> {
      * @return found rectangle or null
      */
     public Rectangle find(double x, double y);
+
+    /**
+     * Find the rectangle belonging to the property.
+     * 
+     * @return found rectangle or null
+     */
+    public Rectangle find(OtmProperty property);
+    // public Rectangle find(OtmFacet property);
 
     public void findAndRunRectangle(MouseEvent e);
 
@@ -107,4 +116,14 @@ public interface DexSprite<O extends OtmObject> {
      * @param collapsed
      */
     void setCollapsed(boolean collapsed);
+
+    /**
+     * @return the drawing canvas
+     */
+    public Canvas getCanvas();
+
+    /**
+     * @return collapsed field
+     */
+    boolean isCollapsed();
 }

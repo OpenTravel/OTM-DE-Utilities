@@ -47,6 +47,8 @@ public class DexMemberSelectionEvent extends DexNavigationEvent {
     // Member selected because it or some descendant is type user
     public static final EventType<DexMemberSelectionEvent> TYPE_USER_SELECTED =
         new EventType<>( DEX_ALL, "TYPE_USER_SELECTED" );
+    public static final EventType<DexMemberSelectionEvent> DOUBLE_CLICK_MEMBER_SELECTED =
+        new EventType<>( DEX_ALL, "DOUBLE_CLICK_MEMBER_SELECTED" );
 
 
     /**
@@ -81,6 +83,18 @@ public class DexMemberSelectionEvent extends DexNavigationEvent {
      */
     public DexMemberSelectionEvent(OtmLibraryMember otm) {
         super( MEMBER_SELECTED );
+        if (otm instanceof OtmContributedFacet)
+            otm = ((OtmContributedFacet) otm).getContributor();
+        member = otm;
+    }
+
+    /**
+     * @param otm
+     */
+    public DexMemberSelectionEvent(OtmLibraryMember otm, boolean doubleClick) {
+        super( MEMBER_SELECTED );
+        if (doubleClick)
+            eventType = DOUBLE_CLICK_MEMBER_SELECTED;
         if (otm instanceof OtmContributedFacet)
             otm = ((OtmContributedFacet) otm).getContributor();
         member = otm;

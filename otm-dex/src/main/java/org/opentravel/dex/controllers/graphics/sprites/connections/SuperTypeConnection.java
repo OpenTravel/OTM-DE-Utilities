@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.graphics.sprites;
+package org.opentravel.dex.controllers.graphics.sprites.connections;
 
-import org.opentravel.dex.controllers.graphics.sprites.connections.Connection;
+import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 
 import javafx.scene.canvas.GraphicsContext;

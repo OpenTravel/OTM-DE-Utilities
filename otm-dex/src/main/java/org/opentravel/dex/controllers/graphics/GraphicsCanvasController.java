@@ -29,6 +29,7 @@ import org.opentravel.dex.controllers.graphics.sprites.SpriteManager;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.event.ActionEvent;
@@ -54,102 +55,63 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 
 /**
- * Manage the search results display
+ * Manage the Graphics display
  * 
  * @author dmh
  */
 public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObject> {
     private static Log log = LogFactory.getLog( GraphicsCanvasController.class );
 
-    @FXML
-    private Pane spriteArea;
-    // @FXML
-    // private AnchorPane spritePane;
-
-    @FXML
-    private ToolBar graphicsToolbar;
-    @FXML
-    private AnchorPane graphicsPane;
-    // @FXML
-    // private ScrollPane scrollPane;
-    @FXML
-    private VBox graphicsVBox;
-    @FXML
-    private ColorPicker colorPicker;
-    @FXML
-    private Slider fontSlider;
-
-
-    // Pane graphicsRoot;
-    DexMainController parentController = null;
-
     // private static final Font DEFAULT_FONT = new Font( "Arial", 14 );
     public static final Font DEFAULT_FONT = new Font( "Monospaced", 15 );
     private static final Paint DEFAULT_STROKE = Color.BLACK;
     static final Paint DEFAULT_FILL = Color.gray( 0.8 );
-    boolean isLocked;
 
-    // private Color backgroundStrokeColor;
+    private static final EventType[] subscribedEvents =
+        {DexMemberSelectionEvent.MEMBER_SELECTED, DexMemberSelectionEvent.DOUBLE_CLICK_MEMBER_SELECTED};
+    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
 
+    @FXML
+    private AnchorPane graphicsPane;
+    @FXML
+    private VBox graphicsVBox;
+
+    private DexMainController parentController = null;
     private SpriteManager spriteManager;
+
+    private Pane spritePane;
     private ScrollPane scrollPane = null;
+
     private Canvas backgroundCanvas;
     private GraphicsContext backgroundGC;
+
     private Canvas doodleCanvas = null;
+    private GraphicsContext dgc = null;
 
     private boolean ignoreEvents = false;
 
-    private static final EventType[] subscribedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
-    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
-
-
-
-    @Override
-    public void checkNodes() {
-        if (graphicsPane == null)
-            throw new IllegalStateException( "Null pane in graphics controller." );
-        // if (spriteArea == null)
-        // throw new IllegalStateException( "Null sprite pane in graphics controller." );
-    }
+    private boolean isLocked = false;
+    private boolean tracking = true;
 
     public GraphicsCanvasController() {
         super( subscribedEvents, publishedEvents );
     }
 
     @Override
+    public void checkNodes() {
+        if (graphicsPane == null)
+            throw new IllegalStateException( "Null pane in graphics controller." );
+        // private Pane spriteArea;
+        if (graphicsVBox == null)
+            throw new IllegalStateException( "Null graphics vBox in graphics controller." );
+    }
+
+    @Override
     public void clear() {
-        clearCanvas();
+        // clearCanvas();
         spriteManager.clear();
-    }
-
-    @Override
-    @FXML
-    public void initialize() {
-        log.debug( "Graphics canvas controller initialized." );
-    }
-
-    @Override
-    public void post(OtmObject o) {
-        if (!ignoreEvents && !isLocked) {
-            log.debug( "Graphics canvas controller posting object: " + o );
-            if (o instanceof OtmLibraryMember) {
-                DexSprite<?> s = spriteManager.add( ((OtmLibraryMember) o) );
-                if (s != null) {
-                    // Scroll to the new sprite's location
-                    double dx = s.getBoundaries().getX() / backgroundCanvas.getWidth();
-                    double dy = s.getBoundaries().getMaxY() / backgroundCanvas.getHeight();
-                    scrollPane.setVvalue( dy );
-                    scrollPane.setHvalue( dx );
-                }
-            }
-        }
-    }
-
-    @Override
-    public void publishEvent(DexEvent event) {
-        ignoreEvents = true;
-        fireEvent( event );
-        ignoreEvents = false;
+        backgroundGC.clearRect( 0, 0, backgroundCanvas.getWidth(), backgroundCanvas.getHeight() );
+        // spriteManager.clear();
     }
 
     @Override
@@ -160,10 +122,14 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
         createToolBar( graphicsVBox );
 
-        Pane spritePane = createSpritePane( graphicsVBox );
-        backgroundCanvas = createCanvas( spritePane );
+        spritePane = createSpritePane( graphicsVBox );
+
+        // Create a background and bind the dimensions when the user resizes the window.
+        backgroundCanvas = new Canvas();
+        backgroundCanvas.widthProperty().bind( spritePane.widthProperty() );
+        backgroundCanvas.heightProperty().bind( spritePane.heightProperty() );
+        spritePane.getChildren().add( backgroundCanvas );
         backgroundGC = backgroundCanvas.getGraphicsContext2D();
-        // doodleCanvas = createCanvas( spritePane );
 
         backgroundGC.setFont( DEFAULT_FONT );
         backgroundGC.setFill( DEFAULT_FILL );
@@ -176,55 +142,6 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     }
 
     /**
-     * Create the background canvas and GC.
-     * 
-     * @param spritePane to be parent of canvas
-     */
-    private Canvas createCanvas(Pane spritePane) {
-        Canvas canvas = new Canvas();
-        // bind the dimensions when the user resizes the window.
-        canvas.widthProperty().bind( spritePane.widthProperty() );
-        canvas.heightProperty().bind( spritePane.heightProperty() );
-        spritePane.getChildren().add( canvas );
-        return canvas;
-    }
-
-    private ToolBar createToolBar(VBox parent) {
-        Button clearB = new Button( "Clear" );
-        clearB.setOnAction( this::doClear );
-
-        Button refreshB = new Button( "Refresh" );
-        refreshB.setOnAction( this::doRefresh );
-
-        Separator cSep = new Separator( Orientation.VERTICAL );
-        ToggleSwitch collapseS = new ToggleSwitch( "Collapse" );
-        collapseS.selectedProperty().addListener( (v, o, n) -> doCollapse( n ) );
-
-        Separator lockSep = new Separator( Orientation.VERTICAL );
-        ToggleSwitch lockS = new ToggleSwitch( "Lock" );
-        ImageView lockI = ImageManager.get( Icons.LOCK );
-        lockS.selectedProperty().addListener( (v, o, n) -> doLock( n, lockI ) );
-
-        Separator fontSep = new Separator( Orientation.VERTICAL );
-        Label fontL = new Label( "Font" );
-        Slider fontS = new Slider( 8, 24, 14 ); // Min, max, current
-        fontS.valueProperty().addListener( (v, o, n) -> doFont( n ) );
-
-        // Separator dSep = new Separator( Orientation.VERTICAL );
-        // ToggleSwitch doodleS = new ToggleSwitch( "Draw" );
-        // doodleS.selectedProperty().addListener( (v, o, n) -> doDoodle( n ) );
-
-        ColorPicker colorP = new ColorPicker();
-        colorP.setOnAction( this::doColor );
-
-        ToolBar tb =
-            new ToolBar( clearB, refreshB, cSep, collapseS, lockSep, lockS, lockI, fontSep, fontL, fontS, colorP );
-        parent.getChildren().add( tb );
-        tb.setStyle( "-fx-background-color: #7cafc2" );
-        return tb;
-    }
-
-    /**
      * Create sprite pane controlled by scroll pane.
      * <p>
      * fxml only has VBox with toolbar
@@ -234,69 +151,60 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
      */
     private Pane createSpritePane(VBox parent) {
         // Create panes and add to parent
-        Pane spritePane = new Pane();
+        spritePane = new Pane();
         scrollPane = new ScrollPane( spritePane );
         parent.getChildren().add( scrollPane );
         // Configure sizes
         VBox.setVgrow( scrollPane, Priority.ALWAYS );
         scrollPane.setMaxWidth( Double.MAX_VALUE );
         return spritePane;
-
-        // Other stuff that could be done
-        // // drawingPane.setPrefSize( 800, 800 );
-        // scrollPane.setHbarPolicy( ScrollBarPolicy.AS_NEEDED );
-        // scrollPane.setVbarPolicy( ScrollBarPolicy.AS_NEEDED );
-        // // drawingPane.setMaxSize( Double.MAX_VALUE, Double.MAX_VALUE );
-        // scrollPane.setPrefSize( vPane.getWidth(), vPane.getHeight() );
-        // scrollPane.setMaxSize( Double.MAX_VALUE, Double.MAX_VALUE );
-        // scrollPane.setViewportBounds( value ); // ???
-        // scrollPane.setPrefViewportWidth(1000);
-        // scrollPane.setPrefViewportHeight(1000);
-        // scrollPane.setFitToWidth( true ); // Sizes contents to the scroll bar area
-        // scrollPane.setFitToHeight( true );
-        // scrollPane.setHmax( 3 ); // Sizes the slider control
-        // scrollPane.setHvalue( 2 ); // Moves to the right
-        // scrollPane.setStyle( "-fx-focus-color: transparent;" );
-        // VBox.setVgrow( scrollPane, Priority.ALWAYS );
-        // scrollPane.setMaxWidth( Double.MAX_VALUE );
-        // scrollPane.maxWidthProperty().bind( vPane.widthProperty() );
-        // scrollPane.maxHeightProperty().bind( vPane.heightProperty() );
-        // scrollPane.setPrefSize( vPane.getPrefWidth(), vPane.getPrefHeight() );
-        // spritePane.setPrefSize( vPane.getPrefWidth(), vPane.getPrefHeight() );
-        //
-        // Fill the AnchorPane with the ScrollPane and set the Anchors to 0.0
-        // AnchorPane.setTopAnchor( scrollPane, 0.0 );
-        // AnchorPane.setBottomAnchor( scrollPane, 0.0 );
-        // AnchorPane.setLeftAnchor( scrollPane, 0.0 );
-        // AnchorPane.setRightAnchor( scrollPane, 0.0 );
-        // scrollPane.setHbarPolicy( ScrollBarPolicy.ALWAYS );
-        // scrollPane.setVbarPolicy( ScrollBarPolicy.ALWAYS );
     }
 
-    public boolean isLocked() {
-        return isLocked;
+    private ToolBar createToolBar(VBox parent) {
+        Button clearB = new Button( "Clear" );
+        clearB.setOnAction( this::doClear );
+
+        Button refreshB = new Button( "Refresh" );
+        refreshB.setOnAction( this::doRefresh );
+
+        Separator tSep = new Separator( Orientation.VERTICAL );
+        ToggleSwitch trackS = new ToggleSwitch( "Track" );
+        trackS.selectedProperty().addListener( (v, o, n) -> doTrack( n ) );
+
+        Separator cSep = new Separator( Orientation.VERTICAL );
+        ToggleSwitch collapseS = new ToggleSwitch( "Collapse" );
+        collapseS.selectedProperty().addListener( (v, o, n) -> doCollapse( n ) );
+
+        Separator lockSep = new Separator( Orientation.VERTICAL );
+        ToggleSwitch lockS = new ToggleSwitch( "Lock" );
+        ImageView lockI = ImageManager.get( Icons.LOCK );
+        lockS.selectedProperty().addListener( (v, o, n) -> doLock( n ) );
+
+        Separator fontSep = new Separator( Orientation.VERTICAL );
+        Label fontL = new Label( "Font" );
+        Slider fontS = new Slider( 8, 24, 14 ); // Min, max, current
+        fontS.valueProperty().addListener( (v, o, n) -> doFont( n ) );
+
+        Separator dSep = new Separator( Orientation.VERTICAL );
+        ToggleSwitch doodleS = new ToggleSwitch( "Draw" );
+        doodleS.selectedProperty().addListener( (v, o, n) -> doDoodle( n ) );
+
+        ColorPicker colorP = new ColorPicker();
+        colorP.setOnAction( this::doColor );
+
+        ToolBar tb = new ToolBar( clearB, refreshB, tSep, trackS, cSep, collapseS, lockSep, lockS, lockI, fontSep,
+            fontL, fontS, colorP, dSep, doodleS );
+        parent.getChildren().add( tb );
+        tb.setStyle( "-fx-background-color: #7cafc2" );
+        return tb;
     }
 
-    public void doLock(boolean lock, ImageView icon) {
-        // log.debug( "do lock boolean." );
-        isLocked = lock;
+    public void doClear(ActionEvent e) {
+        clear();
     }
 
-    public void doFont(Number v) {
-        log.debug( "Change font size to: " + v.intValue() );
-        spriteManager.update( v.intValue() );
-    }
-
-    public void clearCanvas() {
-        spriteManager.clear();
-        backgroundGC.clearRect( 0, 0, backgroundCanvas.getWidth(), backgroundCanvas.getHeight() );
-    }
-
-    @FXML
-    public void doColor() {
-        if (colorPicker != null && spriteManager != null) {
-            spriteManager.update( colorPicker.getValue() );
-        }
+    public void doCollapse(boolean collapse) {
+        spriteManager.setCollapsed( collapse );
     }
 
     public void doColor(ActionEvent e) {
@@ -305,70 +213,128 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         }
     }
 
-    public void doCollapse(boolean collapse) {
-        // log.debug( "TODO - colapse all." );
-        spriteManager.setCollapsed( collapse );
+    /**
+     * Let user annotate (doodle) on the drawing surface
+     * 
+     * @param run
+     */
+    private void doDoodle(boolean run) {
+        if (run) {
+            log.debug( "Starting doodle." );
+            if (doodleCanvas == null) {
+                doodleCanvas =
+                    new Canvas( graphicsVBox.getWidth(), spritePane.getHeight() > 0 ? spritePane.getHeight() : 1000 );
+                spritePane.getChildren().add( doodleCanvas );
+            }
+            dgc = doodleCanvas.getGraphicsContext2D();
+            // if (colorPicker != null && colorPicker.getValue() != null)
+            // dgc.setStroke( colorPicker.getValue() );
+            // else
+            dgc.setStroke( Color.DARKRED );
+            dgc.setLineWidth( 4 );
+
+            doodleCanvas.setOnMouseDragged( e -> {
+                log.debug( " doodle drag" );
+                dgc.lineTo( e.getX(), e.getY() );
+                dgc.stroke();
+            } );
+            doodleCanvas.setOnMousePressed( e -> {
+                log.debug( " doodle point" );
+                dgc.beginPath();
+                dgc.lineTo( e.getX(), e.getY() );
+                dgc.stroke();
+            } );
+        } else {
+            if (dgc != null) {
+                dgc.setFill( backgroundGC.getFill() );
+                dgc.setStroke( backgroundGC.getStroke() );
+                dgc.fillRect( 0, 0, doodleCanvas.getWidth(), doodleCanvas.getHeight() );
+                dgc.setLineWidth( 1 );
+                spritePane.getChildren().remove( doodleCanvas );
+                doodleCanvas = null;
+            }
+        }
     }
 
-
-    // @FXML
-    public void doClear(ActionEvent e) {
-        clear();
+    public void doFont(Number v) {
+        log.debug( "Change font size to: " + v.intValue() );
+        spriteManager.update( v.intValue() );
     }
-    //
-    // @Deprecated
-    // @FXML
-    // public void doLock(ActionEvent e) {
-    // log.debug( "do lock - DEPRECATED." );
-    // Demos.postAnimation( backgroundGC );
-    // }
-    //
-    // @FXML
-    // public void doRefresh() {
-    // log.debug( "do refresh." );
-    // spriteManager.update( Color.gray( 0.9 ) );
-    // }
+
+    public void doLock(boolean lock) {
+        isLocked = lock;
+    }
 
     public void doRefresh(ActionEvent e) {
         log.debug( "do refresh." );
         spriteManager.update( Color.gray( 0.9 ) );
     }
 
+    public void doTrack(boolean track) {
+        this.tracking = track;
+    }
+
     @Override
     public void handleEvent(AbstractOtmEvent event) {
+        // log.debug( "Event received: " + event.getEventType() );
         if (!isLocked) {
-            // log.debug( event.getEventType() + " event received. " );
-            if (event instanceof DexMemberSelectionEvent)
+            if (!tracking && event.getEventType() == DexMemberSelectionEvent.DOUBLE_CLICK_MEMBER_SELECTED)
+                post( ((DexMemberSelectionEvent) event).getMember() );
+            else if (tracking && event instanceof DexMemberSelectionEvent)
                 post( ((DexMemberSelectionEvent) event).getMember() );
             else
                 refresh();
         }
     }
 
-    // FUTURE - Mouse pressed is not dispatched to this handler
-    // private void doDoodle(boolean run) {
-    // GraphicsContext dgc = doodleCanvas.getGraphicsContext2D();
-    // if (run) {
-    // log.debug( "Starting doodle." );
-    // dgc.setStroke( Color.GREENYELLOW );
-    // dgc.setStroke( Color.ORANGERED );
-    // dgc.setLineWidth( 4 );
-    // dgc.strokeOval( 100, 100, 60, 60 );
-    // dgc.fillOval( 100, 100, 40, 40 );
-    //
-    // doodleCanvas.setOnMouseClicked( e -> {
-    // log.debug( " doodle click" );
-    // } );
-    // doodleCanvas.setOnMousePressed( e -> {
-    // log.debug( " doodle point" );
-    // dgc.beginPath();
-    // dgc.lineTo( e.getX(), e.getY() );
-    // // graphicsContext.moveTo(event.getX(), event.getY());
-    // dgc.stroke();
-    // } );
-    // } else {
-    // dgc.setStroke( DEFAULT_STROKE );
-    // dgc.setLineWidth( 1 );
-    // }
-    // }
+    @Override
+    @FXML
+    public void initialize() {
+        log.debug( "Graphics canvas controller initialized." );
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    @Override
+    public void post(OtmObject o) {
+        log.debug( "Graphics canvas controller posting object: " + o );
+        if (o instanceof OtmLibraryMember) {
+            OtmLibraryMember member = (OtmLibraryMember) o;
+            if (tracking)
+                spriteManager.clear();
+            DexSprite<?> s = spriteManager.add( member );
+            if (s != null) {
+                if (tracking) {
+                    // Display the type providers
+                    double dx = s.getBoundaries().getX() + s.getBoundaries().getWidth() / 2;
+                    double dy = s.getBoundaries().getY() + s.getBoundaries().getHeight() / 2;
+                    DexSprite<?> newS = null;
+                    for (OtmTypeUser user : member.getDescendantsTypeUsers()) {
+                        newS = s.connect( user, s, dx, dy );
+                        if (newS != null)
+                            newS.setCollapsed( true );
+                    }
+                    scrollPane.setVvalue( 0 );
+                    scrollPane.setHvalue( 0 );
+                } else {
+                    // Scroll to the new sprite's location
+                    double dx = s.getBoundaries().getX() / backgroundCanvas.getWidth();
+                    double dy = s.getBoundaries().getMaxY() / backgroundCanvas.getHeight();
+                    scrollPane.setVvalue( dy );
+                    scrollPane.setHvalue( dx );
+                }
+            }
+            spriteManager.refresh();
+        }
+
+    }
+
+    @Override
+    public void publishEvent(DexEvent event) {
+        ignoreEvents = true;
+        fireEvent( event );
+        ignoreEvents = false;
+    }
 }

@@ -22,11 +22,13 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils.DrawType;
 import org.opentravel.dex.controllers.graphics.sprites.connections.TypeConnection;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle.RectangleEventHandler;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmProperties.OtmProperty;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,11 +121,28 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         r.setOnMouseClicked( e -> collapseOrExpand() );
     }
 
+    /**
+     * Toggle collapsed state.
+     */
     public void collapseOrExpand() {
         clear();
         collapsed = !collapsed;
         render();
 
+    }
+
+    /**
+     * Return the width
+     * 
+     * @param compute - if true, return the larger. if false return the width
+     * @param width
+     * @param rect
+     * @param offsetX - added to rectangle's width
+     * @return
+     */
+    public double computeWidth(boolean compute, double width, Rectangle rect, double offsetX) {
+        width = rect.getWidth() + offsetX > width ? rect.getWidth() + offsetX : width;
+        return width;
     }
 
     public M getMember() {
@@ -144,7 +163,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         canvas.setHeight( y + canvasR.getHeight() );
         canvas.setWidth( x + canvasR.getWidth() );
         // canvasR.draw( gc, false );
-        log.debug( "Sized canvas: " + canvasR );
+        // log.debug( "Sized canvas: " + canvasR );
 
         drawMember( gc, gc.getFont() );
         manager.updateConnections( this );
@@ -233,19 +252,20 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
             // Clicks go to the top most node...so let the pane catch them
             // canvas.setOnMouseClicked( this::mouseClick );
         }
-        log.debug( "Refreshed " + member );
+        // log.debug( "Refreshed " + member );
         mRect = new Rectangle( x, y, width, height );
         // mRect.draw( gc, false );
         return mRect;
     }
 
+    @Override
     public boolean isCollapsed() {
         return collapsed;
     }
 
     @Override
     public void onRectangleClick(MouseEvent e) {
-        log.debug( "Rectangle click at: " + e.getX() + " " + e.getY() );
+        // log.debug( "Rectangle click at: " + e.getX() + " " + e.getY() );
     }
 
     // private void mouseClick(MouseEvent e) {
@@ -262,6 +282,14 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     // findAndRunRectangle( e );
     // }
     // }
+
+    @Override
+    public PropertyRectangle find(OtmProperty property) {
+        for (Rectangle r : rectangles)
+            if (r instanceof PropertyRectangle && ((PropertyRectangle) r).getProperty() == property)
+                return ((PropertyRectangle) r);
+        return null;
+    }
 
     @Override
     public Rectangle find(double x, double y) {
@@ -297,7 +325,11 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
 
     @Override
     public void setCollapsed(boolean collapsed) {
+        log.debug( "Collapsed = " + collapsed + " " + this );
         this.collapsed = collapsed;
+        // SIZE this
+        setBoundaries( 0, 0 );
+        log.debug( "   became = " + this );
     }
 
     /**
@@ -334,7 +366,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         for (Circle circle : listOfCircles) {
             Point2D point2D = new Point2D( event.getX(), event.getY() );
             if (circle.contains( point2D )) {
-                log.debug( "circle clicked" );
+                // log.debug( "circle clicked" );
             }
         }
     }
@@ -342,6 +374,11 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     @Override
     public Rectangle getBoundaries() {
         return boundaries;
+    }
+
+    @Override
+    public Canvas getCanvas() {
+        return canvas;
     }
 
     @Override
@@ -357,27 +394,45 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
      */
     // TODO - why not pass in the property rectangle?
     @Override
-    public void connect(OtmTypeUser user, DexSprite<?> from, double x, double y) {
-        log.debug( "Connecting to " + user );
+    public DexSprite<?> connect(OtmTypeUser user, DexSprite<?> from, double x, double y) {
+        // log.debug( "Connecting to " + user );
+        DexSprite<?> newSprite = null;
         if (user != null && user.getAssignedType() instanceof OtmTypeProvider) {
             OtmLibraryMember provider = user.getAssignedType().getOwningMember();
+            if (provider != user.getOwningMember()) {
+                Point2D p = manager.getNextRightColumn( this );
+                newSprite = manager.add( provider, p.getX(), p.getY() );
 
-            Point2D p = manager.getNextRightColumn( this );
-            DexSprite<?> newSprite = manager.add( provider, p.getX(), p.getY() );
+                // Place the new sprite and connect it
+                if (newSprite != null) {
+                    newSprite.refresh();
 
-            // Place the new sprite and connect it
-            if (newSprite != null) {
-                newSprite.refresh();
-
-                // Find the rectangle and make type connection
-                Rectangle fRect = from.find( x, y );
-                if (fRect != null) {
-                    TypeConnection c = new TypeConnection( fRect, from, newSprite );
-                    manager.addAndDraw( c );
+                    // Find the rectangle and make type connection
+                    Rectangle fRect;
+                    if (user instanceof OtmProperty)
+                        fRect = from.find( (OtmProperty) user );
+                    else
+                        fRect = from.find( x, y );
+                    if (fRect != null) {
+                        TypeConnection c = new TypeConnection( fRect, from, newSprite );
+                        manager.addAndDraw( c );
+                    }
+                } else {
+                    // Manager already has the member displayed, remove it
+                    DexSprite<?> ps = manager.findSprite( provider );
+                    if (ps != null) {
+                        ps.getCanvas().toFront();
+                        ps.setCollapsed( !ps.isCollapsed() );
+                        ps.refresh();
+                    } else
+                        manager.remove( provider );
                 }
-            } else
-                // Manager already has the member displayed, remove it
-                manager.remove( provider );
+            }
         }
+        return newSprite;
+    }
+
+    public String toString() {
+        return "Sprite for " + getMember() + " at " + getBoundaries();
     }
 }

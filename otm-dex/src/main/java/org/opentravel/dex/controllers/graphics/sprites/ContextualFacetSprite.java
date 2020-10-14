@@ -62,10 +62,9 @@ public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implem
 
         Rectangle rect = new Rectangle( 0, 0, 0, 0 );
 
-        if (!getMember().getChildren().isEmpty()) {
+        if (!isCollapsed() && !getMember().getChildren().isEmpty()) {
             rect = new FacetRectangle( (OtmContextualFacet) member, this, width );
-            rect.set( fx, fy );
-            rect.draw( gc, true );
+            rect.set( fx, fy ).draw( gc, true );
             width = compute && rect.getWidth() > width ? rect.getWidth() + fx : width;
         }
 

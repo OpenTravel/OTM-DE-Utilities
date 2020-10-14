@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.controllers.graphics.sprites.connections.Connection;
+import org.opentravel.dex.controllers.graphics.sprites.connections.SuperTypeConnection;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
@@ -125,7 +126,7 @@ public class SpriteManager {
         if (member.getBaseType() != null) {
             baseSprite = add( (OtmLibraryMember) member.getBaseType(), p.getX(), p.getY() );
             if (baseSprite != null) {
-                log.debug( "Added at " + p.getX() + " " + p.getY() + " base sprite: " + member.getBaseType() );
+                // log.debug( "Added at " + p.getX() + " " + p.getY() + " base sprite: " + member.getBaseType() );
                 p = getNextInColumn( baseSprite.getBoundaries().getX(),
                     baseSprite.getBoundaries().getMaxY() + FACET_OFFSET );
             }
@@ -173,9 +174,14 @@ public class SpriteManager {
         c.draw( connectionsGC );
     }
 
+    /**
+     * Remove all sprites and their canvases. Remove all connections.
+     */
     public void clear() {
-        for (DexSprite<?> sprite : activeSprites)
+        for (DexSprite<?> sprite : activeSprites) {
             sprite.clear();
+            spritePane.getChildren().remove( sprite.getCanvas() );
+        }
         activeSprites.clear();
 
         eraseConnections();
@@ -194,13 +200,13 @@ public class SpriteManager {
      */
     public void drag(MouseEvent e) {
         if (draggedSprite != null) {
-            log.debug( "Found Selected Sprite: " + draggedSprite.getMember() );
+            // log.debug( "Found Selected Sprite: " + draggedSprite.getMember() );
             draggedSprite.clear();
             draggedSprite.set( e.getX(), e.getY() );
             draggedSprite.render();
             updateConnections( draggedSprite );
         }
-        log.debug( "Dragging sprite." );
+        // log.debug( "Dragging sprite." );
     }
 
 
@@ -208,11 +214,11 @@ public class SpriteManager {
         if (draggedSprite != null)
             updateConnections();
         draggedSprite = null;
-        log.debug( "Drag end." );
+        // log.debug( "Drag end." );
     }
 
     public void dragStart(MouseEvent e) {
-        log.debug( "Drag start. x = " + e.getX() + " y = " + e.getY() );
+        // log.debug( "Drag start. x = " + e.getX() + " y = " + e.getY() );
         draggedSprite = findSprite( new Point2D( e.getX(), e.getY() ) );
     }
 
@@ -226,7 +232,7 @@ public class SpriteManager {
         for (DexSprite<?> sprite : activeSprites)
             if (sprite.getMember() == member) {
                 selectedSprite = sprite;
-                log.debug( "findSprite found: " + selectedSprite.getMember() );
+                // log.debug( "findSprite found: " + selectedSprite.getMember() );
                 break;
             }
         return selectedSprite;
@@ -237,7 +243,7 @@ public class SpriteManager {
         for (DexSprite<?> sprite : activeSprites)
             if (sprite.contains( point )) {
                 selectedSprite = sprite;
-                log.debug( "findSprite found: " + selectedSprite.getMember() );
+                // log.debug( "findSprite found: " + selectedSprite.getMember() );
                 break;
             }
         return selectedSprite;
@@ -275,20 +281,23 @@ public class SpriteManager {
     }
 
     public Point2D getNextRightColumn(DexSprite<?> sprite) {
+        // Get the x for the next column
         double columnX = sprite.getBoundaries().getMaxX() + COLUMN_WIDTH;
-        Point2D bottom = new Point2D( columnX, sprite.getBoundaries().getY() - 20 );
+        // Start looking just above the sprite
+        double startY = sprite.getBoundaries().getY() - 20 > 0 ? sprite.getBoundaries().getY() - 20 : 0;
+        Point2D bottom = new Point2D( columnX, startY );
         DexSprite<?> next = null;
         do {
             next = findSprite( bottom );
             if (next != null)
-                bottom = new Point2D( columnX, next.getBoundaries().getMaxY() + 5 );
+                bottom = new Point2D( columnX, next.getBoundaries().getMaxY() + 10 );
         } while (next != null && bottom.getY() < spritePane.getHeight());
 
         return bottom;
     }
 
     private void mouseClick(MouseEvent e) {
-        log.debug( "Mouse click on at: " + e.getX() + " " + e.getY() );
+        // log.debug( "Mouse click on at: " + e.getX() + " " + e.getY() );
         // The whole canvas is active, check boundaries
         DexSprite<?> selected = null;
         for (DexSprite<?> sprite : activeSprites)
@@ -297,10 +306,8 @@ public class SpriteManager {
                 break;
             }
         if (selected != null) {
-            if (e.getButton() == MouseButton.SECONDARY)
-                log.debug( "TODO - secondary button click." );
-            else if (e.getClickCount() >= 2) {
-                log.debug( "Throw event: " + selected.getMember() );
+            if (e.getButton() != MouseButton.SECONDARY && e.getClickCount() >= 2) {
+                // log.debug( "Throw event: " + selected.getMember() );
                 publishEvent( new DexMemberSelectionEvent( selected.getMember() ) );
             } else
                 selected.findAndRunRectangle( e );
@@ -311,7 +318,7 @@ public class SpriteManager {
      * Put all sprites onto the parent node
      */
     public void post() {
-        log.debug( "Posting all sprites." );
+        // log.debug( "Posting all sprites." );
         for (DexSprite<?> sprite : activeSprites)
             if (sprite != null) {
                 sprite.render();
@@ -370,6 +377,7 @@ public class SpriteManager {
             Font font = new Font( DEFAULT_FONT_NAME, fontSize );
             for (DexSprite<?> sprite : activeSprites)
                 sprite.set( font );
+            defaultGC.setFont( font );
             refresh();
         }
     }

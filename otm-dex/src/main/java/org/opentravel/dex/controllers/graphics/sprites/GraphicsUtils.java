@@ -106,7 +106,7 @@ public class GraphicsUtils {
                 gc.setFill( color );
                 gc.fillOval( x, y, CONNECTOR_SIZE, CONNECTOR_SIZE );
                 gc.setFill( savedColor );
-                log.debug( "Drew Connector with filled oval." );
+                // log.debug( "Drew Connector with filled oval." );
             }
             gc.strokeOval( x, y, CONNECTOR_SIZE, CONNECTOR_SIZE );
             Image link = ImageManager.getImage( ImageManager.Icons.NAV_GO );

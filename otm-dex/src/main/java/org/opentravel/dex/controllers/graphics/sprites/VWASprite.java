@@ -33,6 +33,7 @@ import javafx.scene.text.Font;
  *
  */
 public class VWASprite extends MemberSprite<OtmValueWithAttributes> implements DexSprite<OtmLibraryMember> {
+    // gets log from base class
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
     public VWASprite(OtmValueWithAttributes member, SpriteManager manager, GraphicsContext paramsGC) {
@@ -45,22 +46,19 @@ public class VWASprite extends MemberSprite<OtmValueWithAttributes> implements D
         Rectangle rect = null;
 
         double dxSummary = FacetRectangle.SUMMARY_OFFSET;
-        // double dxDetail = FacetRectangle.DETAIL_OFFSET;
         double width = getBoundaries().getWidth();
         double fy = y + FacetRectangle.FACET_MARGIN;
 
         // Show value type
         rect = new PropertyRectangle( getMember(), this, width );
-        rect.set( x + dxSummary, fy );
-        rect.draw( gc, true );
+        rect.set( x + dxSummary, fy ).draw( gc, true );
         fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
         width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
 
         // Show facets
         if (!isCollapsed()) {
             rect = new FacetRectangle( getMember(), this, width - dxSummary );
-            rect.set( x + dxSummary, fy );
-            rect.draw( gc, true );
+            rect.set( x + dxSummary, fy ).draw( gc, true );
             fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
             width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
 

@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.GraphicsCanvasController;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
@@ -26,6 +24,7 @@ import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.model.otmProperties.OtmProperty;
@@ -45,7 +44,7 @@ import javafx.scene.text.Font;
  *
  */
 public class PropertyRectangle extends Rectangle {
-    private static Log log = LogFactory.getLog( PropertyRectangle.class );
+    // private static Log log = LogFactory.getLog( PropertyRectangle.class );
 
     public static final double PROPERTY_MARGIN = 2;
     public static final double PROPERTY_OFFSET = 10; // left margin
@@ -67,6 +66,11 @@ public class PropertyRectangle extends Rectangle {
     private Point2D connectionPoint;
 
     private OtmProperty property;
+
+    public OtmProperty getProperty() {
+        return property;
+    }
+
     private String label;
     private Image icon;
 
@@ -92,6 +96,8 @@ public class PropertyRectangle extends Rectangle {
         // Get type information
         if (property instanceof OtmTypeUser) {
             typeProvider = ((OtmTypeUser) property).getAssignedType();
+            if (typeProvider == property.getOwningMember())
+                typeProvider = null;
             if (typeProvider != null) {
                 providerLabel = typeProvider.getNameWithPrefix();
                 if (typeProvider instanceof OtmComplexObjects)
@@ -207,7 +213,7 @@ public class PropertyRectangle extends Rectangle {
             gc.strokeLine( x, lineY, x + width - rightMargin, lineY );
 
         // Draw Connector symbol and register listener
-        if (typeProvider instanceof OtmComplexObjects) {
+        if (typeProvider != null && !(typeProvider.getOwningMember() instanceof OtmSimpleObjects)) {
             connectionPoint = new Point2D( x + width - PROPERTY_MARGIN, lineY );
             GraphicsUtils.drawConnector( gc, providerColor, x + width - 2 * connectorSize + 2 * PROPERTY_MARGIN,
                 lineY - connectorSize / 2 );

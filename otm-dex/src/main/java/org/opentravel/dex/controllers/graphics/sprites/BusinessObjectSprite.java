@@ -60,7 +60,7 @@ public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> impleme
         if (!isCollapsed())
             mRect = drawFacets( getMember(), gc, font, x, y, width );
 
-        // log.debug( "Drew contents into " + mRect );
+        log.debug( "Drew " + getMember() + " contents into " + getBoundaries() );
         return mRect;
     }
 
@@ -78,23 +78,20 @@ public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> impleme
         if (!isCollapsed()) {
 
             rect = new FacetRectangle( getMember().getIdFacet(), this, width - dxID );
-            rect.set( x + dxID, fy );
-            rect.draw( gc, true );
+            rect.set( x + dxID, fy ).draw( gc, true );
             fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
-            width = compute && rect.getWidth() > width ? rect.getWidth() + dxID : width;
+            width = computeWidth( compute, width, rect, dxID );
 
             rect = new FacetRectangle( getMember().getSummary(), this, width - dxSummary );
-            rect.set( x + dxSummary, fy );
-            rect.draw( gc, true );
+            rect.set( x + dxSummary, fy ).draw( gc, true );
             fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
-            width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
+            width = computeWidth( compute, width, rect, dxSummary );
 
             if (!getMember().getDetail().getChildren().isEmpty()) {
                 rect = new FacetRectangle( getMember().getDetail(), this, width - dxDetail );
-                rect.set( x + dxDetail, fy );
-                rect.draw( gc, true );
+                rect.set( x + dxDetail, fy ).draw( gc, true );
                 fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
-                width = compute && rect.getWidth() > width ? rect.getWidth() + dxDetail : width;
+                width = computeWidth( compute, width, rect, dxDetail );
             }
         }
         // TEST - contributed and contextual facets
@@ -108,17 +105,16 @@ public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> impleme
 
         for (OtmCustomFacet f : customs) {
             rect = new FacetRectangle( f, this, width - FacetRectangle.CUSTOM_OFFSET );
-            rect.set( x + FacetRectangle.CUSTOM_OFFSET, fy );
-            rect.draw( gc, true );
+            rect.set( x + FacetRectangle.CUSTOM_OFFSET, fy ).draw( gc, true );
             fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
-            width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
+            width = computeWidth( compute, width, rect, dxSummary );
         }
         for (OtmQueryFacet f : queries) {
             rect = new FacetRectangle( f, this, width - FacetRectangle.QUERY_OFFSET );
             rect.set( x + FacetRectangle.QUERY_OFFSET, fy );
             rect.draw( gc, true );
             fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
-            width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
+            width = computeWidth( compute, width, rect, dxID );
         }
 
         // Return the enclosing rectangle
@@ -127,5 +123,4 @@ public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> impleme
         // return fRect;
         return new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
     }
-
 }

@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.GraphicsCanvasController;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
@@ -45,7 +43,7 @@ import javafx.scene.text.Font;
  *
  */
 public class FacetRectangle extends Rectangle {
-    private static Log log = LogFactory.getLog( FacetRectangle.class );
+    // private static Log log = LogFactory.getLog( FacetRectangle.class );
 
     public static final double FACET_MARGIN = 5;
     public static final double FACET_OFFSET = 8;

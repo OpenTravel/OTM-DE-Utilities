@@ -33,6 +33,7 @@ import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.dex.events.OtmObjectReplacedEvent;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmEmptyTableFacet;
@@ -51,6 +52,7 @@ import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
@@ -100,7 +102,8 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         DexMemberSelectionEvent.TYPE_USER_SELECTED, DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED,
         DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED, OtmObjectChangeEvent.OBJECT_CHANGED,
         OtmObjectModifiedEvent.OBJECT_MODIFIED};
-    private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
+    private static final EventType[] publishedEvents =
+        {DexMemberSelectionEvent.MEMBER_SELECTED, DexMemberSelectionEvent.DOUBLE_CLICK_MEMBER_SELECTED};
 
     /**
      * Construct a member tree table controller that can publish and receive events.
@@ -216,6 +219,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         memberTree.getSelectionModel().selectedItemProperty()
             .addListener( (v, old, newValue) -> memberSelectionListener( newValue ) );
 
+        setOnMouseClicked( this::mouseClick ); // events for drawing pane
         refresh();
     }
 
@@ -377,9 +381,18 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
 
     public void mouseClick(MouseEvent event) {
         // this fires after the member selection listener
-        // if (event.getButton().equals( MouseButton.PRIMARY ) && event.getClickCount() == 2)
-        // log.debug( "Double click selection: " );
-        // + memberTree.getSelectionModel().getSelectedItem().getValue().nameProperty().toString());
+        OtmObject item = null;
+        if (memberTree.getSelectionModel().getSelectedItem() != null)
+            item = memberTree.getSelectionModel().getSelectedItem().getValue().getValue();
+        log.debug( "Click selection: " + item );
+        if (item instanceof OtmLibraryMember && event.getButton().equals( MouseButton.PRIMARY )
+            && event.getClickCount() == 2) {
+            log.debug( "Double click selection: " + item );
+            ignoreEvents = true;
+            if (eventPublisherNode != null)
+                eventPublisherNode.fireEvent( new DexMemberSelectionEvent( (OtmLibraryMember) item, true ) );
+            ignoreEvents = false;
+        }
     }
 
     /**

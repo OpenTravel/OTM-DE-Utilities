@@ -16,9 +16,6 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
@@ -35,7 +32,7 @@ import javafx.scene.input.MouseEvent;
  *
  */
 public class Rectangle {
-    private static Log log = LogFactory.getLog( Rectangle.class );
+    // private static Log log = LogFactory.getLog( Rectangle.class );
 
     /**
      * Render methods that create rectangles may set the event to run if the implement this interface.
@@ -126,9 +123,10 @@ public class Rectangle {
             eventHandler.onRectangleClick( e );
     }
 
-    public void set(double x, double y) {
+    public Rectangle set(double x, double y) {
         this.x = x;
         this.y = y;
+        return this;
     }
 
     public void set(double x, double y, double width) {
