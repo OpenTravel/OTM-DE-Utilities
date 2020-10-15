@@ -27,7 +27,9 @@ import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
+import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 
 import java.util.ArrayList;
@@ -160,6 +162,10 @@ public class SpriteManager {
                 newSprite = new VWASprite( (OtmValueWithAttributes) member, this, defaultGC );
             else if (member instanceof OtmContextualFacet)
                 newSprite = new ContextualFacetSprite( (OtmContextualFacet) member, this, defaultGC );
+            else if (member instanceof OtmEnumeration)
+                newSprite = new EnumerationSprite( (OtmEnumeration<?>) member, this, defaultGC );
+            else if (member instanceof OtmSimpleObjects)
+                newSprite = new SimpleSprite( (OtmSimpleObjects<?>) member, this, defaultGC );
 
             if (newSprite != null) {
                 newSprite.set( x, y );

@@ -90,7 +90,7 @@ public class PropertyRectangle extends Rectangle {
 
         // Get property information
         this.property = property;
-        label = getLabel( property );
+        label = property.getName();
         icon = property.getIcon();
 
         // Get type information
@@ -101,7 +101,7 @@ public class PropertyRectangle extends Rectangle {
             if (typeProvider != null) {
                 providerLabel = typeProvider.getNameWithPrefix();
                 if (typeProvider instanceof OtmComplexObjects)
-                    providerLabel = typeProvider.getPrefix();
+                    providerLabel = getCardinality( property ) + typeProvider.getPrefix();
                 providerIcon = typeProvider.getIcon();
                 providerColor = property.isAssignedTypeInNamespace() ? null : GraphicsUtils.CONNECTOR_COLOR;
             }
@@ -199,12 +199,12 @@ public class PropertyRectangle extends Rectangle {
             Rectangle tRect;
             tRect = GraphicsUtils.drawLabel( providerLabel, providerIcon, null, font, x, y );
             actualWidth += tRect.getWidth() + PROPERTY_TYPE_MARGIN;
-            width = compute && actualWidth > width ? actualWidth : width;
             double tx = x + width - tRect.getWidth() - rightMargin - PROPERTY_MARGIN;
             GraphicsUtils.drawLabel( providerLabel, providerIcon, true, gc, font, tx, y );
         }
 
-        // Compute property Height and Width
+        // Compute property Height
+        width = compute && actualWidth > width ? actualWidth : width;
         height = lRect.getHeight() + 2 * PROPERTY_MARGIN;
 
         // Draw Underline
@@ -229,13 +229,21 @@ public class PropertyRectangle extends Rectangle {
         return this;
     }
 
-    private static String getLabel(OtmProperty property) {
+    private static String getCardinality(OtmProperty property) {
         String cardinality = "";
-        if (property instanceof OtmElement)
-            cardinality = Integer.toString( ((OtmElement<?>) property).getRepeatCount() );
-        else if (property instanceof OtmTypeUser && property.isManditory())
-            cardinality = "1";
-        return property.getName() + "  " + cardinality;
+        if (property instanceof OtmElement) {
+            if (property.isManditory())
+                cardinality = "[1";
+            else
+                cardinality = "[0";
+            if (((OtmElement<?>) property).getRepeatCount() > 0)
+                cardinality += Integer.toString( ((OtmElement<?>) property).getRepeatCount() );
+
+            cardinality += "] ";
+        } else if (property instanceof OtmTypeUser && property.isManditory())
+            cardinality = "[1] ";
+        return cardinality;
+
     }
 
     @Override

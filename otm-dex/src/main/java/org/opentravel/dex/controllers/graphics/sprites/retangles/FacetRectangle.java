@@ -22,6 +22,7 @@ import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
+import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmProperties.OtmProperty;
@@ -72,7 +73,7 @@ public class FacetRectangle extends Rectangle {
 
 
     private OtmFacet<?> facet = null;
-    private OtmContextualFacet cFacet = null;
+    private OtmObject otmObject = null;
     private DexSprite<OtmLibraryMember> parent;
     private Font font;
     private String label;
@@ -97,8 +98,7 @@ public class FacetRectangle extends Rectangle {
 
     public FacetRectangle(OtmContextualFacet member, DexSprite<OtmLibraryMember> parentSprite, double width) {
         super( 0, 0, width, 0 );
-        // this.facet = facet;
-        this.cFacet = member;
+        this.otmObject = member;
         this.parent = parentSprite;
         this.icon = member.getIcon();
         this.label = member.getName();
@@ -112,13 +112,26 @@ public class FacetRectangle extends Rectangle {
         draw( null, font );
     }
 
+    public FacetRectangle(OtmEnumeration<?> member, DexSprite<OtmLibraryMember> parentSprite, double width) {
+        super( 0, 0, width, 0 );
+        this.otmObject = member;
+        this.parent = parentSprite;
+        // Leave name and icon null to prevent label at top of facet
+        this.children = member.getChildren();
+
+        if (parentSprite != null)
+            this.font = parentSprite.getFont();
+        else
+            this.font = GraphicsCanvasController.DEFAULT_FONT;
+        // Compute the size
+        draw( null, font );
+    }
+
     public FacetRectangle(OtmValueWithAttributes member, DexSprite<OtmLibraryMember> parentSprite, double width) {
         super( 0, 0, width, 0 );
-        // this.facet = facet;
-        // this.cFacet = member;
+        this.otmObject = member;
         this.parent = parentSprite;
-        this.icon = member.getIcon();
-        this.label = member.getName();
+        // Leave name and icon null to prevent label at top of facet
         this.icon = null;
         this.label = null;
         this.children = member.getChildren();
