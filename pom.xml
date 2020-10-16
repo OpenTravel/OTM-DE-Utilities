@@ -22,6 +22,7 @@
 		<module>ota2-message-validator</module>
 		<module>ota2-example-upgrade-utility</module>
 		<module>ota2-app-launcher</module>
+		<module>ota2-app-launcher-bundle</module>
 		<module>utilities-test-aggregate</module>
 	</modules>
 

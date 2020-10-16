@@ -18,7 +18,6 @@ package org.opentravel.launcher;
 
 import org.apache.commons.lang3.StringUtils;
 import org.opentravel.application.common.AbstractMainWindowController;
-import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.OTA2ApplicationProvider;
 import org.opentravel.application.common.OTA2ApplicationSpec;
 import org.opentravel.application.common.OTA2LauncherTabSpec;
@@ -29,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
@@ -54,7 +54,6 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -72,6 +71,7 @@ public class LauncherController extends AbstractMainWindowController {
     private static final Logger log = LoggerFactory.getLogger( LauncherController.class );
 
     private static final String APP_CLASS_KEY = "appClass";
+    private static final String APP_LIBFOLDER_KEY = "appLibraryFolderPath";
     private static final String APP_PROCESS_KEY = "appProcess";
     private static final String MSG_ALREADY_RUNNING_TITLE = "alert.alreadyRunning.title";
     private static final String MSG_ALREADY_RUNNING_MESSAGE = "alert.alreadyRunning.message";
@@ -122,29 +122,28 @@ public class LauncherController extends AbstractMainWindowController {
      * 
      * @param event the action event that triggered this method call
      */
-    @SuppressWarnings("unchecked")
     @FXML
     public void launchUtilityApp(ActionEvent event) {
         Button sourceButton = (Button) event.getSource();
-        Class<? extends AbstractOTMApplication> appClass =
-            (Class<? extends AbstractOTMApplication>) sourceButton.getProperties().get( APP_CLASS_KEY );
+        String appClassname = (String) sourceButton.getProperties().get( APP_CLASS_KEY );
+        String appLibraryFolderPath = (String) sourceButton.getProperties().get( APP_LIBFOLDER_KEY );
         Process appProcess = (Process) sourceButton.getProperties().get( APP_PROCESS_KEY );
 
         if ((appProcess != null) && appProcess.isAlive()) {
             Alert alert = new Alert( AlertType.INFORMATION );
 
             alert.setTitle( MessageBuilder.formatMessage( MSG_ALREADY_RUNNING_TITLE ) );
-            alert.setHeaderText( MessageBuilder.getDisplayName( appClass ) );
+            alert.setHeaderText( sourceButton.getText() );
             alert.setContentText( MessageBuilder.formatMessage( MSG_ALREADY_RUNNING_MESSAGE ) );
             alert.showAndWait();
 
         } else {
-            String statusMessage =
-                MessageBuilder.formatMessage( MSG_LAUNCH_TITLE, MessageBuilder.getDisplayName( appClass ) );
+            String statusMessage = MessageBuilder.formatMessage( MSG_LAUNCH_TITLE, sourceButton.getText() );
             Runnable r = new BackgroundTask( statusMessage, StatusType.INFO ) {
                 @Override
                 public void execute() throws OtmApplicationException {
-                    launchApplicationProcess( sourceButton, appClass );
+                    launchApplicationProcess( sourceButton, appClassname, sourceButton.getText(),
+                        appLibraryFolderPath );
                 }
             };
 
@@ -157,15 +156,17 @@ public class LauncherController extends AbstractMainWindowController {
      * Spawns an external Java process for the selected application.
      * 
      * @param sourceButton the button that was clicked by the user to launch an application
-     * @param appClass the JavaFX application class for the utility being launched
+     * @param appClassname the fully-qualified JavaFX application class name for the utility being launched
+     * @param appDisplayName the display name for the application being launched
+     * @param appLibraryFolderPath folder path for the application's library jars (may be null for native apps)
      * @throws OtmApplicationException thrown if an error occurs while launching the application
      */
-    private void launchApplicationProcess(Button sourceButton, Class<? extends AbstractOTMApplication> appClass)
-        throws OtmApplicationException {
+    private void launchApplicationProcess(Button sourceButton, String appClassname, String appDisplayName,
+        String appLibraryFolderPath) throws OtmApplicationException {
         try {
             String javaHome = System.getProperty( "java.home" );
             String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
-            String classpath = System.getProperty( "java.class.path" );
+            String classpath = getClasspath( appLibraryFolderPath );
             UserSettings settings = UserSettings.load();
             List<String> cmds = new ArrayList<>( Arrays.asList( javaBin, "-cp", classpath ) );
             ProcessBuilder builder;
@@ -189,10 +190,12 @@ public class LauncherController extends AbstractMainWindowController {
             }
 
             // Build and execute the command to start the new sub-process
-            cmds.add( appClass.getCanonicalName() );
+            for (String appCmd : appClassname.split( "\\s+" )) {
+                cmds.add( appCmd );
+            }
             builder = new ProcessBuilder( cmds );
             builder.redirectErrorStream( true );
-            builder.redirectOutput( Redirect.appendTo( getLogFile( appClass ) ) );
+            builder.redirectOutput( Redirect.appendTo( getLogFile( appClassname ) ) );
             newProcess = builder.start();
             sourceButton.getProperties().put( APP_PROCESS_KEY, newProcess );
 
@@ -203,12 +206,48 @@ public class LauncherController extends AbstractMainWindowController {
             if (!newProcess.isAlive()) {
                 sourceButton.getProperties().put( APP_PROCESS_KEY, null );
                 throw new OtmApplicationRuntimeException(
-                    MessageBuilder.formatMessage( MSG_LAUNCH_ERROR, MessageBuilder.getDisplayName( appClass ) ) );
+                    MessageBuilder.formatMessage( MSG_LAUNCH_ERROR, appDisplayName ) );
             }
 
         } catch (Exception e) {
             throw new OtmApplicationException( e.getMessage(), e );
         }
+    }
+
+    /**
+     * Returns the classpath to use when launching an application. If the given library folder path is null, the current
+     * system classpath will be returned. If non-null, the classpath will include all jar files in that folder.
+     * 
+     * @param libraryFolderPath the library folder path for the application jars (may be null)
+     * @return String
+     * @throws FileNotFoundException thrown if the specified library folder path does not exist
+     */
+    private String getClasspath(String libraryFolderPath) throws FileNotFoundException {
+        String localCp = System.getProperty( "java.class.path" );
+        String cp;
+
+        if (libraryFolderPath != null) {
+            File libFolder = new File( System.getProperty( "user.dir" ) + libraryFolderPath );
+            String javaHome = System.getProperty( "java.home" );
+            StringBuilder cpb = new StringBuilder();
+
+            if (!libFolder.exists()) {
+                throw new FileNotFoundException(
+                    String.format( "The application's library folder \"%s\" does not exist.", libraryFolderPath ) );
+            }
+
+            for (String lcpPart : localCp.split( File.pathSeparator )) {
+                if (lcpPart.startsWith( javaHome )) {
+                    cpb.append( lcpPart ).append( File.pathSeparatorChar );
+                }
+            }
+            cpb.append( libFolder.getAbsolutePath() + File.separator + "*" );
+            cp = cpb.toString();
+
+        } else {
+            cp = localCp;
+        }
+        return cp;
     }
 
     /**
@@ -298,7 +337,7 @@ public class LauncherController extends AbstractMainWindowController {
             TilePane buttonPane = newTab( tabSpec.getName() );
 
             for (OTA2ApplicationSpec appSpec : entry.getValue()) {
-                Button launchButton = newAppIcon( appSpec.getApplicationClass(), appSpec.getLaunchIcon() );
+                Button launchButton = newAppIcon( appSpec );
 
                 buttonPane.getChildren().add( launchButton );
                 launchButtons.add( launchButton );
@@ -356,31 +395,43 @@ public class LauncherController extends AbstractMainWindowController {
      * Constructs a new utility application icon that will launch the given application class when the button is
      * clicked.
      * 
-     * @param appClass the JavaFX application class to use when launching the utility
-     * @param image the image icon to display on the button
+     * @param appSpec the application spec for the application to be launched
      * @return Button
      */
-    private Button newAppIcon(Class<? extends AbstractOTMApplication> appClass, Image image) {
+    private Button newAppIcon(OTA2ApplicationSpec appSpec) {
         ImageView buttonImg = new ImageView();
         Button appButton = new Button();
 
-        buttonImg.setImage( image );
-        appButton.setText( MessageBuilder.getDisplayName( appClass ) );
+        buttonImg.setImage( appSpec.getLaunchIcon() );
+        appButton.setText( appSpec.getName() );
         appButton.setGraphic( buttonImg );
         appButton.setContentDisplay( ContentDisplay.TOP );
         appButton.setOnAction( this::launchUtilityApp );
-        appButton.getProperties().put( APP_CLASS_KEY, appClass );
+        appButton.getProperties().put( APP_CLASS_KEY, appSpec.getApplicationClassname() );
+        appButton.getProperties().put( APP_LIBFOLDER_KEY, appSpec.getLibraryFolderPath() );
         return appButton;
+    }
+
+    /**
+     * Returns the simple name of the class with the given qualified name.
+     * 
+     * @param classname the fully-qualified name of the Java class
+     * @return String
+     */
+    private String getSimpleClassname(String classname) {
+        int lastIdx = classname.lastIndexOf( '.' );
+
+        return (lastIdx < 0) ? classname : classname.substring( lastIdx + 1 );
     }
 
     /**
      * Returns the file to which the given application class's log output should be directed.
      * 
-     * @param appClass the utility application class for which to return a log file
+     * @param appClassname the utility application class name for which to return a log file
      * @return File
      */
-    private File getLogFile(Class<?> appClass) {
-        return new File( getLogFolder(), appClass.getSimpleName() + ".log" );
+    private File getLogFile(String appClassname) {
+        return new File( getLogFolder(), getSimpleClassname( appClassname ) + ".log" );
     }
 
     /**
