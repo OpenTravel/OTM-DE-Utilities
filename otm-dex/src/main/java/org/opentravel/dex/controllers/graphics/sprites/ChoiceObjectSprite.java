@@ -36,8 +36,13 @@ import javafx.scene.text.Font;
 public class ChoiceObjectSprite extends MemberSprite<OtmChoiceObject> implements DexSprite<OtmLibraryMember> {
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
-    public ChoiceObjectSprite(OtmChoiceObject member, SpriteManager manager, GraphicsContext paramsGC) {
-        super( member, manager, paramsGC );
+    public ChoiceObjectSprite(OtmChoiceObject member, SpriteManager manager, SettingsManager settingsManager) {
+        super( member, manager, settingsManager );
+    }
+
+    @Override
+    public Rectangle drawContents(final double x, final double y) {
+        return drawContents( settingsManager.getGc(), settingsManager.getFont(), x, y );
     }
 
     @Override

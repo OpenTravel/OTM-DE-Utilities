@@ -25,12 +25,16 @@ import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
 import org.opentravel.dex.controllers.graphics.sprites.SpriteManager;
+import org.opentravel.dex.controllers.graphics.sprites.connections.SuperTypeConnection;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventType;
@@ -51,8 +55,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 
 /**
  * Manage the Graphics display
@@ -62,10 +67,8 @@ import javafx.scene.text.Font;
 public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObject> {
     private static Log log = LogFactory.getLog( GraphicsCanvasController.class );
 
-    // private static final Font DEFAULT_FONT = new Font( "Arial", 14 );
     public static final Font DEFAULT_FONT = new Font( "Monospaced", 15 );
-    private static final Paint DEFAULT_STROKE = Color.BLACK;
-    static final Paint DEFAULT_FILL = Color.gray( 0.8 );
+    public static final Font DEFAULT_FONT_ITALIC = Font.font( "Monospaced", FontWeight.NORMAL, FontPosture.ITALIC, 15 );
 
     private static final EventType[] subscribedEvents =
         {DexMemberSelectionEvent.MEMBER_SELECTED, DexMemberSelectionEvent.DOUBLE_CLICK_MEMBER_SELECTED};
@@ -78,6 +81,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
     private DexMainController parentController = null;
     private SpriteManager spriteManager;
+    private SettingsManager settingsManager;
 
     private Pane spritePane;
     private ScrollPane scrollPane = null;
@@ -92,6 +96,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
     private boolean isLocked = false;
     private boolean tracking = true;
+
 
     public GraphicsCanvasController() {
         super( subscribedEvents, publishedEvents );
@@ -131,12 +136,14 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         spritePane.getChildren().add( backgroundCanvas );
         backgroundGC = backgroundCanvas.getGraphicsContext2D();
 
-        backgroundGC.setFont( DEFAULT_FONT );
-        backgroundGC.setFill( DEFAULT_FILL );
-        backgroundGC.setStroke( DEFAULT_STROKE );
+        settingsManager = new SettingsManager( spritePane, this, backgroundGC );
+
+        backgroundGC.setFont( settingsManager.getDefaultFont() );
+        backgroundGC.setFill( settingsManager.getDefaultFill() );
+        backgroundGC.setStroke( settingsManager.getDefaultStroke() );
         backgroundGC.setLineWidth( 1 );
 
-        spriteManager = new SpriteManager( spritePane, this, backgroundGC );
+        spriteManager = new SpriteManager( this, settingsManager );
 
         log.debug( "Configured graphics canvas." );
     }
@@ -170,19 +177,22 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         Separator tSep = new Separator( Orientation.VERTICAL );
         ToggleSwitch trackS = new ToggleSwitch( "Track" );
         trackS.selectedProperty().addListener( (v, o, n) -> doTrack( n ) );
-
-        Separator cSep = new Separator( Orientation.VERTICAL );
-        ToggleSwitch collapseS = new ToggleSwitch( "Collapse" );
-        collapseS.selectedProperty().addListener( (v, o, n) -> doCollapse( n ) );
+        trackS.setSelected( tracking );
 
         Separator lockSep = new Separator( Orientation.VERTICAL );
         ToggleSwitch lockS = new ToggleSwitch( "Lock" );
         ImageView lockI = ImageManager.get( Icons.LOCK );
         lockS.selectedProperty().addListener( (v, o, n) -> doLock( n ) );
+        // lockS.setSelected( isLocked() );
+
+        Separator cSep = new Separator( Orientation.VERTICAL );
+        ToggleSwitch collapseS = new ToggleSwitch( "Collapse" );
+        collapseS.selectedProperty().addListener( (v, o, n) -> doCollapse( n ) );
 
         Separator fontSep = new Separator( Orientation.VERTICAL );
         Label fontL = new Label( "Font" );
         Slider fontS = new Slider( 8, 24, 14 ); // Min, max, current
+        // Slider fontS = new Slider( 1, 99, 1 ); // Min, max, current
         fontS.valueProperty().addListener( (v, o, n) -> doFont( n ) );
 
         Separator dSep = new Separator( Orientation.VERTICAL );
@@ -192,7 +202,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         ColorPicker colorP = new ColorPicker();
         colorP.setOnAction( this::doColor );
 
-        ToolBar tb = new ToolBar( clearB, refreshB, tSep, trackS, cSep, collapseS, lockSep, lockS, lockI, fontSep,
+        ToolBar tb = new ToolBar( clearB, refreshB, tSep, trackS, lockSep, lockS, lockI, cSep, collapseS, fontSep,
             fontL, fontS, colorP, dSep, doodleS );
         parent.getChildren().add( tb );
         tb.setStyle( "-fx-background-color: #7cafc2" );
@@ -257,6 +267,9 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     }
 
     public void doFont(Number v) {
+        // double scale = 1 - v.doubleValue() / 100;
+        // spritePane.setScaleX( scale );
+        // spritePane.setScaleY( scale );
         log.debug( "Change font size to: " + v.intValue() );
         spriteManager.update( v.intValue() );
     }
@@ -302,9 +315,24 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         log.debug( "Graphics canvas controller posting object: " + o );
         if (o instanceof OtmLibraryMember) {
             OtmLibraryMember member = (OtmLibraryMember) o;
+            ColumnRectangle userColumn = spriteManager.getColumn( 1 );
+            ColumnRectangle memberColumn = spriteManager.getColumn( 2 );
+            // ColumnRectangle providerColumn = spriteManager.getColumn( 3 );
+
             if (tracking)
                 spriteManager.clear();
-            DexSprite<?> s = spriteManager.add( member );
+
+            // Add base type
+            DexSprite<OtmLibraryMember> baseSprite = null;
+            if (member.getBaseType() instanceof OtmLibraryMember)
+                baseSprite = spriteManager.add( (OtmLibraryMember) member.getBaseType(), memberColumn, true );
+
+            // Add member and connection
+            DexSprite<?> s = spriteManager.add( member, memberColumn, false );
+            if (baseSprite != null)
+                spriteManager.addAndDraw( new SuperTypeConnection( s, baseSprite ) );
+
+            // Add member and users and providers
             if (s != null) {
                 if (tracking) {
                     // Display the type providers
@@ -312,7 +340,15 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
                     double dy = s.getBoundaries().getY() + s.getBoundaries().getHeight() / 2;
                     DexSprite<?> newS = null;
                     for (OtmTypeUser user : member.getDescendantsTypeUsers()) {
-                        newS = s.connect( user, s, dx, dy );
+                        if (user.getAssignedType() != null && !(user.getAssignedType() instanceof OtmSimpleObjects))
+                            newS = s.connect( user, s, dx, dy ); // FIXME - don't pass x and y
+                        if (newS != null)
+                            newS.setCollapsed( true );
+                    }
+                    // Display the users
+                    for (OtmLibraryMember user : member.getWhereUsed()) {
+                        if (user != member)
+                            newS = spriteManager.add( user, userColumn, true );
                         if (newS != null)
                             newS.setCollapsed( true );
                     }

@@ -34,8 +34,13 @@ import javafx.scene.text.Font;
  */
 public class EnumerationSprite extends MemberSprite<OtmEnumeration<?>> implements DexSprite<OtmLibraryMember> {
 
-    public EnumerationSprite(OtmEnumeration<?> member, SpriteManager manager, GraphicsContext paramsGC) {
-        super( member, manager, paramsGC );
+    public EnumerationSprite(OtmEnumeration<?> member, SpriteManager manager, SettingsManager settingsManager) {
+        super( member, manager, settingsManager );
+    }
+
+    @Override
+    public Rectangle drawContents(final double x, final double y) {
+        return drawContents( settingsManager.getGc(), settingsManager.getFont(), x, y );
     }
 
     @Override

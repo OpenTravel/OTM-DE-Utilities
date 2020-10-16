@@ -17,26 +17,23 @@
 package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.Font;
 
 /**
- * Graphics Display Object (Sprite) for containing OTM VWA object.
+ * Graphics Display Object (Sprite) for containing OTM Emumeration object.
  * 
  * @author dmh
  * @param <O>
  *
  */
-public class VWASprite extends MemberSprite<OtmValueWithAttributes> implements DexSprite<OtmLibraryMember> {
-    // gets log from base class
-    // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
+public class ResourceSprite extends MemberSprite<OtmResource> implements DexSprite<OtmLibraryMember> {
 
-    public VWASprite(OtmValueWithAttributes member, SpriteManager manager, SettingsManager settingsManager) {
+    public ResourceSprite(OtmResource member, SpriteManager manager, SettingsManager settingsManager) {
         super( member, manager, settingsManager );
     }
 
@@ -47,32 +44,37 @@ public class VWASprite extends MemberSprite<OtmValueWithAttributes> implements D
 
     @Override
     public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
-        boolean compute = gc == null;
         Rectangle rect = null;
 
-        double dxSummary = FacetRectangle.SUMMARY_OFFSET;
+        double dx = FacetRectangle.ID_OFFSET;
         double width = getBoundaries().getWidth();
         double fy = y + FacetRectangle.FACET_MARGIN;
 
-        // Show value type
-        rect = new PropertyRectangle( getMember(), this, width );
-        rect.set( x + dxSummary, fy ).draw( gc, true );
-        fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
-        width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
+        rect = GraphicsUtils.drawLabel( "TODO", null, gc, font, x + dx, fy );
+        width = computeWidth( gc == null, width, rect, 0 );
+        Demos.postSmileyFace( gc, dx, fy );
+        width += 300;
+        fy += 300;
 
-        // Show facets
-        if (!isCollapsed()) {
-            rect = new FacetRectangle( getMember(), this, width - dxSummary );
-            rect.set( x + dxSummary, fy ).draw( gc, true );
-            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
-            width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
-
-        }
-        // Return the enclosing rectangle
-        // Rectangle sRect = new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
-        // log.debug( "Drew choice contents into " + sRect );
-        // fRect.draw( gc, false );
-        // return sRect;
+        // Show base type
+        // // Show open's Other property
+        // if (getMember() instanceof OtmEnumerationOpen) {
+        // rect = GraphicsUtils.drawLabel( "Other", null, false, gc, font, x + dx, fy );
+        // fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+        // }
+        //
+        // // Show values
+        // if (!isCollapsed()) {
+        // rect = new FacetRectangle( getMember(), this, width - dx );
+        // rect.set( x + dx, fy ).draw( gc, true );
+        // fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+        // width = computeWidth( compute, width, rect, dx );
+        // }
+        // // Return the enclosing rectangle
+        // // Rectangle sRect = new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
+        // // log.debug( "Drew choice contents into " + sRect );
+        // // fRect.draw( gc, false );
+        // // return sRect;
         return new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
     }
 

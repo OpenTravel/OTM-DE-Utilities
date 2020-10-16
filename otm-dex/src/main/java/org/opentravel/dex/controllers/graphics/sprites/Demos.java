@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
@@ -130,10 +131,24 @@ public class Demos {
     }
 
     public static void postSmileyFace(GraphicsContext gc, double x, double y) {
-        gc.strokeOval( x + 100, y + 50, 200, 200 );
-        gc.fillOval( x + 155, y + 100, 10, 20 );
-        gc.fillOval( x + 230, y + 100, 10, 20 );
-        gc.strokeArc( x + 150, y + 160, 100, 50, 180, 180, ArcType.OPEN );
+        if (gc != null) {
+            Paint saveFill = gc.getFill();
+            Paint saveStroke = gc.getStroke();
+            double saveLW = gc.getLineWidth();
+
+            gc.setFill( Color.DARKSLATEBLUE );
+            gc.setStroke( Color.LIGHTSTEELBLUE );
+            gc.setLineWidth( 5 );
+
+            gc.strokeOval( x + 100, y + 50, 200, 200 );
+            gc.fillOval( x + 155, y + 100, 10, 20 );
+            gc.fillOval( x + 230, y + 100, 10, 20 );
+            gc.strokeArc( x + 150, y + 160, 100, 50, 180, 180, ArcType.OPEN );
+
+            gc.setFill( saveFill );
+            gc.setStroke( saveStroke );
+            gc.setLineWidth( saveLW );
+        }
     }
 
     public static void drawLines(GraphicsContext gc, double x, double y) {

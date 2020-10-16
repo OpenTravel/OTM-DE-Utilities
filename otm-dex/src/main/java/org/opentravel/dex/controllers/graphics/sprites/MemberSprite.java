@@ -21,11 +21,11 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils.DrawType;
 import org.opentravel.dex.controllers.graphics.sprites.connections.TypeConnection;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle.RectangleEventHandler;
-import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
@@ -60,6 +60,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     private double x;
     private double y;
     protected M member;
+    protected ColumnRectangle column;
     private Canvas canvas;
     private GraphicsContext gc = null;
 
@@ -69,22 +70,27 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     private List<Rectangle> rectangles = new ArrayList<>();
     private SpriteManager manager;
 
+    protected SettingsManager settingsManager;
+
     /**
      * Initialize member sprite. Create canvas and save GC for parameters.
      * 
      * @param member
      * @param paramsGC - source of font and color information ONLY. If null, defaults are used.
      */
-    public MemberSprite(M member, SpriteManager manager, GraphicsContext paramsGC) {
+    public MemberSprite(M member, SpriteManager manager, SettingsManager settingsManager) {
         this.member = member;
 
         this.manager = manager;
-        boundaries = new Rectangle( 0, 0, 0, 0 );
+        this.settingsManager = settingsManager;
 
         //
         canvas = new Canvas( MIN_WIDTH, MIN_HEIGHT );
         gc = canvas.getGraphicsContext2D();
-        setGCParams( paramsGC );
+        setGCParams( settingsManager.getGc() );
+
+        // boundaries = new Rectangle( 0, 0, 0, 0 );
+        setBoundaries( 0, 0 );
     }
 
     @Override
@@ -150,6 +156,17 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     }
 
     @Override
+    public SettingsManager getSettingsManager() {
+        return settingsManager;
+    }
+
+    @Override
+    public Canvas render(Point2D point) {
+        set( point );
+        return render();
+    }
+
+    @Override
     public Canvas render() {
         log.debug( "Rendering at " + x + " " + y + " sprite for: " + member );
         if (member == null || manager == null)
@@ -203,7 +220,10 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
      * @param y
      * @return rectangle around all contents
      */
+    @Deprecated
     public abstract Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y);
+
+    public abstract Rectangle drawContents(final double x, final double y);
 
     /**
      * Draw background, label and controls.
@@ -308,12 +328,27 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
             selected.onMouseClicked( e );
     }
 
+    @Override
+    public void set(ColumnRectangle column) {
+        this.column = column;
+    }
 
+    @Override
+    @Deprecated
     public void set(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
+    @Override
+    public void set(Point2D p) {
+        if (p != null) {
+            x = p.getX();
+            y = p.getY();
+        }
+    }
+
+    @Override
     public void setBackgroundColor(Color color) {
         gc.setFill( color );
     }
@@ -383,7 +418,19 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
 
     @Override
     public Font getFont() {
+        if (gc.getFont() == null)
+            return settingsManager.getFont();
         return gc.getFont();
+    }
+
+    @Override
+    public Font getItalicFont() {
+        return settingsManager.getItalicFont();
+    }
+
+    @Override
+    public ColumnRectangle getColumn() {
+        return column;
     }
 
     /**
@@ -392,44 +439,50 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
      * @param user
      * @param column which column to put the new sprite into
      */
-    // TODO - why not pass in the property rectangle?
     @Override
     public DexSprite<?> connect(OtmTypeUser user, DexSprite<?> from, double x, double y) {
         // log.debug( "Connecting to " + user );
-        DexSprite<?> newSprite = null;
-        if (user != null && user.getAssignedType() instanceof OtmTypeProvider) {
-            OtmLibraryMember provider = user.getAssignedType().getOwningMember();
-            if (provider != user.getOwningMember()) {
-                Point2D p = manager.getNextRightColumn( this );
-                newSprite = manager.add( provider, p.getX(), p.getY() );
+        if (user == null || user.getAssignedType() == null || !(user instanceof OtmProperty))
+            return null;
+        OtmLibraryMember provider = user.getAssignedType().getOwningMember();
+        if (provider == null || provider.getOwningMember() == user.getOwningMember())
+            return null;
 
-                // Place the new sprite and connect it
-                if (newSprite != null) {
-                    newSprite.refresh();
-
-                    // Find the rectangle and make type connection
-                    Rectangle fRect;
-                    if (user instanceof OtmProperty)
-                        fRect = from.find( (OtmProperty) user );
-                    else
-                        fRect = from.find( x, y );
-                    if (fRect != null) {
-                        TypeConnection c = new TypeConnection( fRect, from, newSprite );
-                        manager.addAndDraw( c );
-                    }
-                } else {
-                    // Manager already has the member displayed, remove it
-                    DexSprite<?> ps = manager.findSprite( provider );
-                    if (ps != null) {
-                        ps.getCanvas().toFront();
-                        ps.setCollapsed( !ps.isCollapsed() );
-                        ps.refresh();
-                    } else
-                        manager.remove( provider );
-                }
-            }
+        DexSprite<?> toSprite = manager.get( provider );
+        if (toSprite == null && from.getColumn() != null) {
+            // Place the new sprite and connect it
+            // Point2D p = manager.getNextRightColumn( this );
+            // from.getColumn().getNext();
+            toSprite = manager.add( provider, from.getColumn().getNext() );
+            connect( (OtmProperty) user, from, toSprite );
+        } else {
+            if (toSprite != null)
+                toSprite.setCollapsed( !toSprite.isCollapsed() );
         }
-        return newSprite;
+        if (toSprite != null) {
+            toSprite.getCanvas().toFront();
+            toSprite.refresh();
+        }
+        return toSprite;
+    }
+
+    /**
+     * Find the property's rectangle and make type connection
+     * 
+     * @param property
+     * @param from
+     * @param to
+     * @return
+     */
+    public TypeConnection connect(OtmProperty property, DexSprite<?> from, DexSprite<?> to) {
+        TypeConnection c = null;
+        Rectangle fRect;
+        fRect = from.find( property );
+        if (fRect != null) {
+            c = new TypeConnection( fRect, from, to );
+            manager.addAndDraw( c );
+        }
+        return c;
     }
 
     public String toString() {

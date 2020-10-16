@@ -128,17 +128,24 @@ public class GraphicsUtils {
      */
     public static Rectangle drawLabel(String label, Image image, GraphicsContext gc, Font font, final double x,
         final double y) {
-        return drawLabel( label, image, false, gc, font, x, y );
+        return drawLabel( label, image, true, false, gc, font, x, y );
     }
 
     public static Rectangle drawLabel(String label, Image image, boolean imageAfterText, GraphicsContext gc, Font font,
         final double x, final double y) {
+        return drawLabel( label, image, true, imageAfterText, gc, font, x, y );
+    }
+
+    public static Rectangle drawLabel(String label, Image image, boolean bold, boolean imageAfterText,
+        GraphicsContext gc, Font font, final double x, final double y) {
 
         // Compute size, start with start and end margins
         double width = 2 * LABEL_MARGIN;
         double height = 2 * LABEL_MARGIN;
         double imageWidth = 0;
         double imageHeight = 0;
+        Paint saveFill = null;
+        Font saveFont = null;
 
         // Add size of image
         if (image != null) {
@@ -152,15 +159,27 @@ public class GraphicsUtils {
         width += textSize.getX();
 
         if (gc != null) {
+            saveFill = gc.getFill();
+            saveFont = gc.getFont();
+            gc.setFill( Color.BLACK );
+            gc.setFont( font );
             if (imageAfterText) {
-                gc.strokeText( label, x + LABEL_MARGIN, y + textSize.getY() );
+                if (bold)
+                    gc.strokeText( label, x + LABEL_MARGIN, y + textSize.getY() );
+                else
+                    gc.fillText( label, x + LABEL_MARGIN, y + textSize.getY() );
                 if (image != null)
                     gc.drawImage( image, x + textSize.getX() + 2 + LABEL_MARGIN, y + 2 * LABEL_MARGIN );
             } else {
                 if (image != null)
                     gc.drawImage( image, x + LABEL_MARGIN, y + LABEL_MARGIN );
-                gc.strokeText( label, x + 2 * LABEL_MARGIN + imageWidth, y + textSize.getY() );
+                if (bold)
+                    gc.strokeText( label, x + 2 * LABEL_MARGIN + imageWidth, y + textSize.getY() );
+                else
+                    gc.fillText( label, x + 2 * LABEL_MARGIN + imageWidth, y + textSize.getY() );
             }
+            gc.setFill( saveFill );
+            gc.setFont( saveFont );
         }
         Rectangle lRect = new Rectangle( x, y, width, height );
         // lRect.draw( gc, false );

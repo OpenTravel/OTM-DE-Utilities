@@ -86,7 +86,8 @@ public class FacetRectangle extends Rectangle {
         this.parent = parentSprite;
         this.icon = facet.getIcon();
         this.label = facet.getName();
-        this.children = facet.getChildren();
+        this.children = facet.getInheritedChildren();
+        this.children.addAll( facet.getChildren() );
 
         if (parentSprite != null)
             this.font = parentSprite.getFont();
@@ -177,6 +178,7 @@ public class FacetRectangle extends Rectangle {
             Rectangle lRect = GraphicsUtils.drawLabel( label, icon, gc, font, x, y );
             height = lRect.getHeight();
             width = compute && lRect.getWidth() > width ? lRect.getWidth() : width;
+            // lRect.draw( gc, false );
         }
 
         // Properties
@@ -186,9 +188,11 @@ public class FacetRectangle extends Rectangle {
         if (!children.isEmpty()) {
             for (OtmObject c : children) {
                 if (c instanceof OtmProperty) {
-                    pRect = new PropertyRectangle( (OtmProperty) c, parent, font, width );
-                    pRect.set( px, py );
-                    pRect.draw( gc, true );
+                    if (c.isInherited())
+                        pRect = new PropertyRectangle( (OtmProperty) c, parent, parent.getItalicFont(), width );
+                    else
+                        pRect = new PropertyRectangle( (OtmProperty) c, parent, font, width );
+                    pRect.set( px, py ).draw( gc, true );
 
                     height += pRect.getHeight();
                     width = compute && pRect.getWidth() > width ? pRect.getWidth() : width;

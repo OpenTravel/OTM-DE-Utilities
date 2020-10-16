@@ -33,8 +33,13 @@ import javafx.scene.text.Font;
  */
 public class SimpleSprite extends MemberSprite<OtmSimpleObjects<?>> implements DexSprite<OtmLibraryMember> {
 
-    public SimpleSprite(OtmSimpleObjects<?> member, SpriteManager manager, GraphicsContext paramsGC) {
-        super( member, manager, paramsGC );
+    public SimpleSprite(OtmSimpleObjects<?> member, SpriteManager manager, SettingsManager settingsManager) {
+        super( member, manager, settingsManager );
+    }
+
+    @Override
+    public Rectangle drawContents(final double x, final double y) {
+        return drawContents( settingsManager.getGc(), settingsManager.getFont(), x, y );
     }
 
     @Override

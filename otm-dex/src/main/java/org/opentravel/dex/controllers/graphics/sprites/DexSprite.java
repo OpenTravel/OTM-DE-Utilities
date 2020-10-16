@@ -16,6 +16,7 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
+import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
@@ -87,11 +88,28 @@ public interface DexSprite<O extends OtmObject> {
     public Rectangle getBoundaries();
 
     /**
-     * @return the font from the active graphics context
+     * @return the drawing canvas
      */
-    Font getFont();
+    public Canvas getCanvas();
+
+    /**
+     * @return the column this sprite is in.
+     */
+    public ColumnRectangle getColumn();
+
+    /**
+     * @return the font from settings
+     */
+    public Font getFont();
+
+    public Font getItalicFont();
 
     public OtmLibraryMember getMember();
+
+    /**
+     * @return collapsed field
+     */
+    boolean isCollapsed();
 
     /**
      * Clear then draw the sprite.
@@ -104,9 +122,26 @@ public interface DexSprite<O extends OtmObject> {
     public Canvas render();
 
     /**
+     * @param point
+     * @return
+     */
+    Canvas render(Point2D point);
+
+    /**
+     * @param column
+     */
+    void set(ColumnRectangle column);
+
+    /**
      * Simply set the top, left coordinates.
      */
+    @Deprecated
     public void set(double x, double y);
+
+    /**
+     * @param p
+     */
+    void set(Point2D p);
 
     public void set(Font font);
 
@@ -118,12 +153,9 @@ public interface DexSprite<O extends OtmObject> {
     void setCollapsed(boolean collapsed);
 
     /**
-     * @return the drawing canvas
+     * @return
      */
-    public Canvas getCanvas();
+    SettingsManager getSettingsManager();
 
-    /**
-     * @return collapsed field
-     */
-    boolean isCollapsed();
+
 }

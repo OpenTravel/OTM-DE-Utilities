@@ -38,8 +38,13 @@ import javafx.scene.text.Font;
 public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implements DexSprite<OtmLibraryMember> {
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
-    public ContextualFacetSprite(OtmContextualFacet member, SpriteManager manager, GraphicsContext paramsGC) {
-        super( member, manager, paramsGC );
+    public ContextualFacetSprite(OtmContextualFacet member, SpriteManager manager, SettingsManager settingsManager) {
+        super( member, manager, settingsManager );
+    }
+
+    @Override
+    public Rectangle drawContents(final double x, final double y) {
+        return drawContents( settingsManager.getGc(), settingsManager.getFont(), x, y );
     }
 
     @Override
@@ -65,7 +70,7 @@ public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implem
         if (!isCollapsed() && !getMember().getChildren().isEmpty()) {
             rect = new FacetRectangle( (OtmContextualFacet) member, this, width );
             rect.set( fx, fy ).draw( gc, true );
-            width = compute && rect.getWidth() > width ? rect.getWidth() + fx : width;
+            width = computeWidth( compute, width, rect, ox );
         }
 
         // Rectangle fRect = new Rectangle( rect.getX(), rect.getY(), width, rect.getHeight() );

@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.GraphicsCanvasController;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
@@ -27,6 +29,7 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmProperties.OtmElement;
+import org.opentravel.model.otmProperties.OtmIdReferenceElement;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 import javafx.geometry.Point2D;
@@ -44,7 +47,7 @@ import javafx.scene.text.Font;
  *
  */
 public class PropertyRectangle extends Rectangle {
-    // private static Log log = LogFactory.getLog( PropertyRectangle.class );
+    private static Log log = LogFactory.getLog( PropertyRectangle.class );
 
     public static final double PROPERTY_MARGIN = 2;
     public static final double PROPERTY_OFFSET = 10; // left margin
@@ -73,6 +76,7 @@ public class PropertyRectangle extends Rectangle {
 
     private String label;
     private Image icon;
+    private boolean editable = false;
 
     private OtmTypeProvider typeProvider = null;
     private String providerLabel;
@@ -92,6 +96,7 @@ public class PropertyRectangle extends Rectangle {
         this.property = property;
         label = property.getName();
         icon = property.getIcon();
+        editable = property.isEditable();
 
         // Get type information
         if (property instanceof OtmTypeUser) {
@@ -125,6 +130,7 @@ public class PropertyRectangle extends Rectangle {
         label = "Simple";
         icon = core.getIcon();
         icon = null;
+        editable = core.isEditable();
 
         // Get type information
         typeProvider = core.getAssignedType();
@@ -151,6 +157,7 @@ public class PropertyRectangle extends Rectangle {
         // Get property information
         label = "Value";
         icon = null;
+        editable = vwa.isEditable();
 
         // Get type information
         typeProvider = vwa.getAssignedType();
@@ -172,9 +179,8 @@ public class PropertyRectangle extends Rectangle {
      */
     @Override
     public Rectangle draw(GraphicsContext gc, boolean filled) {
-        if (gc != null) {
+        if (gc != null)
             draw( gc, font );
-        }
         return this;
     }
 
@@ -188,22 +194,23 @@ public class PropertyRectangle extends Rectangle {
         double connectorSize = GraphicsUtils.drawConnector( null, null, 0, 0 ).getX();
         double rightMargin = connectorSize + PROPERTY_MARGIN;
         double actualWidth = rightMargin + PROPERTY_MARGIN; // actual width as computed
-
         //
         // Draw Property Name and icon
-        Rectangle lRect = GraphicsUtils.drawLabel( label, icon, gc, font, x, y );
+        Rectangle lRect = GraphicsUtils.drawLabel( label, icon, editable, false, gc, font, x, y );
         actualWidth += lRect.getWidth(); // Actual width
+        // lRect.draw( gc, false );
 
         // Draw Type provider if any
+        Rectangle tRect;
         if (typeProvider != null) {
-            Rectangle tRect;
             tRect = GraphicsUtils.drawLabel( providerLabel, providerIcon, null, font, x, y );
             actualWidth += tRect.getWidth() + PROPERTY_TYPE_MARGIN;
-            double tx = x + width - tRect.getWidth() - rightMargin - PROPERTY_MARGIN;
-            GraphicsUtils.drawLabel( providerLabel, providerIcon, true, gc, font, tx, y );
+            double tx = x + width - tRect.getWidth() - rightMargin - PROPERTY_MARGIN - PROPERTY_MARGIN;
+            GraphicsUtils.drawLabel( providerLabel, providerIcon, false, true, gc, font, tx, y );
+            // tRect.draw( gc, false );
         }
 
-        // Compute property Height
+        // Compute property height and width
         width = compute && actualWidth > width ? actualWidth : width;
         height = lRect.getHeight() + 2 * PROPERTY_MARGIN;
 
@@ -226,12 +233,13 @@ public class PropertyRectangle extends Rectangle {
 
         }
         // super.draw( gc, false ); // debug
+        // Log.debug("Drew "+this);
         return this;
     }
 
     private static String getCardinality(OtmProperty property) {
         String cardinality = "";
-        if (property instanceof OtmElement) {
+        if (property instanceof OtmElement && !(property instanceof OtmIdReferenceElement)) {
             if (property.isManditory())
                 cardinality = "[1";
             else

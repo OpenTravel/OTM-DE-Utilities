@@ -21,6 +21,7 @@ import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmFacets.OtmQueryFacet;
+import org.opentravel.model.otmFacets.OtmUpdateFacet;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
@@ -40,14 +41,20 @@ import javafx.scene.text.Font;
 public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> implements DexSprite<OtmLibraryMember> {
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
-    public BusinessObjectSprite(OtmBusinessObject member, SpriteManager manager, GraphicsContext paramsGC) {
-        super( member, manager, paramsGC );
+    public BusinessObjectSprite(OtmBusinessObject member, SpriteManager manager, SettingsManager settingsManager) {
+        super( member, manager, settingsManager );
     }
 
     @Override
     public OtmBusinessObject getMember() {
         return (OtmBusinessObject) member;
     }
+
+    @Override
+    public Rectangle drawContents(final double x, final double y) {
+        return drawContents( settingsManager.getGc(), settingsManager.getFont(), x, y );
+    }
+
 
     @Override
     public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
@@ -94,14 +101,16 @@ public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> impleme
                 width = computeWidth( compute, width, rect, dxDetail );
             }
         }
-        // TEST - contributed and contextual facets
         List<OtmCustomFacet> customs = new ArrayList<>();
         List<OtmQueryFacet> queries = new ArrayList<>();
+        List<OtmUpdateFacet> updates = new ArrayList<>();
         for (OtmContributedFacet cf : member.getChildrenContributedFacets())
             if (cf.getContributor() instanceof OtmCustomFacet)
                 customs.add( (OtmCustomFacet) cf.getContributor() );
             else if (cf.getContributor() instanceof OtmQueryFacet)
                 queries.add( (OtmQueryFacet) cf.getContributor() );
+            else if (cf.getContributor() instanceof OtmUpdateFacet)
+                updates.add( (OtmUpdateFacet) cf.getContributor() );
 
         for (OtmCustomFacet f : customs) {
             rect = new FacetRectangle( f, this, width - FacetRectangle.CUSTOM_OFFSET );
@@ -111,8 +120,13 @@ public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> impleme
         }
         for (OtmQueryFacet f : queries) {
             rect = new FacetRectangle( f, this, width - FacetRectangle.QUERY_OFFSET );
-            rect.set( x + FacetRectangle.QUERY_OFFSET, fy );
-            rect.draw( gc, true );
+            rect.set( x + FacetRectangle.QUERY_OFFSET, fy ).draw( gc, true );
+            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+            width = computeWidth( compute, width, rect, dxID );
+        }
+        for (OtmUpdateFacet f : updates) {
+            rect = new FacetRectangle( f, this, width - FacetRectangle.UPDATE_OFFSET );
+            rect.set( x + FacetRectangle.UPDATE_OFFSET, fy ).draw( gc, true );
             fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
             width = computeWidth( compute, width, rect, dxID );
         }
