@@ -9,10 +9,6 @@
 	<packaging>pom</packaging>
 	<name>OTA2.0 Native Utilities Application Bundle</name>
 
-	<properties>
-		<build.timestamp>${maven.build.timestamp}</build.timestamp>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.opentravel.otm</groupId>

@@ -8,6 +8,11 @@
 	<packaging>pom</packaging>
 	<name>OTA2.0 Utility Application Bundler</name>
 
+	<properties>
+		<build.timestamp>${maven.build.timestamp}</build.timestamp>
+		<maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
+	</properties>
+
 	<modules>
 		<module>native-utilities</module>
 	</modules>
