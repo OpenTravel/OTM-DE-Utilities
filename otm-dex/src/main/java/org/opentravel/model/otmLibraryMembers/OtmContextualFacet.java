@@ -236,7 +236,8 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
 
     @Override
     public List<OtmObject> getInheritedChildren() {
-        return Collections.emptyList(); // TODO
+        return Collections.emptyList();
+        // TODO
     }
 
     /**

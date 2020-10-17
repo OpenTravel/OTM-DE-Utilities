@@ -16,9 +16,9 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
-import org.opentravel.dex.controllers.graphics.GraphicsCanvasController;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
+import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
@@ -27,6 +27,7 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmProperties.OtmProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.scene.canvas.GraphicsContext;
@@ -73,76 +74,57 @@ public class FacetRectangle extends Rectangle {
 
 
     private OtmFacet<?> facet = null;
-    private OtmObject otmObject = null;
+    // private OtmObject otmObject = null;
     private DexSprite<OtmLibraryMember> parent;
     private Font font;
     private String label;
     private Image icon;
     private List<OtmObject> children;
+    boolean editable = false;
+
+    public FacetRectangle(OtmObject obj, DexSprite<OtmLibraryMember> parent, double width, String label, Image icon) {
+        super( 0, 0, width, 0 );
+        this.parent = parent;
+        this.font = parent.getFont();
+        this.icon = icon;
+        this.label = label;
+        this.editable = obj.isEditable();
+        if (obj instanceof OtmChildrenOwner)
+            this.children = getChildren( (OtmChildrenOwner) obj );
+    }
 
     public FacetRectangle(OtmFacet<?> facet, DexSprite<OtmLibraryMember> parentSprite, double width) {
-        super( 0, 0, width, 0 );
+        this( facet, parentSprite, width, facet.getName(), facet.getIcon() );
         this.facet = facet;
-        this.parent = parentSprite;
-        this.icon = facet.getIcon();
-        this.label = facet.getName();
-        this.children = facet.getInheritedChildren();
-        this.children.addAll( facet.getChildren() );
-
-        if (parentSprite != null)
-            this.font = parentSprite.getFont();
-        else
-            this.font = GraphicsCanvasController.DEFAULT_FONT;
         // Compute the size
         draw( null, font );
     }
 
     public FacetRectangle(OtmContextualFacet member, DexSprite<OtmLibraryMember> parentSprite, double width) {
-        super( 0, 0, width, 0 );
-        this.otmObject = member;
-        this.parent = parentSprite;
-        this.icon = member.getIcon();
-        this.label = member.getName();
-        this.children = member.getChildren();
-
-        if (parentSprite != null)
-            this.font = parentSprite.getFont();
-        else
-            this.font = GraphicsCanvasController.DEFAULT_FONT;
+        this( member, parentSprite, width, member.getName(), member.getIcon() );
         // Compute the size
         draw( null, font );
     }
 
     public FacetRectangle(OtmEnumeration<?> member, DexSprite<OtmLibraryMember> parentSprite, double width) {
-        super( 0, 0, width, 0 );
-        this.otmObject = member;
-        this.parent = parentSprite;
-        // Leave name and icon null to prevent label at top of facet
-        this.children = member.getChildren();
-
-        if (parentSprite != null)
-            this.font = parentSprite.getFont();
-        else
-            this.font = GraphicsCanvasController.DEFAULT_FONT;
+        this( member, parentSprite, width, null, null );
+        // this.otmObject = member;
         // Compute the size
         draw( null, font );
     }
 
     public FacetRectangle(OtmValueWithAttributes member, DexSprite<OtmLibraryMember> parentSprite, double width) {
-        super( 0, 0, width, 0 );
-        this.otmObject = member;
-        this.parent = parentSprite;
-        // Leave name and icon null to prevent label at top of facet
-        this.icon = null;
-        this.label = null;
-        this.children = member.getChildren();
-
-        if (parentSprite != null)
-            this.font = parentSprite.getFont();
-        else
-            this.font = GraphicsCanvasController.DEFAULT_FONT;
+        this( member, parentSprite, width, null, null );
+        // this.otmObject = member;
         // Compute the size
         draw( null, font );
+    }
+
+    private List<OtmObject> getChildren(OtmChildrenOwner owner) {
+        List<OtmObject> kids = new ArrayList<>();
+        kids.addAll( owner.getInheritedChildren() );
+        kids.addAll( owner.getChildren() );
+        return kids;
     }
 
     /**
@@ -175,7 +157,7 @@ public class FacetRectangle extends Rectangle {
 
         // Label
         if (label != null) {
-            Rectangle lRect = GraphicsUtils.drawLabel( label, icon, gc, font, x, y );
+            Rectangle lRect = GraphicsUtils.drawLabel( label, icon, editable, false, gc, font, x, y );
             height = lRect.getHeight();
             width = compute && lRect.getWidth() > width ? lRect.getWidth() : width;
             // lRect.draw( gc, false );
