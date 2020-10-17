@@ -88,6 +88,7 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+		<!--
 		<plugins>
 			<plugin>
 				<groupId>com.zenjava</groupId>
@@ -141,6 +142,7 @@
 				</executions>
 			</plugin>
 		</plugins>
+		-->
 	</build>
 
 </project>

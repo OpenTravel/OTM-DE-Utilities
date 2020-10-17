@@ -28,10 +28,11 @@ public class OTA2ApplicationSpec implements Comparable<OTA2ApplicationSpec> {
     private int priority;
     private OTA2LauncherTabSpec launcherTab;
     private Image launchIcon;
-    private Class<? extends AbstractOTMApplication> applicationClass;
+    private String applicationClassname;
+    private String libraryFolderPath;
 
     /**
-     * Full constructor.
+     * Constructor that accepts the Java class that will be used to launch the application.
      * 
      * @param name the name of the application
      * @param description a brief description of the application
@@ -42,11 +43,29 @@ public class OTA2ApplicationSpec implements Comparable<OTA2ApplicationSpec> {
      */
     public OTA2ApplicationSpec(String name, String description, int priority, OTA2LauncherTabSpec launcherTab,
         Image launchIcon, Class<? extends AbstractOTMApplication> applicationClass) {
+        this( name, description, priority, launcherTab, launchIcon, applicationClass.getName(), null );
+    }
+
+    /**
+     * Constructor that accepts the Java class that will be used to launch the application.
+     * 
+     * @param name the name of the application
+     * @param description a brief description of the application
+     * @param priority the priority that indicates the order of applications in the launcher tab
+     * @param launcherTab the spec for the tab where the application's launch button should be displayed
+     * @param launchIcon the icon to display on the launch button for the application
+     * @param applicationClassname the fully-qualified name of the application class to be called when launching the
+     *        application
+     * @param libraryFolderPath the path of the library folder to use when launching the application
+     */
+    public OTA2ApplicationSpec(String name, String description, int priority, OTA2LauncherTabSpec launcherTab,
+        Image launchIcon, String applicationClassname, String libraryFolderPath) {
         this.name = name;
         this.description = description;
         this.launcherTab = launcherTab;
         this.launchIcon = launchIcon;
-        this.applicationClass = applicationClass;
+        this.applicationClassname = applicationClassname;
+        this.applicationClassname = applicationClassname;
     }
 
     /**
@@ -88,10 +107,19 @@ public class OTA2ApplicationSpec implements Comparable<OTA2ApplicationSpec> {
     /**
      * Returns the application class to be called when launching the application.
      *
-     * @return Class&lt;? extends AbstractOTMApplication&gt;
+     * @return String
      */
-    public Class<? extends AbstractOTMApplication> getApplicationClass() {
-        return applicationClass;
+    public String getApplicationClassname() {
+        return applicationClassname;
+    }
+
+    /**
+     * Returns the path of the library folder to use when launching the application.
+     * 
+     * @return String
+     */
+    public String getLibraryFolderPath() {
+        return libraryFolderPath;
     }
 
     /**
