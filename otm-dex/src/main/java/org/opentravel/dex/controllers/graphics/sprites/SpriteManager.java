@@ -420,15 +420,12 @@ public class SpriteManager {
     }
 
     /**
-     * Update the font size then redraw the sprites and connections.
+     * Update the size then redraw the sprites and connections.
      * 
-     * @param fontSize
+     * @param size
      */
-    public void update(int fontSize) {
-        if (settingsManager.updateFontSize( fontSize )) {
-            // if (fontSize != this.fontSize) {
-            // Font font = new Font( DEFAULT_FONT_NAME, fontSize );
-            // defaultGC.setFont( font );
+    public void update(int size) {
+        if (settingsManager.updateSize( size )) {
             getAllSprites().forEach( s -> s.set( settingsManager.getFont() ) );
             refresh();
         }

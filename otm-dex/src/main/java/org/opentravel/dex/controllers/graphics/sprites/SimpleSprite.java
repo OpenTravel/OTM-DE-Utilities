@@ -38,11 +38,6 @@ public class SimpleSprite extends MemberSprite<OtmSimpleObjects<?>> implements D
     }
 
     @Override
-    public Rectangle drawContents(final double x, final double y) {
-        return drawContents( settingsManager.getGc(), settingsManager.getFont(), x, y );
-    }
-
-    @Override
     public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
         boolean compute = gc == null;
         Rectangle rect = null;

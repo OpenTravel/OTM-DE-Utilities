@@ -184,7 +184,7 @@ public class ColumnRectangle extends Rectangle {
     public void resize(double width) {
         this.width = width;
         if (nextColumn != null)
-            nextColumn.set( getMaxX(), COLUMN_MARGIN_X );
+            nextColumn.set( getMaxX(), COLUMN_MARGIN_Y );
     }
 
     @Override
@@ -194,6 +194,8 @@ public class ColumnRectangle extends Rectangle {
             s.set( x, s.getBoundaries().getY() );
             s.refresh();
         } );
+        if (nextColumn != null)
+            nextColumn.set( getMaxX(), COLUMN_MARGIN_Y );
         return this;
     }
 

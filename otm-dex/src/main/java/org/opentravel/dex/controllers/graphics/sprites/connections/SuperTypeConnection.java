@@ -36,16 +36,16 @@ public class SuperTypeConnection extends Connection {
         this.to = subTypeSprite;
     }
 
-    private void setFxy(Rectangle csb) {
+    private void setFxy(Rectangle btb) {
         // Connect to the base type's bottom center
-        fx = csb.getX() + csb.getWidth() / 2;
-        fy = csb.getMaxY();
+        fx = btb.getX() + btb.getWidth() / 2;
+        fy = btb.getMaxY();
     }
 
-    private void setTxy(Rectangle osb) {
+    private void setTxy(Rectangle stb) {
         // Connect to subType's top center
-        tx = osb.getX() + osb.getWidth() / 2;
-        ty = osb.getY();
+        tx = stb.getX() + stb.getWidth() / 2;
+        ty = stb.getY();
     }
 
     /**

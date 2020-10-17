@@ -36,10 +36,13 @@ import javafx.scene.text.FontWeight;
 public class SettingsManager {
     private static Log log = LogFactory.getLog( SettingsManager.class );
 
+    public static final double FONT_BASE = 8;
+    public static final double FONT_INCREMENT = 2;
     public static final Font DEFAULT_FONT = new Font( "Monospaced", 15 );
     public static final Font DEFAULT_FONT_ITALIC = Font.font( "Monospaced", FontWeight.NORMAL, FontPosture.ITALIC, 15 );
     private static final String DEFAULT_FONT_NAME = "Monospaced";
-    private int fontSize = 14;
+
+    private int currentSize = 3;
     private Font currentFont;
     private Font currentItalicFont;
 
@@ -78,10 +81,10 @@ public class SettingsManager {
         return DEFAULT_FONT;
     }
 
-    public Font getCurrentFont() {
-        return currentFont;
-    }
-
+    // public Font getCurrentFont() {
+    // return currentFont;
+    // }
+    //
     public Font getItalicFont() {
         return currentItalicFont;
     }
@@ -112,19 +115,25 @@ public class SettingsManager {
         return currentFont;
     }
 
+    public int getSize() {
+        return currentSize;
+    }
+
     public void update(Color color) {
         currentGC.setFill( color );
     }
 
     /**
      * 
-     * @param fontSize
+     * @param size a value from 1 to 5
      * @return true if the font has changed
      */
-    public boolean updateFontSize(int fontSize) {
-        if (fontSize != this.fontSize) {
-            currentFont = new Font( DEFAULT_FONT_NAME, fontSize );
-            currentItalicFont = Font.font( DEFAULT_FONT_NAME, FontWeight.NORMAL, FontPosture.ITALIC, fontSize );
+    public boolean updateSize(int size) {
+        if (size != this.currentSize) {
+            log.debug( "Setting size to " + size );
+            currentFont = new Font( DEFAULT_FONT_NAME, FONT_BASE + size * FONT_INCREMENT );
+            currentItalicFont = Font.font( DEFAULT_FONT_NAME, FontWeight.NORMAL, FontPosture.ITALIC,
+                FONT_BASE + size * FONT_INCREMENT );
             currentGC.setFont( currentFont );
             return true;
         }

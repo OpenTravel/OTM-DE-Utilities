@@ -65,7 +65,10 @@ public class TypeConnection extends Connection {
 
             // Move the point then draw
             if (from == sprite) {
-                if (fromRect != null) {
+                if (from.isCollapsed()) {
+                    fx = from.getBoundaries().getMaxX();
+                    fy = from.getBoundaries().getY() + sprite.getBoundaries().getHeight() / 2;
+                } else if (fromRect != null) {
                     fx = from.getBoundaries().getX() + offsetX;
                     fy = from.getBoundaries().getY() + offsetY;
                 } else {

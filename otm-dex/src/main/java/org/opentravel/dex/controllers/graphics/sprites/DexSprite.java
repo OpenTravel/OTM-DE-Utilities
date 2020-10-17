@@ -50,12 +50,12 @@ public interface DexSprite<O extends OtmObject> {
     public void clear();
 
     /**
+     * If needed, add sprite for the member that provides the type then add connection to new sprite. Otherwise, toggle
+     * the collapsed state.
+     * 
      * @param user
-     * @param from
-     * @param x
-     * @param y
      */
-    public DexSprite<?> connect(OtmTypeUser user, DexSprite<?> from, double x, double y);
+    public DexSprite<?> connect(OtmTypeUser user);
 
     /**
      * Is this point within the bounding box for the sprite?
@@ -148,7 +148,7 @@ public interface DexSprite<O extends OtmObject> {
     public void setBackgroundColor(Color color);
 
     /**
-     * @param collapsed
+     * Set the collapsed flag and resize.
      */
     void setCollapsed(boolean collapsed);
 
@@ -156,6 +156,13 @@ public interface DexSprite<O extends OtmObject> {
      * @return
      */
     SettingsManager getSettingsManager();
+
+    /**
+     * Connect this member to its base type.
+     * 
+     * @return
+     */
+    DexSprite<?> connect();
 
 
 }

@@ -188,10 +188,7 @@ public class FacetRectangle extends Rectangle {
         if (!children.isEmpty()) {
             for (OtmObject c : children) {
                 if (c instanceof OtmProperty) {
-                    if (c.isInherited())
-                        pRect = new PropertyRectangle( (OtmProperty) c, parent, parent.getItalicFont(), width );
-                    else
-                        pRect = new PropertyRectangle( (OtmProperty) c, parent, font, width );
+                    pRect = new PropertyRectangle( (OtmProperty) c, parent, width );
                     pRect.set( px, py ).draw( gc, true );
 
                     height += pRect.getHeight();

@@ -39,11 +39,6 @@ public class CoreObjectSprite extends MemberSprite<OtmCore> implements DexSprite
         super( member, manager, settingsManager );
     }
 
-    @Override
-    public Rectangle drawContents(final double x, final double y) {
-        return drawContents( settingsManager.getGc(), settingsManager.getFont(), x, y );
-    }
-
 
     @Override
     public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {

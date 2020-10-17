@@ -27,12 +27,12 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
 import org.opentravel.dex.controllers.graphics.sprites.SpriteManager;
-import org.opentravel.dex.controllers.graphics.sprites.connections.SuperTypeConnection;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 
@@ -125,7 +125,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         eventPublisherNode = graphicsPane;
         parentController = parent;
 
-        createToolBar( graphicsVBox );
+        createToolBar( graphicsVBox ); // to first to have at top
 
         spritePane = createSpritePane( graphicsVBox );
 
@@ -183,7 +183,6 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         ToggleSwitch lockS = new ToggleSwitch( "Lock" );
         ImageView lockI = ImageManager.get( Icons.LOCK );
         lockS.selectedProperty().addListener( (v, o, n) -> doLock( n ) );
-        // lockS.setSelected( isLocked() );
 
         Separator cSep = new Separator( Orientation.VERTICAL );
         ToggleSwitch collapseS = new ToggleSwitch( "Collapse" );
@@ -191,9 +190,10 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
         Separator fontSep = new Separator( Orientation.VERTICAL );
         Label fontL = new Label( "Font" );
-        Slider fontS = new Slider( 8, 24, 14 ); // Min, max, current
-        // Slider fontS = new Slider( 1, 99, 1 ); // Min, max, current
-        fontS.valueProperty().addListener( (v, o, n) -> doFont( n ) );
+        // Slider fontS = new Slider( 8, 24, 14 ); // Min, max, current
+        Slider fontS = new Slider( 1, 5, 3 ); // Min, max, current
+        fontS.setShowTickMarks( true );
+        fontS.valueProperty().addListener( (v, o, n) -> doSize( n ) );
 
         Separator dSep = new Separator( Orientation.VERTICAL );
         ToggleSwitch doodleS = new ToggleSwitch( "Draw" );
@@ -266,11 +266,8 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         }
     }
 
-    public void doFont(Number v) {
-        // double scale = 1 - v.doubleValue() / 100;
-        // spritePane.setScaleX( scale );
-        // spritePane.setScaleY( scale );
-        log.debug( "Change font size to: " + v.intValue() );
+    public void doSize(Number v) {
+        // log.debug( "Change font size to: " + v.intValue() );
         spriteManager.update( v.intValue() );
     }
 
@@ -324,33 +321,29 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
             // Add base type
             DexSprite<OtmLibraryMember> baseSprite = null;
-            if (member.getBaseType() instanceof OtmLibraryMember)
+            if (member.getBaseType() instanceof OtmLibraryMember && !(member instanceof OtmContextualFacet))
                 baseSprite = spriteManager.add( (OtmLibraryMember) member.getBaseType(), memberColumn, true );
 
             // Add member and connection
             DexSprite<?> s = spriteManager.add( member, memberColumn, false );
             if (baseSprite != null)
-                spriteManager.addAndDraw( new SuperTypeConnection( s, baseSprite ) );
+                s.connect();
 
             // Add member and users and providers
             if (s != null) {
                 if (tracking) {
                     // Display the type providers
-                    double dx = s.getBoundaries().getX() + s.getBoundaries().getWidth() / 2;
-                    double dy = s.getBoundaries().getY() + s.getBoundaries().getHeight() / 2;
                     DexSprite<?> newS = null;
                     for (OtmTypeUser user : member.getDescendantsTypeUsers()) {
                         if (user.getAssignedType() != null && !(user.getAssignedType() instanceof OtmSimpleObjects))
-                            newS = s.connect( user, s, dx, dy ); // FIXME - don't pass x and y
+                            newS = s.connect( user );
                         if (newS != null)
                             newS.setCollapsed( true );
                     }
                     // Display the users
                     for (OtmLibraryMember user : member.getWhereUsed()) {
                         if (user != member)
-                            newS = spriteManager.add( user, userColumn, true );
-                        if (newS != null)
-                            newS.setCollapsed( true );
+                            spriteManager.add( user, userColumn, true );
                     }
                     scrollPane.setVvalue( 0 );
                     scrollPane.setHvalue( 0 );

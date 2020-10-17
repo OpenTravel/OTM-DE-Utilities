@@ -37,10 +37,6 @@ public class ResourceSprite extends MemberSprite<OtmResource> implements DexSpri
         super( member, manager, settingsManager );
     }
 
-    @Override
-    public Rectangle drawContents(final double x, final double y) {
-        return drawContents( settingsManager.getGc(), settingsManager.getFont(), x, y );
-    }
 
     @Override
     public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
@@ -52,9 +48,11 @@ public class ResourceSprite extends MemberSprite<OtmResource> implements DexSpri
 
         rect = GraphicsUtils.drawLabel( "TODO", null, gc, font, x + dx, fy );
         width = computeWidth( gc == null, width, rect, 0 );
-        Demos.postSmileyFace( gc, dx, fy );
-        width += 300;
-        fy += 300;
+        if (!isCollapsed()) {
+            Demos.postSmileyFace( gc, x + dx, fy );
+            width += 300;
+            fy += 300;
+        }
 
         // Show base type
         // // Show open's Other property
