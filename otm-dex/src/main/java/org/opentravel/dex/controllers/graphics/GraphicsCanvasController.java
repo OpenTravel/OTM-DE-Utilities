@@ -184,14 +184,14 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         ImageView lockI = ImageManager.get( Icons.LOCK );
         lockS.selectedProperty().addListener( (v, o, n) -> doLock( n ) );
 
-        Separator cSep = new Separator( Orientation.VERTICAL );
-        ToggleSwitch collapseS = new ToggleSwitch( "Collapse" );
-        collapseS.selectedProperty().addListener( (v, o, n) -> doCollapse( n ) );
-
+        // Separator cSep = new Separator( Orientation.VERTICAL );
+        // ToggleSwitch collapseS = new ToggleSwitch( "Collapse" );
+        // collapseS.selectedProperty().addListener( (v, o, n) -> doCollapse( n ) );
+        //
         Separator fontSep = new Separator( Orientation.VERTICAL );
-        Label fontL = new Label( "Font" );
+        Label fontL = new Label( "Size" );
         // Slider fontS = new Slider( 8, 24, 14 ); // Min, max, current
-        Slider fontS = new Slider( 1, 5, 3 ); // Min, max, current
+        Slider fontS = new Slider( 1, 10, 5 ); // Min, max, current
         fontS.setShowTickMarks( true );
         fontS.valueProperty().addListener( (v, o, n) -> doSize( n ) );
 
@@ -202,8 +202,8 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         ColorPicker colorP = new ColorPicker();
         colorP.setOnAction( this::doColor );
 
-        ToolBar tb = new ToolBar( clearB, refreshB, tSep, trackS, lockSep, lockS, lockI, cSep, collapseS, fontSep,
-            fontL, fontS, colorP, dSep, doodleS );
+        ToolBar tb = new ToolBar( clearB, refreshB, tSep, trackS, lockSep, lockS, lockI, fontSep, fontL, fontS, colorP,
+            dSep, doodleS );
         parent.getChildren().add( tb );
         tb.setStyle( "-fx-background-color: #7cafc2" );
         return tb;

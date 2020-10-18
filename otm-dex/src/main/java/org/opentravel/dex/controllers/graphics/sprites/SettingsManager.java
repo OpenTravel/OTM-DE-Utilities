@@ -37,7 +37,7 @@ public class SettingsManager {
     private static Log log = LogFactory.getLog( SettingsManager.class );
 
     public static final double FONT_BASE = 8;
-    public static final double FONT_INCREMENT = 2;
+    public static final double FONT_INCREMENT = 1;
     public static final Font DEFAULT_FONT = new Font( "Monospaced", 15 );
     public static final Font DEFAULT_FONT_ITALIC = Font.font( "Monospaced", FontWeight.NORMAL, FontPosture.ITALIC, 15 );
     private static final String DEFAULT_FONT_NAME = "Monospaced";
@@ -50,9 +50,70 @@ public class SettingsManager {
 
     static final Paint DEFAULT_FILL = Color.gray( 0.8 );
 
+    private static final double FACET_OFFSET = 8;
+
+    public enum Offsets {
+        PROPERTY(10),
+        ID(FACET_OFFSET),
+        SHARED(FACET_OFFSET),
+        QUERY(FACET_OFFSET),
+        UPDATE(FACET_OFFSET),
+        SUMMARY(FACET_OFFSET + FACET_OFFSET),
+        CHOICE(FACET_OFFSET + FACET_OFFSET),
+        DETAIL(FACET_OFFSET + FACET_OFFSET + FACET_OFFSET),
+        CUSTOM(FACET_OFFSET + FACET_OFFSET + FACET_OFFSET);
+
+        public final double offset;
+
+        private Offsets(double offset) {
+            this.offset = offset;
+        }
+
+        public double getOffset() {
+            return this.offset;
+        }
+    }
+
+    public double getOffset(Offsets offset) {
+        return offset.getOffset() * scale;
+    }
+
+    private static final double FACET_MARGIN = 8;
+
+    public enum Margins {
+        FACET(FACET_MARGIN), PROPERTY(2), PROPERTY_TYPE(8);
+
+        public final double margin;
+
+        private Margins(double margin) {
+            this.margin = margin;
+        }
+
+        public double getMargin() {
+            return this.margin;
+        }
+    }
+
+    public double getMargin(Margins margin) {
+        return margin.getMargin() * scale;
+    }
+
+
+    // Left Margin offsets per facet type
+    // public static final double ID_OFFSET = FACET_OFFSET;
+    // public static final double SHARED_OFFSET = ID_OFFSET;
+    // public static final double QUERY_OFFSET = ID_OFFSET;
+    // public static final double UPDATE_OFFSET = ID_OFFSET;
+    // public static final double SUMMARY_OFFSET = ID_OFFSET + FACET_OFFSET;
+    // public static final double CHOICE_OFFSET = SUMMARY_OFFSET;
+    // public static final double DETAIL_OFFSET = SUMMARY_OFFSET + FACET_OFFSET;
+    // public static final double CUSTOM_OFFSET = DETAIL_OFFSET;
+
+    private static final Paint FACET_COLOR = Color.ANTIQUEWHITE;
+
     private static final double COLUMN_START = 10;
     private static final double COLUMN_WIDTH = 150;
-    private static final int FACET_OFFSET = 5;
+    // private static final int FACET_OFFSET = 5;
     private static final double MINIMUM_SLOT_HEIGHT = 20;
     private Paint backgroundColor = Color.gray( 0.95 );
 
@@ -60,6 +121,7 @@ public class SettingsManager {
     private DexIncludedController<?> controller;
 
     private GraphicsContext currentGC;
+    private double scale;
 
     /**
      * Initialize the sprite. Create connections canvas and add to pane. Set mouse click handler.
@@ -75,6 +137,7 @@ public class SettingsManager {
 
         currentFont = DEFAULT_FONT;
         currentItalicFont = DEFAULT_FONT_ITALIC;
+        scale = 1;
     }
 
     public Font getDefaultFont() {
@@ -125,8 +188,8 @@ public class SettingsManager {
 
     /**
      * 
-     * @param size a value from 1 to 5
-     * @return true if the font has changed
+     * @param size a value from 1 to 10
+     * @return true if the size has changed
      */
     public boolean updateSize(int size) {
         if (size != this.currentSize) {
@@ -135,6 +198,8 @@ public class SettingsManager {
             currentItalicFont = Font.font( DEFAULT_FONT_NAME, FontWeight.NORMAL, FontPosture.ITALIC,
                 FONT_BASE + size * FONT_INCREMENT );
             currentGC.setFont( currentFont );
+            //
+            scale = .2 + size * 0.125;
             return true;
         }
         return false;

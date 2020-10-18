@@ -34,12 +34,20 @@ public class TypeConnection extends Connection {
             || providerSprite.getBoundaries() == null)
             throw new IllegalArgumentException( "Missing rectangle on connection constructor." );
 
-        // Connect to the rectangle's right side
-        fx = propertyRect.getMaxX() - PropertyRectangle.PROPERTY_MARGIN;
-        offsetX = fx - userSprite.getBoundaries().getX();
         // Connect to connector arrow point
-        fy = propertyRect.getMaxY() - GraphicsUtils.CONNECTOR_SIZE / 2;
+        if (propertyRect instanceof PropertyRectangle) {
+            // use property rectangle connection point
+            fx = ((PropertyRectangle) propertyRect).getConnectionPoint().getX();
+            fy = ((PropertyRectangle) propertyRect).getConnectionPoint().getY();
+        } else {
+            // Connect to the rectangle's right side
+            fx = propertyRect.getMaxX();
+            fy = propertyRect.getMaxY() - GraphicsUtils.CONNECTOR_SIZE / 2;
+        }
+        // fx = propertyRect.getMaxX() - PropertyRectangle.PROPERTY_MARGIN;
+        offsetX = fx - userSprite.getBoundaries().getX();
         offsetY = fy - userSprite.getBoundaries().getY();
+
         // Connect to provider's left, center
         tx = providerSprite.getBoundaries().getX();
         ty = providerSprite.getBoundaries().getY() + providerSprite.getBoundaries().getHeight() / 2;

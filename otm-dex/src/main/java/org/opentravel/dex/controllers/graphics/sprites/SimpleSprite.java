@@ -16,7 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
-import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
@@ -33,39 +34,30 @@ import javafx.scene.text.Font;
  */
 public class SimpleSprite extends MemberSprite<OtmSimpleObjects<?>> implements DexSprite<OtmLibraryMember> {
 
+    double dx;
+    double margin;
+
     public SimpleSprite(OtmSimpleObjects<?> member, SpriteManager manager, SettingsManager settingsManager) {
         super( member, manager, settingsManager );
+        dx = settingsManager.getOffset( Offsets.ID );
+        margin = settingsManager.getMargin( Margins.FACET );
     }
 
     @Override
     public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
-        boolean compute = gc == null;
+        // boolean compute = gc == null;
         Rectangle rect = null;
 
-        double dx = FacetRectangle.ID_OFFSET;
         double width = getBoundaries().getWidth();
-        double fy = y + FacetRectangle.FACET_MARGIN;
+        double fy = y + margin;
 
         // Show base type
-        // // Show open's Other property
         // if (getMember() instanceof OtmEnumerationOpen) {
         // rect = GraphicsUtils.drawLabel( "Other", null, false, gc, font, x + dx, fy );
-        // fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+        // fy += rect.getHeight() + margin;
         // }
         //
-        // // Show values
-        // if (!isCollapsed()) {
-        // rect = new FacetRectangle( getMember(), this, width - dx );
-        // rect.set( x + dx, fy ).draw( gc, true );
-        // fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
-        // width = computeWidth( compute, width, rect, dx );
-        // }
-        // // Return the enclosing rectangle
-        // // Rectangle sRect = new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
-        // // log.debug( "Drew choice contents into " + sRect );
-        // // fRect.draw( gc, false );
-        // // return sRect;
-        return new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
+        return new Rectangle( x, y, width + margin, fy - y );
     }
 
 }

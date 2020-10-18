@@ -20,6 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
@@ -49,11 +51,11 @@ import javafx.scene.text.Font;
 public class PropertyRectangle extends Rectangle {
     private static Log log = LogFactory.getLog( PropertyRectangle.class );
 
-    public static final double PROPERTY_MARGIN = 2;
-    public static final double PROPERTY_OFFSET = 10; // left margin
+    // public static final double PROPERTY_MARGIN = 2;
+    // public static final double PROPERTY_OFFSET = 10; // left margin
 
-    private static final double PROPERTY_TYPE_MARGIN = 8; // distance between property name and type
-    protected static final double CONNECTOR_SIZE = 16;
+    // private static final double PROPERTY_TYPE_MARGIN = 8; // distance between property name and type
+    // protected static final double CONNECTOR_SIZE = 16;
 
     /**
      * Render methods that create rectangles may set the event to run if the implement this interface.
@@ -84,6 +86,10 @@ public class PropertyRectangle extends Rectangle {
     private Image providerIcon = null;
     private Paint providerColor = null;
 
+    double margin = 2;
+    double offset = 10; // left margin
+    double typeMargin = 8; // distance between property name and type
+
 
     public PropertyRectangle(DexSprite<OtmLibraryMember> parent, double width, String label, Image icon,
         boolean editable) {
@@ -94,6 +100,13 @@ public class PropertyRectangle extends Rectangle {
         this.editable = editable;
         this.width = width;
         this.font = parent.getFont();
+
+        if (parent.getSettingsManager() != null) {
+            margin = parent.getSettingsManager().getMargin( Margins.PROPERTY );
+            offset = parent.getSettingsManager().getOffset( Offsets.PROPERTY ); // left margin
+            typeMargin = parent.getSettingsManager().getMargin( Margins.PROPERTY_TYPE ); // distance between property
+                                                                                         // name and type
+        }
     }
 
     public PropertyRectangle(OtmProperty property, DexSprite<OtmLibraryMember> parentSprite, double width) {
@@ -196,8 +209,8 @@ public class PropertyRectangle extends Rectangle {
         boolean compute = gc == null;
 
         double connectorSize = GraphicsUtils.drawConnector( null, null, 0, 0 ).getX();
-        double rightMargin = connectorSize + PROPERTY_MARGIN;
-        double actualWidth = rightMargin + PROPERTY_MARGIN; // actual width as computed
+        double rightMargin = connectorSize + margin;
+        double actualWidth = rightMargin + margin; // actual width as computed
         //
         // Draw Property Name and icon
         Rectangle lRect = GraphicsUtils.drawLabel( label, icon, editable, false, gc, font, x, y );
@@ -208,8 +221,8 @@ public class PropertyRectangle extends Rectangle {
         Rectangle tRect;
         if (typeProvider != null) {
             tRect = GraphicsUtils.drawLabel( providerLabel, providerIcon, null, font, x, y );
-            actualWidth += tRect.getWidth() + PROPERTY_TYPE_MARGIN;
-            double tx = x + width - tRect.getWidth() - rightMargin - PROPERTY_MARGIN - PROPERTY_MARGIN;
+            actualWidth += tRect.getWidth() + typeMargin;
+            double tx = x + width - tRect.getWidth() - rightMargin - margin - margin;
             GraphicsUtils.drawLabel( providerLabel, providerIcon, false, true, gc, font, tx, y );
             // tRect.draw( gc, false );
             // FIXME - don't draw if provider is base type
@@ -217,17 +230,17 @@ public class PropertyRectangle extends Rectangle {
 
         // Compute property height and width
         width = compute && actualWidth > width ? actualWidth : width;
-        height = lRect.getHeight() + 2 * PROPERTY_MARGIN;
+        height = lRect.getHeight() + 2 * margin;
 
         // Draw Underline
-        double lineY = y + lRect.getHeight() - PROPERTY_MARGIN;
+        double lineY = y + lRect.getHeight() - margin;
         if (gc != null)
             gc.strokeLine( x, lineY, x + width - rightMargin, lineY );
 
         // Draw Connector symbol and register listener
         if (typeProvider != null && !(typeProvider.getOwningMember() instanceof OtmSimpleObjects)) {
-            connectionPoint = new Point2D( x + width - PROPERTY_MARGIN, lineY );
-            GraphicsUtils.drawConnector( gc, providerColor, x + width - 2 * connectorSize + 2 * PROPERTY_MARGIN,
+            connectionPoint = new Point2D( x + width - margin, lineY );
+            GraphicsUtils.drawConnector( gc, providerColor, x + width - 2 * connectorSize + 2 * margin,
                 lineY - connectorSize / 2 );
 
             // Register mouse listener with parent

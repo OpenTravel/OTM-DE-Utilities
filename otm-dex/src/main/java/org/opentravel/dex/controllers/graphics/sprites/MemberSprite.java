@@ -20,10 +20,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils.DrawType;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.connections.SuperTypeConnection;
 import org.opentravel.dex.controllers.graphics.sprites.connections.TypeConnection;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle.RectangleEventHandler;
@@ -77,20 +77,19 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
      * Initialize member sprite. Create canvas and save GC for parameters.
      * 
      * @param member
-     * @param paramsGC - source of font and color information ONLY. If null, defaults are used.
+     * @param settingsManager, must <b>not</b> be null.
      */
     public MemberSprite(M member, SpriteManager manager, SettingsManager settingsManager) {
-        this.member = member;
+        if (settingsManager == null)
+            throw new IllegalArgumentException( "Must have settings" );
 
+        this.member = member;
         this.manager = manager;
         this.settingsManager = settingsManager;
-
         //
         canvas = new Canvas( MIN_WIDTH, MIN_HEIGHT );
         gc = canvas.getGraphicsContext2D();
         setGCParams( settingsManager.getGc() );
-
-        // boundaries = new Rectangle( 0, 0, 0, 0 );
         setBoundaries( 0, 0 );
     }
 
@@ -254,8 +253,8 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         // Draw background box
         if (gc != null) {
             Rectangle bRect = new Rectangle( boundaries.getX(), boundaries.getY(),
-                boundaries.getWidth() + FacetRectangle.FACET_MARGIN,
-                boundaries.getHeight() + FacetRectangle.FACET_MARGIN );
+                boundaries.getWidth() + settingsManager.getMargin( Margins.FACET ),
+                boundaries.getHeight() + settingsManager.getMargin( Margins.FACET ) );
             bRect.draw( gc, false ); // Outline
             bRect.draw( gc, true ); // Fill
         }
@@ -283,8 +282,8 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         // Show content (facets, properties, etc)
         mRect = drawContents( gc, font, boundaries.getX(), y + height );
         // mRect.draw( gc, false );
-        if (gc == null && mRect.getWidth() + FacetRectangle.FACET_MARGIN > width)
-            width = mRect.getWidth() + FacetRectangle.FACET_MARGIN;
+        if (gc == null && mRect.getWidth() + settingsManager.getMargin( Margins.FACET ) > width)
+            width = mRect.getWidth() + settingsManager.getMargin( Margins.FACET );
         height += mRect.getHeight();
 
 

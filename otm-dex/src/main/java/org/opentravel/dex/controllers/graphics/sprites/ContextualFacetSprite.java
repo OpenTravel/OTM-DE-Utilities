@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
@@ -38,8 +40,20 @@ import javafx.scene.text.Font;
 public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implements DexSprite<OtmLibraryMember> {
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
+    double dxChoice;
+    double dxCustom;
+    double dxQuery;
+    double dxUpdate;
+    double margin;
+
     public ContextualFacetSprite(OtmContextualFacet member, SpriteManager manager, SettingsManager settingsManager) {
         super( member, manager, settingsManager );
+
+        dxChoice = settingsManager.getOffset( Offsets.CHOICE );
+        dxCustom = settingsManager.getOffset( Offsets.CUSTOM );
+        dxQuery = settingsManager.getOffset( Offsets.QUERY );
+        dxUpdate = settingsManager.getOffset( Offsets.UPDATE );
+        margin = settingsManager.getMargin( Margins.FACET );
     }
 
 
@@ -49,16 +63,16 @@ public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implem
 
         double ox = 0;
         if (member instanceof OtmCustomFacet)
-            ox = FacetRectangle.CUSTOM_OFFSET;
+            ox = dxCustom;
         else if (member instanceof OtmQueryFacet)
-            ox = FacetRectangle.QUERY_OFFSET;
+            ox = dxQuery;
         else if (member instanceof OtmChoiceObject)
-            ox = FacetRectangle.CHOICE_OFFSET;
+            ox = dxChoice;
         else if (member instanceof OtmUpdateFacet)
-            ox = FacetRectangle.UPDATE_OFFSET;
+            ox = dxUpdate;
 
         double fy = y;
-        double width = getBoundaries().getWidth() - ox - FacetRectangle.FACET_MARGIN;
+        double width = getBoundaries().getWidth() - ox - margin;
         double fx = x + ox;
 
         Rectangle rect = new Rectangle( 0, 0, 0, 0 );

@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
@@ -36,8 +38,14 @@ public class VWASprite extends MemberSprite<OtmValueWithAttributes> implements D
     // gets log from base class
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
+    double dxSummary;
+    double margin;
+
     public VWASprite(OtmValueWithAttributes member, SpriteManager manager, SettingsManager settingsManager) {
         super( member, manager, settingsManager );
+
+        dxSummary = settingsManager.getOffset( Offsets.SUMMARY );
+        margin = settingsManager.getMargin( Margins.FACET );
     }
 
     @Override
@@ -45,30 +53,29 @@ public class VWASprite extends MemberSprite<OtmValueWithAttributes> implements D
         boolean compute = gc == null;
         Rectangle rect = null;
 
-        double dxSummary = FacetRectangle.SUMMARY_OFFSET;
         double width = getBoundaries().getWidth();
-        double fy = y + FacetRectangle.FACET_MARGIN;
+        double fy = y + margin;
 
         // Show value type
         rect = new PropertyRectangle( getMember(), this, width );
         rect.set( x + dxSummary, fy ).draw( gc, true );
-        fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+        fy += rect.getHeight() + margin;
         width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
 
         // Show facets
         if (!isCollapsed()) {
             rect = new FacetRectangle( getMember(), this, width - dxSummary );
             rect.set( x + dxSummary, fy ).draw( gc, true );
-            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+            fy += rect.getHeight() + margin;
             width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
 
         }
         // Return the enclosing rectangle
-        // Rectangle sRect = new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
+        // Rectangle sRect = new Rectangle( x, y, width + margin, fy - y );
         // log.debug( "Drew choice contents into " + sRect );
         // fRect.draw( gc, false );
         // return sRect;
-        return new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
+        return new Rectangle( x, y, width + margin, fy - y );
     }
 
 }

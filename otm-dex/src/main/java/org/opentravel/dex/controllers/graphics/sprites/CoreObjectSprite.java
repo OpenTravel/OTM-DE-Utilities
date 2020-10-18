@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
@@ -35,8 +37,19 @@ import javafx.scene.text.Font;
 public class CoreObjectSprite extends MemberSprite<OtmCore> implements DexSprite<OtmLibraryMember> {
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
+    double dxID;
+    double dxSummary;
+    double dxDetail;
+    double margin;
+
+
     public CoreObjectSprite(OtmCore member, SpriteManager manager, SettingsManager settingsManager) {
         super( member, manager, settingsManager );
+
+        dxID = settingsManager.getOffset( Offsets.ID );
+        dxSummary = settingsManager.getOffset( Offsets.SUMMARY );
+        dxDetail = settingsManager.getOffset( Offsets.DETAIL );
+        margin = settingsManager.getMargin( Margins.FACET );
     }
 
 
@@ -45,16 +58,14 @@ public class CoreObjectSprite extends MemberSprite<OtmCore> implements DexSprite
         boolean compute = gc == null;
         Rectangle rect = null;
 
-        double dxSummary = FacetRectangle.SUMMARY_OFFSET;
-        double dxDetail = FacetRectangle.DETAIL_OFFSET;
         double width = getBoundaries().getWidth();
-        double fy = y + FacetRectangle.FACET_MARGIN;
+        double fy = y + margin;
 
         // Show simple type
         rect = new PropertyRectangle( getMember(), this, width );
         rect.set( x + dxSummary, fy );
         rect.draw( gc, true );
-        fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+        fy += rect.getHeight() + margin;
         width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
 
         // Show facets
@@ -63,23 +74,23 @@ public class CoreObjectSprite extends MemberSprite<OtmCore> implements DexSprite
             rect = new FacetRectangle( getMember().getSummary(), this, width - dxSummary );
             rect.set( x + dxSummary, fy );
             rect.draw( gc, true );
-            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+            fy += rect.getHeight() + margin;
             width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
 
             if (!getMember().getDetail().getChildren().isEmpty()) {
                 rect = new FacetRectangle( getMember().getDetail(), this, width - dxDetail );
                 rect.set( x + dxDetail, fy );
                 rect.draw( gc, true );
-                fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+                fy += rect.getHeight() + margin;
                 width = compute && rect.getWidth() > width ? rect.getWidth() + dxDetail : width;
             }
         }
         // Return the enclosing rectangle
-        // Rectangle sRect = new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
+        // Rectangle sRect = new Rectangle( x, y, width + margin, fy - y );
         // log.debug( "Drew choice contents into " + sRect );
         // fRect.draw( gc, false );
         // return sRect;
-        return new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
+        return new Rectangle( x, y, width + margin, fy - y );
     }
 
 }

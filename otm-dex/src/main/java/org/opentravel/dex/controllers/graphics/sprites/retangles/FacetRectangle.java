@@ -18,6 +18,9 @@ package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmFacet;
@@ -47,18 +50,18 @@ import javafx.scene.text.Font;
 public class FacetRectangle extends Rectangle {
     // private static Log log = LogFactory.getLog( FacetRectangle.class );
 
-    public static final double FACET_MARGIN = 5;
-    public static final double FACET_OFFSET = 8;
+    // public static final double FACET_MARGIN = 5;
+    // public static final double FACET_OFFSET = 8;
 
     // Left Margin offsets per facet type
-    public static final double ID_OFFSET = FACET_OFFSET;
-    public static final double SHARED_OFFSET = ID_OFFSET;
-    public static final double QUERY_OFFSET = ID_OFFSET;
-    public static final double UPDATE_OFFSET = ID_OFFSET;
-    public static final double SUMMARY_OFFSET = ID_OFFSET + FACET_OFFSET;
-    public static final double CHOICE_OFFSET = SUMMARY_OFFSET;
-    public static final double DETAIL_OFFSET = SUMMARY_OFFSET + FACET_OFFSET;
-    public static final double CUSTOM_OFFSET = DETAIL_OFFSET;
+    // public static final double ID_OFFSET = FACET_OFFSET;
+    // public static final double SHARED_OFFSET = ID_OFFSET;
+    // public static final double QUERY_OFFSET = ID_OFFSET;
+    // public static final double UPDATE_OFFSET = ID_OFFSET;
+    // public static final double SUMMARY_OFFSET = ID_OFFSET + FACET_OFFSET;
+    // public static final double CHOICE_OFFSET = SUMMARY_OFFSET;
+    // public static final double DETAIL_OFFSET = SUMMARY_OFFSET + FACET_OFFSET;
+    // public static final double CUSTOM_OFFSET = DETAIL_OFFSET;
 
     private static final Paint FACET_COLOR = Color.ANTIQUEWHITE;
 
@@ -81,6 +84,10 @@ public class FacetRectangle extends Rectangle {
     private Image icon;
     private List<OtmObject> children;
     boolean editable = false;
+    private SettingsManager settings;
+
+    double pMargin;
+    double pOffset;
 
     public FacetRectangle(OtmObject obj, DexSprite<OtmLibraryMember> parent, double width, String label, Image icon) {
         super( 0, 0, width, 0 );
@@ -91,6 +98,13 @@ public class FacetRectangle extends Rectangle {
         this.editable = obj.isEditable();
         if (obj instanceof OtmChildrenOwner)
             this.children = getChildren( (OtmChildrenOwner) obj );
+        settings = parent.getSettingsManager();
+
+        if (settings == null)
+            throw new IllegalArgumentException( "Must have settings" );
+
+        pMargin = settings.getMargin( Margins.PROPERTY );
+        pOffset = settings.getOffset( Offsets.PROPERTY );
     }
 
     public FacetRectangle(OtmFacet<?> facet, DexSprite<OtmLibraryMember> parentSprite, double width) {
@@ -166,7 +180,7 @@ public class FacetRectangle extends Rectangle {
         // Properties
         PropertyRectangle pRect = null;
         double py = y + height;
-        double px = x + PropertyRectangle.PROPERTY_OFFSET;
+        double px = x + pOffset;
         if (!children.isEmpty()) {
             for (OtmObject c : children) {
                 if (c instanceof OtmProperty) {
@@ -180,8 +194,8 @@ public class FacetRectangle extends Rectangle {
             }
             // Draw vertical line
             if (pRect != null && !compute) {
-                px = px + PropertyRectangle.PROPERTY_MARGIN - 1;
-                double ly = y + height - 2 * PropertyRectangle.PROPERTY_MARGIN - 1;
+                px = px + pMargin - 1;
+                double ly = y + height - 2 * pMargin - 1;
                 gc.strokeLine( px, y + pRect.getHeight(), px, ly );
             }
         }

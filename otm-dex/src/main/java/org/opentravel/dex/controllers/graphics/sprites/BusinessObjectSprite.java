@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
@@ -41,8 +43,24 @@ import javafx.scene.text.Font;
 public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> implements DexSprite<OtmLibraryMember> {
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
+    double dxID;
+    double dxSummary;
+    double dxDetail;
+    double dxCustom;
+    double dxQuery;
+    double dxUpdate;
+    double margin;
+
     public BusinessObjectSprite(OtmBusinessObject member, SpriteManager manager, SettingsManager settingsManager) {
         super( member, manager, settingsManager );
+
+        dxID = settingsManager.getOffset( Offsets.ID );
+        dxSummary = settingsManager.getOffset( Offsets.SUMMARY );
+        dxDetail = settingsManager.getOffset( Offsets.DETAIL );
+        dxCustom = settingsManager.getOffset( Offsets.CUSTOM );
+        dxQuery = settingsManager.getOffset( Offsets.QUERY );
+        dxUpdate = settingsManager.getOffset( Offsets.UPDATE );
+        margin = settingsManager.getMargin( Margins.FACET );
     }
 
     @Override
@@ -71,28 +89,28 @@ public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> impleme
 
         boolean compute = gc == null;
         FacetRectangle rect = null;
-        double dxID = FacetRectangle.ID_OFFSET;
-        double dxSummary = FacetRectangle.SUMMARY_OFFSET;
-        double dxDetail = FacetRectangle.DETAIL_OFFSET;
+        // double dxID = FacetRectangle.ID_OFFSET;
+        // double dxSummary = FacetRectangle.SUMMARY_OFFSET;
+        // double dxDetail = FacetRectangle.DETAIL_OFFSET;
 
-        double fy = y + FacetRectangle.FACET_MARGIN;
+        double fy = y + margin;
 
         if (!isCollapsed()) {
 
             rect = new FacetRectangle( getMember().getIdFacet(), this, width - dxID );
             rect.set( x + dxID, fy ).draw( gc, true );
-            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+            fy += rect.getHeight() + margin;
             width = computeWidth( compute, width, rect, dxID );
 
             rect = new FacetRectangle( getMember().getSummary(), this, width - dxSummary );
             rect.set( x + dxSummary, fy ).draw( gc, true );
-            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+            fy += rect.getHeight() + margin;
             width = computeWidth( compute, width, rect, dxSummary );
 
             if (!getMember().getDetail().getChildren().isEmpty()) {
                 rect = new FacetRectangle( getMember().getDetail(), this, width - dxDetail );
                 rect.set( x + dxDetail, fy ).draw( gc, true );
-                fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+                fy += rect.getHeight() + margin;
                 width = computeWidth( compute, width, rect, dxDetail );
             }
         }
@@ -108,28 +126,28 @@ public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> impleme
                 updates.add( (OtmUpdateFacet) cf.getContributor() );
 
         for (OtmCustomFacet f : customs) {
-            rect = new FacetRectangle( f, this, width - FacetRectangle.CUSTOM_OFFSET );
-            rect.set( x + FacetRectangle.CUSTOM_OFFSET, fy ).draw( gc, true );
-            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+            rect = new FacetRectangle( f, this, width - dxCustom );
+            rect.set( x + dxCustom, fy ).draw( gc, true );
+            fy += rect.getHeight() + margin;
             width = computeWidth( compute, width, rect, dxSummary );
         }
         for (OtmQueryFacet f : queries) {
-            rect = new FacetRectangle( f, this, width - FacetRectangle.QUERY_OFFSET );
-            rect.set( x + FacetRectangle.QUERY_OFFSET, fy ).draw( gc, true );
-            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+            rect = new FacetRectangle( f, this, width - dxQuery );
+            rect.set( x + dxQuery, fy ).draw( gc, true );
+            fy += rect.getHeight() + margin;
             width = computeWidth( compute, width, rect, dxID );
         }
         for (OtmUpdateFacet f : updates) {
-            rect = new FacetRectangle( f, this, width - FacetRectangle.UPDATE_OFFSET );
-            rect.set( x + FacetRectangle.UPDATE_OFFSET, fy ).draw( gc, true );
-            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+            rect = new FacetRectangle( f, this, width - dxUpdate );
+            rect.set( x + dxUpdate, fy ).draw( gc, true );
+            fy += rect.getHeight() + margin;
             width = computeWidth( compute, width, rect, dxID );
         }
 
         // Return the enclosing rectangle
-        // Rectangle fRect = new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
+        // Rectangle fRect = new Rectangle( x, y, width + margin, fy - y );
         // fRect.draw( gc, false );
         // return fRect;
-        return new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
+        return new Rectangle( x, y, width + margin, fy - y );
     }
 }

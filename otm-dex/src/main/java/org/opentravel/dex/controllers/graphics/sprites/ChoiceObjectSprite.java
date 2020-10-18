@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.otmFacets.OtmChoiceFacet;
@@ -36,8 +38,18 @@ import javafx.scene.text.Font;
 public class ChoiceObjectSprite extends MemberSprite<OtmChoiceObject> implements DexSprite<OtmLibraryMember> {
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
+    double dxID;
+    double dxShared;
+    double dxChoice;
+    double margin;
+
     public ChoiceObjectSprite(OtmChoiceObject member, SpriteManager manager, SettingsManager settingsManager) {
         super( member, manager, settingsManager );
+
+        dxID = settingsManager.getOffset( Offsets.ID );
+        dxShared = settingsManager.getOffset( Offsets.SHARED );
+        dxChoice = settingsManager.getOffset( Offsets.CHOICE );
+        margin = settingsManager.getMargin( Margins.FACET );
     }
 
 
@@ -46,9 +58,9 @@ public class ChoiceObjectSprite extends MemberSprite<OtmChoiceObject> implements
         boolean compute = gc == null;
         FacetRectangle rect = null;
 
-        double dxShared = FacetRectangle.SHARED_OFFSET;
+        // double dxShared = FacetRectangle.SHARED_OFFSET;
         double width = getBoundaries().getWidth();
-        double fy = y + FacetRectangle.FACET_MARGIN;
+        double fy = y + margin;
 
         // Show facets
         if (!isCollapsed()) {
@@ -56,25 +68,25 @@ public class ChoiceObjectSprite extends MemberSprite<OtmChoiceObject> implements
             rect = new FacetRectangle( getMember().getShared(), this, width - dxShared );
             rect.set( x + dxShared, fy );
             rect.draw( gc, true );
-            fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
+            fy += rect.getHeight() + margin;
             width = compute && rect.getWidth() > width ? rect.getWidth() + dxShared : width;
 
             for (OtmContributedFacet f : member.getChildrenContributedFacets()) {
                 if (f.getContributor() instanceof OtmChoiceFacet) {
-                    rect = new FacetRectangle( f, this, width - FacetRectangle.CHOICE_OFFSET );
-                    rect.set( x + FacetRectangle.CHOICE_OFFSET, fy );
+                    rect = new FacetRectangle( f, this, width - dxChoice );
+                    rect.set( x + dxChoice, fy );
                     rect.draw( gc, true );
-                    fy += rect.getHeight() + FacetRectangle.FACET_MARGIN;
-                    width = compute && rect.getWidth() > width ? rect.getWidth() + FacetRectangle.CHOICE_OFFSET : width;
+                    fy += rect.getHeight() + margin;
+                    width = compute && rect.getWidth() > width ? rect.getWidth() + dxChoice : width;
                 }
             }
         }
         // Return the enclosing rectangle
-        // Rectangle sRect = new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
+        // Rectangle sRect = new Rectangle( x, y, width + margin, fy - y );
         // log.debug( "Drew choice contents into " + sRect );
         // fRect.draw( gc, false );
         // return sRect;
-        return new Rectangle( x, y, width + FacetRectangle.FACET_MARGIN, fy - y );
+        return new Rectangle( x, y, width + margin, fy - y );
     }
 
 }
