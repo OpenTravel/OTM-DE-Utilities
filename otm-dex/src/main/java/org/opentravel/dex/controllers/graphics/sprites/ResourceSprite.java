@@ -18,9 +18,12 @@ package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.model.resource.OtmAction;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.Font;
@@ -48,13 +51,30 @@ public class ResourceSprite extends MemberSprite<OtmResource> implements DexSpri
         double margin = settingsManager.getMargin( Margins.FACET );
         double fy = y + margin;
 
-        rect = GraphicsUtils.drawLabel( "TODO", null, gc, font, x + dx, fy );
+
+        // Display subject as property
+        rect = new PropertyRectangle( this, getMember(), width );
+        rect.set( x + dx, fy ).draw( gc, false );
+        fy += rect.getHeight();
         width = computeWidth( gc == null, width, rect, 0 );
-        if (!isCollapsed()) {
-            Demos.postSmileyFace( gc, x + dx, fy );
-            width += 300;
-            fy += 300;
+
+        for (OtmAction action : member.getActions()) {
+            rect = new FacetRectangle( action, this, width - margin );
+            rect.set( x + dx, fy ).draw( gc, true );
+            fy += rect.getHeight();
+            width = computeWidth( gc == null, width, rect, 0 );
         }
+
+        // rect = GraphicsUtils.drawLabel( "TODO", null, gc, font, x + dx, fy );
+        // width = computeWidth( gc == null, width, rect, 0 );
+        // fy += rect.getHeight();
+
+        // if (!isCollapsed()) {
+        // Demos.postSmileyFace( gc, x + dx, fy );
+        // width += 300;
+        // fy += 300;
+        // }
+
 
         // Show base type
         // // Show open's Other property

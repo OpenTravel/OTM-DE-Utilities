@@ -383,9 +383,9 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
 
     @Override
     public void setCollapsed(boolean collapsed) {
-        // log.debug( "Collapsed = " + collapsed + " " + this );
+        log.debug( "Collapsed = " + collapsed + " " + this );
         this.collapsed = collapsed;
-        // SIZE this
+        // resize this sprite
         setBoundaries( 0, 0 );
         // log.debug( " became = " + this );
         manager.updateConnections( this );

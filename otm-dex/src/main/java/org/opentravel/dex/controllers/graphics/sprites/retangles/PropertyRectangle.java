@@ -28,6 +28,7 @@ import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmProperties.OtmElement;
@@ -114,8 +115,10 @@ public class PropertyRectangle extends Rectangle {
 
         // Get property information
         this.property = property;
-        if (property.isInherited())
+        if (property.isInherited()) {
             this.font = parent.getItalicFont();
+            this.label += " (i)";
+        }
         if (property instanceof OtmTypeUser) {
             OtmTypeProvider provider = ((OtmTypeUser) property).getAssignedType();
             if (provider == property.getOwningMember() || provider == property.getOwningMember().getBaseType())
@@ -151,23 +154,36 @@ public class PropertyRectangle extends Rectangle {
 
     /**
      * Create a base type property. Throws exception if base type is not a OtmTypeProvider.
+     * 
+     * @param parentSprite
+     * @param member whose base type will be displayed as a property
+     * @param width
      */
     public PropertyRectangle(DexSprite<OtmLibraryMember> parentSprite, OtmLibraryMember member, double width) {
         this( parentSprite, width, "Extends", null, member.isEditable() );
 
-        if (member.getBaseType() instanceof OtmTypeProvider)
+        if (member.getBaseType() instanceof OtmTypeProvider) {
             baseType = (OtmTypeProvider) member.getBaseType();
-        else
-            throw new IllegalArgumentException( "Missing base type in constructor." );
+            if (member.getBaseType() instanceof OtmTypeProvider)
+                setProvider( (OtmTypeProvider) member.getBaseType() );
+            if (!member.getLibrary().getBaseNamespace().equals( member.getBaseType().getLibrary().getBaseNamespace() ))
+                this.providerColor = GraphicsUtils.CONNECTOR_COLOR;
+            this.providerLabel = member.getBaseType().getNameWithPrefix();
+        } else if (member instanceof OtmResource) {
+            setProvider( ((OtmResource) member).getSubject() );
+            this.label = "Exposes";
+        } else
+            throw new IllegalArgumentException( "Missing related type in constructor." );
+
         if (member instanceof OtmContextualFacet)
             this.label = "Contributes to";
 
-        // Get base type information
-        if (member.getBaseType() instanceof OtmTypeProvider)
-            setProvider( (OtmTypeProvider) member.getBaseType() );
-        if (!member.getLibrary().getBaseNamespace().equals( member.getBaseType().getLibrary().getBaseNamespace() ))
-            this.providerColor = GraphicsUtils.CONNECTOR_COLOR;
-        this.providerLabel = member.getBaseType().getNameWithPrefix();
+        // // Get base type information
+        // if (member.getBaseType() instanceof OtmTypeProvider)
+        // setProvider( (OtmTypeProvider) member.getBaseType() );
+        // if (!member.getLibrary().getBaseNamespace().equals( member.getBaseType().getLibrary().getBaseNamespace() ))
+        // this.providerColor = GraphicsUtils.CONNECTOR_COLOR;
+        // this.providerLabel = member.getBaseType().getNameWithPrefix();
 
         // TODO - get color from settingsManager
 
@@ -234,8 +250,11 @@ public class PropertyRectangle extends Rectangle {
 
         // Draw Underline
         double lineY = y + lRect.getHeight() - margin;
+        double lineX = x + width - rightMargin;
+        if (property != null && !(property instanceof OtmTypeUser))
+            lineX = x + lRect.getWidth();
         if (gc != null)
-            gc.strokeLine( x, lineY, x + width - rightMargin, lineY );
+            gc.strokeLine( x, lineY, lineX, lineY );
 
         // Draw Connector symbol and register listener
         if (typeProvider != null && !(typeProvider.getOwningMember() instanceof OtmSimpleObjects)) {
@@ -251,6 +270,7 @@ public class PropertyRectangle extends Rectangle {
                 this.setOnMouseClicked( e -> parent.connect() );
                 parent.add( this );
             }
+            // TODO - add connection for resource subject
         }
         // super.draw( gc, false ); // debug
         // Log.debug("Drew "+this);

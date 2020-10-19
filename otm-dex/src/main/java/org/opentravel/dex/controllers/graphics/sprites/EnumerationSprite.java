@@ -52,10 +52,11 @@ public class EnumerationSprite extends MemberSprite<OtmEnumeration<?>> implement
         double fy = y + margin;
 
         // Show base type
+
         // Show open's Other property
         if (getMember() instanceof OtmEnumerationOpen) {
-            rect = GraphicsUtils.drawLabel( "Other", null, false, gc, font, x + dx, fy );
-            fy += rect.getHeight() + margin;
+            rect = GraphicsUtils.drawLabel( "Other", null, false, false, gc, font, x + dx, y );
+            fy += rect.getHeight();
         }
 
         // Show values

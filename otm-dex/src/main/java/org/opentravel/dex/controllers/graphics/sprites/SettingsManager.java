@@ -78,7 +78,7 @@ public class SettingsManager {
         return offset.getOffset() * scale;
     }
 
-    private static final double FACET_MARGIN = 8;
+    private static final double FACET_MARGIN = 5;
 
     public enum Margins {
         FACET(FACET_MARGIN), PROPERTY(2), PROPERTY_TYPE(8);

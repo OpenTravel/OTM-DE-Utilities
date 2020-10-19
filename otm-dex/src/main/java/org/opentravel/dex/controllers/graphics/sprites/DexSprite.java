@@ -50,6 +50,14 @@ public interface DexSprite<O extends OtmObject> {
     public void clear();
 
     /**
+     * Connect this member to its base type. Create sprite for base type if not already managed. If there was a sprite,
+     * toggle its collapsed state.
+     * 
+     * @return
+     */
+    DexSprite<?> connect();
+
+    /**
      * If needed, add sprite for the member that provides the type then add connection to new sprite. Otherwise, toggle
      * the collapsed state.
      * 
@@ -107,6 +115,11 @@ public interface DexSprite<O extends OtmObject> {
     public OtmLibraryMember getMember();
 
     /**
+     * @return
+     */
+    SettingsManager getSettingsManager();
+
+    /**
      * @return collapsed field
      */
     boolean isCollapsed();
@@ -138,12 +151,12 @@ public interface DexSprite<O extends OtmObject> {
     @Deprecated
     public void set(double x, double y);
 
+    public void set(Font font);
+
     /**
      * @param p
      */
     void set(Point2D p);
-
-    public void set(Font font);
 
     public void setBackgroundColor(Color color);
 
@@ -151,18 +164,6 @@ public interface DexSprite<O extends OtmObject> {
      * Set the collapsed flag and resize.
      */
     void setCollapsed(boolean collapsed);
-
-    /**
-     * @return
-     */
-    SettingsManager getSettingsManager();
-
-    /**
-     * Connect this member to its base type.
-     * 
-     * @return
-     */
-    DexSprite<?> connect();
 
 
 }

@@ -327,7 +327,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
             // Add member and connection
             DexSprite<?> s = spriteManager.add( member, memberColumn, false );
             if (baseSprite != null)
-                s.connect();
+                s.connect().setCollapsed( true );
 
             // Add member and users and providers
             if (s != null) {

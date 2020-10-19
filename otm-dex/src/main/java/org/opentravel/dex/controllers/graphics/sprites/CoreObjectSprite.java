@@ -63,9 +63,9 @@ public class CoreObjectSprite extends MemberSprite<OtmCore> implements DexSprite
 
         // Show simple type
         rect = new PropertyRectangle( getMember(), this, width );
-        rect.set( x + dxSummary, fy );
+        rect.set( x + dxSummary, y );
         rect.draw( gc, true );
-        fy += rect.getHeight() + margin;
+        fy += rect.getHeight();
         width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
 
         // Show facets

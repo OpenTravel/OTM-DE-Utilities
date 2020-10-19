@@ -155,7 +155,7 @@ public class ColumnRectangle extends Rectangle {
     // }
 
     public Point2D getNextInColumn() {
-        double cx = x + 2 * COLUMN_MARGIN_X; // get past the margin
+        double cx = x + 20; // get past the margin
         double dy = COLUMN_MARGIN_Y;
         DexSprite<?> next = null;
         Point2D bottom = new Point2D( cx, 2 * COLUMN_MARGIN_Y );

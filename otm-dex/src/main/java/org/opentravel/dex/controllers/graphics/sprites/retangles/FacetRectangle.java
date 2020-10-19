@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
@@ -23,12 +25,14 @@ import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.resource.OtmAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +52,7 @@ import javafx.scene.text.Font;
  *
  */
 public class FacetRectangle extends Rectangle {
-    // private static Log log = LogFactory.getLog( FacetRectangle.class );
+    private static Log log = LogFactory.getLog( FacetRectangle.class );
 
     // public static final double FACET_MARGIN = 5;
     // public static final double FACET_OFFSET = 8;
@@ -134,6 +138,14 @@ public class FacetRectangle extends Rectangle {
         draw( null, font );
     }
 
+    public FacetRectangle(OtmAction action, DexSprite<OtmLibraryMember> parentSprite, double width) {
+        this( action, parentSprite, width, action.getName(), action.getIcon() );
+
+        this.children = action.getChildren();
+
+        draw( null, font );
+    }
+
     private List<OtmObject> getChildren(OtmChildrenOwner owner) {
         List<OtmObject> kids = new ArrayList<>();
         kids.addAll( owner.getInheritedChildren() );
@@ -190,7 +202,8 @@ public class FacetRectangle extends Rectangle {
                     height += pRect.getHeight();
                     width = compute && pRect.getWidth() > width ? pRect.getWidth() : width;
                     py += pRect.getHeight();
-                }
+                } else if (c instanceof OtmResourceChild)
+                    log.debug( "TODO - handle action request and response" );
             }
             // Draw vertical line
             if (pRect != null && !compute) {
