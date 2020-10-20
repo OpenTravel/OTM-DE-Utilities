@@ -344,6 +344,7 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
     private void setProperty(ActionEvent a, StringProperty p) {
         if (p != null && a.getSource() instanceof TextField) {
             p.set( ((TextField) a.getSource()).getText() );
+            // log.debug( "Set text to: " + p.get() );
         }
     }
 

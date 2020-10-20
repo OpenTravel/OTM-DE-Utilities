@@ -123,6 +123,14 @@ public class OtmDocHandler {
         exampleProperty = null;
     }
 
+    private String scrub(String source) {
+        String s = source;
+        // s = s.replaceAll( "[^a-z,^A-Z,^0-9,^( )]", "" );
+        s = s.replaceAll( "[&]", "" );
+        // log.debug( "S = " + s );
+        return s;
+    }
+
     public String setDeprecation(String deprecation) {
         if (obj.getTL() instanceof TLDocumentationOwner) {
             TLDocumentation doc = ((TLDocumentationOwner) obj.getTL()).getDocumentation();
@@ -140,7 +148,7 @@ public class OtmDocHandler {
                     ((TLDocumentationOwner) obj.getTL()).setDocumentation( doc );
                 }
                 TLDocumentationItem docItem = new TLDocumentationItem();
-                docItem.setText( deprecation );
+                docItem.setText( scrub( deprecation ) );
                 doc.addDeprecation( docItem );
             }
         }
@@ -159,7 +167,7 @@ public class OtmDocHandler {
         }
         // ModelEvents are only thrown when the documentation element changes.
         if (descriptionProperty != null)
-            descriptionProperty.setValue( description );
+            descriptionProperty.setValue( scrub( description ) );
         return getDescription();
     }
 
@@ -171,7 +179,7 @@ public class OtmDocHandler {
             // If value is not null and not empty
             if (value != null && !value.isEmpty()) {
                 TLExample tlEx = new TLExample();
-                tlEx.setValue( value );
+                tlEx.setValue( scrub( value ) );
                 tlEx.setContext( EXAMPLE_CONTEXT );
                 ((TLExampleOwner) obj.getTL()).addExample( tlEx );
             }
