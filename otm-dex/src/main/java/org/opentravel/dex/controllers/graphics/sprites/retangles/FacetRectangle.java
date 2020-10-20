@@ -25,7 +25,6 @@ import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
@@ -33,6 +32,8 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.resource.OtmAction;
+import org.opentravel.model.resource.OtmActionRequest;
+import org.opentravel.model.resource.OtmActionResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -195,15 +196,19 @@ public class FacetRectangle extends Rectangle {
         double px = x + pOffset;
         if (!children.isEmpty()) {
             for (OtmObject c : children) {
-                if (c instanceof OtmProperty) {
+                pRect = null;
+                if (c instanceof OtmProperty)
                     pRect = new PropertyRectangle( (OtmProperty) c, parent, width );
+                else if (c instanceof OtmActionRequest)
+                    pRect = new PropertyRectangle( (OtmActionRequest) c, parent, width );
+                else if (c instanceof OtmActionResponse)
+                    pRect = new PropertyRectangle( (OtmActionResponse) c, parent, width );
+                if (pRect != null) {
                     pRect.set( px, py ).draw( gc, true );
-
                     height += pRect.getHeight();
                     width = compute && pRect.getWidth() > width ? pRect.getWidth() : width;
                     py += pRect.getHeight();
-                } else if (c instanceof OtmResourceChild)
-                    log.debug( "TODO - handle action request and response" );
+                }
             }
             // Draw vertical line
             if (pRect != null && !compute) {

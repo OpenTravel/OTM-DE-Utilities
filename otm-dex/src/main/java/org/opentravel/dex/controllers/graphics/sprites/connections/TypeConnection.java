@@ -35,7 +35,8 @@ public class TypeConnection extends Connection {
             throw new IllegalArgumentException( "Missing rectangle on connection constructor." );
 
         // Connect to connector arrow point
-        if (propertyRect instanceof PropertyRectangle) {
+        if (propertyRect instanceof PropertyRectangle
+            && ((PropertyRectangle) propertyRect).getConnectionPoint() != null) {
             // use property rectangle connection point
             fx = ((PropertyRectangle) propertyRect).getConnectionPoint().getX();
             fy = ((PropertyRectangle) propertyRect).getConnectionPoint().getY();

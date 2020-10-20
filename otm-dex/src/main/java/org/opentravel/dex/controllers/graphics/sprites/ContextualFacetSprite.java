@@ -71,7 +71,7 @@ public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implem
         else if (member instanceof OtmUpdateFacet)
             ox = dxUpdate;
 
-        double fy = y;
+        double fy = y + margin;
         double width = getBoundaries().getWidth() - ox - margin;
         double fx = x + ox;
 

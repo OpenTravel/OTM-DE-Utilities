@@ -25,15 +25,15 @@ import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
-import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.model.otmProperties.OtmIdReferenceElement;
 import org.opentravel.model.otmProperties.OtmProperty;
+import org.opentravel.model.resource.OtmActionRequest;
+import org.opentravel.model.resource.OtmActionResponse;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
@@ -52,12 +52,6 @@ import javafx.scene.text.Font;
 public class PropertyRectangle extends Rectangle {
     private static Log log = LogFactory.getLog( PropertyRectangle.class );
 
-    // public static final double PROPERTY_MARGIN = 2;
-    // public static final double PROPERTY_OFFSET = 10; // left margin
-
-    // private static final double PROPERTY_TYPE_MARGIN = 8; // distance between property name and type
-    // protected static final double CONNECTOR_SIZE = 16;
-
     /**
      * Render methods that create rectangles may set the event to run if the implement this interface.
      * <p>
@@ -67,25 +61,21 @@ public class PropertyRectangle extends Rectangle {
         public void onRectangleClick(MouseEvent e);
     }
 
-    private DexSprite<OtmLibraryMember> parent;
-    private Font font;
-    private Point2D connectionPoint;
+    protected DexSprite<OtmLibraryMember> parent;
+    protected Font font;
+    private Point2D connectionPoint = null;
 
+    // Objects this can draw
     private OtmProperty property;
-    private OtmTypeProvider baseType = null;
 
-    public OtmProperty getProperty() {
-        return property;
-    }
-
-    private String label = "";
+    protected String label = "";
     private Image icon = null;
     private boolean editable = false;
 
-    private OtmTypeProvider typeProvider = null;
-    private String providerLabel = "";
+    protected OtmTypeProvider typeProvider = null;
+    protected String providerLabel = "";
     private Image providerIcon = null;
-    private Paint providerColor = null;
+    protected Paint providerColor = null;
 
     double margin = 2;
     double offset = 10; // left margin
@@ -104,9 +94,8 @@ public class PropertyRectangle extends Rectangle {
 
         if (parent.getSettingsManager() != null) {
             margin = parent.getSettingsManager().getMargin( Margins.PROPERTY );
-            offset = parent.getSettingsManager().getOffset( Offsets.PROPERTY ); // left margin
-            typeMargin = parent.getSettingsManager().getMargin( Margins.PROPERTY_TYPE ); // distance between property
-                                                                                         // name and type
+            offset = parent.getSettingsManager().getOffset( Offsets.PROPERTY );
+            typeMargin = parent.getSettingsManager().getMargin( Margins.PROPERTY_TYPE );
         }
     }
 
@@ -127,6 +116,34 @@ public class PropertyRectangle extends Rectangle {
                 setProvider( provider );
             this.providerColor = property.isAssignedTypeInNamespace() ? null : GraphicsUtils.CONNECTOR_COLOR;
         }
+
+        // Compute the size
+        draw( null, font );
+
+        // // Register mouse listener with parent
+        // if (parent != null && property instanceof OtmTypeUser) {
+        // this.setOnMouseClicked( e -> parent.connect( ((OtmTypeUser) property) ) );
+        // parent.add( this );
+        // }
+    }
+
+    public PropertyRectangle(OtmActionRequest rq, DexSprite<OtmLibraryMember> parentSprite, double width) {
+        this( parentSprite, width, rq.getName(), rq.getIcon(), rq.isEditable() );
+
+        if (rq.getMethod() != null)
+            this.label = rq.getMethod().toString();
+        if (rq.getPayloadActionFacet() != null)
+            this.label += "  " + rq.getPayloadActionFacetName();
+
+        // Compute the size
+        draw( null, font );
+    }
+
+    public PropertyRectangle(OtmActionResponse rs, DexSprite<OtmLibraryMember> parentSprite, double width) {
+        this( parentSprite, width, rs.getName(), rs.getIcon(), rs.isEditable() );
+
+        if (rs.getPayloadActionFacet() != null)
+            this.label = rs.getPayloadActionFacetName();
 
         // Compute the size
         draw( null, font );
@@ -152,46 +169,8 @@ public class PropertyRectangle extends Rectangle {
         draw( null, font );
     }
 
-    /**
-     * Create a base type property. Throws exception if base type is not a OtmTypeProvider.
-     * 
-     * @param parentSprite
-     * @param member whose base type will be displayed as a property
-     * @param width
-     */
-    public PropertyRectangle(DexSprite<OtmLibraryMember> parentSprite, OtmLibraryMember member, double width) {
-        this( parentSprite, width, "Extends", null, member.isEditable() );
 
-        if (member.getBaseType() instanceof OtmTypeProvider) {
-            baseType = (OtmTypeProvider) member.getBaseType();
-            if (member.getBaseType() instanceof OtmTypeProvider)
-                setProvider( (OtmTypeProvider) member.getBaseType() );
-            if (!member.getLibrary().getBaseNamespace().equals( member.getBaseType().getLibrary().getBaseNamespace() ))
-                this.providerColor = GraphicsUtils.CONNECTOR_COLOR;
-            this.providerLabel = member.getBaseType().getNameWithPrefix();
-        } else if (member instanceof OtmResource) {
-            setProvider( ((OtmResource) member).getSubject() );
-            this.label = "Exposes";
-        } else
-            throw new IllegalArgumentException( "Missing related type in constructor." );
-
-        if (member instanceof OtmContextualFacet)
-            this.label = "Contributes to";
-
-        // // Get base type information
-        // if (member.getBaseType() instanceof OtmTypeProvider)
-        // setProvider( (OtmTypeProvider) member.getBaseType() );
-        // if (!member.getLibrary().getBaseNamespace().equals( member.getBaseType().getLibrary().getBaseNamespace() ))
-        // this.providerColor = GraphicsUtils.CONNECTOR_COLOR;
-        // this.providerLabel = member.getBaseType().getNameWithPrefix();
-
-        // TODO - get color from settingsManager
-
-        // Compute the size
-        draw( null, font );
-    }
-
-    private void setProvider(OtmTypeProvider provider) {
+    protected void setProvider(OtmTypeProvider provider) {
         if (provider != null) {
             this.typeProvider = provider;
             this.providerLabel = provider.getNameWithPrefix();
@@ -219,9 +198,14 @@ public class PropertyRectangle extends Rectangle {
         return connectionPoint;
     }
 
+    public OtmProperty getProperty() {
+        return property;
+    }
+
+
     // label, icon, editable
     // TypeProvider, providerLabel, providerIcon
-    private Rectangle draw(GraphicsContext gc, Font font) {
+    protected Rectangle draw(GraphicsContext gc, Font font) {
         boolean compute = gc == null;
 
         double connectorSize = GraphicsUtils.drawConnector( null, null, 0, 0 ).getX();
@@ -241,7 +225,6 @@ public class PropertyRectangle extends Rectangle {
             double tx = x + width - tRect.getWidth() - rightMargin - margin - margin;
             GraphicsUtils.drawLabel( providerLabel, providerIcon, false, true, gc, font, tx, y );
             // tRect.draw( gc, false );
-            // FIXME - don't draw if provider is base type
         }
 
         // Compute property height and width
@@ -263,18 +246,24 @@ public class PropertyRectangle extends Rectangle {
                 lineY - connectorSize / 2 );
 
             // Register mouse listener with parent
-            if (!compute && property != null && parent != null) {
-                this.setOnMouseClicked( e -> parent.connect( ((OtmTypeUser) property) ) );
-                parent.add( this );
-            } else if (!compute && baseType != null && parent != null) {
-                this.setOnMouseClicked( e -> parent.connect() );
-                parent.add( this );
+            if (!compute && parent != null) {
+                if (property != null) {
+                    this.setOnMouseClicked( e -> parent.connect( ((OtmTypeUser) property) ) );
+                    parent.add( this );
+                }
+                // else if (baseType != null) {
+                // this.setOnMouseClicked( e -> parent.connect() );
+                // parent.add( this );
+                // } else if (resource != null && parent instanceof ResourceSprite) {
+                // this.setOnMouseClicked( e -> ((ResourceSprite) parent).connect() );
+                // parent.add( this );
+                // }
             }
-            // TODO - add connection for resource subject
         }
         // super.draw( gc, false ); // debug
         // Log.debug("Drew "+this);
         return this;
+
     }
 
     private static String getCardinality(OtmProperty property) {

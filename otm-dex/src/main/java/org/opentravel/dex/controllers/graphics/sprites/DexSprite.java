@@ -23,6 +23,8 @@ import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 
+import java.util.List;
+
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.MouseEvent;
@@ -164,6 +166,11 @@ public interface DexSprite<O extends OtmObject> {
      * Set the collapsed flag and resize.
      */
     void setCollapsed(boolean collapsed);
+
+    /**
+     * @return
+     */
+    public List<Rectangle> getRectangles();
 
 
 }

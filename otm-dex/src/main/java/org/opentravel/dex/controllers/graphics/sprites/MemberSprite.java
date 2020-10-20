@@ -23,6 +23,7 @@ import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils.DrawType;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.connections.SuperTypeConnection;
 import org.opentravel.dex.controllers.graphics.sprites.connections.TypeConnection;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.BaseTypeRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
@@ -69,7 +70,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     private boolean collapsed = false;
 
     private List<Rectangle> rectangles = new ArrayList<>();
-    private SpriteManager manager;
+    protected SpriteManager manager;
 
     protected SettingsManager settingsManager;
 
@@ -153,6 +154,11 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
 
     public M getMember() {
         return member;
+    }
+
+    @Override
+    public List<Rectangle> getRectangles() {
+        return rectangles;
     }
 
     @Override
@@ -273,7 +279,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
 
         // Draw property for base type if any
         if (!collapsed && member.getBaseType() != null) {
-            mRect = new PropertyRectangle( this, member, width );
+            mRect = new BaseTypeRectangle( this, member, width );
             mRect.set( boundaries.getMaxX() - mRect.getWidth(), y + height ).draw( gc, true );
             width = computeWidth( gc == null, width, mRect, 0 );
             height += mRect.getHeight();
@@ -477,7 +483,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
 
     @Override
     public DexSprite<?> connect(OtmTypeUser user) {
-        // log.debug( "Connecting to " + user );
+        log.debug( "Connecting to " + user );
         if (user == null || user.getAssignedType() == null || !(user instanceof OtmProperty))
             return null;
         if (getColumn() == null)

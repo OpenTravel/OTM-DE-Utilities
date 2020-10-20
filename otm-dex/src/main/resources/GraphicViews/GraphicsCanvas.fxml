@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane fx:id="graphicsPane" minWidth="150.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" 
-	xmlns:fx="http://javafx.com/fxml/1" stylesheets="@DavesViper.css" 
+	xmlns:fx="http://javafx.com/fxml/1" stylesheets="@../DavesViper.css" 
 	fx:controller="org.opentravel.dex.controllers.graphics.GraphicsCanvasController">
    <children>
       <VBox fx:id="graphicsVBox" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

@@ -18,13 +18,16 @@ package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
+import org.opentravel.dex.controllers.graphics.sprites.connections.ResourceTypeConnection;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.ResourceSubjectRectangle;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.resource.OtmAction;
 
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.Font;
 
@@ -37,10 +40,42 @@ import javafx.scene.text.Font;
  */
 public class ResourceSprite extends MemberSprite<OtmResource> implements DexSprite<OtmLibraryMember> {
 
+    PropertyRectangle subjectRectangle = null;
+
     public ResourceSprite(OtmResource member, SpriteManager manager, SettingsManager settingsManager) {
         super( member, manager, settingsManager );
     }
 
+    /**
+     * Connect this resource sprite to its subject.
+     * <p>
+     * Needed to allow both base and subject property connections. Only sprites for objects that have multiple property
+     * relationships need create additional connect methods.
+     * 
+     * @param subject
+     * @return
+     */
+    // @Override
+    public DexSprite<?> connectSubject() {
+        if (member.getSubject() == null)
+            return null;
+
+        DexSprite<?> subjectSprite = manager.get( (OtmLibraryMember) member.getSubject() );
+        if (subjectSprite == null) {
+            subjectSprite = manager.add( (OtmLibraryMember) member.getSubject(), getColumn().getNext() );
+        } else
+            subjectSprite.setCollapsed( !subjectSprite.isCollapsed() );
+        if (subjectSprite != null) {
+            manager.addAndDraw( new ResourceTypeConnection( this, subjectSprite ) );
+            subjectSprite.getCanvas().toFront();
+            subjectSprite.refresh();
+        }
+        return subjectSprite;
+    }
+
+    public Point2D getSubjectCP() {
+        return subjectRectangle.getConnectionPoint();
+    }
 
     @Override
     public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
@@ -51,19 +86,28 @@ public class ResourceSprite extends MemberSprite<OtmResource> implements DexSpri
         double margin = settingsManager.getMargin( Margins.FACET );
         double fy = y + margin;
 
-
         // Display subject as property
-        rect = new PropertyRectangle( this, getMember(), width );
-        rect.set( x + dx, fy ).draw( gc, false );
-        fy += rect.getHeight();
-        width = computeWidth( gc == null, width, rect, 0 );
-
-        for (OtmAction action : member.getActions()) {
-            rect = new FacetRectangle( action, this, width - margin );
-            rect.set( x + dx, fy ).draw( gc, true );
-            fy += rect.getHeight();
+        if (member.getSubject() != null) {
+            // subjectRectangle = new PropertyRectangle( this, getMember(), width );
+            subjectRectangle = new ResourceSubjectRectangle( this, getMember(), width );
+            subjectRectangle.set( x + dx, y ).draw( gc, false );
+            fy += subjectRectangle.getHeight() + margin;
+            width = computeWidth( gc == null, width, subjectRectangle, 0 );
+        } else {
+            rect = GraphicsUtils.drawLabel( "Abstract", null, false, false, gc, font, x + dx, fy );
+            // rect.set( x + dx, fy ).draw( gc, false );
+            fy += rect.getHeight() + margin;
             width = computeWidth( gc == null, width, rect, 0 );
         }
+
+        // Display Actions
+        if (!isCollapsed())
+            for (OtmAction action : member.getActions()) {
+                rect = new FacetRectangle( action, this, width - margin );
+                rect.set( x + dx, fy ).draw( gc, true );
+                fy += rect.getHeight() + margin;
+                width = computeWidth( gc == null, width, rect, 0 );
+            }
 
         // rect = GraphicsUtils.drawLabel( "TODO", null, gc, font, x + dx, fy );
         // width = computeWidth( gc == null, width, rect, 0 );
