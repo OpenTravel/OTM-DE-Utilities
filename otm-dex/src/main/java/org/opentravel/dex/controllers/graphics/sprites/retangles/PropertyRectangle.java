@@ -25,10 +25,8 @@ import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
-import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
-import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.model.otmProperties.OtmIdReferenceElement;
 import org.opentravel.model.otmProperties.OtmProperty;
@@ -65,14 +63,13 @@ public class PropertyRectangle extends Rectangle {
     protected Font font;
     private Point2D connectionPoint = null;
 
-    // Objects this can draw
     private OtmProperty property;
+    protected OtmTypeProvider typeProvider = null;
 
     protected String label = "";
     private Image icon = null;
     private boolean editable = false;
 
-    protected OtmTypeProvider typeProvider = null;
     protected String providerLabel = "";
     private Image providerIcon = null;
     protected Paint providerColor = null;
@@ -83,7 +80,7 @@ public class PropertyRectangle extends Rectangle {
 
 
     public PropertyRectangle(DexSprite<OtmLibraryMember> parent, double width, String label, Image icon,
-        boolean editable) {
+        boolean editable, boolean inherited) {
         super( 0, 0, GraphicsUtils.MINIMUM_WIDTH, 0 );
         this.parent = parent;
         this.label = label;
@@ -91,6 +88,10 @@ public class PropertyRectangle extends Rectangle {
         this.editable = editable;
         this.width = width;
         this.font = parent.getFont();
+        if (inherited) {
+            this.font = parent.getItalicFont();
+            this.label += " (i)";
+        }
 
         if (parent.getSettingsManager() != null) {
             margin = parent.getSettingsManager().getMargin( Margins.PROPERTY );
@@ -100,14 +101,11 @@ public class PropertyRectangle extends Rectangle {
     }
 
     public PropertyRectangle(OtmProperty property, DexSprite<OtmLibraryMember> parentSprite, double width) {
-        this( parentSprite, width, property.getName(), property.getIcon(), property.isEditable() );
+        this( parentSprite, width, property.getName(), property.getIcon(), property.isEditable(),
+            property.isInherited() );
 
         // Get property information
         this.property = property;
-        if (property.isInherited()) {
-            this.font = parent.getItalicFont();
-            this.label += " (i)";
-        }
         if (property instanceof OtmTypeUser) {
             OtmTypeProvider provider = ((OtmTypeUser) property).getAssignedType();
             if (provider == property.getOwningMember() || provider == property.getOwningMember().getBaseType())
@@ -128,7 +126,7 @@ public class PropertyRectangle extends Rectangle {
     }
 
     public PropertyRectangle(OtmActionRequest rq, DexSprite<OtmLibraryMember> parentSprite, double width) {
-        this( parentSprite, width, rq.getName(), rq.getIcon(), rq.isEditable() );
+        this( parentSprite, width, rq.getName(), rq.getIcon(), rq.isEditable(), rq.isInherited() );
 
         if (rq.getMethod() != null)
             this.label = rq.getMethod().toString();
@@ -140,30 +138,10 @@ public class PropertyRectangle extends Rectangle {
     }
 
     public PropertyRectangle(OtmActionResponse rs, DexSprite<OtmLibraryMember> parentSprite, double width) {
-        this( parentSprite, width, rs.getName(), rs.getIcon(), rs.isEditable() );
+        this( parentSprite, width, rs.getName(), rs.getIcon(), rs.isEditable(), rs.isInherited() );
 
         if (rs.getPayloadActionFacet() != null)
             this.label = rs.getPayloadActionFacetName();
-
-        // Compute the size
-        draw( null, font );
-    }
-
-    public PropertyRectangle(OtmCore core, DexSprite<OtmLibraryMember> parentSprite, double width) {
-        this( parentSprite, width, "Simple", null, core.isEditable() );
-
-        // Get type information
-        setProvider( core.getAssignedType() );
-
-        // Compute the size
-        draw( null, font );
-    }
-
-    public PropertyRectangle(OtmValueWithAttributes vwa, DexSprite<OtmLibraryMember> parentSprite, double width) {
-        this( parentSprite, width, "Value", null, vwa.isEditable() );
-
-        // Get type information
-        setProvider( vwa.getAssignedType() );
 
         // Compute the size
         draw( null, font );
@@ -177,12 +155,14 @@ public class PropertyRectangle extends Rectangle {
             if (provider instanceof OtmComplexObjects)
                 this.providerLabel = getCardinality( property ) + typeProvider.getPrefix();
             this.providerIcon = typeProvider.getIcon();
+
+            // TODO - get color from settingsManager
             this.providerColor = null;
         }
     }
 
     /**
-     * Draw the facet.
+     * Draw the rectangle.
      * 
      * @param gc
      * @param filled
@@ -246,18 +226,10 @@ public class PropertyRectangle extends Rectangle {
                 lineY - connectorSize / 2 );
 
             // Register mouse listener with parent
-            if (!compute && parent != null) {
-                if (property != null) {
-                    this.setOnMouseClicked( e -> parent.connect( ((OtmTypeUser) property) ) );
-                    parent.add( this );
-                }
-                // else if (baseType != null) {
-                // this.setOnMouseClicked( e -> parent.connect() );
-                // parent.add( this );
-                // } else if (resource != null && parent instanceof ResourceSprite) {
-                // this.setOnMouseClicked( e -> ((ResourceSprite) parent).connect() );
-                // parent.add( this );
-                // }
+            if (!compute && parent != null && property != null) {
+                this.setOnMouseClicked( e -> parent.connect( ((OtmTypeUser) property) ) );
+                parent.add( this );
+                // sub-types will register after rectangle is sized.
             }
         }
         // super.draw( gc, false ); // debug

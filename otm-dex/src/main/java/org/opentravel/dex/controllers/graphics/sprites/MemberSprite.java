@@ -38,6 +38,7 @@ import java.util.List;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -92,6 +93,15 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         gc = canvas.getGraphicsContext2D();
         setGCParams( settingsManager.getGc() );
         setBoundaries( 0, 0 );
+
+        // This relies on the canvas being clipped to the active boundaries
+        String desc = member.getDescription();
+        if (desc != null && !desc.isEmpty()) {
+            Tooltip t = new Tooltip();
+            Tooltip.install( canvas, t );
+            t.setText( desc );
+        }
+
     }
 
     @Override
@@ -111,22 +121,27 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         return boundaries.contains( point );
     }
 
-    public void drawControls(Rectangle boundaries) {
+    public double drawControls(Rectangle boundaries, GraphicsContext cgc) {
         Image close = ImageManager.getImage( ImageManager.Icons.CLOSE );
         Image collapse = ImageManager.getImage( ImageManager.Icons.COLLAPSE );
 
         // Start at right edge and work backwards
         double cx = boundaries.getMaxX() - GraphicsUtils.MEMBER_MARGIN - close.getWidth();
         double cy = boundaries.getY() + GraphicsUtils.MEMBER_MARGIN;
-        Rectangle r = GraphicsUtils.drawImage( close, DrawType.OUTLINE, gc, cx, cy );
+        Rectangle r = GraphicsUtils.drawImage( close, DrawType.OUTLINE, cgc, cx, cy );
         rectangles.add( r );
         r.setOnMouseClicked( e -> manager.remove( this ) );
+        double width = r.getWidth() + GraphicsUtils.MEMBER_MARGIN;
 
         cx = r.getX() - collapse.getWidth();
-        r = GraphicsUtils.drawImage( collapse, DrawType.OUTLINE, gc, cx, cy );
+        r = GraphicsUtils.drawImage( collapse, DrawType.OUTLINE, cgc, cx, cy );
         rectangles.add( r );
         r.setOnMouseClicked( e -> collapseOrExpand() );
+        width += r.getWidth() + GraphicsUtils.MEMBER_MARGIN;
+
+        return width;
     }
+
 
     /**
      * Toggle collapsed state.
@@ -272,10 +287,10 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         double height = mRect.getHeight();
 
         // Add the controls
-        if (gc == null)
-            width += 2 * 18;
-        else
-            drawControls( boundaries );
+        // if (gc == null)
+        // width += 2 * 18;
+        // else
+        width += drawControls( boundaries, gc ) + GraphicsUtils.MEMBER_MARGIN;
 
         // Draw property for base type if any
         if (!collapsed && member.getBaseType() != null) {
@@ -288,8 +303,9 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         // Show content (facets, properties, etc)
         mRect = drawContents( gc, font, boundaries.getX(), y + height );
         // mRect.draw( gc, false );
-        if (gc == null && mRect.getWidth() + settingsManager.getMargin( Margins.FACET ) > width)
-            width = mRect.getWidth() + settingsManager.getMargin( Margins.FACET );
+        width = computeWidth( gc == null, width, mRect, settingsManager.getMargin( Margins.FACET ) );
+        // if (gc == null && mRect.getWidth() + settingsManager.getMargin( Margins.FACET ) > width)
+        // width = mRect.getWidth() + settingsManager.getMargin( Margins.FACET );
         height += mRect.getHeight();
 
 
@@ -304,6 +320,10 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         // log.debug( "Refreshed " + member );
         mRect = new Rectangle( x, y, width, height );
         // mRect.draw( gc, false );
+
+        // Clip the canvas to just have the sprite
+        canvas.setClip( new javafx.scene.shape.Rectangle( mRect.getX(), mRect.getY() - 2, mRect.getWidth(),
+            mRect.getHeight() + 4 ) );
         return mRect;
     }
 

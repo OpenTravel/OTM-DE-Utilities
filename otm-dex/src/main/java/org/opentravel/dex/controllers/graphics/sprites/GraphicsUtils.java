@@ -66,12 +66,14 @@ public class GraphicsUtils {
      * @return
      */
     public static Rectangle drawImage(Image image, DrawType fill, GraphicsContext gc, final double x, final double y) {
-        gc.drawImage( image, x, y );
+        if (gc != null)
+            gc.drawImage( image, x, y );
         Rectangle r = new Rectangle( x, y, image.getWidth(), image.getHeight() );
-        if (fill == DrawType.OUTLINE)
-            r.draw( gc, false );
-        else if (fill == DrawType.FILL)
-            r.draw( gc, true );
+        if (gc != null)
+            if (fill == DrawType.OUTLINE)
+                r.draw( gc, false );
+            else if (fill == DrawType.FILL)
+                r.draw( gc, true );
         return r;
     }
 

@@ -18,8 +18,8 @@ package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.CorePropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -62,7 +62,7 @@ public class CoreObjectSprite extends MemberSprite<OtmCore> implements DexSprite
         double fy = y + margin;
 
         // Show simple type
-        rect = new PropertyRectangle( getMember(), this, width );
+        rect = new CorePropertyRectangle( getMember(), this, width );
         rect.set( x + dxSummary, y );
         rect.draw( gc, true );
         fy += rect.getHeight();

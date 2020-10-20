@@ -19,8 +19,8 @@ package org.opentravel.dex.controllers.graphics.sprites;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.VWAPropertyRectangle;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 
@@ -57,7 +57,7 @@ public class VWASprite extends MemberSprite<OtmValueWithAttributes> implements D
         double fy = y + margin;
 
         // Show value type
-        rect = new PropertyRectangle( getMember(), this, width );
+        rect = new VWAPropertyRectangle( getMember(), this, width );
         rect.set( x + dxSummary, fy ).draw( gc, true );
         fy += rect.getHeight() + margin;
         width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;

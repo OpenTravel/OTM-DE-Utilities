@@ -54,14 +54,12 @@ public class ResourceSubjectRectangle extends PropertyRectangle {
      * @param width
      */
     public ResourceSubjectRectangle(DexSprite<OtmLibraryMember> parentSprite, OtmResource member, double width) {
-        super( parentSprite, width, "Exposes", null, member.isEditable() );
+        super( parentSprite, width, "Exposes", null, member.isEditable(), false );
 
         setProvider( member.getSubject() );
         resource = member;
         if (typeProvider != null)
             this.label += ": " + typeProvider.getName();
-
-        // TODO - get color from settingsManager
 
         // Compute the size
         draw( null, font );
@@ -73,11 +71,11 @@ public class ResourceSubjectRectangle extends PropertyRectangle {
         log.debug( "Created base type rectangle:" + this );
     }
 
-    public OtmLibraryMember getSubject() {
+    public OtmLibraryMember get() {
         return resource.getSubject();
     }
 
-    public OtmLibraryMember get() {
+    public OtmLibraryMember getResource() {
         return resource;
     }
 

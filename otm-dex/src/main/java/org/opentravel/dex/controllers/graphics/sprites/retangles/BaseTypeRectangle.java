@@ -54,21 +54,17 @@ public class BaseTypeRectangle extends PropertyRectangle {
      * @param width
      */
     public BaseTypeRectangle(DexSprite<OtmLibraryMember> parentSprite, OtmLibraryMember member, double width) {
-        super( parentSprite, width, "Extends", null, member.isEditable() );
+        super( parentSprite, width, "Extends", null, member.isEditable(), false );
 
         if (member.getBaseType() instanceof OtmTypeProvider) {
             baseType = (OtmTypeProvider) member.getBaseType();
             if (member.getBaseType() instanceof OtmTypeProvider)
                 setProvider( (OtmTypeProvider) member.getBaseType() );
+            this.providerLabel = member.getBaseType().getNameWithPrefix();
+
             if (!member.getLibrary().getBaseNamespace().equals( member.getBaseType().getLibrary().getBaseNamespace() ))
                 this.providerColor = GraphicsUtils.CONNECTOR_COLOR;
-            this.providerLabel = member.getBaseType().getNameWithPrefix();
         }
-
-        // if (member instanceof OtmContextualFacet)
-        // this.label = "Contributes to";
-
-        // TODO - get color from settingsManager
 
         // Compute the size
         draw( null, font );
@@ -81,7 +77,7 @@ public class BaseTypeRectangle extends PropertyRectangle {
         log.debug( "Created base type rectangle:" + this );
     }
 
-    public OtmLibraryMember getBaseType() {
+    public OtmLibraryMember get() {
         return (OtmLibraryMember) baseType;
     }
 
