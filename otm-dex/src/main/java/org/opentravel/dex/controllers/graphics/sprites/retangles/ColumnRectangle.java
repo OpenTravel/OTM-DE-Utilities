@@ -17,6 +17,7 @@
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
+import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import java.util.ArrayList;
@@ -114,11 +115,11 @@ public class ColumnRectangle extends Rectangle {
         y = COLUMN_MARGIN_Y;
     }
 
-    public DexSprite<OtmLibraryMember> find(OtmLibraryMember member) {
-        DexSprite<OtmLibraryMember> selectedSprite = null;
+    public MemberSprite<OtmLibraryMember> find(OtmLibraryMember member) {
+        MemberSprite<OtmLibraryMember> selectedSprite = null;
         for (DexSprite<?> sprite : activeSprites)
-            if (sprite.getMember() == member) {
-                return (DexSprite<OtmLibraryMember>) sprite;
+            if (sprite.getMember() == member && sprite instanceof MemberSprite) {
+                return (MemberSprite<OtmLibraryMember>) sprite;
             }
         return selectedSprite;
     }
