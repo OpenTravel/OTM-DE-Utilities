@@ -142,10 +142,10 @@ public class SpriteManager {
         return add( member, column, false );
     }
 
-    public DexSprite<OtmLibraryMember> add(OtmLibraryMember member, ColumnRectangle column, boolean collapsed) {
+    public MemberSprite<OtmLibraryMember> add(OtmLibraryMember member, ColumnRectangle column, boolean collapsed) {
         if (column == null)
             column = getColumn( 1 );
-        DexSprite<OtmLibraryMember> memberSprite = column.find( member );
+        MemberSprite<OtmLibraryMember> memberSprite = column.find( member );
         if (memberSprite == null)
             memberSprite = factory( member );
         if (memberSprite != null) {
@@ -162,9 +162,8 @@ public class SpriteManager {
      * @return Built sprite or null.
      */
     // sprite factory
-    private DexSprite<OtmLibraryMember> factory(OtmLibraryMember member) {
-        GraphicsContext defaultGC = settingsManager.getGc();
-        DexSprite<OtmLibraryMember> newSprite = null;
+    private MemberSprite<OtmLibraryMember> factory(OtmLibraryMember member) {
+        MemberSprite<?> newSprite = null;
         if (member instanceof OtmBusinessObject)
             newSprite = new BusinessObjectSprite( (OtmBusinessObject) member, this, settingsManager );
         else if (member instanceof OtmChoiceObject)
@@ -181,8 +180,8 @@ public class SpriteManager {
             newSprite = new SimpleSprite( (OtmSimpleObjects<?>) member, this, settingsManager );
         else if (member instanceof OtmResource)
             newSprite = new ResourceSprite( (OtmResource) member, this, settingsManager );
-        log.debug( "factory created: " + newSprite );
-        return newSprite;
+        // log.debug( "factory created: " + newSprite );
+        return (MemberSprite<OtmLibraryMember>) newSprite;
     }
 
     /**

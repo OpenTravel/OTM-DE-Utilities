@@ -503,6 +503,10 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
 
     @Override
     public DexSprite<?> connect(OtmTypeUser user) {
+        return connect( user, false );
+    }
+
+    public DexSprite<?> connect(OtmTypeUser user, boolean collapsed) {
         log.debug( "Connecting to " + user );
         if (user == null || user.getAssignedType() == null || !(user instanceof OtmProperty))
             return null;
@@ -516,7 +520,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         DexSprite<?> toSprite = manager.get( provider );
         if (toSprite == null) {
             // Place the new sprite and connect it
-            toSprite = manager.add( provider, getColumn().getNext() );
+            toSprite = manager.add( provider, getColumn().getNext(), collapsed );
             connect( (OtmProperty) user, this, toSprite );
         } else {
             toSprite.setCollapsed( !toSprite.isCollapsed() );

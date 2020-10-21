@@ -181,9 +181,11 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
     @Override
     public void doOK() {
         // FIXME
-        // 1. Make sure there is a project selected
         // 2. Name, Namespace, Comments, Project
         // When they enter a name or fileName copy to other field
+
+        // 3. FIXME - assure namespace has version suffix
+
         if (selectedProject == null) {
             postResults( "Must select a project for the new library. " );
             return;

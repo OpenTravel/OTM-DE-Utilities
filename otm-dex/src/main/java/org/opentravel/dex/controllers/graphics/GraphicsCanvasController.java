@@ -25,6 +25,7 @@ import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
+import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
 import org.opentravel.dex.controllers.graphics.sprites.SpriteManager;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
@@ -307,57 +308,74 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         return isLocked;
     }
 
+    private DexSprite<OtmLibraryMember> postBase(DexSprite<OtmLibraryMember> memberSprite) {
+        DexSprite<OtmLibraryMember> baseSprite = null;
+        if (memberSprite != null) {
+            OtmLibraryMember member = memberSprite.getMember();
+            if (member.getBaseType() instanceof OtmLibraryMember && !(member instanceof OtmContextualFacet)) {
+                ColumnRectangle column = memberSprite.getColumn().getPrev();
+                boolean collapsed = true;
+                baseSprite = spriteManager.add( (OtmLibraryMember) member.getBaseType(), column, collapsed );
+                memberSprite.connect().setCollapsed( true );
+            }
+        }
+        return baseSprite;
+    }
+
+    // Add member and users and providers
+    private void postProviders(MemberSprite<OtmLibraryMember> memberSprite) {
+        if (memberSprite != null) {
+            OtmLibraryMember member = memberSprite.getMember();
+            for (OtmTypeUser user : member.getDescendantsTypeUsers()) {
+                if (user.getAssignedType() != null && !(user.getAssignedType() instanceof OtmSimpleObjects))
+                    memberSprite.connect( user, true );
+            }
+        }
+    }
+
+    private void postUsers(MemberSprite<OtmLibraryMember> memberSprite) {
+        if (memberSprite != null) {
+            OtmLibraryMember member = memberSprite.getMember();
+            if (member.getBaseType() instanceof OtmLibraryMember && !(member instanceof OtmContextualFacet)) {
+                ColumnRectangle column = memberSprite.getColumn().getNext();
+                boolean collapsed = true;
+
+                for (OtmLibraryMember user : member.getWhereUsed())
+                    if (user != member)
+                        spriteManager.add( user, column, collapsed );
+            }
+        }
+    }
+
     @Override
     public void post(OtmObject o) {
         log.debug( "Graphics canvas controller posting object: " + o );
         if (o instanceof OtmLibraryMember) {
             OtmLibraryMember member = (OtmLibraryMember) o;
-            ColumnRectangle userColumn = spriteManager.getColumn( 1 );
             ColumnRectangle memberColumn = spriteManager.getColumn( 2 );
-            // ColumnRectangle providerColumn = spriteManager.getColumn( 3 );
 
             if (tracking)
                 spriteManager.clear();
 
-            // Add base type
-            DexSprite<OtmLibraryMember> baseSprite = null;
-            if (member.getBaseType() instanceof OtmLibraryMember && !(member instanceof OtmContextualFacet))
-                baseSprite = spriteManager.add( (OtmLibraryMember) member.getBaseType(), memberColumn, true );
+            MemberSprite<OtmLibraryMember> memberS = spriteManager.add( member, memberColumn, false );
 
-            // Add member and connection
-            DexSprite<?> s = spriteManager.add( member, memberColumn, false );
-            if (baseSprite != null)
-                s.connect().setCollapsed( true );
-
-            // Add member and users and providers
-            if (s != null) {
+            if (memberS != null)
                 if (tracking) {
-                    // Display the type providers
-                    DexSprite<?> newS = null;
-                    for (OtmTypeUser user : member.getDescendantsTypeUsers()) {
-                        if (user.getAssignedType() != null && !(user.getAssignedType() instanceof OtmSimpleObjects))
-                            newS = s.connect( user );
-                        if (newS != null)
-                            newS.setCollapsed( true );
-                    }
-                    // Display the users
-                    for (OtmLibraryMember user : member.getWhereUsed()) {
-                        if (user != member)
-                            spriteManager.add( user, userColumn, true );
-                    }
+                    postBase( memberS );
+                    postProviders( memberS );
+                    postUsers( memberS );
+
                     scrollPane.setVvalue( 0 );
                     scrollPane.setHvalue( 0 );
                 } else {
                     // Scroll to the new sprite's location
-                    double dx = s.getBoundaries().getX() / backgroundCanvas.getWidth();
-                    double dy = s.getBoundaries().getMaxY() / backgroundCanvas.getHeight();
+                    double dx = memberS.getBoundaries().getX() / backgroundCanvas.getWidth();
+                    double dy = memberS.getBoundaries().getMaxY() / backgroundCanvas.getHeight();
                     scrollPane.setVvalue( dy );
                     scrollPane.setHvalue( dx );
                 }
-            }
-            spriteManager.refresh();
         }
-
+        spriteManager.refresh();
     }
 
     @Override
