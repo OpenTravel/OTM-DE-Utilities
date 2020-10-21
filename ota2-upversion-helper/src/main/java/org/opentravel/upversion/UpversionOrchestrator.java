@@ -296,10 +296,17 @@ public class UpversionOrchestrator {
     /**
      * Deletes all files from the output folder that end with an '.otp' or '.otm' extension. If any sub-folders exist,
      * they are not purged by this method.
+     * 
+     * @throws SchemaCompilerException thrown if the output directory cannot be purged (or created in the first place)
      */
-    private void purgeExistingLibraries() {
-        if (outputFolder.exists()) {
-            outputFolder.mkdirs();
+    private void purgeExistingLibraries() throws SchemaCompilerException {
+        if (!outputFolder.exists()) {
+            boolean folderCreated = outputFolder.mkdirs();
+
+            if (!folderCreated) {
+                throw new SchemaCompilerException(
+                    String.format( "Unable to create output folder: %s", outputFolder.getAbsolutePath() ) );
+            }
         }
 
         for (File f : outputFolder.listFiles()) {
