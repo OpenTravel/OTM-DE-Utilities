@@ -13,6 +13,7 @@
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.MenuBarWithProjectController">
@@ -32,7 +33,10 @@
                     <MenuItem fx:id="fileOpenItem" mnemonicParsing="false" onAction="#fileOpen" text="Open..." />
                     <SeparatorMenuItem mnemonicParsing="false" />
                     <MenuItem fx:id="doCloseItem" mnemonicParsing="false" onAction="#doClose" text="Close All" />
-                    <MenuItem fx:id="doSaveAllItem" mnemonicParsing="false" onAction="#doSaveAll" text="Save All" />
+                    <MenuItem fx:id="doSaveAllItem" mnemonicParsing="false" onAction="#doSaveAll" text="Save All">
+                           <accelerator>
+                              <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                           </accelerator></MenuItem>
                     <SeparatorMenuItem mnemonicParsing="false" />
                     <MenuItem fx:id="doCompileMenuItem" mnemonicParsing="false" onAction="#doCompile" text="Compile" />
                     <SeparatorMenuItem mnemonicParsing="false" />

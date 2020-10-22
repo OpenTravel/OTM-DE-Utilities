@@ -329,10 +329,6 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         projectCombo.getItems().clear();
         projectFileMap = modelMgr.getOtmProjectManager().getOpenFileMap();
         ObservableList<String> projectList = FXCollections.observableArrayList( projectFileMap.keySet() );
-        // modelMgr.getProjects().forEach( p -> {
-        // if (p != null && p.getTL() != null && p.getTL().getProjectFile() != null)
-        // projectList.add( p.getTL().getProjectFile().getName() );
-        // } );
         projectCombo.setEditable( false );
         projectCombo.setItems( projectList );
         if (!projectList.isEmpty()) {

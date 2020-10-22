@@ -645,8 +645,8 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     /**
      * 
      */
-    public void save() {
-        save( new LibraryModelSaver() );
+    public String save() {
+        return save( new LibraryModelSaver() );
     }
 
     /**
@@ -654,19 +654,23 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
      * 
      * @param lms
      */
-    public void save(LibraryModelSaver lms) {
+    public String save(LibraryModelSaver lms) {
+        String results = "Error saving library.";
         if (getTL() instanceof TLLibrary) {
             // final ValidationFindings findings = new ValidationFindings();
             try {
                 // log.debug("Saving library: " + libraryName + " " + libraryUrl);
                 // findings.addAll( lms.saveLibrary( (TLLibrary) getTL() ) );
                 lms.saveLibrary( (TLLibrary) getTL() );
+                results = "Saved " + this;
             } catch (final LibrarySaveException e) {
                 final Throwable t = e.getCause();
+                results = "Save error";
                 if (t != null && t.getMessage() != null)
-                    log.error( "Save error" + t.getMessage() );
+                    results += t.getMessage();
             }
         }
+        return results;
     }
 
     public String toString() {

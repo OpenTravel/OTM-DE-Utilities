@@ -100,20 +100,6 @@ public class OtmProjectManager implements TaskResultHandlerI {
             add( new OtmProject( tlProject, modelManager ) );
     }
 
-    // private OtmProject newProject(Project tlProject) {
-    // return new OtmProject( tlProject, modelManager );
-    // }
-
-    // /**
-    // * @deprecated - use addProject(Project tlProject)
-    // * @param key
-    // * @param value
-    // */
-    // public void addProject(String key, OtmProject value) {
-    // projects.put( key, value );
-    // }
-
-
     /**
      * @return true if the project exists as a value in the project map.
      */
@@ -121,71 +107,9 @@ public class OtmProjectManager implements TaskResultHandlerI {
         return member != null && projects.containsValue( member );
     }
 
-
-
-    // /**
-    // * Get all the projects from the project manager. Create libraries for all project items if they have not already
-    // be
-    // * modeled. Start validation and type resolution task.
-    // */
-    // public void addProjects() {
-    // // log.debug( "AddProjects() with " + getTlModel().getAllLibraries().size() + " libraries" );
-    //
-    // // Add projects to project map
-    // for (Project project : projectManager.getAllProjects())
-    // projects.put( project.getName(), new OtmProject( project, modelManager ) );
-    //
-    // // Get the built in libraries, will do nothing if already added
-    // addBuiltInLibraries( getTlModel() );
-    //
-    // // Get Libraries - Libraries can belong to multiple projects.
-    // // Map will de-dup the entries based on baseNS and name.
-    // for (ProjectItem pi : projectManager.getAllProjectItems()) {
-    // add( pi );
-    // }
-    //
-    // startValidatingAndResolvingTasks();
-    // // log.debug( "Model has " + members.size() + " members." );
-    // }
-
     public OtmProject getProject(String projectName) {
         return projects.get( projectName );
     }
-
-
-    // /**
-    // * If the project item is new to this model manager:
-    // * <ul>
-    // * <li>create OtmLibrary to represent the abstract TL library
-    // * <li>add the absLibrary:OtmLibrary pair to the libraries map
-    // * <li>add the libraryNamespace:library in the baseNS map
-    // * </ul>
-    // * <p>
-    // * base namespaces can have multiple libraries.
-    // *
-    // * @param pi
-    // */
-    // private void add(ProjectItem pi) {
-    // if (pi == null)
-    // return;
-    // AbstractLibrary absLibrary = pi.getContent();
-    // if (absLibrary == null)
-    // return;
-    // // log.debug( "Adding project item: " + absLibrary.getName() + " in " + absLibrary.getNamespace() );
-    // if (contains( absLibrary )) {
-    // // let the library track project as needed to know if the library is editable
-    // libraries.get( absLibrary ).add( pi );
-    // } else {
-    // // Model and Add newly discovered library to the libraries and baseNS maps
-    // add( pi, getVersionChainFactory() );
-    // }
-    // OtmLibrary lib = libraries.get( absLibrary );
-    // if (lib != null) {
-    // // Could be a minor version which will require refreshing the chain
-    // lib.getVersionChain().refresh();
-    // } else
-    // log.error( "Failed to find newly added library." );
-    // }
 
     /**
      * Clear the model. Clears the model manager's data, the TL Model, and Project Manager.
@@ -203,8 +127,6 @@ public class OtmProjectManager implements TaskResultHandlerI {
         if (oProject != null && oProject.getTL() != null)
             projects.remove( oProject.getTL().getName() );
     }
-
-
 
     public OtmProject get(String name) {
         return projects.get( name );
@@ -236,18 +158,6 @@ public class OtmProjectManager implements TaskResultHandlerI {
             fileMap.put( file.getName(), file );
         return fileMap;
     }
-
-    // /**
-    // * Get a map of recently used project file names and files from user settings. Sorted by most recently used first.
-    // *
-    // * @return
-    // */
-    // public Map<String,File> getOpenProjects() {
-    // Map<String,File> fileMap = new LinkedHashMap<>();
-    // for (File file : getOpenProjectFiles())
-    // fileMap.put( file.getName(), file );
-    // return fileMap;
-    // }
 
     /**
      * Get the list of the recently used project files from user settings.
@@ -310,19 +220,6 @@ public class OtmProjectManager implements TaskResultHandlerI {
         }
         return projectFileMap;
     }
-
-    // /**
-    // * Get a map of recently used project file names and files from user settings
-    // *
-    // * @return
-    // */
-    // public Map<String,File> getRecentProjects() {
-    // Map<String,File> fileMap = new HashMap<>();
-    // if (modelManager != null && modelManager.getUserSettings() != null)
-    // for (File file : modelManager.getUserSettings().getRecentProjects())
-    // fileMap.put( file.getName(), file );
-    // return fileMap;
-    // }
 
     /**
      * Get a project that contains this library.

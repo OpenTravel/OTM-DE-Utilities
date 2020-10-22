@@ -34,6 +34,7 @@ import org.opentravel.dex.tasks.repository.VersionLibraryTask;
 import org.opentravel.dex.tasks.repository.VersionLibraryTask.VersionType;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
 
@@ -246,8 +247,18 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
 
     private void saveLibrary() {
         OtmLibrary library = getSelected();
-        if (library != null)
-            library.save();
+        if (library != null) {
+            String results = library.save();
+            DialogBoxContoller dialog = getDialogBox( null );
+            dialog.show( "Save Results", results );
+
+        }
+    }
+
+    private DialogBoxContoller getDialogBox(UserSettings settings) {
+        DialogBoxContoller dialogBox = DialogBoxContoller.init();
+        dialogBox.setUserSettings( settings );
+        return dialogBox;
     }
 
     /**

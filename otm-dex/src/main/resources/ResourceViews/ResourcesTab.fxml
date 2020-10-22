@@ -21,13 +21,14 @@
                            <items>
                                <fx:include fx:id="resourceDetails" source="ResourceDetails.fxml" />
                                <fx:include fx:id="resourceActionsTreeTable" source="ResourceActionsTreeTable.fxml" />
+                  <fx:include fx:id="resourceErrorsTreeTable" source="ResourceErrorsTreeTable.fxml" />
                            </items>
                        </SplitPane>
                      </items>
                 </SplitPane>
                </center>
-			   <bottom>
+			   <!--  bottom>
                   <fx:include fx:id="resourceErrorsTreeTable" source="ResourceErrorsTreeTable.fxml" />
-			   </bottom>
+			   </bottom -->
             </BorderPane>
 	</Tab>

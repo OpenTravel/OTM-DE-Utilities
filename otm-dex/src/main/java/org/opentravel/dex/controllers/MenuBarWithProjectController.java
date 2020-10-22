@@ -243,6 +243,18 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
         updateNavigationButtons();
         setDisplaySizeMenu();
+
+        // Accelerator set up by scene builder
+        // stage.getScene().getAccelerators().put( new KeyCodeCombination( KeyCode.S, KeyCombination.CONTROL_DOWN ),
+        // new Runnable() {
+        // @FXML
+        // public void run() {
+        // doSaveAllItem.fire();
+        // log.debug( "Control S pressed." );
+        // // button.fire();
+        // }
+        // } );
+
     }
 
     private DialogBoxContoller getDialogBox(UserSettings settings) {

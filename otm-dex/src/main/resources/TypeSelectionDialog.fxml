@@ -5,7 +5,6 @@
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.TextFlow?>
@@ -14,13 +13,12 @@
    <top>
       <VBox styleClass="menu-bar" stylesheets="@DavesViper.css" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="dialogTitleLabel" style="-fx-alignment: center;" styleClass="bold-label" 
-            		stylesheets="@DavesViper.css" text="">
+            <Label fx:id="dialogTitleLabel" style="-fx-alignment: center;" styleClass="bold-label" stylesheets="@DavesViper.css" text="">
                <VBox.margin>
                   <Insets left="20.0" top="10.0" />
                </VBox.margin>
             </Label>
-            <TextFlow fx:id="dialogHelp" prefHeight="45.0" prefWidth="600.0" styleClass="label" stylesheets="@DavesViper.css">
+            <TextFlow fx:id="dialogHelp" prefHeight="30.0" prefWidth="600.0" styleClass="label" stylesheets="@DavesViper.css">
                <VBox.margin>
                   <Insets left="20.0" />
                </VBox.margin>
@@ -29,7 +27,7 @@
       </VBox>
    </top>
    <bottom>
-      <ButtonBar BorderPane.alignment="CENTER">
+      <ButtonBar minHeight="25.0" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets bottom="5.0" left="10.0" right="20.0" top="5.0" />
          </BorderPane.margin>
@@ -40,7 +38,7 @@
                </opaqueInsets>
             </Button>
             <Separator orientation="VERTICAL" />
-            <Button fx:id="selectButton" alignment="CENTER" contentDisplay="CENTER" layoutX="419.0" layoutY="10.0" mnemonicParsing="false" prefWidth="75.0" styleClass="button-blue" stylesheets="@DavesViper.css" text="Select" textAlignment="CENTER">
+            <Button fx:id="selectButton" alignment="CENTER" contentDisplay="CENTER" layoutX="419.0" layoutY="10.0" minHeight="25.0" mnemonicParsing="false" prefWidth="75.0" styleClass="button-blue" stylesheets="@DavesViper.css" text="Select" textAlignment="CENTER">
                <opaqueInsets>
                   <Insets bottom="10.0" />
                </opaqueInsets>

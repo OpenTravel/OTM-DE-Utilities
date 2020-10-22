@@ -74,8 +74,7 @@ public class TypeSelectionContoller extends DexPopupControllerBase {
             if (!(controller instanceof TypeSelectionContoller))
                 throw new IllegalStateException( "Error creating type selection dialog controller." );
         } catch (IOException e1) {
-            throw new IllegalStateException(
-                "Error loading dialog box. " + e1.getLocalizedMessage() + "\n" + e1.getCause().toString() );
+            throw new IllegalStateException( "Error loading dialog box. " + e1.getCause().toString() );
         }
         positionStage( dialogStage );
         return controller;
@@ -91,6 +90,8 @@ public class TypeSelectionContoller extends DexPopupControllerBase {
     private MemberTreeTableController memberTreeTableController;
     @FXML
     private MemberFilterController memberFilterController;
+    // @FXML
+    // private BorderPane dialogBox;
 
     public MemberFilterController getMemberFilterController() {
         return memberFilterController;
@@ -146,6 +147,7 @@ public class TypeSelectionContoller extends DexPopupControllerBase {
         postHelp( helpText, dialogHelp );
         cancelButton.setOnAction( e -> doCancel() );
         selectButton.setOnAction( e -> doOK() );
+        // selectButton.setMinHeight( 25 );
 
         memberTreeTableController.configure( modelManager, false );
         memberFilterController.configure( modelManager, this );
@@ -154,6 +156,7 @@ public class TypeSelectionContoller extends DexPopupControllerBase {
 
         memberTreeTableController.post( modelManager );
         memberTreeTableController.setOnMouseClicked( this::mouseClick );
+
     }
 
 }
