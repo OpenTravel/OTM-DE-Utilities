@@ -19,7 +19,6 @@ package org.opentravel.dex.controllers.popup;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexFileHandler;
-import org.opentravel.common.DexProjectHandler;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
@@ -31,12 +30,16 @@ import org.opentravel.schemacompiler.repository.RepositoryException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -108,10 +111,14 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
     Button dialogButtonOK;
     @FXML
     TextField nameField;
+    // @FXML
+    // TextField nsField;
     @FXML
-    TextField nsField;
+    ComboBox<String> nsCombo;
     @FXML
-    TextField projectField;
+    ComboBox<String> projectCombo;
+    // @FXML
+    // TextField projectField;
     @FXML
     TextField descriptionField;
     @FXML
@@ -134,6 +141,8 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
 
     private UserSettings userSettings;
 
+    private Map<String,OtmProject> projectFileMap;
+
     public String getResultText() {
         return resultText;
     }
@@ -152,14 +161,14 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         dialogHelp.getChildren().clear();
     }
 
-    @FXML
-    void doOpenProject(ActionEvent e) {
-        DexProjectHandler handler = new DexProjectHandler();
-        selectedProject = handler.selectProject( modelMgr );
-        if (selectedProject != null)
-            projectField.setText( selectedProject.getName() );
-        // FIXME - also implement open the project
-    }
+    // @FXML
+    // void doOpenProject(ActionEvent e) {
+    // DexProjectHandler handler = new DexProjectHandler();
+    // selectedProject = handler.selectProject( modelMgr );
+    // if (selectedProject != null)
+    // projectField.setText( selectedProject.getName() );
+    // // FIXME - also implement open the project
+    // }
 
     /**
      * Event handler invoked by fxml when the selection button is pushed.
@@ -184,7 +193,7 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         // 2. Name, Namespace, Comments, Project
         // When they enter a name or fileName copy to other field
 
-        // 3. FIXME - assure namespace has version suffix
+        // 3. DONE - assure namespace has version suffix
 
         if (selectedProject == null) {
             postResults( "Must select a project for the new library. " );
@@ -200,8 +209,8 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         }
         if (nameField.getText().isEmpty())
             nameField.setText( fileNameField.getText() );
-        if (nsField.getText().isEmpty())
-            nsField.setText( "http://opentravel.org/Sandbox" );
+        if (nsCombo.getValue().isEmpty())
+            nsCombo.setValue( "http://opentravel.org/Sandbox" );
 
         //
         // final File file = new File(metaData.getPath());
@@ -244,7 +253,7 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
                 tlLib.setOwningModel( modelMgr.getTlModel() );
                 tlLib.setName( nameField.getText() );
                 tlLib.setPrefix( "pf1" );
-                tlLib.setNamespace( nsField.getText() );
+                tlLib.setNamespace( checkNS( nsCombo.getValue() ) );
                 // TODO - refactor how lib added to project. see DexProjectHandler
                 ProjectItem pi = selectedProject.getTL().getProjectManager().addUnmanagedProjectItem( tlLib,
                     selectedProject.getTL() );
@@ -316,6 +325,47 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         this.userSettings = settings;
     }
 
+    private void setupProject() {
+        projectCombo.getItems().clear();
+        projectFileMap = modelMgr.getOtmProjectManager().getOpenFileMap();
+        ObservableList<String> projectList = FXCollections.observableArrayList( projectFileMap.keySet() );
+        // modelMgr.getProjects().forEach( p -> {
+        // if (p != null && p.getTL() != null && p.getTL().getProjectFile() != null)
+        // projectList.add( p.getTL().getProjectFile().getName() );
+        // } );
+        projectCombo.setEditable( false );
+        projectCombo.setItems( projectList );
+        if (!projectList.isEmpty()) {
+            projectCombo.getSelectionModel().select( 0 );
+            selectedProject = projectFileMap.get( projectCombo.getValue() );
+        }
+        projectCombo.setOnAction( this::setSelectedProject );
+    }
+
+    private void setSelectedProject(ActionEvent e) {
+        selectedProject = projectFileMap.get( projectCombo.getValue() );
+    }
+
+    private void setupNS() {
+        // Get the namespaces from the projects
+        modelMgr.getBaseNamespaces().forEach( ns -> nsCombo.getItems().add( ns ) );
+        nsCombo.setEditable( true );
+        // nsCombo.valueProperty().addListener( (ov, o, n) -> checkNS( n ) );
+    }
+
+    private String checkNS(String ns) {
+        String suffix = ns;
+        if (ns.lastIndexOf( '/' ) > 0)
+            suffix = ns.substring( ns.lastIndexOf( '/' ) );
+        if (!suffix.matches( "/v[0-9].*" ))
+            ns += "/v1";
+
+        ns = ns.replace( "//", "/" );
+        // nsCombo.setValue( ns );
+        log.debug( "NS check: " + ns );
+        return ns;
+    }
+
     @Override
     protected void setup(String message) {
         super.setStage( dialogTitle, dialogStage );
@@ -327,12 +377,15 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
 
         // Initial settings
         //
-        projectField.setEditable( false );
-        projectField.setDisable( true ); // Grey it out
-        if (!modelMgr.getOtmProjectManager().hasProjects()) {
-            postResults( "Must have a project for the new library." );
-            dialogButtonOK.setDisable( true );
-        }
+        // projectField.setEditable( false );
+        // projectField.setDisable( true ); // Grey it out
+        // if (!modelMgr.getOtmProjectManager().hasProjects()) {
+        // postResults( "Must have a project for the new library." );
+        // dialogButtonOK.setDisable( true );
+        // }
+        setupNS();
+        setupProject();
+
         if (userSettings != null)
             directoryField.setText( userSettings.getLastProjectFolder().getPath() );
         else

@@ -237,6 +237,18 @@ public class OtmProjectManager implements TaskResultHandlerI {
         return fileMap;
     }
 
+    // /**
+    // * Get a map of recently used project file names and files from user settings. Sorted by most recently used first.
+    // *
+    // * @return
+    // */
+    // public Map<String,File> getOpenProjects() {
+    // Map<String,File> fileMap = new LinkedHashMap<>();
+    // for (File file : getOpenProjectFiles())
+    // fileMap.put( file.getName(), file );
+    // return fileMap;
+    // }
+
     /**
      * Get the list of the recently used project files from user settings.
      * 
@@ -244,6 +256,20 @@ public class OtmProjectManager implements TaskResultHandlerI {
      */
     public List<File> getRecentlyUsedProjectFiles() {
         return hasSettings() ? userSettings.getRecentProjects() : Collections.emptyList();
+    }
+
+    /**
+     * Get the map of the open used project file names and their projects.
+     * 
+     * @return
+     */
+    public Map<String,OtmProject> getOpenFileMap() {
+        Map<String,OtmProject> projectMap = new HashMap<>();
+        modelManager.getProjects().forEach( p -> {
+            if (p != null && p.getTL() != null && p.getTL().getProjectFile() != null)
+                projectMap.put( p.getTL().getProjectFile().getName(), p );
+        } );
+        return projectMap;
     }
 
     /**

@@ -361,10 +361,11 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
             if (memberS != null)
                 if (tracking) {
+                    // Post the related objects
                     postBase( memberS );
                     postProviders( memberS );
                     postUsers( memberS );
-
+                    // Scroll to origin (0,0)
                     scrollPane.setVvalue( 0 );
                     scrollPane.setHvalue( 0 );
                 } else {
