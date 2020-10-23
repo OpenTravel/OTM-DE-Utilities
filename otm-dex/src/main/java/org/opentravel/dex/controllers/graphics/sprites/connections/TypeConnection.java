@@ -16,38 +16,35 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.connections;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
+import org.opentravel.model.otmProperties.OtmProperty;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
 
 public class TypeConnection extends Connection {
-    private Rectangle fromRect;
-    private double offsetY; // offset from sprite Y
-    private double offsetX; // offset from sprite X
+    private static Log log = LogFactory.getLog( TypeConnection.class );
 
-    public TypeConnection(Rectangle propertyRect, DexSprite<?> userSprite, DexSprite<?> providerSprite) {
-        if (userSprite == null || providerSprite == null || userSprite.getBoundaries() == null
-            || providerSprite.getBoundaries() == null)
-            throw new IllegalArgumentException( "Missing rectangle on connection constructor." );
+    private OtmProperty property;
+
+    public TypeConnection(PropertyRectangle propertyRect, DexSprite<?> userSprite, DexSprite<?> providerSprite) {
+        if (userSprite == null || providerSprite == null || propertyRect == null)
+            throw new IllegalArgumentException( "Missing parameter on connection constructor." );
+        if (providerSprite.getBoundaries() == null)
+            throw new IllegalArgumentException( "Missing provider boundaries on connection constructor." );
+        if (propertyRect.getProperty() == null)
+            throw new IllegalArgumentException( "Missing property rectangle otm-property on connection constructor." );
+        if (propertyRect.getConnectionPoint() == null)
+            throw new IllegalArgumentException(
+                "Missing property rectangle connection point on connection constructor." );
 
         // Connect to connector arrow point
-        if (propertyRect instanceof PropertyRectangle
-            && ((PropertyRectangle) propertyRect).getConnectionPoint() != null) {
-            // use property rectangle connection point
-            fx = ((PropertyRectangle) propertyRect).getConnectionPoint().getX();
-            fy = ((PropertyRectangle) propertyRect).getConnectionPoint().getY();
-        } else {
-            // Connect to the rectangle's right side
-            fx = propertyRect.getMaxX();
-            fy = propertyRect.getMaxY() - GraphicsUtils.CONNECTOR_SIZE / 2;
-        }
-        // fx = propertyRect.getMaxX() - PropertyRectangle.PROPERTY_MARGIN;
-        offsetX = fx - userSprite.getBoundaries().getX();
-        offsetY = fy - userSprite.getBoundaries().getY();
+        getFromXY( propertyRect );
+        property = propertyRect.getProperty();
 
         // Connect to provider's left, center
         tx = providerSprite.getBoundaries().getX();
@@ -55,7 +52,20 @@ public class TypeConnection extends Connection {
 
         this.from = userSprite;
         this.to = providerSprite;
-        this.fromRect = propertyRect;
+    }
+
+    private void getFromXY(PropertyRectangle propertyRect) {
+        // log.debug( "Start getFromXY: " + fx + " " + fy );
+        if (propertyRect.getConnectionPoint() != null) {
+            // use property rectangle connection point
+            fx = propertyRect.getConnectionPoint().getX();
+            fy = propertyRect.getConnectionPoint().getY();
+        } else {
+            // Connect to the rectangle's right side
+            fx = propertyRect.getMaxX();
+            fy = propertyRect.getMaxY() - GraphicsUtils.CONNECTOR_SIZE / 2;
+        }
+        // log.debug( " End getFromXY: " + fx + " " + fy );
     }
 
     /**
@@ -72,23 +82,20 @@ public class TypeConnection extends Connection {
             // Erase old line, saving gc settings
             erase( gc, backgroundColor );
 
-            // Move the point then draw
+            // Move the point
             if (from == sprite) {
                 if (from.isCollapsed()) {
                     fx = from.getBoundaries().getMaxX();
                     fy = from.getBoundaries().getY() + sprite.getBoundaries().getHeight() / 2;
-                } else if (fromRect != null) {
-                    fx = from.getBoundaries().getX() + offsetX;
-                    fy = from.getBoundaries().getY() + offsetY;
                 } else {
-                    fx = from.getBoundaries().getX() + offsetX;
-                    fy = from.getBoundaries().getY() + sprite.getBoundaries().getHeight() / 2;
+                    getFromXY( from.find( property ) );
                 }
             } else if (to == sprite) {
                 tx = sprite.getBoundaries().getX();
                 ty = sprite.getBoundaries().getY() + sprite.getBoundaries().getHeight() / 2;
             }
 
+            // Draw new line from f to t
             draw( gc );
         }
         return false;

@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.member;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.cellfactories.ValidationMemberTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexController;
@@ -63,7 +61,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class MemberTreeTableController extends DexIncludedControllerBase<OtmModelManager> implements DexController {
-    private static Log log = LogFactory.getLog( MemberTreeTableController.class );
+    // private static Log log = LogFactory.getLog( MemberTreeTableController.class );
 
     // Column labels
     // TODO - externalize strings
@@ -322,11 +320,11 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     // }
 
     private void handleEvent(OtmObjectReplacedEvent event) {
-        if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
-            log.error( "BAD HERE" );
+        // if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
+        // log.error( "BAD HERE" );
         refresh();
-        if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
-            log.error( "BAD HERE" );
+        // if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
+        // log.error( "BAD HERE" );
     }
 
     private void handleEvent(DexMemberSelectionEvent event) {
@@ -384,10 +382,10 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         OtmObject item = null;
         if (memberTree.getSelectionModel().getSelectedItem() != null)
             item = memberTree.getSelectionModel().getSelectedItem().getValue().getValue();
-        log.debug( "Click selection: " + item );
+        // log.debug( "Click selection: " + item );
         if (item instanceof OtmLibraryMember && event.getButton().equals( MouseButton.PRIMARY )
             && event.getClickCount() == 2) {
-            log.debug( "Double click selection: " + item );
+            // log.debug( "Double click selection: " + item );
             ignoreEvents = true;
             if (eventPublisherNode != null)
                 eventPublisherNode.fireEvent( new DexMemberSelectionEvent( (OtmLibraryMember) item, true ) );
@@ -422,7 +420,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             try {
                 memberTree.sort();
             } catch (Exception e) {
-                log.warn( "Exception sorting: " + e.getLocalizedMessage() );
+                // log.warn( "Exception sorting: " + e.getLocalizedMessage() );
             }
         }
         ignoreEvents = false;

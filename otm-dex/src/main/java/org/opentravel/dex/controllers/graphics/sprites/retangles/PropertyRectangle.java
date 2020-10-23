@@ -24,7 +24,6 @@ import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 import org.opentravel.model.otmProperties.OtmElement;
@@ -33,7 +32,6 @@ import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmActionResponse;
 
-import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
@@ -61,7 +59,7 @@ public class PropertyRectangle extends Rectangle {
 
     protected DexSprite<OtmLibraryMember> parent;
     protected Font font;
-    private Point2D connectionPoint = null;
+    // private Point2D connectionPoint = null;
 
     private OtmProperty property;
     protected OtmTypeProvider typeProvider = null;
@@ -152,7 +150,7 @@ public class PropertyRectangle extends Rectangle {
         if (provider != null) {
             this.typeProvider = provider;
             this.providerLabel = provider.getNameWithPrefix();
-            if (provider instanceof OtmComplexObjects)
+            if (showConnector( provider ))
                 this.providerLabel = getCardinality( property ) + typeProvider.getPrefix();
             this.providerIcon = typeProvider.getIcon();
 
@@ -174,12 +172,17 @@ public class PropertyRectangle extends Rectangle {
         return this;
     }
 
-    public Point2D getConnectionPoint() {
-        return connectionPoint;
-    }
+    // @Override
+    // public Point2D getConnectionPoint() {
+    // return connectionPoint;
+    // }
 
     public OtmProperty getProperty() {
         return property;
+    }
+
+    public OtmTypeProvider getProvider() {
+        return typeProvider;
     }
 
 
@@ -202,7 +205,7 @@ public class PropertyRectangle extends Rectangle {
         if (typeProvider != null) {
             tRect = GraphicsUtils.drawLabel( providerLabel, providerIcon, null, font, x, y );
             actualWidth += tRect.getWidth() + typeMargin;
-            double tx = x + width - tRect.getWidth() - rightMargin - margin - margin;
+            double tx = x + width - tRect.getWidth() - rightMargin - 3 * margin;
             GraphicsUtils.drawLabel( providerLabel, providerIcon, false, true, gc, font, tx, y );
             // tRect.draw( gc, false );
         }
@@ -220,14 +223,15 @@ public class PropertyRectangle extends Rectangle {
             gc.strokeLine( x, lineY, lineX, lineY );
 
         // Draw Connector symbol and register listener
-        if (typeProvider != null && !(typeProvider.getOwningMember() instanceof OtmSimpleObjects)) {
-            connectionPoint = new Point2D( x + width - margin, lineY );
-            GraphicsUtils.drawConnector( gc, providerColor, x + width - 2 * connectorSize + 2 * margin,
-                lineY - connectorSize / 2 );
+        if (showConnector( typeProvider )) {
+            double cx = x + width - 2 * connectorSize + 2 * margin;
+            connectionPoint = GraphicsUtils.drawConnector( gc, providerColor, cx, lineY - connectorSize );
+            // log.debug( " Set connection point to: " + connectionPoint );
 
             // Register mouse listener with parent
             if (!compute && parent != null && property != null) {
-                this.setOnMouseClicked( e -> parent.connect( ((OtmTypeUser) property) ) );
+                // this.setOnMouseClicked( e -> parent.connect( ((OtmTypeUser) property) ) );
+                this.setOnMouseClicked( e -> parent.connect( this ) );
                 parent.add( this );
                 // sub-types will register after rectangle is sized.
             }
@@ -238,6 +242,10 @@ public class PropertyRectangle extends Rectangle {
 
     }
 
+    private static boolean showConnector(OtmTypeProvider provider) {
+        return (provider != null && !(provider.getOwningMember() instanceof OtmSimpleObjects));
+    }
+
     private static String getCardinality(OtmProperty property) {
         String cardinality = "";
         if (property instanceof OtmElement && !(property instanceof OtmIdReferenceElement)) {
@@ -246,11 +254,14 @@ public class PropertyRectangle extends Rectangle {
             else
                 cardinality = "[0";
             if (((OtmElement<?>) property).getRepeatCount() > 0)
-                cardinality += Integer.toString( ((OtmElement<?>) property).getRepeatCount() );
+                cardinality += ".." + Integer.toString( ((OtmElement<?>) property).getRepeatCount() );
 
             cardinality += "] ";
-        } else if (property instanceof OtmTypeUser && property.isManditory())
-            cardinality = "[1] ";
+        } else if (property instanceof OtmTypeUser)
+            if (property.isManditory())
+                cardinality = "[1] ";
+            else
+                cardinality = "[0] ";
         return cardinality;
 
     }

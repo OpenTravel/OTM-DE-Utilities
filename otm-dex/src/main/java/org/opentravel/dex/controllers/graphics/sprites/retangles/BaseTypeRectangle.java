@@ -74,7 +74,7 @@ public class BaseTypeRectangle extends PropertyRectangle {
             parent.add( this );
         }
 
-        log.debug( "Created base type rectangle:" + this );
+        // log.debug( "Created base type rectangle:" + this );
     }
 
     public OtmLibraryMember get() {

@@ -53,21 +53,10 @@ import javafx.scene.paint.Paint;
 public class SpriteManager {
     private static Log log = LogFactory.getLog( SpriteManager.class );
 
-    // private static final double COLUMN_START = 10;
-    // private static final double COLUMN_WIDTH = 150;
-    // private static final int FACET_OFFSET = 5;
-    // private static final double MINIMUM_SLOT_HEIGHT = 20;
-    // private static final String DEFAULT_FONT_NAME = "Monospaced";
-
     private SettingsManager settingsManager;
     private Pane spritePane;
-    // private List<DexSprite<?>> activeSprites = new ArrayList<>();
     private DexIncludedController<?> parentController = null;
     private DexSprite<?> draggedSprite = null;
-    // private int fontSize = 14;
-
-    // private Canvas backgroundCanvas;
-    // private GraphicsContext defaultGC;
     private GraphicsContext connectionsGC;
     private List<Connection> connections;
     private Canvas connectionsCanvas;
@@ -231,10 +220,10 @@ public class SpriteManager {
         return false;
     }
 
-    public DexSprite<?> get(OtmLibraryMember member) {
+    public MemberSprite<OtmLibraryMember> get(OtmLibraryMember member) {
         for (DexSprite<?> s : getAllSprites())
-            if (s.getMember() == member)
-                return s;
+            if (s.getMember() == member && s instanceof MemberSprite)
+                return (MemberSprite<OtmLibraryMember>) s;
         return null;
     }
 
@@ -247,7 +236,7 @@ public class SpriteManager {
             draggedSprite.clear();
             draggedSprite.set( e.getX(), e.getY() );
             draggedSprite.render();
-            updateConnections( draggedSprite );
+            // render updates connections updateConnections( draggedSprite );
         }
         // log.debug( "Dragging sprite." );
     }
@@ -258,8 +247,6 @@ public class SpriteManager {
             updateConnections();
         draggedSprite = null;
         // log.debug( "Drag end." );
-
-        // FIXME - may have to move to different column
     }
 
     public void dragStart(MouseEvent e) {
@@ -281,10 +268,6 @@ public class SpriteManager {
             if (selectedSprite != null)
                 return selectedSprite;
         }
-        // for (DexSprite<?> sprite : getAllSprites())
-        // if (sprite.getMember() == member) {
-        // return (sprite);
-        // }
         return selectedSprite;
     }
 
@@ -301,48 +284,6 @@ public class SpriteManager {
         return connectionsGC;
     }
 
-    // public Point2D getNextInColumn(DexSprite<?> sprite) {
-    // Point2D bottom = new Point2D( 0, 0 );
-    // if (sprite != null) {
-    // DexSprite<?> next = sprite;
-    // do {
-    // bottom = new Point2D( next.getBoundaries().getX(), next.getBoundaries().getMaxY() + 5 );
-    // next = findSprite( bottom );
-    // } while (next != null && bottom.getY() < spritePane.getHeight());
-    // }
-    // return bottom;
-    // }
-
-    // public Point2D getNextInColumn(double x, double y) {
-    // Point2D bottom = new Point2D( x, y );
-    // DexSprite<?> next = null;
-    // do {
-    // next = findSprite( bottom );
-    // if (next != null)
-    // bottom = new Point2D( x, next.getBoundaries().getMaxY() + 5 );
-    // else {
-    // bottom = new Point2D( x, bottom.getY() + MINIMUM_SLOT_HEIGHT );// minimum slot size;
-    // next = findSprite( bottom );
-    // }
-    // } while (next != null && bottom.getY() < spritePane.getHeight());
-    // return bottom;
-    // }
-
-    // public Point2D getNextRightColumn(DexSprite<?> sprite) {
-    // // Get the x for the next column
-    // double columnX = sprite.getBoundaries().getMaxX() + COLUMN_WIDTH;
-    // // Start looking just above the sprite
-    // double startY = sprite.getBoundaries().getY() - 20 > 0 ? sprite.getBoundaries().getY() - 20 : 0;
-    // Point2D bottom = new Point2D( columnX, startY );
-    // DexSprite<?> next = null;
-    // do {
-    // next = findSprite( bottom );
-    // if (next != null)
-    // bottom = new Point2D( columnX, next.getBoundaries().getMaxY() + 10 );
-    // } while (next != null && bottom.getY() < spritePane.getHeight());
-    //
-    // return bottom;
-    // }
 
     private void mouseClick(MouseEvent e) {
         // log.debug( "Mouse click on at: " + e.getX() + " " + e.getY() );
@@ -362,18 +303,6 @@ public class SpriteManager {
                 selected.findAndRunRectangle( e );
         }
     }
-
-    // /**
-    // * Put all sprites onto the parent node
-    // */
-    // public void post() {
-    // // log.debug( "Posting all sprites." );
-    // for (DexSprite<?> sprite : activeSprites)
-    // if (sprite != null) {
-    // sprite.render();
-    // spritePane.getChildren().add( sprite.render() );
-    // }
-    // }
 
     protected void publishEvent(DexEvent event) {
         if (parentController != null)

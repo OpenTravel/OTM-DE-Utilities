@@ -328,7 +328,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
             OtmLibraryMember member = memberSprite.getMember();
             for (OtmTypeUser user : member.getDescendantsTypeUsers()) {
                 if (user.getAssignedType() != null && !(user.getAssignedType() instanceof OtmSimpleObjects))
-                    memberSprite.connect( user, true );
+                    memberSprite.addConnection( user );
             }
         }
     }
@@ -336,20 +336,18 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     private void postUsers(MemberSprite<OtmLibraryMember> memberSprite) {
         if (memberSprite != null) {
             OtmLibraryMember member = memberSprite.getMember();
-            if (member.getBaseType() instanceof OtmLibraryMember && !(member instanceof OtmContextualFacet)) {
-                ColumnRectangle column = memberSprite.getColumn().getNext();
-                boolean collapsed = true;
+            ColumnRectangle column = memberSprite.getColumn().getPrev();
+            boolean collapsed = true;
 
-                for (OtmLibraryMember user : member.getWhereUsed())
-                    if (user != member)
-                        spriteManager.add( user, column, collapsed );
-            }
+            for (OtmLibraryMember user : member.getWhereUsed())
+                if (user != member)
+                    spriteManager.add( user, column, collapsed );
         }
     }
 
     @Override
     public void post(OtmObject o) {
-        log.debug( "Graphics canvas controller posting object: " + o );
+        // log.debug( "Graphics canvas controller posting object: " + o );
         if (o instanceof OtmLibraryMember) {
             OtmLibraryMember member = (OtmLibraryMember) o;
             ColumnRectangle memberColumn = spriteManager.getColumn( 2 );

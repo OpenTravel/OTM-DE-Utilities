@@ -96,11 +96,11 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
 
         // This relies on the canvas being clipped to the active boundaries
         String desc = member.getDescription();
-        if (desc != null && !desc.isEmpty()) {
-            Tooltip t = new Tooltip();
-            Tooltip.install( canvas, t );
-            t.setText( desc );
-        }
+        // if (desc != null && !desc.isEmpty()) {
+        Tooltip t = new Tooltip();
+        Tooltip.install( canvas, t );
+        t.setText( member.getPrefix() + " : " + member.getNamespace() + "\n" + desc );
+        // }
 
     }
 
@@ -195,7 +195,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
 
         setBoundaries( 0, 0 );
 
-        // Create Canvas
+        // Size Canvas
         Rectangle canvasR = new Rectangle( x, y, boundaries.getWidth() + GraphicsUtils.CANVAS_MARGIN,
             boundaries.getHeight() + GraphicsUtils.CANVAS_MARGIN );
         canvas.setHeight( y + canvasR.getHeight() );
@@ -204,6 +204,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
 
         drawMember( true );
         manager.updateConnections( this );
+        // log.debug( "Rendered " + member + " at " + getBoundaries() );
         return canvas;
     }
 
@@ -290,7 +291,16 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         // if (gc == null)
         // width += 2 * 18;
         // else
-        width += drawControls( boundaries, gc ) + GraphicsUtils.MEMBER_MARGIN;
+        double cWidth = drawControls( boundaries, gc ) + GraphicsUtils.MEMBER_MARGIN;
+        width += cWidth;
+
+        // prefix
+        double px = boundaries.getMaxX() - cWidth;
+        Rectangle pRect =
+            GraphicsUtils.drawLabel( member.getPrefix(), null, member.isEditable(), false, null, font, px, y );
+        px -= pRect.getWidth() + settingsManager.getMargin( Margins.TEXT );
+        pRect = GraphicsUtils.drawLabel( member.getPrefix(), null, member.isEditable(), false, gc, font, px, y );
+        width += pRect.getWidth();
 
         // Draw property for base type if any
         if (!collapsed && member.getBaseType() != null) {
@@ -383,8 +393,9 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     }
 
     @Override
-    @Deprecated
     public void set(double x, double y) {
+        // Rectangles are not save at sprite level anymore
+        // rectangles.forEach( r -> r.moveConnectionPoint( this.x - x, this.y - y ) );
         this.x = x;
         this.y = y;
     }
@@ -392,8 +403,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     @Override
     public void set(Point2D p) {
         if (p != null) {
-            x = p.getX();
-            y = p.getY();
+            set( p.getX(), p.getY() );
         }
     }
 
@@ -409,8 +419,11 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
 
     @Override
     public void setCollapsed(boolean collapsed) {
-        log.debug( "Collapsed = " + collapsed + " " + this );
+        // log.debug( "Collapsed = " + collapsed + " " + this );
         this.collapsed = collapsed;
+        if (!collapsed)
+            getCanvas().toFront();
+
         // resize this sprite
         setBoundaries( 0, 0 );
         // log.debug( " became = " + this );
@@ -502,22 +515,19 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     }
 
     @Override
-    public DexSprite<?> connect(OtmTypeUser user) {
-        return connect( user, false );
-    }
-
-    public DexSprite<?> connect(OtmTypeUser user, boolean collapsed) {
-        log.debug( "Connecting to " + user );
-        if (user == null || user.getAssignedType() == null || !(user instanceof OtmProperty))
+    public MemberSprite<OtmLibraryMember> connect(PropertyRectangle pSprite) {
+        log.debug( "Connecting to " + pSprite );
+        if (pSprite == null || pSprite.getProperty() == null || pSprite.getProvider() == null)
             return null;
         if (getColumn() == null)
             return null;
 
-        OtmLibraryMember provider = user.getAssignedType().getOwningMember();
+        OtmTypeUser user = (OtmTypeUser) pSprite.getProperty();
+        OtmLibraryMember provider = pSprite.getProvider().getOwningMember();
         if (provider == null || provider == user.getOwningMember())
             return null;
 
-        DexSprite<?> toSprite = manager.get( provider );
+        MemberSprite<OtmLibraryMember> toSprite = manager.get( provider );
         if (toSprite == null) {
             // Place the new sprite and connect it
             toSprite = manager.add( provider, getColumn().getNext(), collapsed );
@@ -532,6 +542,57 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         return toSprite;
     }
 
+    // @Override
+    // public DexSprite<?> connect(OtmTypeUser user) {
+    // log.debug( "Connecting to " + user );
+    // if (user == null || user.getAssignedType() == null || !(user instanceof OtmProperty))
+    // return null;
+    // if (getColumn() == null)
+    // return null;
+    //
+    // OtmLibraryMember provider = user.getAssignedType().getOwningMember();
+    // if (provider == null || provider == user.getOwningMember())
+    // return null;
+    //
+    // DexSprite<?> toSprite = manager.get( provider );
+    // if (toSprite == null) {
+    // // Place the new sprite and connect it
+    // toSprite = manager.add( provider, getColumn().getNext(), collapsed );
+    // connect( (OtmProperty) user, this, toSprite );
+    // } else {
+    // toSprite.setCollapsed( !toSprite.isCollapsed() );
+    // }
+    // if (toSprite != null) {
+    // toSprite.getCanvas().toFront();
+    // toSprite.refresh();
+    // }
+    // return toSprite;
+    // }
+
+    /**
+     * Get or Create provider sprite if non exists.
+     * 
+     * @param user
+     * @return
+     */
+    public MemberSprite<OtmLibraryMember> addConnection(OtmTypeUser user) {
+        log.debug( "Adding connection to " + user );
+        if (getColumn() == null || user == null || user.getAssignedType() == null || !(user instanceof OtmProperty))
+            return null;
+
+        OtmLibraryMember provider = user.getAssignedType().getOwningMember();
+        if (provider == null || provider == user.getOwningMember())
+            return null;
+
+        MemberSprite<OtmLibraryMember> toSprite = manager.get( provider );
+        if (!(toSprite instanceof MemberSprite)) {
+            // Create new collapsed sprite and connect it
+            toSprite = manager.add( provider, getColumn().getNext(), true );
+            connect( (OtmProperty) user, this, toSprite );
+        }
+        return toSprite;
+    }
+
     /**
      * Find the property's rectangle and make type connection
      * 
@@ -542,7 +603,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
      */
     private TypeConnection connect(OtmProperty property, DexSprite<?> from, DexSprite<?> to) {
         TypeConnection c = null;
-        Rectangle fRect;
+        PropertyRectangle fRect;
         fRect = from.find( property );
         if (fRect != null) {
             c = new TypeConnection( fRect, from, to );

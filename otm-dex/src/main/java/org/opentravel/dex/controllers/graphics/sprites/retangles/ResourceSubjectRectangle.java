@@ -68,7 +68,7 @@ public class ResourceSubjectRectangle extends PropertyRectangle {
             this.setOnMouseClicked( e -> ((ResourceSprite) parent).connectSubject() );
             parent.add( this );
         }
-        log.debug( "Created base type rectangle:" + this );
+        // log.debug( "Created base type rectangle:" + this );
     }
 
     public OtmLibraryMember get() {

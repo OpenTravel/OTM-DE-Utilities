@@ -17,6 +17,7 @@
 package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
@@ -87,8 +88,7 @@ public interface DexSprite<O extends OtmObject> {
      * 
      * @return found rectangle or null
      */
-    public Rectangle find(OtmProperty property);
-    // public Rectangle find(OtmFacet property);
+    public PropertyRectangle find(OtmProperty property);
 
     public void findAndRunRectangle(MouseEvent e);
 
@@ -148,9 +148,8 @@ public interface DexSprite<O extends OtmObject> {
     void set(ColumnRectangle column);
 
     /**
-     * Simply set the top, left coordinates.
+     * Simply set the top, left coordinates and update the rectangle's connection points.
      */
-    @Deprecated
     public void set(double x, double y);
 
     public void set(Font font);
@@ -171,6 +170,12 @@ public interface DexSprite<O extends OtmObject> {
      * @return
      */
     public List<Rectangle> getRectangles();
+
+    /**
+     * @param pSprite
+     * @return
+     */
+    MemberSprite<OtmLibraryMember> connect(PropertyRectangle pSprite);
 
 
 }

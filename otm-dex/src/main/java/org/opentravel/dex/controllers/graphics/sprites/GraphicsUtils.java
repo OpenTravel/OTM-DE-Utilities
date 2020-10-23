@@ -113,9 +113,9 @@ public class GraphicsUtils {
             gc.strokeOval( x, y, CONNECTOR_SIZE, CONNECTOR_SIZE );
             Image link = ImageManager.getImage( ImageManager.Icons.NAV_GO );
             gc.drawImage( link, x, y );
-            return new Point2D( x + CONNECTOR_SIZE, y + CONNECTOR_SIZE );
+            return new Point2D( x + CONNECTOR_SIZE, y + CONNECTOR_SIZE / 2 );
         }
-        return new Point2D( CONNECTOR_SIZE, CONNECTOR_SIZE );
+        return new Point2D( x + CONNECTOR_SIZE, y + CONNECTOR_SIZE / 2 );
     }
 
     /**

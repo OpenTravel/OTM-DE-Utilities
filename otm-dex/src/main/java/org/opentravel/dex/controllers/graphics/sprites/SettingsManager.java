@@ -81,7 +81,7 @@ public class SettingsManager {
     private static final double FACET_MARGIN = 5;
 
     public enum Margins {
-        FACET(FACET_MARGIN), PROPERTY(2), PROPERTY_TYPE(8);
+        FACET(FACET_MARGIN), PROPERTY(2), PROPERTY_TYPE(8), TEXT(2);
 
         public final double margin;
 
