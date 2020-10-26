@@ -42,7 +42,7 @@ public class SettingsManager {
     public static final Font DEFAULT_FONT_ITALIC = Font.font( "Monospaced", FontWeight.NORMAL, FontPosture.ITALIC, 15 );
     private static final String DEFAULT_FONT_NAME = "Monospaced";
 
-    public static final double CONNECTOR_SIZE = 16;
+    public static final double CONNECTOR_SIZE = 18;
     public static final Paint CONNECTOR_COLOR = Color.gray( 0.3 );
     private static final Paint FACET_COLOR = Color.ANTIQUEWHITE;
     private Paint backgroundColor = Color.gray( 0.95 );

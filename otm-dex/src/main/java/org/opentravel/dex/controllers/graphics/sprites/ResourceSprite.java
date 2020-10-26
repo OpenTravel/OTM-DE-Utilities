@@ -20,6 +20,7 @@ import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.dex.controllers.graphics.sprites.connections.ResourceTypeConnection;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ResourceSubjectRectangle;
@@ -94,7 +95,8 @@ public class ResourceSprite extends MemberSprite<OtmResource> implements DexSpri
             fy += subjectRectangle.getHeight() + margin;
             width = computeWidth( gc == null, width, subjectRectangle, 0 );
         } else {
-            rect = GraphicsUtils.drawLabel( "Abstract", null, false, false, gc, font, x + dx, fy );
+            rect = new LabelRectangle( this, "Abstract", null, false, false, false ).draw( gc, x + dx, fy );
+            // rect = GraphicsUtils.drawLabel( "Abstract", null, false, false, gc, font, x + dx, fy );
             // rect.set( x + dx, fy ).draw( gc, false );
             fy += rect.getHeight() + margin;
             width = computeWidth( gc == null, width, rect, 0 );

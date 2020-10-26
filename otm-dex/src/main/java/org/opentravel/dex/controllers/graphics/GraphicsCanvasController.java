@@ -372,7 +372,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
                     // Scroll to the new sprite's location
                     double dx = memberS.getBoundaries().getX() / backgroundCanvas.getWidth();
                     double dy = memberS.getBoundaries().getMaxY() / backgroundCanvas.getHeight();
-                    scrollPane.setVvalue( dy );
+                    scrollPane.setVvalue( scrollPane.getVmin() );
                     scrollPane.setHvalue( dx );
                 }
         }

@@ -184,7 +184,8 @@ public class FacetRectangle extends Rectangle {
 
         // Label
         if (label != null) {
-            Rectangle lRect = GraphicsUtils.drawLabel( label, icon, editable, false, gc, font, x, y );
+            Rectangle lRect = new LabelRectangle( parent, label, icon, editable, false, false ).draw( gc, x, y );
+            // Rectangle lRect = GraphicsUtils.drawLabel( label, icon, editable, false, gc, font, x, y );
             height = lRect.getHeight();
             width = compute && lRect.getWidth() > width ? lRect.getWidth() : width;
             // lRect.draw( gc, false );

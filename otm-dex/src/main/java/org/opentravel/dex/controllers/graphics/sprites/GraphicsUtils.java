@@ -110,9 +110,9 @@ public class GraphicsUtils {
             }
             gc.strokeOval( x, y, size, size );
             Image link = ImageManager.getImage( ImageManager.Icons.CONN_L );
-            if (size + 3 < link.getWidth())
+            if (size + 1 < link.getWidth())
                 link = ImageManager.getImage( ImageManager.Icons.CONN_M );
-            if (size + 3 < link.getWidth())
+            if (size + 1 < link.getWidth())
                 link = ImageManager.getImage( ImageManager.Icons.CONN_SM );
 
             double imageX = x + size - link.getWidth();
@@ -125,73 +125,74 @@ public class GraphicsUtils {
 
     }
 
-    /**
-     * Draw the label with optional image on the graphics context at x, y.
-     * 
-     * @param label
-     * @param image - can be null
-     * @param gc - if null, just compute size
-     * @param x
-     * @param y
-     * @return bounding rectangle
-     */
-    public static Rectangle drawLabel(String label, Image image, Font font, final double x, final double y) {
-        return drawLabel( label, image, true, false, null, font, x, y );
-    }
-
-    // public static Rectangle drawLabel(String label, Image image, boolean imageAfterText, GraphicsContext gc, Font
-    // font,
-    // final double x, final double y) {
-    // return drawLabel( label, image, true, imageAfterText, gc, font, x, y );
+    // /**
+    // * Draw the label with optional image on the graphics context at x, y.
+    // *
+    // * @param label
+    // * @param image - can be null
+    // * @param gc - if null, just compute size
+    // * @param x
+    // * @param y
+    // * @return bounding rectangle
+    // */
+    //// public static Rectangle drawLabel(String label, Image image, Font font, final double x, final double y) {
+    //// return drawLabel( label, image, true, false, null, font, x, y );
+    //// }
+    ////
+    //// // public static Rectangle drawLabel(String label, Image image, boolean imageAfterText, GraphicsContext gc,
+    // Font
+    //// // font,
+    //// // final double x, final double y) {
+    //// // return drawLabel( label, image, true, imageAfterText, gc, font, x, y );
+    //// // }
+    //
+    // public static Rectangle drawLabel(String label, Image image, boolean bold, boolean imageAfterText,
+    // GraphicsContext gc, Font font, final double x, final double y) {
+    //
+    // // Compute size, start with start and end margins
+    // double width = 2 * LABEL_MARGIN;
+    // double height = 2 * LABEL_MARGIN;
+    // double imageWidth = 0;
+    // double imageHeight = 0;
+    // Paint saveFill = null;
+    // Font saveFont = null;
+    //
+    // // Add size of image
+    // if (image != null) {
+    // width += image.getWidth() + LABEL_MARGIN;
+    // imageWidth = image.getWidth();
+    // imageHeight = image.getHeight();
     // }
-
-    public static Rectangle drawLabel(String label, Image image, boolean bold, boolean imageAfterText,
-        GraphicsContext gc, Font font, final double x, final double y) {
-
-        // Compute size, start with start and end margins
-        double width = 2 * LABEL_MARGIN;
-        double height = 2 * LABEL_MARGIN;
-        double imageWidth = 0;
-        double imageHeight = 0;
-        Paint saveFill = null;
-        Font saveFont = null;
-
-        // Add size of image
-        if (image != null) {
-            width += image.getWidth() + LABEL_MARGIN;
-            imageWidth = image.getWidth();
-            imageHeight = image.getHeight();
-        }
-        // Add size of text area
-        Point2D textSize = drawString( label, null, font, 0, 0 );
-        height += textSize.getY() > imageHeight ? textSize.getY() : imageHeight;
-        width += textSize.getX();
-
-        if (gc != null) {
-            saveFill = gc.getFill();
-            saveFont = gc.getFont();
-            gc.setFill( Color.BLACK );
-            gc.setFont( font );
-            if (imageAfterText) {
-                if (bold)
-                    gc.strokeText( label, x + LABEL_MARGIN, y + textSize.getY() );
-                else
-                    gc.fillText( label, x + LABEL_MARGIN, y + textSize.getY() );
-                if (image != null)
-                    gc.drawImage( image, x + textSize.getX() + 2 + LABEL_MARGIN, y + 2 * LABEL_MARGIN );
-            } else {
-                if (image != null)
-                    gc.drawImage( image, x + LABEL_MARGIN, y + LABEL_MARGIN );
-                if (bold)
-                    gc.strokeText( label, x + 2 * LABEL_MARGIN + imageWidth, y + textSize.getY() );
-                else
-                    gc.fillText( label, x + 2 * LABEL_MARGIN + imageWidth, y + textSize.getY() );
-            }
-            gc.setFill( saveFill );
-            gc.setFont( saveFont );
-        }
-        Rectangle lRect = new Rectangle( x, y, width, height );
-        // lRect.draw( gc, false );
-        return lRect;
-    }
+    // // Add size of text area
+    // Point2D textSize = drawString( label, null, font, 0, 0 );
+    // height += textSize.getY() > imageHeight ? textSize.getY() : imageHeight;
+    // width += textSize.getX();
+    //
+    // if (gc != null) {
+    // saveFill = gc.getFill();
+    // saveFont = gc.getFont();
+    // gc.setFill( Color.BLACK );
+    // gc.setFont( font );
+    // if (imageAfterText) {
+    // if (bold)
+    // gc.strokeText( label, x + LABEL_MARGIN, y + textSize.getY() );
+    // else
+    // gc.fillText( label, x + LABEL_MARGIN, y + textSize.getY() );
+    // if (image != null)
+    // gc.drawImage( image, x + textSize.getX() + 2 + LABEL_MARGIN, y + 2 * LABEL_MARGIN );
+    // } else {
+    // if (image != null)
+    // gc.drawImage( image, x + LABEL_MARGIN, y + LABEL_MARGIN );
+    // if (bold)
+    // gc.strokeText( label, x + 2 * LABEL_MARGIN + imageWidth, y + textSize.getY() );
+    // else
+    // gc.fillText( label, x + 2 * LABEL_MARGIN + imageWidth, y + textSize.getY() );
+    // }
+    // gc.setFill( saveFill );
+    // gc.setFont( saveFont );
+    // }
+    // Rectangle lRect = new Rectangle( x, y, width, height );
+    // // lRect.draw( gc, false );
+    // return lRect;
+    // }
 }

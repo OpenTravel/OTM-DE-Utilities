@@ -19,6 +19,7 @@ package org.opentravel.dex.controllers.graphics.sprites;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmEnumerationOpen;
@@ -55,7 +56,8 @@ public class EnumerationSprite extends MemberSprite<OtmEnumeration<?>> implement
 
         // Show open's Other property
         if (getMember() instanceof OtmEnumerationOpen) {
-            rect = GraphicsUtils.drawLabel( "Other", null, false, false, gc, font, x + dx, y );
+            rect = new LabelRectangle( this, "Other", null, false, false, false ).draw( gc, x + dx, y );
+            // rect = GraphicsUtils.drawLabel( "Other", null, false, false, gc, font, x + dx, y );
             fy += rect.getHeight();
         }
 

@@ -25,6 +25,7 @@ import org.opentravel.dex.controllers.graphics.sprites.connections.SuperTypeConn
 import org.opentravel.dex.controllers.graphics.sprites.connections.TypeConnection;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.BaseTypeRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle.RectangleEventHandler;
@@ -285,7 +286,9 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
 
         // Draw the name of the object
         Rectangle mRect =
-            GraphicsUtils.drawLabel( member.getName(), member.getIcon(), member.isEditable(), false, gc, font, x, y );
+            new LabelRectangle( this, member.getName(), member.getIcon(), member.isEditable(), false, false ).draw( gc,
+                x, y );
+        // GraphicsUtils.drawLabel( member.getName(), member.getIcon(), member.isEditable(), false, gc, font, x, y );
         double width = mRect.getWidth();
         double height = mRect.getHeight();
 
@@ -298,10 +301,10 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
 
         // prefix
         double px = boundaries.getMaxX() - cWidth;
-        Rectangle pRect =
-            GraphicsUtils.drawLabel( member.getPrefix(), null, member.isEditable(), false, null, font, px, y );
-        px -= pRect.getWidth() + settingsManager.getMargin( Margins.TEXT );
-        pRect = GraphicsUtils.drawLabel( member.getPrefix(), null, member.isEditable(), false, gc, font, px, y );
+        LabelRectangle pRect = new LabelRectangle( this, member.getPrefix(), null, member.isEditable(), false, false );
+        // GraphicsUtils.drawLabel( member.getPrefix(), null, member.isEditable(), false, null, font, px, y );
+        px -= pRect.getWidth() + settingsManager.getMargin( Margins.LABEL );
+        pRect.draw( gc, px, y );
         width += pRect.getWidth();
 
         // Draw property for base type if any
