@@ -159,4 +159,14 @@ public class Rectangle {
         return "x = " + x + " y = " + y + " width = " + width + " height = " + height;
     }
 
+    /**
+     * Draw with filled set to false.
+     * 
+     * @param gc
+     * @return
+     */
+    public Rectangle draw(GraphicsContext gc) {
+        return draw( gc, false );
+    }
+
 }

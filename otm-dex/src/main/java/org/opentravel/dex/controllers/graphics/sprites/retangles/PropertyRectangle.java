@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.model.OtmTypeProvider;
@@ -59,6 +60,7 @@ public class PropertyRectangle extends Rectangle {
 
     protected DexSprite<OtmLibraryMember> parent;
     protected Font font;
+    protected SettingsManager settings;
     // private Point2D connectionPoint = null;
 
     private OtmProperty property;
@@ -67,6 +69,7 @@ public class PropertyRectangle extends Rectangle {
     protected String label = "";
     private Image icon = null;
     private boolean editable = false;
+    private boolean inherited = false;
 
     protected String providerLabel = "";
     private Image providerIcon = null;
@@ -75,6 +78,7 @@ public class PropertyRectangle extends Rectangle {
     double margin = 2;
     double offset = 10; // left margin
     double typeMargin = 8; // distance between property name and type
+    double connectorSize = SettingsManager.CONNECTOR_SIZE;
 
 
     public PropertyRectangle(DexSprite<OtmLibraryMember> parent, double width, String label, Image icon,
@@ -84,6 +88,7 @@ public class PropertyRectangle extends Rectangle {
         this.label = label;
         this.icon = icon;
         this.editable = editable;
+        this.inherited = inherited;
         this.width = width;
         this.font = parent.getFont();
         if (inherited) {
@@ -91,10 +96,12 @@ public class PropertyRectangle extends Rectangle {
             this.label += " (i)";
         }
 
-        if (parent.getSettingsManager() != null) {
-            margin = parent.getSettingsManager().getMargin( Margins.PROPERTY );
-            offset = parent.getSettingsManager().getOffset( Offsets.PROPERTY );
-            typeMargin = parent.getSettingsManager().getMargin( Margins.PROPERTY_TYPE );
+        settings = parent.getSettingsManager();
+        if (settings != null) {
+            margin = settings.getMargin( Margins.PROPERTY );
+            offset = settings.getOffset( Offsets.PROPERTY );
+            typeMargin = settings.getMargin( Margins.PROPERTY_TYPE );
+            connectorSize = settings.getConnectorSize();
         }
     }
 
@@ -172,11 +179,6 @@ public class PropertyRectangle extends Rectangle {
         return this;
     }
 
-    // @Override
-    // public Point2D getConnectionPoint() {
-    // return connectionPoint;
-    // }
-
     public OtmProperty getProperty() {
         return property;
     }
@@ -191,22 +193,25 @@ public class PropertyRectangle extends Rectangle {
     protected Rectangle draw(GraphicsContext gc, Font font) {
         boolean compute = gc == null;
 
-        double connectorSize = GraphicsUtils.drawConnector( null, null, 0, 0 ).getX();
+        connectorSize = GraphicsUtils.drawConnector( null, null, connectorSize, 0, 0 ).getX();
         double rightMargin = connectorSize + margin;
         double actualWidth = rightMargin + margin; // actual width as computed
         //
         // Draw Property Name and icon
-        Rectangle lRect = GraphicsUtils.drawLabel( label, icon, editable, false, gc, font, x, y );
+        LabelRectangle lRect = new LabelRectangle( parent, label, icon, editable, inherited, false ).draw( gc, x, y );
+        // Rectangle lRect = GraphicsUtils.drawLabel( label, icon, editable, false, gc, font, x, y );
         actualWidth += lRect.getWidth(); // Actual width
         // lRect.draw( gc, false );
 
         // Draw Type provider if any
-        Rectangle tRect;
+        LabelRectangle tRect;
         if (typeProvider != null) {
-            tRect = GraphicsUtils.drawLabel( providerLabel, providerIcon, null, font, x, y );
+            tRect = new LabelRectangle( parent, providerLabel, providerIcon, false, inherited, true );
+            // tRect = GraphicsUtils.drawLabel( providerLabel, providerIcon, font, x, y );
             actualWidth += tRect.getWidth() + typeMargin;
             double tx = x + width - tRect.getWidth() - rightMargin - 3 * margin;
-            GraphicsUtils.drawLabel( providerLabel, providerIcon, false, true, gc, font, tx, y );
+            tRect.draw( gc, tx, y );
+            // GraphicsUtils.drawLabel( providerLabel, providerIcon, false, true, gc, font, tx, y );
             // tRect.draw( gc, false );
         }
 
@@ -225,7 +230,8 @@ public class PropertyRectangle extends Rectangle {
         // Draw Connector symbol and register listener
         if (showConnector( typeProvider )) {
             double cx = x + width - 2 * connectorSize + 2 * margin;
-            connectionPoint = GraphicsUtils.drawConnector( gc, providerColor, cx, lineY - connectorSize );
+            connectionPoint =
+                GraphicsUtils.drawConnector( gc, providerColor, connectorSize, cx, lineY - connectorSize );
             // log.debug( " Set connection point to: " + connectionPoint );
 
             // Register mouse listener with parent

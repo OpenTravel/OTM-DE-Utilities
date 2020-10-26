@@ -19,7 +19,7 @@ package org.opentravel.dex.controllers.graphics.sprites.connections;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
-import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.model.otmProperties.OtmProperty;
 
@@ -64,7 +64,7 @@ public class TypeConnection extends Connection {
             } else {
                 // Connect to the rectangle's right side
                 fx = propertyRect.getMaxX();
-                fy = propertyRect.getMaxY() - GraphicsUtils.CONNECTOR_SIZE / 2;
+                fy = propertyRect.getMaxY() - SettingsManager.CONNECTOR_SIZE / 2;
             }
             // log.debug( " End getFromXY: " + fx + " " + fy );
         }

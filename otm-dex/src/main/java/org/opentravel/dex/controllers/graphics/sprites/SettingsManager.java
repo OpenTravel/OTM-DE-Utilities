@@ -42,6 +42,16 @@ public class SettingsManager {
     public static final Font DEFAULT_FONT_ITALIC = Font.font( "Monospaced", FontWeight.NORMAL, FontPosture.ITALIC, 15 );
     private static final String DEFAULT_FONT_NAME = "Monospaced";
 
+    public static final double CONNECTOR_SIZE = 16;
+    public static final Paint CONNECTOR_COLOR = Color.gray( 0.3 );
+    private static final Paint FACET_COLOR = Color.ANTIQUEWHITE;
+    private Paint backgroundColor = Color.gray( 0.95 );
+
+    private static final double COLUMN_START = 10;
+    private static final double COLUMN_WIDTH = 150;
+    // private static final int FACET_OFFSET = 5;
+    private static final double MINIMUM_SLOT_HEIGHT = 20;
+
     private int currentSize = 3;
     private Font currentFont;
     private Font currentItalicFont;
@@ -81,7 +91,7 @@ public class SettingsManager {
     private static final double FACET_MARGIN = 5;
 
     public enum Margins {
-        FACET(FACET_MARGIN), PROPERTY(2), PROPERTY_TYPE(8), TEXT(2), MEMBER(2);
+        CANVAS(10), FACET(FACET_MARGIN), LABEL(4), PROPERTY(1), PROPERTY_TYPE(8), TEXT(2), MEMBER(2);
 
         public final double margin;
 
@@ -99,23 +109,6 @@ public class SettingsManager {
     }
 
 
-    // Left Margin offsets per facet type
-    // public static final double ID_OFFSET = FACET_OFFSET;
-    // public static final double SHARED_OFFSET = ID_OFFSET;
-    // public static final double QUERY_OFFSET = ID_OFFSET;
-    // public static final double UPDATE_OFFSET = ID_OFFSET;
-    // public static final double SUMMARY_OFFSET = ID_OFFSET + FACET_OFFSET;
-    // public static final double CHOICE_OFFSET = SUMMARY_OFFSET;
-    // public static final double DETAIL_OFFSET = SUMMARY_OFFSET + FACET_OFFSET;
-    // public static final double CUSTOM_OFFSET = DETAIL_OFFSET;
-
-    private static final Paint FACET_COLOR = Color.ANTIQUEWHITE;
-
-    private static final double COLUMN_START = 10;
-    private static final double COLUMN_WIDTH = 150;
-    // private static final int FACET_OFFSET = 5;
-    private static final double MINIMUM_SLOT_HEIGHT = 20;
-    private Paint backgroundColor = Color.gray( 0.95 );
 
     private Pane spritePane;
     private DexIncludedController<?> controller;
@@ -155,6 +148,10 @@ public class SettingsManager {
 
     public GraphicsContext getGc() {
         return currentGC;
+    }
+
+    public double getConnectorSize() {
+        return CONNECTOR_SIZE * scale;
     }
 
     public Paint getDefaultFill() {

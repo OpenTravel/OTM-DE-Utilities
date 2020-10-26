@@ -325,11 +325,10 @@ public class SpriteManager {
 
     public void remove(DexSprite<?> sprite) {
         if (sprite != null) {
-            log.debug( "Removing sprite: " + sprite.getMember() );
+            // log.debug( "Removing sprite: " + sprite.getMember() );
             removeConnection( sprite );
             sprite.getColumn().remove( sprite );
             sprite.clear();
-            // activeSprites.remove( sprite );
         }
     }
 

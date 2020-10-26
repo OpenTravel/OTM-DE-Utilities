@@ -39,11 +39,8 @@ import javafx.scene.text.Text;
 public class GraphicsUtils {
     private static Log log = LogFactory.getLog( GraphicsUtils.class );
 
-    protected static final double MEMBER_MARGIN = 2;
-    protected static final double CANVAS_MARGIN = 10;
-    protected static final double LABEL_MARGIN = 4;
+    private static final double LABEL_MARGIN = 4;
 
-    public static final double CONNECTOR_SIZE = 16;
     public static final Paint CONNECTOR_COLOR = Color.gray( 0.3 );
 
     public static final double MINIMUM_WIDTH = 50;
@@ -101,21 +98,31 @@ public class GraphicsUtils {
     /**
      * Draw a circle and triangle connector symbol
      */
-    public static Point2D drawConnector(GraphicsContext gc, Paint color, final double x, final double y) {
+    public static Point2D drawConnector(GraphicsContext gc, Paint color, final double size, final double x,
+        final double y) {
         if (gc != null) {
             Paint savedColor = gc.getFill();
             if (color != null) {
                 gc.setFill( color );
-                gc.fillOval( x, y, CONNECTOR_SIZE, CONNECTOR_SIZE );
+                gc.fillOval( x, y, size, size );
                 gc.setFill( savedColor );
                 // log.debug( "Drew Connector with filled oval." );
             }
-            gc.strokeOval( x, y, CONNECTOR_SIZE, CONNECTOR_SIZE );
-            Image link = ImageManager.getImage( ImageManager.Icons.NAV_GO );
-            gc.drawImage( link, x, y );
-            return new Point2D( x + CONNECTOR_SIZE, y + CONNECTOR_SIZE / 2 );
+            gc.strokeOval( x, y, size, size );
+            Image link = ImageManager.getImage( ImageManager.Icons.CONN_L );
+            if (size + 3 < link.getWidth())
+                link = ImageManager.getImage( ImageManager.Icons.CONN_M );
+            if (size + 3 < link.getWidth())
+                link = ImageManager.getImage( ImageManager.Icons.CONN_SM );
+
+            double imageX = x + size - link.getWidth();
+            double imageY = y + size / 2 - link.getHeight() / 2;
+            gc.drawImage( link, imageX, imageY );
+
+            return new Point2D( x + size, y + size / 2 );
         }
-        return new Point2D( x + CONNECTOR_SIZE, y + CONNECTOR_SIZE / 2 );
+        return new Point2D( x + size, y + size / 2 );
+
     }
 
     /**
@@ -128,15 +135,15 @@ public class GraphicsUtils {
      * @param y
      * @return bounding rectangle
      */
-    public static Rectangle drawLabel(String label, Image image, GraphicsContext gc, Font font, final double x,
-        final double y) {
-        return drawLabel( label, image, true, false, gc, font, x, y );
+    public static Rectangle drawLabel(String label, Image image, Font font, final double x, final double y) {
+        return drawLabel( label, image, true, false, null, font, x, y );
     }
 
-    public static Rectangle drawLabel(String label, Image image, boolean imageAfterText, GraphicsContext gc, Font font,
-        final double x, final double y) {
-        return drawLabel( label, image, true, imageAfterText, gc, font, x, y );
-    }
+    // public static Rectangle drawLabel(String label, Image image, boolean imageAfterText, GraphicsContext gc, Font
+    // font,
+    // final double x, final double y) {
+    // return drawLabel( label, image, true, imageAfterText, gc, font, x, y );
+    // }
 
     public static Rectangle drawLabel(String label, Image image, boolean bold, boolean imageAfterText,
         GraphicsContext gc, Font font, final double x, final double y) {

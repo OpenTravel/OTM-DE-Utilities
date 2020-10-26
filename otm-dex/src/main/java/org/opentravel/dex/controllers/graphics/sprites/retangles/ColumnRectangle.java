@@ -209,6 +209,7 @@ public class ColumnRectangle extends Rectangle {
     public void remove(DexSprite<?> sprite) {
         log.debug( "Removing sprite: " + sprite + "  " + activeSprites.contains( sprite ) );
         activeSprites.remove( sprite );
+        spritePane.getChildren().remove( sprite.getCanvas() );
     }
 
     public String toString() {

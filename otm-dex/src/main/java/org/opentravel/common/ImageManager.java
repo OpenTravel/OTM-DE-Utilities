@@ -42,6 +42,9 @@ public class ImageManager {
         EXPAND("/icons/expandall.gif"),
         COLLAPSE("/icons/collapseall.gif"),
         CLOSE("/icons/close.gif"),
+        CONN_SM("/icons/nav_go.gif"),
+        CONN_M("/icons/nav_go.gif"),
+        CONN_L("/icons/nav_go.gif"),
         // Decorations
         ERROR("/icons/error.gif"),
         RUN("/icons/run.gif"),
@@ -104,25 +107,43 @@ public class ImageManager {
     public ImageManager(Stage primaryStage) {
         if (!initalized) {
             // Load the application icon in the foreground, the rest in the background
-            if (primaryStage != null)
+            if (primaryStage != null) {
                 primaryStage.getIcons().add( new Image( Icons.APPLICATION.label ) );
+            }
 
             // All icons must be loaded into the stage and retained for reuse
-            Image image;
+            // Control height, width, ratio, smooth resize, in background
+            Image image = null;
             for (Icons icon : Icons.values()) {
                 try {
-                    if (icon == Icons.APPLICATION)
-                        continue;
-                    // image = new Image( icon.label );
-                    // Control height, width, ratio, smooth resize, in background
-                    image = new Image( icon.label, 16, 16, true, true, true );
-                    if (primaryStage != null)
-                        primaryStage.getIcons().add( image );
-                    iconMap.put( icon, image );
+                    // if (icon == Icons.APPLICATION)
+                    // continue;
+                    switch (icon) {
+                        case APPLICATION:
+                            break;
+                        case CONN_L:
+                            image = new Image( Icons.CONN_L.label, 16, 16, true, true );
+                            break;
+                        case CONN_M:
+                            image = new Image( Icons.CONN_M.label, 10, 10, true, true );
+                            break;
+                        case CONN_SM:
+                            image = new Image( Icons.CONN_SM.label, 8, 8, true, true );
+                            break;
+                        default:
+                            image = new Image( icon.label, 16, 16, true, true, true );
+                            break;
+                    }
+                    if (image != null) {
+                        if (primaryStage != null)
+                            primaryStage.getIcons().add( image );
+                        iconMap.put( icon, image );
+                    }
                 } catch (Exception e) {
                     log.error( "Could not create image: " + e.getLocalizedMessage() );
                 }
             }
+            // Put the connector(s) in the map and stage
         }
         initalized = true;
     }
@@ -149,6 +170,11 @@ public class ImageManager {
     public static Image getImage(Icons icon) {
         return icon != null ? iconMap.get( icon ) : null;
         // return icon != null ? new Image(getClass().getResourceAsStream(icon.label)) : null;
+    }
+
+    public static Image getConnectorImage() {
+        String path = "/icons/nav_go.gif";
+        return new Image( path, 12, 12, true, true, true );
     }
 
     /**

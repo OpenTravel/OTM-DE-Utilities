@@ -114,8 +114,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     public void clear() {
         gc.clearRect( 0, 0, canvas.getWidth(), canvas.getHeight() );
         rectangles.clear();
-        // if (getColumn() != null)
-        // getColumn().remove( this );
+        // do NOT remove from column...let caller do that
     }
 
     @Override
@@ -199,8 +198,8 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         setBoundaries( 0, 0 );
 
         // Size Canvas
-        Rectangle canvasR = new Rectangle( x, y, boundaries.getWidth() + GraphicsUtils.CANVAS_MARGIN,
-            boundaries.getHeight() + GraphicsUtils.CANVAS_MARGIN );
+        Rectangle canvasR = new Rectangle( x, y, boundaries.getWidth() + settingsManager.getMargin( Margins.CANVAS ),
+            boundaries.getHeight() + settingsManager.getMargin( Margins.CANVAS ) );
         canvas.setHeight( y + canvasR.getHeight() );
         canvas.setWidth( x + canvasR.getWidth() );
         // log.debug( "Sized canvas: " + canvasR );
@@ -294,7 +293,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         // if (gc == null)
         // width += 2 * 18;
         // else
-        double cWidth = drawControls( boundaries, gc ) + GraphicsUtils.MEMBER_MARGIN;
+        double cWidth = drawControls( boundaries, gc ) + settingsManager.getMargin( Margins.MEMBER );
         width += cWidth;
 
         // prefix
@@ -580,7 +579,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
      * @return
      */
     public MemberSprite<OtmLibraryMember> addConnection(OtmTypeUser user) {
-        log.debug( "Adding connection to " + user );
+        // log.debug( "Adding connection to " + user );
         if (getColumn() == null || user == null || user.getAssignedType() == null || !(user instanceof OtmProperty))
             return null;
 
