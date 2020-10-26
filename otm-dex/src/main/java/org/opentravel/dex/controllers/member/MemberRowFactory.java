@@ -206,7 +206,10 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
     private void setCSSClass(TreeTableRow<MemberAndProvidersDAO> tc, TreeItem<MemberAndProvidersDAO> newTreeItem) {
         OtmObject obj = getSelectedObject( newTreeItem );
         if (obj != null) {
-            setStateChanged( tc, obj.isDeprecated(), obj.isEditable() );
+            if (obj instanceof OtmLibraryMember)
+                setStateChanged( tc, obj.isDeprecated(), ((OtmLibraryMember) obj).isEditableMinor() );
+            else
+                setStateChanged( tc, obj.isDeprecated(), obj.isEditable() );
             // log.debug( obj.getNameWithPrefix() + " deprecated ? " + obj.isDeprecated() );
 
             addAliasItem.setDisable( !obj.getActionManager().isEnabled( DexActions.ADDALIAS, obj ) );

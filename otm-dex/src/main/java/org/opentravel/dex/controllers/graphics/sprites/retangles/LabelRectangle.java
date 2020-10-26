@@ -27,29 +27,28 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 
 /**
- * Graphics utility for containing property regions.
+ * Rectangle containing labels with image regions.
  * 
  * @author dmh
- * @param <O>
  *
  */
 public class LabelRectangle extends Rectangle {
     private static Log log = LogFactory.getLog( LabelRectangle.class );
 
-    /**
-     * Render methods that create rectangles may set the event to run if the implement this interface.
-     * <p>
-     * Example: r.setOnMouseClicked( e -> manager.remove( this ) );
-     */
-    public abstract interface RectangleEventHandler {
-        public void onRectangleClick(MouseEvent e);
-    }
+    // un-comment if going to use the rectangle for mouse click handling
+    // /**
+    // * Render methods that create rectangles may set the event to run if the implement this interface.
+    // * <p>
+    // * Example: r.setOnMouseClicked( e -> manager.remove( this ) );
+    // */
+    // public abstract interface RectangleEventHandler {
+    // public void onRectangleClick(MouseEvent e);
+    // }
 
     protected DexSprite<OtmLibraryMember> parent;
     protected Font font;
@@ -58,13 +57,10 @@ public class LabelRectangle extends Rectangle {
     protected String label = "";
     private Image image = null;
 
-    // private boolean italic = false;
     private boolean bold = false;
     private boolean imageLast = false;
+    private double margin = LABEL_MARGIN;
 
-    double margin = 2;
-    // double offset = 10; // left margin
-    // double typeMargin = 8; // distance between property name and type
     private static final double LABEL_MARGIN = 4;
     private static final double MINIMUM_WIDTH = 10;
 
@@ -90,33 +86,6 @@ public class LabelRectangle extends Rectangle {
         draw( null, font );
     }
 
-    // public LabelRectangle(OtmProperty property, DexSprite<OtmLibraryMember> parentSprite, double width) {
-    // this( parentSprite, width, property.getName(), property.getIcon(), property.isEditable(),
-    // property.isInherited() );
-    //
-    // // Get property information
-    // this.property = property;
-    // if (property instanceof OtmTypeUser) {
-    // OtmTypeProvider provider = ((OtmTypeUser) property).getAssignedType();
-    // if (provider == property.getOwningMember() || provider == property.getOwningMember().getBaseType())
-    // this.typeProvider = null;
-    // else
-    // setProvider( provider );
-    // this.providerColor = property.isAssignedTypeInNamespace() ? null : GraphicsUtils.CONNECTOR_COLOR;
-    // }
-    //
-    // // Compute the size
-    // draw( null, font );
-    //
-    // // // Register mouse listener with parent
-    // // if (parent != null && property instanceof OtmTypeUser) {
-    // // this.setOnMouseClicked( e -> parent.connect( ((OtmTypeUser) property) ) );
-    // // parent.add( this );
-    // // }
-    // }
-
-
-
     /**
      * Draw the rectangle.
      * 
@@ -138,7 +107,7 @@ public class LabelRectangle extends Rectangle {
     // label, icon, editable
     // TypeProvider, providerLabel, providerIcon
     protected Rectangle draw(GraphicsContext gc, Font font) {
-        boolean compute = gc == null;
+        // boolean compute = gc == null;
 
         // Compute size, start with start and end margins
         width = 2 * margin;
@@ -166,40 +135,25 @@ public class LabelRectangle extends Rectangle {
             gc.setFont( font );
             if (imageLast) {
                 renderText( gc, margin, textSize.getY() );
-                // if (bold)
-                // gc.strokeText( label, x + margin, y + textSize.getY() );
-                // else
-                // gc.fillText( label, x + margin, y + textSize.getY() );
                 if (image != null)
                     gc.drawImage( image, x + textSize.getX() + 2 + margin, y + 2 * margin );
             } else {
                 if (image != null)
                     gc.drawImage( image, x + margin, y + margin );
                 renderText( gc, 2 * margin + imageWidth, textSize.getY() );
-                // if (bold)
-                // gc.strokeText( label, x + 2 * margin + imageWidth, y + textSize.getY() );
-                // else
-                // gc.fillText( label, x + 2 * margin + imageWidth, y + textSize.getY() );
             }
             gc.setFill( saveFill );
             gc.setFont( saveFont );
         }
-        // Rectangle lRect = new Rectangle( x, y, width, height );
-        // lRect.draw( gc, false );
-        return this;
 
         // // Register mouse listener with parent
-        // if (!compute && parent != null && property != null) {
+        // if (gc != null && parent != null ) {
         // // this.setOnMouseClicked( e -> parent.connect( ((OtmTypeUser) property) ) );
-        // this.setOnMouseClicked( e -> parent.connect( this ) );
-        // parent.add( this );
-        // // sub-types will register after rectangle is sized.
         // }
-        // }
+
         // // super.draw( gc, false ); // debug
         // // Log.debug("Drew "+this);
-        // return this;
-        //
+        return this;
     }
 
     private void renderText(GraphicsContext gc, double offsetX, double offsetY) {
