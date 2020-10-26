@@ -114,6 +114,8 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     public void clear() {
         gc.clearRect( 0, 0, canvas.getWidth(), canvas.getHeight() );
         rectangles.clear();
+        // if (getColumn() != null)
+        // getColumn().remove( this );
     }
 
     @Override
@@ -126,18 +128,19 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         Image collapse = ImageManager.getImage( ImageManager.Icons.COLLAPSE );
 
         // Start at right edge and work backwards
-        double cx = boundaries.getMaxX() - GraphicsUtils.MEMBER_MARGIN - close.getWidth();
-        double cy = boundaries.getY() + GraphicsUtils.MEMBER_MARGIN;
+        double margin = settingsManager.getMargin( Margins.MEMBER );
+        double cx = boundaries.getMaxX() - margin - close.getWidth();
+        double cy = boundaries.getY() + margin;
         Rectangle r = GraphicsUtils.drawImage( close, DrawType.OUTLINE, cgc, cx, cy );
         rectangles.add( r );
         r.setOnMouseClicked( e -> manager.remove( this ) );
-        double width = r.getWidth() + GraphicsUtils.MEMBER_MARGIN;
+        double width = r.getWidth() + margin;
 
         cx = r.getX() - collapse.getWidth();
         r = GraphicsUtils.drawImage( collapse, DrawType.OUTLINE, cgc, cx, cy );
         rectangles.add( r );
         r.setOnMouseClicked( e -> collapseOrExpand() );
-        width += r.getWidth() + GraphicsUtils.MEMBER_MARGIN;
+        width += r.getWidth() + margin;
 
         return width;
     }
@@ -515,15 +518,15 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     }
 
     @Override
-    public MemberSprite<OtmLibraryMember> connect(PropertyRectangle pSprite) {
-        log.debug( "Connecting to " + pSprite );
-        if (pSprite == null || pSprite.getProperty() == null || pSprite.getProvider() == null)
+    public MemberSprite<OtmLibraryMember> connect(PropertyRectangle pRect) {
+        log.debug( "Connecting property " + pRect );
+        if (pRect == null || pRect.getProperty() == null || pRect.getProvider() == null)
             return null;
         if (getColumn() == null)
             return null;
 
-        OtmTypeUser user = (OtmTypeUser) pSprite.getProperty();
-        OtmLibraryMember provider = pSprite.getProvider().getOwningMember();
+        OtmProperty user = pRect.getProperty();
+        OtmLibraryMember provider = pRect.getProvider().getOwningMember();
         if (provider == null || provider == user.getOwningMember())
             return null;
 
@@ -531,7 +534,8 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         if (toSprite == null) {
             // Place the new sprite and connect it
             toSprite = manager.add( provider, getColumn().getNext(), collapsed );
-            connect( (OtmProperty) user, this, toSprite );
+            if (toSprite != null)
+                manager.addAndDraw( new TypeConnection( pRect, this, toSprite ) );
         } else {
             toSprite.setCollapsed( !toSprite.isCollapsed() );
         }

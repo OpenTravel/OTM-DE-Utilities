@@ -56,16 +56,18 @@ public class TypeConnection extends Connection {
 
     private void getFromXY(PropertyRectangle propertyRect) {
         // log.debug( "Start getFromXY: " + fx + " " + fy );
-        if (propertyRect.getConnectionPoint() != null) {
-            // use property rectangle connection point
-            fx = propertyRect.getConnectionPoint().getX();
-            fy = propertyRect.getConnectionPoint().getY();
-        } else {
-            // Connect to the rectangle's right side
-            fx = propertyRect.getMaxX();
-            fy = propertyRect.getMaxY() - GraphicsUtils.CONNECTOR_SIZE / 2;
+        if (propertyRect != null) {
+            if (propertyRect.getConnectionPoint() != null) {
+                // use property rectangle connection point
+                fx = propertyRect.getConnectionPoint().getX();
+                fy = propertyRect.getConnectionPoint().getY();
+            } else {
+                // Connect to the rectangle's right side
+                fx = propertyRect.getMaxX();
+                fy = propertyRect.getMaxY() - GraphicsUtils.CONNECTOR_SIZE / 2;
+            }
+            // log.debug( " End getFromXY: " + fx + " " + fy );
         }
-        // log.debug( " End getFromXY: " + fx + " " + fy );
     }
 
     /**

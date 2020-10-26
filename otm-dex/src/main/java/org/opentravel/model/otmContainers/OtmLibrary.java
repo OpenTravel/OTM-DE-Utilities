@@ -206,6 +206,10 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         }
     }
 
+    public boolean sameBaseNamespace(OtmLibrary otherLibrary) {
+        return otherLibrary != null ? this.getBaseNamespace().equals( otherLibrary.getBaseNamespace() ) : false;
+    }
+
     /**
      * Get Read-only, Minor or Full action manager. To determine which manager to return, consider
      * <ul>
@@ -250,7 +254,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     /**
      * Get the base namespace from the first project item
      * 
-     * @return
+     * @return project item's base namespace or empty string
      */
     public String getBaseNamespace() {
         if (getTL() instanceof TLLibrary)

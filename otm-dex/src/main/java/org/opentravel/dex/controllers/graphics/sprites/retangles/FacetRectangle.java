@@ -190,6 +190,22 @@ public class FacetRectangle extends Rectangle {
             // lRect.draw( gc, false );
         }
 
+        // TODO - implement collapse
+        // Image collapse = ImageManager.getImage( ImageManager.Icons.COLLAPSE );
+        //
+        // // Start at right edge and work backwards
+        // double margin = settingsManager.getMargin( Margins.MEMBER );
+        // double cx = boundaries.getMaxX() - margin - collapse.getWidth();
+        // double cy = boundaries.getY() + margin;
+        //
+        // Rectangle r = GraphicsUtils.drawImage( collapse, DrawType.OUTLINE, cgc, cx, cy );
+        // cx = r.getX() - collapse.getWidth();
+        // r = GraphicsUtils.drawImage( collapse, DrawType.OUTLINE, cgc, cx, cy );
+        //// rectangles.add( r );
+        // r.setOnMouseClicked( e -> collapseOrExpand() );
+        // width += r.getWidth() + margin;
+
+
         // Properties
         PropertyRectangle pRect = null;
         double py = y + height;

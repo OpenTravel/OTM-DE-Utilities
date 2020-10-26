@@ -209,6 +209,9 @@ public class SpriteManager {
         columns.forEach( ColumnRectangle::clear );
         eraseConnections();
         connections.clear();
+        // should be done in columns, but just to be sure
+        spritePane.getChildren().clear();
+        spritePane.getChildren().add( connectionsCanvas );
     }
 
     // FIXME - this seems broken!
@@ -256,6 +259,9 @@ public class SpriteManager {
             draggedSprite.getCanvas().toFront();
     }
 
+    /**
+     * Draw a filled rectangle on the connections canvas
+     */
     public void eraseConnections() {
         // connectionsGC.clearRect( 0, 0, connectionsCanvas.getWidth(), connectionsCanvas.getHeight() );
         connectionsGC.fillRect( 0, 0, connectionsCanvas.getWidth(), connectionsCanvas.getHeight() );
@@ -319,9 +325,10 @@ public class SpriteManager {
 
     public void remove(DexSprite<?> sprite) {
         if (sprite != null) {
+            log.debug( "Removing sprite: " + sprite.getMember() );
             removeConnection( sprite );
-            sprite.getColumn().clear();
-            // sprite.clear();
+            sprite.getColumn().remove( sprite );
+            sprite.clear();
             // activeSprites.remove( sprite );
         }
     }

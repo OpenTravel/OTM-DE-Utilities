@@ -295,6 +295,8 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
                 post( ((DexMemberSelectionEvent) event).getMember() );
             else
                 refresh();
+
+            // FIXME - handle clear, close, model change, object change
         }
     }
 

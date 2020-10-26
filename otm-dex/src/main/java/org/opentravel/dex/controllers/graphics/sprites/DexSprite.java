@@ -20,7 +20,6 @@ import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 
@@ -64,9 +63,10 @@ public interface DexSprite<O extends OtmObject> {
      * If needed, add sprite for the member that provides the type then add connection to new sprite. Otherwise, toggle
      * the collapsed state.
      * 
-     * @param user
+     * @param pSprite
+     * @return
      */
-    public DexSprite<?> connect(OtmTypeUser user);
+    MemberSprite<OtmLibraryMember> connect(PropertyRectangle pSprite);
 
     /**
      * Is this point within the bounding box for the sprite?
@@ -119,6 +119,11 @@ public interface DexSprite<O extends OtmObject> {
     /**
      * @return
      */
+    public List<Rectangle> getRectangles();
+
+    /**
+     * @return
+     */
     SettingsManager getSettingsManager();
 
     /**
@@ -143,6 +148,8 @@ public interface DexSprite<O extends OtmObject> {
     Canvas render(Point2D point);
 
     /**
+     * Simply set the column field.
+     * 
      * @param column
      */
     void set(ColumnRectangle column);
@@ -165,17 +172,6 @@ public interface DexSprite<O extends OtmObject> {
      * Set the collapsed flag and resize.
      */
     void setCollapsed(boolean collapsed);
-
-    /**
-     * @return
-     */
-    public List<Rectangle> getRectangles();
-
-    /**
-     * @param pSprite
-     * @return
-     */
-    MemberSprite<OtmLibraryMember> connect(PropertyRectangle pSprite);
 
 
 }

@@ -18,6 +18,7 @@ package org.opentravel.model.otmProperties;
 
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmPropertyOwner;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -84,13 +85,15 @@ public abstract class OtmPropertyBase<T extends TLModelElement> extends OtmModel
 
     @Override
     public boolean isAssignedTypeInNamespace() {
-        if (this instanceof OtmTypeUser) {
-            if (((OtmTypeUser) this).getAssignedType() != null
-                && ((OtmTypeUser) this).getAssignedType().getLibrary() != null)
-                return getLibrary().getBaseNamespace()
-                    .equals( ((OtmTypeUser) this).getAssignedType().getLibrary().getBaseNamespace() );
-        }
-        return false;
+        OtmTypeProvider provider = null;
+        if (getLibrary() == null)
+            return false;
+        if (this instanceof OtmTypeUser)
+            provider = ((OtmTypeUser) this).getAssignedType();
+        if (provider == null)
+            return false;
+
+        return getLibrary().sameBaseNamespace( provider.getLibrary() );
     }
 
     @Override

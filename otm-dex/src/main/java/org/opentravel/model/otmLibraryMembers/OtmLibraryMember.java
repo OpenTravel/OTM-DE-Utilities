@@ -221,5 +221,11 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      */
     public StringProperty versionProperty();
 
+    /**
+     * @param otherMember
+     * @return true if the namespace base is same
+     */
+    public boolean sameBaseNamespace(OtmLibraryMember otherMember);
+
 
 }

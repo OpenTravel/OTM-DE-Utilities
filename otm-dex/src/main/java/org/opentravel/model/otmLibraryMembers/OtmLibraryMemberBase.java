@@ -631,6 +631,13 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     @Override
+    public boolean sameBaseNamespace(OtmLibraryMember otherMember) {
+        if (getLibrary() == null || otherMember == null || otherMember.getLibrary() == null)
+            return false;
+        return getLibrary().sameBaseNamespace( otherMember.getLibrary() );
+    }
+
+    @Override
     public OtmObject setBaseType(OtmObject baseObj) {
         OtmLibraryMember oldBaseOwner = null;
         if (getBaseType() != null)

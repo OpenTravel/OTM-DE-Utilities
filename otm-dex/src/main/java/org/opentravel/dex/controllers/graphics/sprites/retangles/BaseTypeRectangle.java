@@ -62,7 +62,8 @@ public class BaseTypeRectangle extends PropertyRectangle {
                 setProvider( (OtmTypeProvider) member.getBaseType() );
             this.providerLabel = member.getBaseType().getNameWithPrefix();
 
-            if (!member.getLibrary().getBaseNamespace().equals( member.getBaseType().getLibrary().getBaseNamespace() ))
+            if (member.getBaseType() instanceof OtmLibraryMember
+                && !member.sameBaseNamespace( (OtmLibraryMember) member.getBaseType() ))
                 this.providerColor = GraphicsUtils.CONNECTOR_COLOR;
         }
 

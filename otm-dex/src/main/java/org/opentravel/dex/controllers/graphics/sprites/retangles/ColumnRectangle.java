@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -38,7 +40,7 @@ import javafx.scene.layout.Pane;
  *
  */
 public class ColumnRectangle extends Rectangle {
-    // private static Log log = LogFactory.getLog( Rectangle.class );
+    private static Log log = LogFactory.getLog( Rectangle.class );
 
     public static final int COLUMN_HEIGHT_MIN = 1000;
     public static final int COLUMN_MARGIN_X = 50;
@@ -97,7 +99,7 @@ public class ColumnRectangle extends Rectangle {
             activeSprites.add( sprite );
             sprite.set( this );
 
-            sprite.refresh();
+            // sprite.refresh();
         }
         return sprite;
     }
@@ -202,6 +204,11 @@ public class ColumnRectangle extends Rectangle {
 
     public void setNext(ColumnRectangle next) {
         nextColumn = next;
+    }
+
+    public void remove(DexSprite<?> sprite) {
+        log.debug( "Removing sprite: " + sprite + "  " + activeSprites.contains( sprite ) );
+        activeSprites.remove( sprite );
     }
 
     public String toString() {

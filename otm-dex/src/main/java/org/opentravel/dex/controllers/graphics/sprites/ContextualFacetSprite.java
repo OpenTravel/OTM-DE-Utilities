@@ -86,7 +86,7 @@ public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implem
         // Rectangle fRect = new Rectangle( rect.getX(), rect.getY(), width, rect.getHeight() );
         // log.debug( "Drew CF contents into " + fRect );
         // return fRect;
-        return new Rectangle( rect.getX(), rect.getY(), width, rect.getHeight() );
+        return new Rectangle( rect.getX(), rect.getY(), width + 2 * margin, rect.getHeight() + 2 * margin );
     }
 
 }
