@@ -179,6 +179,7 @@ public class ManageLibraryTask extends DexTaskBase<OtmLibrary> {
             if (dialogBoxController != null)
                 Platform.runLater( () -> dialogBoxController.close() );
         } else
+            // TODO - get more specific about the error
             throw new DexTaskException( "Missing project, repository or library information." );
     }
 }

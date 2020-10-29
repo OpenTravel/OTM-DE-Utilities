@@ -29,6 +29,9 @@ import org.opentravel.model.otmProperties.OtmProperty;
  * @author dmh
  *
  */
+//
+// FIXME - move enumeration values
+//
 public class MoveElementAction extends DexRunAction {
     public enum MoveDirection {
         UP, DOWN

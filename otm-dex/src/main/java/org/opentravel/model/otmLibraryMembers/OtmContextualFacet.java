@@ -382,6 +382,8 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
 
     @Override
     public OtmObject setBaseType(OtmObject baseObj) {
+        if (baseObj instanceof OtmContributedFacet)
+            baseObj = ((OtmContributedFacet) baseObj).getContributor();
         if (baseObj instanceof OtmLibraryMember && baseObj.getTL() instanceof TLFacetOwner) {
             OtmLibraryMember lm = (OtmLibraryMember) baseObj;
             // Set the TL Owning entity

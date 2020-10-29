@@ -52,7 +52,7 @@ public class ImageManager {
         V_ERROR("/icons/error_st_obj.gif"),
         V_WARN("/icons/warning_st_obj.gif"),
         LOCK("/icons/lock.png"),
-        UNLOCK("icons/unlock.png"),
+        UNLOCK("/icons/unlock.png"),
         // Otm Objects
         APPLICATION("/icons/alt_window_16.gif"),
         ALIAS("/icons/alias.gif"),
@@ -140,7 +140,7 @@ public class ImageManager {
                         iconMap.put( icon, image );
                     }
                 } catch (Exception e) {
-                    log.error( "Could not create image: " + e.getLocalizedMessage() );
+                    log.error( "Could not create image " + icon + ": " + e.getLocalizedMessage() );
                 }
             }
             // Put the connector(s) in the map and stage

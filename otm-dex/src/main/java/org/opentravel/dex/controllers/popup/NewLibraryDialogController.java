@@ -356,7 +356,7 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         if (!suffix.matches( "/v[0-9].*" ))
             ns += "/v1";
 
-        ns = ns.replace( "//", "/" );
+        // ns = ns.replace( "//", "/" );
         // nsCombo.setValue( ns );
         log.debug( "NS check: " + ns );
         return ns;

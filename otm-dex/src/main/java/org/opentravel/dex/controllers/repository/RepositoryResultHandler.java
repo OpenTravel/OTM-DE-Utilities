@@ -34,7 +34,8 @@ import javafx.concurrent.WorkerStateEvent;
  */
 public class RepositoryResultHandler implements TaskResultHandlerI {
     private static Log log = LogFactory.getLog( RepositoryResultHandler.class );
-    private static final String TITLE = "Repository Error";
+    private static final String TITLE_ERROR = "Repository Error";
+    private static final String TITLE_OK = "Repository Results";
     private DexMainController mainController;
 
     /**
@@ -50,18 +51,29 @@ public class RepositoryResultHandler implements TaskResultHandlerI {
     // Value can be null if the task has not been updated. Message is set in a background thread.
     @Override
     public void handleTaskComplete(WorkerStateEvent event) {
-        if (event != null && event.getTarget() instanceof Task) {
-            Object data = ((Task<?>) event.getTarget()).getValue();
-            // Post a waring dialog if the task has string value
-            log.debug( event.getTarget().getClass().getSimpleName() + " task complete. " );
-            if (data instanceof String && (!((String) data).isEmpty())) {
+        String data = "";
+        String title = TITLE_OK;
+        if (event != null) {
+            if (event.getEventType() != WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
+                title = TITLE_ERROR;
+                log.warn( "Invalid event in result handler." );
+            }
+            if (event.getSource() instanceof Task) {
+                Task<?> src = (Task<?>) event.getSource();
+                data = src.getMessage();
+                log.debug( "Source reports: " + data );
+            }
+            if (event.getTarget() instanceof Task && ((Task<?>) event.getTarget()).getValue() instanceof String) {
+                data += (String) ((Task<?>) event.getTarget()).getValue();
+                log.debug( event.getTarget().getClass().getSimpleName() + " task complete. " );
+            }
+            // Post a dialog if the task has string value
+            if (!data.isEmpty()) {
                 DialogBoxContoller dbc = DialogBoxContoller.init();
                 if (dbc != null)
-                    dbc.show( TITLE, (String) data );
+                    dbc.show( title, (String) data );
             }
-            mainController.refresh();
-        } else {
-            log.warn( "Invalid event in result handler." );
         }
+        mainController.refresh();
     }
 }
