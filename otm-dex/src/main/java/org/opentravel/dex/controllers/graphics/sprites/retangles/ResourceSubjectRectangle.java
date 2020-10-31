@@ -53,7 +53,7 @@ public class ResourceSubjectRectangle extends PropertyRectangle {
      * @param member whose base type will be displayed as a property
      * @param width
      */
-    public ResourceSubjectRectangle(DexSprite<OtmLibraryMember> parentSprite, OtmResource member, double width) {
+    public ResourceSubjectRectangle(DexSprite parentSprite, OtmResource member, double width) {
         super( parentSprite, width, "Exposes", null, member.isEditable(), false );
 
         setProvider( member.getSubject() );

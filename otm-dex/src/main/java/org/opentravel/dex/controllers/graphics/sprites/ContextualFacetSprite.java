@@ -28,7 +28,6 @@ import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.text.Font;
 
 /**
  * Graphics Display Object (Sprite) for containing OTM business object.
@@ -37,7 +36,7 @@ import javafx.scene.text.Font;
  * @param <O>
  *
  */
-public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implements DexSprite<OtmLibraryMember> {
+public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implements DexSprite {
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
     double dxChoice;
@@ -46,8 +45,8 @@ public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implem
     double dxUpdate;
     double margin;
 
-    public ContextualFacetSprite(OtmContextualFacet member, SpriteManager manager, SettingsManager settingsManager) {
-        super( member, manager, settingsManager );
+    public ContextualFacetSprite(OtmContextualFacet member, SpriteManager manager) {
+        super( member, manager );
 
         dxChoice = settingsManager.getOffset( Offsets.CHOICE );
         dxCustom = settingsManager.getOffset( Offsets.CUSTOM );
@@ -58,7 +57,7 @@ public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implem
 
 
     @Override
-    public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
+    public Rectangle drawContents(GraphicsContext gc, final double x, final double y) {
         boolean compute = gc == null;
 
         double ox = 0;
@@ -80,7 +79,7 @@ public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implem
         if (!isCollapsed() && !getMember().getChildren().isEmpty()) {
             rect = new FacetRectangle( (OtmContextualFacet) member, this, width );
             rect.set( fx, fy ).draw( gc, true );
-            width = computeWidth( compute, width, rect, ox );
+            width = computeWidth( width, rect, ox );
         }
 
         // Rectangle fRect = new Rectangle( rect.getX(), rect.getY(), width, rect.getHeight() );

@@ -39,8 +39,8 @@ public class ImageManager {
     public enum Icons {
         // Navigation
         NAV_GO("/icons/nav_go.gif"),
-        EXPAND("/icons/expandall.gif"),
-        COLLAPSE("/icons/collapseall.gif"),
+        EXPAND("/icons/expand.gif"),
+        COLLAPSE("/icons/collapse.gif"),
         CLOSE("/icons/close.gif"),
         CONN_SM("/icons/nav_go.gif"),
         CONN_M("/icons/nav_go.gif"),

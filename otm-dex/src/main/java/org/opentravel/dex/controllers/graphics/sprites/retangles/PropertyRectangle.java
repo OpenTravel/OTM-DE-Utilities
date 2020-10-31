@@ -25,7 +25,6 @@ import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.model.otmProperties.OtmIdReferenceElement;
@@ -58,10 +57,9 @@ public class PropertyRectangle extends Rectangle {
         public void onRectangleClick(MouseEvent e);
     }
 
-    protected DexSprite<OtmLibraryMember> parent;
+    protected DexSprite parent;
     protected Font font;
     protected SettingsManager settings;
-    // private Point2D connectionPoint = null;
 
     private OtmProperty property;
     protected OtmTypeProvider typeProvider = null;
@@ -81,8 +79,8 @@ public class PropertyRectangle extends Rectangle {
     double connectorSize = SettingsManager.CONNECTOR_SIZE;
 
 
-    public PropertyRectangle(DexSprite<OtmLibraryMember> parent, double width, String label, Image icon,
-        boolean editable, boolean inherited) {
+    public PropertyRectangle(DexSprite parent, double width, String label, Image icon, boolean editable,
+        boolean inherited) {
         super( 0, 0, GraphicsUtils.MINIMUM_WIDTH, 0 );
         this.parent = parent;
         this.label = label;
@@ -105,7 +103,7 @@ public class PropertyRectangle extends Rectangle {
         }
     }
 
-    public PropertyRectangle(OtmProperty property, DexSprite<OtmLibraryMember> parentSprite, double width) {
+    public PropertyRectangle(OtmProperty property, DexSprite parentSprite, double width) {
         this( parentSprite, width, property.getName(), property.getIcon(), property.isEditable(),
             property.isInherited() );
 
@@ -130,7 +128,7 @@ public class PropertyRectangle extends Rectangle {
         // }
     }
 
-    public PropertyRectangle(OtmActionRequest rq, DexSprite<OtmLibraryMember> parentSprite, double width) {
+    public PropertyRectangle(OtmActionRequest rq, DexSprite parentSprite, double width) {
         this( parentSprite, width, rq.getName(), rq.getIcon(), rq.isEditable(), rq.isInherited() );
 
         if (rq.getMethod() != null)
@@ -142,7 +140,7 @@ public class PropertyRectangle extends Rectangle {
         draw( null, font );
     }
 
-    public PropertyRectangle(OtmActionResponse rs, DexSprite<OtmLibraryMember> parentSprite, double width) {
+    public PropertyRectangle(OtmActionResponse rs, DexSprite parentSprite, double width) {
         this( parentSprite, width, rs.getName(), rs.getIcon(), rs.isEditable(), rs.isInherited() );
 
         if (rs.getPayloadActionFacet() != null)
@@ -199,7 +197,6 @@ public class PropertyRectangle extends Rectangle {
         //
         // Draw Property Name and icon
         LabelRectangle lRect = new LabelRectangle( parent, label, icon, editable, inherited, false ).draw( gc, x, y );
-        // Rectangle lRect = GraphicsUtils.drawLabel( label, icon, editable, false, gc, font, x, y );
         actualWidth += lRect.getWidth(); // Actual width
         // lRect.draw( gc, false );
 
@@ -207,12 +204,9 @@ public class PropertyRectangle extends Rectangle {
         LabelRectangle tRect;
         if (typeProvider != null) {
             tRect = new LabelRectangle( parent, providerLabel, providerIcon, false, inherited, true );
-            // tRect = GraphicsUtils.drawLabel( providerLabel, providerIcon, font, x, y );
             actualWidth += tRect.getWidth() + typeMargin;
             double tx = x + width - tRect.getWidth() - rightMargin - 3 * margin;
             tRect.draw( gc, tx, y );
-            // GraphicsUtils.drawLabel( providerLabel, providerIcon, false, true, gc, font, tx, y );
-            // tRect.draw( gc, false );
         }
 
         // Compute property height and width
@@ -229,14 +223,13 @@ public class PropertyRectangle extends Rectangle {
 
         // Draw Connector symbol and register listener
         if (showConnector( typeProvider )) {
-            double cx = x + width - 2 * connectorSize + 2 * margin;
+            double cx = x + width - connectorSize - 6 * margin;
             connectionPoint =
                 GraphicsUtils.drawConnector( gc, providerColor, connectorSize, cx, lineY - connectorSize );
             // log.debug( " Set connection point to: " + connectionPoint );
 
             // Register mouse listener with parent
             if (!compute && parent != null && property != null) {
-                // this.setOnMouseClicked( e -> parent.connect( ((OtmTypeUser) property) ) );
                 this.setOnMouseClicked( e -> parent.connect( this ) );
                 parent.add( this );
                 // sub-types will register after rectangle is sized.

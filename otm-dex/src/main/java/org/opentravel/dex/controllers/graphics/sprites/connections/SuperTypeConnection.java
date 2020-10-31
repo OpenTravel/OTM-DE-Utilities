@@ -24,7 +24,7 @@ import javafx.scene.paint.Paint;
 
 public class SuperTypeConnection extends Connection {
 
-    public SuperTypeConnection(DexSprite<?> baseSprite, DexSprite<?> subTypeSprite) {
+    public SuperTypeConnection(DexSprite baseSprite, DexSprite subTypeSprite) {
         if (baseSprite == null || subTypeSprite == null || baseSprite.getBoundaries() == null
             || subTypeSprite.getBoundaries() == null)
             throw new IllegalArgumentException( "Missing boundaries in connection constructor." );
@@ -56,7 +56,7 @@ public class SuperTypeConnection extends Connection {
      * @param backgroundColor
      * @return
      */
-    public boolean update(DexSprite<?> sprite, GraphicsContext gc, Paint backgroundColor) {
+    public boolean update(DexSprite sprite, GraphicsContext gc, Paint backgroundColor) {
         if (contains( sprite )) {
 
             // Erase old line, saving gc settings
@@ -70,6 +70,7 @@ public class SuperTypeConnection extends Connection {
             }
 
             draw( gc );
+            return true;
         }
         return false;
     }

@@ -31,7 +31,7 @@ public class TypeConnection extends Connection {
 
     private OtmProperty property;
 
-    public TypeConnection(PropertyRectangle propertyRect, DexSprite<?> userSprite, DexSprite<?> providerSprite) {
+    public TypeConnection(PropertyRectangle propertyRect, DexSprite userSprite, DexSprite providerSprite) {
         if (userSprite == null || providerSprite == null || propertyRect == null)
             throw new IllegalArgumentException( "Missing parameter on connection constructor." );
         if (providerSprite.getBoundaries() == null)
@@ -76,29 +76,31 @@ public class TypeConnection extends Connection {
      * @param sprite
      * @param gc
      * @param backgroundColor
-     * @return
+     * @return true if the connection was drawn
      */
-    public boolean update(DexSprite<?> sprite, GraphicsContext gc, Paint backgroundColor) {
+    public boolean update(DexSprite sprite, GraphicsContext gc, Paint backgroundColor) {
         if (contains( sprite )) {
 
             // Erase old line, saving gc settings
             erase( gc, backgroundColor );
 
-            // Move the point
-            if (from == sprite) {
-                if (from.isCollapsed()) {
-                    fx = from.getBoundaries().getMaxX();
-                    fy = from.getBoundaries().getY() + sprite.getBoundaries().getHeight() / 2;
-                } else {
-                    getFromXY( from.find( property ) );
+            if (property.getParent().isExpanded()) {
+                // Move the point
+                if (from == sprite) {
+                    if (from.isCollapsed()) {
+                        fx = from.getBoundaries().getMaxX();
+                        fy = from.getBoundaries().getY() + sprite.getBoundaries().getHeight() / 2;
+                    } else {
+                        getFromXY( from.get( property ) );
+                    }
+                } else if (to == sprite) {
+                    tx = sprite.getBoundaries().getX();
+                    ty = sprite.getBoundaries().getY() + sprite.getBoundaries().getHeight() / 2;
                 }
-            } else if (to == sprite) {
-                tx = sprite.getBoundaries().getX();
-                ty = sprite.getBoundaries().getY() + sprite.getBoundaries().getHeight() / 2;
+                // Draw new line from f to t
+                draw( gc );
+                return true;
             }
-
-            // Draw new line from f to t
-            draw( gc );
         }
         return false;
     }

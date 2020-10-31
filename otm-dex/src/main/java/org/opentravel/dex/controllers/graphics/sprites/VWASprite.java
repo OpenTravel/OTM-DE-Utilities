@@ -21,11 +21,9 @@ import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.VWAPropertyRectangle;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.text.Font;
 
 /**
  * Graphics Display Object (Sprite) for containing OTM VWA object.
@@ -34,22 +32,22 @@ import javafx.scene.text.Font;
  * @param <O>
  *
  */
-public class VWASprite extends MemberSprite<OtmValueWithAttributes> implements DexSprite<OtmLibraryMember> {
+public class VWASprite extends MemberSprite<OtmValueWithAttributes> implements DexSprite {
     // gets log from base class
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
     double dxSummary;
     double margin;
 
-    public VWASprite(OtmValueWithAttributes member, SpriteManager manager, SettingsManager settingsManager) {
-        super( member, manager, settingsManager );
+    public VWASprite(OtmValueWithAttributes member, SpriteManager manager) {
+        super( member, manager );
 
         dxSummary = settingsManager.getOffset( Offsets.SUMMARY );
         margin = settingsManager.getMargin( Margins.FACET );
     }
 
     @Override
-    public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
+    public Rectangle drawContents(GraphicsContext gc, final double x, final double y) {
         boolean compute = gc == null;
         Rectangle rect = null;
 

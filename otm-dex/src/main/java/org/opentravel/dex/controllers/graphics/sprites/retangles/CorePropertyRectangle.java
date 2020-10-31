@@ -18,7 +18,6 @@ package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 /**
  * Graphics utility for containing property regions.
@@ -32,7 +31,7 @@ public class CorePropertyRectangle extends PropertyRectangle {
 
     private OtmCore core;
 
-    public CorePropertyRectangle(OtmCore core, DexSprite<OtmLibraryMember> parentSprite, double width) {
+    public CorePropertyRectangle(OtmCore core, DexSprite parentSprite, double width) {
         super( parentSprite, width, "Simple", null, core.isEditable(), false );
 
         // Get type information

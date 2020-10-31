@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexIncludedController;
 
 import javafx.scene.canvas.GraphicsContext;
@@ -34,7 +32,7 @@ import javafx.scene.text.FontWeight;
  * @author dmh
  */
 public class SettingsManager {
-    private static Log log = LogFactory.getLog( SettingsManager.class );
+    // private static Log log = LogFactory.getLog( SettingsManager.class );
 
     public static final double FONT_BASE = 8;
     public static final double FONT_INCREMENT = 1;
@@ -167,6 +165,32 @@ public class SettingsManager {
     }
 
     /**
+     * Set the passed GC to font, fill, stroke and linewidth of current gc
+     * 
+     * @param gc
+     */
+    public void setGCParams(GraphicsContext gc) {
+        if (gc != null && gc != currentGC) {
+            gc.setFont( currentGC.getFont() );
+            gc.setFill( currentGC.getFill() );
+            gc.setStroke( currentGC.getStroke() );
+            gc.setLineWidth( currentGC.getLineWidth() );
+        }
+    }
+
+    /**
+     * Use defaults
+     */
+    public void setGCParamsDefaults(GraphicsContext gc) {
+        if (gc != null) {
+            gc.setFont( new Font( "Arial", 18 ) );
+            gc.setFill( Color.gray( 0.85 ) );
+            gc.setStroke( Color.DARKSLATEBLUE );
+            gc.setLineWidth( 1 );
+        }
+    }
+
+    /**
      * Get the current font.
      * 
      * @return
@@ -190,7 +214,7 @@ public class SettingsManager {
      */
     public boolean updateSize(int size) {
         if (size != this.currentSize) {
-            log.debug( "Setting size to " + size );
+            // log.debug( "Setting size to " + size );
             currentFont = new Font( DEFAULT_FONT_NAME, FONT_BASE + size * FONT_INCREMENT );
             currentItalicFont = Font.font( DEFAULT_FONT_NAME, FontWeight.NORMAL, FontPosture.ITALIC,
                 FONT_BASE + size * FONT_INCREMENT );

@@ -53,6 +53,7 @@ public class GraphicsUtils {
         // NO-OP static methods
     }
 
+
     /**
      * 
      * @param image
@@ -60,7 +61,7 @@ public class GraphicsUtils {
      * @param gc
      * @param x
      * @param y
-     * @return
+     * @return new rectangle containing the image
      */
     public static Rectangle drawImage(Image image, DrawType fill, GraphicsContext gc, final double x, final double y) {
         if (gc != null)

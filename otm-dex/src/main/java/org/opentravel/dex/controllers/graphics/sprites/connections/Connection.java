@@ -27,8 +27,8 @@ public abstract class Connection {
     protected double tx;
     protected double ty;
 
-    protected DexSprite<?> from;
-    protected DexSprite<?> to;
+    protected DexSprite from;
+    protected DexSprite to;
     // private Rectangle fromRect;
     // private double offsetY; // offset from sprite Y
     // private double offsetX; // offset from sprite X
@@ -41,7 +41,7 @@ public abstract class Connection {
     // this.ty = ty;
     // }
 
-    public boolean contains(DexSprite<?> sprite) {
+    public boolean contains(DexSprite sprite) {
         return from == sprite || to == sprite;
     }
 
@@ -53,7 +53,7 @@ public abstract class Connection {
      * @param backgroundColor
      * @return
      */
-    public abstract boolean update(DexSprite<?> sprite, GraphicsContext gc, Paint backgroundColor);
+    public abstract boolean update(DexSprite sprite, GraphicsContext gc, Paint backgroundColor);
 
     public void draw(GraphicsContext gc) {
         gc.strokeLine( fx, fy, tx, ty );

@@ -40,7 +40,7 @@ import javafx.scene.layout.Pane;
  *
  */
 public class ColumnRectangle extends Rectangle {
-    private static Log log = LogFactory.getLog( Rectangle.class );
+    private static Log log = LogFactory.getLog( ColumnRectangle.class );
 
     public static final int COLUMN_HEIGHT_MIN = 1000;
     public static final int COLUMN_MARGIN_X = 50;
@@ -48,7 +48,7 @@ public class ColumnRectangle extends Rectangle {
     private static final double COLUMN_WIDTH = 100;
 
     int index = 0;
-    private List<DexSprite<?>> activeSprites = new ArrayList<>();
+    private List<DexSprite> activeSprites = new ArrayList<>();
     Pane spritePane;
     private ColumnRectangle previousColumn = null;
     private ColumnRectangle nextColumn = null;
@@ -69,7 +69,7 @@ public class ColumnRectangle extends Rectangle {
 
     // public Point2D getNextInColumn(double x, double y) {
     // Point2D bottom = new Point2D( x, y );
-    // DexSprite<?> next = null;
+    // DexSprite next = null;
     // do {
     // next = findSprite( bottom );
     // if (next != null)
@@ -88,18 +88,15 @@ public class ColumnRectangle extends Rectangle {
      * @param sprite
      * @return the sprite (added or found already column)
      */
-    public DexSprite<OtmLibraryMember> add(DexSprite<OtmLibraryMember> sprite) {
+    public DexSprite add(DexSprite sprite) {
         if (sprite != null && !activeSprites.contains( sprite )) {
             // If the sprite is wider than column, resize column
-            if (sprite.getBoundaries().getWidth() + COLUMN_MARGIN_X > width)
-                resize( sprite.getBoundaries().getWidth() + COLUMN_MARGIN_X );
+            if (sprite.getWidth() + COLUMN_MARGIN_X > width)
+                resize( sprite.getWidth() + COLUMN_MARGIN_X );
 
-            // Add the sprite to list and pane
-            spritePane.getChildren().add( sprite.render( getNextInColumn() ) );
+            // Render sprite into this column, add to list and pane
+            spritePane.getChildren().add( sprite.render( this ) );
             activeSprites.add( sprite );
-            sprite.set( this );
-
-            // sprite.refresh();
         }
         return sprite;
     }
@@ -108,7 +105,7 @@ public class ColumnRectangle extends Rectangle {
      * Remove all sprites and their canvases. Remove all connections.
      */
     public void clear() {
-        for (DexSprite<?> sprite : activeSprites) {
+        for (DexSprite sprite : activeSprites) {
             sprite.clear();
             spritePane.getChildren().remove( sprite.getCanvas() );
         }
@@ -117,18 +114,18 @@ public class ColumnRectangle extends Rectangle {
         y = COLUMN_MARGIN_Y;
     }
 
-    public MemberSprite<OtmLibraryMember> find(OtmLibraryMember member) {
+    public MemberSprite<OtmLibraryMember> get(OtmLibraryMember member) {
         MemberSprite<OtmLibraryMember> selectedSprite = null;
-        for (DexSprite<?> sprite : activeSprites)
+        for (DexSprite sprite : activeSprites)
             if (sprite.getMember() == member && sprite instanceof MemberSprite) {
                 return (MemberSprite<OtmLibraryMember>) sprite;
             }
         return selectedSprite;
     }
 
-    public DexSprite<?> findSprite(Point2D point) {
-        DexSprite<?> selectedSprite = null;
-        for (DexSprite<?> sprite : activeSprites)
+    public DexSprite findSprite(Point2D point) {
+        DexSprite selectedSprite = null;
+        for (DexSprite sprite : activeSprites)
             if (sprite.contains( point )) {
                 return (sprite);
             }
@@ -143,12 +140,12 @@ public class ColumnRectangle extends Rectangle {
         return nextColumn != null ? nextColumn : this;
     }
 
-    // public Point2D getNextInColumn(DexSprite<?> sprite) {
+    // public Point2D getNextInColumn(DexSprite sprite) {
     // double dx = 2 * COLUMN_MARGIN_X; // get past the margin
     // double dy = 2 * COLUMN_MARGIN_Y;
     // Point2D bottom = new Point2D( dx, dy );
     // if (sprite != null) {
-    // DexSprite<?> next = sprite;
+    // DexSprite next = sprite;
     // do {
     // bottom = new Point2D( x + dx, next.getBoundaries().getMaxY() + dy );
     // next = findSprite( bottom );
@@ -160,7 +157,7 @@ public class ColumnRectangle extends Rectangle {
     public Point2D getNextInColumn() {
         double cx = x + 20; // get past the margin
         double dy = COLUMN_MARGIN_Y;
-        DexSprite<?> next = null;
+        DexSprite next = null;
         Point2D bottom = new Point2D( cx, 2 * COLUMN_MARGIN_Y );
         do {
             next = findSprite( bottom );
@@ -180,7 +177,7 @@ public class ColumnRectangle extends Rectangle {
         return previousColumn != null ? previousColumn : this;
     }
 
-    public List<DexSprite<?>> getSprites() {
+    public List<DexSprite> getSprites() {
         return activeSprites;
     }
 
@@ -188,17 +185,19 @@ public class ColumnRectangle extends Rectangle {
         this.width = width;
         if (nextColumn != null)
             nextColumn.set( getMaxX(), COLUMN_MARGIN_Y );
+        // log.debug( "Resized column " + this );
     }
 
     @Override
     public Rectangle set(double x, double y) {
         super.set( x, y );
         activeSprites.forEach( s -> {
-            s.set( x, s.getBoundaries().getY() );
+            s.set( x, s.getY() );
             s.refresh();
         } );
         if (nextColumn != null)
             nextColumn.set( getMaxX(), COLUMN_MARGIN_Y );
+        // log.debug( "Set column " + this );
         return this;
     }
 
@@ -206,7 +205,7 @@ public class ColumnRectangle extends Rectangle {
         nextColumn = next;
     }
 
-    public void remove(DexSprite<?> sprite) {
+    public void remove(DexSprite sprite) {
         log.debug( "Removing sprite: " + sprite + "  " + activeSprites.contains( sprite ) );
         activeSprites.remove( sprite );
         spritePane.getChildren().remove( sprite.getCanvas() );

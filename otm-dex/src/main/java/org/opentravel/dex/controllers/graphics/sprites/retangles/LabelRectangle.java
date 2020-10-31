@@ -22,7 +22,6 @@ import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
@@ -50,7 +49,7 @@ public class LabelRectangle extends Rectangle {
     // public void onRectangleClick(MouseEvent e);
     // }
 
-    protected DexSprite<OtmLibraryMember> parent;
+    protected DexSprite parent;
     protected Font font;
     protected SettingsManager settings;
 
@@ -65,7 +64,7 @@ public class LabelRectangle extends Rectangle {
     private static final double MINIMUM_WIDTH = 10;
 
 
-    public LabelRectangle(DexSprite<OtmLibraryMember> parent, String label, Image image, boolean bold, boolean italic,
+    public LabelRectangle(DexSprite parent, String label, Image image, boolean bold, boolean italic,
         boolean imageLast) {
         super( 0, 0, MINIMUM_WIDTH, 0 );
         this.parent = parent;

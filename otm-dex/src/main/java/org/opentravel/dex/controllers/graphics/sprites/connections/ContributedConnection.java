@@ -27,7 +27,7 @@ public class ContributedConnection extends Connection {
     // private double offsetY; // offset from sprite Y
     // private double offsetX; // offset from sprite X
 
-    public ContributedConnection(DexSprite<?> contributorSprite, DexSprite<?> objectSprite) {
+    public ContributedConnection(DexSprite contributorSprite, DexSprite objectSprite) {
         if (contributorSprite == null || objectSprite == null || contributorSprite.getBoundaries() == null
             || objectSprite.getBoundaries() == null)
             throw new IllegalArgumentException( "Missing boundaries in connection constructor." );
@@ -59,7 +59,7 @@ public class ContributedConnection extends Connection {
      * @param backgroundColor
      * @return
      */
-    public boolean update(DexSprite<?> sprite, GraphicsContext gc, Paint backgroundColor) {
+    public boolean update(DexSprite sprite, GraphicsContext gc, Paint backgroundColor) {
         if (contains( sprite )) {
 
             // Erase old line, saving gc settings
@@ -73,6 +73,7 @@ public class ContributedConnection extends Connection {
             }
 
             draw( gc );
+            return true;
         }
         return false;
     }

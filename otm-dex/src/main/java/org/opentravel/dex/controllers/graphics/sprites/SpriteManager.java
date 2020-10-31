@@ -56,7 +56,7 @@ public class SpriteManager {
     private SettingsManager settingsManager;
     private Pane spritePane;
     private DexIncludedController<?> parentController = null;
-    private DexSprite<?> draggedSprite = null;
+    private DexSprite draggedSprite = null;
     private GraphicsContext connectionsGC;
     private List<Connection> connections;
     private Canvas connectionsCanvas;
@@ -91,86 +91,49 @@ public class SpriteManager {
         spritePane.setOnMouseClicked( this::mouseClick );
     }
 
-    private void createColumns(int count) {
-        if (columns == null)
-            columns = new ArrayList<>();
-        ColumnRectangle column = new ColumnRectangle( spritePane, null );
-        int i = 0;
-        do {
-            columns.add( column );
-            ColumnRectangle nc = new ColumnRectangle( spritePane, column );
-            column.setNext( nc );
-            column = nc;
-        } while (i++ < count);
-    }
+    // /**
+    // * Add the sprite to the list and render into pane
+    // *
+    // * @param sprite
+    // */
+    // public void add(DexSprite<OtmLibraryMember> sprite, ColumnRectangle column) {
+    // column.add( sprite );
+    // // activeSprites.add( sprite );
+    // // spritePane.getChildren().add( sprite.render() );
+    // }
 
 
     /**
-     * Add the sprite to the list and render into pane
-     * 
-     * @param sprite
-     */
-    public void add(DexSprite<OtmLibraryMember> sprite, ColumnRectangle column) {
-        column.add( sprite );
-        // activeSprites.add( sprite );
-        // spritePane.getChildren().add( sprite.render() );
-    }
-
-    public void setCollapsed(boolean collapsed) {
-        getAllSprites().forEach( s -> s.setCollapsed( collapsed ) );
-        refresh();
-    }
-
-    /**
-     * Uses Sprite factory to adds sprite and related sprites to list and FX pane's children. Manager determines the
-     * location for the sprite.
+     * {@link #add(OtmLibraryMember, ColumnRectangle, boolean)} not collapsed.
      * 
      * @param member
      */
-    public DexSprite<OtmLibraryMember> add(OtmLibraryMember member, ColumnRectangle column) {
+    public DexSprite add(OtmLibraryMember member, ColumnRectangle column) {
         return add( member, column, false );
     }
 
+    /**
+     * If the column does not contain the sprite, create it using {@link #factory(OtmLibraryMember)}.
+     * 
+     * @param member
+     * @param column if null, use column 1
+     * @param collapsed
+     * @return
+     */
     public MemberSprite<OtmLibraryMember> add(OtmLibraryMember member, ColumnRectangle column, boolean collapsed) {
         if (column == null)
             column = getColumn( 1 );
-        MemberSprite<OtmLibraryMember> memberSprite = column.find( member );
-        if (memberSprite == null)
+
+        MemberSprite<OtmLibraryMember> memberSprite = column.get( member );
+
+        if (memberSprite == null) {
             memberSprite = factory( member );
-        if (memberSprite != null) {
-            memberSprite.setCollapsed( collapsed );
             column.add( memberSprite );
         }
+        if (memberSprite != null) {
+            memberSprite.setCollapsed( collapsed );
+        }
         return memberSprite;
-    }
-
-    /**
-     * Sprite factory.
-     * 
-     * @param member
-     * @return Built sprite or null.
-     */
-    // sprite factory
-    private MemberSprite<OtmLibraryMember> factory(OtmLibraryMember member) {
-        MemberSprite<?> newSprite = null;
-        if (member instanceof OtmBusinessObject)
-            newSprite = new BusinessObjectSprite( (OtmBusinessObject) member, this, settingsManager );
-        else if (member instanceof OtmChoiceObject)
-            newSprite = new ChoiceObjectSprite( (OtmChoiceObject) member, this, settingsManager );
-        else if (member instanceof OtmCore)
-            newSprite = new CoreObjectSprite( (OtmCore) member, this, settingsManager );
-        else if (member instanceof OtmValueWithAttributes)
-            newSprite = new VWASprite( (OtmValueWithAttributes) member, this, settingsManager );
-        else if (member instanceof OtmContextualFacet)
-            newSprite = new ContextualFacetSprite( (OtmContextualFacet) member, this, settingsManager );
-        else if (member instanceof OtmEnumeration)
-            newSprite = new EnumerationSprite( (OtmEnumeration<?>) member, this, settingsManager );
-        else if (member instanceof OtmSimpleObjects)
-            newSprite = new SimpleSprite( (OtmSimpleObjects<?>) member, this, settingsManager );
-        else if (member instanceof OtmResource)
-            newSprite = new ResourceSprite( (OtmResource) member, this, settingsManager );
-        // log.debug( "factory created: " + newSprite );
-        return (MemberSprite<OtmLibraryMember>) newSprite;
     }
 
     /**
@@ -183,23 +146,6 @@ public class SpriteManager {
             connections.add( c );
             c.draw( connectionsGC );
         }
-    }
-
-    public ColumnRectangle getColumn(int index) {
-        for (ColumnRectangle c : columns)
-            if (c.getIndex() == index)
-                return c;
-        return null;
-    }
-
-    /**
-     * 
-     * @return new list of all sprites in all columns
-     */
-    public List<DexSprite<?>> getAllSprites() {
-        List<DexSprite<?>> sprites = new ArrayList<>();
-        columns.forEach( c -> sprites.addAll( c.getSprites() ) );
-        return sprites;
     }
 
     /**
@@ -217,17 +163,23 @@ public class SpriteManager {
     // FIXME - this seems broken!
     @Deprecated
     public boolean contains(OtmLibraryMember member) {
-        for (DexSprite<?> s : getAllSprites())
+        for (DexSprite s : getAllSprites())
             if (s.getMember() == member)
                 return true;
         return false;
     }
 
-    public MemberSprite<OtmLibraryMember> get(OtmLibraryMember member) {
-        for (DexSprite<?> s : getAllSprites())
-            if (s.getMember() == member && s instanceof MemberSprite)
-                return (MemberSprite<OtmLibraryMember>) s;
-        return null;
+    private void createColumns(int count) {
+        if (columns == null)
+            columns = new ArrayList<>();
+        ColumnRectangle column = new ColumnRectangle( spritePane, null );
+        int i = 0;
+        do {
+            columns.add( column );
+            ColumnRectangle nc = new ColumnRectangle( spritePane, column );
+            column.setNext( nc );
+            column = nc;
+        } while (i++ < count);
     }
 
     /**
@@ -243,7 +195,6 @@ public class SpriteManager {
         }
         // log.debug( "Dragging sprite." );
     }
-
 
     public void dragEnd(MouseEvent e) {
         if (draggedSprite != null)
@@ -267,36 +218,93 @@ public class SpriteManager {
         connectionsGC.fillRect( 0, 0, connectionsCanvas.getWidth(), connectionsCanvas.getHeight() );
     }
 
-    public DexSprite<?> findSprite(OtmLibraryMember member) {
-        DexSprite<?> selectedSprite = null;
+    /**
+     * Sprite factory.
+     * 
+     * @param member
+     * @return Built sprite or null.
+     */
+    // sprite factory
+    private MemberSprite<OtmLibraryMember> factory(OtmLibraryMember member) {
+        MemberSprite<?> newSprite = null;
+        if (member instanceof OtmBusinessObject)
+            newSprite = new BusinessObjectSprite( (OtmBusinessObject) member, this );
+        else if (member instanceof OtmChoiceObject)
+            newSprite = new ChoiceObjectSprite( (OtmChoiceObject) member, this );
+        else if (member instanceof OtmCore)
+            newSprite = new CoreObjectSprite( (OtmCore) member, this );
+        else if (member instanceof OtmValueWithAttributes)
+            newSprite = new VWASprite( (OtmValueWithAttributes) member, this );
+        else if (member instanceof OtmContextualFacet)
+            newSprite = new ContextualFacetSprite( (OtmContextualFacet) member, this );
+        else if (member instanceof OtmEnumeration)
+            newSprite = new EnumerationSprite( (OtmEnumeration<?>) member, this );
+        else if (member instanceof OtmSimpleObjects)
+            newSprite = new SimpleSprite( (OtmSimpleObjects<?>) member, this );
+        else if (member instanceof OtmResource)
+            newSprite = new ResourceSprite( (OtmResource) member, this );
+        // log.debug( "factory created: " + newSprite );
+        return (MemberSprite<OtmLibraryMember>) newSprite;
+    }
+
+    public DexSprite findSprite(OtmLibraryMember member) {
+        DexSprite selectedSprite = null;
         for (ColumnRectangle column : columns) {
-            selectedSprite = column.find( member );
+            selectedSprite = column.get( member );
             if (selectedSprite != null)
                 return selectedSprite;
         }
         return selectedSprite;
     }
 
-    public DexSprite<?> findSprite(Point2D point) {
-        DexSprite<?> selectedSprite = null;
-        for (DexSprite<?> sprite : getAllSprites())
+
+    public DexSprite findSprite(Point2D point) {
+        DexSprite selectedSprite = null;
+        for (DexSprite sprite : getAllSprites())
             if (sprite.contains( point )) {
                 return (sprite);
             }
         return selectedSprite;
     }
 
+    public MemberSprite<OtmLibraryMember> get(OtmLibraryMember member) {
+        for (DexSprite s : getAllSprites())
+            if (s.getMember() == member && s instanceof MemberSprite)
+                return (MemberSprite<OtmLibraryMember>) s;
+        return null;
+    }
+
+    /**
+     * 
+     * @return new list of all sprites in all columns
+     */
+    public List<DexSprite> getAllSprites() {
+        List<DexSprite> sprites = new ArrayList<>();
+        columns.forEach( c -> sprites.addAll( c.getSprites() ) );
+        return sprites;
+    }
+
+    public ColumnRectangle getColumn(int index) {
+        for (ColumnRectangle c : columns)
+            if (c.getIndex() == index)
+                return c;
+        return null;
+    }
+
     public GraphicsContext getConnectionsGC() {
         return connectionsGC;
     }
 
+    public SettingsManager getSettingsManager() {
+        return settingsManager;
+    }
 
     private void mouseClick(MouseEvent e) {
         // log.debug( "Mouse click on at: " + e.getX() + " " + e.getY() );
         // The whole canvas is active, check boundaries
         // TODO - use find(point)
-        DexSprite<?> selected = null;
-        for (DexSprite<?> sprite : getAllSprites())
+        DexSprite selected = null;
+        for (DexSprite sprite : getAllSprites())
             if (sprite.contains( new Point2D( e.getX(), e.getY() ) )) {
                 selected = sprite;
                 break;
@@ -316,14 +324,14 @@ public class SpriteManager {
     }
 
     public void refresh() {
-        for (DexSprite<?> sprite : getAllSprites()) {
+        for (DexSprite sprite : getAllSprites()) {
             sprite.clear();
             sprite.render();
         }
         updateConnections();
     }
 
-    public void remove(DexSprite<?> sprite) {
+    public void remove(DexSprite sprite) {
         if (sprite != null) {
             // log.debug( "Removing sprite: " + sprite.getMember() );
             removeConnection( sprite );
@@ -333,11 +341,11 @@ public class SpriteManager {
     }
 
     public void remove(OtmLibraryMember member) {
-        DexSprite<?> sprite = findSprite( member );
+        DexSprite sprite = findSprite( member );
         remove( sprite );
     }
 
-    public void removeConnection(DexSprite<?> sprite) {
+    public void removeConnection(DexSprite sprite) {
         if (sprite != null) {
             List<Connection> list = new ArrayList<>( connections );
             for (Connection c : list)
@@ -345,6 +353,11 @@ public class SpriteManager {
                     connections.remove( c );
             updateConnections();
         }
+    }
+
+    public void setCollapsed(boolean collapsed) {
+        getAllSprites().forEach( s -> s.setCollapsed( collapsed ) );
+        refresh();
     }
 
     public void update(Color color) {
@@ -373,10 +386,13 @@ public class SpriteManager {
         // FIXME - rectangles may have changed if font changed.
     }
 
-    public void updateConnections(DexSprite<?> sprite) {
+    public void updateConnections(DexSprite sprite) {
+        List<Connection> toDelete = new ArrayList<>();
         for (Connection c : connections) {
-            c.update( sprite, connectionsGC, backgroundColor );
+            if (!c.update( sprite, connectionsGC, backgroundColor ))
+                toDelete.add( c );
         }
+        // connections.removeAll( toDelete );
     }
 
 }

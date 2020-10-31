@@ -30,7 +30,6 @@ import org.opentravel.model.resource.OtmAction;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.text.Font;
 
 /**
  * Graphics Display Object (Sprite) for containing OTM Emumeration object.
@@ -39,12 +38,12 @@ import javafx.scene.text.Font;
  * @param <O>
  *
  */
-public class ResourceSprite extends MemberSprite<OtmResource> implements DexSprite<OtmLibraryMember> {
+public class ResourceSprite extends MemberSprite<OtmResource> implements DexSprite {
 
     PropertyRectangle subjectRectangle = null;
 
-    public ResourceSprite(OtmResource member, SpriteManager manager, SettingsManager settingsManager) {
-        super( member, manager, settingsManager );
+    public ResourceSprite(OtmResource member, SpriteManager manager) {
+        super( member, manager );
     }
 
     /**
@@ -57,11 +56,11 @@ public class ResourceSprite extends MemberSprite<OtmResource> implements DexSpri
      * @return
      */
     // @Override
-    public DexSprite<?> connectSubject() {
+    public DexSprite connectSubject() {
         if (member.getSubject() == null)
             return null;
 
-        DexSprite<?> subjectSprite = manager.get( (OtmLibraryMember) member.getSubject() );
+        DexSprite subjectSprite = manager.get( (OtmLibraryMember) member.getSubject() );
         if (subjectSprite == null) {
             subjectSprite = manager.add( (OtmLibraryMember) member.getSubject(), getColumn().getNext() );
         } else
@@ -79,7 +78,7 @@ public class ResourceSprite extends MemberSprite<OtmResource> implements DexSpri
     }
 
     @Override
-    public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
+    public Rectangle drawContents(GraphicsContext gc, final double x, final double y) {
         Rectangle rect = null;
 
         double dx = settingsManager.getOffset( Offsets.ID );
@@ -93,13 +92,13 @@ public class ResourceSprite extends MemberSprite<OtmResource> implements DexSpri
             subjectRectangle = new ResourceSubjectRectangle( this, getMember(), width );
             subjectRectangle.set( x + dx, y ).draw( gc, false );
             fy += subjectRectangle.getHeight() + margin;
-            width = computeWidth( gc == null, width, subjectRectangle, 0 );
+            width = computeWidth( width, subjectRectangle, 0 );
         } else {
             rect = new LabelRectangle( this, "Abstract", null, false, false, false ).draw( gc, x + dx, fy );
             // rect = GraphicsUtils.drawLabel( "Abstract", null, false, false, gc, font, x + dx, fy );
             // rect.set( x + dx, fy ).draw( gc, false );
             fy += rect.getHeight() + margin;
-            width = computeWidth( gc == null, width, rect, 0 );
+            width = computeWidth( width, rect, 0 );
         }
 
         // Display Actions
@@ -108,7 +107,7 @@ public class ResourceSprite extends MemberSprite<OtmResource> implements DexSpri
                 rect = new FacetRectangle( action, this, width - margin );
                 rect.set( x + dx, fy ).draw( gc, true );
                 fy += rect.getHeight() + margin;
-                width = computeWidth( gc == null, width, rect, 0 );
+                width = computeWidth( width, rect, 0 );
             }
 
         // rect = GraphicsUtils.drawLabel( "TODO", null, gc, font, x + dx, fy );

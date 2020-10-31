@@ -17,7 +17,6 @@
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 
 /**
@@ -32,7 +31,7 @@ public class VWAPropertyRectangle extends PropertyRectangle {
 
     private OtmValueWithAttributes vwa;
 
-    public VWAPropertyRectangle(OtmValueWithAttributes vwa, DexSprite<OtmLibraryMember> parentSprite, double width) {
+    public VWAPropertyRectangle(OtmValueWithAttributes vwa, DexSprite parentSprite, double width) {
         super( parentSprite, width, "Value", null, vwa.isEditable(), false );
 
         // Get type information

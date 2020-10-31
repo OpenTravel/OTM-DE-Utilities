@@ -25,11 +25,13 @@ import org.opentravel.dex.controllers.graphics.sprites.connections.SuperTypeConn
 import org.opentravel.dex.controllers.graphics.sprites.connections.TypeConnection;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.BaseTypeRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle.RectangleEventHandler;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 
@@ -43,8 +45,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 
 /**
@@ -54,8 +54,7 @@ import javafx.scene.text.Font;
  * @param <O>
  *
  */
-public abstract class MemberSprite<M extends OtmLibraryMember>
-    implements DexSprite<OtmLibraryMember>, RectangleEventHandler {
+public abstract class MemberSprite<M extends OtmLibraryMember> implements DexSprite, RectangleEventHandler {
     protected static Log log = LogFactory.getLog( MemberSprite.class );
 
     private static final double MIN_HEIGHT = 50;
@@ -72,37 +71,35 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
     private boolean collapsed = false;
 
     private List<Rectangle> rectangles = new ArrayList<>();
-    protected SpriteManager manager;
 
+    protected SpriteManager manager;
     protected SettingsManager settingsManager;
 
     /**
-     * Initialize member sprite. Create canvas and save GC for parameters.
+     * Initialize member sprite. Create canvas and GC parameters. Compute initial size. Create tool tip. Sub-types will
+     * initialize settings using the manager's setting manager.
      * 
      * @param member
      * @param settingsManager, must <b>not</b> be null.
      */
-    public MemberSprite(M member, SpriteManager manager, SettingsManager settingsManager) {
-        if (settingsManager == null)
-            throw new IllegalArgumentException( "Must have settings" );
-
+    public MemberSprite(M member, SpriteManager manager) {
         this.member = member;
         this.manager = manager;
-        this.settingsManager = settingsManager;
-        //
+        this.settingsManager = manager.getSettingsManager();
+
+        // Create canvas with configured GC
         canvas = new Canvas( MIN_WIDTH, MIN_HEIGHT );
         gc = canvas.getGraphicsContext2D();
-        setGCParams( settingsManager.getGc() );
-        setBoundaries( 0, 0 );
+        settingsManager.setGCParams( gc );
 
-        // This relies on the canvas being clipped to the active boundaries
+        // Compute size
+        draw( null, 0, 0 );
+
+        // Correct tool tip display relies on the canvas being clipped to this sprite's active boundaries
         String desc = member.getDescription();
-        // if (desc != null && !desc.isEmpty()) {
         Tooltip t = new Tooltip();
         Tooltip.install( canvas, t );
         t.setText( member.getPrefix() + " : " + member.getNamespace() + "\n" + desc );
-        // }
-
     }
 
     @Override
@@ -111,40 +108,37 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
             rectangles.add( rectangle );
     }
 
+    /**
+     * Get or Create provider sprite if none exists. Draw connection to this sprite.
+     * 
+     * @param user
+     * @return the provider sprite
+     */
+    public MemberSprite<OtmLibraryMember> addConnection(OtmTypeUser user) {
+        // log.debug( "Adding connection to " + user );
+        if (getColumn() == null || user == null || user.getAssignedType() == null || !(user instanceof OtmProperty))
+            return null;
+
+        OtmLibraryMember provider = user.getAssignedType().getOwningMember();
+        if (provider == null || provider == user.getOwningMember())
+            return null;
+
+        MemberSprite<OtmLibraryMember> toSprite = manager.get( provider );
+        if (!(toSprite instanceof MemberSprite)) {
+            // Create new collapsed sprite and connect it
+            toSprite = manager.add( provider, getColumn().getNext(), true );
+            connect( (OtmProperty) user, this, toSprite );
+        }
+        return toSprite;
+    }
+
     @Override
     public void clear() {
         gc.clearRect( 0, 0, canvas.getWidth(), canvas.getHeight() );
         rectangles.clear();
+        boundaries = null;
         // do NOT remove from column...let caller do that
     }
-
-    @Override
-    public boolean contains(Point2D point) {
-        return boundaries.contains( point );
-    }
-
-    public double drawControls(Rectangle boundaries, GraphicsContext cgc) {
-        Image close = ImageManager.getImage( ImageManager.Icons.CLOSE );
-        Image collapse = ImageManager.getImage( ImageManager.Icons.COLLAPSE );
-
-        // Start at right edge and work backwards
-        double margin = settingsManager.getMargin( Margins.MEMBER );
-        double cx = boundaries.getMaxX() - margin - close.getWidth();
-        double cy = boundaries.getY() + margin;
-        Rectangle r = GraphicsUtils.drawImage( close, DrawType.OUTLINE, cgc, cx, cy );
-        rectangles.add( r );
-        r.setOnMouseClicked( e -> manager.remove( this ) );
-        double width = r.getWidth() + margin;
-
-        cx = r.getX() - collapse.getWidth();
-        r = GraphicsUtils.drawImage( collapse, DrawType.OUTLINE, cgc, cx, cy );
-        rectangles.add( r );
-        r.setOnMouseClicked( e -> collapseOrExpand() );
-        width += r.getWidth() + margin;
-
-        return width;
-    }
-
 
     /**
      * Toggle collapsed state.
@@ -153,360 +147,46 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         clear();
         collapsed = !collapsed;
         render();
-
+        manager.updateConnections( this );
     }
 
     /**
-     * Return the width
-     * 
-     * @param compute - if true, return the larger. if false return the width
-     * @param width
-     * @param rect
-     * @param offsetX - added to rectangle's width
-     * @return
+     * Toggle collapsed state.
      */
-    public double computeWidth(boolean compute, double width, Rectangle rect, double offsetX) {
-        width = rect.getWidth() + offsetX > width ? rect.getWidth() + offsetX : width;
+    @Override
+    public void collapseOrExpand(OtmFacet<?> f) {
+        log.debug( "Collapse or expand." );
+        if (f != null) {
+            clear();
+            f.setExpanded( !f.isExpanded() );
+            // collapsed = !collapsed;
+            render();
+            manager.updateConnections( this );
+            log.debug( "Collapse or expand: " + f + " to " + f.isExpanded() );
+        }
+    }
+
+
+    /**
+     * Utility to compute the wider width. Returns
+     * 
+     * @param width - current effective with
+     * @param rect - rectangle with width that may be larger that current effective width
+     * @param offsetX - added to rectangle's width
+     * @return the computed effective width
+     */
+    public static double computeWidth(double width, Rectangle rect, double offsetX) {
+        if (rect != null)
+            width = rect.getWidth() + offsetX > width ? rect.getWidth() + offsetX : width;
         return width;
     }
 
-    public M getMember() {
-        return member;
-    }
-
     @Override
-    public List<Rectangle> getRectangles() {
-        return rectangles;
-    }
-
-    @Override
-    public SettingsManager getSettingsManager() {
-        return settingsManager;
-    }
-
-    @Override
-    public Canvas render(Point2D point) {
-        set( point );
-        return render();
-    }
-
-    @Override
-    public Canvas render() {
-        // log.debug( "Rendering at " + x + " " + y + " sprite for: " + member );
-        if (member == null || manager == null)
-            return null;
-
-        setBoundaries( 0, 0 );
-
-        // Size Canvas
-        Rectangle canvasR = new Rectangle( x, y, boundaries.getWidth() + settingsManager.getMargin( Margins.CANVAS ),
-            boundaries.getHeight() + settingsManager.getMargin( Margins.CANVAS ) );
-        canvas.setHeight( y + canvasR.getHeight() );
-        canvas.setWidth( x + canvasR.getWidth() );
-        // log.debug( "Sized canvas: " + canvasR );
-
-        drawMember( true );
-        manager.updateConnections( this );
-        // log.debug( "Rendered " + member + " at " + getBoundaries() );
-        return canvas;
-    }
-
-    /**
-     * If width or height are 0 then compute new values
-     * 
-     * @param width if 0, compute
-     * @param height if 0, compute
-     */
-    public void setBoundaries(double width, double height) {
-        // Use minimum boundaries
-        boundaries = new Rectangle( x, y, MIN_WIDTH, MIN_HEIGHT );
-        // Get size of sprite using minimum boundaries
-        Rectangle ms = drawMember( false );
-        // Set the true boundaries
-        boundaries = new Rectangle( x, y, width == 0 ? ms.getWidth() : width, height == 0 ? ms.getHeight() : height );
-        // boundaries.draw( gc, false );
-    }
-
-    @Override
-    public void refresh() {
-        clear();
-        render();
-    }
-
-    /**
-     * Draw the facets and properties for this member. Start at the passed x, y.
-     * 
-     * @param gc if null, compute size. If not-null, draw within boundaries.
-     * @param font
-     * @param x
-     * @param y
-     * @return rectangle around all contents
-     */
-    public abstract Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y);
-
-    public Rectangle drawContents(boolean render, final double x, final double y) {
-        GraphicsContext dgc = null;
-        if (render)
-            dgc = gc;
-        return drawContents( dgc, gc.getFont(), x, y );
-    }
-
-    /**
-     * Draw background, label, controls and contents for this member.
-     * 
-     * @param render draw onto canvas if true, compute sizes if false
-     * @return
-     */
-    public Rectangle drawMember(boolean render) {
-        GraphicsContext dgc = null;
-        if (render)
-            dgc = gc;
-        return drawMember( dgc, gc.getFont() );
-    }
-
-    /**
-     * Draw background, label and controls.
-     * 
-     * @param gc
-     * @param font
-     * @return
-     */
-    private Rectangle drawMember(GraphicsContext gc, Font font) {
-        if (member == null)
-            return new Rectangle( 0, 0, 0, 0 );
-
-        // Draw background box
-        if (gc != null) {
-            Rectangle bRect = new Rectangle( boundaries.getX(), boundaries.getY(),
-                boundaries.getWidth() + settingsManager.getMargin( Margins.FACET ),
-                boundaries.getHeight() + settingsManager.getMargin( Margins.FACET ) );
-            bRect.draw( gc, false ); // Outline
-            bRect.draw( gc, true ); // Fill
-        }
-
-        // Draw the name of the object
-        Rectangle mRect =
-            new LabelRectangle( this, member.getName(), member.getIcon(), member.isEditable(), false, false ).draw( gc,
-                x, y );
-        // GraphicsUtils.drawLabel( member.getName(), member.getIcon(), member.isEditable(), false, gc, font, x, y );
-        double width = mRect.getWidth();
-        double height = mRect.getHeight();
-
-        // Add the controls
-        // if (gc == null)
-        // width += 2 * 18;
-        // else
-        double cWidth = drawControls( boundaries, gc ) + settingsManager.getMargin( Margins.MEMBER );
-        width += cWidth;
-
-        // prefix
-        double px = boundaries.getMaxX() - cWidth;
-        LabelRectangle pRect = new LabelRectangle( this, member.getPrefix(), null, member.isEditable(), false, false );
-        // GraphicsUtils.drawLabel( member.getPrefix(), null, member.isEditable(), false, null, font, px, y );
-        px -= pRect.getWidth() + settingsManager.getMargin( Margins.LABEL );
-        pRect.draw( gc, px, y );
-        width += pRect.getWidth();
-
-        // Draw property for base type if any
-        if (!collapsed && member.getBaseType() != null) {
-            mRect = new BaseTypeRectangle( this, member, width );
-            mRect.set( boundaries.getMaxX() - mRect.getWidth(), y + height ).draw( gc, true );
-            width = computeWidth( gc == null, width, mRect, 0 );
-            height += mRect.getHeight();
-        }
-
-        // Show content (facets, properties, etc)
-        mRect = drawContents( gc, font, boundaries.getX(), y + height );
-        // mRect.draw( gc, false );
-        width = computeWidth( gc == null, width, mRect, settingsManager.getMargin( Margins.FACET ) );
-        // if (gc == null && mRect.getWidth() + settingsManager.getMargin( Margins.FACET ) > width)
-        // width = mRect.getWidth() + settingsManager.getMargin( Margins.FACET );
-        height += mRect.getHeight();
-
-
-        // Handler for canvas layer
-        if (manager != null) {
-            canvas.setOnMouseDragged( manager::drag );
-            canvas.setOnDragDetected( manager::dragStart );
-            canvas.setOnMouseReleased( manager::dragEnd );
-            // Clicks go to the top most node...so let the pane catch them
-            // canvas.setOnMouseClicked( this::mouseClick );
-        }
-        // log.debug( "Refreshed " + member );
-        mRect = new Rectangle( x, y, width, height );
-        // mRect.draw( gc, false );
-
-        // Clip the canvas to just have the sprite
-        canvas.setClip( new javafx.scene.shape.Rectangle( mRect.getX(), mRect.getY() - 2, mRect.getWidth(),
-            mRect.getHeight() + 4 ) );
-        return mRect;
-    }
-
-    @Override
-    public boolean isCollapsed() {
-        return collapsed;
-    }
-
-    @Override
-    public void onRectangleClick(MouseEvent e) {
-        // log.debug( "Rectangle click at: " + e.getX() + " " + e.getY() );
-    }
-
-    // private void mouseClick(MouseEvent e) {
-    // log.debug( "Mouse click on " + member + " at: " + e.getX() + " " + e.getY() );
-    //
-    // // The whole canvas is active, check boundaries
-    // if (boundaries.contains( new Point2D( e.getX(), e.getY() ) )) {
-    // if (e.getButton() == MouseButton.SECONDARY)
-    // log.debug( "TODO - secondary button click." );
-    // else if (e.getClickCount() >= 2) {
-    // log.debug( "Throw event: " + member );
-    // manager.publishEvent( new DexMemberSelectionEvent( member ) );
-    // } else
-    // findAndRunRectangle( e );
-    // }
-    // }
-
-    @Override
-    public PropertyRectangle find(OtmProperty property) {
-        for (Rectangle r : rectangles)
-            if (r instanceof PropertyRectangle && ((PropertyRectangle) r).getProperty() == property)
-                return ((PropertyRectangle) r);
-        return null;
-    }
-
-    @Override
-    public Rectangle find(double x, double y) {
-        Rectangle selected = null;
-        for (Rectangle r : rectangles)
-            if (r.contains( x, y )) {
-                selected = r;
-                break;
-            }
-        return selected;
-    }
-
-    public void findAndRunRectangle(MouseEvent e) {
-        Rectangle selected = find( e.getX(), e.getY() );
-        if (selected != null)
-            selected.onMouseClicked( e );
-    }
-
-    @Override
-    public void set(ColumnRectangle column) {
-        this.column = column;
-    }
-
-    @Override
-    public void set(double x, double y) {
-        // Rectangles are not save at sprite level anymore
-        // rectangles.forEach( r -> r.moveConnectionPoint( this.x - x, this.y - y ) );
-        this.x = x;
-        this.y = y;
-    }
-
-    @Override
-    public void set(Point2D p) {
-        if (p != null) {
-            set( p.getX(), p.getY() );
-        }
-    }
-
-    @Override
-    public void setBackgroundColor(Color color) {
-        gc.setFill( color );
-    }
-
-    @Override
-    public void set(Font font) {
-        gc.setFont( font );
-    }
-
-    @Override
-    public void setCollapsed(boolean collapsed) {
-        // log.debug( "Collapsed = " + collapsed + " " + this );
-        this.collapsed = collapsed;
-        if (!collapsed)
-            getCanvas().toFront();
-
-        // resize this sprite
-        setBoundaries( 0, 0 );
-        // log.debug( " became = " + this );
-        manager.updateConnections( this );
-    }
-
-    /**
-     * Use defaults
-     */
-    public void setGCParams() {
-        if (gc != null) {
-            gc.setFont( new Font( "Arial", 18 ) );
-            gc.setFill( Color.gray( 0.85 ) );
-            gc.setStroke( Color.DARKSLATEBLUE );
-            gc.setLineWidth( 1 );
-        }
-    }
-
-    public void setGCParams(Font font, Paint fillColor, Paint strokeColor, double lineWidth) {
-        if (gc != null) {
-            gc.setFont( font );
-            gc.setFill( fillColor );
-            gc.setStroke( strokeColor );
-            gc.setLineWidth( lineWidth );
-        }
-    }
-
-    public void setGCParams(GraphicsContext sourceGC) {
-        if (sourceGC != null)
-            setGCParams( sourceGC.getFont(), sourceGC.getFill(), sourceGC.getStroke(), sourceGC.getLineWidth() );
-        else
-            setGCParams();
-    }
-
-    public void todo(GraphicsContext gc) {
-        MouseEvent event = null;
-        ArrayList<Circle> listOfCircles = new ArrayList<>();
-        for (Circle circle : listOfCircles) {
-            Point2D point2D = new Point2D( event.getX(), event.getY() );
-            if (circle.contains( point2D )) {
-                // log.debug( "circle clicked" );
-            }
-        }
-    }
-
-    @Override
-    public Rectangle getBoundaries() {
-        return boundaries;
-    }
-
-    @Override
-    public Canvas getCanvas() {
-        return canvas;
-    }
-
-    @Override
-    public Font getFont() {
-        if (gc.getFont() == null)
-            return settingsManager.getFont();
-        return gc.getFont();
-    }
-
-    @Override
-    public Font getItalicFont() {
-        return settingsManager.getItalicFont();
-    }
-
-    @Override
-    public ColumnRectangle getColumn() {
-        return column;
-    }
-
-    @Override
-    public DexSprite<?> connect() {
+    public DexSprite connect() {
         if (!(getMember().getBaseType() instanceof OtmLibraryMember))
             return null;
 
-        DexSprite<?> baseSprite = manager.get( (OtmLibraryMember) member.getBaseType() );
+        DexSprite baseSprite = manager.get( (OtmLibraryMember) member.getBaseType() );
         if (baseSprite == null) {
             baseSprite = manager.add( (OtmLibraryMember) member.getBaseType(), getColumn() );
         } else
@@ -517,6 +197,25 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
             baseSprite.refresh();
         }
         return baseSprite;
+    }
+
+    /**
+     * Find the property's rectangle and make type connection
+     * 
+     * @param property
+     * @param from
+     * @param to
+     * @return
+     */
+    private TypeConnection connect(OtmProperty property, DexSprite from, DexSprite to) {
+        TypeConnection c = null;
+        PropertyRectangle fRect;
+        fRect = from.get( property );
+        if (fRect != null) {
+            c = new TypeConnection( fRect, from, to );
+            manager.addAndDraw( c );
+        }
+        return c;
     }
 
     @Override
@@ -548,74 +247,354 @@ public abstract class MemberSprite<M extends OtmLibraryMember>
         return toSprite;
     }
 
-    // @Override
-    // public DexSprite<?> connect(OtmTypeUser user) {
-    // log.debug( "Connecting to " + user );
-    // if (user == null || user.getAssignedType() == null || !(user instanceof OtmProperty))
-    // return null;
-    // if (getColumn() == null)
-    // return null;
-    //
-    // OtmLibraryMember provider = user.getAssignedType().getOwningMember();
-    // if (provider == null || provider == user.getOwningMember())
-    // return null;
-    //
-    // DexSprite<?> toSprite = manager.get( provider );
-    // if (toSprite == null) {
-    // // Place the new sprite and connect it
-    // toSprite = manager.add( provider, getColumn().getNext(), collapsed );
-    // connect( (OtmProperty) user, this, toSprite );
-    // } else {
-    // toSprite.setCollapsed( !toSprite.isCollapsed() );
-    // }
-    // if (toSprite != null) {
-    // toSprite.getCanvas().toFront();
-    // toSprite.refresh();
-    // }
-    // return toSprite;
-    // }
+    @Override
+    public boolean contains(Point2D point) {
+        return boundaries.contains( point );
+    }
 
-    /**
-     * Get or Create provider sprite if non exists.
-     * 
-     * @param user
-     * @return
-     */
-    public MemberSprite<OtmLibraryMember> addConnection(OtmTypeUser user) {
-        // log.debug( "Adding connection to " + user );
-        if (getColumn() == null || user == null || user.getAssignedType() == null || !(user instanceof OtmProperty))
-            return null;
-
-        OtmLibraryMember provider = user.getAssignedType().getOwningMember();
-        if (provider == null || provider == user.getOwningMember())
-            return null;
-
-        MemberSprite<OtmLibraryMember> toSprite = manager.get( provider );
-        if (!(toSprite instanceof MemberSprite)) {
-            // Create new collapsed sprite and connect it
-            toSprite = manager.add( provider, getColumn().getNext(), true );
-            connect( (OtmProperty) user, this, toSprite );
-        }
-        return toSprite;
+    @Override
+    public Rectangle draw(GraphicsContext gc, double x, double y) {
+        set( x, y );
+        return drawMember( gc );
     }
 
     /**
-     * Find the property's rectangle and make type connection
+     * Draw the facets and properties for this member. Start at the passed x, y.
+     * <p>
+     * This must be implemented by sub-types to draw their object type specific contents.
      * 
-     * @param property
-     * @param from
-     * @param to
+     * @param gc if null, compute size. If not-null, draw within boundaries.
+     * @param x
+     * @param y
+     * @return rectangle around all contents
+     */
+    public abstract Rectangle drawContents(GraphicsContext gc, final double x, final double y);
+
+    /**
+     * Draw close and collapse active rectangles.
+     * 
+     * @param boundaries
+     * @param cgc
      * @return
      */
-    private TypeConnection connect(OtmProperty property, DexSprite<?> from, DexSprite<?> to) {
-        TypeConnection c = null;
-        PropertyRectangle fRect;
-        fRect = from.find( property );
-        if (fRect != null) {
-            c = new TypeConnection( fRect, from, to );
-            manager.addAndDraw( c );
+    public double drawControls(Rectangle boundaries, GraphicsContext cgc) {
+        Image close = ImageManager.getImage( ImageManager.Icons.CLOSE );
+        Image collapse = ImageManager.getImage( ImageManager.Icons.COLLAPSE );
+
+        // Start at right edge and work backwards
+        double margin = settingsManager.getMargin( Margins.MEMBER );
+        double cy = boundaries.getY() + margin;
+
+        double cx = boundaries.getMaxX() - margin - close.getWidth();
+        Rectangle r = GraphicsUtils.drawImage( close, DrawType.OUTLINE, cgc, cx, cy );
+        rectangles.add( r );
+        r.setOnMouseClicked( e -> manager.remove( this ) );
+        double width = r.getWidth() + margin;
+
+        cx = r.getX() - collapse.getWidth();
+        r = GraphicsUtils.drawImage( collapse, DrawType.OUTLINE, cgc, cx, cy );
+        rectangles.add( r );
+        r.setOnMouseClicked( e -> collapseOrExpand() );
+        width += r.getWidth() + margin;
+
+        return width;
+    }
+
+    /**
+     * Draw background, label and controls.
+     * 
+     * @param gc
+     * @return
+     */
+    private Rectangle drawMember(GraphicsContext gc) {
+        if (member == null)
+            return new Rectangle( 0, 0, 0, 0 );
+        if (boundaries == null)
+            // Use minimum boundaries
+            boundaries = new Rectangle( x, y, MIN_WIDTH, MIN_HEIGHT );
+
+        // Draw background box
+        if (gc != null) {
+            Rectangle bRect = new Rectangle( boundaries.getX(), boundaries.getY(),
+                boundaries.getWidth() + settingsManager.getMargin( Margins.FACET ),
+                boundaries.getHeight() + settingsManager.getMargin( Margins.FACET ) );
+            bRect.draw( gc, false ); // Outline
+            bRect.draw( gc, true ); // Fill
         }
-        return c;
+
+        // TODO - DRAW property for users if any
+        // int users = member.getWhereUsed().size();
+        double px = boundaries.getX();
+        // if (gc != null && !collapsed && users > 0) {
+        // // TODO
+        // // create rectangle to contain the connector
+        // // add to rectangles
+        // // create mouse handler (thows event?)
+        // GraphicsUtils.drawConnector( gc, gc.getFill(), settingsManager.getConnectorSize(), px, y );
+        // // LabelRectangle usersR =
+        // // new LabelRectangle( this, users + " Users", null, member.isEditable(), false, false );
+        // // usersR.draw( gc, boundaries.getX(), y + height );
+        // // height += usersR.getHeight();
+        // px += settingsManager.getConnectorSize();
+        // }
+
+        // Draw the name of the object
+        Rectangle mRect =
+            new LabelRectangle( this, member.getName(), member.getIcon(), member.isEditable(), false, false ).draw( gc,
+                px, y );
+        // GraphicsUtils.drawLabel( member.getName(), member.getIcon(), member.isEditable(), false, gc, font, x, y );
+        double width = mRect.getWidth();
+        double height = mRect.getHeight();
+
+        // Add the controls
+        double cWidth = drawControls( boundaries, gc ) + settingsManager.getMargin( Margins.MEMBER );
+        width += cWidth;
+
+        // prefix
+        px = boundaries.getMaxX() - cWidth;
+        LabelRectangle pRect = new LabelRectangle( this, member.getPrefix(), null, member.isEditable(), false, false );
+        px -= pRect.getWidth() + settingsManager.getMargin( Margins.LABEL );
+        pRect.draw( gc, px, y );
+        width += pRect.getWidth();
+
+        // Draw property for base type if any
+        if (!collapsed && member.getBaseType() != null) {
+            mRect = new BaseTypeRectangle( this, member, width );
+            mRect.set( boundaries.getMaxX() - mRect.getWidth(), y + height ).draw( gc, true );
+            width = computeWidth( width, mRect, 0 );
+            height += mRect.getHeight();
+        }
+
+        // Show content (facets, properties, etc)
+        mRect = drawContents( gc, boundaries.getX(), y + height );
+        if (mRect != null) {
+            width = computeWidth( width, mRect, settingsManager.getMargin( Margins.FACET ) );
+            height += mRect.getHeight();
+        }
+
+        // Handler for canvas layer
+        if (manager != null) {
+            canvas.setOnMouseDragged( manager::drag );
+            canvas.setOnDragDetected( manager::dragStart );
+            canvas.setOnMouseReleased( manager::dragEnd );
+            // Clicks go to the top most node...so let the pane catch them
+            // canvas.setOnMouseClicked( this::mouseClick );
+        }
+        // log.debug( "Refreshed " + member );
+        boundaries = new Rectangle( x, y, width, height );
+        // boundaries.draw( gc, false );
+
+        // Clip the canvas to just have the sprite
+        double clipX = boundaries.getX() - 4;
+        double clipY = boundaries.getY() - 4;
+        double clipW = boundaries.getWidth() + 8 + settingsManager.getMargin( Margins.FACET );
+        double clipH = boundaries.getHeight() + 8 + settingsManager.getMargin( Margins.FACET );
+        canvas.setClip( new javafx.scene.shape.Rectangle( clipX, clipY, clipW, clipH ) );
+
+        return boundaries;
+    }
+
+    @Override
+    public Rectangle find(double x, double y) {
+        Rectangle selected = null;
+        for (Rectangle r : rectangles)
+            if (r.contains( x, y )) {
+                selected = r;
+                break;
+            }
+        return selected;
+    }
+
+    @Override
+    public PropertyRectangle get(OtmProperty property) {
+        for (Rectangle r : rectangles)
+            if (r instanceof PropertyRectangle && ((PropertyRectangle) r).getProperty() == property)
+                return ((PropertyRectangle) r);
+        return null;
+    }
+
+    public void findAndRunRectangle(MouseEvent e) {
+        Rectangle selected = find( e.getX(), e.getY() );
+        if (selected != null)
+            selected.onMouseClicked( e );
+    }
+
+    @Override
+    public Rectangle getBoundaries() {
+        return boundaries;
+    }
+
+    @Override
+    public Canvas getCanvas() {
+        return canvas;
+    }
+
+    @Override
+    public ColumnRectangle getColumn() {
+        return column;
+    }
+
+    public List<FacetRectangle> getFacetRectangles() {
+        List<FacetRectangle> list = new ArrayList<>();
+        rectangles.forEach( r -> {
+            if (r instanceof FacetRectangle)
+                list.add( (FacetRectangle) r );
+        } );
+        return list;
+    }
+
+    @Override
+    public Font getFont() {
+        if (gc.getFont() == null)
+            return settingsManager.getFont();
+        return gc.getFont();
+    }
+
+    @Override
+    public double getHeight() {
+        return boundaries != null ? boundaries.getHeight() : 0;
+    }
+
+    @Override
+    public Font getItalicFont() {
+        return settingsManager.getItalicFont();
+    }
+
+    public M getMember() {
+        return member;
+    }
+
+    @Override
+    public List<Rectangle> getRectangles() {
+        return rectangles;
+    }
+
+    @Override
+    public SettingsManager getSettingsManager() {
+        return settingsManager;
+    }
+
+    @Override
+    public double getWidth() {
+        return boundaries != null ? boundaries.getWidth() : 0;
+    }
+
+    @Override
+    public double getX() {
+        return boundaries != null ? boundaries.getX() : 0;
+    }
+
+    @Override
+    public double getY() {
+        return boundaries != null ? boundaries.getY() : 0;
+    }
+
+    @Override
+    public boolean isCollapsed() {
+        return collapsed;
+    }
+
+
+    // public void todo(GraphicsContext gc) {
+    // MouseEvent event = null;
+    // ArrayList<Circle> listOfCircles = new ArrayList<>();
+    // for (Circle circle : listOfCircles) {
+    // Point2D point2D = new Point2D( event.getX(), event.getY() );
+    // if (circle.contains( point2D )) {
+    // // log.debug( "circle clicked" );
+    // }
+    // }
+    // }
+
+    @Override
+    public void onRectangleClick(MouseEvent e) {
+        // log.debug( "Rectangle click at: " + e.getX() + " " + e.getY() );
+    }
+
+    @Override
+    public void refresh() {
+        clear();
+        render();
+    }
+
+    @Override
+    public Canvas render() {
+        // log.debug( "Rendering at " + x + " " + y + " sprite for: " + member );
+        if (member == null || manager == null)
+            return null;
+
+        if (boundaries == null)
+            draw( null, x, y );
+
+        // Size Canvas
+        Rectangle canvasR = new Rectangle( x, y, boundaries.getWidth() + settingsManager.getMargin( Margins.CANVAS ),
+            boundaries.getHeight() + settingsManager.getMargin( Margins.CANVAS ) );
+        canvas.setHeight( y + canvasR.getHeight() );
+        canvas.setWidth( x + canvasR.getWidth() );
+        // log.debug( "Sized canvas: " + canvasR );
+
+        drawMember( gc );
+        manager.updateConnections( this );
+        // log.debug( "Rendered " + member + " at " + getBoundaries() );
+        return canvas;
+    }
+
+    @Override
+    public Canvas render(ColumnRectangle column) {
+        this.column = column;
+        Point2D p = column.getNextInColumn();
+        this.x = p.getX();
+        this.y = p.getY();
+        boundaries = null;
+        return render();
+    }
+
+    @Override
+    public void set(double x, double y) {
+        // Not all rectangles are saved at sprite level
+        // rectangles.forEach( r -> r.moveConnectionPoint( this.x - x, this.y - y ) );
+        this.x = x;
+        this.y = y;
+    }
+
+    @Override
+    public void set(Font font) {
+        gc.setFont( font );
+    }
+
+    @Override
+    public void setBackgroundColor(Color color) {
+        gc.setFill( color );
+    }
+
+
+    /**
+     * If width or height are 0 then compute new values
+     * 
+     * @param width if 0, compute
+     * @param height if 0, compute
+     */
+    private void setBoundaries(double width, double height) {
+        // Use minimum boundaries
+        boundaries = new Rectangle( x, y, MIN_WIDTH, MIN_HEIGHT );
+        // Get size of sprite using minimum boundaries
+        Rectangle ms = drawMember( null );
+        // Set the true boundaries
+        boundaries = new Rectangle( x, y, width == 0 ? ms.getWidth() : width, height == 0 ? ms.getHeight() : height );
+        // boundaries.draw( gc, false );
+    }
+
+    @Override
+    public void setCollapsed(boolean collapsed) {
+        // log.debug( "Collapsed = " + collapsed + " " + this );
+        this.collapsed = collapsed;
+        if (!collapsed)
+            getCanvas().toFront();
+
+        // resize this sprite
+        setBoundaries( 0, 0 );
+        // log.debug( " became = " + this );
+        manager.updateConnections( this );
     }
 
     public String toString() {

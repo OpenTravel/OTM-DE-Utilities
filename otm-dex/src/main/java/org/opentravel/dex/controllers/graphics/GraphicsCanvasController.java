@@ -310,8 +310,8 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         return isLocked;
     }
 
-    private DexSprite<OtmLibraryMember> postBase(DexSprite<OtmLibraryMember> memberSprite) {
-        DexSprite<OtmLibraryMember> baseSprite = null;
+    private DexSprite postBase(DexSprite memberSprite) {
+        DexSprite baseSprite = null;
         if (memberSprite != null) {
             OtmLibraryMember member = memberSprite.getMember();
             if (member.getBaseType() instanceof OtmLibraryMember && !(member instanceof OtmContextualFacet)) {

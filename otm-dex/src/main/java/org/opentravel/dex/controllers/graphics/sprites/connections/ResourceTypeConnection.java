@@ -26,7 +26,7 @@ import javafx.scene.paint.Paint;
 
 public class ResourceTypeConnection extends Connection {
 
-    public ResourceTypeConnection(ResourceSprite resourceSprite, DexSprite<?> subjectSprite) {
+    public ResourceTypeConnection(ResourceSprite resourceSprite, DexSprite subjectSprite) {
         if (resourceSprite == null || subjectSprite == null || resourceSprite.getBoundaries() == null
             || subjectSprite.getBoundaries() == null)
             throw new IllegalArgumentException( "Missing boundaries in connection constructor." );
@@ -63,7 +63,7 @@ public class ResourceTypeConnection extends Connection {
      * @param backgroundColor
      * @return
      */
-    public boolean update(DexSprite<?> sprite, GraphicsContext gc, Paint backgroundColor) {
+    public boolean update(DexSprite sprite, GraphicsContext gc, Paint backgroundColor) {
         if (contains( sprite )) {
 
             // Erase old line, saving gc settings
@@ -79,6 +79,7 @@ public class ResourceTypeConnection extends Connection {
             }
 
             draw( gc );
+            return true;
         }
         return false;
     }

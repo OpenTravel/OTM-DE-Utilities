@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.text.Font;
 
 /**
  * Graphics Display Object (Sprite) for containing OTM business object.
@@ -40,7 +39,7 @@ import javafx.scene.text.Font;
  * @param <O>
  *
  */
-public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> implements DexSprite<OtmLibraryMember> {
+public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> implements DexSprite {
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
     double dxID;
@@ -51,8 +50,8 @@ public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> impleme
     double dxUpdate;
     double margin;
 
-    public BusinessObjectSprite(OtmBusinessObject member, SpriteManager manager, SettingsManager settingsManager) {
-        super( member, manager, settingsManager );
+    public BusinessObjectSprite(OtmBusinessObject member, SpriteManager manager) {
+        super( member, manager );
 
         dxID = settingsManager.getOffset( Offsets.ID );
         dxSummary = settingsManager.getOffset( Offsets.SUMMARY );
@@ -69,8 +68,13 @@ public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> impleme
     }
 
 
+    // @Override
+    // public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
+    // return drawContents( gc, x, y );
+    // }
+
     @Override
-    public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
+    public Rectangle drawContents(GraphicsContext gc, final double x, final double y) {
         double width = getBoundaries().getWidth();
         Rectangle mRect = new Rectangle( 0, 0, 0, 0 );
 
@@ -78,70 +82,84 @@ public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> impleme
 
         // Show facets
         if (!isCollapsed())
-            mRect = drawFacets( getMember(), gc, font, x, y, width );
+            mRect = drawFacets( getMember(), gc, x, y, width );
 
         // log.debug( "Drew " + getMember() + " contents into " + getBoundaries() );
         return mRect;
     }
 
-    public Rectangle drawFacets(OtmLibraryMember member, GraphicsContext gc, Font font, final double x, final double y,
+
+    public Rectangle drawFacets(OtmLibraryMember member, GraphicsContext gc, final double x, final double y,
         double width) {
 
-        boolean compute = gc == null;
+        // boolean compute = gc == null;
         FacetRectangle rect = null;
-        // double dxID = FacetRectangle.ID_OFFSET;
-        // double dxSummary = FacetRectangle.SUMMARY_OFFSET;
-        // double dxDetail = FacetRectangle.DETAIL_OFFSET;
 
         double fy = y + margin;
-
+        double fw = getBoundaries().getWidth() - margin;
+        double offset = 0;
+        // Mouse clicks use rectangle regions to determine source. If these large rectangles are added to list, they
+        // will receive the mouse clicks. Consider "active rectangle" interface as solution.
         if (!isCollapsed()) {
-
+            // if (!getFacetRectangles().isEmpty()) {
+            // for (FacetRectangle fr : getFacetRectangles()) {
+            // offset = fr.getX() - getBoundaries().getX();
+            // fr.set( fr.getX(), fr.getY(), fw - offset ).draw( gc, true );
+            // fy += fr.getHeight() + margin;
+            // }
+            // } else {
             rect = new FacetRectangle( getMember().getIdFacet(), this, width - dxID );
             rect.set( x + dxID, fy ).draw( gc, true );
             fy += rect.getHeight() + margin;
-            width = computeWidth( compute, width, rect, dxID );
+            width = computeWidth( width, rect, dxID );
+            // add( rect );
 
             rect = new FacetRectangle( getMember().getSummary(), this, width - dxSummary );
             rect.set( x + dxSummary, fy ).draw( gc, true );
             fy += rect.getHeight() + margin;
-            width = computeWidth( compute, width, rect, dxSummary );
+            width = computeWidth( width, rect, dxSummary );
+            // add( rect );
 
             if (!getMember().getDetail().getChildren().isEmpty()) {
                 rect = new FacetRectangle( getMember().getDetail(), this, width - dxDetail );
                 rect.set( x + dxDetail, fy ).draw( gc, true );
                 fy += rect.getHeight() + margin;
-                width = computeWidth( compute, width, rect, dxDetail );
+                width = computeWidth( width, rect, dxDetail );
+                // add( rect );
             }
-        }
-        List<OtmCustomFacet> customs = new ArrayList<>();
-        List<OtmQueryFacet> queries = new ArrayList<>();
-        List<OtmUpdateFacet> updates = new ArrayList<>();
-        for (OtmContributedFacet cf : member.getChildrenContributedFacets())
-            if (cf.getContributor() instanceof OtmCustomFacet)
-                customs.add( (OtmCustomFacet) cf.getContributor() );
-            else if (cf.getContributor() instanceof OtmQueryFacet)
-                queries.add( (OtmQueryFacet) cf.getContributor() );
-            else if (cf.getContributor() instanceof OtmUpdateFacet)
-                updates.add( (OtmUpdateFacet) cf.getContributor() );
+            List<OtmCustomFacet> customs = new ArrayList<>();
+            List<OtmQueryFacet> queries = new ArrayList<>();
+            List<OtmUpdateFacet> updates = new ArrayList<>();
+            for (OtmContributedFacet cf : member.getChildrenContributedFacets())
+                if (cf.getContributor() instanceof OtmCustomFacet)
+                    customs.add( (OtmCustomFacet) cf.getContributor() );
+                else if (cf.getContributor() instanceof OtmQueryFacet)
+                    queries.add( (OtmQueryFacet) cf.getContributor() );
+                else if (cf.getContributor() instanceof OtmUpdateFacet)
+                    updates.add( (OtmUpdateFacet) cf.getContributor() );
 
-        for (OtmCustomFacet f : customs) {
-            rect = new FacetRectangle( f, this, width - dxCustom );
-            rect.set( x + dxCustom, fy ).draw( gc, true );
-            fy += rect.getHeight() + margin;
-            width = computeWidth( compute, width, rect, dxSummary );
-        }
-        for (OtmQueryFacet f : queries) {
-            rect = new FacetRectangle( f, this, width - dxQuery );
-            rect.set( x + dxQuery, fy ).draw( gc, true );
-            fy += rect.getHeight() + margin;
-            width = computeWidth( compute, width, rect, dxID );
-        }
-        for (OtmUpdateFacet f : updates) {
-            rect = new FacetRectangle( f, this, width - dxUpdate );
-            rect.set( x + dxUpdate, fy ).draw( gc, true );
-            fy += rect.getHeight() + margin;
-            width = computeWidth( compute, width, rect, dxID );
+            for (OtmCustomFacet f : customs) {
+                rect = new FacetRectangle( f, this, width - dxCustom );
+                rect.set( x + dxCustom, fy ).draw( gc, true );
+                fy += rect.getHeight() + margin;
+                width = computeWidth( width, rect, dxSummary );
+                // add( rect );
+            }
+            for (OtmQueryFacet f : queries) {
+                rect = new FacetRectangle( f, this, width - dxQuery );
+                rect.set( x + dxQuery, fy ).draw( gc, true );
+                fy += rect.getHeight() + margin;
+                width = computeWidth( width, rect, dxID );
+                // add( rect );
+            }
+            for (OtmUpdateFacet f : updates) {
+                rect = new FacetRectangle( f, this, width - dxUpdate );
+                rect.set( x + dxUpdate, fy ).draw( gc, true );
+                fy += rect.getHeight() + margin;
+                width = computeWidth( width, rect, dxID );
+                // add( rect );
+            }
+            // }
         }
 
         // Return the enclosing rectangle

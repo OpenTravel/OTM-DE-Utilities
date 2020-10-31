@@ -18,17 +18,19 @@ package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
+import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils.DrawType;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.resource.OtmAction;
@@ -40,7 +42,6 @@ import java.util.List;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
@@ -71,19 +72,19 @@ public class FacetRectangle extends Rectangle {
     private static final Paint FACET_COLOR = Color.ANTIQUEWHITE;
 
 
-    /**
-     * Render methods that create rectangles may set the event to run if the implement this interface.
-     * <p>
-     * Example: r.setOnMouseClicked( e -> manager.remove( this ) );
-     */
-    public abstract interface RectangleEventHandler {
-        public void onRectangleClick(MouseEvent e);
-    }
-
+    // /**
+    // * Render methods that create rectangles may set the event to run if the implement this interface.
+    // * <p>
+    // * Example: r.setOnMouseClicked( e -> manager.remove( this ) );
+    // */
+    // public abstract interface RectangleEventHandler {
+    // public void onRectangleClick(MouseEvent e);
+    // }
+    //
 
     private OtmFacet<?> facet = null;
-    // private OtmObject otmObject = null;
-    private DexSprite<OtmLibraryMember> parent;
+    private OtmObject otmObject = null;
+    private DexSprite parent;
     private Font font;
     private String label;
     private Image icon;
@@ -93,8 +94,9 @@ public class FacetRectangle extends Rectangle {
 
     double pMargin;
     double pOffset;
+    private boolean collapsed = false;
 
-    public FacetRectangle(OtmObject obj, DexSprite<OtmLibraryMember> parent, double width, String label, Image icon) {
+    public FacetRectangle(OtmObject obj, DexSprite parent, double width, String label, Image icon) {
         super( 0, 0, width, 0 );
         this.parent = parent;
         this.font = parent.getFont();
@@ -104,47 +106,51 @@ public class FacetRectangle extends Rectangle {
         if (obj instanceof OtmChildrenOwner)
             this.children = getChildren( (OtmChildrenOwner) obj );
         settings = parent.getSettingsManager();
+        this.otmObject = obj;
+        collapsed = !obj.isExpanded();
 
         if (settings == null)
             throw new IllegalArgumentException( "Must have settings" );
 
         pMargin = settings.getMargin( Margins.PROPERTY );
         pOffset = settings.getOffset( Offsets.PROPERTY );
+
+        // log.debug( "Created facet rectangle: " + label );
     }
 
-    public FacetRectangle(OtmFacet<?> facet, DexSprite<OtmLibraryMember> parentSprite, double width) {
+    public FacetRectangle(OtmFacet<?> facet, DexSprite parentSprite, double width) {
         this( facet, parentSprite, width, facet.getName(), facet.getIcon() );
         this.facet = facet;
         // Compute the size
-        draw( null, font );
+        draw( null );
     }
 
-    public FacetRectangle(OtmContextualFacet member, DexSprite<OtmLibraryMember> parentSprite, double width) {
-        this( member, parentSprite, width, member.getName(), member.getIcon() );
+    public FacetRectangle(OtmContextualFacet member, DexSprite parentSprite, double width) {
+        this( member.getWhereContributed(), parentSprite, width, member.getName(), member.getIcon() );
+        this.facet = member.getWhereContributed();
+
         // Compute the size
-        draw( null, font );
+        draw( null );
     }
 
-    public FacetRectangle(OtmEnumeration<?> member, DexSprite<OtmLibraryMember> parentSprite, double width) {
+    public FacetRectangle(OtmEnumeration<?> member, DexSprite parentSprite, double width) {
         this( member, parentSprite, width, null, null );
         // this.otmObject = member;
         // Compute the size
-        draw( null, font );
+        draw( null );
     }
 
-    public FacetRectangle(OtmValueWithAttributes member, DexSprite<OtmLibraryMember> parentSprite, double width) {
+    public FacetRectangle(OtmValueWithAttributes member, DexSprite parentSprite, double width) {
         this( member, parentSprite, width, null, null );
         // this.otmObject = member;
         // Compute the size
-        draw( null, font );
+        draw( null );
     }
 
-    public FacetRectangle(OtmAction action, DexSprite<OtmLibraryMember> parentSprite, double width) {
+    public FacetRectangle(OtmAction action, DexSprite parentSprite, double width) {
         this( action, parentSprite, width, action.getName(), action.getIcon() );
-
         this.children = action.getChildren();
-
-        draw( null, font );
+        draw( null );
     }
 
     private List<OtmObject> getChildren(OtmChildrenOwner owner) {
@@ -170,48 +176,59 @@ public class FacetRectangle extends Rectangle {
             if (filled)
                 super.draw( gc, true ); // Draw fill
 
-            draw( gc, font );
+            draw( gc );
 
             gc.setFill( savedColor );
         }
         return this;
     }
 
-
-    private Rectangle draw(GraphicsContext gc, Font font) {
+    @Override
+    public Rectangle draw(GraphicsContext gc) {
         boolean compute = gc == null;
         height = 0;
+        double margin = settings.getMargin( Margins.MEMBER );
+        Rectangle r = null;
+
+        if (otmObject instanceof OtmFacet) {
+            Image collapse = null;
+            if (otmObject.isExpanded())
+                collapse = ImageManager.getImage( ImageManager.Icons.COLLAPSE );
+            else
+                collapse = ImageManager.getImage( ImageManager.Icons.EXPAND );
+            double cx = x;
+            double cy = y + margin;
+            r = GraphicsUtils.drawImage( collapse, DrawType.OUTLINE, gc, cx, cy );
+            if (gc != null && facet != null) {
+                parent.add( r );
+                r.setOnMouseClicked( e -> parent.collapseOrExpand( facet ) );
+            }
+            // width += r.getWidth() + margin;
+        }
 
         // Label
+        double lx = r == null ? x : x + r.getWidth();
         if (label != null) {
-            Rectangle lRect = new LabelRectangle( parent, label, icon, editable, false, false ).draw( gc, x, y );
-            // Rectangle lRect = GraphicsUtils.drawLabel( label, icon, editable, false, gc, font, x, y );
+            Rectangle lRect = new LabelRectangle( parent, label, icon, editable, false, false ).draw( gc, lx, y );
             height = lRect.getHeight();
             width = compute && lRect.getWidth() > width ? lRect.getWidth() : width;
             // lRect.draw( gc, false );
         }
-
-        // TODO - implement collapse
-        // Image collapse = ImageManager.getImage( ImageManager.Icons.COLLAPSE );
-        //
-        // // Start at right edge and work backwards
-        // double margin = settingsManager.getMargin( Margins.MEMBER );
-        // double cx = boundaries.getMaxX() - margin - collapse.getWidth();
-        // double cy = boundaries.getY() + margin;
-        //
-        // Rectangle r = GraphicsUtils.drawImage( collapse, DrawType.OUTLINE, cgc, cx, cy );
-        // cx = r.getX() - collapse.getWidth();
-        // r = GraphicsUtils.drawImage( collapse, DrawType.OUTLINE, cgc, cx, cy );
-        //// rectangles.add( r );
-        // r.setOnMouseClicked( e -> collapseOrExpand() );
-        // width += r.getWidth() + margin;
+        // prefix
+        if (otmObject instanceof OtmContributedFacet) {
+            LabelRectangle pRect =
+                new LabelRectangle( parent, otmObject.getPrefix(), null, otmObject.isEditable(), false, false );
+            pRect.draw( gc, x + width - pRect.getWidth(), y );
+            // width += pRect.getWidth();
+        }
 
 
         // Properties
+        collapsed = otmObject instanceof OtmFacet ? !otmObject.isExpanded() : false;
         PropertyRectangle pRect = null;
         double py = y + height;
         double px = x + pOffset;
-        if (!children.isEmpty()) {
+        if (!children.isEmpty() && !collapsed) {
             for (OtmObject c : children) {
                 pRect = null;
                 if (c instanceof OtmProperty)
@@ -234,7 +251,7 @@ public class FacetRectangle extends Rectangle {
                 gc.strokeLine( px, y + pRect.getHeight(), px, ly );
             }
         }
-        // log.debug( "Drew/sized " + this );
+        // log.debug( "Drew/sized - compute = " + compute + " " + this );
         // super.draw( gc, false ); // debug
         return this;
     }

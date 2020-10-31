@@ -53,7 +53,7 @@ public class BaseTypeRectangle extends PropertyRectangle {
      * @param member whose base type will be displayed as a property
      * @param width
      */
-    public BaseTypeRectangle(DexSprite<OtmLibraryMember> parentSprite, OtmLibraryMember member, double width) {
+    public BaseTypeRectangle(DexSprite parentSprite, OtmLibraryMember member, double width) {
         super( parentSprite, width, "Extends", null, member.isEditable(), false );
 
         if (member.getBaseType() instanceof OtmTypeProvider) {

@@ -23,10 +23,8 @@ import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmEnumerationOpen;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.text.Font;
 
 /**
  * Graphics Display Object (Sprite) for containing OTM Emumeration object.
@@ -35,15 +33,15 @@ import javafx.scene.text.Font;
  * @param <O>
  *
  */
-public class EnumerationSprite extends MemberSprite<OtmEnumeration<?>> implements DexSprite<OtmLibraryMember> {
+public class EnumerationSprite extends MemberSprite<OtmEnumeration<?>> implements DexSprite {
 
-    public EnumerationSprite(OtmEnumeration<?> member, SpriteManager manager, SettingsManager settingsManager) {
-        super( member, manager, settingsManager );
+    public EnumerationSprite(OtmEnumeration<?> member, SpriteManager manager) {
+        super( member, manager );
     }
 
 
     @Override
-    public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
+    public Rectangle drawContents(GraphicsContext gc, final double x, final double y) {
         boolean compute = gc == null;
         Rectangle rect = null;
 
@@ -66,7 +64,7 @@ public class EnumerationSprite extends MemberSprite<OtmEnumeration<?>> implement
             rect = new FacetRectangle( getMember(), this, width - dx );
             rect.set( x + dx, fy ).draw( gc, true );
             fy += rect.getHeight() + margin;
-            width = computeWidth( compute, width, rect, dx );
+            width = computeWidth( width, rect, dx );
         }
         // Return the enclosing rectangle
         // Rectangle sRect = new Rectangle( x, y, width + margin, fy - y );

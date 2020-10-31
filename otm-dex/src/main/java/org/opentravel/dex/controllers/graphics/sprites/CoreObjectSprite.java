@@ -22,10 +22,8 @@ import org.opentravel.dex.controllers.graphics.sprites.retangles.CorePropertyRec
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.text.Font;
 
 /**
  * Graphics Display Object (Sprite) for containing OTM choice object.
@@ -34,7 +32,7 @@ import javafx.scene.text.Font;
  * @param <O>
  *
  */
-public class CoreObjectSprite extends MemberSprite<OtmCore> implements DexSprite<OtmLibraryMember> {
+public class CoreObjectSprite extends MemberSprite<OtmCore> implements DexSprite {
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
     double dxID;
@@ -43,8 +41,8 @@ public class CoreObjectSprite extends MemberSprite<OtmCore> implements DexSprite
     double margin;
 
 
-    public CoreObjectSprite(OtmCore member, SpriteManager manager, SettingsManager settingsManager) {
-        super( member, manager, settingsManager );
+    public CoreObjectSprite(OtmCore member, SpriteManager manager) {
+        super( member, manager );
 
         dxID = settingsManager.getOffset( Offsets.ID );
         dxSummary = settingsManager.getOffset( Offsets.SUMMARY );
@@ -54,7 +52,7 @@ public class CoreObjectSprite extends MemberSprite<OtmCore> implements DexSprite
 
 
     @Override
-    public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
+    public Rectangle drawContents(GraphicsContext gc, final double x, final double y) {
         boolean compute = gc == null;
         Rectangle rect = null;
 

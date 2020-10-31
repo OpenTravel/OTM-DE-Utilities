@@ -137,6 +137,7 @@ public class Rectangle {
     public final void onMouseClicked(MouseEvent e) {
         if (e != null && eventHandler != null)
             eventHandler.onRectangleClick( e );
+        log.debug( "Mouse clicked. " + e.toString() );
     }
 
     public Rectangle set(double x, double y) {
@@ -145,9 +146,10 @@ public class Rectangle {
         return this;
     }
 
-    public void set(double x, double y, double width) {
+    public Rectangle set(double x, double y, double width) {
         set( x, y );
         this.width = width;
+        return this;
     }
 
     public final void setOnMouseClicked(RectangleEventHandler a) {

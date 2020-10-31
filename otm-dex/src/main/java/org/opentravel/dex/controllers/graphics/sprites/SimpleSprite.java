@@ -19,11 +19,9 @@ package org.opentravel.dex.controllers.graphics.sprites;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.text.Font;
 
 /**
  * Graphics Display Object (Sprite) for containing OTM Emumeration object.
@@ -32,19 +30,19 @@ import javafx.scene.text.Font;
  * @param <O>
  *
  */
-public class SimpleSprite extends MemberSprite<OtmSimpleObjects<?>> implements DexSprite<OtmLibraryMember> {
+public class SimpleSprite extends MemberSprite<OtmSimpleObjects<?>> implements DexSprite {
 
     double dx;
     double margin;
 
-    public SimpleSprite(OtmSimpleObjects<?> member, SpriteManager manager, SettingsManager settingsManager) {
-        super( member, manager, settingsManager );
+    public SimpleSprite(OtmSimpleObjects<?> member, SpriteManager manager) {
+        super( member, manager );
         dx = settingsManager.getOffset( Offsets.ID );
         margin = settingsManager.getMargin( Margins.FACET );
     }
 
     @Override
-    public Rectangle drawContents(GraphicsContext gc, Font font, final double x, final double y) {
+    public Rectangle drawContents(GraphicsContext gc, final double x, final double y) {
         // boolean compute = gc == null;
         Rectangle rect = null;
 
