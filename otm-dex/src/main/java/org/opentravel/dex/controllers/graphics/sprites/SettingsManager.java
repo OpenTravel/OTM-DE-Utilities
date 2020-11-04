@@ -17,6 +17,7 @@
 package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
@@ -224,5 +225,26 @@ public class SettingsManager {
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param domainSprite
+     */
+    public Paint getColor(DomainSprite domainSprite) {
+        return (Color.BLANCHEDALMOND);
+    }
+
+    /**
+     * @param a facet rectangle
+     */
+    public Paint getColor(FacetRectangle rect) {
+        return (Color.ANTIQUEWHITE);
+    }
+
+    /**
+     * @param member sprite
+     */
+    public Paint getColor(MemberSprite<?> sprite) {
+        return (currentGC.getFill());
     }
 }

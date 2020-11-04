@@ -48,31 +48,26 @@ public class VWASprite extends MemberSprite<OtmValueWithAttributes> implements D
 
     @Override
     public Rectangle drawContents(GraphicsContext gc, final double x, final double y) {
-        boolean compute = gc == null;
         Rectangle rect = null;
 
-        double width = getBoundaries().getWidth();
-        double fy = y + margin;
+        double width = 0;
+        double fy = y;
 
-        // Show value type
-        rect = new VWAPropertyRectangle( getMember(), this, width );
-        rect.set( x + dxSummary, fy ).draw( gc, true );
-        fy += rect.getHeight() + margin;
-        width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
-
-        // Show facets
         if (!isCollapsed()) {
-            rect = new FacetRectangle( getMember(), this, width - dxSummary );
-            rect.set( x + dxSummary, fy ).draw( gc, true );
-            fy += rect.getHeight() + margin;
-            width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
+            width = getBoundaries().getWidth();
 
+            // Show value type
+            rect = new VWAPropertyRectangle( getMember(), this, width );
+            width = draw( rect, gc, width, x, dxSummary, y );
+            fy += rect.getHeight() + margin;
+
+            // Show facets
+            rect = new FacetRectangle( getMember(), this, width - dxSummary );
+            width = draw( rect, gc, width, x, dxSummary, fy );
+            fy += rect.getHeight() + margin;
         }
+
         // Return the enclosing rectangle
-        // Rectangle sRect = new Rectangle( x, y, width + margin, fy - y );
-        // log.debug( "Drew choice contents into " + sRect );
-        // fRect.draw( gc, false );
-        // return sRect;
         return new Rectangle( x, y, width + margin, fy - y );
     }
 

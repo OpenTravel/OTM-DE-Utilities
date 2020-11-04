@@ -39,6 +39,7 @@ import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
 import org.opentravel.model.otmLibraryMembers.TestChoice;
 import org.opentravel.model.otmLibraryMembers.TestXsdSimple;
 import org.opentravel.schemacompiler.model.TLAttribute;
+import org.opentravel.schemacompiler.model.TLAttributeOwner;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLIndicator;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -276,6 +277,22 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
             element = new OtmElement<>( tlp, owner );
         }
         return element;
+    }
+
+    /**
+     * Build a new attribute in the passed owner
+     * 
+     * @param owner must be facade for TLAttributeOwner
+     * @return element or null
+     */
+    public static OtmAttribute<TLAttribute> buildAttribute(OtmPropertyOwner owner) {
+        OtmAttribute<TLAttribute> attr = null;
+        if (owner.getTL() instanceof TLAttributeOwner) {
+            TLAttribute tlp = new TLAttribute();
+            ((TLAttributeOwner) owner.getTL()).addAttribute( tlp );
+            attr = new OtmAttribute<>( tlp, owner );
+        }
+        return attr;
     }
 
     /**

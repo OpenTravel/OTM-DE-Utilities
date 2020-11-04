@@ -98,6 +98,8 @@ public interface OtmChildrenOwner extends OtmObject {
     /**
      * Get a live list containing all descendants that are type users or empty list. Does not include the childrenOwner
      * used in the method invocation.
+     * <p>
+     * Note: this is a live list and may be changed in a background thread.
      * 
      * @return live list of type users or empty list.
      */

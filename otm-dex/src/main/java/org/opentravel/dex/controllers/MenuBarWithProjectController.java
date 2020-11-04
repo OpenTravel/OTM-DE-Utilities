@@ -409,7 +409,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         ObservableList<String> projectList = FXCollections.observableArrayList( projectMap.keySet() );
         projectCombo.setItems( projectList );
         projectCombo.setOnAction( this::projectComboSelectionListener );
-        log.debug( "Configured project combo with " + projectList.size() + " items." );
+        // log.debug( "Configured project combo with " + projectList.size() + " items." );
     }
 
     public void configureProjectCombo(File initialDirectory) {

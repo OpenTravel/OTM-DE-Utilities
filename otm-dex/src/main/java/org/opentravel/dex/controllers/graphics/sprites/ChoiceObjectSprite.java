@@ -53,37 +53,28 @@ public class ChoiceObjectSprite extends MemberSprite<OtmChoiceObject> implements
 
     @Override
     public Rectangle drawContents(GraphicsContext gc, final double x, final double y) {
-        boolean compute = gc == null;
         FacetRectangle rect = null;
-
         // double dxShared = FacetRectangle.SHARED_OFFSET;
-        double width = getBoundaries().getWidth();
-        double fy = y + margin;
+        double fy = y;
+        double width = 0;
 
         // Show facets
         if (!isCollapsed()) {
+            width = getBoundaries().getWidth();
 
             rect = new FacetRectangle( getMember().getShared(), this, width - dxShared );
-            rect.set( x + dxShared, fy );
-            rect.draw( gc, true );
             fy += rect.getHeight() + margin;
-            width = compute && rect.getWidth() > width ? rect.getWidth() + dxShared : width;
+            width = draw( rect, gc, width, x, dxShared, y );
 
             for (OtmContributedFacet f : member.getChildrenContributedFacets()) {
                 if (f.getContributor() instanceof OtmChoiceFacet) {
                     rect = new FacetRectangle( f, this, width - dxChoice );
-                    rect.set( x + dxChoice, fy );
-                    rect.draw( gc, true );
+                    width = draw( rect, gc, width, x, dxChoice, fy );
                     fy += rect.getHeight() + margin;
-                    width = compute && rect.getWidth() > width ? rect.getWidth() + dxChoice : width;
                 }
             }
         }
-        // Return the enclosing rectangle
-        // Rectangle sRect = new Rectangle( x, y, width + margin, fy - y );
-        // log.debug( "Drew choice contents into " + sRect );
-        // fRect.draw( gc, false );
-        // return sRect;
+
         return new Rectangle( x, y, width + margin, fy - y );
     }
 

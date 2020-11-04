@@ -18,7 +18,7 @@ package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
+import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.dex.controllers.graphics.sprites.ResourceSprite;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -53,7 +53,7 @@ public class ResourceSubjectRectangle extends PropertyRectangle {
      * @param member whose base type will be displayed as a property
      * @param width
      */
-    public ResourceSubjectRectangle(DexSprite parentSprite, OtmResource member, double width) {
+    public ResourceSubjectRectangle(MemberSprite<?> parentSprite, OtmResource member, double width) {
         super( parentSprite, width, "Exposes", null, member.isEditable(), false );
 
         setProvider( member.getSubject() );

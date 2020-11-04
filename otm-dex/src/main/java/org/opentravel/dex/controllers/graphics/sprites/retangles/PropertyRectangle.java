@@ -18,8 +18,8 @@ package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
+import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
@@ -57,7 +57,7 @@ public class PropertyRectangle extends Rectangle {
         public void onRectangleClick(MouseEvent e);
     }
 
-    protected DexSprite parent;
+    protected MemberSprite<?> parent;
     protected Font font;
     protected SettingsManager settings;
 
@@ -79,7 +79,7 @@ public class PropertyRectangle extends Rectangle {
     double connectorSize = SettingsManager.CONNECTOR_SIZE;
 
 
-    public PropertyRectangle(DexSprite parent, double width, String label, Image icon, boolean editable,
+    public PropertyRectangle(MemberSprite<?> parent, double width, String label, Image icon, boolean editable,
         boolean inherited) {
         super( 0, 0, GraphicsUtils.MINIMUM_WIDTH, 0 );
         this.parent = parent;
@@ -103,7 +103,7 @@ public class PropertyRectangle extends Rectangle {
         }
     }
 
-    public PropertyRectangle(OtmProperty property, DexSprite parentSprite, double width) {
+    public PropertyRectangle(OtmProperty property, MemberSprite<?> parentSprite, double width) {
         this( parentSprite, width, property.getName(), property.getIcon(), property.isEditable(),
             property.isInherited() );
 
@@ -128,7 +128,7 @@ public class PropertyRectangle extends Rectangle {
         // }
     }
 
-    public PropertyRectangle(OtmActionRequest rq, DexSprite parentSprite, double width) {
+    public PropertyRectangle(OtmActionRequest rq, MemberSprite<?> parentSprite, double width) {
         this( parentSprite, width, rq.getName(), rq.getIcon(), rq.isEditable(), rq.isInherited() );
 
         if (rq.getMethod() != null)
@@ -140,7 +140,7 @@ public class PropertyRectangle extends Rectangle {
         draw( null, font );
     }
 
-    public PropertyRectangle(OtmActionResponse rs, DexSprite parentSprite, double width) {
+    public PropertyRectangle(OtmActionResponse rs, MemberSprite<?> parentSprite, double width) {
         this( parentSprite, width, rs.getName(), rs.getIcon(), rs.isEditable(), rs.isInherited() );
 
         if (rs.getPayloadActionFacet() != null)

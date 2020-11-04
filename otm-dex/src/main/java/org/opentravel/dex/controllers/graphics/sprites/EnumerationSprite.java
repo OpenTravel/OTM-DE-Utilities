@@ -35,42 +35,42 @@ import javafx.scene.canvas.GraphicsContext;
  */
 public class EnumerationSprite extends MemberSprite<OtmEnumeration<?>> implements DexSprite {
 
+    private double margin;
+    private double dx;
+
+
     public EnumerationSprite(OtmEnumeration<?> member, SpriteManager manager) {
         super( member, manager );
+
+        margin = settingsManager.getMargin( Margins.FACET );
+        dx = settingsManager.getOffset( Offsets.ID );
     }
 
 
     @Override
     public Rectangle drawContents(GraphicsContext gc, final double x, final double y) {
-        boolean compute = gc == null;
         Rectangle rect = null;
+        double width = 0;
+        double fy = y;
 
-        double dx = settingsManager.getOffset( Offsets.ID );
-        double width = getBoundaries().getWidth();
-        double margin = settingsManager.getMargin( Margins.FACET );
-        double fy = y + margin;
-
-        // Show base type
-
-        // Show open's Other property
-        if (getMember() instanceof OtmEnumerationOpen) {
-            rect = new LabelRectangle( this, "Other", null, false, false, false ).draw( gc, x + dx, y );
-            // rect = GraphicsUtils.drawLabel( "Other", null, false, false, gc, font, x + dx, y );
-            fy += rect.getHeight();
-        }
-
-        // Show values
         if (!isCollapsed()) {
+            width = getBoundaries().getWidth();
+
+            // Show base type
+
+            // Show open's Other property
+            if (getMember() instanceof OtmEnumerationOpen) {
+                rect = new LabelRectangle( this, "Other", null, false, false, false ).draw( gc, x + dx, y );
+                fy += rect.getHeight();
+            }
+
+            // Show values
             rect = new FacetRectangle( getMember(), this, width - dx );
-            rect.set( x + dx, fy ).draw( gc, true );
+            width = draw( rect, gc, width, x, dx, fy );
             fy += rect.getHeight() + margin;
-            width = computeWidth( width, rect, dx );
         }
+
         // Return the enclosing rectangle
-        // Rectangle sRect = new Rectangle( x, y, width + margin, fy - y );
-        // log.debug( "Drew choice contents into " + sRect );
-        // fRect.draw( gc, false );
-        // return sRect;
         return new Rectangle( x, y, width + margin, fy - y );
     }
 

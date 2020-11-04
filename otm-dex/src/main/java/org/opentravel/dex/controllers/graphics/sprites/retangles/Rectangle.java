@@ -35,7 +35,7 @@ import javafx.scene.input.MouseEvent;
  *
  */
 public class Rectangle {
-    private static Log log = LogFactory.getLog( Rectangle.class );
+    protected static Log log = LogFactory.getLog( Rectangle.class );
 
     /**
      * Render methods that create rectangles may set the event to run if the implement this interface.
@@ -137,7 +137,7 @@ public class Rectangle {
     public final void onMouseClicked(MouseEvent e) {
         if (e != null && eventHandler != null)
             eventHandler.onRectangleClick( e );
-        log.debug( "Mouse clicked. " + e.toString() );
+        // log.debug( "Mouse clicked. " + e.toString() );
     }
 
     public Rectangle set(double x, double y) {
@@ -155,6 +155,25 @@ public class Rectangle {
     public final void setOnMouseClicked(RectangleEventHandler a) {
         // TEST
         eventHandler = a;
+    }
+
+    public void addWidth(double added) {
+        width += added;
+    }
+
+    public final void setIfLarger(Rectangle rectangle) {
+        setIfWider( rectangle.getWidth() );
+        setIfHigher( rectangle.getHeight() );
+    }
+
+    public final void setIfWider(double width) {
+        if (width > this.width)
+            this.width = width;
+    }
+
+    public final void setIfHigher(double height) {
+        if (height > this.height)
+            this.height = height;
     }
 
     public String toString() {

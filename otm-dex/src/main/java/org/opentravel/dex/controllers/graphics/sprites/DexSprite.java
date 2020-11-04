@@ -19,8 +19,6 @@ package org.opentravel.dex.controllers.graphics.sprites;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
-import org.opentravel.model.otmFacets.OtmFacet;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 import java.util.List;
@@ -53,6 +51,11 @@ public interface DexSprite {
     public void clear();
 
     /**
+     * Toggle the collapse state then render and update connections.
+     */
+    void collapseOrExpand();
+
+    /**
      * Connect this member to its base type. Create sprite for base type if not already managed. If there was a sprite,
      * toggle its collapsed state.
      * 
@@ -60,14 +63,15 @@ public interface DexSprite {
      */
     public DexSprite connect();
 
-    /**
-     * If needed, add sprite for the member that provides the type then add connection to new sprite. Otherwise, toggle
-     * the collapsed state.
-     * 
-     * @param pSprite
-     * @return
-     */
-    public MemberSprite<OtmLibraryMember> connect(PropertyRectangle pSprite);
+    // /**
+    // * If needed, add sprite for the member that provides the type then add connection to new sprite. Otherwise,
+    // toggle
+    // * the collapsed state.
+    // *
+    // * @param pSprite
+    // * @return
+    // */
+    // public MemberSprite<OtmLibraryMember> connect(PropertyRectangle pSprite);
 
     /**
      * Is this point within the bounding box for the sprite?
@@ -78,11 +82,23 @@ public interface DexSprite {
     public boolean contains(Point2D point);
 
     /**
+     * Compute size and draw the sprite.
+     * 
+     * @param gc if null, compute size of sprite
+     * @param x left most point to start drawing
+     * @param y top point to start drawing
+     * @return
+     */
+    public Rectangle draw(GraphicsContext gc, double x, double y);
+
+    /**
      * @param x
      * @param y
      * @return found rectangle or null
      */
     public Rectangle find(double x, double y);
+
+    public void findAndRunRectangle(MouseEvent e);
 
     /**
      * Find the rectangle belonging to the property.
@@ -90,8 +106,6 @@ public interface DexSprite {
      * @return found rectangle or null
      */
     public PropertyRectangle get(OtmProperty property);
-
-    public void findAndRunRectangle(MouseEvent e);
 
     /**
      * @return
@@ -113,9 +127,14 @@ public interface DexSprite {
      */
     public Font getFont();
 
+    /**
+     * @return
+     */
+    public double getHeight();
+
     public Font getItalicFont();
 
-    public OtmLibraryMember getMember();
+    // public OtmLibraryMember getMember();
 
     /**
      * @return
@@ -126,21 +145,6 @@ public interface DexSprite {
      * @return
      */
     SettingsManager getSettingsManager();
-
-    /**
-     * @return collapsed field
-     */
-    boolean isCollapsed();
-
-    /**
-     * Clear then draw the sprite.
-     */
-    public void refresh();
-
-    /**
-     * Render the sprite.
-     */
-    public Canvas render();
 
     // /**
     // * Render the sprite at the point and return clipped canvas.
@@ -159,7 +163,50 @@ public interface DexSprite {
     // public DexSprite set(ColumnRectangle column);
 
     /**
+     * @return
+     */
+    public double getWidth();
+
+    /**
+     * @return x value of boundaries
+     */
+    public double getX();
+
+    /**
+     * @return y value of boundaries
+     */
+    public double getY();
+
+    /**
+     * @return collapsed field
+     */
+    boolean isCollapsed();
+
+    /**
+     * Clear then draw the sprite.
+     */
+    public void refresh();
+
+    /**
+     * Render the sprite.
+     */
+    public Canvas render();
+
+    /**
+     * Render this sprite into next available slot in the column.
+     * <p>
+     * Set the column field then set the x and y to the next slot in the column
+     * {@link ColumnRectangle#getNextInColumn()}.
+     * 
+     * @param column
+     * @return
+     */
+    public Canvas render(ColumnRectangle column, boolean collapsed);
+
+    /**
      * Simply set the top, left coordinates and update the rectangle's connection points.
+     * <p>
+     * <b>Note:</b> does not change the boundaries
      */
     public void set(double x, double y);
 
@@ -171,52 +218,6 @@ public interface DexSprite {
      * Set the collapsed flag and resize.
      */
     void setCollapsed(boolean collapsed);
-
-    /**
-     * Compute size and draw the sprite.
-     * 
-     * @param gc if null, compute size of sprite
-     * @param x left most point to start drawing
-     * @param y top point to start drawing
-     * @return
-     */
-    public Rectangle draw(GraphicsContext gc, double x, double y);
-
-    /**
-     * @return
-     */
-    public double getWidth();
-
-    /**
-     * @return
-     */
-    public double getHeight();
-
-    /**
-     * @return
-     */
-    public double getX();
-
-    /**
-     * @return
-     */
-    public double getY();
-
-    /**
-     * Render this sprite into next available slot in the column.
-     * <p>
-     * Set the column field then set the x and y to the next slot in the column
-     * {@link ColumnRectangle#getNextInColumn()}.
-     * 
-     * @param column
-     * @return
-     */
-    public Canvas render(ColumnRectangle column);
-
-    /**
-     * @param f
-     */
-    void collapseOrExpand(OtmFacet<?> f);
 
 
 

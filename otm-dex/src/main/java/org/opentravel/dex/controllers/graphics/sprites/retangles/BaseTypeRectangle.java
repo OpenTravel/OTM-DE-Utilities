@@ -18,8 +18,8 @@ package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
+import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
@@ -53,7 +53,7 @@ public class BaseTypeRectangle extends PropertyRectangle {
      * @param member whose base type will be displayed as a property
      * @param width
      */
-    public BaseTypeRectangle(DexSprite parentSprite, OtmLibraryMember member, double width) {
+    public BaseTypeRectangle(MemberSprite<?> parentSprite, OtmLibraryMember member, double width) {
         super( parentSprite, width, "Extends", null, member.isEditable(), false );
 
         if (member.getBaseType() instanceof OtmTypeProvider) {

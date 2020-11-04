@@ -41,9 +41,13 @@ import javafx.scene.canvas.GraphicsContext;
 public class ResourceSprite extends MemberSprite<OtmResource> implements DexSprite {
 
     PropertyRectangle subjectRectangle = null;
+    private double margin;
+    private double dx;
 
     public ResourceSprite(OtmResource member, SpriteManager manager) {
         super( member, manager );
+        dx = settingsManager.getOffset( Offsets.ID );
+        margin = settingsManager.getMargin( Margins.FACET );
     }
 
     /**
@@ -81,22 +85,17 @@ public class ResourceSprite extends MemberSprite<OtmResource> implements DexSpri
     public Rectangle drawContents(GraphicsContext gc, final double x, final double y) {
         Rectangle rect = null;
 
-        double dx = settingsManager.getOffset( Offsets.ID );
         double width = getBoundaries().getWidth();
-        double margin = settingsManager.getMargin( Margins.FACET );
-        double fy = y + margin;
+        double fy = y;
 
         // Display subject as property
         if (member.getSubject() != null) {
-            // subjectRectangle = new PropertyRectangle( this, getMember(), width );
             subjectRectangle = new ResourceSubjectRectangle( this, getMember(), width );
             subjectRectangle.set( x + dx, y ).draw( gc, false );
             fy += subjectRectangle.getHeight() + margin;
             width = computeWidth( width, subjectRectangle, 0 );
         } else {
             rect = new LabelRectangle( this, "Abstract", null, false, false, false ).draw( gc, x + dx, fy );
-            // rect = GraphicsUtils.drawLabel( "Abstract", null, false, false, gc, font, x + dx, fy );
-            // rect.set( x + dx, fy ).draw( gc, false );
             fy += rect.getHeight() + margin;
             width = computeWidth( width, rect, 0 );
         }
@@ -105,41 +104,11 @@ public class ResourceSprite extends MemberSprite<OtmResource> implements DexSpri
         if (!isCollapsed())
             for (OtmAction action : member.getActions()) {
                 rect = new FacetRectangle( action, this, width - margin );
-                rect.set( x + dx, fy ).draw( gc, true );
+                width = draw( rect, gc, width, x, 0, fy );
                 fy += rect.getHeight() + margin;
-                width = computeWidth( width, rect, 0 );
             }
 
-        // rect = GraphicsUtils.drawLabel( "TODO", null, gc, font, x + dx, fy );
-        // width = computeWidth( gc == null, width, rect, 0 );
-        // fy += rect.getHeight();
-
-        // if (!isCollapsed()) {
-        // Demos.postSmileyFace( gc, x + dx, fy );
-        // width += 300;
-        // fy += 300;
-        // }
-
-
-        // Show base type
-        // // Show open's Other property
-        // if (getMember() instanceof OtmEnumerationOpen) {
-        // rect = GraphicsUtils.drawLabel( "Other", null, false, gc, font, x + dx, fy );
-        // fy += rect.getHeight() + margin;
-        // }
-        //
-        // // Show values
-        // if (!isCollapsed()) {
-        // rect = new FacetRectangle( getMember(), this, width - dx );
-        // rect.set( x + dx, fy ).draw( gc, true );
-        // fy += rect.getHeight() + margin;
-        // width = computeWidth( compute, width, rect, dx );
-        // }
-        // // Return the enclosing rectangle
-        // // Rectangle sRect = new Rectangle( x, y, width + margin, fy - y );
-        // // log.debug( "Drew choice contents into " + sRect );
-        // // fRect.draw( gc, false );
-        // // return sRect;
+        // Return the enclosing rectangle
         return new Rectangle( x, y, width + margin, fy - y );
     }
 

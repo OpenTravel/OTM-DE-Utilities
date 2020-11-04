@@ -108,8 +108,12 @@ public class SpriteManager {
      * 
      * @param member
      */
-    public DexSprite add(OtmLibraryMember member, ColumnRectangle column) {
-        return add( member, column, false );
+    // public DexSprite add(OtmLibraryMember member, ColumnRectangle column) {
+    // return add( member, column, false );
+    // }
+
+    public MemberSprite<?> add(OtmLibraryMember member, ColumnRectangle column) {
+        return add( member, column, !member.isExpanded() );
     }
 
     /**
@@ -120,19 +124,17 @@ public class SpriteManager {
      * @param collapsed
      * @return
      */
-    public MemberSprite<OtmLibraryMember> add(OtmLibraryMember member, ColumnRectangle column, boolean collapsed) {
+    public MemberSprite<?> add(OtmLibraryMember member, ColumnRectangle column, boolean collapsed) {
         if (column == null)
             column = getColumn( 1 );
 
-        MemberSprite<OtmLibraryMember> memberSprite = column.get( member );
-
-        if (memberSprite == null) {
+        MemberSprite<?> memberSprite = column.get( member );
+        if (memberSprite == null)
             memberSprite = factory( member );
-            column.add( memberSprite );
-        }
-        if (memberSprite != null) {
-            memberSprite.setCollapsed( collapsed );
-        }
+
+        if (memberSprite != null)
+            memberSprite.render( column, collapsed );
+
         return memberSprite;
     }
 
@@ -160,23 +162,15 @@ public class SpriteManager {
         spritePane.getChildren().add( connectionsCanvas );
     }
 
-    // FIXME - this seems broken!
-    @Deprecated
-    public boolean contains(OtmLibraryMember member) {
-        for (DexSprite s : getAllSprites())
-            if (s.getMember() == member)
-                return true;
-        return false;
-    }
 
     private void createColumns(int count) {
         if (columns == null)
             columns = new ArrayList<>();
-        ColumnRectangle column = new ColumnRectangle( spritePane, null );
+        ColumnRectangle column = new ColumnRectangle( spritePane, new DomainSprite( this ), null );
         int i = 0;
         do {
             columns.add( column );
-            ColumnRectangle nc = new ColumnRectangle( spritePane, column );
+            ColumnRectangle nc = new ColumnRectangle( spritePane, new DomainSprite( this ), column );
             column.setNext( nc );
             column = nc;
         } while (i++ < count);
@@ -225,7 +219,7 @@ public class SpriteManager {
      * @return Built sprite or null.
      */
     // sprite factory
-    private MemberSprite<OtmLibraryMember> factory(OtmLibraryMember member) {
+    protected MemberSprite<?> factory(OtmLibraryMember member) {
         MemberSprite<?> newSprite = null;
         if (member instanceof OtmBusinessObject)
             newSprite = new BusinessObjectSprite( (OtmBusinessObject) member, this );
@@ -243,8 +237,12 @@ public class SpriteManager {
             newSprite = new SimpleSprite( (OtmSimpleObjects<?>) member, this );
         else if (member instanceof OtmResource)
             newSprite = new ResourceSprite( (OtmResource) member, this );
-        // log.debug( "factory created: " + newSprite );
-        return (MemberSprite<OtmLibraryMember>) newSprite;
+
+        if (newSprite != null)
+            spritePane.getChildren().add( newSprite.getCanvas() );
+
+        log.debug( "factory created: " + newSprite );
+        return newSprite;
     }
 
     public DexSprite findSprite(OtmLibraryMember member) {
@@ -267,9 +265,10 @@ public class SpriteManager {
         return selectedSprite;
     }
 
+    @SuppressWarnings("unchecked")
     public MemberSprite<OtmLibraryMember> get(OtmLibraryMember member) {
         for (DexSprite s : getAllSprites())
-            if (s.getMember() == member && s instanceof MemberSprite)
+            if (s instanceof MemberSprite && ((MemberSprite<?>) s).getMember() == member)
                 return (MemberSprite<OtmLibraryMember>) s;
         return null;
     }
@@ -309,10 +308,10 @@ public class SpriteManager {
                 selected = sprite;
                 break;
             }
-        if (selected != null) {
+        if (selected instanceof MemberSprite) {
             if (e.getButton() != MouseButton.SECONDARY && e.getClickCount() >= 2) {
                 // log.debug( "Throw event: " + selected.getMember() );
-                publishEvent( new DexMemberSelectionEvent( selected.getMember() ) );
+                publishEvent( new DexMemberSelectionEvent( ((MemberSprite<?>) selected).getMember() ) );
             } else
                 selected.findAndRunRectangle( e );
         }

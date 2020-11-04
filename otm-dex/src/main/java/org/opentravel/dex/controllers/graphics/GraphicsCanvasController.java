@@ -312,8 +312,8 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
     private DexSprite postBase(DexSprite memberSprite) {
         DexSprite baseSprite = null;
-        if (memberSprite != null) {
-            OtmLibraryMember member = memberSprite.getMember();
+        if (memberSprite instanceof MemberSprite) {
+            OtmLibraryMember member = ((MemberSprite<?>) memberSprite).getMember();
             if (member.getBaseType() instanceof OtmLibraryMember && !(member instanceof OtmContextualFacet)) {
                 ColumnRectangle column = memberSprite.getColumn().getPrev();
                 boolean collapsed = true;
@@ -325,7 +325,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     }
 
     // Add member and users and providers
-    private void postProviders(MemberSprite<OtmLibraryMember> memberSprite) {
+    private void postProviders(MemberSprite<?> memberSprite) {
         if (memberSprite != null) {
             OtmLibraryMember member = memberSprite.getMember();
             for (OtmTypeUser user : member.getDescendantsTypeUsers()) {
@@ -335,7 +335,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         }
     }
 
-    private void postUsers(MemberSprite<OtmLibraryMember> memberSprite) {
+    private void postUsers(MemberSprite<?> memberSprite) {
         if (memberSprite != null) {
             OtmLibraryMember member = memberSprite.getMember();
             ColumnRectangle column = memberSprite.getColumn().getPrev();
@@ -357,7 +357,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
             if (tracking)
                 spriteManager.clear();
 
-            MemberSprite<OtmLibraryMember> memberS = spriteManager.add( member, memberColumn, false );
+            MemberSprite<?> memberS = spriteManager.add( member, memberColumn, false );
 
             if (memberS != null)
                 if (tracking) {

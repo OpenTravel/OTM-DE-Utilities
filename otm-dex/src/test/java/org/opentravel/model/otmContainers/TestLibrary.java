@@ -449,6 +449,11 @@ public class TestLibrary extends AbstractFxTest {
         return new TLLibrary();
     }
 
+    /**
+     * Build one of each library member type.
+     * 
+     * @param lib
+     */
     public static void addOneOfEach(OtmLibrary lib) {
         int i = 1;
         for (OtmLibraryMemberType value : OtmLibraryMemberType.values()) {

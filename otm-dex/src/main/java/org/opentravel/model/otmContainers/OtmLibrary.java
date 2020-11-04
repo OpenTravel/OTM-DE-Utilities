@@ -207,7 +207,9 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     public boolean sameBaseNamespace(OtmLibrary otherLibrary) {
-        return otherLibrary != null ? this.getBaseNamespace().equals( otherLibrary.getBaseNamespace() ) : false;
+        if (otherLibrary == null || this.getBaseNamespace() == null || otherLibrary.getBaseNamespace() == null)
+            return false;
+        return this.getBaseNamespace().equals( otherLibrary.getBaseNamespace() );
     }
 
     /**

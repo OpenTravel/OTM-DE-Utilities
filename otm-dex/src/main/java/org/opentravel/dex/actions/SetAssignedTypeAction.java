@@ -1,4 +1,5 @@
 /**
+
  * Copyright (C) 2014 OpenTravel Alliance (info@opentravel.org)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -183,12 +184,11 @@ public class SetAssignedTypeAction extends DexRunAction {
             newProvider = (OtmTypeProvider) data;
             // Set value into model
             getSubject().setAssignedType( newProvider );
-            if (newProvider.isNameControlled()) {
-                // String newName = XsdCodegenUtils.getGlobalTypeName( (NamedEntity) newProvider.getTL() );
-                QName newQName = XsdCodegenUtils.getGlobalElementName( (NamedEntity) newProvider.getTL() );
-                if (newQName != null)
-                    getSubject().setName( newQName.getLocalPart() );
-            }
+            // if (newProvider.isNameControlled()) {
+            QName newQName = XsdCodegenUtils.getGlobalElementName( (NamedEntity) newProvider.getTL() );
+            if (newQName != null)
+                getSubject().setName( newQName.getLocalPart() );
+            // }
         }
         return get();
     }

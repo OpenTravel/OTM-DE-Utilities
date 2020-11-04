@@ -53,41 +53,31 @@ public class CoreObjectSprite extends MemberSprite<OtmCore> implements DexSprite
 
     @Override
     public Rectangle drawContents(GraphicsContext gc, final double x, final double y) {
-        boolean compute = gc == null;
         Rectangle rect = null;
-
-        double width = getBoundaries().getWidth();
-        double fy = y + margin;
-
-        // Show simple type
-        rect = new CorePropertyRectangle( getMember(), this, width );
-        rect.set( x + dxSummary, y );
-        rect.draw( gc, true );
-        fy += rect.getHeight();
-        width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
+        double width = 0;
+        double fy = y;
 
         // Show facets
         if (!isCollapsed()) {
+            width = getBoundaries().getWidth();
 
-            rect = new FacetRectangle( getMember().getSummary(), this, width - dxSummary );
-            rect.set( x + dxSummary, fy );
-            rect.draw( gc, true );
+            // Show simple type
+            rect = new CorePropertyRectangle( getMember(), this, width );
+            width = draw( rect, gc, width, x, dxSummary, y );
             fy += rect.getHeight() + margin;
-            width = compute && rect.getWidth() > width ? rect.getWidth() + dxSummary : width;
+
+            // Draw facets
+            rect = new FacetRectangle( getMember().getSummary(), this, width - dxSummary );
+            width = draw( rect, gc, width, x, dxSummary, fy );
+            fy += rect.getHeight() + margin;
 
             if (!getMember().getDetail().getChildren().isEmpty()) {
                 rect = new FacetRectangle( getMember().getDetail(), this, width - dxDetail );
-                rect.set( x + dxDetail, fy );
-                rect.draw( gc, true );
+                width = draw( rect, gc, width, x, dxDetail, fy );
                 fy += rect.getHeight() + margin;
-                width = compute && rect.getWidth() > width ? rect.getWidth() + dxDetail : width;
             }
         }
-        // Return the enclosing rectangle
-        // Rectangle sRect = new Rectangle( x, y, width + margin, fy - y );
-        // log.debug( "Drew choice contents into " + sRect );
-        // fRect.draw( gc, false );
-        // return sRect;
+        // Return an enclosing rectangle
         return new Rectangle( x, y, width + margin, fy - y );
     }
 

@@ -19,6 +19,7 @@ package org.opentravel.dex.controllers.graphics.sprites.retangles;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
+import org.opentravel.dex.controllers.graphics.sprites.DomainSprite;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
@@ -29,7 +30,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
 
 /**
- * Graphics utility for containing regions (x, y, width, height). A rectangle does <b>not</b> have a canvas.
+ * Rectangle for columns of sprites. When resized, columns will adjust their width then the "next" column.
  * <p>
  * Sub-types have contents that can be drawn into the rectangle. These rectangles will compute their size when
  * constructed and when drawn with a null GraphicsContext (GC). A rectangle may be mouse click-able if the parent sprite
@@ -47,58 +48,48 @@ public class ColumnRectangle extends Rectangle {
     public static final int COLUMN_MARGIN_Y = 10;
     private static final double COLUMN_WIDTH = 100;
 
-    int index = 0;
+    private int index = 0;
     private List<DexSprite> activeSprites = new ArrayList<>();
-    Pane spritePane;
+    private Pane spritePane;
     private ColumnRectangle previousColumn = null;
     private ColumnRectangle nextColumn = null;
+    private DomainSprite domainSprite;
 
-    public ColumnRectangle(Pane spritePane, ColumnRectangle previous) {
+    public ColumnRectangle(Pane spritePane, DomainSprite domain, ColumnRectangle previous) {
         super( 0, 0, COLUMN_WIDTH, COLUMN_HEIGHT_MIN );
         this.spritePane = spritePane;
         if (previous == null)
             index = 1;
         else
             index = previous.getIndex() + 1;
+        previousColumn = previous;
+
+        this.domainSprite = domain;
 
         this.x = (index - 1) * width + COLUMN_MARGIN_X;
         this.y = COLUMN_MARGIN_Y;
-
-        previousColumn = previous;
+        log.debug( this );
     }
 
-    // public Point2D getNextInColumn(double x, double y) {
-    // Point2D bottom = new Point2D( x, y );
-    // DexSprite next = null;
-    // do {
-    // next = findSprite( bottom );
-    // if (next != null)
-    // bottom = new Point2D( x, next.getBoundaries().getMaxY() + 5 );
-    // else {
-    // bottom = new Point2D( x, bottom.getY() + MINIMUM_SLOT_HEIGHT );// minimum slot size;
-    // next = findSprite( bottom );
-    // }
-    // } while (next != null && bottom.getY() < spritePane.getHeight());
-    // return bottom;
-    // }
-
     /**
-     * Place the sprite in the next available slot in this column.
+     * Place and render the sprite in the next available slot in this column.
      * 
      * @param sprite
      * @return the sprite (added or found already column)
      */
-    public DexSprite add(DexSprite sprite) {
+    public void add(DexSprite sprite) {
+        log.debug( "Adding " + sprite );
         if (sprite != null && !activeSprites.contains( sprite )) {
             // If the sprite is wider than column, resize column
             if (sprite.getWidth() + COLUMN_MARGIN_X > width)
                 resize( sprite.getWidth() + COLUMN_MARGIN_X );
 
-            // Render sprite into this column, add to list and pane
-            spritePane.getChildren().add( sprite.render( this ) );
+            // add to list
             activeSprites.add( sprite );
+
+            // Show what domain it is in
+            // domainSprite.add( sprite );
         }
-        return sprite;
     }
 
     /**
@@ -110,17 +101,8 @@ public class ColumnRectangle extends Rectangle {
             spritePane.getChildren().remove( sprite.getCanvas() );
         }
         activeSprites.clear();
-        resize( COLUMN_WIDTH + COLUMN_MARGIN_X );
+        resize( COLUMN_WIDTH );
         y = COLUMN_MARGIN_Y;
-    }
-
-    public MemberSprite<OtmLibraryMember> get(OtmLibraryMember member) {
-        MemberSprite<OtmLibraryMember> selectedSprite = null;
-        for (DexSprite sprite : activeSprites)
-            if (sprite.getMember() == member && sprite instanceof MemberSprite) {
-                return (MemberSprite<OtmLibraryMember>) sprite;
-            }
-        return selectedSprite;
     }
 
     public DexSprite findSprite(Point2D point) {
@@ -132,6 +114,16 @@ public class ColumnRectangle extends Rectangle {
         return selectedSprite;
     }
 
+    @SuppressWarnings("unchecked")
+    public MemberSprite<OtmLibraryMember> get(OtmLibraryMember member) {
+        MemberSprite<OtmLibraryMember> selectedSprite = null;
+        for (DexSprite sprite : activeSprites)
+            if (sprite instanceof MemberSprite && ((MemberSprite<?>) sprite).getMember() == member) {
+                return (MemberSprite<OtmLibraryMember>) sprite;
+            }
+        return selectedSprite;
+    }
+
     public int getIndex() {
         return index;
     }
@@ -139,20 +131,6 @@ public class ColumnRectangle extends Rectangle {
     public ColumnRectangle getNext() {
         return nextColumn != null ? nextColumn : this;
     }
-
-    // public Point2D getNextInColumn(DexSprite sprite) {
-    // double dx = 2 * COLUMN_MARGIN_X; // get past the margin
-    // double dy = 2 * COLUMN_MARGIN_Y;
-    // Point2D bottom = new Point2D( dx, dy );
-    // if (sprite != null) {
-    // DexSprite next = sprite;
-    // do {
-    // bottom = new Point2D( x + dx, next.getBoundaries().getMaxY() + dy );
-    // next = findSprite( bottom );
-    // } while (next != null && bottom.getY() < spritePane.getHeight());
-    // }
-    // return bottom;
-    // }
 
     public Point2D getNextInColumn() {
         double cx = x + 20; // get past the margin
@@ -169,10 +147,6 @@ public class ColumnRectangle extends Rectangle {
     }
 
 
-    // public Point2D getNextInColumn(OtmLibraryMember member) {
-    // return getNextInColumn( find( member ) );
-    // }
-
     public ColumnRectangle getPrev() {
         return previousColumn != null ? previousColumn : this;
     }
@@ -181,11 +155,17 @@ public class ColumnRectangle extends Rectangle {
         return activeSprites;
     }
 
+    public void remove(DexSprite sprite) {
+        log.debug( "Removing sprite: " + sprite + "  " + activeSprites.contains( sprite ) );
+        activeSprites.remove( sprite );
+        spritePane.getChildren().remove( sprite.getCanvas() );
+    }
+
     public void resize(double width) {
         this.width = width;
         if (nextColumn != null)
             nextColumn.set( getMaxX(), COLUMN_MARGIN_Y );
-        // log.debug( "Resized column " + this );
+        log.debug( "Resized column " + this );
     }
 
     @Override
@@ -197,7 +177,7 @@ public class ColumnRectangle extends Rectangle {
         } );
         if (nextColumn != null)
             nextColumn.set( getMaxX(), COLUMN_MARGIN_Y );
-        // log.debug( "Set column " + this );
+        log.debug( "Set column " + this );
         return this;
     }
 
@@ -205,14 +185,10 @@ public class ColumnRectangle extends Rectangle {
         nextColumn = next;
     }
 
-    public void remove(DexSprite sprite) {
-        log.debug( "Removing sprite: " + sprite + "  " + activeSprites.contains( sprite ) );
-        activeSprites.remove( sprite );
-        spritePane.getChildren().remove( sprite.getCanvas() );
-    }
-
+    @Override
     public String toString() {
-        return "index = " + getIndex() + " x = " + x + " y = " + y + " width = " + width + " height = " + height;
+        return "Column: index = " + getIndex() + " x = " + x + " y = " + y + " width = " + width + " height = "
+            + height;
     }
 
 }

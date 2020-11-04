@@ -17,75 +17,46 @@
 package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
-import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
-import org.opentravel.model.otmFacets.OtmCustomFacet;
-import org.opentravel.model.otmFacets.OtmQueryFacet;
-import org.opentravel.model.otmFacets.OtmUpdateFacet;
-import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.scene.canvas.GraphicsContext;
 
 /**
- * Graphics Display Object (Sprite) for containing OTM business object.
+ * Graphics Display Object (Sprite) for containing OTM contextual facets (choice, custom, query, update).
  * 
  * @author dmh
  * @param <O>
  *
  */
-public class ContextualFacetSprite extends MemberSprite<OtmLibraryMember> implements DexSprite {
+public class ContextualFacetSprite extends MemberSprite<OtmContextualFacet> implements DexSprite {
     // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
 
-    double dxChoice;
-    double dxCustom;
-    double dxQuery;
-    double dxUpdate;
     double margin;
+    double dx = 0;
 
     public ContextualFacetSprite(OtmContextualFacet member, SpriteManager manager) {
         super( member, manager );
 
-        dxChoice = settingsManager.getOffset( Offsets.CHOICE );
-        dxCustom = settingsManager.getOffset( Offsets.CUSTOM );
-        dxQuery = settingsManager.getOffset( Offsets.QUERY );
-        dxUpdate = settingsManager.getOffset( Offsets.UPDATE );
         margin = settingsManager.getMargin( Margins.FACET );
+        dx = margin;
     }
-
 
     @Override
     public Rectangle drawContents(GraphicsContext gc, final double x, final double y) {
-        boolean compute = gc == null;
-
-        double ox = 0;
-        if (member instanceof OtmCustomFacet)
-            ox = dxCustom;
-        else if (member instanceof OtmQueryFacet)
-            ox = dxQuery;
-        else if (member instanceof OtmChoiceObject)
-            ox = dxChoice;
-        else if (member instanceof OtmUpdateFacet)
-            ox = dxUpdate;
-
-        double fy = y + margin;
-        double width = getBoundaries().getWidth() - ox - margin;
-        double fx = x + ox;
-
-        Rectangle rect = new Rectangle( 0, 0, 0, 0 );
+        double fy = y;
+        double width = 0;
+        Rectangle rect = null;
 
         if (!isCollapsed() && !getMember().getChildren().isEmpty()) {
+            width = getBoundaries().getWidth();
             rect = new FacetRectangle( (OtmContextualFacet) member, this, width );
-            rect.set( fx, fy ).draw( gc, true );
-            width = computeWidth( width, rect, ox );
+            width = draw( rect, gc, width, x, dx, fy );
+            fy += rect.getHeight() + margin;
         }
 
-        // Rectangle fRect = new Rectangle( rect.getX(), rect.getY(), width, rect.getHeight() );
-        // log.debug( "Drew CF contents into " + fRect );
-        // return fRect;
-        return new Rectangle( rect.getX(), rect.getY(), width + 2 * margin, rect.getHeight() + 2 * margin );
+        return new Rectangle( x, y, width + margin, fy - y );
     }
 
 }
