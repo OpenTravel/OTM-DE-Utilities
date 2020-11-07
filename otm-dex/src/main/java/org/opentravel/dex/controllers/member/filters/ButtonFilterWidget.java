@@ -37,8 +37,8 @@ public class ButtonFilterWidget implements DexFilterWidget<OtmLibraryMember> {
     }
 
     private MemberFilterController parentController;
-    private RadioButton button = null;
-    private Selector selector;
+    protected RadioButton button = null;
+    protected Selector selector;
 
     public ButtonFilterWidget(MemberFilterController parent, RadioButton button) {
         if (!(button instanceof RadioButton))
@@ -49,16 +49,6 @@ public class ButtonFilterWidget implements DexFilterWidget<OtmLibraryMember> {
         this.button = button;
         button.setOnAction( e -> set() );
         this.parentController = parent;
-    }
-
-    public ButtonFilterWidget setSelector(Selector s) {
-        this.selector = s;
-        return this;
-    }
-
-    private void set() {
-        // selected = button.isSelected();
-        parentController.fireFilterChangeEvent();
     }
 
     @Override
@@ -83,7 +73,7 @@ public class ButtonFilterWidget implements DexFilterWidget<OtmLibraryMember> {
      * No-Op
      */
     @Override
-    public void selectionHandler(DexEvent event) {
+    public void refresh() {
         // No-Op
     }
 
@@ -91,8 +81,21 @@ public class ButtonFilterWidget implements DexFilterWidget<OtmLibraryMember> {
      * No-Op
      */
     @Override
-    public void refresh() {
+    public void selectionHandler(DexEvent event) {
         // No-Op
+    }
+
+    public void set(boolean state) {
+        button.setSelected( state );
+    }
+
+    private void set() {
+        parentController.fireFilterChangeEvent();
+    }
+
+    public ButtonFilterWidget setSelector(Selector s) {
+        this.selector = s;
+        return this;
     }
 
 }

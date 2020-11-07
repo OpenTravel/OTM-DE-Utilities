@@ -4,12 +4,12 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" 
-	fx:controller="org.opentravel.dex.controllers.member.MemberFilterController">
+<VBox xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.member.MemberFilterController">
    <children>
       <HBox fx:id="memberFilter" styleClass="tab-menu-bar" stylesheets="@DavesViper.css">
          <children>
@@ -28,10 +28,11 @@
             </VBox>
             <VBox spacing="2.0">
                <children>
-                  <RadioButton fx:id="latestButton" mnemonicParsing="false" text="Latest" />
-                  <RadioButton fx:id="editableButton" mnemonicParsing="false" text="Editable" />
-                  <RadioButton fx:id="errorsButton" mnemonicParsing="false" text="Errors" />
-                  <RadioButton fx:id="builtInsButton" mnemonicParsing="false" text="BuiltIns" />
+                  <RadioButton fx:id="latestButton" mnemonicParsing="false" text="Latest Only" />
+                  <RadioButton fx:id="editableButton" mnemonicParsing="false" text="Editable Only" />
+                  <RadioButton fx:id="errorsButton" mnemonicParsing="false" text="Warnings and Errors" />
+                  <Separator prefWidth="200.0" />
+                  <RadioButton fx:id="builtInsButton" mnemonicParsing="false" text="Show BuiltIns" />
                </children>
                <HBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

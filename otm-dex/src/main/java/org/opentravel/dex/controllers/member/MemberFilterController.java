@@ -23,6 +23,7 @@ import org.opentravel.dex.controllers.DexFilterWidget;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.member.filters.ButtonFilterWidget;
+import org.opentravel.dex.controllers.member.filters.ButtonToggleFilterWidget;
 import org.opentravel.dex.controllers.member.filters.LibraryFilterWidget;
 import org.opentravel.dex.controllers.member.filters.NameFilterWidget;
 import org.opentravel.dex.controllers.member.filters.ObjectTypeFilterWidget;
@@ -34,7 +35,6 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
-import org.opentravel.schemacompiler.model.BuiltInLibrary;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,9 +86,12 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
 
     // Possible alternate target for change events
     private DexPopupController popupController = null;
-    private boolean builtIns = false;
+    // Filter data
+    private ButtonFilterWidget builtInFilter;
+    // private boolean builtIns = false;
     private OtmTypeProvider minorVersionMatch = null;
     private List<DexFilterWidget<OtmLibraryMember>> filterWidgets = new ArrayList<>();
+
     private boolean ignoreClear = false;
     private OtmModelManager modelMgr;
 
@@ -148,6 +151,12 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         filterWidgets.add( new LibraryFilterWidget( this, librarySelector ) );
         filterWidgets.add( new ObjectTypeFilterWidget( this, memberTypeCombo ) );
         filterWidgets.add( new NameFilterWidget( this, memberNameFilter ) );
+
+        this.builtInFilter = new ButtonToggleFilterWidget( this, builtInsButton );
+        builtInFilter.set( true );
+        builtInFilter.setSelector( m -> m.getLibrary().isBuiltIn() );
+        filterWidgets.add( builtInFilter );
+
         filterWidgets
             .add( new ButtonFilterWidget( this, latestButton ).setSelector( OtmLibraryMember::isLatestVersion ) );
         filterWidgets
@@ -198,8 +207,8 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         checkNodes();
 
         // TODO - use DexFilterWidget
-        builtInsButton.setSelected( builtIns );
-        builtInsButton.setOnAction( e -> setBuiltIns() );
+        // builtInsButton.setSelected( builtIns );
+        // builtInsButton.setOnAction( e -> setBuiltIns() );
 
         // Get focus after the scene is set
         Platform.runLater( () -> memberNameFilter.requestFocus() );
@@ -223,9 +232,8 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         for (DexFilterWidget<OtmLibraryMember> w : filterWidgets)
             if (!w.isSelected( member ))
                 return false;
-
-        if (!builtIns && member.getLibrary().getTL() instanceof BuiltInLibrary)
-            return false;
+        // if (!builtIns && member.getLibrary().getTL() instanceof BuiltInLibrary)
+        // return false;
 
         // log.debug( member.getName() + " passed filter." );
         // No filters applied OR passed all filters
@@ -243,10 +251,10 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         filterWidgets.forEach( DexFilterWidget::refresh );
     }
 
-    private void setBuiltIns() {
-        builtIns = builtInsButton.isSelected();
-        fireFilterChangeEvent();
-    }
+    // private void setBuiltIns() {
+    // builtIns = builtInsButton.isSelected();
+    // fireFilterChangeEvent();
+    // }
 
     //
     /**
@@ -255,7 +263,8 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
      * @param show
      */
     public void setBuiltIns(boolean show) {
-        builtInsButton.setSelected( show );
+        builtInFilter.set( show );
+        // builtInsButton.setSelected( show );
     }
 
     /**
