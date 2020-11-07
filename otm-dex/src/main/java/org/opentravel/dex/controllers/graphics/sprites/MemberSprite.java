@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.connections.SuperTypeConnection;
 import org.opentravel.dex.controllers.graphics.sprites.connections.TypeConnection;
@@ -48,7 +50,7 @@ import javafx.scene.paint.Paint;
  */
 public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSpriteBase
     implements DexSprite, RectangleEventHandler {
-    // protected static Log log = LogFactory.getLog( MemberSprite.class );
+    private static Log log = LogFactory.getLog( MemberSprite.class );
 
     private static final double MIN_HEIGHT = 50;
     private static final double MIN_WIDTH = 50;
@@ -119,8 +121,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
         log.debug( "Collapse or expand." );
         if (f != null) {
             clear();
-            f.setExpanded( !f.isExpanded() );
-            // collapsed = !collapsed;
+            f.setCollapsed( !f.isCollapsed() );
             render();
             manager.updateConnections( this );
             log.debug( "Collapse or expand: " + f + " to " + f.isExpanded() );
@@ -243,6 +244,10 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
     protected Rectangle drawMember(GraphicsContext gc) {
         if (member == null)
             return new Rectangle( 0, 0, 0, 0 );
+
+        // Rectangles are disposable.
+        rectangles.clear();
+
         if (boundaries == null)
             boundaries = new Rectangle( x, y, MIN_WIDTH, MIN_HEIGHT );
 
@@ -350,6 +355,15 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
         rectangles.forEach( r -> {
             if (r instanceof FacetRectangle)
                 list.add( (FacetRectangle) r );
+        } );
+        return list;
+    }
+
+    public List<PropertyRectangle> getPropertyRectangles() {
+        List<PropertyRectangle> list = new ArrayList<>();
+        rectangles.forEach( r -> {
+            if (r instanceof PropertyRectangle)
+                list.add( (PropertyRectangle) r );
         } );
         return list;
     }

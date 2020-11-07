@@ -82,8 +82,8 @@ public class TestCustomFacet extends TestContextualFacet {
      * @param bo
      * @return
      */
-    public static OtmContextualFacet buildOtm(OtmModelManager modelManager, OtmBusinessObject bo) {
-        OtmContextualFacet cf = buildOtm( modelManager );
+    public static OtmCustomFacet buildOtm(OtmModelManager modelManager, OtmBusinessObject bo) {
+        OtmCustomFacet cf = buildOtm( modelManager );
         bo.add( cf );
         testContributedFacet( cf.getWhereContributed(), cf, bo );
         return cf;

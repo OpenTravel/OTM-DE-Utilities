@@ -21,6 +21,9 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
+import org.opentravel.model.OtmPropertyOwner;
+import org.opentravel.model.otmFacets.OtmFacet;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 import javafx.scene.canvas.GraphicsContext;
@@ -29,7 +32,7 @@ import javafx.scene.paint.Paint;
 public class TypeConnection extends Connection {
     private static Log log = LogFactory.getLog( TypeConnection.class );
 
-    private OtmProperty property;
+    protected OtmProperty fromProperty;
 
     public TypeConnection(PropertyRectangle propertyRect, DexSprite userSprite, DexSprite providerSprite) {
         if (userSprite == null || providerSprite == null || propertyRect == null)
@@ -44,7 +47,7 @@ public class TypeConnection extends Connection {
 
         // Connect to connector arrow point
         getFromXY( propertyRect );
-        property = propertyRect.getProperty();
+        fromProperty = propertyRect.getProperty();
 
         // Connect to provider's left, center
         tx = providerSprite.getBoundaries().getX();
@@ -70,6 +73,13 @@ public class TypeConnection extends Connection {
         }
     }
 
+    private boolean isCollapsed(OtmProperty property) {
+        OtmPropertyOwner parent = property.getParent();
+        if (parent instanceof OtmContextualFacet)
+            parent = ((OtmContextualFacet) parent).getWhereContributed();
+        return parent instanceof OtmFacet && ((OtmFacet) parent).isCollapsed();
+    }
+
     /**
      * Update connections involving the sprite.
      * 
@@ -84,14 +94,16 @@ public class TypeConnection extends Connection {
             // Erase old line, saving gc settings
             erase( gc, backgroundColor );
 
-            if (property.getParent().isExpanded()) {
+            // Is the facet expanded or collapsed
+            if (!isCollapsed( fromProperty )) {
+                // if (fromProperty.getParent().isExpanded()) {
                 // Move the point
                 if (from == sprite) {
                     if (from.isCollapsed()) {
                         fx = from.getBoundaries().getMaxX();
                         fy = from.getBoundaries().getY() + sprite.getBoundaries().getHeight() / 2;
                     } else {
-                        getFromXY( from.get( property ) );
+                        getFromXY( from.get( fromProperty ) );
                     }
                 } else if (to == sprite) {
                     tx = sprite.getBoundaries().getX();

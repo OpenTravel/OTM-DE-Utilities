@@ -120,12 +120,6 @@ public class PropertyRectangle extends Rectangle {
 
         // Compute the size
         draw( null, font );
-
-        // // Register mouse listener with parent
-        // if (parent != null && property instanceof OtmTypeUser) {
-        // this.setOnMouseClicked( e -> parent.connect( ((OtmTypeUser) property) ) );
-        // parent.add( this );
-        // }
     }
 
     public PropertyRectangle(OtmActionRequest rq, MemberSprite<?> parentSprite, double width) {
@@ -232,6 +226,7 @@ public class PropertyRectangle extends Rectangle {
             if (!compute && parent != null && property != null) {
                 this.setOnMouseClicked( e -> parent.connect( this ) );
                 parent.add( this );
+                log.debug( "Added mouse listener to " + property );
                 // sub-types will register after rectangle is sized.
             }
         }

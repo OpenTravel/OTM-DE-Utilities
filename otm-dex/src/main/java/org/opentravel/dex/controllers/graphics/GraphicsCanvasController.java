@@ -37,6 +37,9 @@ import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
@@ -328,7 +331,8 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     private void postProviders(MemberSprite<?> memberSprite) {
         if (memberSprite != null) {
             OtmLibraryMember member = memberSprite.getMember();
-            for (OtmTypeUser user : member.getDescendantsTypeUsers()) {
+            Collection<OtmTypeUser> users = new ArrayList<>( member.getDescendantsTypeUsers() );
+            for (OtmTypeUser user : users) {
                 if (user.getAssignedType() != null && !(user.getAssignedType() instanceof OtmSimpleObjects))
                     memberSprite.addConnection( user );
             }

@@ -100,6 +100,21 @@ public class TestQueryFacet extends TestContextualFacet {
     /** ****************************************************** **/
 
     /**
+     * Create query facet and contribute it to the passed business object.
+     * 
+     * @param modelManager
+     * @param bo
+     * @return
+     */
+    public static OtmQueryFacet buildOtm(OtmModelManager modelManager, OtmBusinessObject bo) {
+        OtmQueryFacet cf = buildOtm( modelManager );
+        bo.add( cf );
+        testContributedFacet( cf.getWhereContributed(), cf, bo );
+        return cf;
+    }
+
+
+    /**
      * Build a custom facet. It will not have where contributed or children!
      * 
      * @param mgr

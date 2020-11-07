@@ -165,7 +165,7 @@ public class ColumnRectangle extends Rectangle {
         this.width = width;
         if (nextColumn != null)
             nextColumn.set( getMaxX(), COLUMN_MARGIN_Y );
-        log.debug( "Resized column " + this );
+        // log.debug( "Resized column " + this );
     }
 
     @Override
@@ -177,7 +177,7 @@ public class ColumnRectangle extends Rectangle {
         } );
         if (nextColumn != null)
             nextColumn.set( getMaxX(), COLUMN_MARGIN_Y );
-        log.debug( "Set column " + this );
+        // log.debug( "Set column " + this );
         return this;
     }
 

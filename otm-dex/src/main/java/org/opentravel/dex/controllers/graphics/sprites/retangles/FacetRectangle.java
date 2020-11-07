@@ -97,7 +97,6 @@ public class FacetRectangle extends Rectangle {
             throw new IllegalArgumentException( "Must have settings" );
 
         this.editable = obj.isEditable();
-        this.collapsed = !obj.isExpanded();
         if (obj instanceof OtmChildrenOwner)
             this.children = getChildren( (OtmChildrenOwner) obj );
 
@@ -110,6 +109,7 @@ public class FacetRectangle extends Rectangle {
     public FacetRectangle(OtmFacet<?> facet, MemberSprite<?> parentSprite, double width) {
         this( facet, parentSprite, width, facet.getName(), facet.getIcon() );
         this.facet = facet;
+        this.collapsed = facet.isCollapsed();
         draw( null ); // Compute the size
     }
 
@@ -170,7 +170,7 @@ public class FacetRectangle extends Rectangle {
         Rectangle r = null;
         Image cIcon = null;
 
-        if (otmObject.isExpanded())
+        if (!collapsed)
             cIcon = ImageManager.getImage( ImageManager.Icons.COLLAPSE );
         else
             cIcon = ImageManager.getImage( ImageManager.Icons.EXPAND );
@@ -216,6 +216,8 @@ public class FacetRectangle extends Rectangle {
     @Override
     public Rectangle draw(GraphicsContext gc) {
         boolean compute = gc == null;
+        // Update the collapsed state saved in the facet facade.
+        collapsed = otmObject instanceof OtmFacet && ((OtmFacet<?>) otmObject).isCollapsed();
         height = 0;
 
         // Title line - control, name, prefix
@@ -225,7 +227,6 @@ public class FacetRectangle extends Rectangle {
         height += r.getHeight();
 
         // Properties
-        collapsed = otmObject instanceof OtmFacet ? !otmObject.isExpanded() : false;
         PropertyRectangle pRect = null;
         double py = y + height;
         double px = x + propertyOffset;

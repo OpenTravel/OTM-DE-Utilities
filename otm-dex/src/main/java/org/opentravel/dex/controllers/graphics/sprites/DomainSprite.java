@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
@@ -40,7 +42,7 @@ import javafx.scene.input.MouseEvent;
  *
  */
 public class DomainSprite extends DexSpriteBase {
-    // protected static Log log = LogFactory.getLog( DomainSprite.class );
+    private static Log log = LogFactory.getLog( DomainSprite.class );
 
     private String baseNamespace = "";
     private Map<OtmLibrary,LibraryRectangle> libMap = new HashMap<>();

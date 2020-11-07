@@ -45,7 +45,7 @@ import javafx.scene.text.Font;
  *
  */
 public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler {
-    protected static Log log = LogFactory.getLog( DexSpriteBase.class );
+    private static Log log = LogFactory.getLog( DexSpriteBase.class );
 
     protected static final double MIN_HEIGHT = 50;
     protected static final double MIN_WIDTH = 50;
@@ -96,9 +96,6 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
         // do NOT remove from column...let caller do that
     }
 
-    // /**
-    // * Toggle collapsed state.
-    // */
     @Override
     public void collapseOrExpand() {
         clear();
@@ -111,7 +108,6 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
     public boolean contains(Point2D point) {
         return boundaries.contains( point );
     }
-
 
     /**
      * Draw close and collapse active rectangles.
@@ -296,16 +292,6 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
     public void setCollapsed(boolean collapsed) {
         if (this.collapsed != collapsed) {
             collapseOrExpand();
-            // // log.debug( "Collapsed = " + collapsed + " " + this );
-            // this.collapsed = collapsed;
-            // if (!collapsed)
-            // getCanvas().toFront();
-            //
-            // // // resize this sprite
-            // draw( null, 0, 0 );
-            //
-            // // log.debug( " became = " + this );
-            // manager.updateConnections( this );
         }
     }
 

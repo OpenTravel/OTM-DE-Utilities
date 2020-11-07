@@ -299,7 +299,7 @@ public class SpriteManager {
     }
 
     private void mouseClick(MouseEvent e) {
-        // log.debug( "Mouse click on at: " + e.getX() + " " + e.getY() );
+        log.debug( "Mouse click on at: " + e.getX() + " " + e.getY() );
         // The whole canvas is active, check boundaries
         // TODO - use find(point)
         DexSprite selected = null;

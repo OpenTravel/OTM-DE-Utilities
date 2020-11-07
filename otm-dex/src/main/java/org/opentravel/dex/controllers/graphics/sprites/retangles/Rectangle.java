@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
@@ -38,12 +39,16 @@ public class Rectangle {
     protected static Log log = LogFactory.getLog( Rectangle.class );
 
     /**
-     * Render methods that create rectangles may set the event to run if the implement this interface.
+     * Render methods that create rectangles may set the event to run if they implement this interface.
      * <p>
-     * Example: r.setOnMouseClicked( e -> manager.remove( this ) );
+     * Example to run remove on click: r.setOnMouseClicked( e -> manager.remove( this ) );
+     * <p>
+     * Mouse clicks are captured by sprite manager. It uses {@link DexSprite#findAndRunRectangle()} to find the
+     * rectangle at the event's X and Y then runs {@link Rectangle#onMouseClicked(MouseEvent)}. onMouseClicked() will
+     * run with the event the method that was the argument to {@link #setOnMouseClicked(RectangleEventHandler)} .
      */
     public abstract interface RectangleEventHandler {
-        public void onRectangleClick(MouseEvent e);
+        public void onRectangleClick(MouseEvent e); // the functional interface implemented by lambda expression
     }
 
     protected double x;
@@ -101,11 +106,14 @@ public class Rectangle {
         return connectionPoint;
     }
 
+    /**
+     * @return <b>NEW</b> connection point with delta added
+     */
     public Point2D moveConnectionPoint(double deltaX, double deltaY) {
         log.debug( "Connection point move: " + connectionPoint );
         if (connectionPoint != null)
             connectionPoint = connectionPoint.add( deltaX, deltaY );
-        log.debug( "Connection point move: " + connectionPoint );
+        log.debug( "New Connection point : " + connectionPoint );
         return connectionPoint;
     }
 
@@ -134,6 +142,11 @@ public class Rectangle {
         return y;
     }
 
+    /**
+     * Run the method that was the argument to {@link #setOnMouseClicked(RectangleEventHandler)} with the event.
+     * 
+     * @param e
+     */
     public final void onMouseClicked(MouseEvent e) {
         if (e != null && eventHandler != null)
             eventHandler.onRectangleClick( e );
@@ -152,8 +165,12 @@ public class Rectangle {
         return this;
     }
 
+    /**
+     * Save in this rectangle a event handler to call on mouse click.
+     * 
+     * @param a
+     */
     public final void setOnMouseClicked(RectangleEventHandler a) {
-        // TEST
         eventHandler = a;
     }
 

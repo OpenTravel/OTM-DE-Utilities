@@ -29,17 +29,6 @@ public abstract class Connection {
 
     protected DexSprite from;
     protected DexSprite to;
-    // private Rectangle fromRect;
-    // private double offsetY; // offset from sprite Y
-    // private double offsetX; // offset from sprite X
-
-    //
-    // protected Connection(double fx, double fy, double tx, double ty) {
-    // this.fx = fx;
-    // this.fy = fy;
-    // this.tx = tx;
-    // this.ty = ty;
-    // }
 
     public boolean contains(DexSprite sprite) {
         return from == sprite || to == sprite;
@@ -70,5 +59,10 @@ public abstract class Connection {
 
         gc.setStroke( save );
         gc.setLineWidth( saveW );
+    }
+
+    @Override
+    public String toString() {
+        return "Connection: " + fx + "-" + fy + " to " + tx + "-" + ty;
     }
 }

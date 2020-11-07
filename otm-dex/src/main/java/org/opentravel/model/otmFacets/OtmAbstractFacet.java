@@ -57,9 +57,13 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
 
     // private OtmLibraryMember parent;
 
+    // Collapsed is only for graphical views. Tree and table views should use Expanded.
+    private boolean collapsed;
+
     public OtmAbstractFacet(T tl) {
         super( tl );
         setExpanded( true ); // Start out expanded
+        setCollapsed( false ); // Start out expanded
     }
 
     @Override
@@ -414,6 +418,21 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
                 inheritedChildren.remove( property );
     }
 
+    /**
+     * Collapsed is only for graphical views. Tree and table views should use Expanded.
+     * 
+     * @param flag
+     */
+    public void setCollapsed(boolean flag) {
+        collapsed = flag;
+    }
+
+    /**
+     * Collapsed is only for graphical views. Tree and table views should use Expanded.
+     */
+    public boolean isCollapsed() {
+        return collapsed;
+    }
     // @Override
     // public String toString() {
     // return getNameWithPrefix();
