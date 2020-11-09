@@ -41,6 +41,9 @@ import javafx.stage.Stage;
 public class UnlockAndCommitLibraryDialogController extends DexPopupControllerBase {
     // private static Log log = LogFactory.getLog( UnlockAndCommitLibraryDialogController.class );
 
+    /**
+     * Task will be used by the caller who creates the controller.
+     */
     public enum TaskRequested {
         Cancel, UnlockOnly, CommitOnly, CommitAndUnlock
     }
@@ -147,11 +150,13 @@ public class UnlockAndCommitLibraryDialogController extends DexPopupControllerBa
         commitOnlyButton.setDisable( notReady );
     }
 
+    @Override
     public void doCancel() {
         task = TaskRequested.Cancel;
         super.doCancel();
     }
 
+    @Override
     public void doOK() {
         task = TaskRequested.CommitAndUnlock;
         super.doOK();
@@ -173,8 +178,7 @@ public class UnlockAndCommitLibraryDialogController extends DexPopupControllerBa
      * @param message
      */
     public void add(String message) {
-        if (dialogText != null)
-            dialogText.setText( message );
+        postHelp( message + "\n\n", dialogHelp );
     }
 
     public String getCommitRemarks() {

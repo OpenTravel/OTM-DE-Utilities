@@ -137,23 +137,33 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     }
 
     private void commitLibrary() {
-        UnlockAndCommitLibraryDialogController uldc = UnlockAndCommitLibraryDialogController.init();
-        uldc.showAndWait( "" );
-        String remarks = uldc.getCommitRemarks();
-        TaskRequested task = uldc.getTask();
-        RepositoryResultHandler resultHandler = new RepositoryResultHandler( mainController );
-        switch (task) {
-            case Cancel:
-                break;
-            case UnlockOnly:
-                new UnlockLibraryTask( getSelected(), false, remarks, resultHandler, statusController ).go();
-                break;
-            case CommitAndUnlock:
-                new UnlockLibraryTask( getSelected(), true, remarks, resultHandler, statusController ).go();
-                break;
-            case CommitOnly:
-                new CommitLibraryTask( getSelected(), remarks, resultHandler, statusController ).go();
-                break;
+        String results = null;
+        OtmLibrary selected = getSelected();
+        // if (getSelected().getActionManager().getQueueSize() > 0) {
+        // log.debug( "Need to save" );
+        if (selected != null) {
+            results = selected.save();
+
+            UnlockAndCommitLibraryDialogController uldc = UnlockAndCommitLibraryDialogController.init();
+            if (results != null)
+                uldc.add( results );
+            uldc.showAndWait( "" );
+            String remarks = uldc.getCommitRemarks();
+            TaskRequested task = uldc.getTask();
+            RepositoryResultHandler resultHandler = new RepositoryResultHandler( mainController );
+            switch (task) {
+                case Cancel:
+                    break;
+                case UnlockOnly:
+                    new UnlockLibraryTask( selected, false, remarks, resultHandler, statusController ).go();
+                    break;
+                case CommitAndUnlock:
+                    new UnlockLibraryTask( selected, true, remarks, resultHandler, statusController ).go();
+                    break;
+                case CommitOnly:
+                    new CommitLibraryTask( selected, remarks, resultHandler, statusController ).go();
+                    break;
+            }
         }
     }
 

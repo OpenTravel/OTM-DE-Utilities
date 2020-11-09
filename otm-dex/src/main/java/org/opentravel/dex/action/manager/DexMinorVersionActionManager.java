@@ -55,6 +55,14 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
      * {@inheritDoc} Use the queue from the passed action manager.
      */
     @Override
+    public int getQueueSize() {
+        return actionManager.getQueueSize();
+    }
+
+    /**
+     * {@inheritDoc} Use the queue from the passed action manager.
+     */
+    @Override
     public void push(DexAction<?> action) {
         actionManager.push( action );
     }
