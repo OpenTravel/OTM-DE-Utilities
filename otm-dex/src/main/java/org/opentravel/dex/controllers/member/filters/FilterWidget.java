@@ -16,56 +16,75 @@
 
 package org.opentravel.dex.controllers.member.filters;
 
+import org.opentravel.dex.controllers.DexFilterWidget;
 import org.opentravel.dex.controllers.member.MemberFilterController;
+import org.opentravel.dex.events.DexEvent;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
-import javafx.scene.control.RadioButton;
-
 /**
- * Widget for filter buttons.
+ * Generic filter widget.
  * 
  * @author dmh
  *
  */
-public class ButtonFilterWidget extends FilterWidget {
+public class FilterWidget implements DexFilterWidget<OtmLibraryMember> {
     // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
 
-    protected RadioButton button = null;
+    public interface Selector {
+        public boolean isSelected(OtmLibraryMember m);
+    }
 
-    public ButtonFilterWidget(MemberFilterController parent, RadioButton button) {
-        super( parent );
-        if (!(button instanceof RadioButton))
-            throw new IllegalArgumentException( " filter widget must have access to button." );
+    protected MemberFilterController parentController;
+    private static final boolean INITIALSTATE = false;
+    boolean active = INITIALSTATE;
+    protected Selector selector;
 
-        this.button = button;
-        button.setOnAction( e -> set() );
+    public FilterWidget(MemberFilterController parent) {
+        if (parent == null)
+            throw new IllegalArgumentException( "filter widget must have access filter controller." );
+        this.parentController = parent;
     }
 
     @Override
     public void clear() {
-        button.setSelected( false );
+        active = INITIALSTATE;
     }
 
     /**
      * {@inheritDoc}
-     * <p>
-     * True if member's library is in built in library.
      */
-    @Override
     public boolean isSelected(OtmLibraryMember member) {
-        if (!button.isSelected())
+        if (!active)
             return true;
-        if (member == null || member.getLibrary() == null)
+        if (member == null)
             return true;
         return selector.isSelected( member );
     }
 
+    /**
+     * No-Op
+     */
     @Override
-    public void set(boolean state) {
-        button.setSelected( state );
+    public void refresh() {
+        // No-Op
     }
 
-    private void set() {
+    /**
+     * No-Op
+     */
+    @Override
+    public void selectionHandler(DexEvent event) {
+        // No-Op
+    }
+
+    public void set(boolean state) {
+        active = state;
         parentController.fireFilterChangeEvent();
     }
+
+    public FilterWidget setSelector(Selector s) {
+        this.selector = s;
+        return this;
+    }
+
 }

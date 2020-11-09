@@ -16,7 +16,6 @@
 
 package org.opentravel.dex.controllers.member.filters;
 
-import org.opentravel.dex.controllers.DexFilterWidget;
 import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexLibrarySelectionEvent;
@@ -36,23 +35,20 @@ import javafx.scene.control.ChoiceBox;
  * @author dmh
  *
  */
-public class LibraryFilterWidget implements DexFilterWidget<OtmLibraryMember> {
+public class LibraryFilterWidget extends FilterWidget {
     // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
 
     private static final String ALLLIBS = "All Libraries";
-    private MemberFilterController parentController;
     private ChoiceBox<String> librarySelector;
     private OtmModelManager modelMgr;
     private TreeMap<String,OtmLibrary> libraryMap = new TreeMap<>();
     private String libraryFilter = null;
 
     public LibraryFilterWidget(MemberFilterController parent, ChoiceBox<String> librarySelector) {
+        super( parent );
         if (!(librarySelector instanceof ChoiceBox))
             throw new IllegalArgumentException( "Library filter widget must have access to choice box." );
-        if (parent == null)
-            throw new IllegalArgumentException( "Library filter widget must have access filter controller." );
 
-        this.parentController = parent;
         this.modelMgr = parent.getModelManager();
         this.librarySelector = librarySelector;
         if (modelMgr == null)
@@ -82,6 +78,7 @@ public class LibraryFilterWidget implements DexFilterWidget<OtmLibraryMember> {
     /**
      * Clear the selector's backing list and selection.
      */
+    @Override
     public void clear() {
         libraryMap.clear();
         libraryFilter = null;
@@ -102,6 +99,7 @@ public class LibraryFilterWidget implements DexFilterWidget<OtmLibraryMember> {
      * <p>
      * True if ALL LIBS is selected or member's library starts with the selected value
      */
+    @Override
     public boolean isSelected(OtmLibraryMember member) {
         if (libraryFilter == null)
             return true; // Not activated
@@ -136,6 +134,7 @@ public class LibraryFilterWidget implements DexFilterWidget<OtmLibraryMember> {
     /**
      * Update selection's backing list. Leave selected library selected.
      */
+    @Override
     public void refresh() {
         OtmLibrary lib = getSelectedLibrary();
         updateMap();

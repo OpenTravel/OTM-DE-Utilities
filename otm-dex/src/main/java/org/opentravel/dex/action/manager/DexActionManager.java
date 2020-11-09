@@ -129,6 +129,12 @@ public interface DexActionManager {
     public boolean isEnabled(DexActions action, OtmObject subject, OtmObject target);
 
     /**
+     * @param e - exception use to get localized error message
+     * @param warning
+     */
+    void postError(Exception e, String title);
+
+    /**
      * If the controller has been set, use it to post the status message.
      * 
      * @param status

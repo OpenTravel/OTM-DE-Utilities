@@ -88,6 +88,7 @@ public class SetAssignedTypeAction extends DexRunAction {
         // Constructor for reflection
     }
 
+
     /**
      * {@inheritDoc} Override with the Delete member event constructed by undo when a minor version change that creates
      * new library member
@@ -127,7 +128,7 @@ public class SetAssignedTypeAction extends DexRunAction {
             // Create a new property in a new minor version of the owning member
             newUser = user.getLibrary().getVersionChain().getNewMinorTypeUser( user );
             if (newUser == null) {
-                otm.getActionManager().postWarning( "Error creating minor version of " + otm.getOwningMember() );
+                // otm.getActionManager().postWarning( "Error creating minor version of " + otm.getOwningMember() );
                 return null;
             }
             // set filter and event

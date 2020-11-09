@@ -109,6 +109,9 @@ public class OtmVersionChain {
     // return result;
     // }
 
+    /**
+     * @return first editable library found, or null
+     */
     public OtmLibrary getEditable() {
         for (OtmLibrary lib : libraries)
             if (lib.isEditable())
@@ -206,8 +209,10 @@ public class OtmVersionChain {
     }
 
     /**
-     * Create a copy of the subject's owning member in an minor library. Minor library must be in the chain as the
-     * subject and editable. The latest version of the subject's owning member will be used to make the minor version.
+     * Create a copy of the subject's owning member in an minor library.
+     * <p>
+     * Minor library must be in the same chain as the subject and editable. The latest version of the subject's owning
+     * member will be used to make the minor version.
      * 
      * @param subject
      * @return a property owner in the new object with the matching name or null if the minor version could not be
@@ -224,9 +229,9 @@ public class OtmVersionChain {
         OtmLibraryMember latestMember = subjectLibrary.getVersionChain().getLatestVersion( subject );
         if (latestMember == null)
             return null;
-        OtmLibraryMember newMinorLibraryMember = null;
 
-        // If the latest member is in the target minor library us it
+        // If the latest member is in the target minor library use it
+        OtmLibraryMember newMinorLibraryMember = null;
         if (latestMember.getLibrary() == minorLibrary)
             newMinorLibraryMember = latestMember;
         else
@@ -304,8 +309,9 @@ public class OtmVersionChain {
     }
 
     /**
-     * Can the candidate be assigned as type in a minor version for users are currently assigned to the member? To do
-     * so, the candidate must be a later version in the same version chain of the member.
+     * Can the candidate be assigned as type in a minor version for users are currently assigned to the member?
+     * <p>
+     * To do so, the candidate must be a later version in the same version chain of the member.
      * 
      * @param member
      * @param candidate
@@ -322,19 +328,27 @@ public class OtmVersionChain {
             return false;
         if (!member.getName().equals( candidate.getName() ))
             return false;
-        if (member.getLibrary() == candidate.getLibrary())
+        // if (member.getLibrary() == candidate.getLibrary())
+        // return false;
+        // if (!member.getLibrary().getNameWithBasenamespace().equals( candidate.getLibrary().getNameWithBasenamespace()
+        // ))
+        // return false;
+        return isLaterVersion( member.getLibrary(), candidate.getLibrary() );
+    }
+
+    public static boolean isLaterVersion(OtmLibrary library, OtmLibrary candidate) {
+        if (library == candidate)
             return false;
-        if (!member.getLibrary().getNameWithBasenamespace().equals( candidate.getLibrary().getNameWithBasenamespace() ))
+        if (!library.getNameWithBasenamespace().equals( candidate.getNameWithBasenamespace() ))
             return false;
         try {
-            if (member.getLibrary().getMajorVersion() != candidate.getLibrary().getMajorVersion())
+            if (library.getMajorVersion() != candidate.getMajorVersion())
                 return false;
-            if (member.getLibrary().getMinorVersion() >= candidate.getLibrary().getMinorVersion())
+            if (library.getMinorVersion() >= candidate.getMinorVersion())
                 return false;
         } catch (VersionSchemeException e) {
             return false;
         }
-
         return true;
     }
 

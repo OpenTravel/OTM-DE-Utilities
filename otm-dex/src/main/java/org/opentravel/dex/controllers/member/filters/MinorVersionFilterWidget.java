@@ -17,32 +17,47 @@
 package org.opentravel.dex.controllers.member.filters;
 
 import org.opentravel.dex.controllers.member.MemberFilterController;
+import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.otmContainers.OtmVersionChain;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
-import javafx.scene.control.RadioButton;
-
 /**
- * Widget for filter buttons. When <b>not</b> selected, only those that do <b>not</b> match the selector are shown.
+ * In minor version chain (a.k.a. is later version) filter widget.
  * 
  * @author dmh
  *
  */
-public class ButtonToggleFilterWidget extends ButtonFilterWidget {
+public class MinorVersionFilterWidget extends FilterWidget {
     // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
 
+    private OtmTypeProvider provider = null;
+    private OtmVersionChain chain = null;
+
     /**
-     * Widget for filter buttons. When <b>not</b> selected, only those that do <b>not</b> match the selector are shown.
+     * In minor version chain (a.k.a. is later version) filter widget.
      */
-    public ButtonToggleFilterWidget(MemberFilterController parent, RadioButton button) {
-        super( parent, button );
+    public MinorVersionFilterWidget(MemberFilterController parent) {
+        super( parent );
+    }
+
+    @Override
+    public void clear() {
+        provider = null;
     }
 
     @Override
     public boolean isSelected(OtmLibraryMember member) {
-        if (member == null || member.getLibrary() == null)
+        if (provider == null || chain == null)
             return true;
-        if (!button.isSelected())
-            return !selector.isSelected( member );
-        return button.isSelected();
+        if (member == null)
+            return true;
+        return chain.isLaterVersion( provider, member );
+    }
+
+    public void set(OtmTypeProvider provider) {
+        this.provider = provider;
+        if (provider != null)
+            this.chain = provider.getLibrary().getVersionChain();
+        parentController.fireFilterChangeEvent();
     }
 }

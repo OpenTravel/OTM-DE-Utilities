@@ -44,7 +44,7 @@ public interface DexFilterWidget<T> {
     public void refresh();
 
     /**
-     * Handler for external events this widget handles.
+     * Handler for external events.
      * 
      * @param event
      */

@@ -185,6 +185,12 @@ public abstract class DexActionManagerBase implements DexActionManager {
     }
 
     @Override
+    public void postError(Exception e, String warning) {
+        if (mainController != null)
+            mainController.postError( e, warning );
+    }
+
+    @Override
     public void push(DexAction<?> action) {
         if (action == null) {
             // log.debug( "Pushed a null action!" );

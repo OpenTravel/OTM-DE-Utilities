@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.popup;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.controllers.member.MemberTreeTableController;
@@ -42,7 +44,7 @@ import javafx.stage.Stage;
  *
  */
 public class TypeSelectionContoller extends DexPopupControllerBase {
-    // private static Log log = LogFactory.getLog( TypeSelectionContoller.class );
+    private static Log log = LogFactory.getLog( TypeSelectionContoller.class );
 
     public static final String LAYOUT_FILE = "/TypeSelectionDialog.fxml";
 
@@ -139,6 +141,11 @@ public class TypeSelectionContoller extends DexPopupControllerBase {
 
     public void setManager(OtmModelManager model) {
         this.modelManager = model;
+
+        memberTreeTableController.configure( modelManager, false );
+        memberFilterController.configure( modelManager, this );
+        memberFilterController.setBuiltIns( true ); // always start with built-ins showing
+        memberTreeTableController.setFilter( memberFilterController );
     }
 
     @Override
@@ -149,14 +156,17 @@ public class TypeSelectionContoller extends DexPopupControllerBase {
         selectButton.setOnAction( e -> doOK() );
         // selectButton.setMinHeight( 25 );
 
-        memberTreeTableController.configure( modelManager, false );
-        memberFilterController.configure( modelManager, this );
-        memberFilterController.setBuiltIns( true ); // always start with built-ins showing
-        memberTreeTableController.setFilter( memberFilterController );
+        if (modelManager == null) {
+            log.error( "Must have access to model manager." );
+            memberTreeTableController.configure( modelManager, false );
+            // Without model manager the filters can not be created.
+            // memberFilterController.configure( modelManager, this );
+            // memberFilterController.setBuiltIns( true ); // always start with built-ins showing
+            memberTreeTableController.setFilter( memberFilterController );
+        }
 
         memberTreeTableController.post( modelManager );
         memberTreeTableController.setOnMouseClicked( this::mouseClick );
-
     }
 
 }

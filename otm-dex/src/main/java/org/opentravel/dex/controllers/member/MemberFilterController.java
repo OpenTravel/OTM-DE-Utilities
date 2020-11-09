@@ -25,6 +25,7 @@ import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.member.filters.ButtonFilterWidget;
 import org.opentravel.dex.controllers.member.filters.ButtonToggleFilterWidget;
 import org.opentravel.dex.controllers.member.filters.LibraryFilterWidget;
+import org.opentravel.dex.controllers.member.filters.MinorVersionFilterWidget;
 import org.opentravel.dex.controllers.member.filters.NameFilterWidget;
 import org.opentravel.dex.controllers.member.filters.ObjectTypeFilterWidget;
 import org.opentravel.dex.controllers.popup.DexPopupController;
@@ -88,9 +89,8 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     private DexPopupController popupController = null;
     // Filter data
     private ButtonFilterWidget builtInFilter;
-    // private boolean builtIns = false;
-    private OtmTypeProvider minorVersionMatch = null;
-    private List<DexFilterWidget<OtmLibraryMember>> filterWidgets = new ArrayList<>();
+    // private OtmTypeProvider minorVersionMatch = null;
+    private List<DexFilterWidget<OtmLibraryMember>> filters = new ArrayList<>();
 
     private boolean ignoreClear = false;
     private OtmModelManager modelMgr;
@@ -126,7 +126,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         if (!ignoreClear) {
             if (mainController != null)
                 modelMgr = mainController.getModelManager();
-            filterWidgets.forEach( DexFilterWidget::clear );
+            filters.forEach( DexFilterWidget::clear );
         }
     }
 
@@ -148,20 +148,18 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     }
 
     private void configureFilters() {
-        filterWidgets.add( new LibraryFilterWidget( this, librarySelector ) );
-        filterWidgets.add( new ObjectTypeFilterWidget( this, memberTypeCombo ) );
-        filterWidgets.add( new NameFilterWidget( this, memberNameFilter ) );
+        filters.add( new LibraryFilterWidget( this, librarySelector ) );
+        filters.add( new ObjectTypeFilterWidget( this, memberTypeCombo ) );
+        filters.add( new NameFilterWidget( this, memberNameFilter ) );
+        filters.add( new ButtonFilterWidget( this, latestButton ).setSelector( OtmLibraryMember::isLatestVersion ) );
+        filters.add( new ButtonFilterWidget( this, editableButton ).setSelector( OtmLibraryMember::isEditableMinor ) );
+        filters.add( new ButtonFilterWidget( this, errorsButton ).setSelector( m -> !m.isValid( false ) ) );
+        filters.add( new MinorVersionFilterWidget( this ) );
 
         this.builtInFilter = new ButtonToggleFilterWidget( this, builtInsButton );
-        builtInFilter.set( true );
+        builtInFilter.set( false );
         builtInFilter.setSelector( m -> m.getLibrary().isBuiltIn() );
-        filterWidgets.add( builtInFilter );
-
-        filterWidgets
-            .add( new ButtonFilterWidget( this, latestButton ).setSelector( OtmLibraryMember::isLatestVersion ) );
-        filterWidgets
-            .add( new ButtonFilterWidget( this, editableButton ).setSelector( OtmLibraryMember::isEditableMinor ) );
-        filterWidgets.add( new ButtonFilterWidget( this, errorsButton ).setSelector( m -> !m.isValid( false ) ) );
+        filters.add( builtInFilter );
     }
 
     /**
@@ -181,10 +179,17 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         return modelMgr;
     }
 
-    private ObjectTypeFilterWidget getTypeWidget() {
-        for (DexFilterWidget<?> w : filterWidgets)
+    private ObjectTypeFilterWidget getTypeFilter() {
+        for (DexFilterWidget<?> w : filters)
             if (w instanceof ObjectTypeFilterWidget)
                 return (ObjectTypeFilterWidget) w;
+        return null;
+    }
+
+    private MinorVersionFilterWidget getMinorVersionFilter() {
+        for (DexFilterWidget<?> w : filters)
+            if (w instanceof MinorVersionFilterWidget)
+                return (MinorVersionFilterWidget) w;
         return null;
     }
 
@@ -198,17 +203,12 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
 
     private void handleModelChange(DexModelChangeEvent e) {
         modelMgr = e.getModelManager();
-        filterWidgets.forEach( DexFilterWidget::refresh );
+        filters.forEach( DexFilterWidget::refresh );
     }
 
     @Override
     public void initialize() {
-        // log.debug("Member Filter Controller - Initialize");
         checkNodes();
-
-        // TODO - use DexFilterWidget
-        // builtInsButton.setSelected( builtIns );
-        // builtInsButton.setOnAction( e -> setBuiltIns() );
 
         // Get focus after the scene is set
         Platform.runLater( () -> memberNameFilter.requestFocus() );
@@ -225,15 +225,13 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
             return true;
         }
         // log.debug( "Is " + member + " selected?" );
-        if (minorVersionMatch != null
-            && !minorVersionMatch.getLibrary().getVersionChain().isLaterVersion( minorVersionMatch, member ))
-            return false;
+        // if (minorVersionMatch != null
+        // && !minorVersionMatch.getLibrary().getVersionChain().isLaterVersion( minorVersionMatch, member ))
+        // return false;
 
-        for (DexFilterWidget<OtmLibraryMember> w : filterWidgets)
+        for (DexFilterWidget<OtmLibraryMember> w : filters)
             if (!w.isSelected( member ))
                 return false;
-        // if (!builtIns && member.getLibrary().getTL() instanceof BuiltInLibrary)
-        // return false;
 
         // log.debug( member.getName() + " passed filter." );
         // No filters applied OR passed all filters
@@ -241,30 +239,24 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     }
 
     public void librarySelectionHandler(DexLibrarySelectionEvent event) {
-        filterWidgets.forEach( w -> w.selectionHandler( event ) );
+        filters.forEach( w -> w.selectionHandler( event ) );
     }
 
     @Override
     public void refresh() {
         if (mainController != null)
             modelMgr = mainController.getModelManager();
-        filterWidgets.forEach( DexFilterWidget::refresh );
+        filters.forEach( DexFilterWidget::refresh );
     }
 
-    // private void setBuiltIns() {
-    // builtIns = builtInsButton.isSelected();
-    // fireFilterChangeEvent();
-    // }
-
-    //
     /**
      * Set the built-in button
      *
      * @param show
      */
     public void setBuiltIns(boolean show) {
-        builtInFilter.set( show );
-        // builtInsButton.setSelected( show );
+        if (builtInFilter != null)
+            builtInFilter.set( show );
     }
 
     /**
@@ -273,7 +265,10 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
      * @param type
      */
     public void setMinorVersionFilter(OtmTypeProvider type) {
-        minorVersionMatch = type;
+        MinorVersionFilterWidget w = getMinorVersionFilter();
+        if (w != null)
+            w.set( type );
+        // minorVersionMatch = type;
     }
 
     /**
@@ -283,7 +278,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
      * @param member
      */
     public void setTypeFilter(OtmLibraryMember member) {
-        ObjectTypeFilterWidget w = getTypeWidget();
+        ObjectTypeFilterWidget w = getTypeFilter();
         if (w != null)
             w.set( OtmLibraryMemberType.get( member ) );
     }
@@ -295,7 +290,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
      * @param value
      */
     public void setTypeFilterValue(OtmLibraryMemberType value) {
-        ObjectTypeFilterWidget w = getTypeWidget();
+        ObjectTypeFilterWidget w = getTypeFilter();
         if (w != null)
             w.set( value );
     }

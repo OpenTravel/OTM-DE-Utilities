@@ -187,28 +187,34 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     public OtmLibraryMember createMinorVersion(OtmLibrary minorLibrary) {
         OtmLibraryMember lm = null;
         Versioned v = null;
+        Exception exception = null;
+        String errMsg = null;
+        if (!OtmVersionChain.isLaterVersion( getLibrary(), minorLibrary ))
+            errMsg = minorLibrary + " is not later version of this library.";
+        if (getLibrary() == minorLibrary)
+            errMsg = "Same library.";
+        if (!(minorLibrary.isMinorVersion()))
+            errMsg = "Not a minor verion.";
+        if (!(getTL() instanceof Versioned))
+            errMsg = "Not a versioned object type.";
+        if (!(minorLibrary.getTL() instanceof TLLibrary))
+            errMsg = "Not a TL library.";
 
-        if (getLibrary() != minorLibrary && minorLibrary.isMinorVersion() && getTL() instanceof Versioned
-            && minorLibrary.getTL() instanceof TLLibrary) {
+        if (errMsg == null) {
             TLLibrary targetTLLib = (TLLibrary) minorLibrary.getTL();
             try {
                 MinorVersionHelper helper = new MinorVersionHelper();
                 v = helper.createNewMinorVersion( (Versioned) getTL(), targetTLLib );
                 lm = OtmLibraryMemberFactory.create( (LibraryMember) v, getModelManager() );
             } catch (VersionSchemeException | ValidationException e) {
-                log.debug( "Exception creating minor TL version in: " + targetTLLib.getPrefix() + ":"
-                    + targetTLLib.getName() + " " + e.getLocalizedMessage() );
-                return null;
+                errMsg = "Minor Version Error: " + targetTLLib.getPrefix() + ":" + targetTLLib.getName();
+                exception = e;
+                lm = null;
             }
-        } else {
-            if (getLibrary() == minorLibrary)
-                log.debug( "Same library." );
-            if (!(minorLibrary.isMinorVersion()))
-                log.debug( "Not a minor verion." );
-            if (!(getTL() instanceof Versioned))
-                log.debug( "Not a versioned object type." );
-            if (!(minorLibrary.getTL() instanceof TLLibrary))
-                log.debug( "Not a TL library." );
+        }
+        if (errMsg != null) {
+            getActionManager().postError( exception, errMsg );
+            log.debug( errMsg );
         }
         return lm;
     }
