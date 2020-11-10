@@ -56,7 +56,7 @@ public class NewProjectDialogController extends DexPopupControllerBase {
 
     protected static Stage dialogStage;
     private static String helpText = "Select the project.";
-    private static String dialogTitle = "Project Selection Dialog";
+    private static String dialogTitle = "Project Selection";
 
     /**
      * Initialize this controller using the passed FXML loader.
@@ -124,40 +124,6 @@ public class NewProjectDialogController extends DexPopupControllerBase {
 
     private UserSettings userSettings;
 
-    public String getResultText() {
-        return resultText;
-    }
-
-    @Override
-    public void checkNodes() {
-        if (dialogStage == null)
-            throw new IllegalStateException( "Missing stage." );
-
-        if (newProjectDialog == null || dialogTitleLabel == null || dialogHelp == null || dialogButtonCancel == null
-            || dialogButtonOK == null || resultsArea == null)
-            throw new IllegalStateException( "Missing injected field." );
-    }
-
-    @Override
-    public void clear() {
-        dialogHelp.getChildren().clear();
-    }
-
-
-    /**
-     * Select the directory button action event handler.
-     * 
-     * @param e
-     */
-    @FXML
-    public void selectFile(ActionEvent e) {
-        log.debug( "Button: " + e.toString() );
-        DexFileHandler fileHandler = new DexFileHandler();
-        projFile = fileHandler.directoryChooser( dialogStage, "Select Project Directory", userSettings );
-        if (projFile != null)
-            directoryField.setText( projFile.getPath() );
-    }
-
     private boolean canExit() {
         if (!checkFileName())
             return false;
@@ -174,6 +140,86 @@ public class NewProjectDialogController extends DexPopupControllerBase {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Check directory and post any errors found
+     * 
+     * @return true if directory is writable
+     */
+    public boolean checkDirectory() {
+        if (!directoryField.getText().isEmpty()) {
+            File tmpDir = new File( directoryField.getText() );
+            String cPath = "";
+            try {
+                cPath = tmpDir.getCanonicalPath();
+            } catch (IOException e) {
+                postResults( "Error accessing directory: " + getFileName() + "\n" + e.getLocalizedMessage() );
+                return false;
+            }
+            if (!tmpDir.isDirectory())
+                postResults( "Invalid directory: " + cPath );
+            else if (!tmpDir.canWrite())
+                postResults( "Can't create file in the directory: " + cPath );
+            else
+                return true;
+        }
+        return false;
+    }
+
+    public boolean checkFileName() {
+        if (checkDirectory()) {
+            if (fileNameField.getText().isEmpty())
+                return false;
+            File tmpFile = new File( getFileName() );
+            if (tmpFile.exists()) {
+                postResults( "Project already exists." );
+                return false;
+            }
+            postResults( "File name OK." );
+        }
+
+        if (nameField.getText().isEmpty())
+            nameField.setText( fileNameField.getText() );
+        return true;
+    }
+
+
+    @Override
+    public void checkNodes() {
+        if (dialogStage == null)
+            throw new IllegalStateException( "Missing stage." );
+
+        if (newProjectDialog == null || dialogTitleLabel == null || dialogHelp == null || dialogButtonCancel == null
+            || dialogButtonOK == null || resultsArea == null)
+            throw new IllegalStateException( "Missing injected field." );
+    }
+
+    @Override
+    public void clear() {
+        dialogHelp.getChildren().clear();
+    }
+
+    /**
+     * 
+     * @param manager used to create project
+     * @param initialProjectFolder used in user file selection dialog
+     */
+    public void configure(OtmModelManager manager, UserSettings settings) {
+        // TODO - the settings should be abstracted for Dex applications
+        this.modelMgr = manager;
+        this.userSettings = settings;
+    }
+
+    private void doName() {
+        if (nameField != null && idField != null && contextIdField != null) {
+            String name = this.nameField.getText();
+            String id = idField.getText();
+            if (idField.getText().isEmpty())
+                idField.setText( name );
+            if (contextIdField.getText().isEmpty())
+                contextIdField.setText( name );
+        }
     }
 
     /**
@@ -239,6 +285,10 @@ public class NewProjectDialogController extends DexPopupControllerBase {
         return fileName;
     }
 
+    public String getResultText() {
+        return resultText;
+    }
+
     private void postResults(String text) {
         resultsArea.setWrapText( true );
         if (projFile != null)
@@ -247,56 +297,17 @@ public class NewProjectDialogController extends DexPopupControllerBase {
     }
 
     /**
+     * Select the directory button action event handler.
      * 
-     * @param manager used to create project
-     * @param initialProjectFolder used in user file selection dialog
+     * @param e
      */
-    public void configure(OtmModelManager manager, UserSettings settings) {
-        // TODO - the settings should be abstracted for Dex applications
-        this.modelMgr = manager;
-        this.userSettings = settings;
-    }
-
-    public boolean checkFileName() {
-        if (checkDirectory()) {
-            if (fileNameField.getText().isEmpty())
-                return false;
-            File tmpFile = new File( getFileName() );
-            if (tmpFile.exists()) {
-                postResults( "Project already exists." );
-                return false;
-            }
-            postResults( "File name OK." );
-        }
-
-        if (nameField.getText().isEmpty())
-            nameField.setText( fileNameField.getText() );
-        return true;
-    }
-
-    /**
-     * Check directory and post any errors found
-     * 
-     * @return true if directory is writable
-     */
-    public boolean checkDirectory() {
-        if (!directoryField.getText().isEmpty()) {
-            File tmpDir = new File( directoryField.getText() );
-            String cPath = "";
-            try {
-                cPath = tmpDir.getCanonicalPath();
-            } catch (IOException e) {
-                postResults( "Error accessing directory: " + getFileName() + "\n" + e.getLocalizedMessage() );
-                return false;
-            }
-            if (!tmpDir.isDirectory())
-                postResults( "Invalid directory: " + cPath );
-            else if (!tmpDir.canWrite())
-                postResults( "Can't create file in the directory: " + cPath );
-            else
-                return true;
-        }
-        return false;
+    @FXML
+    public void selectFile(ActionEvent e) {
+        log.debug( "Button: " + e.toString() );
+        DexFileHandler fileHandler = new DexFileHandler();
+        projFile = fileHandler.directoryChooser( dialogStage, "Select Project Directory", userSettings );
+        if (projFile != null)
+            directoryField.setText( projFile.getPath() );
     }
 
     @Override
@@ -309,6 +320,8 @@ public class NewProjectDialogController extends DexPopupControllerBase {
 
         fileNameField.setOnAction( e -> checkFileName() );
         directoryField.setOnAction( e -> checkFileName() );
+        nameField.setOnAction( e -> doName() );
+        nameField.focusedProperty().addListener( (ov, oldV, newV) -> doName() );
 
         postHelp( helpText, dialogHelp );
 

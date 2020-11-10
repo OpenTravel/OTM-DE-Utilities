@@ -57,7 +57,7 @@
    <center>
       <VBox BorderPane.alignment="CENTER">
          <children>
-            <GridPane>
+            <GridPane prefHeight="250.0" prefWidth="600.0">
               <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.20001220703125" minWidth="0.0" prefWidth="0.0" />
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="400.0" minWidth="10.0" prefWidth="56.0" />
@@ -67,7 +67,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
@@ -76,60 +76,107 @@
                      <tooltip>
                         <Tooltip text="Directory location for the project file." />
                      </tooltip>
+                     <GridPane.margin>
+                        <Insets right="4.0" />
+                     </GridPane.margin>
                   </Label>
                   <Label layoutX="58.0" layoutY="44.0" text="File name" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
                      <tooltip>
                         <Tooltip text="Name of the project file." />
                      </tooltip>
+                     <GridPane.margin>
+                        <Insets right="4.0" />
+                     </GridPane.margin>
                   </Label>
                   <Label layoutX="10.0" layoutY="16.0" text="Name" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
                      <tooltip>
                         <Tooltip text="Name of the project displyed to users." />
                      </tooltip>
+                     <GridPane.margin>
+                        <Insets right="4.0" />
+                     </GridPane.margin>
                   </Label>
-                  <Label layoutX="10.0" layoutY="108.0" text="ID" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
-                     <tooltip>
-                        <Tooltip text="Unique ID of the project. Typically the URL of the primary libraries is used." />
-                     </tooltip>
-                  </Label>
-                  <Label layoutX="10.0" layoutY="47.0" text="Description" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+                  <Label layoutX="10.0" layoutY="47.0" text="Description" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
                      <tooltip>
                         <Tooltip text="Description of the project" />
                      </tooltip>
-                  </Label>
-                  <Label layoutX="10.0" layoutY="47.0" text="Context Id" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
-                     <tooltip>
-                        <Tooltip text="Default context ID to use on examples." />
-                     </tooltip>
+                     <GridPane.margin>
+                        <Insets right="4.0" />
+                     </GridPane.margin>
                   </Label>
                   <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2">
                      <children>
-                        <TextField fx:id="directoryField" HBox.hgrow="ALWAYS" />
-                        <Button fx:id="selectButton" mnemonicParsing="false" onAction="#selectFile" text="Select" />
+                        <TextField fx:id="directoryField" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets right="4.0" />
+                           </HBox.margin></TextField>
+                        <Button fx:id="selectButton" mnemonicParsing="false" onAction="#selectFile" text="Select">
+                           <HBox.margin>
+                              <Insets right="4.0" />
+                           </HBox.margin></Button>
                      </children>
                   </HBox>
                   <TextField fx:id="fileNameField" GridPane.columnIndex="2" GridPane.rowIndex="1">
                      <tooltip>
                         <Tooltip text="Name of the project file." />
                      </tooltip>
+                     <GridPane.margin>
+                        <Insets right="4.0" />
+                     </GridPane.margin>
                   </TextField>
                   <TextField fx:id="nameField" GridPane.columnIndex="2" GridPane.rowIndex="2">
 				     <tooltip>
                         <Tooltip text="Name of the project displyed to users." />
                      </tooltip>
+                     <GridPane.margin>
+                        <Insets right="4.0" />
+                     </GridPane.margin>
 				  </TextField>
-                  <TextField fx:id="idField" GridPane.columnIndex="2" GridPane.rowIndex="3">
-				     <tooltip>
-                        <Tooltip text="Unique ID of the project. Typically the URL of the primary libraries is used." />
-                     </tooltip>
-				  </TextField>
-                  <TextField fx:id="descriptionField" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                  <TextField fx:id="contextIdField" GridPane.columnIndex="2" GridPane.rowIndex="5">
-				     <tooltip>
-                        <Tooltip text="Default context ID to use on examples." />
-                     </tooltip>
-				  </TextField>
+                  <TextField fx:id="descriptionField" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                     <GridPane.margin>
+                        <Insets right="4.0" />
+                     </GridPane.margin></TextField>
+                  <Separator prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                  <HBox prefHeight="100.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5">
+                     <children>
+                        <Label text="ID">
+                           <tooltip>
+                              <Tooltip text="Unique ID of the project. Typically the URL of the primary libraries is used." />
+                           </tooltip>
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="idField">
+                           <tooltip>
+                              <Tooltip text="Default context ID to use on examples." />
+                           </tooltip>
+                           <HBox.margin>
+                              <Insets left="5.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label text="Context Id">
+                           <tooltip>
+                              <Tooltip text="Default context ID to use on examples." />
+                           </tooltip>
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="contextIdField">
+                           <tooltip>
+                              <Tooltip text="Unique ID of the project. Typically the URL of the primary libraries is used." />
+                           </tooltip>
+                           <HBox.margin>
+                              <Insets left="5.0" />
+                           </HBox.margin>
+                        </TextField>
+                     </children>
+                  </HBox>
                </children>
+               <VBox.margin>
+                  <Insets top="4.0" />
+               </VBox.margin>
             </GridPane>
             <TextArea fx:id="resultsArea" editable="false" focusTraversable="false" prefHeight="92.0" prefWidth="600.0" VBox.vgrow="ALWAYS" />
          </children>
