@@ -155,7 +155,12 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
     }
 
     public StringProperty versionProperty() {
-        return new SimpleStringProperty( library.getTL().getVersion() );
+        StringProperty vp = new SimpleStringProperty( library.getTL().getVersion() );
+        vp.addListener( (o, v, n) -> {
+            // log.debug( "Version change request: " + n );
+            library.getTL().setVersion( n );
+        } );
+        return vp;
     }
 
     /**

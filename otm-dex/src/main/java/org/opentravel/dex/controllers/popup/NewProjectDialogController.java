@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.popup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmProject;
@@ -50,7 +48,7 @@ import javafx.stage.Stage;
  *
  */
 public class NewProjectDialogController extends DexPopupControllerBase {
-    private static Log log = LogFactory.getLog( NewProjectDialogController.class );
+    // private static Log log = LogFactory.getLog( NewProjectDialogController.class );
 
     public static final String LAYOUT_FILE = "/Dialogs/NewProjectDialog.fxml";
 
@@ -206,7 +204,6 @@ public class NewProjectDialogController extends DexPopupControllerBase {
      * @param initialProjectFolder used in user file selection dialog
      */
     public void configure(OtmModelManager manager, UserSettings settings) {
-        // TODO - the settings should be abstracted for Dex applications
         this.modelMgr = manager;
         this.userSettings = settings;
     }
@@ -214,7 +211,6 @@ public class NewProjectDialogController extends DexPopupControllerBase {
     private void doName() {
         if (nameField != null && idField != null && contextIdField != null) {
             String name = this.nameField.getText();
-            String id = idField.getText();
             if (idField.getText().isEmpty())
                 idField.setText( name );
             if (contextIdField.getText().isEmpty())
@@ -238,11 +234,11 @@ public class NewProjectDialogController extends DexPopupControllerBase {
                 return;
             }
         } catch (SecurityException se) {
-            log.error( "Security error creating project file: " + se.getLocalizedMessage() );
+            // log.error( "Security error creating project file: " + se.getLocalizedMessage() );
             postResults( "Access denied while creating project file: " + se.getLocalizedMessage() );
             return;
         } catch (IOException e1) {
-            log.error( "IO error creating project file: " + e1.getLocalizedMessage() );
+            // log.error( "IO error creating project file: " + e1.getLocalizedMessage() );
             postResults( "Error creating project file: " + e1.getLocalizedMessage() );
             return;
         }
@@ -267,8 +263,7 @@ public class NewProjectDialogController extends DexPopupControllerBase {
             newProject.close();
             new DexFileHandler().openProject( projFile, modelMgr, null );
         }
-
-        log.debug( "Created project: " + projFile.getAbsolutePath() );
+        // log.debug( "Created project: " + projFile.getAbsolutePath() );
         super.doOK(); // all OK - close window
     }
 
@@ -303,7 +298,6 @@ public class NewProjectDialogController extends DexPopupControllerBase {
      */
     @FXML
     public void selectFile(ActionEvent e) {
-        log.debug( "Button: " + e.toString() );
         DexFileHandler fileHandler = new DexFileHandler();
         projFile = fileHandler.directoryChooser( dialogStage, "Select Project Directory", userSettings );
         if (projFile != null)
@@ -313,11 +307,9 @@ public class NewProjectDialogController extends DexPopupControllerBase {
     @Override
     protected void setup(String message) {
         super.setStage( dialogTitle, dialogStage );
-        // checkNodes();
 
         dialogButtonCancel.setOnAction( e -> doCancel() );
         dialogButtonOK.setOnAction( e -> doOK() );
-
         fileNameField.setOnAction( e -> checkFileName() );
         directoryField.setOnAction( e -> checkFileName() );
         nameField.setOnAction( e -> doName() );

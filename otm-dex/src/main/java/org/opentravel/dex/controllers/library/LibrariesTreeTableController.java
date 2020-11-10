@@ -82,6 +82,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     private TreeTableColumn<LibraryDAO,String> nameColumn;
     private TreeTableColumn<LibraryDAO,String> namespaceColumn;
     private TreeTableColumn<LibraryDAO,String> prefixColumn;
+    private TreeTableColumn<LibraryDAO,String> versionColumn;
 
     public LibrariesTreeTableController() {
         super( subscribedEvents, publishedEvents );
@@ -94,9 +95,8 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         prefixColumn = createStringColumn( PREFIXCOLUMNLABEL, "prefix", true, true, true, 0 );
         nameColumn = createStringColumn( NAMELABEL, "name", true, true, true, 200 );
         namespaceColumn = createStringColumn( NAMESPACELABEL, "namespace", true, true, true, 250 );
+        versionColumn = createStringColumn( VERSIONLABEL, "version", true, true, true, 0 );
 
-        TreeTableColumn<LibraryDAO,String> versionColumn =
-            createStringColumn( VERSIONLABEL, "version", true, false, true, 0 );
         TreeTableColumn<LibraryDAO,String> statusColumn =
             createStringColumn( STATUSLABEL, "status", true, false, true, 0 );
         TreeTableColumn<LibraryDAO,String> stateColumn =
@@ -264,6 +264,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         nameColumn.setEditable( editable );
         namespaceColumn.setEditable( editable );
         prefixColumn.setEditable( editable );
+        versionColumn.setEditable( editable );
     }
 
     /**
