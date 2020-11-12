@@ -25,6 +25,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
+import org.opentravel.dex.actions.resource.AssignResourceSubjectAction;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;

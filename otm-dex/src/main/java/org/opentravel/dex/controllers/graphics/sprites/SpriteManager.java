@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.controllers.graphics.sprites.connections.Connection;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
@@ -51,7 +49,7 @@ import javafx.scene.paint.Paint;
  * @author dmh
  */
 public class SpriteManager {
-    private static Log log = LogFactory.getLog( SpriteManager.class );
+    // private static Log log = LogFactory.getLog( SpriteManager.class );
 
     private SettingsManager settingsManager;
     private Pane spritePane;
@@ -241,7 +239,7 @@ public class SpriteManager {
         if (newSprite != null)
             spritePane.getChildren().add( newSprite.getCanvas() );
 
-        log.debug( "factory created: " + newSprite );
+        // log.debug( "factory created: " + newSprite );
         return newSprite;
     }
 
@@ -299,7 +297,7 @@ public class SpriteManager {
     }
 
     private void mouseClick(MouseEvent e) {
-        log.debug( "Mouse click on at: " + e.getX() + " " + e.getY() );
+        // log.debug( "Mouse click on at: " + e.getX() + " " + e.getY() );
         // The whole canvas is active, check boundaries
         // TODO - use find(point)
         DexSprite selected = null;

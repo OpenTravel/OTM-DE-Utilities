@@ -107,6 +107,7 @@ public class OtmSimpleObject extends OtmSimpleObjects<TLSimple> implements OtmTy
 
     @Override
     public TLPropertyType setAssignedTLType(NamedEntity type) {
+        // 11/11/2020 - Will fail if namespace is null
         if (type instanceof TLAttributeType)
             getTL().setParentType( (TLAttributeType) type );
         assignedTypeProperty = null;
@@ -128,6 +129,13 @@ public class OtmSimpleObject extends OtmSimpleObjects<TLSimple> implements OtmTy
         return getAssignedType();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * No-Op. Use {@link OtmSimpleObject#setAssignedType(OtmTypeProvider)}
+     * 
+     * @see org.opentravel.model.otmLibraryMembers.OtmLibraryMemberBase#setBaseType(org.opentravel.model.OtmObject)
+     */
     @Override
     public OtmObject setBaseType(OtmObject baseObj) {
         return null; // No-Op

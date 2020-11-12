@@ -834,6 +834,26 @@ public class OtmModelManager implements TaskResultHandlerI {
 
     public static final String XSD_LIBRARY_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
     public static final String XSD_ID_NAME = "ID";
+    public static final String XSD_DECIMAL_NAME = "decimal";
+    public static final String XSD_INTEGER_NAME = "integer";
+    public static final String XSD_STRING_NAME = "string";
+
+    public OtmLibrary getXsdLibrary() {
+        for (OtmLibrary lib : getLibraries()) {
+            if (lib.getTL() instanceof BuiltInLibrary && lib.getTL().getNamespace().equals( XSD_LIBRARY_NAMESPACE ))
+                return lib;
+        }
+        return null;
+    }
+
+    public OtmXsdSimple getXsdMember(String name) {
+        OtmLibrary lib = getXsdLibrary();
+        LibraryMember member = null;
+        if (lib != null)
+            member = lib.getTL().getNamedMember( name );
+        OtmObject otm = OtmModelElement.get( (TLModelElement) member );
+        return otm instanceof OtmXsdSimple ? (OtmXsdSimple) otm : null;
+    }
 
     /**
      * Try to find the XSD ID type and return it
@@ -841,15 +861,16 @@ public class OtmModelManager implements TaskResultHandlerI {
      * @return
      */
     public OtmXsdSimple getIdType() {
-        LibraryMember tlId = null;
-        for (OtmLibrary lib : getLibraries()) {
-            if (lib.getTL() instanceof BuiltInLibrary && lib.getTL().getNamespace().equals( XSD_LIBRARY_NAMESPACE ))
-                tlId = lib.getTL().getNamedMember( XSD_ID_NAME );
-        }
-        OtmObject id = OtmModelElement.get( (TLModelElement) tlId );
-        // if (id == null)
-        // log.debug( "Missing ID type to return." );
-        return id instanceof OtmXsdSimple ? (OtmXsdSimple) id : null;
+        return getXsdMember( XSD_ID_NAME );
+        // LibraryMember tlId = null;
+        // for (OtmLibrary lib : getLibraries()) {
+        // if (lib.getTL() instanceof BuiltInLibrary && lib.getTL().getNamespace().equals( XSD_LIBRARY_NAMESPACE ))
+        // tlId = lib.getTL().getNamedMember( XSD_ID_NAME );
+        // }
+        // OtmObject id = OtmModelElement.get( (TLModelElement) tlId );
+        // // if (id == null)
+        // // log.debug( "Missing ID type to return." );
+        // return id instanceof OtmXsdSimple ? (OtmXsdSimple) id : null;
     }
 
 

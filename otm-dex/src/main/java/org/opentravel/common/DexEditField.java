@@ -18,6 +18,9 @@ package org.opentravel.common;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.actions.DexAction;
+import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.model.OtmObject;
 
 import java.util.Map;
@@ -31,6 +34,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
@@ -61,6 +65,14 @@ public class DexEditField {
      * @param fxNode actual Java FX control node or if null no node column is used
      */
     public DexEditField(int row, int column, String label, String tooltip, Node fxNode) {
+        set( row, column, label, tooltip, fxNode );
+    }
+
+    public DexEditField() {
+
+    }
+
+    public void set(int row, int column, String label, String tooltip, Node fxNode) {
         this.label = label;
         this.fxNode = fxNode;
         this.row = row;
@@ -125,17 +137,60 @@ public class DexEditField {
         if (stringProperty instanceof ReadOnlyStringWrapper) {
             field.setEditable( false );
             field.setDisable( true );
+            // field.setVisible( false );
         } else {
             field.setEditable( true );
             field.setDisable( false );
+            field.setOnAction( a -> {
+                stringProperty.set( ((TextField) a.getSource()).getText() );
+            } );
         }
-        field.setOnAction( a -> {
-            stringProperty.set( ((TextField) a.getSource()).getText() );
-            // log.debug( "String Property Field edited" );
-        } );
         return field;
     }
 
 
+    public Spinner<Integer> makeSpinner(int value, OtmObject obj, DexActions actionType) {
+        Spinner<Integer> spinner = new Spinner<>( 0, 10000, value ); // min, max, init
+        spinner.setDisable( !obj.isEditable() );
+        spinner.setEditable( obj.isEditable() );
 
+        spinner.getEditor().setOnAction( a -> spinnerListener( spinner, obj, actionType ) );
+        spinner.focusedProperty().addListener( (o, old, newV) -> spinnerListener( spinner, obj, actionType ) );
+
+        // spinner.getEditor().setOnAction( a -> spinnerListener( spinner ) );
+        // // spinnerListener( spinner ) );
+        // spinner.focusedProperty().addListener( (o, old, newV) -> spinnerListener( spinner ) );
+        return spinner;
+    }
+
+    // Create the action and use it to get and set the value from the spinner
+    private void spinnerListener(Spinner<Integer> spinner, OtmObject simple, DexActions actionType) {
+        DexRunAction action = null;
+        try {
+            DexAction<?> a = DexActions.getAction( actionType, simple, null, simple.getActionManager() );
+            if (a instanceof DexRunAction)
+                action = (DexRunAction) a;
+        } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException e) {
+            log.debug( "Error getting action." );
+            return;
+        }
+
+        if (action != null && spinner != null) {
+            Object currentValue = action.get();
+            try {
+                // If they type, the editor will access the value
+                int value = Integer.parseInt( spinner.getEditor().getText() );
+                if (spinner.getValue() != value)
+                    spinner.getValueFactory().setValue( value );
+
+                // If the value changed, run the action
+                if (spinner.getValue() != currentValue) {
+                    simple.getActionManager().run( action, spinner.getValue() );
+                }
+            } catch (NumberFormatException e) {
+                log.debug( "Not a valid number format: " + spinner.getEditor().getText() );
+                simple.getActionManager().run( action, null );
+            }
+        }
+    }
 }

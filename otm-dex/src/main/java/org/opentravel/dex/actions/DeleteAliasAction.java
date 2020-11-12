@@ -76,7 +76,7 @@ public class DeleteAliasAction extends DexRunAction {
     }
 
     @Override
-    protected Object get() {
+    public Object get() {
         return deletedAlias;
     }
 

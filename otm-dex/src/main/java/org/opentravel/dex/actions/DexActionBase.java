@@ -47,9 +47,6 @@ public abstract class DexActionBase {
      */
     protected void postWarning(String reason) {
         getSubject().getActionManager().postWarning( reason );
-        // DialogBoxContoller dbc = DialogBoxContoller.init();
-        // if (dbc != null)
-        // dbc.show( title, reason );
     }
 
     // Override if the action has specific sub-type of OtmObject as its subject.

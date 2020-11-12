@@ -84,7 +84,7 @@ public class MoveElementAction extends DexRunAction {
     }
 
     @Override
-    protected Object get() {
+    public Object get() {
         return movedElement;
     }
 

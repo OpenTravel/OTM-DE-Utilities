@@ -18,6 +18,7 @@ package org.opentravel.dex.actions;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.actions.resource.AddResourceChildAction;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmProperties.OtmProperty;
@@ -69,7 +70,7 @@ public class DeletePropertyAction extends DexRunAction {
     }
 
     @Override
-    protected Object get() {
+    public Object get() {
         return deletedProperty;
     }
 

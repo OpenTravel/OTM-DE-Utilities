@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.DomainSprite;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
@@ -41,7 +39,7 @@ import javafx.scene.layout.Pane;
  *
  */
 public class ColumnRectangle extends Rectangle {
-    private static Log log = LogFactory.getLog( ColumnRectangle.class );
+    // private static Log log = LogFactory.getLog( ColumnRectangle.class );
 
     public static final int COLUMN_HEIGHT_MIN = 1000;
     public static final int COLUMN_MARGIN_X = 50;
@@ -78,7 +76,7 @@ public class ColumnRectangle extends Rectangle {
      * @return the sprite (added or found already column)
      */
     public void add(DexSprite sprite) {
-        log.debug( "Adding " + sprite );
+        // log.debug( "Adding " + sprite );
         if (sprite != null && !activeSprites.contains( sprite )) {
             // If the sprite is wider than column, resize column
             if (sprite.getWidth() + COLUMN_MARGIN_X > width)
@@ -156,7 +154,7 @@ public class ColumnRectangle extends Rectangle {
     }
 
     public void remove(DexSprite sprite) {
-        log.debug( "Removing sprite: " + sprite + "  " + activeSprites.contains( sprite ) );
+        // log.debug( "Removing sprite: " + sprite + " " + activeSprites.contains( sprite ) );
         activeSprites.remove( sprite );
         spritePane.getChildren().remove( sprite.getCanvas() );
     }

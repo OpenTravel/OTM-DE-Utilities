@@ -19,7 +19,7 @@ package org.opentravel.common;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexActions;
-import org.opentravel.dex.actions.SetMimeTypesAction;
+import org.opentravel.dex.actions.resource.SetMimeTypesAction;
 import org.opentravel.model.OtmObject;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.model.TLMimeType;

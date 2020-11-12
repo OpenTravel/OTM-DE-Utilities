@@ -145,8 +145,8 @@ public class TestContextualFacetSprite extends AbstractFxTest {
         cmRect = csC.drawMember( gc ); // 157 x 28
         emRect = csE.drawMember( gc ); // 577 x 121
 
-        // Must conform to width set when gc was null
-        assertTrue( eRect.getWidth() >= 600 );
+        // Must conform to width less some margins set when gc was null
+        assertTrue( eRect.getWidth() >= 500 );
     }
 
     /**

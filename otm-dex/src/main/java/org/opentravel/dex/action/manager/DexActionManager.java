@@ -18,6 +18,7 @@ package org.opentravel.dex.action.manager;
 
 import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.model.OtmObject;
 
@@ -77,6 +78,11 @@ public interface DexActionManager {
      * @return simple string property if editable and action enabled, read only property otherwise
      */
     public StringProperty add(DexActions action, String currentValue, OtmObject subject);
+
+    /**
+     * Remove all entries from the queue
+     */
+    void clearQueue();
 
     /**
      * Peek at the last action put onto the queue. See {@link #undo()}
@@ -190,6 +196,17 @@ public interface DexActionManager {
      */
     public Object run(DexActions actionType, OtmObject subject, Object data);
 
+    /**
+     * * Do the run action and push onto queue.
+     * <p>
+     * Other actions depend upon a FX observable to make changes. Run actions must be explicitly invoked.
+     * 
+     * @param actionHandler
+     * @param value
+     * @return
+     */
+    public Object run(DexRunAction actionHandler, Object value);
+
     public void setMainController(DexMainController mainController);
 
     /**
@@ -197,10 +214,5 @@ public interface DexActionManager {
      * 
      */
     public void undo();
-
-    /**
-     * Remove all entries from the queue
-     */
-    void clearQueue();
 
 }

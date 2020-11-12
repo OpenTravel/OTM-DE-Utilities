@@ -18,9 +18,9 @@ package org.opentravel.common;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.model.OtmObject;
 import org.opentravel.schemacompiler.validate.FindingMessageFormat;
 import org.opentravel.schemacompiler.validate.FindingType;
-import org.opentravel.schemacompiler.validate.Validatable;
 import org.opentravel.schemacompiler.validate.ValidationFinding;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
@@ -76,6 +76,11 @@ public class ValidationUtils {
         return key.substring( key.lastIndexOf( '.' ), key.length() );
     }
 
+    /**
+     * @param keyArray
+     * @param findings
+     * @return findings containing only those matching the veto keys if any.
+     */
     public static ValidationFindings getRelevantFindings(String[] keyArray, ValidationFindings findings) {
         List<String> longKeys = new ArrayList<>( Arrays.asList( keyArray ) );
         List<String> keys = new ArrayList<>();
@@ -87,13 +92,8 @@ public class ValidationUtils {
                 String key = trim( f.getMessageKey() );
                 if (keys.contains( key )) {
                     relevant.addFinding( f );
-                    // String msg = f.getFormattedMessage(FindingMessageFormat.IDENTIFIED_FORMAT);
-                    String msg2 = f.getFormattedMessage( FindingMessageFormat.MESSAGE_ONLY_FORMAT );
-                    // FindingType type = f.getType();
-                    Validatable source = f.getSource();
-                    log.debug( "Relevant Finding: " + source.getValidationIdentity() + " : " + msg2 );
-                } else
-                    log.debug( "Unrelevant Finding: " + key );
+                } // else
+                  // log.debug( "Unrelevant Finding: " + f.getMessageKey() );
             }
         return relevant;
     }
@@ -106,4 +106,26 @@ public class ValidationUtils {
         return findings != null ? !findings.getFindingsAsList( FindingType.ERROR ).isEmpty() : false;
     }
 
+    /**
+     * Is subject vetoed? Force validation and try to match the keys.
+     * 
+     * @param vetoKeys
+     * @param subject
+     * @return true if any of the validation findings matches the veto keys.
+     */
+    public static boolean isVetoed(String[] vetoKeys, OtmObject subject) {
+        boolean veto = false;
+        ValidationFindings findings = null;
+        if (!subject.isValid( true )) {
+            findings = getRelevantFindings( vetoKeys, subject.getFindings() );
+            if (!findings.isEmpty()) {
+                veto = true;
+            }
+        }
+        // if (subject instanceof OtmTypeUser)
+        // log.debug( "Veto " + subject.getName() + ((OtmTypeUser) subject).getAssignedType() + "? " + veto );
+        // if (veto)
+        // log.debug( getMessagesAsString( findings ) );
+        return veto;
+    }
 }

@@ -88,7 +88,8 @@ public interface OtmObject {
     public String getExample();
 
     /**
-     * Get the validation findings associated with this object. Lazy evaluated: if null, validation will be run.
+     * Get the validation findings associated with this object. Lazy evaluated; if the findings were null validation
+     * will be run.
      * 
      * @return
      */
@@ -210,7 +211,7 @@ public interface OtmObject {
      * Are there any warnings or errors in the findings?
      * 
      * @param When force is true, run validation on all children and where used library members.
-     * @return
+     * @return true if there are no warning or error findings
      */
     public boolean isValid(boolean refresh);
 

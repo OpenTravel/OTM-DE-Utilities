@@ -277,14 +277,14 @@ public class TestDexActionManager {
     @Test
     public void testReadOnlyActionManager() {
         DexActionManager am = new DexReadOnlyActionManager();
-        OtmModelManager mgr = new OtmModelManager( am, null );
+        OtmModelManager mgr = new OtmModelManager( am, null, null );
         lib = mgr.add( new TLLibrary() );
         OtmBusinessObject newBO = TestBusiness.buildOtm( mgr, "NewBO" );
         lib.add( newBO );
         assertTrue( newBO.isEditable() );
 
         // Should do nothing and have no side effects
-        am.run( null, null );
+        // am.run( null, null );
         am.run( DexActions.DESCRIPTIONCHANGE, null );
 
         // Should always be false

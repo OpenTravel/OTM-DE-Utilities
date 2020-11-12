@@ -71,7 +71,6 @@ public class OtmValidationHandler {
     }
 
     public ValidationFindings getFindings() {
-        // return isValid( getTL() );
         if (findings == null) {
             isValid( true );
             // log.debug( "Getting findings for " + this );
@@ -110,9 +109,9 @@ public class OtmValidationHandler {
             if (validationImageProperty() != null)
                 validationImageProperty().setValue( validationImage() );
         }
-        // log.debug( "Validated " + this + " resulted in " + findings.count() + " findings." );
+        // log.debug( "Validated " + this.obj );
         // if (findings != null && findings.count() > 0)
-        // log.debug( this + "findings: " + findings.count() + " findings found" );
+        // log.debug( " findings: " + findings.count() + " findings found" );
         // Model change events make the image and tool tip update
         return findings == null || findings.isEmpty();
     }

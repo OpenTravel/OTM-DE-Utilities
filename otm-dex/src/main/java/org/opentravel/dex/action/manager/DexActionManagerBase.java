@@ -259,26 +259,35 @@ public abstract class DexActionManagerBase implements DexActionManager {
         Object result = null;
         if (subject == null)
             return null;
-
         try {
             if (value instanceof OtmObject)
                 actionHandler = DexActions.getAction( action, subject, (OtmObject) value, this );
             else
                 actionHandler = DexActions.getAction( action, subject, this );
-            if (actionHandler instanceof DexRunAction) {
-                result = ((DexRunAction) actionHandler).doIt( value );
-            } else {
-                String warning = "Error running action ";
-                if (action != null)
-                    warning += action.toString();
-                postWarning( warning );
-                log.warn( "Action is null or not a run action." );
-            }
         } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException | SecurityException
             | IllegalArgumentException e) {
             log.warn( "Could not create action. " + e.getLocalizedMessage() );
         }
 
+        // If run action was successfully created, run it.
+        if (actionHandler instanceof DexRunAction) {
+            result = run( (DexRunAction) actionHandler, value );
+        } else {
+            String warning = "Error running action ";
+            if (action != null)
+                warning += action.toString();
+            postWarning( warning );
+            log.warn( "Action is null or not a run action." );
+        }
+        return result;
+    }
+
+    @Override
+    public Object run(DexRunAction actionHandler, Object value) {
+        Object result = null;
+
+        if (actionHandler instanceof DexRunAction)
+            result = actionHandler.doIt( value );
         // push results onto queue
         if (result != null)
             push( actionHandler );

@@ -38,9 +38,6 @@ public abstract class DexRunAction extends DexActionBase implements DexAction<Ob
         super();
     }
 
-    // @Deprecated
-    // public abstract Object doIt();
-    //
     /**
      * Perform the action using supplied data.
      * 
@@ -52,7 +49,7 @@ public abstract class DexRunAction extends DexActionBase implements DexAction<Ob
     /**
      * Simply get the object's field value
      */
-    protected abstract Object get();
+    public abstract Object get();
 
     @Override
     public ObservableValue<? extends OtmObject> getObservable() {

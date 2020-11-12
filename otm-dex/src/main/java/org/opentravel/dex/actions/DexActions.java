@@ -17,6 +17,43 @@
 package org.opentravel.dex.actions;
 
 import org.opentravel.dex.action.manager.DexActionManager;
+import org.opentravel.dex.actions.constraints.SetConstraintFractionDigitsAction;
+import org.opentravel.dex.actions.constraints.SetConstraintMaxExclusiveAction;
+import org.opentravel.dex.actions.constraints.SetConstraintMaxInclusiveAction;
+import org.opentravel.dex.actions.constraints.SetConstraintMaxLengthAction;
+import org.opentravel.dex.actions.constraints.SetConstraintMinExclusiveAction;
+import org.opentravel.dex.actions.constraints.SetConstraintMinInclusiveAction;
+import org.opentravel.dex.actions.constraints.SetConstraintMinLengthAction;
+import org.opentravel.dex.actions.constraints.SetConstraintPatternAction;
+import org.opentravel.dex.actions.constraints.SetConstraintTotalDigitsAction;
+import org.opentravel.dex.actions.resource.AddResourceChildAction;
+import org.opentravel.dex.actions.resource.AddResourceParameterAction;
+import org.opentravel.dex.actions.resource.AddResourceResponseAction;
+import org.opentravel.dex.actions.resource.AssignResourceSubjectAction;
+import org.opentravel.dex.actions.resource.BasePathChangeAction;
+import org.opentravel.dex.actions.resource.DeleteResourceChildAction;
+import org.opentravel.dex.actions.resource.RemoveActionFacetBasePayloadAction;
+import org.opentravel.dex.actions.resource.SetAFReferenceCountAction;
+import org.opentravel.dex.actions.resource.SetAFReferenceFacetAction;
+import org.opentravel.dex.actions.resource.SetAFReferenceTypeAction;
+import org.opentravel.dex.actions.resource.SetAbstractAction;
+import org.opentravel.dex.actions.resource.SetFirstClassAction;
+import org.opentravel.dex.actions.resource.SetIdGroupAction;
+import org.opentravel.dex.actions.resource.SetMimeTypesAction;
+import org.opentravel.dex.actions.resource.SetParameterFieldAction;
+import org.opentravel.dex.actions.resource.SetParameterGroupFacetAction;
+import org.opentravel.dex.actions.resource.SetParameterLocationAction;
+import org.opentravel.dex.actions.resource.SetParentParameterGroupAction;
+import org.opentravel.dex.actions.resource.SetParentPathTemplateAction;
+import org.opentravel.dex.actions.resource.SetParentRefParentAction;
+import org.opentravel.dex.actions.resource.SetRepeatCountAction;
+import org.opentravel.dex.actions.resource.SetRequestMethodAction;
+import org.opentravel.dex.actions.resource.SetRequestParameterGroupAction;
+import org.opentravel.dex.actions.resource.SetRequestPathAction;
+import org.opentravel.dex.actions.resource.SetRequestPayloadAction;
+import org.opentravel.dex.actions.resource.SetResourceExtensionAction;
+import org.opentravel.dex.actions.resource.SetResponsePayloadAction;
+import org.opentravel.dex.actions.resource.SetRestStatusCodesAction;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.dex.events.DexMemberDeleteEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
@@ -50,6 +87,7 @@ public enum DexActions {
     NEWLIBRARYMEMBER(NewLibraryMemberAction.class, DexModelChangeEvent.class),
     SETLIBRARY(SetLibraryAction.class, DexModelChangeEvent.class),
     DELETEALIAS(DeleteAliasAction.class, OtmObjectChangeEvent.class),
+    SETLIST(SetListAction.class, OtmObjectModifiedEvent.class),
     // Properties
     ADDPROPERTY(AddPropertyAction.class, OtmObjectChangeEvent.class),
     COPYPROPERTY(CopyPropertyAction.class, OtmObjectChangeEvent.class),
@@ -57,19 +95,17 @@ public enum DexActions {
     SETREPEATCOUNT(SetRepeatCountAction.class, OtmObjectModifiedEvent.class),
     PROPERTYROLECHANGE(PropertyRoleChangeAction.class, OtmObjectModifiedEvent.class),
     MOVEELEMENT(MoveElementAction.class, OtmObjectChangeEvent.class),
-    //
+    // Resource
     ADDRESOURCECHILD(AddResourceChildAction.class, DexResourceChangeEvent.class),
     ADDRESOURCEPARAMETER(AddResourceParameterAction.class, DexResourceChangeEvent.class),
     ADDRESOURCERESPONSE(AddResourceResponseAction.class, DexResourceChangeEvent.class),
     DELETERESOURCECHILD(DeleteResourceChildAction.class, DexResourceChangeEvent.class),
-    //
     // Assigning resource subject can cause a new resource to be created.
     ASSIGNSUBJECT(AssignResourceSubjectAction.class, DexModelChangeEvent.class),
     BASEPATHCHANGE(BasePathChangeAction.class, DexResourceModifiedEvent.class),
     SETABSTRACT(SetAbstractAction.class, DexResourceModifiedEvent.class),
     SETFIRSTCLASS(SetFirstClassAction.class, DexResourceModifiedEvent.class),
     SETRESOURCEEXTENSION(SetResourceExtensionAction.class, DexResourceModifiedEvent.class),
-    //
     REMOVEAFBASEPAYLOAD(RemoveActionFacetBasePayloadAction.class, DexResourceChildModifiedEvent.class),
     SETAFREFERENCETYPE(SetAFReferenceTypeAction.class, DexResourceChildModifiedEvent.class),
     SETAFREFERENCEFACET(SetAFReferenceFacetAction.class, DexResourceChildModifiedEvent.class),
@@ -89,7 +125,16 @@ public enum DexActions {
     SETRESTSTATUSCODES(SetRestStatusCodesAction.class, DexResourceChildModifiedEvent.class),
     SETPARAMETERFIELD(SetParameterFieldAction.class, DexResourceChildModifiedEvent.class),
     SETAFREFERENCEFACETCOUNT(SetAFReferenceCountAction.class, DexResourceChildModifiedEvent.class),
-    SETLIST(SetListAction.class, OtmObjectModifiedEvent.class);
+    // Simple Type Constraints
+    SETCONSTRAINT_PATTERN(SetConstraintPatternAction.class, OtmObjectModifiedEvent.class),
+    SETCONSTRAINT_TOTALDIGITS(SetConstraintTotalDigitsAction.class, OtmObjectModifiedEvent.class),
+    SETCONSTRAINT_FRACTIONDIGITS(SetConstraintFractionDigitsAction.class, OtmObjectModifiedEvent.class),
+    SETCONSTRAINT_MINLENGTH(SetConstraintMinLengthAction.class, OtmObjectModifiedEvent.class),
+    SETCONSTRAINT_MAXLENGTH(SetConstraintMaxLengthAction.class, OtmObjectModifiedEvent.class),
+    SETCONSTRAINT_MININCLUSIVE(SetConstraintMinInclusiveAction.class, OtmObjectModifiedEvent.class),
+    SETCONSTRAINT_MAXINCLUSIVE(SetConstraintMaxInclusiveAction.class, OtmObjectModifiedEvent.class),
+    SETCONSTRAINT_MINEXCLUSIVE(SetConstraintMinExclusiveAction.class, OtmObjectModifiedEvent.class),
+    SETCONSTRAINT_MAXEXCLUSIVE(SetConstraintMaxExclusiveAction.class, OtmObjectModifiedEvent.class);
 
     private final Class<? extends DexChangeEvent> eventClass;
 

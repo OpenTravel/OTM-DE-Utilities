@@ -32,7 +32,7 @@ public class TestXsdSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         subject = buildOtm( staticModelManager );
         baseObject = buildOtm( staticModelManager );
         baseObject.setName( "BaseSimple" );
@@ -59,6 +59,9 @@ public class TestXsdSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
         return simple;
     }
 
+    public static OtmXsdSimple getString(OtmModelManager mgr) {
+        return mgr.getIdType();
+    }
 
     /**
      * Build an TL xsd simple type named "simpleString".

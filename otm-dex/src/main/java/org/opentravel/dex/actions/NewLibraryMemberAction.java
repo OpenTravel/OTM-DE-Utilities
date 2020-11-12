@@ -19,6 +19,7 @@ package org.opentravel.dex.actions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexWizardActionManager;
+import org.opentravel.dex.actions.resource.AssignResourceSubjectAction;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.MemberDetailsPopupController;
 import org.opentravel.model.OtmObject;

@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.connections.SuperTypeConnection;
 import org.opentravel.dex.controllers.graphics.sprites.connections.TypeConnection;
@@ -50,7 +48,7 @@ import javafx.scene.paint.Paint;
  */
 public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSpriteBase
     implements DexSprite, RectangleEventHandler {
-    private static Log log = LogFactory.getLog( MemberSprite.class );
+    // private static Log log = LogFactory.getLog( MemberSprite.class );
 
     private static final double MIN_HEIGHT = 50;
     private static final double MIN_WIDTH = 50;
@@ -118,13 +116,13 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
      * Toggle collapsed state.
      */
     public void collapseOrExpand(OtmFacet<?> f) {
-        log.debug( "Collapse or expand." );
+        // log.debug( "Collapse or expand." );
         if (f != null) {
             clear();
             f.setCollapsed( !f.isCollapsed() );
             render();
             manager.updateConnections( this );
-            log.debug( "Collapse or expand: " + f + " to " + f.isExpanded() );
+            // log.debug( "Collapse or expand: " + f + " to " + f.isExpanded() );
         }
     }
 
@@ -334,11 +332,11 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
         double clipH = boundaries.getHeight() + 8 + settingsManager.getMargin( Margins.FACET );
         canvas.setClip( new javafx.scene.shape.Rectangle( clipX, clipY, clipW, clipH ) );
 
-        if (gc == null)
-            log.debug( "ComputeMember: " + this );
-        else
-            log.debug( "DrawMember: " + this );
-
+        // if (gc == null)
+        // log.debug( "ComputeMember: " + this );
+        // else
+        // log.debug( "DrawMember: " + this );
+        //
         return boundaries;
     }
 
@@ -381,7 +379,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
 
     @Override
     public Canvas render() {
-        log.debug( "Rendering at " + x + " " + y + " sprite for: " + member );
+        // log.debug( "Rendering at " + x + " " + y + " sprite for: " + member );
         if (member == null || manager == null)
             return null;
 
@@ -397,7 +395,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
 
         drawMember( gc );
         manager.updateConnections( this );
-        log.debug( "Rendered " + member + " at " + getBoundaries() );
+        // log.debug( "Rendered " + member + " at " + getBoundaries() );
         return canvas;
     }
 

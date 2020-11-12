@@ -22,7 +22,7 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.actions.ManditoryChangeAction;
 import org.opentravel.dex.actions.PropertyRoleChangeAction;
-import org.opentravel.dex.actions.SetRepeatCountAction;
+import org.opentravel.dex.actions.resource.SetRepeatCountAction;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.dex.controllers.DexFilter;
 import org.opentravel.dex.controllers.DexIncludedController;

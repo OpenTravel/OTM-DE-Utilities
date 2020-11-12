@@ -70,6 +70,7 @@ public class TestOtmSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
         return s;
     }
 
+    // 11/11/2020 - causes NPE if tlLib is managed
     public static OtmSimpleObject buildOtm(OtmModelManager mgr) {
         OtmSimpleObject simple = new OtmSimpleObject( buildTL(), mgr );
         simple.setAssignedType( TestXsdSimple.buildOtm( mgr ) );

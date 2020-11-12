@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.member.properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.DexRepeatMaxConverter;
 import org.opentravel.common.cellfactories.AssignedTypePropertiesTreeTableCellFactory;
@@ -64,7 +62,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class MemberPropertiesTreeTableController extends DexIncludedControllerBase<OtmLibraryMember> {
-    private static Log log = LogFactory.getLog( MemberPropertiesTreeTableController.class );
+    // private static Log log = LogFactory.getLog( MemberPropertiesTreeTableController.class );
 
     private static final EventType[] publishedEvents =
         {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED,
@@ -286,7 +284,7 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
     }
 
     private void handleEvent(OtmObjectModifiedEvent e) {
-        log.debug( "Object modified event, subject is: " + e.getObject() );
+        // log.debug( "Object modified event, subject is: " + e.getObject() );
         refresh();
     }
 
@@ -307,8 +305,9 @@ public class MemberPropertiesTreeTableController extends DexIncludedControllerBa
             TreeItem<PropertiesDAO> currentItem = event.getRowValue();
             if (currentItem != null)
                 currentItem.getValue().setMax( event.getNewValue() );
-        } else
-            log.warn( "ERROR - cell max edit handler has null." );
+        }
+        // else
+        // log.warn( "ERROR - cell max edit handler has null." );
     }
 
     public void handleEvent(DexMemberSelectionEvent event) {

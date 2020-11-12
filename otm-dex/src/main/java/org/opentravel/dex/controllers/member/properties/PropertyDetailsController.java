@@ -21,6 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
+import org.opentravel.common.ValidationUtils;
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DeprecationChangeAction;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.actions.MoveElementAction;
@@ -39,6 +41,7 @@ import org.opentravel.model.otmFacets.OtmVWAValueFacet;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.schemacompiler.model.TLExampleOwner;
+import org.opentravel.schemacompiler.model.TLSimple;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -52,6 +55,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.ImageView;
@@ -192,26 +196,101 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
     }
 
 
-    public void post(OtmSimpleObject property) {
+    // private static String NA = "Not Applicable";
+    private static String MININ_LABEL = "Min Inclusive";
+    private static String MININ_TIP = "Assigns a minimum (inclusive) value.";
+    private static String MAXIN_LABEL = "Max Inclusive";
+    private static String MAXIN_TIP = "Assigns a maximum (inclusive) value.";
+    private static String MINEX_LABEL = "Min Exclusive";
+    private static String MINEX_TIP = "Assigns a minimum (exclusive) value.";
+    private static String MAXEX_LABEL = "Max Exclusive";
+    private static String MAXEX_TIP = "Assigns a maximum (exclusive) value.";
+
+    private static String TOTALDIGITS_LABEL = "Total Digits";
+    private static String TOTALDIGITS_TIP = "Assign the total number of digits of a numeric datatype.";
+    private static String FRACTIONDIGITS_LABEL = "Fraction Digits";
+    private static String FRACTIONDIGITS_TIP = "Assign the number of fractional digits of a numerical datatype.";
+
+    private static String MINLEN_LABEL = "Min Length";
+    private static String MINLEN_TIP = "Assign the minimum length expressed in a unit that depends on the datatype.";
+
+    private static String MAXLEN_LABEL = "Max Length";
+    private static String MAXLEN_TIP = "Assign the maximum length expressed in a unit that depends on the datatype.";
+
+    public void post(OtmSimpleObject simple) {
         // log.debug( "Posting simple object " + property );
-        postedData = property;
+        postedData = simple;
         propertyGrid.getChildren().clear();
-        postTitle( property );
+        postTitle( simple );
         currentRow = 0;
         propertyButtons.setVisible( false );
 
         // List
-        BooleanProperty listProperty =
-            property.getActionManager().add( DexActions.SETLIST, property.isList(), property );
-        Node checkBox = DexEditField.makeCheckBox( listProperty, "Set to make value repeat." );
-        DexEditField field = new DexEditField( currentRow++, 0, "List", "Does this value repeat.", checkBox );
-        postField( field, property );
+        BooleanProperty listProperty = simple.getActionManager().add( DexActions.SETLIST, simple.isList(), simple );
+        Node checkBox = DexEditField.makeCheckBox( listProperty, "Repeats" );
+        DexEditField field = new DexEditField( currentRow, 0, "List", "Set to allow the value to repeat.", checkBox );
+        postField( field, simple );
+
+        // post fields creating actions
+        DexActionManager am = simple.getActionManager();
+        TLSimple tl = simple.getTL();
 
         // Pattern
+        StringProperty sp = am.add( DexActions.SETCONSTRAINT_PATTERN, tl.getPattern(), simple );
+        Node p = DexEditField.makeTextField( sp );
+        field = new DexEditField( currentRow++, 2, "Pattern", "Assign a regular expression pattern constraint.", p );
+        postField( field, simple );
+
         // Min/Max Length
-        // Fraction/Total digits
-        // Min/Max inclusive
-        // Min/Max exclusive
+        makeSpinner( simple, DexActions.SETCONSTRAINT_MINLENGTH, tl.getMinLength(), currentRow, 0, MINLEN_LABEL,
+            MINLEN_TIP );
+        makeSpinner( simple, DexActions.SETCONSTRAINT_MAXLENGTH, tl.getMaxLength(), currentRow, 2, MAXLEN_LABEL,
+            MAXLEN_TIP );
+
+        // Total and fraction digits
+        makeSpinner( simple, DexActions.SETCONSTRAINT_TOTALDIGITS, tl.getTotalDigits(), currentRow, 4,
+            TOTALDIGITS_LABEL, TOTALDIGITS_TIP );
+        makeSpinner( simple, DexActions.SETCONSTRAINT_FRACTIONDIGITS, tl.getFractionDigits(), currentRow++, 6,
+            FRACTIONDIGITS_LABEL, FRACTIONDIGITS_TIP );
+
+        // Min/Max inclusive/exclusive
+        makeField( simple, DexActions.SETCONSTRAINT_MININCLUSIVE, currentRow, 0, tl.getMinInclusive(), MININ_LABEL,
+            MININ_TIP );
+        makeField( simple, DexActions.SETCONSTRAINT_MAXINCLUSIVE, currentRow, 2, tl.getMaxInclusive(), MAXIN_LABEL,
+            MAXIN_TIP );
+        makeField( simple, DexActions.SETCONSTRAINT_MINEXCLUSIVE, currentRow, 4, tl.getMinExclusive(), MINEX_LABEL,
+            MINEX_TIP );
+        makeField( simple, DexActions.SETCONSTRAINT_MAXEXCLUSIVE, currentRow, 6, tl.getMaxExclusive(), MAXEX_LABEL,
+            MAXEX_TIP );
+    }
+
+    private void makeSpinner(OtmSimpleObject simple, DexActions actionType, int value, int row, int col, String label,
+        String tip) {
+        DexEditField field = new DexEditField();
+        Spinner<Integer> spinner = field.makeSpinner( value, simple, actionType );
+        boolean enabled = simple.getActionManager().isEnabled( actionType, simple );
+        if (!enabled) {
+            tip = ValidationUtils.getMessagesAsString( simple.getFindings() );
+            spinner.setDisable( true );
+            spinner.setEditable( false );
+            // spinner.setVisible( false );
+        }
+        field.set( row, col, label, tip, spinner );
+        postField( field, simple );
+    }
+
+    private DexEditField makeField(OtmSimpleObject simple, DexActions action, int row, int col, String value,
+        String label, String tip) {
+        boolean enabled = simple.getActionManager().isEnabled( action, simple );
+        if (!enabled) {
+            // value = "";
+            tip = ValidationUtils.getMessagesAsString( simple.getFindings() );
+        }
+        StringProperty sp = simple.getActionManager().add( action, value, simple );
+        Node mxe = DexEditField.makeTextField( sp );
+        DexEditField field = new DexEditField( row, col, label, tip, mxe );
+        postField( field, simple );
+        return field;
     }
 
     private Button postButton(ObservableList<Node> list, DexActions action, OtmProperty p, String label) {
@@ -306,12 +385,16 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
             label.setTooltip( field.tooltip );
             propertyGrid.add( label, field.column, field.row + rowIndex );
             column += 1;
+            label.setDisable( field.fxNode.disabledProperty().get() == true );
         }
         if (field.fxNode != null) {
             field.fxNode.setDisable( !obj.isEditable() );
             if (field.fxNode instanceof Control) {
                 ((Control) field.fxNode).setTooltip( field.tooltip );
             }
+            // if (!field.fxNode.isVisible()) {
+            // field.fxNode = new Label( "Not Applicable" );
+            // }
             propertyGrid.add( field.fxNode, column++, field.row + rowIndex );
         }
         return column;
