@@ -42,7 +42,7 @@
                         <Insets bottom="10.0" />
                      </opaqueInsets>
                   </Button>
-                  <Button fx:id="dialogButtonClose" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-red" stylesheets="../@DavesViper.css" text="Close" textAlignment="CENTER">
+                  <Button fx:id="dialogButtonClose" defaultButton="true" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-red" stylesheets="../@DavesViper.css" text="Close" textAlignment="CENTER">
                      <opaqueInsets>
                         <Insets bottom="10.0" />
                      </opaqueInsets>

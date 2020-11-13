@@ -512,6 +512,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     public boolean isEditableMinor() {
         if (isEditable())
             return true;
+        if (getLibrary() == null)
+            return false;
         OtmVersionChain chain = getLibrary().getVersionChain();
         return (chain.isChainEditable() && chain.isLatestChain() && chain.isLatestVersion( this ));
     }

@@ -78,7 +78,8 @@ public abstract class DexPopupControllerBase implements DexPopupController {
      */
     public void doCancel() {
         clear();
-        popupStage.close();
+        if (popupStage != null)
+            popupStage.close();
         result = Results.CANCEL;
     }
 
@@ -193,6 +194,7 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         if (popupStage == null)
             log.warn( "Could not show pop-up window, null stage." );
         else {
+            popupStage.requestFocus();
             popupStage.showAndWait();
         }
         return result;

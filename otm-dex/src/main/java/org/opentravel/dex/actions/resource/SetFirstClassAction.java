@@ -35,11 +35,11 @@ public class SetFirstClassAction extends DexBooleanAction {
         return false;
     }
 
-    protected SetFirstClassAction() {
+    public SetFirstClassAction() {
         // actionType = DexActions.SETFIRSTCLASS;
     }
 
-    protected boolean get() {
+    public boolean get() {
         return getSubject().isFirstClass();
     }
 
@@ -48,7 +48,7 @@ public class SetFirstClassAction extends DexBooleanAction {
         return (OtmResource) otm;
     }
 
-    protected void set(boolean value) {
+    public void set(boolean value) {
         getSubject().setFirstClass( value );
     }
 

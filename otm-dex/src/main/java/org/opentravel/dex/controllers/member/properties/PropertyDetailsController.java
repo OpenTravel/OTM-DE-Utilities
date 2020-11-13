@@ -21,14 +21,11 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
-import org.opentravel.common.ValidationUtils;
-import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DeprecationChangeAction;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.actions.MoveElementAction;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
-import org.opentravel.dex.controllers.popup.TextAreaEditorContoller;
 import org.opentravel.dex.events.DexFacetSelectionEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
@@ -44,19 +41,13 @@ import org.opentravel.schemacompiler.model.TLExampleOwner;
 import org.opentravel.schemacompiler.model.TLSimple;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -77,6 +68,36 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
         DexFacetSelectionEvent.FACET_SELECTED, DexMemberSelectionEvent.MEMBER_SELECTED,
         DexMemberSelectionEvent.RESOURCE_SELECTED, OtmObjectModifiedEvent.OBJECT_MODIFIED,
         DexModelChangeEvent.MODEL_CHANGED, OtmObjectChangeEvent.OBJECT_CHANGED};
+
+    private static final String PATTERN_LABEL = "Pattern";
+    private static final String PATTERN_TIP = "Assign a regular expression pattern constraint.";
+    private static final String MININ_LABEL = "Min Inclusive";
+    private static final String MININ_TIP = "Assigns a minimum (inclusive) value.";
+    private static final String MAXIN_LABEL = "Max Inclusive";
+    private static final String MAXIN_TIP = "Assigns a maximum (inclusive) value.";
+    private static final String MINEX_LABEL = "Min Exclusive";
+    private static final String MINEX_TIP = "Assigns a minimum (exclusive) value.";
+    private static final String MAXEX_LABEL = "Max Exclusive";
+    private static final String MAXEX_TIP = "Assigns a maximum (exclusive) value.";
+    private static final String TOTALDIGITS_LABEL = "Total Digits";
+    private static final String TOTALDIGITS_TIP = "Assign the total number of digits of a numeric datatype.";
+    private static final String FRACTIONDIGITS_LABEL = "Fraction Digits";
+    private static final String FRACTIONDIGITS_TIP = "Assign the number of fractional digits of a numerical datatype.";
+    private static final String MINLEN_LABEL = "Min Length";
+    private static final String MINLEN_TIP =
+        "Assign the minimum length expressed in a unit that depends on the datatype.";
+    private static final String MAXLEN_LABEL = "Max Length";
+    private static final String MAXLEN_TIP =
+        "Assign the maximum length expressed in a unit that depends on the datatype.";
+
+    private static final String DEPRECATION_LABEL = "Deprecation";
+    private static final String DEPRECATION_TIP = "Describe why this property is obsolete.";
+    private static final String DESCRIPTION_LABEL = "Description";
+    private static final String DESCRIPTION_TIP = "Describe what this property contains.";
+    private static final String EXAMPLE_LABEL = "Example";
+    private static final String EXAMPLE_TIP = "Provide an example of this data field.";
+
+
     /**
      * FXML Java FX Nodes this controller is dependent upon
      */
@@ -89,7 +110,7 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
     @FXML
     private ImageView objectImageView;
 
-    private int rowIndex = 0; // last row populated with data
+    // private int rowIndex = 0; // last row populated with data
     private boolean ignoreClear = false;
     private int currentRow;
 
@@ -127,6 +148,7 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
     @Override
     public void handleEvent(AbstractOtmEvent event) {
         // log.debug( "Event received: " + event.getClass().getSimpleName() );
+        propertyDetailsPane.setExpanded( false );
         if (event instanceof DexPropertySelectionEvent)
             handleEvent( (DexPropertySelectionEvent) event );
         else if (event instanceof DexFacetSelectionEvent)
@@ -158,14 +180,12 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
         if (obj == null)
             return;
 
+        postTitle( obj );
+        postExample( obj );
         if (obj instanceof OtmProperty)
             post( (OtmProperty) obj );
         else if (obj instanceof OtmSimpleObject)
             post( (OtmSimpleObject) obj );
-        else {
-            postTitle( obj );
-            postExample( obj );
-        }
     }
 
 
@@ -179,6 +199,8 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
      */
     public void post(OtmProperty property) {
         // log.debug( "Posting property " + property );
+        propertyDetailsPane.setExpanded( true );
+
         if (property == null) {
             clear();
             return;
@@ -196,29 +218,11 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
     }
 
 
-    // private static String NA = "Not Applicable";
-    private static String MININ_LABEL = "Min Inclusive";
-    private static String MININ_TIP = "Assigns a minimum (inclusive) value.";
-    private static String MAXIN_LABEL = "Max Inclusive";
-    private static String MAXIN_TIP = "Assigns a maximum (inclusive) value.";
-    private static String MINEX_LABEL = "Min Exclusive";
-    private static String MINEX_TIP = "Assigns a minimum (exclusive) value.";
-    private static String MAXEX_LABEL = "Max Exclusive";
-    private static String MAXEX_TIP = "Assigns a maximum (exclusive) value.";
-
-    private static String TOTALDIGITS_LABEL = "Total Digits";
-    private static String TOTALDIGITS_TIP = "Assign the total number of digits of a numeric datatype.";
-    private static String FRACTIONDIGITS_LABEL = "Fraction Digits";
-    private static String FRACTIONDIGITS_TIP = "Assign the number of fractional digits of a numerical datatype.";
-
-    private static String MINLEN_LABEL = "Min Length";
-    private static String MINLEN_TIP = "Assign the minimum length expressed in a unit that depends on the datatype.";
-
-    private static String MAXLEN_LABEL = "Max Length";
-    private static String MAXLEN_TIP = "Assign the maximum length expressed in a unit that depends on the datatype.";
 
     public void post(OtmSimpleObject simple) {
         // log.debug( "Posting simple object " + property );
+        propertyDetailsPane.setExpanded( true );
+
         postedData = simple;
         propertyGrid.getChildren().clear();
         postTitle( simple );
@@ -229,17 +233,15 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
         BooleanProperty listProperty = simple.getActionManager().add( DexActions.SETLIST, simple.isList(), simple );
         Node checkBox = DexEditField.makeCheckBox( listProperty, "Repeats" );
         DexEditField field = new DexEditField( currentRow, 0, "List", "Set to allow the value to repeat.", checkBox );
-        postField( field, simple );
+        field.postField( propertyGrid, simple, currentRow, 0 );
 
         // post fields creating actions
-        DexActionManager am = simple.getActionManager();
+        // DexActionManager am = simple.getActionManager();
         TLSimple tl = simple.getTL();
 
         // Pattern
-        StringProperty sp = am.add( DexActions.SETCONSTRAINT_PATTERN, tl.getPattern(), simple );
-        Node p = DexEditField.makeTextField( sp );
-        field = new DexEditField( currentRow++, 2, "Pattern", "Assign a regular expression pattern constraint.", p );
-        postField( field, simple );
+        makeField( simple, DexActions.SETCONSTRAINT_PATTERN, currentRow++, 2, tl.getPattern(), PATTERN_LABEL,
+            PATTERN_TIP );
 
         // Min/Max Length
         makeSpinner( simple, DexActions.SETCONSTRAINT_MINLENGTH, tl.getMinLength(), currentRow, 0, MINLEN_LABEL,
@@ -266,30 +268,16 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
 
     private void makeSpinner(OtmSimpleObject simple, DexActions actionType, int value, int row, int col, String label,
         String tip) {
-        DexEditField field = new DexEditField();
-        Spinner<Integer> spinner = field.makeSpinner( value, simple, actionType );
-        boolean enabled = simple.getActionManager().isEnabled( actionType, simple );
-        if (!enabled) {
-            tip = ValidationUtils.getMessagesAsString( simple.getFindings() );
-            spinner.setDisable( true );
-            spinner.setEditable( false );
-            // spinner.setVisible( false );
-        }
-        field.set( row, col, label, tip, spinner );
-        postField( field, simple );
+        DexEditField field = new DexEditField( simple, actionType, label, tip );
+        field.makeSpinner( value );
+        field.postField( propertyGrid, simple, row, col );
     }
 
     private DexEditField makeField(OtmSimpleObject simple, DexActions action, int row, int col, String value,
         String label, String tip) {
-        boolean enabled = simple.getActionManager().isEnabled( action, simple );
-        if (!enabled) {
-            // value = "";
-            tip = ValidationUtils.getMessagesAsString( simple.getFindings() );
-        }
-        StringProperty sp = simple.getActionManager().add( action, value, simple );
-        Node mxe = DexEditField.makeTextField( sp );
-        DexEditField field = new DexEditField( row, col, label, tip, mxe );
-        postField( field, simple );
+        DexEditField field = new DexEditField( simple, action, label, tip );
+        field.makeTextField( value );
+        field.postField( propertyGrid, simple, row, col );
         return field;
     }
 
@@ -336,25 +324,18 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
     }
 
     private void postDeprecation(OtmObject obj) {
+        // If deprecated, show the label, value and button
         if (obj.getDeprecation() != null && !obj.getDeprecation().isEmpty()) {
-            TextField txt = new TextField( obj.deprecationProperty().get() );
-            txt.setDisable( obj.deprecationProperty() instanceof ReadOnlyStringWrapper );
-            txt.setOnAction( a -> setProperty( a, obj.deprecationProperty() ) );
-
-            DexEditField field =
-                new DexEditField( currentRow++, 0, "Deprecation", "Describe why this property is obsolete.", txt );
-            postField( field, obj, obj.deprecationProperty() );
+            DexEditField field = new DexEditField();
+            field.set( currentRow++, 0, DEPRECATION_LABEL, DEPRECATION_TIP, null );
+            field.post( propertyGrid, obj.deprecationProperty(), true );
         }
     }
 
     private void postDescription(OtmObject obj) {
-        // Editable field. String property will invoke action if needed
-        TextField txt = new TextField( obj.descriptionProperty().get() );
-        txt.setDisable( obj.descriptionProperty() instanceof ReadOnlyStringWrapper );
-        txt.setOnAction( a -> setProperty( a, obj.descriptionProperty() ) );
-        DexEditField field =
-            new DexEditField( currentRow++, 0, "Description", "Describe what this property contains.", txt );
-        postField( field, obj, obj.descriptionProperty() );
+        DexEditField field = new DexEditField();
+        field.set( currentRow++, 0, DESCRIPTION_LABEL, DESCRIPTION_TIP, null );
+        field.post( propertyGrid, obj.descriptionProperty(), true );
     }
 
     private void postExample(OtmObject obj) {
@@ -368,47 +349,21 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
 
     private void postExample(OtmObject obj, StringProperty stringProperty) {
         if (obj.getTL() instanceof TLExampleOwner) {
-            // if (property.getExample() != null && !property.getExample().isEmpty()) {
-            TextField txt = new TextField( stringProperty.get() );
-            txt.setDisable( stringProperty instanceof ReadOnlyStringWrapper );
-            txt.setOnAction( a -> setProperty( a, stringProperty ) );
-            DexEditField field =
-                new DexEditField( currentRow++, 0, "Example", "Provide an example of this data field.", txt );
-            postField( field, obj, stringProperty );
+            DexEditField field = new DexEditField();
+            field.set( currentRow++, 0, EXAMPLE_LABEL, EXAMPLE_TIP, null );
+            field.post( propertyGrid, stringProperty, true );
         }
     }
 
-    private int postField(DexEditField field, OtmObject obj) {
-        int column = field.column;
-        if (field.label != null) {
-            Label label = new Label( field.label );
-            label.setTooltip( field.tooltip );
-            propertyGrid.add( label, field.column, field.row + rowIndex );
-            column += 1;
-            label.setDisable( field.fxNode.disabledProperty().get() == true );
-        }
-        if (field.fxNode != null) {
-            field.fxNode.setDisable( !obj.isEditable() );
-            if (field.fxNode instanceof Control) {
-                ((Control) field.fxNode).setTooltip( field.tooltip );
-            }
-            // if (!field.fxNode.isVisible()) {
-            // field.fxNode = new Label( "Not Applicable" );
-            // }
-            propertyGrid.add( field.fxNode, column++, field.row + rowIndex );
-        }
-        return column;
-    }
 
-    private void postField(DexEditField field, OtmObject obj, StringProperty property) {
-        int column = postField( field, obj );
-        if (field.fxNode instanceof TextField && obj.isEditable()) {
-            Button button = new Button( "Edit" );
-            button.setOnAction( a -> TextAreaEditorContoller.init().showAndWait( property ) );
-            propertyGrid.add( button, column, field.row + rowIndex );
-        }
-    }
-
+    // private void postField(DexEditField field, OtmObject obj, StringProperty property) {
+    // field.set( obj );
+    // field.postField( propertyGrid );
+    // // Add edit button with listener
+    // Button button = DexEditField.makeButton( property );
+    // propertyGrid.add( button, field.column, field.row );
+    // }
+    //
     private void postTitle(OtmObject obj) {
         if (obj != null && obj.getOwningMember() != null) {
             objectImageView.setImage( ImageManager.getImage( obj.getIconType() ) );
@@ -424,11 +379,11 @@ public class PropertyDetailsController extends DexIncludedControllerBase<OtmObje
         post( postedData );
     }
 
-    private void setProperty(ActionEvent a, StringProperty p) {
-        if (p != null && a.getSource() instanceof TextField) {
-            p.set( ((TextField) a.getSource()).getText() );
-            // log.debug( "Set text to: " + p.get() );
-        }
-    }
-
+    // private void setProperty(ActionEvent a, StringProperty p) {
+    // if (p != null && a.getSource() instanceof TextField) {
+    // p.set( ((TextField) a.getSource()).getText() );
+    // // log.debug( "Set text to: " + p.get() );
+    // }
+    // }
+    //
 }

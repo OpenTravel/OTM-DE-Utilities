@@ -478,11 +478,16 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         if (event.getTarget() instanceof MenuItem) {
             clear();
             if (modelMgr != null) {
+                DexActionManager actionMgr = modelMgr.getActionManager( true );
+
+                // Save if there have been changes
+                if (actionMgr.getQueueSize() > 0)
+                    handleSaveAllMenu( null );
+
                 // Clear the model
                 modelMgr.clear();
 
                 // Clear action queue
-                DexActionManager actionMgr = modelMgr.getActionManager( true );
                 if (actionMgr != null) {
                     actionMgr.clearQueue();
                     updateActionManagerDisplay( actionMgr );

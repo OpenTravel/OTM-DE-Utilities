@@ -160,9 +160,9 @@ public class DialogBoxContoller extends DexPopupControllerBase {
         }
 
         // TODO - how to know if/when to show OK or not?
-        if (dialogButtonOK != null)
+        if (dialogButtonOK != null) {
             dialogButtonOK.setVisible( false );
-
+        }
         dialogTitle.getChildren().clear();
         dialogTitle.getChildren().add( new Text( title ) );
 
@@ -187,6 +187,8 @@ public class DialogBoxContoller extends DexPopupControllerBase {
     public Results showAndWait(String message) {
 
         dialogButtonClose.setOnAction( e -> close() );
+        dialogButtonClose.setDefaultButton( true );
+        dialogButtonClose.requestFocus();
 
         if (dialogButtonOK != null) {
             dialogButtonOK.setVisible( false );

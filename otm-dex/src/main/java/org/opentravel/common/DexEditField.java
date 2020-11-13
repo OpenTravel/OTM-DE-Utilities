@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.actions.DexRunAction;
+import org.opentravel.dex.controllers.popup.TextAreaEditorContoller;
 import org.opentravel.model.OtmObject;
 
 import java.util.Map;
@@ -32,11 +33,15 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
 /**
@@ -55,6 +60,10 @@ public class DexEditField {
     public Tooltip tooltip;
     public int row;
     public int column;
+    private Label fxLabel;
+    private OtmObject otm;
+    private DexActions actionType;
+    boolean enabled = true;
 
     /**
      * 
@@ -69,7 +78,12 @@ public class DexEditField {
     }
 
     public DexEditField() {
+        this.tooltip = new Tooltip( "" );
+    }
 
+    public DexEditField(OtmObject otm, DexActions actionType, String label, String tooltip) {
+        set( otm, actionType, label, tooltip );
+        this.enabled = isEnabled();
     }
 
     public void set(int row, int column, String label, String tooltip, Node fxNode) {
@@ -80,8 +94,20 @@ public class DexEditField {
         this.tooltip = new Tooltip( tooltip );
     }
 
+    public void set(OtmObject otm, DexActions actionType, String label, String tooltip) {
+        this.otm = otm;
+        this.actionType = actionType;
+        this.label = label;
+        this.tooltip = new Tooltip( tooltip );
+    }
+
+    public void set(OtmObject otm) {
+        this.otm = otm;
+        enabled = otm.isEditable();
+    }
+
     @Deprecated
-    public static CheckBox makeCheckBox(boolean value, String label, OtmObject object) {
+    private static CheckBox makeCheckBox(boolean value, String label, OtmObject object) {
         CheckBox box = new CheckBox( label );
         box.setSelected( value );
         box.setDisable( !object.getOwningMember().isEditable() );
@@ -133,38 +159,144 @@ public class DexEditField {
      * @return
      */
     public static TextField makeTextField(StringProperty stringProperty) {
-        TextField field = new TextField( stringProperty.get() );
+        TextField txtField = new TextField( stringProperty.get() );
         if (stringProperty instanceof ReadOnlyStringWrapper) {
-            field.setEditable( false );
-            field.setDisable( true );
-            // field.setVisible( false );
+            txtField.setEditable( false );
+            txtField.setDisable( true );
+            // txtField.setVisible( false );
         } else {
-            field.setEditable( true );
-            field.setDisable( false );
-            field.setOnAction( a -> {
-                stringProperty.set( ((TextField) a.getSource()).getText() );
+            txtField.setEditable( true );
+            txtField.setDisable( false );
+            txtField.setOnAction( a -> stringProperty.set( ((TextField) a.getSource()).getText() ) );
+            txtField.focusedProperty().addListener( (ov, oldV, newV) -> {
+                if (!newV) // focus lost
+                    stringProperty.set( txtField.getText() );
             } );
         }
-        return field;
+        return txtField;
     }
 
+    /**
+     * @param string property
+     * @return
+     */
+    public TextField makeTextField(String value) {
+        if (otm == null || actionType == null)
+            return null;
+        // Changes to string property will be handled by action
+        StringProperty sp = otm.getActionManager().add( actionType, value, otm );
+        // Changes to text field will cause string property to change
+        TextField tf = makeTextField( sp );
+        this.fxNode = tf;
+        return tf;
+    }
 
-    public Spinner<Integer> makeSpinner(int value, OtmObject obj, DexActions actionType) {
+    /**
+     * Add label (if any) and fxNode to grid to post them to the UI.
+     * 
+     * @param grid
+     * @param obj
+     * @param row
+     * @param column
+     * @return next available column
+     */
+    public int postField(GridPane grid, OtmObject obj, int row, int column) {
+        this.row = row;
+        this.column = column;
+        this.otm = obj;
+        return postField( grid );
+    }
+
+    /**
+     * Add label (if any) and fxNode to grid to post them to the UI.
+     * 
+     * @param grid
+     * @param obj
+     * @return next available column
+     */
+    public int postField(final GridPane grid) {
+        if (grid == null)
+            return 0;
+        if (label != null) {
+            fxLabel = new Label( label );
+            fxLabel.setTooltip( tooltip );
+            fxLabel.setDisable( !enabled );
+            grid.add( fxLabel, column, row );
+            column += 1;
+        }
+        if (fxNode != null) {
+            fxNode.setDisable( !enabled );
+            if (fxNode instanceof Control) {
+                ((Control) fxNode).setTooltip( tooltip );
+            }
+            grid.add( fxNode, column, row );
+            column += 1;
+        }
+        return column;
+    }
+
+    /**
+     * @param otm
+     * @param actionType
+     * @return true if editable and action is enabled for the object
+     */
+    public boolean isEnabled() {
+        if (otm == null || actionType == null)
+            return false;
+        enabled = otm.isEditable();
+        if (enabled)
+            enabled = otm.getActionManager().isEnabled( actionType, otm );
+        return enabled;
+    }
+
+    public void post(GridPane grid, StringProperty sp, boolean addButton) {
+        enabled = !(sp instanceof ReadOnlyStringWrapper);
+        this.fxNode = makeTextField( sp );
+        postField( grid );
+        if (addButton) {
+            Button button = DexEditField.makeButton( sp );
+            grid.add( button, column, row );
+        }
+    }
+
+    /**
+     * Make an "edit" button for the string property.
+     * 
+     * @param sp
+     * @return
+     */
+    public static Button makeButton(StringProperty sp) {
+        Button button = new Button( "Edit" );
+        if (!(sp instanceof ReadOnlyStringWrapper)) {
+            button.setDisable( false );
+            button.setOnAction( a -> TextAreaEditorContoller.init().showAndWait( sp ) );
+        } else {
+            button.setDisable( true );
+        }
+        return button;
+    }
+
+    public Spinner<Integer> makeSpinner(int value) {
         Spinner<Integer> spinner = new Spinner<>( 0, 10000, value ); // min, max, init
-        spinner.setDisable( !obj.isEditable() );
-        spinner.setEditable( obj.isEditable() );
-
-        spinner.getEditor().setOnAction( a -> spinnerListener( spinner, obj, actionType ) );
-        spinner.focusedProperty().addListener( (o, old, newV) -> spinnerListener( spinner, obj, actionType ) );
-
-        // spinner.getEditor().setOnAction( a -> spinnerListener( spinner ) );
-        // // spinnerListener( spinner ) );
-        // spinner.focusedProperty().addListener( (o, old, newV) -> spinnerListener( spinner ) );
+        this.fxNode = spinner;
+        if (!enabled) {
+            spinner.setDisable( true );
+            spinner.setEditable( false );
+        } else {
+            spinner.setDisable( false );
+            spinner.setEditable( true );
+        }
+        if (otm != null && actionType != null) {
+            spinner.getEditor().setOnAction( a -> spinnerListener( spinner, otm, actionType ) );
+            spinner.focusedProperty().addListener( (o, old, newV) -> spinnerListener( spinner, otm, actionType ) );
+        }
+        spinner.setTooltip( tooltip );
         return spinner;
     }
 
     // Create the action and use it to get and set the value from the spinner
     private void spinnerListener(Spinner<Integer> spinner, OtmObject simple, DexActions actionType) {
+        log.debug( "Listener start." );
         DexRunAction action = null;
         try {
             DexAction<?> a = DexActions.getAction( actionType, simple, null, simple.getActionManager() );
@@ -186,6 +318,7 @@ public class DexEditField {
                 // If the value changed, run the action
                 if (spinner.getValue() != currentValue) {
                     simple.getActionManager().run( action, spinner.getValue() );
+                    log.debug( "Action ran." );
                 }
             } catch (NumberFormatException e) {
                 log.debug( "Not a valid number format: " + spinner.getEditor().getText() );

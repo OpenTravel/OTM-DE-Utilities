@@ -33,11 +33,11 @@ public class SetAbstractAction extends DexBooleanAction {
         return false;
     }
 
-    protected SetAbstractAction() {
+    public SetAbstractAction() {
         // actionType = DexActions.SETABSTRACT;
     }
 
-    protected boolean get() {
+    public boolean get() {
         return getSubject().isAbstract();
     }
 
@@ -46,7 +46,7 @@ public class SetAbstractAction extends DexBooleanAction {
         return (OtmResource) otm;
     }
 
-    protected void set(boolean value) {
+    public void set(boolean value) {
         getSubject().setAbstract( value );
     }
 

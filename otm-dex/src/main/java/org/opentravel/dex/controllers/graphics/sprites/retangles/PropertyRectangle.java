@@ -46,7 +46,7 @@ import javafx.scene.text.Font;
  *
  */
 public class PropertyRectangle extends Rectangle {
-    private static Log log = LogFactory.getLog( PropertyRectangle.class );
+    // private static Log log = LogFactory.getLog( PropertyRectangle.class );
 
     /**
      * Render methods that create rectangles may set the event to run if the implement this interface.
@@ -226,7 +226,7 @@ public class PropertyRectangle extends Rectangle {
             if (!compute && parent != null && property != null) {
                 this.setOnMouseClicked( e -> parent.connect( this ) );
                 parent.add( this );
-                log.debug( "Added mouse listener to " + property );
+                // log.debug( "Added mouse listener to " + property );
                 // sub-types will register after rectangle is sized.
             }
         }
