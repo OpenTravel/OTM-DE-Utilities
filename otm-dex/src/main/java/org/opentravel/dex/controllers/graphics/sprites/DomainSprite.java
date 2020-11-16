@@ -24,6 +24,7 @@ import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.LibraryRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -79,6 +80,11 @@ public class DomainSprite extends DexSpriteBase {
 
     @Override
     public DexSprite connect() {
+        return null;
+    }
+
+    @Override
+    public DexSprite connect(OtmLibraryMember member) {
         return null;
     }
 

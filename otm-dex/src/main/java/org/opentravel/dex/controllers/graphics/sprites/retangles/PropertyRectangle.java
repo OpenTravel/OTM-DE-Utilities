@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
@@ -25,6 +23,7 @@ import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.model.otmProperties.OtmIdReferenceElement;
@@ -171,6 +170,9 @@ public class PropertyRectangle extends Rectangle {
         return this;
     }
 
+    /**
+     * @return the property field
+     */
     public OtmProperty getProperty() {
         return property;
     }
@@ -223,11 +225,14 @@ public class PropertyRectangle extends Rectangle {
             // log.debug( " Set connection point to: " + connectionPoint );
 
             // Register mouse listener with parent
-            if (!compute && parent != null && property != null) {
-                this.setOnMouseClicked( e -> parent.connect( this ) );
+            // parent.connect won't run until clicked, parent needs rectangle to dispatch click.
+            if (!compute && parent != null) {
+                if (property != null)
+                    this.setOnMouseClicked( e -> parent.connect( this ) );
+                else
+                    this.setOnMouseClicked( e -> parent.connect( (OtmLibraryMember) typeProvider ) );
                 parent.add( this );
                 // log.debug( "Added mouse listener to " + property );
-                // sub-types will register after rectangle is sized.
             }
         }
         // super.draw( gc, false ); // debug

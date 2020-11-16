@@ -19,6 +19,7 @@ package org.opentravel.dex.controllers.graphics.sprites;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 import java.util.List;
@@ -62,6 +63,15 @@ public interface DexSprite {
      * @return
      */
     public DexSprite connect();
+
+    /**
+     * Connect to another library member.
+     * 
+     * @param member
+     * @return
+     */
+    DexSprite connect(OtmLibraryMember member);
+
 
     // /**
     // * If needed, add sprite for the member that provides the type then add connection to new sprite. Otherwise,

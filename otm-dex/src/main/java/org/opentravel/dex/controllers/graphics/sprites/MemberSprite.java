@@ -145,18 +145,22 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
     public DexSprite connect() {
         if (!(getMember().getBaseType() instanceof OtmLibraryMember))
             return null;
+        return connect( (OtmLibraryMember) member.getBaseType() );
+    }
 
-        DexSprite baseSprite = manager.get( (OtmLibraryMember) member.getBaseType() );
-        if (baseSprite == null) {
-            baseSprite = manager.add( (OtmLibraryMember) member.getBaseType(), getColumn() );
+    @Override
+    public DexSprite connect(OtmLibraryMember member) {
+        DexSprite otherSprite = manager.get( member );
+        if (otherSprite == null) {
+            otherSprite = manager.add( member, getColumn() );
         } else
-            baseSprite.setCollapsed( !baseSprite.isCollapsed() );
-        if (baseSprite != null) {
-            manager.addAndDraw( new SuperTypeConnection( baseSprite, this ) );
-            baseSprite.getCanvas().toFront();
-            baseSprite.refresh();
+            otherSprite.setCollapsed( !otherSprite.isCollapsed() );
+        if (otherSprite != null) {
+            manager.addAndDraw( new SuperTypeConnection( otherSprite, this ) );
+            otherSprite.getCanvas().toFront();
+            otherSprite.refresh();
         }
-        return baseSprite;
+        return otherSprite;
     }
 
     /**

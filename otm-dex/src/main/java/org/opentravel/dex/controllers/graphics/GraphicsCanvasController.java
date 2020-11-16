@@ -280,7 +280,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     }
 
     public void doRefresh(ActionEvent e) {
-        log.debug( "do refresh." );
+        // log.debug( "do refresh." );
         spriteManager.update( Color.gray( 0.9 ) );
     }
 
