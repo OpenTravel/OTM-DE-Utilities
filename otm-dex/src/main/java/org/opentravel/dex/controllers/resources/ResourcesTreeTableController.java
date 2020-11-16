@@ -23,6 +23,7 @@ import org.opentravel.common.cellfactories.ValidationResourceTreeTableCellFactor
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexFilterChangeEvent;
 import org.opentravel.dex.events.DexMemberDeleteEvent;
@@ -90,10 +91,12 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
     // By default, the tree is editable. Setting this to false will prevent edits.
     // private boolean treeEditingEnabled = true;
 
+    private MemberFilterController filter = null;
+
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents = {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED,
         DexResourceChangeEvent.RESOURCE_CHANGED, DexResourceChildModifiedEvent.RESOURCE_CHILD_MODIFIED,
-        DexModelChangeEvent.MODEL_CHANGED, DexMemberDeleteEvent.MEMBER_DELETED};
+        DexModelChangeEvent.MODEL_CHANGED, DexMemberDeleteEvent.MEMBER_DELETED, DexFilterChangeEvent.FILTER_CHANGED};
 
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED,
         DexMemberSelectionEvent.RESOURCE_SELECTED, DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED};
@@ -179,26 +182,29 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
     }
 
     public void createTreeItem(OtmResource resource, TreeItem<ResourcesDAO> parent) {
-        // The resource
-        TreeItem<ResourcesDAO> rItem = new ResourcesDAO( resource ).createTreeItem( parent );
+        if (filter == null || filter.isSelected( resource )) {
 
-        // Parent Refs
-        resource.getParentRefs().forEach( pr -> new ResourcesDAO( pr ).createTreeItem( rItem ) );
+            // The resource
+            TreeItem<ResourcesDAO> rItem = new ResourcesDAO( resource ).createTreeItem( parent );
 
-        // Parameter Groups
-        resource.getParameterGroups().forEach( pg -> {
-            TreeItem<ResourcesDAO> child = new ResourcesDAO( pg ).createTreeItem( rItem );
-            createChildrenItems( pg, child );
-        } );
+            // Parent Refs
+            resource.getParentRefs().forEach( pr -> new ResourcesDAO( pr ).createTreeItem( rItem ) );
 
-        // Action facets
-        resource.getActionFacets().forEach( af -> new ResourcesDAO( af ).createTreeItem( rItem ) );
+            // Parameter Groups
+            resource.getParameterGroups().forEach( pg -> {
+                TreeItem<ResourcesDAO> child = new ResourcesDAO( pg ).createTreeItem( rItem );
+                createChildrenItems( pg, child );
+            } );
 
-        // Actions
-        resource.getActions().forEach( a -> {
-            TreeItem<ResourcesDAO> child = new ResourcesDAO( a ).createTreeItem( rItem );
-            createChildrenItems( a, child );
-        } );
+            // Action facets
+            resource.getActionFacets().forEach( af -> new ResourcesDAO( af ).createTreeItem( rItem ) );
+
+            // Actions
+            resource.getActions().forEach( a -> {
+                TreeItem<ResourcesDAO> child = new ResourcesDAO( a ).createTreeItem( rItem );
+                createChildrenItems( a, child );
+            } );
+        }
     }
 
     /**
@@ -222,6 +228,7 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
             if (p instanceof OtmChildrenOwner)
                 createChildrenItems( (OtmChildrenOwner) p, cfItem );
         } );
+
     }
 
     public TreeItem<ResourcesDAO> getRoot() {
@@ -235,8 +242,10 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
     }
 
     private void handleEvent(DexFilterChangeEvent event) {
-        if (!ignoreEvents)
+        if (!ignoreEvents) {
+            filter = event.getFilter();
             refresh();
+        }
     }
 
     private void handleEvent(DexMemberSelectionEvent event) {

@@ -38,8 +38,8 @@ import javafx.scene.image.ImageView;
  * The type of the TreeItem instances used in this TreeTableView. Simple Data Access Object that contains and provides
  * gui access to OTM model library members.
  * <p>
- * Properties are lazy evaluated. Once created they can not be changed. Simply create a new DAO to change property
- * values.
+ * Properties are lazy evaluated and retained. Once created they can not be changed. Simply create a new DAO to change
+ * property values.
  * 
  * @author dmh
  *

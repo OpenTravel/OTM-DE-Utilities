@@ -18,6 +18,7 @@ package org.opentravel.dex.events;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.controllers.member.MemberFilterController;
 
 import javafx.event.EventTarget;
 import javafx.event.EventType;
@@ -34,6 +35,12 @@ public class DexFilterChangeEvent extends DexEvent {
 
     public static final EventType<DexFilterChangeEvent> FILTER_CHANGED = new EventType<>( DEX_ALL, "FILTER_CHANGED" );
 
+    private MemberFilterController filter = null;
+
+    public MemberFilterController getFilter() {
+        return filter;
+    }
+
     /**
      * Filter change event with no subject.
      */
@@ -41,10 +48,16 @@ public class DexFilterChangeEvent extends DexEvent {
         super( FILTER_CHANGED );
     }
 
+    /**
+     * Filter change event with access to the filter controller.
+     * 
+     * @param source
+     * @param target
+     */
     public DexFilterChangeEvent(Object source, EventTarget target) {
         super( source, target, FILTER_CHANGED );
-        // log.debug("DexEvent source/target constructor ran.");
-        // If there is data, extract it from source or target here
+        if (source instanceof MemberFilterController)
+            filter = (MemberFilterController) source;
     }
 
 }
