@@ -21,10 +21,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.dex.actions.BaseTypeChangeAction;
+import org.opentravel.dex.actions.SetAssignedTypeAction;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeType;
 import org.opentravel.schemacompiler.model.TLValueWithAttributes;
@@ -41,12 +44,11 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         subject = buildOtm( staticModelManager );
         baseObject = buildOtm( staticModelManager );
         baseObject.setName( "BaseVWA" );
     }
-
 
     public static OtmValueWithAttributes buildOtm(OtmModelManager mgr) {
         OtmTypeProvider simple = TestXsdSimple.buildOtm( mgr );
@@ -145,6 +147,53 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
         base = vwa.getBaseType();
         assertTrue( base == baseVwa );
     }
+
+    @Test
+    public void TestVWAasBaseAndValueType() {
+        // Determine and assure Value and Base type are correct.
+        OtmLibrary lib = TestLibrary.buildOtm( staticModelManager, "http://example.com", "ex", "lib1" );
+        OtmValueWithAttributes vwa1 = buildOtm( lib, "TestVWA1" );
+        OtmValueWithAttributes vwa2 = buildOtm( lib, "TestVWA2" );
+        OtmValueWithAttributes vwa3 = buildOtm( lib, "TestVWA3" );
+        OtmValueWithAttributes vwa4 = buildOtm( lib, "TestVWA4" );
+
+        assertTrue( "Given", vwa1.isEditable() );
+        assertTrue( "Given", BaseTypeChangeAction.isEnabled( vwa1 ) == true );
+        assertTrue( "Given", SetAssignedTypeAction.isEnabled( vwa1 ) == true );
+
+        vwa1.setAssignedType( staticModelManager.getXsdMember( "decimal" ) );
+        vwa2.setAssignedType( staticModelManager.getXsdMember( "date" ) );
+        vwa3.setAssignedType( staticModelManager.getXsdMember( "float" ) );
+        vwa4.setAssignedType( staticModelManager.getXsdMember( "time" ) );
+        assertTrue( vwa1.getAssignedType() == staticModelManager.getXsdMember( "decimal" ) );
+        assertTrue( vwa2.getAssignedType() == staticModelManager.getXsdMember( "date" ) );
+        assertTrue( vwa3.getAssignedType() == staticModelManager.getXsdMember( "float" ) );
+        assertTrue( vwa4.getAssignedType() == staticModelManager.getXsdMember( "time" ) );
+
+        OtmTypeProvider base = vwa1.getBaseType();
+        OtmTypeProvider value = vwa1.getAssignedType();
+        assertTrue( "Given", base == null );
+        // When
+        vwa1.setBaseType( vwa2 );
+        // Then
+        base = vwa1.getBaseType();
+        value = vwa1.getAssignedType();
+        assertTrue( base == vwa2 );
+        assertTrue( value == vwa2.getAssignedType() );
+
+        base = vwa3.getBaseType();
+        assertTrue( "Given", base == null );
+        value = vwa3.getAssignedType();
+
+        // When - assigned
+        vwa3.setAssignedType( vwa4 );
+        // Then
+        base = vwa3.getBaseType();
+        value = vwa3.getAssignedType();
+        assertTrue( base == vwa4 ); // Not sure why
+        assertTrue( value == vwa4.getAssignedType() );
+    }
+
 
 
 }

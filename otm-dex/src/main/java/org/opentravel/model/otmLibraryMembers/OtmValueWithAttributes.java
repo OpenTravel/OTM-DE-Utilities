@@ -169,7 +169,7 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
     public StringProperty baseTypeProperty() {
         OtmValueWithAttributes base = getBaseType();
         if (base instanceof OtmValueWithAttributes)
-            return new SimpleStringProperty( base.getName() );
+            return new SimpleStringProperty( base.getNameWithPrefix() );
         else
             return new ReadOnlyStringWrapper( "" );
     }

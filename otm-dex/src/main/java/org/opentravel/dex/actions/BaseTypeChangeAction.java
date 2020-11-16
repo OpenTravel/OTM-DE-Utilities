@@ -29,6 +29,7 @@ import org.opentravel.model.otmFacets.OtmQueryFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
+import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.schemacompiler.model.TLExtensionOwner;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
@@ -49,7 +50,8 @@ public class BaseTypeChangeAction extends DexRunAction {
     public static boolean isEnabled(OtmObject subject) {
         // VWA is not member of TLExtensionOwner!
         if (subject != null && subject.isEditable()) {
-            return subject instanceof OtmContextualFacet || subject.getTL() instanceof TLExtensionOwner;
+            return subject instanceof OtmValueWithAttributes || subject instanceof OtmContextualFacet
+                || subject.getTL() instanceof TLExtensionOwner;
         }
         return false;
     }

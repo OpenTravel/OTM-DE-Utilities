@@ -548,8 +548,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         if (getLibrary() == null)
             return new ReadOnlyStringWrapper( "" ); // deleted member
         if (isEditable())
-            return new SimpleStringProperty( getLibrary().getVersion() + "  " + getLibraryName() );
-        return new ReadOnlyStringWrapper( getLibrary().getVersion() + "  " + getLibraryName() );
+            return new SimpleStringProperty( getPrefix() + "  " + getLibrary().getVersion() + "  " + getLibraryName() );
+        return new ReadOnlyStringWrapper( getPrefix() + "  " + getLibrary().getVersion() + "  " + getLibraryName() );
     }
 
     /**
