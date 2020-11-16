@@ -109,6 +109,10 @@ public class SaveAndExitDialogController extends DexPopupControllerBase {
         // dialogHelp.getChildren().clear();
     }
 
+    public void changeLabels(String newLabel) {
+        saveButton.setText( "Save and " + newLabel );
+        exitButton.setText( newLabel );
+    }
 
 
     @FXML

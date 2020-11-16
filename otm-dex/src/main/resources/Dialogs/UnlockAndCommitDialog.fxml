@@ -34,8 +34,13 @@
             <Insets bottom="5.0" left="10.0" right="20.0" top="5.0" />
          </BorderPane.margin>
          <buttons>
+            <Button fx:id="dialogButtonOK" alignment="CENTER" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" prefHeight="34.0" prefWidth="226.0" styleClass="button-default" stylesheets="@../DavesViper.css" text="Commit and Unlock" textAlignment="CENTER">
+               <opaqueInsets>
+                  <Insets bottom="10.0" />
+               </opaqueInsets>
+            </Button>
             <Separator orientation="VERTICAL" />
-            <Button fx:id="dialogButtonCancel" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-red" stylesheets="@../DavesViper.css" text="Cancel" textAlignment="CENTER">
+            <Button fx:id="dialogButtonCancel" alignment="CENTER" cancelButton="true" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-red" stylesheets="@../DavesViper.css" text="Cancel" textAlignment="CENTER">
                <opaqueInsets>
                   <Insets bottom="10.0" />
                </opaqueInsets>
@@ -69,19 +74,6 @@
                </opaqueInsets>
                <VBox.margin>
                   <Insets bottom="3.0" left="3.0" right="3.0" top="10.0" />
-               </VBox.margin>
-            </Button>
-            <Separator layoutX="10.0" layoutY="79.0" prefWidth="125.0">
-               <VBox.margin>
-                  <Insets top="25.0" />
-               </VBox.margin>
-            </Separator>
-            <Button fx:id="dialogButtonOK" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="72.0" prefWidth="124.0" styleClass="button-blue" stylesheets="@../DavesViper.css" text="Commit &#10;and &#10;Unlock" textAlignment="CENTER" VBox.vgrow="ALWAYS">
-               <opaqueInsets>
-                  <Insets bottom="10.0" />
-               </opaqueInsets>
-               <VBox.margin>
-                  <Insets bottom="3.0" left="3.0" right="3.0" top="25.0" />
                </VBox.margin>
             </Button>
          </children>

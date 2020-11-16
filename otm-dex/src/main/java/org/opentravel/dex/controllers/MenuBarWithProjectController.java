@@ -211,6 +211,11 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         controller.showAndWait( "" );
         e.consume(); // take the event away from windows in case they answer no.
 
+        // TODO
+        // 1. make dialog hand save and close as well as exit
+        // 2. create default button
+        //
+
         if (controller.okResult())
             stage.close();
     }
@@ -481,8 +486,15 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
                 DexActionManager actionMgr = modelMgr.getActionManager( true );
 
                 // Save if there have been changes
-                if (actionMgr.getQueueSize() > 0)
-                    handleSaveAllMenu( null );
+                if (actionMgr != null && actionMgr.getQueueSize() > 0) {
+                    SaveAndExitDialogController controller = SaveAndExitDialogController.init();
+                    controller.setModelManager( modelMgr );
+                    controller.changeLabels( "Close" );
+                    controller.showAndWait( "" );
+                    // handleSaveAllMenu( null );
+                    if (!controller.okResult())
+                        return;
+                }
 
                 // Clear the model
                 modelMgr.clear();

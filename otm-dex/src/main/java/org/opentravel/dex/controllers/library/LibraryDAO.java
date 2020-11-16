@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.library;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.model.OtmModelManager;
@@ -39,7 +37,10 @@ import javafx.scene.image.ImageView;
 /**
  * The type of the TreeItem instances used in this TreeTableView. Simple Data Access Object that contains and provides
  * gui access to OTM model library members.
- *
+ * <p>
+ * Properties are lazy evaluated. Once created they can not be changed. Simply create a new DAO to change property
+ * values.
+ * 
  * @author dmh
  *
  * 
@@ -47,11 +48,19 @@ import javafx.scene.image.ImageView;
  *
  */
 public class LibraryDAO implements DexDAO<OtmLibrary> {
-    private static Log log = LogFactory.getLog( LibraryDAO.class );
+    // private static Log log = LogFactory.getLog( LibraryDAO.class );
 
     protected OtmLibrary library;
     String editable = "False";
     int size = 0; // can be static because model change events creates new DAOs.
+    // Properties
+    private StringProperty editProperty = null;
+    private StringProperty fileNameProperty = null;
+    private StringProperty prefixProperty = null;
+    private StringProperty nameProperty = null;
+    private StringProperty nameSpaceProperty = null;
+    private StringProperty projectsProperty = null;
+    private StringProperty versionProperty = null;
 
     public LibraryDAO(OtmLibrary library) {
         this.library = library;
@@ -61,10 +70,23 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
     }
 
     public StringProperty editProperty() {
-        editable = "False";
-        if (library.isEditable())
-            editable = "True";
-        return new SimpleStringProperty( editable );
+        if (editProperty == null) {
+            editable = "False";
+            if (library.isEditable())
+                editable = "True";
+            editProperty = new ReadOnlyStringWrapper( editable );
+        }
+        return editProperty;
+    }
+
+    public StringProperty fileNameProperty() {
+        if (fileNameProperty == null) {
+            String path = "";
+            if (library != null && library.getTL() != null && library.getTL().getLibraryUrl() != null)
+                path = library.getTL().getLibraryUrl().getPath();
+            fileNameProperty = new ReadOnlyStringWrapper( path );
+        }
+        return fileNameProperty;
     }
 
     @Override
@@ -78,44 +100,39 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
     }
 
     public StringProperty nameProperty() {
-        StringProperty np = new SimpleStringProperty( library.getName() );
-        np.addListener( (o, v, n) -> {
-            // log.debug( "Name change request: " + n );
-            library.getTL().setName( n );
-        } );
-        return np;
+        if (nameProperty == null) {
+            nameProperty = new SimpleStringProperty( library.getName() );
+            nameProperty.addListener( (o, v, n) -> library.getTL().setName( n ) );
+        }
+        return nameProperty;
     }
 
     // Question - Why use ReadOnly when it doesn't seem to matter if the property is readonly or not.
     // Must be tested in controller.
     public StringProperty namespaceProperty() {
-        StringProperty sp;
-        if (library.isEditable() && library.isUnmanaged())
-            sp = new SimpleStringProperty( library.getTL().getNamespace() );
-        else
-            sp = new ReadOnlyStringWrapper( library.getTL().getNamespace() );
-        sp.addListener( (o, v, n) -> {
-            // log.debug( "Namespace change request: " + n );
-            library.getTL().setNamespace( n );
-        } );
-        return sp;
+        if (nameSpaceProperty == null) {
+            if (library.isEditable() && library.isUnmanaged())
+                nameSpaceProperty = new SimpleStringProperty( library.getTL().getNamespace() );
+            else
+                nameSpaceProperty = new ReadOnlyStringWrapper( library.getTL().getNamespace() );
+            nameSpaceProperty.addListener( (o, v, n) -> library.getTL().setNamespace( n ) );
+        }
+        return nameSpaceProperty;
     }
 
     public StringProperty prefixProperty() {
-        StringProperty sp = null;
-        if (library.isEditable() && library.isUnmanaged()) {
-            sp = new SimpleStringProperty( library.getPrefix() );
-            sp.addListener( (o, v, n) -> {
-                // log.debug( "Prefix change request: " + n );
-                library.getTL().setPrefix( n );
-            } );
-        } else
-            sp = new ReadOnlyStringWrapper( library.getPrefix() );
-        return sp;
+        if (prefixProperty == null) {
+            if (library.isEditable() && library.isUnmanaged()) {
+                prefixProperty = new SimpleStringProperty( library.getPrefix() );
+                prefixProperty.addListener( (o, v, n) -> library.getTL().setPrefix( n ) );
+            } else
+                prefixProperty = new ReadOnlyStringWrapper( library.getPrefix() );
+        }
+        return prefixProperty;
     }
 
     public StringProperty stateProperty() {
-        return new SimpleStringProperty( library.getState().toString() );
+        return new ReadOnlyStringWrapper( library.getState().toString() );
     }
 
     public IntegerProperty referenceProperty() {
@@ -127,21 +144,24 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
     }
 
     public StringProperty statusProperty() {
-        return new SimpleStringProperty( library.getStatus().toString() );
+        return new ReadOnlyStringWrapper( library.getStatus().toString() );
     }
 
     public StringProperty lockedProperty() {
-        return new SimpleStringProperty( library.getLockedBy() );
+        return new ReadOnlyStringWrapper( library.getLockedBy() );
     }
 
     public StringProperty projectsProperty() {
-        String projects = "";
-        for (String name : library.getProjectNames())
-            if (projects.isEmpty())
-                projects = name;
-            else
-                projects = projects + ", " + name;
-        return new SimpleStringProperty( projects );
+        if (projectsProperty == null) {
+            String projects = "";
+            for (String name : library.getProjectNames())
+                if (projects.isEmpty())
+                    projects = name;
+                else
+                    projects = projects + ", " + name;
+            projectsProperty = new ReadOnlyStringWrapper( projects );
+        }
+        return projectsProperty;
     }
 
     public BooleanProperty readonlyProperty() {
@@ -155,12 +175,11 @@ public class LibraryDAO implements DexDAO<OtmLibrary> {
     }
 
     public StringProperty versionProperty() {
-        StringProperty vp = new SimpleStringProperty( library.getTL().getVersion() );
-        vp.addListener( (o, v, n) -> {
-            // log.debug( "Version change request: " + n );
-            library.getTL().setVersion( n );
-        } );
-        return vp;
+        if (versionProperty == null) {
+            versionProperty = new SimpleStringProperty( library.getTL().getVersion() );
+            versionProperty.addListener( (o, v, n) -> library.getTL().setVersion( n ) );
+        }
+        return versionProperty;
     }
 
     /**

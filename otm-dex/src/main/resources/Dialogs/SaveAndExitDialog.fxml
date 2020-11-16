@@ -38,7 +38,7 @@
 						</VBox>
       		<ButtonBar layoutX="-4.0" layoutY="59.0" prefHeight="70.0" prefWidth="500.0">
       			<buttons>
-      				<Button fx:id="saveButton" alignment="CENTER" contentDisplay="CENTER" layoutY="10.0" mnemonicParsing="false" onAction="#doSave" styleClass="button-blue" stylesheets="@../DavesViper.css" text="Save And Exit " textAlignment="CENTER">
+      				<Button fx:id="saveButton" alignment="CENTER" contentDisplay="CENTER" defaultButton="true" layoutY="10.0" mnemonicParsing="false" onAction="#doSave" styleClass="button-default" stylesheets="@../DavesViper.css" text="Save And Exit " textAlignment="CENTER">
       					<opaqueInsets>
       						<Insets bottom="10.0" />
       					</opaqueInsets>
@@ -48,7 +48,7 @@
       						<Insets bottom="10.0" />
       					</opaqueInsets>
       				</Button>
-                  <Button fx:id="cancelButton" alignment="CENTER" contentDisplay="CENTER" layoutX="192.0" layoutY="20.0" mnemonicParsing="false" onAction="#doCancelExit" prefWidth="100.0" styleClass="button-red" stylesheets="@../DavesViper.css" text="Cancel" textAlignment="CENTER">
+                  <Button fx:id="cancelButton" alignment="CENTER" cancelButton="true" contentDisplay="CENTER" layoutX="192.0" layoutY="20.0" mnemonicParsing="false" onAction="#doCancelExit" prefWidth="100.0" styleClass="button-red" stylesheets="@../DavesViper.css" text="Cancel" textAlignment="CENTER">
                      <opaqueInsets>
                         <Insets bottom="10.0" />
                      </opaqueInsets>

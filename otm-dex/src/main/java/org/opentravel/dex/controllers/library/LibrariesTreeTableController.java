@@ -59,6 +59,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     private static final String LOCKEDLABEL = "Locked-by";
     private static final String READONLYLABEL = "Read-only";
     private static final String PROJECTSLABEL = "Projects";
+    private static final String FILELABEL = "File";
 
     // All event types fired by this controller.
     private static final EventType[] publishedEvents = {DexLibrarySelectionEvent.LIBRARY_SELECTED};
@@ -107,6 +108,8 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
             createStringColumn( LOCKEDLABEL, "locked", true, false, true, 0 );
         TreeTableColumn<LibraryDAO,String> projectsColumn =
             createStringColumn( PROJECTSLABEL, "projects", true, false, true, 0 );
+        TreeTableColumn<LibraryDAO,String> fileColumn =
+            createStringColumn( FILELABEL, "fileName", true, false, true, 0 );
         TreeTableColumn<LibraryDAO,Boolean> readonlyColumn = new TreeTableColumn<>( READONLYLABEL );
         readonlyColumn.setCellValueFactory( new TreeItemPropertyValueFactory<LibraryDAO,Boolean>( "readonly" ) );
 
@@ -118,7 +121,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         refColumn.setPrefWidth( 100 );
 
         librariesTreeTable.getColumns().addAll( nameColumn, prefixColumn, namespaceColumn, versionColumn, statusColumn,
-            stateColumn, lockedColumn, projectsColumn, sizeColumn, refColumn, readonlyColumn, editColumn );
+            stateColumn, lockedColumn, projectsColumn, sizeColumn, refColumn, readonlyColumn, editColumn, fileColumn );
 
         // Start out sorted on names
         nameColumn.setSortType( SortType.ASCENDING );
