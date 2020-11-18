@@ -22,6 +22,7 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils.DrawType;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle.RectangleEventHandler;
@@ -36,6 +37,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 
 /**
@@ -116,6 +118,64 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
     @Override
     public boolean contains(Point2D point) {
         return boundaries.contains( point );
+    }
+
+    /**
+     * Draw the bounding box, title, icon, prefix if any. Does <b>not</b> draw the contents.
+     * <p>
+     * Sets boundaries to fit the title line.
+     * 
+     * @param gc if null compute size, otherwise draw
+     * @param color of the bounding box
+     * @param name
+     * @param icon
+     * @param prefix
+     * @param editable if true the text is in bold
+     * @return y value to start drawing content.
+     */
+    public double drawSprite(GraphicsContext gc, Paint color, String name, Image icon, String prefix,
+        boolean editable) {
+        if (boundaries == null)
+            boundaries = new Rectangle( x, y, MIN_WIDTH, MIN_HEIGHT );
+
+        // Draw background box
+        if (gc != null) {
+            Paint p = gc.getFill();
+            gc.setFill( color );
+            Rectangle bRect = new Rectangle( boundaries.getX(), boundaries.getY(),
+                boundaries.getWidth() + settingsManager.getMargin( Margins.FACET ),
+                boundaries.getHeight() + settingsManager.getMargin( Margins.FACET ) );
+            bRect.draw( gc, false ); // Outline
+            bRect.draw( gc, true ); // Fill
+            gc.setFill( p );
+            // Clip the canvas so tool tips (and mouse clicks) can go the right sprite
+            clip( canvas, boundaries );
+        }
+
+        // Draw the name of the object
+        Rectangle lr = new LabelRectangle( this, name, icon, editable, false, false ).draw( gc, x, y );
+
+        // Add the controls
+        double cWidth = drawControls( boundaries, gc ) + settingsManager.getMargin( Margins.MEMBER );
+
+        // prefix
+        LabelRectangle pRect = null;
+        if (prefix != null) {
+            double px = boundaries.getMaxX() - cWidth;
+            pRect = new LabelRectangle( this, prefix, null, editable, false, false );
+            px -= pRect.getWidth() + settingsManager.getMargin( Margins.LABEL );
+            pRect.draw( gc, px, y );
+        }
+
+        // Adjust width
+        if (gc == null) {
+            boundaries.setIfLarger( lr );
+            boundaries.addWidth( cWidth );
+            if (pRect != null)
+                boundaries.addWidth( pRect.getWidth() );
+        }
+
+        return y + lr.getHeight();
     }
 
     /**

@@ -236,12 +236,12 @@ public class SettingsManager {
         return false;
     }
 
-    /**
-     * @param domainSprite
-     */
-    public Paint getColor(DomainSprite domainSprite) {
-        return (Color.BLANCHEDALMOND);
-    }
+    // /**
+    // * @param domainSprite
+    // */
+    // public Paint getColor(DomainSprite domainSprite) {
+    // return (Color.BLANCHEDALMOND);
+    // }
 
     /**
      * @param a facet rectangle
@@ -254,6 +254,7 @@ public class SettingsManager {
      * @param member sprite
      */
     public Paint getColor(MemberSprite<?> sprite) {
-        return (currentGC.getFill());
+        OtmLibrary lib = sprite.getMember().getLibrary();
+        return lib != null ? getColor( lib ) : currentGC.getFill();
     }
 }

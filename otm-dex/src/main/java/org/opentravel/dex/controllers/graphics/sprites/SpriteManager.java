@@ -19,11 +19,10 @@ package org.opentravel.dex.controllers.graphics.sprites;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.controllers.graphics.sprites.connections.Connection;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.DomainRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
@@ -65,10 +64,11 @@ public class SpriteManager {
 
     private Paint backgroundColor = Color.gray( 0.95 );
 
-    private Canvas domainCanvas;
-    private GraphicsContext domainGC;
-    private List<DomainSprite> domains;
-    private DomainRectangle domainR;
+    // private Canvas domainCanvas;
+    // private GraphicsContext domainGC;
+    // private List<DomainSprite> domains;
+    // private DomainRectangle domainR;
+    private List<DomainSprite> domainSprites = new ArrayList<>();
 
     /**
      * Initialize the sprite. Create connections canvas and add to pane. Set mouse click handler.
@@ -94,6 +94,7 @@ public class SpriteManager {
         //
         // createDomains();
         createColumns( 3 );
+
         //
         spritePane.setOnMouseClicked( this::mouseClick );
     }
@@ -109,6 +110,9 @@ public class SpriteManager {
     // // spritePane.getChildren().add( sprite.render() );
     // }
 
+    public DomainSprite getDomainSprite(OtmLibrary library) {
+        return !domainSprites.isEmpty() ? domainSprites.get( 0 ) : null;
+    }
 
     /**
      * {@link #add(OtmLibraryMember, ColumnRectangle, boolean)} not collapsed.
@@ -121,6 +125,16 @@ public class SpriteManager {
 
     public MemberSprite<?> add(OtmLibraryMember member, ColumnRectangle column) {
         return add( member, column, !member.isExpanded() );
+    }
+
+    public DomainSprite add(OtmLibrary library, ColumnRectangle column) {
+        DomainSprite ds = getDomainSprite( library );
+        if (ds == null) {
+            ds = factory( library );
+        }
+        // column.add( ds ); done in render
+        ds.render( column, false );
+        return ds;
     }
 
     /**
@@ -162,6 +176,7 @@ public class SpriteManager {
      */
     public void clear() {
         columns.forEach( ColumnRectangle::clear );
+        domainSprites.clear(); // FIXME - these should be in columns
         eraseConnections();
         connections.clear();
         // should be done in columns, but just to be sure
@@ -173,39 +188,41 @@ public class SpriteManager {
     private void createColumns(int count) {
         if (columns == null)
             columns = new ArrayList<>();
-        ColumnRectangle column = new ColumnRectangle( spritePane, null, domainR.getX(), domainR.getMaxY() );
+        ColumnRectangle column = new ColumnRectangle( spritePane, null, 0, 0 );
+        // ColumnRectangle column = new ColumnRectangle( spritePane, null, domainR.getX(), domainR.getMaxY() );
         int i = 0;
         do {
             columns.add( column );
-            ColumnRectangle nc = new ColumnRectangle( spritePane, column, domainR.getX(), domainR.getMaxY() );
+            ColumnRectangle nc = new ColumnRectangle( spritePane, column, 0, 0 );
+            // ColumnRectangle nc = new ColumnRectangle( spritePane, column, domainR.getX(), domainR.getMaxY() );
             column.setNext( nc );
             column = nc;
         } while (i++ <= count);
     }
 
-    // Temporary
-    private void createDomains() {
-        createDomainCanvas();
-        domainR = new DomainRectangle( this );
-        domainR.draw( domainGC, true );
-    }
+    // // Temporary
+    // private void createDomains() {
+    // createDomainCanvas();
+    // domainR = new DomainRectangle( this );
+    // domainR.draw( domainGC, true );
+    // }
 
-    private void createDomainCanvas() {
-        domainCanvas = new Canvas( spritePane.getWidth(), spritePane.getHeight() );
-        spritePane.getChildren().add( domainCanvas );
-        double spw = spritePane.getWidth();
-        double sph = spritePane.getHeight();
-        domainCanvas.setHeight( 50 );
-        // domainCanvas.setWidth( 200 );
-        domainCanvas.widthProperty().bind( spritePane.widthProperty() );
-        // domainCanvas.heightProperty().bind( spritePane.heightProperty() );
-        domainGC = domainCanvas.getGraphicsContext2D();
-        domainGC.setFill( Color.SANDYBROWN );
-        domainGC.fillRect( 0, 0, domainCanvas.getWidth(), domainCanvas.getHeight() );
-        domains = new ArrayList<>();
-
-        new Rectangle( 0, 0, 400, 50 ).draw( domainGC, true );
-    }
+    // private void createDomainCanvas() {
+    // domainCanvas = new Canvas( spritePane.getWidth(), spritePane.getHeight() );
+    // spritePane.getChildren().add( domainCanvas );
+    // double spw = spritePane.getWidth();
+    // double sph = spritePane.getHeight();
+    // domainCanvas.setHeight( 50 );
+    // // domainCanvas.setWidth( 200 );
+    // domainCanvas.widthProperty().bind( spritePane.widthProperty() );
+    // // domainCanvas.heightProperty().bind( spritePane.heightProperty() );
+    // domainGC = domainCanvas.getGraphicsContext2D();
+    // domainGC.setFill( Color.SANDYBROWN );
+    // domainGC.fillRect( 0, 0, domainCanvas.getWidth(), domainCanvas.getHeight() );
+    // domains = new ArrayList<>();
+    //
+    // new Rectangle( 0, 0, 400, 50 ).draw( domainGC, true );
+    // }
 
     /**
      * clear the dragged sprite then post it at the new location
@@ -274,6 +291,13 @@ public class SpriteManager {
 
         // log.debug( "factory created: " + newSprite );
         return newSprite;
+    }
+
+    protected DomainSprite factory(OtmLibrary library) {
+        DomainSprite ds = new DomainSprite( this, library.getBaseNamespace() );
+        domainSprites.add( ds );
+        spritePane.getChildren().add( ds.getCanvas() );
+        return ds;
     }
 
     public DexSprite findSprite(OtmLibraryMember member) {
@@ -363,7 +387,6 @@ public class SpriteManager {
             sprite.render();
         }
         updateConnections();
-        domainR.draw( domainGC );
     }
 
     public void remove(DexSprite sprite) {

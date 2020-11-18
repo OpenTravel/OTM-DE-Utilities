@@ -19,7 +19,6 @@ package org.opentravel.dex.controllers.graphics.sprites;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.LibraryRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.OtmModelManager;
@@ -34,7 +33,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 /**
  * Graphics Display Object (Sprite) for domains ( OTM namespaces ).
@@ -80,6 +79,9 @@ public class DomainSprite extends DexSpriteBase {
         Tooltip t = new Tooltip();
         Tooltip.install( canvas, t );
         t.setText( desc );
+
+        // Compute initial size
+        draw( null, 0, 0 );
     }
 
 
@@ -117,31 +119,12 @@ public class DomainSprite extends DexSpriteBase {
     public Rectangle draw(GraphicsContext gc, double x, double y) {
         set( x, y );
 
-        if (boundaries == null)
-            boundaries = new Rectangle( x, y, MIN_WIDTH, MIN_HEIGHT );
+        Paint color = null;
+        if (gc != null)
+            color = gc.getFill();
+        drawSprite( gc, color, baseNamespace, null, null, false );
 
-        // Draw background box
-        if (gc != null) {
-            Rectangle bRect = new Rectangle( boundaries.getX(), boundaries.getY(),
-                boundaries.getWidth() + settingsManager.getMargin( Margins.FACET ),
-                boundaries.getHeight() + settingsManager.getMargin( Margins.FACET ) );
-            bRect.draw( gc, false ); // Outline
-            bRect.draw( gc, true ); // Fill
-        }
-
-        // Draw the name of the object
-        LabelRectangle lr = new LabelRectangle( this, baseNamespace, null, false, false, false );
-        lr.set( x, y ).draw( gc, true );
-        if (gc == null)
-            boundaries.setIfLarger( lr );
-
-        // Add the controls
-        double cWidth = drawControls( boundaries, gc ) + settingsManager.getMargin( Margins.MEMBER );
-        if (gc == null)
-            boundaries.addWidth( cWidth );
-
-        clip( canvas, boundaries );
-
+        // boundaries.draw( gc, false );
         return boundaries;
     }
 
@@ -179,10 +162,10 @@ public class DomainSprite extends DexSpriteBase {
         canvas.setWidth( x + canvasR.getWidth() );
         log.debug( "Sized domain sprite: " + canvasR );
         //
-        gc.setFill( Color.BROWN );
+        // gc.setFill( Color.BROWN );
         draw( gc, x, y );
         // manager.updateConnections( this );
-        // log.debug( "Rendered " + member + " at " + getBoundaries() );
+        log.debug( "Rendered domain at " + getBoundaries() );
         return canvas;
     }
 

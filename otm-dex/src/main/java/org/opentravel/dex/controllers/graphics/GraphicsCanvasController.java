@@ -357,9 +357,13 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         if (o instanceof OtmLibraryMember) {
             OtmLibraryMember member = (OtmLibraryMember) o;
             ColumnRectangle memberColumn = spriteManager.getColumn( 2 );
+            ColumnRectangle domainColumn = spriteManager.getColumn( 1 );
 
             if (tracking)
                 spriteManager.clear();
+
+            // spriteManager.add( member.getLibrary(), domainColumn );
+            // TODO - add domain sprites to other posters
 
             MemberSprite<?> memberS = spriteManager.add( member, memberColumn, false );
 

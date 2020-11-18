@@ -16,12 +16,13 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.connections.SuperTypeConnection;
 import org.opentravel.dex.controllers.graphics.sprites.connections.TypeConnection;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.BaseTypeRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle.RectangleEventHandler;
@@ -37,7 +38,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Paint;
 
 /**
  * Graphics Display Object (Sprite) for containing OTM library members.
@@ -48,7 +48,7 @@ import javafx.scene.paint.Paint;
  */
 public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSpriteBase
     implements DexSprite, RectangleEventHandler {
-    // private static Log log = LogFactory.getLog( MemberSprite.class );
+    private static Log log = LogFactory.getLog( MemberSprite.class );
 
     private static final double MIN_HEIGHT = 50;
     private static final double MIN_WIDTH = 50;
@@ -237,6 +237,19 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
     public abstract Rectangle drawContents(GraphicsContext gc, final double x, final double y);
 
 
+    // TODO - DRAW property for users if any
+    // int users = member.getWhereUsed().size();
+    // if (gc != null && !collapsed && users > 0) {
+    // // create rectangle to contain the connector
+    // // add to rectangles
+    // // create mouse handler (thows event?)
+    // GraphicsUtils.drawConnector( gc, gc.getFill(), settingsManager.getConnectorSize(), px, y );
+    // // LabelRectangle usersR =
+    // // new LabelRectangle( this, users + " Users", null, member.isEditable(), false, false );
+    // // usersR.draw( gc, boundaries.getX(), y + height );
+    // // height += usersR.getHeight();
+    // px += settingsManager.getConnectorSize();
+    // }
     /**
      * Draw background, label and controls.
      * 
@@ -250,65 +263,18 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
         // Rectangles are disposable.
         rectangles.clear();
 
-        if (boundaries == null)
-            boundaries = new Rectangle( x, y, MIN_WIDTH, MIN_HEIGHT );
+        double fy = drawSprite( gc, settingsManager.getColor( this ), member.getName(), member.getIcon(),
+            member.getPrefix(), member.isEditable() );
 
-        // height of member sprite computed on the fly
-        double fy = y;
-
-        // Draw background box
-        if (gc != null) {
-            Paint p = gc.getFill();
-            gc.setFill( settingsManager.getColor( this ) );
-            Rectangle bRect = new Rectangle( boundaries.getX(), boundaries.getY(),
-                boundaries.getWidth() + settingsManager.getMargin( Margins.FACET ),
-                boundaries.getHeight() + settingsManager.getMargin( Margins.FACET ) );
-            bRect.draw( gc, false ); // Outline
-            bRect.draw( gc, true ); // Fill
-            gc.setFill( p );
-        }
-        double px = boundaries.getX();
-
-        // TODO - DRAW property for users if any
-        // int users = member.getWhereUsed().size();
-        // if (gc != null && !collapsed && users > 0) {
-        // // create rectangle to contain the connector
-        // // add to rectangles
-        // // create mouse handler (thows event?)
-        // GraphicsUtils.drawConnector( gc, gc.getFill(), settingsManager.getConnectorSize(), px, y );
-        // // LabelRectangle usersR =
-        // // new LabelRectangle( this, users + " Users", null, member.isEditable(), false, false );
-        // // usersR.draw( gc, boundaries.getX(), y + height );
-        // // height += usersR.getHeight();
-        // px += settingsManager.getConnectorSize();
-        // }
-
-        // Draw the name of the object
-        Rectangle mRect =
-            new LabelRectangle( this, member.getName(), member.getIcon(), member.isEditable(), false, false ).draw( gc,
-                px, fy );
-        double width = mRect.getWidth();
-        fy += mRect.getHeight();
-        // double height = mRect.getHeight();
-
-        // Add the controls
-        double cWidth = drawControls( boundaries, gc ) + settingsManager.getMargin( Margins.MEMBER );
-        width += cWidth;
-
-        // prefix
-        px = boundaries.getMaxX() - cWidth;
-        LabelRectangle pRect = new LabelRectangle( this, member.getPrefix(), null, member.isEditable(), false, false );
-        px -= pRect.getWidth() + settingsManager.getMargin( Margins.LABEL );
-        pRect.draw( gc, px, y );
-        width += pRect.getWidth();
+        double width = boundaries.getWidth();
 
         // Draw property for base type if any
+        Rectangle mRect = null;
         if (!collapsed && member.getBaseType() != null) {
             mRect = new BaseTypeRectangle( this, member, width );
             mRect.set( boundaries.getMaxX() - mRect.getWidth(), fy ).draw( gc, true );
             width = computeWidth( width, mRect, 0 );
             fy += mRect.getHeight();
-            // height += mRect.getHeight();
         }
 
         // Show content (facets, properties, etc)
@@ -326,22 +292,8 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
             // Clicks go to the top most node...so let the pane catch them
             // canvas.setOnMouseClicked( this::mouseClick );
         }
+
         boundaries = new Rectangle( x, y, width, fy - y );
-        // boundaries.draw( gc, false );
-
-        clip( canvas, boundaries );
-        // // Clip the canvas to just have the sprite
-        // double clipX = boundaries.getX() - 4;
-        // double clipY = boundaries.getY() - 4;
-        // double clipW = boundaries.getWidth() + 8 + settingsManager.getMargin( Margins.FACET );
-        // double clipH = boundaries.getHeight() + 8 + settingsManager.getMargin( Margins.FACET );
-        // canvas.setClip( new javafx.scene.shape.Rectangle( clipX, clipY, clipW, clipH ) );
-
-        // if (gc == null)
-        // log.debug( "ComputeMember: " + this );
-        // else
-        // log.debug( "DrawMember: " + this );
-        //
         return boundaries;
     }
 
@@ -400,7 +352,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
 
         drawMember( gc );
         manager.updateConnections( this );
-        // log.debug( "Rendered " + member + " at " + getBoundaries() );
+        log.debug( "Rendered " + member + " at " + getBoundaries() );
         return canvas;
     }
 
