@@ -18,6 +18,10 @@ package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
+import org.opentravel.model.otmContainers.OtmLibrary;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
@@ -58,6 +62,7 @@ public class SettingsManager {
     private static final Paint DEFAULT_STROKE = Color.BLACK;
 
     static final Paint DEFAULT_FILL = Color.gray( 0.8 );
+    private Map<OtmLibrary,Paint> colorMap = new HashMap();
 
     private static final double FACET_OFFSET = 8;
 
@@ -136,10 +141,14 @@ public class SettingsManager {
         return DEFAULT_FONT;
     }
 
-    // public Font getCurrentFont() {
-    // return currentFont;
-    // }
-    //
+    public Paint getColor(OtmLibrary lib) {
+        return colorMap.get( lib ) != null ? colorMap.get( lib ) : DEFAULT_FILL;
+    }
+
+    public Paint setColor(OtmLibrary lib, Paint color) {
+        return colorMap.put( lib, color );
+    }
+
     public Font getItalicFont() {
         return currentItalicFont;
     }

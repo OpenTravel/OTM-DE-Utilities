@@ -55,6 +55,11 @@ public class LibraryRectangle extends Rectangle {
         library = member.getLibrary();
     }
 
+    public LibraryRectangle(OtmLibrary library) {
+        super( 0, 0, 0, 0 );
+        this.library = library;
+    }
+
     public String getBaseNamespace() {
         return library.getBaseNamespace();
     }

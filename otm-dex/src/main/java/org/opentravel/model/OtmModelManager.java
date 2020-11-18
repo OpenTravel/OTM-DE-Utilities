@@ -551,6 +551,23 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
     /**
+     * Get all libraries in the base namespace.
+     * <p>
+     * Note, some of these may be in a chain, see {@link OtmLibrary#getVersionChain()}
+     * 
+     * @param baseNamespace
+     */
+    public Collection<OtmLibrary> getLibraries(String baseNamespace) {
+        List<OtmLibrary> libList = new ArrayList<>();
+        getLibraries().forEach( l -> {
+            if (l.getBaseNamespace().equals( baseNamespace ))
+                libList.add( l );
+        } );
+        return libList;
+    }
+
+
+    /**
      * @return just user libraries, not built-in
      */
     public List<OtmLibrary> getUserLibraries() {
@@ -887,6 +904,5 @@ public class OtmModelManager implements TaskResultHandlerI {
         OtmObject id = OtmModelElement.get( (TLModelElement) tlId );
         return id instanceof OtmXsdSimple ? (OtmXsdSimple) id : null;
     }
-
 
 }

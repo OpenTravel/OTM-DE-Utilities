@@ -19,8 +19,11 @@ package org.opentravel.dex.controllers.graphics.sprites;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.controllers.graphics.sprites.connections.Connection;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.DomainRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
+import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
@@ -62,6 +65,10 @@ public class SpriteManager {
 
     private Paint backgroundColor = Color.gray( 0.95 );
 
+    private Canvas domainCanvas;
+    private GraphicsContext domainGC;
+    private List<DomainSprite> domains;
+    private DomainRectangle domainR;
 
     /**
      * Initialize the sprite. Create connections canvas and add to pane. Set mouse click handler.
@@ -80,10 +87,12 @@ public class SpriteManager {
         connectionsCanvas.widthProperty().bind( spritePane.widthProperty() );
         connectionsCanvas.heightProperty().bind( spritePane.heightProperty() );
         connectionsGC = connectionsCanvas.getGraphicsContext2D();
+        connectionsGC.setFill( Color.ALICEBLUE );
         connectionsGC.setFill( backgroundColor );
         connectionsGC.fillRect( 0, 0, connectionsCanvas.getWidth(), connectionsCanvas.getHeight() );
         connections = new ArrayList<>();
         //
+        // createDomains();
         createColumns( 3 );
         //
         spritePane.setOnMouseClicked( this::mouseClick );
@@ -164,14 +173,38 @@ public class SpriteManager {
     private void createColumns(int count) {
         if (columns == null)
             columns = new ArrayList<>();
-        ColumnRectangle column = new ColumnRectangle( spritePane, new DomainSprite( this ), null );
+        ColumnRectangle column = new ColumnRectangle( spritePane, null, domainR.getX(), domainR.getMaxY() );
         int i = 0;
         do {
             columns.add( column );
-            ColumnRectangle nc = new ColumnRectangle( spritePane, new DomainSprite( this ), column );
+            ColumnRectangle nc = new ColumnRectangle( spritePane, column, domainR.getX(), domainR.getMaxY() );
             column.setNext( nc );
             column = nc;
-        } while (i++ < count);
+        } while (i++ <= count);
+    }
+
+    // Temporary
+    private void createDomains() {
+        createDomainCanvas();
+        domainR = new DomainRectangle( this );
+        domainR.draw( domainGC, true );
+    }
+
+    private void createDomainCanvas() {
+        domainCanvas = new Canvas( spritePane.getWidth(), spritePane.getHeight() );
+        spritePane.getChildren().add( domainCanvas );
+        double spw = spritePane.getWidth();
+        double sph = spritePane.getHeight();
+        domainCanvas.setHeight( 50 );
+        // domainCanvas.setWidth( 200 );
+        domainCanvas.widthProperty().bind( spritePane.widthProperty() );
+        // domainCanvas.heightProperty().bind( spritePane.heightProperty() );
+        domainGC = domainCanvas.getGraphicsContext2D();
+        domainGC.setFill( Color.SANDYBROWN );
+        domainGC.fillRect( 0, 0, domainCanvas.getWidth(), domainCanvas.getHeight() );
+        domains = new ArrayList<>();
+
+        new Rectangle( 0, 0, 400, 50 ).draw( domainGC, true );
     }
 
     /**
@@ -292,6 +325,10 @@ public class SpriteManager {
         return connectionsGC;
     }
 
+    public OtmModelManager getModelManager() {
+        return parentController != null ? parentController.getModelManager() : null;
+    }
+
     public SettingsManager getSettingsManager() {
         return settingsManager;
     }
@@ -326,6 +363,7 @@ public class SpriteManager {
             sprite.render();
         }
         updateConnections();
+        domainR.draw( domainGC );
     }
 
     public void remove(DexSprite sprite) {

@@ -329,12 +329,13 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
         boundaries = new Rectangle( x, y, width, fy - y );
         // boundaries.draw( gc, false );
 
-        // Clip the canvas to just have the sprite
-        double clipX = boundaries.getX() - 4;
-        double clipY = boundaries.getY() - 4;
-        double clipW = boundaries.getWidth() + 8 + settingsManager.getMargin( Margins.FACET );
-        double clipH = boundaries.getHeight() + 8 + settingsManager.getMargin( Margins.FACET );
-        canvas.setClip( new javafx.scene.shape.Rectangle( clipX, clipY, clipW, clipH ) );
+        clip( canvas, boundaries );
+        // // Clip the canvas to just have the sprite
+        // double clipX = boundaries.getX() - 4;
+        // double clipY = boundaries.getY() - 4;
+        // double clipW = boundaries.getWidth() + 8 + settingsManager.getMargin( Margins.FACET );
+        // double clipH = boundaries.getHeight() + 8 + settingsManager.getMargin( Margins.FACET );
+        // canvas.setClip( new javafx.scene.shape.Rectangle( clipX, clipY, clipW, clipH ) );
 
         // if (gc == null)
         // log.debug( "ComputeMember: " + this );

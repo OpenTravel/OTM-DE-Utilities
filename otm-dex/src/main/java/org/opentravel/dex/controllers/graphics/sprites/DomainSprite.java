@@ -19,24 +19,33 @@ package org.opentravel.dex.controllers.graphics.sprites;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.LibraryRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
+import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 
 /**
- * Graphics Display Object (Sprite) for containing OTM namespaces (domains) and their libraries
+ * Graphics Display Object (Sprite) for domains ( OTM namespaces ).
+ * <p>
+ * A domain has one or more namespaces and prefixes and the libraries in that namespace.
+ * <p>
+ * Each domain has a color. The domain sprite must assure each library in the domain has a color in the settings
+ * manager. The domain registers colors for each library in the setting manager. Member sprites will get color for the
+ * member's library from settings manager.
+ * <p>
+ * Versions ??? ??How to flag when multiple versions of a library are being used?
  * 
  * @author dmh
  * @param <O>
@@ -47,6 +56,8 @@ public class DomainSprite extends DexSpriteBase {
 
     private String baseNamespace = "";
     private Map<OtmLibrary,LibraryRectangle> libMap = new HashMap<>();
+    private SettingsManager settings = null;
+    private OtmModelManager modelManager = null;
 
     /**
      * Initialize member sprite. Create canvas and GC parameters. Compute initial size. Create tool tip. Sub-types will
@@ -55,8 +66,14 @@ public class DomainSprite extends DexSpriteBase {
      * @param member
      * @param settingsManager, must <b>not</b> be null.
      */
-    public DomainSprite(SpriteManager manager) {
-        super( manager );
+    public DomainSprite(SpriteManager manager, String baseNamespace) {
+        super( manager ); // Creates canvas
+        this.baseNamespace = baseNamespace;
+        this.settings = manager.getSettingsManager();
+        this.modelManager = manager.getModelManager();
+
+        Collection<OtmLibrary> libs = modelManager.getLibraries( baseNamespace );
+        libs.forEach( lib -> libMap.put( lib, new LibraryRectangle( lib ) ) );
 
         // Correct tool tip display relies on the canvas being clipped to this sprite's active boundaries
         String desc = "Domain defined by base namespace and its libraries.";
@@ -65,6 +82,12 @@ public class DomainSprite extends DexSpriteBase {
         t.setText( desc );
     }
 
+
+    public DomainSprite add(DexSprite sprite) {
+        if (sprite instanceof MemberSprite)
+            add( (MemberSprite<?>) sprite );
+        return this;
+    }
 
     public DomainSprite add(MemberSprite<?> sprite) {
         if (baseNamespace.isEmpty())
@@ -117,6 +140,8 @@ public class DomainSprite extends DexSpriteBase {
         if (gc == null)
             boundaries.addWidth( cWidth );
 
+        clip( canvas, boundaries );
+
         return boundaries;
     }
 
@@ -152,23 +177,24 @@ public class DomainSprite extends DexSpriteBase {
             boundaries.getHeight() + settingsManager.getMargin( Margins.CANVAS ) );
         canvas.setHeight( y + canvasR.getHeight() );
         canvas.setWidth( x + canvasR.getWidth() );
-        log.debug( "Sized canvas: " + canvasR );
+        log.debug( "Sized domain sprite: " + canvasR );
         //
+        gc.setFill( Color.BROWN );
         draw( gc, x, y );
         // manager.updateConnections( this );
         // log.debug( "Rendered " + member + " at " + getBoundaries() );
         return canvas;
     }
 
-    @Override
-    public Canvas render(ColumnRectangle column, boolean collapsed) {
-        this.column = column;
-        Point2D p = column.getNextInColumn();
-        this.x = p.getX();
-        this.y = p.getY();
-        boundaries = null;
-        return render();
-    }
+    // @Override
+    // public Canvas render(ColumnRectangle column, boolean collapsed) {
+    // this.column = column;
+    // Point2D p = column.getNextInColumn();
+    // this.x = p.getX();
+    // this.y = p.getY();
+    // boundaries = null;
+    // return render();
+    // }
 
     @Override
     public String toString() {

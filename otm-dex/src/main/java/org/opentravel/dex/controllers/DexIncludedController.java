@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers;
 
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.events.DexEvent;
+import org.opentravel.model.OtmModelManager;
 
 import java.util.List;
 
@@ -141,6 +142,11 @@ public interface DexIncludedController<T> extends DexController {
      * @return the currently selected DAO
      */
     public DexDAO<?> getSelection();
+
+    /**
+     * @return
+     */
+    OtmModelManager getModelManager();
 
 
 }

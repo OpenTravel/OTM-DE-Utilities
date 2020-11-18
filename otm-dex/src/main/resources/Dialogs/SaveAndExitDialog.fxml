@@ -36,7 +36,7 @@
                   </Label>
                </children>
 						</VBox>
-      		<ButtonBar layoutX="-4.0" layoutY="59.0" prefHeight="70.0" prefWidth="500.0">
+      		<ButtonBar layoutX="-4.0" layoutY="82.0" prefHeight="47.0" prefWidth="500.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="4.0">
       			<buttons>
       				<Button fx:id="saveButton" alignment="CENTER" contentDisplay="CENTER" defaultButton="true" layoutY="10.0" mnemonicParsing="false" onAction="#doSave" styleClass="button-default" stylesheets="@../DavesViper.css" text="Save And Exit " textAlignment="CENTER">
       					<opaqueInsets>

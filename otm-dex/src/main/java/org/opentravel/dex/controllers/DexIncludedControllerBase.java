@@ -22,6 +22,7 @@ import org.opentravel.application.common.OtmEventUser;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexEventLockEvent;
+import org.opentravel.model.OtmModelManager;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -70,6 +71,11 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
     @Override
     public DexMainController getMainController() {
         return mainController;
+    }
+
+    @Override
+    public OtmModelManager getModelManager() {
+        return mainController != null ? mainController.getModelManager() : null;
     }
 
     /**

@@ -96,6 +96,15 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
         // do NOT remove from column...let caller do that
     }
 
+    public void clip(Canvas canvas, Rectangle boundaries) {
+        // Clip the canvas to just have the sprite
+        double clipX = boundaries.getX() - 4;
+        double clipY = boundaries.getY() - 4;
+        double clipW = boundaries.getWidth() + 8 + settingsManager.getMargin( Margins.FACET );
+        double clipH = boundaries.getHeight() + 8 + settingsManager.getMargin( Margins.FACET );
+        canvas.setClip( new javafx.scene.shape.Rectangle( clipX, clipY, clipW, clipH ) );
+    }
+
     @Override
     public void collapseOrExpand() {
         clear();

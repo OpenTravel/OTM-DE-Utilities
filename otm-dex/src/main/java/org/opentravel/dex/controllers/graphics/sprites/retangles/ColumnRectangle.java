@@ -17,7 +17,6 @@
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
-import org.opentravel.dex.controllers.graphics.sprites.DomainSprite;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
@@ -51,10 +50,14 @@ public class ColumnRectangle extends Rectangle {
     private Pane spritePane;
     private ColumnRectangle previousColumn = null;
     private ColumnRectangle nextColumn = null;
-    private DomainSprite domainSprite;
+    // private DomainRectangle domainRectangle;
 
-    public ColumnRectangle(Pane spritePane, DomainSprite domain, ColumnRectangle previous) {
-        super( 0, 0, COLUMN_WIDTH, COLUMN_HEIGHT_MIN );
+    public ColumnRectangle(Pane spritePane, ColumnRectangle previous) {
+        this( spritePane, previous, 0, 0 );
+    }
+
+    public ColumnRectangle(Pane spritePane, ColumnRectangle previous, double x, double y) {
+        super( x, y, COLUMN_WIDTH, COLUMN_HEIGHT_MIN );
         this.spritePane = spritePane;
         if (previous == null)
             index = 1;
@@ -62,10 +65,10 @@ public class ColumnRectangle extends Rectangle {
             index = previous.getIndex() + 1;
         previousColumn = previous;
 
-        this.domainSprite = domain;
+        // domainRectangle = new DomainRectangle( this );
 
         this.x = (index - 1) * width + COLUMN_MARGIN_X;
-        this.y = COLUMN_MARGIN_Y;
+        this.y = y + COLUMN_MARGIN_Y;
         log.debug( this );
     }
 
@@ -85,7 +88,7 @@ public class ColumnRectangle extends Rectangle {
             // add to list
             activeSprites.add( sprite );
 
-            // Show what domain it is in
+            // // Show what domain it is in
             // domainSprite.add( sprite );
         }
     }
@@ -102,6 +105,13 @@ public class ColumnRectangle extends Rectangle {
         resize( COLUMN_WIDTH );
         y = COLUMN_MARGIN_Y;
     }
+
+    // @Override
+    // public Rectangle draw(GraphicsContext gc) {
+    // super.draw( gc );
+    // domainRectangle.draw( gc );
+    // return this;
+    // }
 
     public DexSprite findSprite(Point2D point) {
         DexSprite selectedSprite = null;
