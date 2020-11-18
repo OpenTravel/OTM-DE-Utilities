@@ -24,6 +24,9 @@ import org.opentravel.application.common.OTA2LauncherTabSpec;
 import org.opentravel.application.common.OtmApplicationException;
 import org.opentravel.application.common.OtmApplicationRuntimeException;
 import org.opentravel.application.common.StatusType;
+import org.opentravel.schemacompiler.repository.RemoteRepository;
+import org.opentravel.schemacompiler.repository.RepositoryException;
+import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -353,16 +356,20 @@ public class LauncherController extends AbstractMainWindowController {
     private Map<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>> getApplicationsByTab() {
         ServiceLoader<OTA2ApplicationProvider> loader = ServiceLoader.load( OTA2ApplicationProvider.class );
         Map<OTA2LauncherTabSpec,SortedSet<OTA2ApplicationSpec>> appsByTab = new TreeMap<>();
+        boolean isAdmin = isAdministrator();
 
         for (OTA2ApplicationProvider provider : loader) {
             OTA2ApplicationSpec spec = provider.getApplicationSpec();
-            SortedSet<OTA2ApplicationSpec> appSpecs = appsByTab.get( spec.getLauncherTab() );
 
-            if (appSpecs == null) {
-                appSpecs = new TreeSet<>();
-                appsByTab.put( spec.getLauncherTab(), appSpecs );
+            if (!spec.isDisabled() && (!spec.isAdminApp() || isAdmin)) {
+                SortedSet<OTA2ApplicationSpec> appSpecs = appsByTab.get( spec.getLauncherTab() );
+
+                if (appSpecs == null) {
+                    appSpecs = new TreeSet<>();
+                    appsByTab.put( spec.getLauncherTab(), appSpecs );
+                }
+                appSpecs.add( spec );
             }
-            appSpecs.add( spec );
         }
         return appsByTab;
     }
@@ -447,6 +454,47 @@ public class LauncherController extends AbstractMainWindowController {
 
         logFolder.mkdirs();
         return logFolder;
+    }
+
+    /**
+     * Returns true if the current user has administrator access to at least one remote OTM repository.
+     * 
+     * @return boolean
+     */
+    private boolean isAdministrator() {
+        boolean isAdmin = false;
+        try {
+            List<RemoteRepository> repos = RepositoryManager.getDefault().listRemoteRepositories();
+
+            for (RemoteRepository repo : repos) {
+                isAdmin = isAdministrator( repo );
+
+                if (isAdmin) {
+                    break;
+                }
+            }
+
+        } catch (RepositoryException e) {
+            // No action - return false
+        }
+        return isAdmin;
+    }
+
+    /**
+     * Returns true if the user is an administrator for the given remote repository.
+     * 
+     * @param repo the remote repository to check
+     * @return boolean
+     */
+    private boolean isAdministrator(RemoteRepository repo) {
+        boolean isAdmin = false;
+        try {
+            isAdmin = repo.isAdministrator();
+
+        } catch (Exception e) {
+            // Ignore error and continue
+        }
+        return isAdmin;
     }
 
     /**

@@ -27,7 +27,8 @@ public class UpversionHelperApplicationProvider implements OTA2ApplicationProvid
 
     private static final OTA2ApplicationSpec spec = new OTA2ApplicationSpec( "Upversion Helper",
         "Bulk processor for creating new library versions and promote/demote operations", 40,
-        OTA2LauncherTabSpec.RELEASED_TAB, Images.launcherIcon, UpversionHelperApplication.class );
+        OTA2LauncherTabSpec.RELEASED_TAB, Images.launcherIcon, UpversionHelperApplication.class.getName(), null, true,
+        false );
 
     /**
      * @see org.opentravel.application.common.OTA2ApplicationProvider#getApplicationSpec()

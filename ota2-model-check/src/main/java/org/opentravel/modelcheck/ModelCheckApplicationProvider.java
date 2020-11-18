@@ -27,7 +27,8 @@ public class ModelCheckApplicationProvider implements OTA2ApplicationProvider {
 
     private static final OTA2ApplicationSpec spec = new OTA2ApplicationSpec( "Model Check",
         "Verifies conformance to rules and best practices for OTM model development", 30,
-        OTA2LauncherTabSpec.EXPERIMENTAL_TAB, Images.launcherIcon, ModelCheckApplication.class );
+        OTA2LauncherTabSpec.EXPERIMENTAL_TAB, Images.launcherIcon, ModelCheckApplication.class.getName(), null, false,
+        true );
 
     /**
      * @see org.opentravel.application.common.OTA2ApplicationProvider#getApplicationSpec()

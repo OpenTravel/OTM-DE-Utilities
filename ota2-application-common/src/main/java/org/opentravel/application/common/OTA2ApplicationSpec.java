@@ -30,6 +30,8 @@ public class OTA2ApplicationSpec implements Comparable<OTA2ApplicationSpec> {
     private Image launchIcon;
     private String applicationClassname;
     private String libraryFolderPath;
+    private boolean adminApp;
+    private boolean disabled;
 
     /**
      * Constructor that accepts the Java class that will be used to launch the application.
@@ -60,12 +62,33 @@ public class OTA2ApplicationSpec implements Comparable<OTA2ApplicationSpec> {
      */
     public OTA2ApplicationSpec(String name, String description, int priority, OTA2LauncherTabSpec launcherTab,
         Image launchIcon, String applicationClassname, String libraryFolderPath) {
+        this( name, description, priority, launcherTab, launchIcon, applicationClassname, null, false, false );
+    }
+
+    /**
+     * Constructor that accepts the Java class that will be used to launch the application.
+     * 
+     * @param name the name of the application
+     * @param description a brief description of the application
+     * @param priority the priority that indicates the order of applications in the launcher tab
+     * @param launcherTab the spec for the tab where the application's launch button should be displayed
+     * @param launchIcon the icon to display on the launch button for the application
+     * @param applicationClassname the fully-qualified name of the application class to be called when launching the
+     *        application
+     * @param libraryFolderPath the path of the library folder to use when launching the application
+     * @param adminApp flag indicating if the application can only be accessed by an OTM repository administrator
+     * @param disabled flag indicating if the application is disabled and should not be available in the launcher
+     */
+    public OTA2ApplicationSpec(String name, String description, int priority, OTA2LauncherTabSpec launcherTab,
+        Image launchIcon, String applicationClassname, String libraryFolderPath, boolean adminApp, boolean disabled) {
         this.name = name;
         this.description = description;
         this.launcherTab = launcherTab;
         this.launchIcon = launchIcon;
         this.applicationClassname = applicationClassname;
-        this.applicationClassname = applicationClassname;
+        this.libraryFolderPath = libraryFolderPath;
+        this.adminApp = adminApp;
+        this.disabled = disabled;
     }
 
     /**
@@ -120,6 +143,24 @@ public class OTA2ApplicationSpec implements Comparable<OTA2ApplicationSpec> {
      */
     public String getLibraryFolderPath() {
         return libraryFolderPath;
+    }
+
+    /**
+     * Returns true if the application can only be accessed by OTM repository administrators.
+     * 
+     * @return boolean
+     */
+    public boolean isAdminApp() {
+        return adminApp;
+    }
+
+    /**
+     * Returns true if the application is disabled and should not be displayed in the launcher.
+     * 
+     * @return boolean
+     */
+    public boolean isDisabled() {
+        return disabled;
     }
 
     /**
