@@ -75,6 +75,7 @@ public class LauncherController extends AbstractMainWindowController {
 
     private static final String APP_CLASS_KEY = "appClass";
     private static final String APP_LIBFOLDER_KEY = "appLibraryFolderPath";
+    private static final String APP_LOGFILE_KEY = "appLogFile";
     private static final String APP_PROCESS_KEY = "appProcess";
     private static final String MSG_ALREADY_RUNNING_TITLE = "alert.alreadyRunning.title";
     private static final String MSG_ALREADY_RUNNING_MESSAGE = "alert.alreadyRunning.message";
@@ -130,6 +131,7 @@ public class LauncherController extends AbstractMainWindowController {
         Button sourceButton = (Button) event.getSource();
         String appClassname = (String) sourceButton.getProperties().get( APP_CLASS_KEY );
         String appLibraryFolderPath = (String) sourceButton.getProperties().get( APP_LIBFOLDER_KEY );
+        String appLogFilename = (String) sourceButton.getProperties().get( APP_LOGFILE_KEY );
         Process appProcess = (Process) sourceButton.getProperties().get( APP_PROCESS_KEY );
 
         if ((appProcess != null) && appProcess.isAlive()) {
@@ -145,8 +147,8 @@ public class LauncherController extends AbstractMainWindowController {
             Runnable r = new BackgroundTask( statusMessage, StatusType.INFO ) {
                 @Override
                 public void execute() throws OtmApplicationException {
-                    launchApplicationProcess( sourceButton, appClassname, sourceButton.getText(),
-                        appLibraryFolderPath );
+                    launchApplicationProcess( sourceButton, appClassname, sourceButton.getText(), appLibraryFolderPath,
+                        appLogFilename );
                 }
             };
 
@@ -162,11 +164,13 @@ public class LauncherController extends AbstractMainWindowController {
      * @param appClassname the fully-qualified JavaFX application class name for the utility being launched
      * @param appDisplayName the display name for the application being launched
      * @param appLibraryFolderPath folder path for the application's library jars (may be null for native apps)
+     * @param logFilename the name of the application's log file
      * @throws OtmApplicationException thrown if an error occurs while launching the application
      */
     private void launchApplicationProcess(Button sourceButton, String appClassname, String appDisplayName,
-        String appLibraryFolderPath) throws OtmApplicationException {
+        String appLibraryFolderPath, String logFilename) throws OtmApplicationException {
         try {
+            File logFile = new File( getLogFolder(), logFilename );
             String javaHome = System.getProperty( "java.home" );
             String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
             String classpath = getClasspath( appLibraryFolderPath );
@@ -198,7 +202,7 @@ public class LauncherController extends AbstractMainWindowController {
             }
             builder = new ProcessBuilder( cmds );
             builder.redirectErrorStream( true );
-            builder.redirectOutput( Redirect.appendTo( getLogFile( appClassname ) ) );
+            builder.redirectOutput( Redirect.appendTo( logFile ) );
             newProcess = builder.start();
             sourceButton.getProperties().put( APP_PROCESS_KEY, newProcess );
 
@@ -406,9 +410,13 @@ public class LauncherController extends AbstractMainWindowController {
      * @return Button
      */
     private Button newAppIcon(OTA2ApplicationSpec appSpec) {
+        String logFilename = appSpec.getLogFilename();
         ImageView buttonImg = new ImageView();
         Button appButton = new Button();
 
+        if (logFilename == null) {
+            logFilename = getSimpleClassname( appSpec.getApplicationClassname() ) + ".log";
+        }
         buttonImg.setImage( appSpec.getLaunchIcon() );
         appButton.setText( appSpec.getName() );
         appButton.setGraphic( buttonImg );
@@ -416,6 +424,7 @@ public class LauncherController extends AbstractMainWindowController {
         appButton.setOnAction( this::launchUtilityApp );
         appButton.getProperties().put( APP_CLASS_KEY, appSpec.getApplicationClassname() );
         appButton.getProperties().put( APP_LIBFOLDER_KEY, appSpec.getLibraryFolderPath() );
+        appButton.getProperties().put( APP_LOGFILE_KEY, logFilename );
         return appButton;
     }
 
@@ -429,16 +438,6 @@ public class LauncherController extends AbstractMainWindowController {
         int lastIdx = classname.lastIndexOf( '.' );
 
         return (lastIdx < 0) ? classname : classname.substring( lastIdx + 1 );
-    }
-
-    /**
-     * Returns the file to which the given application class's log output should be directed.
-     * 
-     * @param appClassname the utility application class name for which to return a log file
-     * @return File
-     */
-    private File getLogFile(String appClassname) {
-        return new File( getLogFolder(), getSimpleClassname( appClassname ) + ".log" );
     }
 
     /**

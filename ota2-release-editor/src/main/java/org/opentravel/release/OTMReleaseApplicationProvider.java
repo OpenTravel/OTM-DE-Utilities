@@ -27,7 +27,7 @@ public class OTMReleaseApplicationProvider implements OTA2ApplicationProvider {
 
     private static final OTA2ApplicationSpec spec = new OTA2ApplicationSpec( "Release Editor",
         "Creates stable release baselines of OTM model projects", 30, OTA2LauncherTabSpec.RELEASED_TAB,
-        Images.launcherIcon, OTMReleaseApplication.class.getName(), null, true, false );
+        Images.launcherIcon, OTMReleaseApplication.class.getName(), null, null, true, false );
 
     /**
      * @see org.opentravel.application.common.OTA2ApplicationProvider#getApplicationSpec()

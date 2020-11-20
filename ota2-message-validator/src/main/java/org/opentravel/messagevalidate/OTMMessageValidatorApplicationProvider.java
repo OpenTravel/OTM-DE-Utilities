@@ -28,7 +28,7 @@ public class OTMMessageValidatorApplicationProvider implements OTA2ApplicationPr
     private static final OTA2ApplicationSpec spec = new OTA2ApplicationSpec( "Message Validator",
         "Verifies conformance of XML and JSON messages to an OTM model specification", 20,
         OTA2LauncherTabSpec.EXPERIMENTAL_TAB, Images.launcherIcon, OTMMessageValidatorApplication.class.getName(), null,
-        false, true );
+        null, false, true );
 
     /**
      * @see org.opentravel.application.common.OTA2ApplicationProvider#getApplicationSpec()

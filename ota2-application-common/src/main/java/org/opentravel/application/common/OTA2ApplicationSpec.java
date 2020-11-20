@@ -30,6 +30,7 @@ public class OTA2ApplicationSpec implements Comparable<OTA2ApplicationSpec> {
     private Image launchIcon;
     private String applicationClassname;
     private String libraryFolderPath;
+    private String logFilename;
     private boolean adminApp;
     private boolean disabled;
 
@@ -45,7 +46,7 @@ public class OTA2ApplicationSpec implements Comparable<OTA2ApplicationSpec> {
      */
     public OTA2ApplicationSpec(String name, String description, int priority, OTA2LauncherTabSpec launcherTab,
         Image launchIcon, Class<? extends AbstractOTMApplication> applicationClass) {
-        this( name, description, priority, launcherTab, launchIcon, applicationClass.getName(), null );
+        this( name, description, priority, launcherTab, launchIcon, applicationClass.getName(), null, null );
     }
 
     /**
@@ -61,8 +62,9 @@ public class OTA2ApplicationSpec implements Comparable<OTA2ApplicationSpec> {
      * @param libraryFolderPath the path of the library folder to use when launching the application
      */
     public OTA2ApplicationSpec(String name, String description, int priority, OTA2LauncherTabSpec launcherTab,
-        Image launchIcon, String applicationClassname, String libraryFolderPath) {
-        this( name, description, priority, launcherTab, launchIcon, applicationClassname, null, false, false );
+        Image launchIcon, String applicationClassname, String libraryFolderPath, String logFilename) {
+        this( name, description, priority, launcherTab, launchIcon, applicationClassname, libraryFolderPath,
+            logFilename, false, false );
     }
 
     /**
@@ -80,13 +82,15 @@ public class OTA2ApplicationSpec implements Comparable<OTA2ApplicationSpec> {
      * @param disabled flag indicating if the application is disabled and should not be available in the launcher
      */
     public OTA2ApplicationSpec(String name, String description, int priority, OTA2LauncherTabSpec launcherTab,
-        Image launchIcon, String applicationClassname, String libraryFolderPath, boolean adminApp, boolean disabled) {
+        Image launchIcon, String applicationClassname, String libraryFolderPath, String logFilename, boolean adminApp,
+        boolean disabled) {
         this.name = name;
         this.description = description;
         this.launcherTab = launcherTab;
         this.launchIcon = launchIcon;
         this.applicationClassname = applicationClassname;
         this.libraryFolderPath = libraryFolderPath;
+        this.logFilename = logFilename;
         this.adminApp = adminApp;
         this.disabled = disabled;
     }
@@ -143,6 +147,15 @@ public class OTA2ApplicationSpec implements Comparable<OTA2ApplicationSpec> {
      */
     public String getLibraryFolderPath() {
         return libraryFolderPath;
+    }
+
+    /**
+     * Returns the name of the application's log file.
+     *
+     * @return String
+     */
+    public String getLogFilename() {
+        return logFilename;
     }
 
     /**
