@@ -52,7 +52,7 @@ public class OtmVersionChain {
     private String name;
 
     /**
-     * Get the chain from the model manager.
+     * Create a version chain.
      * 
      * @param library
      */

@@ -834,6 +834,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      */
     @Override
     public void modelChildren() {
+        // ResourceCodegenUtils.getInheritanceHierarchy( resource );
         getTL().getActionFacets().forEach( a -> new OtmActionFacet( a, this ) );
         getTL().getActions().forEach( a -> new OtmAction( a, this ) );
         getTL().getParamGroups().forEach( a -> new OtmParameterGroup( a, this ) );

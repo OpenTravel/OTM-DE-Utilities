@@ -373,7 +373,8 @@ public class SpriteManager {
                 publishEvent( new DexMemberSelectionEvent( ((MemberSprite<?>) selected).getMember() ) );
             } else
                 selected.findAndRunRectangle( e );
-        }
+        } else if (selected instanceof DomainSprite)
+            selected.findAndRunRectangle( e );
     }
 
     protected void publishEvent(DexEvent event) {

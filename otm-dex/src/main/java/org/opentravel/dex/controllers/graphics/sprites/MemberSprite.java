@@ -37,6 +37,7 @@ import java.util.List;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -127,19 +128,19 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
     }
 
 
-    /**
-     * Utility to compute the wider width. Returns
-     * 
-     * @param width - current effective with
-     * @param rect - rectangle with width that may be larger that current effective width
-     * @param offsetX - added to rectangle's width
-     * @return the computed effective width
-     */
-    public static double computeWidth(double width, Rectangle rect, double offsetX) {
-        if (rect != null)
-            width = rect.getWidth() + offsetX > width ? rect.getWidth() + offsetX : width;
-        return width;
-    }
+    // /**
+    // * Utility to compute the wider width. Returns
+    // *
+    // * @param width - current effective with
+    // * @param rect - rectangle with width that may be larger that current effective width
+    // * @param offsetX - added to rectangle's width
+    // * @return the computed effective width
+    // */
+    // public static double computeWidth(double width, Rectangle rect, double offsetX) {
+    // if (rect != null)
+    // width = rect.getWidth() + offsetX > width ? rect.getWidth() + offsetX : width;
+    // return width;
+    // }
 
     @Override
     public DexSprite connect() {
@@ -253,9 +254,11 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
     /**
      * Draw background, label and controls.
      * 
+     * @deprecated - use {@link #draw(GraphicsContext, double, double)}
      * @param gc
      * @return
      */
+    @Deprecated
     protected Rectangle drawMember(GraphicsContext gc) {
         if (member == null)
             return new Rectangle( 0, 0, 0, 0 );
@@ -263,8 +266,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
         // Rectangles are disposable.
         rectangles.clear();
 
-        double fy = drawSprite( gc, settingsManager.getColor( this ), member.getName(), member.getIcon(),
-            member.getPrefix(), member.isEditable() );
+        double fy = y + drawSprite( gc, settingsManager.getColor( this ), member.getPrefix(), member.isEditable() );
 
         double width = boundaries.getWidth();
 
@@ -284,14 +286,14 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
             fy += mRect.getHeight();
         }
 
-        // Handler for canvas layer
-        if (manager != null) {
-            canvas.setOnMouseDragged( manager::drag );
-            canvas.setOnDragDetected( manager::dragStart );
-            canvas.setOnMouseReleased( manager::dragEnd );
-            // Clicks go to the top most node...so let the pane catch them
-            // canvas.setOnMouseClicked( this::mouseClick );
-        }
+        // // Handler for canvas layer
+        // if (manager != null) {
+        // canvas.setOnMouseDragged( manager::drag );
+        // canvas.setOnDragDetected( manager::dragStart );
+        // canvas.setOnMouseReleased( manager::dragEnd );
+        // // Clicks go to the top most node...so let the pane catch them
+        // // canvas.setOnMouseClicked( this::mouseClick );
+        // }
 
         boundaries = new Rectangle( x, y, width, fy - y );
         return boundaries;
@@ -327,7 +329,15 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
         return member;
     }
 
+    @Override
+    public String getName() {
+        return member.getName();
+    }
 
+    @Override
+    public Image getIcon() {
+        return member.getIcon();
+    }
 
     @Override
     public void onRectangleClick(MouseEvent e) {
@@ -339,20 +349,9 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
         // log.debug( "Rendering at " + x + " " + y + " sprite for: " + member );
         if (member == null || manager == null)
             return null;
-
-        if (boundaries == null)
-            draw( null, x, y );
-
-        // Size Canvas
-        Rectangle canvasR = new Rectangle( x, y, boundaries.getWidth() + settingsManager.getMargin( Margins.CANVAS ),
-            boundaries.getHeight() + settingsManager.getMargin( Margins.CANVAS ) );
-        canvas.setHeight( y + canvasR.getHeight() );
-        canvas.setWidth( x + canvasR.getWidth() );
-        // log.debug( "Sized canvas: " + canvasR );
-
-        drawMember( gc );
+        super.render();
         manager.updateConnections( this );
-        log.debug( "Rendered " + member + " at " + getBoundaries() );
+        // log.debug( "Rendered " + member + " at " + getBoundaries() );
         return canvas;
     }
 

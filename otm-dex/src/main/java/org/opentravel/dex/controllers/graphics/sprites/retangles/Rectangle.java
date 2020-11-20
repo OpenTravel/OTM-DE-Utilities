@@ -88,6 +88,8 @@ public class Rectangle {
 
     /**
      * Draw around the rectangle.
+     * <p>
+     * Should be overridden by sub-types.
      * 
      * @param gc
      * @param filled
@@ -204,6 +206,17 @@ public class Rectangle {
      * @return
      */
     public Rectangle draw(GraphicsContext gc) {
+        return draw( gc, false );
+    }
+
+    /**
+     * Set x,y then Draw with filled set to false.
+     * 
+     * @param gc
+     * @return
+     */
+    public Rectangle draw(GraphicsContext gc, double x, double y) {
+        set( x, y );
         return draw( gc, false );
     }
 

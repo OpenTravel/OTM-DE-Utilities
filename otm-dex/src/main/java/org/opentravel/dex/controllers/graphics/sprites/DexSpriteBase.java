@@ -49,7 +49,7 @@ import javafx.scene.text.Font;
 public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler {
     private static Log log = LogFactory.getLog( DexSpriteBase.class );
 
-    protected static final double MIN_HEIGHT = 50;
+    protected static final double MIN_HEIGHT = 20;
     protected static final double MIN_WIDTH = 50;
 
     protected double x;
@@ -66,6 +66,20 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
 
     protected SpriteManager manager;
     protected SettingsManager settingsManager;
+
+    /**
+     * Utility to compute the wider width. Returns
+     * 
+     * @param width - current effective with
+     * @param rect - rectangle with width that may be larger that current effective width
+     * @param offsetX - added to rectangle's width
+     * @return the computed effective width
+     */
+    public static double computeWidth(double width, Rectangle rect, double offsetX) {
+        if (rect != null)
+            width = rect.getWidth() + offsetX > width ? rect.getWidth() + offsetX : width;
+        return width;
+    }
 
     /**
      * Initialize sprite. Create canvas and GC parameters. Compute initial size. Create tool tip. Sub-types will
@@ -127,14 +141,11 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
      * 
      * @param gc if null compute size, otherwise draw
      * @param color of the bounding box
-     * @param name
-     * @param icon
      * @param prefix
-     * @param editable if true the text is in bold
-     * @return y value to start drawing content.
+     * @param bold
+     * @return height (delta y)
      */
-    public double drawSprite(GraphicsContext gc, Paint color, String name, Image icon, String prefix,
-        boolean editable) {
+    public double drawSprite(GraphicsContext gc, Paint color, String prefix, boolean bold) {
         if (boundaries == null)
             boundaries = new Rectangle( x, y, MIN_WIDTH, MIN_HEIGHT );
 
@@ -153,8 +164,7 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
         }
 
         // Draw the name of the object
-        Rectangle lr = new LabelRectangle( this, name, icon, editable, false, false ).draw( gc, x, y );
-
+        Rectangle lr = new LabelRectangle( this, getName(), getIcon(), bold, false, false ).draw( gc, x, y );
         // Add the controls
         double cWidth = drawControls( boundaries, gc ) + settingsManager.getMargin( Margins.MEMBER );
 
@@ -162,7 +172,7 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
         LabelRectangle pRect = null;
         if (prefix != null) {
             double px = boundaries.getMaxX() - cWidth;
-            pRect = new LabelRectangle( this, prefix, null, editable, false, false );
+            pRect = new LabelRectangle( this, prefix, null, bold, false, false );
             px -= pRect.getWidth() + settingsManager.getMargin( Margins.LABEL );
             pRect.draw( gc, px, y );
         }
@@ -175,7 +185,16 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
                 boundaries.addWidth( pRect.getWidth() );
         }
 
-        return y + lr.getHeight();
+        // Handler for canvas layer
+        if (manager != null) {
+            canvas.setOnMouseDragged( manager::drag );
+            canvas.setOnDragDetected( manager::dragStart );
+            canvas.setOnMouseReleased( manager::dragEnd );
+            // Clicks go to the top most node...so let the pane catch them
+            // canvas.setOnMouseClicked( this::mouseClick );
+        }
+
+        return lr.getHeight();
     }
 
     /**
@@ -320,6 +339,25 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
         clear();
         render();
     }
+
+    @Override
+    public Canvas render() {
+        if (boundaries == null)
+            draw( null, x, y );
+
+        // Size Canvas
+        Rectangle canvasR = new Rectangle( x, y, boundaries.getWidth() + settingsManager.getMargin( Margins.CANVAS ),
+            boundaries.getHeight() + settingsManager.getMargin( Margins.CANVAS ) );
+        canvas.setHeight( y + canvasR.getHeight() );
+        canvas.setWidth( x + canvasR.getWidth() );
+        // log.debug( "Sized sprite: " + canvasR );
+
+        draw( gc, x, y );
+
+        log.debug( "Rendered at " + getBoundaries() );
+        return canvas;
+    }
+
 
     @Override
     public Canvas render(ColumnRectangle column, boolean collapsed) {

@@ -27,6 +27,7 @@ import java.util.List;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -202,6 +203,11 @@ public interface DexSprite {
      */
     public Canvas render();
 
+    public String getName();
+
+    public Image getIcon();
+
+
     /**
      * Render this sprite into next available slot in the column.
      * <p>
@@ -228,7 +234,6 @@ public interface DexSprite {
      * Set the collapsed flag and resize.
      */
     void setCollapsed(boolean collapsed);
-
 
 
 }

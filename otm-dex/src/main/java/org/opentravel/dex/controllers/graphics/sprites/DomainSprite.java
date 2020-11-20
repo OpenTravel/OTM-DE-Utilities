@@ -18,7 +18,10 @@ package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.ImageManager;
+import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.LibraryRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.model.OtmModelManager;
@@ -27,11 +30,12 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Paint;
 
@@ -39,6 +43,8 @@ import javafx.scene.paint.Paint;
  * Graphics Display Object (Sprite) for domains ( OTM namespaces ).
  * <p>
  * A domain has one or more namespaces and prefixes and the libraries in that namespace.
+ * <p>
+ * Domains can have sub-domains. Sub-domains share the same base namespace.
  * <p>
  * Each domain has a color. The domain sprite must assure each library in the domain has a color in the settings
  * manager. The domain registers colors for each library in the setting manager. Member sprites will get color for the
@@ -57,6 +63,7 @@ public class DomainSprite extends DexSpriteBase {
     private Map<OtmLibrary,LibraryRectangle> libMap = new HashMap<>();
     private SettingsManager settings = null;
     private OtmModelManager modelManager = null;
+    private List<String> subDomains = null;
 
     /**
      * Initialize member sprite. Create canvas and GC parameters. Compute initial size. Create tool tip. Sub-types will
@@ -72,7 +79,8 @@ public class DomainSprite extends DexSpriteBase {
         this.modelManager = manager.getModelManager();
 
         Collection<OtmLibrary> libs = modelManager.getLibraries( baseNamespace );
-        libs.forEach( lib -> libMap.put( lib, new LibraryRectangle( lib ) ) );
+        libs.forEach( lib -> libMap.put( lib, new LibraryRectangle( this, lib ) ) );
+        subDomains = modelManager.getSubDomains( baseNamespace );
 
         // Correct tool tip display relies on the canvas being clipped to this sprite's active boundaries
         String desc = "Domain defined by base namespace and its libraries.";
@@ -122,8 +130,72 @@ public class DomainSprite extends DexSpriteBase {
         Paint color = null;
         if (gc != null)
             color = gc.getFill();
-        drawSprite( gc, color, baseNamespace, null, null, false );
 
+        // fy +=
+        double fy = y + drawSprite( gc, color, null, false );
+        double width = boundaries.getWidth();
+        double margin = settingsManager.getMargin( Margins.FACET );
+
+        LabelRectangle lr = null;
+        if (!collapsed) {
+            // The namespace
+            lr = new LabelRectangle( this, baseNamespace, ImageManager.getImage( Icons.NAMESPACEFACET ), false, false,
+                false ).draw( gc, x, fy );
+            fy += lr.getHeight();
+            width = computeWidth( width, lr, margin );
+            double fx = x + margin;
+            double connectorSize = 16;
+
+            // Providers sprite
+            lr = new LabelRectangle( this, "2 Provider Domains", getIcon(), false, false, false );
+            lr.draw( gc, fx, fy );
+            fy += lr.getHeight();
+
+            // javafx.geometry.Point2D connectionPoint =
+            if (gc != null)
+                GraphicsUtils.drawConnector( gc, gc.getFill(), connectorSize, width, fy - connectorSize );
+
+            // Users sprite
+            lr = new LabelRectangle( this, "4 User Domains", getIcon(), false, false, false );
+            lr.draw( gc, fx, fy );
+            fy += lr.getHeight();
+
+            // javafx.geometry.Point2D connectionPoint =
+            if (gc != null)
+                GraphicsUtils.drawConnector( gc, gc.getFill(), connectorSize, width, fy - connectorSize );
+
+            // TODO - sub-domains in one facet, libraries in another facet
+            // Sub-domains
+            // TODO - this must its own rectangle type to receive mouse clicks
+            // TODO - draw line like properties do
+            for (String sd : subDomains) {
+                lr = new LabelRectangle( this, getDomainName( sd ), getIcon(), false, false, false );
+                lr.draw( gc, fx, fy );
+                fy += lr.getHeight();
+
+                // javafx.geometry.Point2D connectionPoint =
+                if (gc != null)
+                    GraphicsUtils.drawConnector( gc, gc.getFill(), connectorSize, width, fy - connectorSize );
+            }
+
+
+            // Directly owned libraries
+            for (LibraryRectangle libr : libMap.values()) {
+                // OtmVersionChain chain = null;
+                // boolean latest = libr.getLibrary().isLatestVersion();
+                libr.draw( gc, fx, fy );
+                fy += libr.getHeight();
+                width = computeWidth( width, libr, margin );
+                if (gc != null)
+                    log.debug( "Drew " + lr );
+            }
+
+
+            if (gc == null) {
+                boundaries.setIfWider( width + margin );
+                boundaries.setIfHigher( fy - y );
+            }
+        }
         // boundaries.draw( gc, false );
         return boundaries;
     }
@@ -142,32 +214,36 @@ public class DomainSprite extends DexSpriteBase {
     // }
 
     @Override
+    public String getName() {
+        return getDomainName( baseNamespace );
+    }
+
+    public String getDomainName(String baseNamespace) {
+        String name = "Domain";
+        if (baseNamespace != null) {
+            int lastSlash = baseNamespace.lastIndexOf( '/' );
+            if (lastSlash > 0)
+                name = baseNamespace.substring( lastSlash + 1 );
+        }
+        return name;
+    }
+
+    @Override
+    public Image getIcon() {
+        return ImageManager.getImage( Icons.DOMAIN );
+    }
+
+
+    @Override
     public void onRectangleClick(MouseEvent e) {
         log.debug( "Rectangle click at: " + e.getX() + " " + e.getY() );
     }
 
-    @Override
-    public Canvas render() {
-        log.debug( "Rendering at " + x + " " + y + " sprite for: " + baseNamespace );
-        // if (member == null || manager == null)
-        // return null;
-        //
-        if (boundaries == null)
-            draw( null, x, y );
-        //
-        // Size Canvas
-        Rectangle canvasR = new Rectangle( x, y, boundaries.getWidth() + settingsManager.getMargin( Margins.CANVAS ),
-            boundaries.getHeight() + settingsManager.getMargin( Margins.CANVAS ) );
-        canvas.setHeight( y + canvasR.getHeight() );
-        canvas.setWidth( x + canvasR.getWidth() );
-        log.debug( "Sized domain sprite: " + canvasR );
-        //
-        // gc.setFill( Color.BROWN );
-        draw( gc, x, y );
-        // manager.updateConnections( this );
-        log.debug( "Rendered domain at " + getBoundaries() );
-        return canvas;
-    }
+    // @Override
+    // public Canvas render() {
+    // log.debug( "Rendering at " + x + " " + y + " sprite for: " + baseNamespace );
+    // return super.render();
+    // }
 
     // @Override
     // public Canvas render(ColumnRectangle column, boolean collapsed) {

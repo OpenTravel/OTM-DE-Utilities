@@ -18,10 +18,15 @@ package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.ImageManager;
+import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
+import org.opentravel.dex.controllers.graphics.sprites.DomainSprite;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -39,12 +44,8 @@ public class LibraryRectangle extends Rectangle {
     private static Log log = LogFactory.getLog( LibraryRectangle.class );
 
     private OtmLibrary library;
+    private DexSprite parent;
 
-    /**
-     * Render methods that create rectangles may set the event to run if the implement this interface.
-     * <p>
-     * Example: r.setOnMouseClicked( e -> manager.remove( this ) );
-     */
     public abstract interface RectangleEventHandler {
         public void onRectangleClick(MouseEvent e);
     }
@@ -55,9 +56,20 @@ public class LibraryRectangle extends Rectangle {
         library = member.getLibrary();
     }
 
-    public LibraryRectangle(OtmLibrary library) {
+    public LibraryRectangle(DomainSprite parent, OtmLibrary library) {
         super( 0, 0, 0, 0 );
         this.library = library;
+        this.parent = parent;
+    }
+
+    @Override
+    public Rectangle draw(GraphicsContext gc, boolean filled) {
+        // Draw Property Name and icon
+        LabelRectangle lRect = new LabelRectangle( parent, library.getNameWithPrefix(),
+            ImageManager.getImage( Icons.LIBRARY ), false, false, false ).draw( gc, x, y );
+        this.setIfWider( lRect.getWidth() );
+        this.setIfHigher( lRect.getHeight() );
+        return this;
     }
 
     public String getBaseNamespace() {
@@ -79,7 +91,8 @@ public class LibraryRectangle extends Rectangle {
     }
 
     public String toString() {
-        return "Library Rectangle: x = " + x + " y = " + y + " width = " + width + " height = " + height;
+        return "Library Rectangle: " + library.getName() + "  x = " + x + " y = " + y + " width = " + width
+            + " height = " + height;
     }
 
 }

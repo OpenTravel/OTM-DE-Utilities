@@ -754,6 +754,8 @@ public class OtmModelManager implements TaskResultHandlerI {
 
     /**
      * Look into the chain and return true if this is the latest version (next version = null)
+     * <p>
+     * True if not in a chain.
      * 
      * @param lib
      * @return
@@ -814,6 +816,20 @@ public class OtmModelManager implements TaskResultHandlerI {
         return resources;
     }
 
+    /**
+     * Get all base namespaces that start with the passed base namespace name.
+     * 
+     * @param baseNamespace
+     * @return new list
+     */
+    public List<String> getSubDomains(String baseNamespace) {
+        List<String> subs = new ArrayList<>();
+        getBaseNamespaces().forEach( b -> {
+            if (b.startsWith( baseNamespace ))
+                subs.add( b );
+        } );
+        return subs;
+    }
 
     /**
      * @return

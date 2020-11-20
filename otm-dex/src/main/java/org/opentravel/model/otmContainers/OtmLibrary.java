@@ -587,7 +587,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     /**
-     * Ask the model manager if this is the latest version of the library
+     * Ask the model manager if this is the latest version of the library {@link OtmModelManager#isLatest(OtmLibrary)}
      * 
      * @return
      */
@@ -731,5 +731,12 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     public void refreshVersionChain() {
         // log.debug( this.getFullName() + " version chain refreshed" );
         versionChain = null;
+    }
+
+    /**
+     * @return
+     */
+    public String getNameWithPrefix() {
+        return getPrefix() + " : " + getName();
     }
 }
