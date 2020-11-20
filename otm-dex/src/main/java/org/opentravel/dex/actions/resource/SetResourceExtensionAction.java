@@ -37,9 +37,9 @@ public class SetResourceExtensionAction extends DexStringAction {
 
     public SetResourceExtensionAction() {
         // Constructor for reflection
-  }
+    }
 
-    protected String get() {
+    public String get() {
 
         return getSubject().getExtendedResourceName();
     }
@@ -49,7 +49,7 @@ public class SetResourceExtensionAction extends DexStringAction {
         return (OtmResource) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         getSubject().setExtendedResourceString( value );
     }
 

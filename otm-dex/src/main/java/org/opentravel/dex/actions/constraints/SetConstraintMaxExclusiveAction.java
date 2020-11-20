@@ -51,12 +51,12 @@ public class SetConstraintMaxExclusiveAction extends DexStringAction {
     }
 
     @Override
-    protected String get() {
+    public String get() {
         return simple.getTL().getMaxExclusive();
     }
 
     @Override
-    protected void set(String value) {
+    public void set(String value) {
         simple.getTL().setMaxExclusive( value );
     }
 

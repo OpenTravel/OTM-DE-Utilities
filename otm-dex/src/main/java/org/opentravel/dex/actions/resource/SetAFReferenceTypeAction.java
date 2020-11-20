@@ -33,11 +33,11 @@ public class SetAFReferenceTypeAction extends DexStringAction {
         return false;
     }
 
-    protected SetAFReferenceTypeAction() {
+    public SetAFReferenceTypeAction() {
         // actionType = DexActions.SETAFREFERENCETYPE;
     }
 
-    protected String get() {
+    public String get() {
         return getSubject().getReferenceTypeString();
     }
 
@@ -46,7 +46,7 @@ public class SetAFReferenceTypeAction extends DexStringAction {
         return (OtmActionFacet) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         getSubject().setReferenceTypeString( value );
     }
 

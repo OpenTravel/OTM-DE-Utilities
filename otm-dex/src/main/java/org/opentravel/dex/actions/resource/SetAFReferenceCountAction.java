@@ -16,7 +16,6 @@
 
 package org.opentravel.dex.actions.resource;
 
-import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.resource.OtmActionFacet;
@@ -39,7 +38,7 @@ public class SetAFReferenceCountAction extends DexRunAction {
         return isEnabled( subject );
     }
 
-    protected SetAFReferenceCountAction() {}
+    public SetAFReferenceCountAction() {}
 
     public Integer get() {
         return getSubject().getRepeatCount();
@@ -50,7 +49,7 @@ public class SetAFReferenceCountAction extends DexRunAction {
         return (OtmActionFacet) otm;
     }
 
-    protected void set(int value) {
+    public void set(int value) {
         getSubject().setRepeatCount( value );
     }
 

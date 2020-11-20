@@ -37,7 +37,7 @@ public class SetRequestParameterGroupAction extends DexStringAction {
         // actionType = DexActions.SETREQUESTPARAMETERGROUP;
     }
 
-    protected String get() {
+    public String get() {
         return getSubject().getParamGroupName();
     }
 
@@ -46,7 +46,7 @@ public class SetRequestParameterGroupAction extends DexStringAction {
         return (OtmActionRequest) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         getSubject().setParamGroupString( value );
     }
 

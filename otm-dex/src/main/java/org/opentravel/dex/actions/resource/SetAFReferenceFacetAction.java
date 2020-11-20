@@ -33,11 +33,11 @@ public class SetAFReferenceFacetAction extends DexStringAction {
         return false;
     }
 
-    protected SetAFReferenceFacetAction() {
+    public SetAFReferenceFacetAction() {
         // actionType = DexActions.SETAFREFERENCEFACET;
     }
 
-    protected String get() {
+    public String get() {
         return getSubject().getReferenceFacetName();
     }
 
@@ -46,7 +46,7 @@ public class SetAFReferenceFacetAction extends DexStringAction {
         return (OtmActionFacet) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         getSubject().setReferenceFacetName( value );
     }
 

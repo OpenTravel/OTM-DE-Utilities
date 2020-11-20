@@ -33,11 +33,11 @@ public class SetRequestPathAction extends DexStringAction {
         return false;
     }
 
-    protected SetRequestPathAction() {
+    public SetRequestPathAction() {
         // actionType = DexActions.SETREQUESTPATH;
     }
 
-    protected String get() {
+    public String get() {
         return getSubject().getPathTemplate();
     }
 
@@ -46,7 +46,7 @@ public class SetRequestPathAction extends DexStringAction {
         return (OtmActionRequest) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         getSubject().setPathTemplate( value, false );
     }
 

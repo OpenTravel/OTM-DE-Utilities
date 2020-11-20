@@ -34,11 +34,11 @@ public class SetParentRefParentAction extends DexStringAction {
         return false;
     }
 
-    protected SetParentRefParentAction() {
+    public SetParentRefParentAction() {
         // actionType = DexActions.SETPARENTREFPARENT;
     }
 
-    protected String get() {
+    public String get() {
         OtmResource r = getSubject().getParentResource();
         return r != null ? r.getNameWithPrefix() : "";
     }
@@ -48,7 +48,7 @@ public class SetParentRefParentAction extends DexStringAction {
         return (OtmParentRef) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         getSubject().setParentResourceString( value );
     }
 

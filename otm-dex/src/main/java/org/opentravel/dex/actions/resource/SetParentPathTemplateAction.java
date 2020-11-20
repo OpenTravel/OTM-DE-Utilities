@@ -33,11 +33,11 @@ public class SetParentPathTemplateAction extends DexStringAction {
         return false;
     }
 
-    protected SetParentPathTemplateAction() {
+    public SetParentPathTemplateAction() {
         // actionType = DexActions.SETPARENTPATHTEMPLATE;
     }
 
-    protected String get() {
+    public String get() {
         return getSubject().getPathTemplate();
     }
 
@@ -46,7 +46,7 @@ public class SetParentPathTemplateAction extends DexStringAction {
         return (OtmParentRef) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         getSubject().setPathTemplate( value );
     }
 

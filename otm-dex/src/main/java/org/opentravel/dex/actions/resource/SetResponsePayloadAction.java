@@ -33,11 +33,11 @@ public class SetResponsePayloadAction extends DexStringAction {
         return false;
     }
 
-    protected SetResponsePayloadAction() {
+    public SetResponsePayloadAction() {
         // actionType = DexActions.SETRESPONSEPAYLOAD;
     }
 
-    protected String get() {
+    public String get() {
         return getSubject().getPayloadActionFacetName();
     }
 
@@ -46,7 +46,7 @@ public class SetResponsePayloadAction extends DexStringAction {
         return (OtmActionResponse) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         getSubject().setPayloadActionFacetString( value );
     }
 

@@ -37,7 +37,7 @@ public class BasePathChangeAction extends DexStringAction {
         // Constructor of reflection
     }
 
-    protected String get() {
+    public String get() {
         return getSubject().getBasePath();
     }
 
@@ -46,7 +46,7 @@ public class BasePathChangeAction extends DexStringAction {
         return (OtmResource) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         getSubject().setBasePath( value );
     }
 

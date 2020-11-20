@@ -33,9 +33,9 @@ public class SetParameterLocationAction extends DexStringAction {
         return false;
     }
 
-    protected SetParameterLocationAction() {}
+    public SetParameterLocationAction() {}
 
-    protected String get() {
+    public String get() {
         return getSubject().getLocation() != null ? getSubject().getLocation().toString() : "";
     }
 
@@ -44,7 +44,7 @@ public class SetParameterLocationAction extends DexStringAction {
         return (OtmParameter) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         getSubject().setLocationString( value );
     }
 

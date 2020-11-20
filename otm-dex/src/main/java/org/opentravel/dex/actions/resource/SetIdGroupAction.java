@@ -33,11 +33,11 @@ public class SetIdGroupAction extends DexBooleanAction {
         return false;
     }
 
-    protected SetIdGroupAction() {
+    public SetIdGroupAction() {
         // actionType = DexActions.SETIDGROUP;
     }
 
-    protected boolean get() {
+    public boolean get() {
         return getSubject().isIdGroup();
     }
 
@@ -46,7 +46,7 @@ public class SetIdGroupAction extends DexBooleanAction {
         return (OtmParameterGroup) otm;
     }
 
-    protected void set(boolean value) {
+    public void set(boolean value) {
         getSubject().setIdGroup( value );
     }
 

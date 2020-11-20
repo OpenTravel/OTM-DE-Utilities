@@ -41,11 +41,11 @@ public class SetParameterGroupFacetAction extends DexStringAction {
 
     private List<OtmParameter> children;
 
-    protected SetParameterGroupFacetAction() {
+    public SetParameterGroupFacetAction() {
         // actionType = DexActions.SETPARAMETERGROUPFACET;
     }
 
-    protected String get() {
+    public String get() {
         return getSubject().getReferenceFacetName();
     }
 
@@ -54,7 +54,7 @@ public class SetParameterGroupFacetAction extends DexStringAction {
         return (OtmParameterGroup) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         OtmObject result = getSubject().setReferenceFacetString( value );
         if (result == null)
             postWarning( "Could not set reference facet to: " + value );

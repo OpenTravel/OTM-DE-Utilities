@@ -33,11 +33,11 @@ public class SetRequestPayloadAction extends DexStringAction {
         return false;
     }
 
-    protected SetRequestPayloadAction() {
+    SetRequestPayloadAction() {
         // Constructor for reflection
     }
 
-    protected String get() {
+    public String get() {
         return getSubject().getPayloadActionFacetName();
     }
 
@@ -46,7 +46,7 @@ public class SetRequestPayloadAction extends DexStringAction {
         return (OtmActionRequest) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         getSubject().setPayloadActionFacetString( value );
     }
 

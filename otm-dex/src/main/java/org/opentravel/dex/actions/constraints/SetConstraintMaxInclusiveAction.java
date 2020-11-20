@@ -52,12 +52,12 @@ public class SetConstraintMaxInclusiveAction extends DexStringAction {
     }
 
     @Override
-    protected String get() {
+    public String get() {
         return simple.getTL().getMaxInclusive();
     }
 
     @Override
-    protected void set(String value) {
+    public void set(String value) {
         simple.getTL().setMaxInclusive( value );
     }
 

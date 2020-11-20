@@ -40,11 +40,11 @@ public class SetRequestMethodAction extends DexStringAction {
         return false;
     }
 
-    protected SetRequestMethodAction() {
+    public SetRequestMethodAction() {
         // actionType = DexActions.SETREQUESTMETHOD;
     }
 
-    protected String get() {
+    public String get() {
         return getSubject().getMethodString();
     }
 
@@ -53,7 +53,7 @@ public class SetRequestMethodAction extends DexStringAction {
         return (OtmActionRequest) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         getSubject().setMethodString( value );
     }
 

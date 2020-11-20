@@ -33,9 +33,9 @@ public class SetParameterFieldAction extends DexStringAction {
         return false;
     }
 
-    protected SetParameterFieldAction() {}
+    public SetParameterFieldAction() {}
 
-    protected String get() {
+    public String get() {
         return getSubject().getFieldRefName();
     }
 
@@ -44,7 +44,7 @@ public class SetParameterFieldAction extends DexStringAction {
         return (OtmParameter) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         getSubject().setFieldString( value );
     }
 

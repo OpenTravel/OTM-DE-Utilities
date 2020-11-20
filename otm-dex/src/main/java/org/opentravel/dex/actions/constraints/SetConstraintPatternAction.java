@@ -61,12 +61,12 @@ public class SetConstraintPatternAction extends DexStringAction {
     }
 
     @Override
-    protected String get() {
+    public String get() {
         return simple.getTL().getPattern();
     }
 
     @Override
-    protected void set(String value) {
+    public void set(String value) {
         simple.getTL().setPattern( value );
     }
 

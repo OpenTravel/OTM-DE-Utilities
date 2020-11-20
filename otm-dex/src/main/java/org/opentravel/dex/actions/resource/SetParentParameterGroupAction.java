@@ -33,11 +33,11 @@ public class SetParentParameterGroupAction extends DexStringAction {
         return false;
     }
 
-    protected SetParentParameterGroupAction() {
+    public SetParentParameterGroupAction() {
         // actionType = DexActions.SETPARENTPARAMETERGROUP;
     }
 
-    protected String get() {
+    public String get() {
         return getSubject().getParameterGroupName();
     }
 
@@ -46,7 +46,7 @@ public class SetParentParameterGroupAction extends DexStringAction {
         return (OtmParentRef) otm;
     }
 
-    protected void set(String value) {
+    public void set(String value) {
         getSubject().setParameterGroupString( value );
     }
 

@@ -64,12 +64,12 @@ public class SetConstraintMinInclusiveAction extends DexStringAction {
     }
 
     @Override
-    protected String get() {
+    public String get() {
         return simple.getTL().getMinInclusive();
     }
 
     @Override
-    protected void set(String value) {
+    public void set(String value) {
         simple.getTL().setMinInclusive( value );
         // log.debug( otm + " min inclusive set to " + value );
     }
