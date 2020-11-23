@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 
 import javafx.geometry.Point2D;
@@ -36,7 +34,7 @@ import javafx.scene.input.MouseEvent;
  *
  */
 public class Rectangle {
-    protected static Log log = LogFactory.getLog( Rectangle.class );
+    // private static Log log = LogFactory.getLog( Rectangle.class );
 
     /**
      * Render methods that create rectangles may set the event to run if they implement this interface.
@@ -112,10 +110,10 @@ public class Rectangle {
      * @return <b>NEW</b> connection point with delta added
      */
     public Point2D moveConnectionPoint(double deltaX, double deltaY) {
-        log.debug( "Connection point move: " + connectionPoint );
+        // log.debug( "Connection point move: " + connectionPoint );
         if (connectionPoint != null)
             connectionPoint = connectionPoint.add( deltaX, deltaY );
-        log.debug( "New Connection point : " + connectionPoint );
+        // log.debug( "New Connection point : " + connectionPoint );
         return connectionPoint;
     }
 

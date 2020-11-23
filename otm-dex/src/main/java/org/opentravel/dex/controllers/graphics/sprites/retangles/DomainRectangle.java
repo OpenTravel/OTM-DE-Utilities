@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SpriteManager;
 
@@ -37,7 +39,7 @@ import javafx.scene.paint.Paint;
  *
  */
 public class DomainRectangle extends Rectangle {
-    // private static Log log = LogFactory.getLog( ColumnRectangle.class );
+    private static Log log = LogFactory.getLog( ColumnRectangle.class );
 
     public static final int DOMAIN_HEIGHT_MIN = 50;
     private static final double DOMAIN_WIDTH_MIN = 50;

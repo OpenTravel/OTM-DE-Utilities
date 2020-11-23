@@ -69,7 +69,7 @@ public class ColumnRectangle extends Rectangle {
 
         this.x = (index - 1) * width + COLUMN_MARGIN_X;
         this.y = y + COLUMN_MARGIN_Y;
-        log.debug( this );
+        // log.debug( this );
     }
 
     /**
