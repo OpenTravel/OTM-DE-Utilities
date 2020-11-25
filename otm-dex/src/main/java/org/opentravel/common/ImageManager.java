@@ -53,6 +53,7 @@ public class ImageManager {
         V_WARN("/icons/warning_st_obj.gif"),
         LOCK("/icons/lock.png"),
         UNLOCK("/icons/unlock.png"),
+        CLIPBOARD("/icons/copy.gif"),
         // Containers
         DOMAIN("/icons/domain.gif"),
         LIBRARY("/icons/Library.png"),

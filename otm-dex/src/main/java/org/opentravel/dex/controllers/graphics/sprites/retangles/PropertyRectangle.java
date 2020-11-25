@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
@@ -23,7 +25,6 @@ import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.model.otmProperties.OtmIdReferenceElement;
@@ -33,9 +34,7 @@ import org.opentravel.model.resource.OtmActionResponse;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
 
 /**
  * Graphics utility for containing property regions.
@@ -44,27 +43,27 @@ import javafx.scene.text.Font;
  * @param <O>
  *
  */
-public class PropertyRectangle extends Rectangle {
-    // private static Log log = LogFactory.getLog( PropertyRectangle.class );
+public class PropertyRectangle extends ClickableRectangle {
+    private static Log log = LogFactory.getLog( PropertyRectangle.class );
 
-    /**
-     * Render methods that create rectangles may set the event to run if the implement this interface.
-     * <p>
-     * Example: r.setOnMouseClicked( e -> manager.remove( this ) );
-     */
-    public abstract interface RectangleEventHandler {
-        public void onRectangleClick(MouseEvent e);
-    }
+    // /**
+    // * Render methods that create rectangles may set the event to run if the implement this interface.
+    // * <p>
+    // * Example: r.setOnMouseClicked( e -> manager.remove( this ) );
+    // */
+    // public abstract interface RectangleEventHandler {
+    // public void onRectangleClick(MouseEvent e);
+    // }
 
     protected MemberSprite<?> parent;
-    protected Font font;
-    protected SettingsManager settings;
+    // protected Font font;
+    // protected SettingsManager settings;
 
     private OtmProperty property;
     protected OtmTypeProvider typeProvider = null;
 
-    protected String label = "";
-    private Image icon = null;
+    // protected String label = "";
+    // private Image icon = null;
     private boolean editable = false;
     private boolean inherited = false;
 
@@ -80,18 +79,19 @@ public class PropertyRectangle extends Rectangle {
 
     public PropertyRectangle(MemberSprite<?> parent, double width, String label, Image icon, boolean editable,
         boolean inherited) {
-        super( 0, 0, GraphicsUtils.MINIMUM_WIDTH, 0 );
+        super( parent, label, icon, width, editable, inherited );
+        // super( 0, 0, GraphicsUtils.MINIMUM_WIDTH, 0 );
         this.parent = parent;
         this.label = label;
         this.icon = icon;
         this.editable = editable;
         this.inherited = inherited;
         this.width = width;
-        this.font = parent.getFont();
-        if (inherited) {
-            this.font = parent.getItalicFont();
-            this.label += " (i)";
-        }
+        // this.font = parent.getFont();
+        // if (inherited) {
+        // this.font = parent.getItalicFont();
+        // this.label += " (i)";
+        // }
 
         settings = parent.getSettingsManager();
         if (settings != null) {
@@ -191,56 +191,20 @@ public class PropertyRectangle extends Rectangle {
 
     @Override
     public Rectangle draw(GraphicsContext gc) {
-        boolean compute = gc == null;
 
-        connectorSize = GraphicsUtils.drawConnector( null, null, connectorSize, 0, 0 ).getX();
-        double rightMargin = connectorSize + margin;
-        double actualWidth = rightMargin + margin; // actual width as computed
-        //
-        // Draw Property Name and icon
-        LabelRectangle lRect = new LabelRectangle( parent, label, icon, editable, inherited, false ).draw( gc, x, y );
-        actualWidth += lRect.getWidth(); // Actual width
-        // lRect.draw( gc, false );
+        // Draw property name
+        LabelRectangle lRect = drawLabel( gc, x, y, this );
 
-        // Draw Type provider if any
-        LabelRectangle tRect;
+        if (showConnector( typeProvider ))
+            drawConnector( gc, lRect, providerColor );
         if (typeProvider != null) {
-            tRect = new LabelRectangle( parent, providerLabel, providerIcon, false, inherited, true );
-            actualWidth += tRect.getWidth() + typeMargin;
-            double tx = x + width - tRect.getWidth() - rightMargin - 3 * margin;
-            tRect.draw( gc, tx, y );
-        }
+            drawUnderline( gc, lRect, width, margin );
+            drawConnectorLabel( gc, lRect, providerLabel, providerIcon, inherited );
+        } else
+            drawUnderline( gc, lRect, labelWidth, margin );
 
-        // Compute property height and width
-        width = compute && actualWidth > width ? actualWidth : width;
-        height = lRect.getHeight() + 2 * margin;
+        drawVerticalLine( gc, lRect, margin );
 
-        // Draw Underline
-        double lineY = y + lRect.getHeight() - margin;
-        double lineX = x + width - rightMargin;
-        if (property != null && !(property instanceof OtmTypeUser))
-            lineX = x + lRect.getWidth();
-        if (gc != null)
-            gc.strokeLine( x, lineY, lineX, lineY );
-
-        // Draw Connector symbol and register listener
-        if (showConnector( typeProvider )) {
-            double cx = x + width - connectorSize - 6 * margin;
-            connectionPoint =
-                GraphicsUtils.drawConnector( gc, providerColor, connectorSize, cx, lineY - connectorSize );
-            // log.debug( " Set connection point to: " + connectionPoint );
-
-            // Register mouse listener with parent
-            // parent.connect won't run until clicked, parent needs rectangle to dispatch click.
-            if (!compute && parent != null) {
-                if (property != null)
-                    this.setOnMouseClicked( e -> parent.connect( this ) );
-                else
-                    this.setOnMouseClicked( e -> parent.connect( (OtmLibraryMember) typeProvider ) );
-                parent.add( this );
-                // log.debug( "Added mouse listener to " + property );
-            }
-        }
         // super.draw( gc, false ); // debug
         // Log.debug("Drew "+this);
         return this;

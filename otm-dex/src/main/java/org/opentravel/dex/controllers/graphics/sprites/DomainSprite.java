@@ -27,7 +27,6 @@ import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.LibraryFacetRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.LibraryRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.SubDomainCR;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.SubDomainFR;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
@@ -123,11 +122,14 @@ public class DomainSprite extends DexSpriteBase {
     // @Override
     public DexSprite connect(ClickableRectangle clickableRectangle, String subDomain) {
         log.debug( "Connect " + subDomain + " to " + clickableRectangle );
-        DomainSprite subDomainS = manager.add( subDomain, getColumn() );
-        subDomainS.collapseOrExpand();
-        subDomainS.getCanvas().toFront();
-        subDomainS.refresh();
-        // TODO - create connection?
+        DomainSprite subDomainS = null;
+        if (subDomain != null && !subDomain.isEmpty()) {
+            subDomainS = manager.add( subDomain, getColumn() );
+            subDomainS.collapseOrExpand();
+            subDomainS.getCanvas().toFront();
+            subDomainS.refresh();
+            // TODO - create connection?
+        }
         return subDomainS;
     }
 

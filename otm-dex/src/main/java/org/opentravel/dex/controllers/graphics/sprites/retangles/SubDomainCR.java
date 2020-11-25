@@ -52,9 +52,9 @@ public class SubDomainCR extends ClickableRectangle {
         LabelRectangle lr = drawLabel( gc, x, y, sd );
         drawVerticalLine( gc, lr, margin );
         drawUnderline( gc, lr, width, margin );
-        drawConnector( gc, lr, width, connectorColor );
+        drawConnector( gc, lr, connectorColor );
 
-        log.debug( "Drew/sized " + this );
+        // log.debug( "Drew/sized " + this );
         // drawOutline( gc, false ); // debug
         return this;
     }

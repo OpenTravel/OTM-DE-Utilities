@@ -64,17 +64,17 @@ public class LibraryFacetRectangle extends CollapsableRectangle {
                 fy += libr.getHeight();
                 height += libr.getHeight();
 
-                if (gc != null)
-                    log.debug( "Drew " + libr );
-                else
-                    log.debug( "sized " + libr );
+                // if (gc != null)
+                // log.debug( "Drew " + libr );
+                // else
+                // log.debug( "sized " + libr );
             }
         }
         height = height + 2 * margin;
-        if (gc != null)
-            log.debug( "Drew " + this );
-        else
-            log.debug( "sized " + this );
+        // if (gc != null)
+        // log.debug( "Drew " + this );
+        // else
+        // log.debug( "sized " + this );
         // super.draw( gc, false ); // debug
         return this;
     }

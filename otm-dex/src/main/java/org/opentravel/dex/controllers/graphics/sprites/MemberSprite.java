@@ -149,21 +149,6 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
         return connect( (OtmLibraryMember) member.getBaseType() );
     }
 
-    @Override
-    public DexSprite connect(OtmLibraryMember member) {
-        DexSprite otherSprite = manager.get( member );
-        if (otherSprite == null) {
-            otherSprite = manager.add( member, getColumn() );
-        } else
-            otherSprite.setCollapsed( !otherSprite.isCollapsed() );
-        if (otherSprite != null) {
-            manager.addAndDraw( new SuperTypeConnection( otherSprite, this ) );
-            otherSprite.getCanvas().toFront();
-            otherSprite.refresh();
-        }
-        return otherSprite;
-    }
-
     /**
      * Find the property's rectangle and make type connection
      * 
@@ -184,10 +169,31 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
         return c;
     }
 
+    @Override
+    public DexSprite connect(OtmLibraryMember member) {
+        DexSprite otherSprite = manager.get( member );
+        if (otherSprite == null) {
+            otherSprite = manager.add( member, getColumn() );
+        } else
+            otherSprite.setCollapsed( !otherSprite.isCollapsed() );
+        if (otherSprite != null) {
+            manager.addAndDraw( new SuperTypeConnection( otherSprite, this ) );
+            otherSprite.getCanvas().toFront();
+            otherSprite.refresh();
+        }
+        return otherSprite;
+    }
+
     // @Override
     public MemberSprite<?> connect(PropertyRectangle pRect) {
+        if (pRect == null)
+            return null;
+
+        if (pRect.getProperty() == null)
+            return (MemberSprite<?>) connect( (OtmLibraryMember) pRect.getProvider() );
+
         // log.debug( "Connecting property " + pRect );
-        if (pRect == null || pRect.getProperty() == null || pRect.getProvider() == null)
+        if (pRect.getProperty() == null || pRect.getProvider() == null)
             return null;
         if (getColumn() == null)
             return null;

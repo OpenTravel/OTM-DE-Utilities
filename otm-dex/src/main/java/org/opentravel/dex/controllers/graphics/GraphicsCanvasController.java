@@ -37,13 +37,20 @@ import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import javax.imageio.ImageIO;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -54,6 +61,9 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -179,6 +189,9 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         Button refreshB = new Button( "Refresh" );
         refreshB.setOnAction( this::doRefresh );
 
+        Button clipboardB = new Button( "Copy", ImageManager.get( Icons.CLIPBOARD ) );
+        clipboardB.setOnAction( e -> snapshot() );
+
         Separator tSep = new Separator( Orientation.VERTICAL );
         ToggleSwitch trackS = new ToggleSwitch( "Track" );
         trackS.selectedProperty().addListener( (v, o, n) -> doTrack( n ) );
@@ -213,8 +226,8 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         ColorPicker colorP = new ColorPicker();
         colorP.setOnAction( this::doColor );
 
-        ToolBar tb = new ToolBar( clearB, refreshB, tSep, trackS, lockSep, lockS, lockI, domainSep, domainI, domainS,
-            fontSep, fontL, fontS, colorP, dSep, doodleS );
+        ToolBar tb = new ToolBar( clearB, refreshB, clipboardB, tSep, trackS, lockSep, lockS, lockI, domainSep, domainI,
+            domainS, fontSep, fontL, fontS, colorP, dSep, doodleS );
         parent.getChildren().add( tb );
         tb.setStyle( "-fx-background-color: #7cafc2" );
         return tb;
@@ -241,7 +254,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
      */
     private void doDoodle(boolean run) {
         if (run) {
-            log.debug( "Starting doodle." );
+            // log.debug( "Starting doodle." );
             if (doodleCanvas == null) {
                 doodleCanvas =
                     new Canvas( graphicsVBox.getWidth(), spritePane.getHeight() > 0 ? spritePane.getHeight() : 1000 );
@@ -254,16 +267,19 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
             dgc.setStroke( Color.DARKRED );
             dgc.setLineWidth( 4 );
 
+            // TODO - Canvas may be too small to capture all mouse clicks
             doodleCanvas.setOnMouseDragged( e -> {
-                log.debug( " doodle drag" );
+                // log.debug( " doodle drag" );
                 dgc.lineTo( e.getX(), e.getY() );
                 dgc.stroke();
+                e.consume();
             } );
             doodleCanvas.setOnMousePressed( e -> {
-                log.debug( " doodle point" );
+                // log.debug( " doodle point" );
                 dgc.beginPath();
                 dgc.lineTo( e.getX(), e.getY() );
                 dgc.stroke();
+                e.consume();
             } );
         } else {
             if (dgc != null) {
@@ -370,13 +386,12 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
             ColumnRectangle memberColumn = spriteManager.getColumn( 2 );
             ColumnRectangle domainColumn = spriteManager.getColumn( 1 );
 
-            if (tracking)
+            if (tracking) {
                 spriteManager.clear();
-
-            if (showDomains)
-                spriteManager.add( member.getLibrary(), domainColumn );
-            // TODO - add domain sprites to other posters
-
+                if (showDomains)
+                    spriteManager.add( member.getLibrary(), domainColumn );
+                // TODO - add domain sprites to other posters
+            }
             MemberSprite<?> memberS = spriteManager.add( member, memberColumn, false );
 
             if (memberS != null)
@@ -405,4 +420,30 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         fireEvent( event );
         ignoreEvents = false;
     }
+
+    private void snapshot() {
+        WritableImage snapshot = scrollPane.snapshot( new SnapshotParameters(), null );
+        // saveImage( snapshot );
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        content.putImage( snapshot );
+        clipboard.setContent( content );
+    }
+
+    File file = new File( "C:/Users/dmh/Desktop/Sample Images/test.jpg" );
+    // File file = new File( "C:/Users/dmh/Desktop/test.jpg" );
+    BufferedImage bufferedImage = new BufferedImage( 550, 400, BufferedImage.TYPE_INT_ARGB );
+
+    private void saveImage(WritableImage snapshot) {
+        BufferedImage image;
+        image = javafx.embed.swing.SwingFXUtils.fromFXImage( snapshot, bufferedImage );
+        try {
+            Graphics2D gd = (Graphics2D) image.getGraphics();
+            gd.translate( scrollPane.getWidth(), scrollPane.getHeight() );
+            ImageIO.write( image, "png", file );
+        } catch (IOException ex) {
+            log.debug( "Error saving image. " + ex );
+        }
+    }
+
 }
