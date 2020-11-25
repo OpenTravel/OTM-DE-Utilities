@@ -24,17 +24,11 @@ import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.DomainSprite;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.model.otmContainers.OtmLibrary;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 
 /**
- * Graphics utility for containing regions (x, y, width, height). A rectangle does <b>not</b> have a canvas.
- * <p>
- * Sub-types have contents that can be drawn into the rectangle. These rectangles will compute their size when
- * constructed and when drawn with a null GraphicsContext (GC). A rectangle may be mouse click-able if the parent sprite
- * is passed when constructing the rectangle.
  * 
  * @author dmh
  * @param <O>
@@ -50,12 +44,6 @@ public class LibraryRectangle extends Rectangle {
         public void onRectangleClick(MouseEvent e);
     }
 
-    public LibraryRectangle(MemberSprite<?> sprite) {
-        super( 0, 0, 0, 0 );
-        OtmLibraryMember member = sprite.getMember();
-        library = member.getLibrary();
-    }
-
     public LibraryRectangle(DomainSprite parent, OtmLibrary library) {
         super( 0, 0, 0, 0 );
         this.library = library;
@@ -63,7 +51,7 @@ public class LibraryRectangle extends Rectangle {
     }
 
     @Override
-    public Rectangle draw(GraphicsContext gc, boolean filled) {
+    public Rectangle draw(GraphicsContext gc) {
         // Draw Property Name and icon
         LabelRectangle lRect = new LabelRectangle( parent, library.getNameWithPrefix(),
             ImageManager.getImage( Icons.LIBRARY ), false, false, false ).draw( gc, x, y );
@@ -90,6 +78,7 @@ public class LibraryRectangle extends Rectangle {
         return sLib.getBaseNamespace().equals( baseNamespace );
     }
 
+    @Override
     public String toString() {
         return "Library Rectangle: " + library.getName() + "  x = " + x + " y = " + y + " width = " + width
             + " height = " + height;

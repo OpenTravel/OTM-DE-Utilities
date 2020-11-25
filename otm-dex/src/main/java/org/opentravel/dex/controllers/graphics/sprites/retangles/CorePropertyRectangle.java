@@ -38,7 +38,7 @@ public class CorePropertyRectangle extends PropertyRectangle {
         setProvider( core.getAssignedType() );
 
         // Compute the size
-        draw( null, font );
+        draw( null );
     }
 
     public OtmCore get() {

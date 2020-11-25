@@ -156,8 +156,8 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
             Rectangle bRect = new Rectangle( boundaries.getX(), boundaries.getY(),
                 boundaries.getWidth() + settingsManager.getMargin( Margins.FACET ),
                 boundaries.getHeight() + settingsManager.getMargin( Margins.FACET ) );
-            bRect.draw( gc, false ); // Outline
-            bRect.draw( gc, true ); // Fill
+            bRect.drawOutline( gc, false ); // Outline
+            bRect.drawOutline( gc, true ); // Fill
             gc.setFill( p );
             // Clip the canvas so tool tips (and mouse clicks) can go the right sprite
             clip( canvas, boundaries );
@@ -240,7 +240,7 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
      */
     public double draw(Rectangle rect, GraphicsContext gc, double width, double x, double dx, double y) {
         rect.set( x + dx, y );
-        rect.draw( gc, true );
+        rect.draw( gc );
         if (gc == null && rect.getWidth() > width)
             width = rect.getWidth() + dx;
         return width;

@@ -44,7 +44,7 @@ public class DomainRectangle extends Rectangle {
     public static final int DOMAIN_HEIGHT_MIN = 50;
     private static final double DOMAIN_WIDTH_MIN = 50;
 
-    private int index = 0;
+    // private int index = 0;
     private List<DexSprite> activeSprites = new ArrayList<>();
     // private Pane spritePane;
     private ColumnRectangle column = null;

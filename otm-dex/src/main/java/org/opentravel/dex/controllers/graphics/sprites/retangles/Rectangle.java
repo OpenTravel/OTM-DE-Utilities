@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 
 import javafx.geometry.Point2D;
@@ -34,7 +36,7 @@ import javafx.scene.input.MouseEvent;
  *
  */
 public class Rectangle {
-    // private static Log log = LogFactory.getLog( Rectangle.class );
+    private static Log log = LogFactory.getLog( Rectangle.class );
 
     /**
      * Render methods that create rectangles may set the event to run if they implement this interface.
@@ -63,6 +65,10 @@ public class Rectangle {
         this.width = width;
     }
 
+    public void addWidth(double added) {
+        width += added;
+    }
+
     /**
      * @param x2
      * @param y2
@@ -85,14 +91,44 @@ public class Rectangle {
     }
 
     /**
-     * Draw around the rectangle.
+     * Draw this rectangle. If not overridden, draw outline with filled set to false.
      * <p>
      * Should be overridden by sub-types.
      * 
      * @param gc
+     * @return this rectangle
+     */
+    public Rectangle draw(GraphicsContext gc) {
+        drawOutline( gc, false );
+        return this;
+    }
+
+    // /**
+    // * Draw around the rectangle.
+    // * <p>
+    // * Should be overridden by sub-types.
+    // *
+    // * @param gc
+    // * @param filled
+    // */
+    // @Deprecated
+    // public Rectangle draw(GraphicsContext gc, boolean filled) {
+    // if (gc != null) {
+    // if (filled)
+    // gc.fillRect( x, y, width, height );
+    // else
+    // gc.strokeRect( x, y, width, height );
+    // }
+    // return this;
+    // }
+
+    /**
+     * Draw around the rectangle.
+     * 
+     * @param gc
      * @param filled
      */
-    public Rectangle draw(GraphicsContext gc, boolean filled) {
+    public final Rectangle drawOutline(GraphicsContext gc, boolean filled) {
         if (gc != null) {
             if (filled)
                 gc.fillRect( x, y, width, height );
@@ -102,18 +138,18 @@ public class Rectangle {
         return this;
     }
 
-    public Point2D getConnectionPoint() {
-        return connectionPoint;
+    /**
+     * Set x,y then Draw with filled set to false.
+     * 
+     * @param gc
+     * @return
+     */
+    public Rectangle draw(GraphicsContext gc, double x, double y) {
+        set( x, y );
+        return draw( gc );
     }
 
-    /**
-     * @return <b>NEW</b> connection point with delta added
-     */
-    public Point2D moveConnectionPoint(double deltaX, double deltaY) {
-        // log.debug( "Connection point move: " + connectionPoint );
-        if (connectionPoint != null)
-            connectionPoint = connectionPoint.add( deltaX, deltaY );
-        // log.debug( "New Connection point : " + connectionPoint );
+    public Point2D getConnectionPoint() {
         return connectionPoint;
     }
 
@@ -129,6 +165,7 @@ public class Rectangle {
         return y + height;
     }
 
+
     public double getWidth() {
         return width;
     }
@@ -137,19 +174,34 @@ public class Rectangle {
         return x;
     }
 
-
     public double getY() {
         return y;
     }
 
     /**
+     * @return <b>NEW</b> connection point with delta added
+     */
+    public Point2D moveConnectionPoint(double deltaX, double deltaY) {
+        // log.debug( "Connection point move: " + connectionPoint );
+        if (connectionPoint != null)
+            connectionPoint = connectionPoint.add( deltaX, deltaY );
+        // log.debug( "New Connection point : " + connectionPoint );
+        return connectionPoint;
+    }
+
+    /**
      * Run the method that was the argument to {@link #setOnMouseClicked(RectangleEventHandler)} with the event.
+     * <p>
+     * If a rectangle does not respond to click, check to see if it has an event handler. If it does, make sure
+     * DexSpriteBase can find the rectangle.
      * 
      * @param e
      */
     public final void onMouseClicked(MouseEvent e) {
         if (e != null && eventHandler != null)
             eventHandler.onRectangleClick( e );
+        else
+            log.warn( "Missing event handler for mouse click." );
         // log.debug( "Mouse clicked. " + e.toString() );
     }
 
@@ -165,17 +217,9 @@ public class Rectangle {
         return this;
     }
 
-    /**
-     * Save in this rectangle a event handler to call on mouse click.
-     * 
-     * @param a
-     */
-    public final void setOnMouseClicked(RectangleEventHandler a) {
-        eventHandler = a;
-    }
-
-    public void addWidth(double added) {
-        width += added;
+    public final void setIfHigher(double height) {
+        if (height > this.height)
+            this.height = height;
     }
 
     public final void setIfLarger(Rectangle rectangle) {
@@ -188,34 +232,17 @@ public class Rectangle {
             this.width = width;
     }
 
-    public final void setIfHigher(double height) {
-        if (height > this.height)
-            this.height = height;
+    /**
+     * Save in this rectangle a event handler to call on mouse click.
+     * 
+     * @param a
+     */
+    public final void setOnMouseClicked(RectangleEventHandler a) {
+        eventHandler = a;
     }
 
     public String toString() {
         return "x = " + x + " y = " + y + " width = " + width + " height = " + height;
-    }
-
-    /**
-     * Draw with filled set to false.
-     * 
-     * @param gc
-     * @return
-     */
-    public Rectangle draw(GraphicsContext gc) {
-        return draw( gc, false );
-    }
-
-    /**
-     * Set x,y then Draw with filled set to false.
-     * 
-     * @param gc
-     * @return
-     */
-    public Rectangle draw(GraphicsContext gc, double x, double y) {
-        set( x, y );
-        return draw( gc, false );
     }
 
 }

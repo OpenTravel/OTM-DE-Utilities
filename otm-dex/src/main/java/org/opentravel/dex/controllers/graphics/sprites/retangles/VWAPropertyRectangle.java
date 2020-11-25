@@ -39,7 +39,7 @@ public class VWAPropertyRectangle extends PropertyRectangle {
         setProvider( vwa.getAssignedType() );
 
         // Compute the size
-        draw( null, font );
+        draw( null );
     }
 
     public OtmValueWithAttributes get() {

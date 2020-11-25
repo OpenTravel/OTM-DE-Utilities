@@ -17,6 +17,7 @@
 package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.CollapsableRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
 import org.opentravel.model.otmContainers.OtmLibrary;
 
@@ -236,17 +237,17 @@ public class SettingsManager {
         return false;
     }
 
-    // /**
-    // * @param domainSprite
-    // */
-    // public Paint getColor(DomainSprite domainSprite) {
-    // return (Color.BLANCHEDALMOND);
-    // }
-
     /**
      * @param a facet rectangle
      */
     public Paint getColor(FacetRectangle rect) {
+        return (Color.ANTIQUEWHITE);
+    }
+
+    /**
+     * @param a facet rectangle
+     */
+    public Paint getColor(CollapsableRectangle rect) {
         return (Color.ANTIQUEWHITE);
     }
 

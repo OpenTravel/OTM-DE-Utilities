@@ -158,7 +158,7 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     /**
      * Configuration for non-main controllers. Call after init() and before posting content.
      * 
-     * @param parent
+     * @param sprite
      * @param editableOnly filter setting
      */
     public void configure(OtmModelManager modelManager, boolean editableOnly) {

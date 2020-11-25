@@ -127,6 +127,14 @@ public class SpriteManager {
         return add( member, column, !member.isExpanded() );
     }
 
+    public DomainSprite add(String baseNamespace, ColumnRectangle column) {
+        DomainSprite subDomainS = findSprite( baseNamespace );
+        if (subDomainS == null)
+            subDomainS = factory( baseNamespace );
+        subDomainS.render( column, false );
+        return subDomainS;
+    }
+
     public DomainSprite add(OtmLibrary library, ColumnRectangle column) {
         DomainSprite ds = getDomainSprite( library );
         if (ds == null) {
@@ -300,6 +308,13 @@ public class SpriteManager {
         return ds;
     }
 
+    protected DomainSprite factory(String baseNamespace) {
+        DomainSprite ds = new DomainSprite( this, baseNamespace );
+        domainSprites.add( ds );
+        spritePane.getChildren().add( ds.getCanvas() );
+        return ds;
+    }
+
     public DexSprite findSprite(OtmLibraryMember member) {
         DexSprite selectedSprite = null;
         for (ColumnRectangle column : columns) {
@@ -318,6 +333,15 @@ public class SpriteManager {
                 return (sprite);
             }
         return selectedSprite;
+    }
+
+    public DomainSprite findSprite(String subDomain) {
+        DexSprite selectedSprite = null;
+        for (DexSprite sprite : getAllSprites())
+            if (sprite instanceof DomainSprite && ((DomainSprite) sprite).getDomain().equals( subDomain )) {
+                return (DomainSprite) (sprite);
+            }
+        return (DomainSprite) selectedSprite;
     }
 
     @SuppressWarnings("unchecked")

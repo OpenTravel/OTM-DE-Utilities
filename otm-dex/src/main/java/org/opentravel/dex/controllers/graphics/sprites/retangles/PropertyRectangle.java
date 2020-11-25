@@ -118,7 +118,7 @@ public class PropertyRectangle extends Rectangle {
         }
 
         // Compute the size
-        draw( null, font );
+        draw( null );
     }
 
     public PropertyRectangle(OtmActionRequest rq, MemberSprite<?> parentSprite, double width) {
@@ -130,7 +130,7 @@ public class PropertyRectangle extends Rectangle {
             this.label += "  " + rq.getPayloadActionFacetName();
 
         // Compute the size
-        draw( null, font );
+        draw( null );
     }
 
     public PropertyRectangle(OtmActionResponse rs, MemberSprite<?> parentSprite, double width) {
@@ -140,7 +140,7 @@ public class PropertyRectangle extends Rectangle {
             this.label = rs.getPayloadActionFacetName();
 
         // Compute the size
-        draw( null, font );
+        draw( null );
     }
 
 
@@ -157,18 +157,19 @@ public class PropertyRectangle extends Rectangle {
         }
     }
 
-    /**
-     * Draw the rectangle.
-     * 
-     * @param gc
-     * @param filled
-     */
-    @Override
-    public Rectangle draw(GraphicsContext gc, boolean filled) {
-        if (gc != null)
-            draw( gc, font );
-        return this;
-    }
+    // /**
+    // * Draw the rectangle.
+    // *
+    // * @param gc
+    // * @param filled
+    // */
+    // @Deprecated
+    // @Override
+    // public Rectangle draw(GraphicsContext gc, boolean filled) {
+    // if (gc != null)
+    // draw( gc );
+    // return this;
+    // }
 
     /**
      * @return the property field
@@ -182,9 +183,14 @@ public class PropertyRectangle extends Rectangle {
     }
 
 
-    // label, icon, editable
-    // TypeProvider, providerLabel, providerIcon
-    protected Rectangle draw(GraphicsContext gc, Font font) {
+    // // label, icon, editable
+    // // TypeProvider, providerLabel, providerIcon
+    // protected Rectangle draw(GraphicsContext gc, Font font) {
+    // return draw( gc );
+    // }
+
+    @Override
+    public Rectangle draw(GraphicsContext gc) {
         boolean compute = gc == null;
 
         connectorSize = GraphicsUtils.drawConnector( null, null, connectorSize, 0, 0 ).getX();

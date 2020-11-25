@@ -100,6 +100,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
     private boolean isLocked = false;
     private boolean tracking = true;
+    private boolean showDomains = true;
 
 
     public GraphicsCanvasController() {
@@ -188,6 +189,12 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         ImageView lockI = ImageManager.get( Icons.LOCK );
         lockS.selectedProperty().addListener( (v, o, n) -> doLock( n ) );
 
+        Separator domainSep = new Separator( Orientation.VERTICAL );
+        ToggleSwitch domainS = new ToggleSwitch( "Domains" );
+        ImageView domainI = ImageManager.get( Icons.DOMAIN );
+        domainS.selectedProperty().addListener( (v, o, n) -> doDomains( n ) );
+        domainS.setSelected( showDomains );
+
         // Separator cSep = new Separator( Orientation.VERTICAL );
         // ToggleSwitch collapseS = new ToggleSwitch( "Collapse" );
         // collapseS.selectedProperty().addListener( (v, o, n) -> doCollapse( n ) );
@@ -206,8 +213,8 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         ColorPicker colorP = new ColorPicker();
         colorP.setOnAction( this::doColor );
 
-        ToolBar tb = new ToolBar( clearB, refreshB, tSep, trackS, lockSep, lockS, lockI, fontSep, fontL, fontS, colorP,
-            dSep, doodleS );
+        ToolBar tb = new ToolBar( clearB, refreshB, tSep, trackS, lockSep, lockS, lockI, domainSep, domainI, domainS,
+            fontSep, fontL, fontS, colorP, dSep, doodleS );
         parent.getChildren().add( tb );
         tb.setStyle( "-fx-background-color: #7cafc2" );
         return tb;
@@ -277,6 +284,10 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
     public void doLock(boolean lock) {
         isLocked = lock;
+    }
+
+    public void doDomains(boolean show) {
+        showDomains = show;
     }
 
     public void doRefresh(ActionEvent e) {
@@ -362,7 +373,8 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
             if (tracking)
                 spriteManager.clear();
 
-            // spriteManager.add( member.getLibrary(), domainColumn );
+            if (showDomains)
+                spriteManager.add( member.getLibrary(), domainColumn );
             // TODO - add domain sprites to other posters
 
             MemberSprite<?> memberS = spriteManager.add( member, memberColumn, false );

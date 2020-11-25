@@ -266,6 +266,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
         // Rectangles are disposable.
         rectangles.clear();
 
+        // Draw background and title line
         double fy = y + drawSprite( gc, settingsManager.getColor( this ), member.getPrefix(), member.isEditable() );
 
         double width = boundaries.getWidth();
@@ -274,12 +275,13 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
         Rectangle mRect = null;
         if (!collapsed && member.getBaseType() != null) {
             mRect = new BaseTypeRectangle( this, member, width );
-            mRect.set( boundaries.getMaxX() - mRect.getWidth(), fy ).draw( gc, true );
+            mRect.set( boundaries.getMaxX() - mRect.getWidth(), fy );
+            mRect.draw( gc );
             width = computeWidth( width, mRect, 0 );
             fy += mRect.getHeight();
         }
 
-        // Show content (facets, properties, etc)
+        // Have sub-types show content (facets, properties, etc)
         mRect = drawContents( gc, boundaries.getX(), fy );
         if (mRect != null) {
             width = computeWidth( width, mRect, settingsManager.getMargin( Margins.FACET ) );

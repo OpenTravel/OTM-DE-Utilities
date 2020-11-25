@@ -175,7 +175,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
      * Note: TreeItem class does not extend the Node class.
      * 
      * @param member post the where-used types for the member.
-     * @param parent the tree root or parent member
+     * @param sprite the tree root or parent member
      * @return
      */
     public void createTreeItems(OtmLibraryMember member) {

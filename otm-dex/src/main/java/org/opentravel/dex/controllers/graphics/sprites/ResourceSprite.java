@@ -91,7 +91,7 @@ public class ResourceSprite extends MemberSprite<OtmResource> implements DexSpri
         // Display subject as property
         if (member.getSubject() != null) {
             subjectRectangle = new ResourceSubjectRectangle( this, getMember(), width );
-            subjectRectangle.set( x + dx, y ).draw( gc, false );
+            subjectRectangle.set( x + dx, y ).draw( gc );
             fy += subjectRectangle.getHeight() + margin;
             width = computeWidth( width, subjectRectangle, 0 );
         } else {

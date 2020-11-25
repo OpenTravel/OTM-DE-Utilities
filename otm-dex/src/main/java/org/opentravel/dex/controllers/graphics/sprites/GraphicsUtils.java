@@ -39,7 +39,7 @@ import javafx.scene.text.Text;
 public class GraphicsUtils {
     private static Log log = LogFactory.getLog( GraphicsUtils.class );
 
-    private static final double LABEL_MARGIN = 4;
+    // private static final double LABEL_MARGIN = 4;
 
     public static final Paint CONNECTOR_COLOR = Color.gray( 0.3 );
 
@@ -69,9 +69,9 @@ public class GraphicsUtils {
         Rectangle r = new Rectangle( x, y, image.getWidth(), image.getHeight() );
         if (gc != null)
             if (fill == DrawType.OUTLINE)
-                r.draw( gc, false );
+                r.drawOutline( gc, false );
             else if (fill == DrawType.FILL)
-                r.draw( gc, true );
+                r.drawOutline( gc, true );
         return r;
     }
 
@@ -126,74 +126,4 @@ public class GraphicsUtils {
 
     }
 
-    // /**
-    // * Draw the label with optional image on the graphics context at x, y.
-    // *
-    // * @param label
-    // * @param image - can be null
-    // * @param gc - if null, just compute size
-    // * @param x
-    // * @param y
-    // * @return bounding rectangle
-    // */
-    //// public static Rectangle drawLabel(String label, Image image, Font font, final double x, final double y) {
-    //// return drawLabel( label, image, true, false, null, font, x, y );
-    //// }
-    ////
-    //// // public static Rectangle drawLabel(String label, Image image, boolean imageAfterText, GraphicsContext gc,
-    // Font
-    //// // font,
-    //// // final double x, final double y) {
-    //// // return drawLabel( label, image, true, imageAfterText, gc, font, x, y );
-    //// // }
-    //
-    // public static Rectangle drawLabel(String label, Image image, boolean bold, boolean imageAfterText,
-    // GraphicsContext gc, Font font, final double x, final double y) {
-    //
-    // // Compute size, start with start and end margins
-    // double width = 2 * LABEL_MARGIN;
-    // double height = 2 * LABEL_MARGIN;
-    // double imageWidth = 0;
-    // double imageHeight = 0;
-    // Paint saveFill = null;
-    // Font saveFont = null;
-    //
-    // // Add size of image
-    // if (image != null) {
-    // width += image.getWidth() + LABEL_MARGIN;
-    // imageWidth = image.getWidth();
-    // imageHeight = image.getHeight();
-    // }
-    // // Add size of text area
-    // Point2D textSize = drawString( label, null, font, 0, 0 );
-    // height += textSize.getY() > imageHeight ? textSize.getY() : imageHeight;
-    // width += textSize.getX();
-    //
-    // if (gc != null) {
-    // saveFill = gc.getFill();
-    // saveFont = gc.getFont();
-    // gc.setFill( Color.BLACK );
-    // gc.setFont( font );
-    // if (imageAfterText) {
-    // if (bold)
-    // gc.strokeText( label, x + LABEL_MARGIN, y + textSize.getY() );
-    // else
-    // gc.fillText( label, x + LABEL_MARGIN, y + textSize.getY() );
-    // if (image != null)
-    // gc.drawImage( image, x + textSize.getX() + 2 + LABEL_MARGIN, y + 2 * LABEL_MARGIN );
-    // } else {
-    // if (image != null)
-    // gc.drawImage( image, x + LABEL_MARGIN, y + LABEL_MARGIN );
-    // if (bold)
-    // gc.strokeText( label, x + 2 * LABEL_MARGIN + imageWidth, y + textSize.getY() );
-    // else
-    // gc.fillText( label, x + 2 * LABEL_MARGIN + imageWidth, y + textSize.getY() );
-    // }
-    // gc.setFill( saveFill );
-    // gc.setFont( saveFont );
-    // }
-    // Rectangle lRect = new Rectangle( x, y, width, height );
-    // // lRect.draw( gc, false );
-    // return lRect;
-    // }
 }

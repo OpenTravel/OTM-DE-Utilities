@@ -21,9 +21,14 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.ClickableRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.CollapsableRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.LibraryFacetRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.LibraryRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.SubDomainCR;
+import org.opentravel.dex.controllers.graphics.sprites.retangles.SubDomainFR;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -61,9 +66,14 @@ public class DomainSprite extends DexSpriteBase {
 
     private String baseNamespace = "";
     private Map<OtmLibrary,LibraryRectangle> libMap = new HashMap<>();
-    private SettingsManager settings = null;
     private OtmModelManager modelManager = null;
     private List<String> subDomains = null;
+
+    private LibraryFacetRectangle libraryFacetRectangle;
+    private boolean librariesCollapsed = false;
+
+    private SubDomainFR subDomainRectangle;
+    private boolean subDomainsCollapsed = false;
 
     /**
      * Initialize member sprite. Create canvas and GC parameters. Compute initial size. Create tool tip. Sub-types will
@@ -75,7 +85,6 @@ public class DomainSprite extends DexSpriteBase {
     public DomainSprite(SpriteManager manager, String baseNamespace) {
         super( manager ); // Creates canvas
         this.baseNamespace = baseNamespace;
-        this.settings = manager.getSettingsManager();
         this.modelManager = manager.getModelManager();
 
         Collection<OtmLibrary> libs = modelManager.getLibraries( baseNamespace );
@@ -93,22 +102,33 @@ public class DomainSprite extends DexSpriteBase {
     }
 
 
-    public DomainSprite add(DexSprite sprite) {
-        if (sprite instanceof MemberSprite)
-            add( (MemberSprite<?>) sprite );
-        return this;
-    }
+    // public DomainSprite add(DexSprite sprite) {
+    // if (sprite instanceof MemberSprite)
+    // add( (MemberSprite<?>) sprite );
+    // return this;
+    // }
+    //
+    // public DomainSprite add(MemberSprite<?> sprite) {
+    // if (baseNamespace.isEmpty())
+    // baseNamespace = sprite.getMember().getLibrary().getBaseNamespace();
+    //
+    // if (LibraryRectangle.contains( baseNamespace, sprite )) {
+    // LibraryRectangle libR = new LibraryRectangle( sprite );
+    // baseNamespace = libR.getBaseNamespace();
+    // libMap.put( libR.getLibrary(), libR );
+    // }
+    // return this;
+    // }
 
-    public DomainSprite add(MemberSprite<?> sprite) {
-        if (baseNamespace.isEmpty())
-            baseNamespace = sprite.getMember().getLibrary().getBaseNamespace();
-
-        if (LibraryRectangle.contains( baseNamespace, sprite )) {
-            LibraryRectangle libR = new LibraryRectangle( sprite );
-            baseNamespace = libR.getBaseNamespace();
-            libMap.put( libR.getLibrary(), libR );
-        }
-        return this;
+    // @Override
+    public DexSprite connect(ClickableRectangle clickableRectangle, String subDomain) {
+        log.debug( "Connect " + subDomain + " to " + clickableRectangle );
+        DomainSprite subDomainS = manager.add( subDomain, getColumn() );
+        subDomainS.collapseOrExpand();
+        subDomainS.getCanvas().toFront();
+        subDomainS.refresh();
+        // TODO - create connection?
+        return subDomainS;
     }
 
     @Override
@@ -121,7 +141,15 @@ public class DomainSprite extends DexSpriteBase {
         return null;
     }
 
-
+    public void collapseOrExpand(CollapsableRectangle rec) {
+        clear();
+        if (rec instanceof LibraryFacetRectangle)
+            librariesCollapsed = rec.isCollapsed();
+        else if (rec instanceof SubDomainFR)
+            subDomainsCollapsed = rec.isCollapsed();
+        render();
+        log.debug( "Collapse or expand set to " + rec.isCollapsed() + " for " + rec );
+    }
 
     @Override
     public Rectangle draw(GraphicsContext gc, double x, double y) {
@@ -140,7 +168,8 @@ public class DomainSprite extends DexSpriteBase {
         if (!collapsed) {
             // The namespace
             lr = new LabelRectangle( this, baseNamespace, ImageManager.getImage( Icons.NAMESPACEFACET ), false, false,
-                false ).draw( gc, x, fy );
+                false );
+            lr.draw( gc, x, fy );
             fy += lr.getHeight();
             width = computeWidth( width, lr, margin );
             double fx = x + margin;
@@ -164,32 +193,20 @@ public class DomainSprite extends DexSpriteBase {
             if (gc != null)
                 GraphicsUtils.drawConnector( gc, gc.getFill(), connectorSize, width, fy - connectorSize );
 
-            // TODO - sub-domains in one facet, libraries in another facet
-            // Sub-domains
-            // TODO - this must its own rectangle type to receive mouse clicks
-            // TODO - draw line like properties do
-            for (String sd : subDomains) {
-                lr = new LabelRectangle( this, getDomainName( sd ), getIcon(), false, false, false );
-                lr.draw( gc, fx, fy );
-                fy += lr.getHeight();
+            fy += margin;
 
-                // javafx.geometry.Point2D connectionPoint =
-                if (gc != null)
-                    GraphicsUtils.drawConnector( gc, gc.getFill(), connectorSize, width, fy - connectorSize );
-            }
-
+            if (subDomainRectangle == null)
+                subDomainRectangle = new SubDomainFR( this, width, subDomainsCollapsed );
+            subDomainRectangle.draw( gc, fx, fy );
+            fy += subDomainRectangle.getHeight() + margin;
+            width = computeWidth( width, subDomainRectangle, margin );
 
             // Directly owned libraries
-            for (LibraryRectangle libr : libMap.values()) {
-                // OtmVersionChain chain = null;
-                // boolean latest = libr.getLibrary().isLatestVersion();
-                libr.draw( gc, fx, fy );
-                fy += libr.getHeight();
-                width = computeWidth( width, libr, margin );
-                if (gc != null)
-                    log.debug( "Drew " + lr );
-            }
-
+            if (libraryFacetRectangle == null)
+                libraryFacetRectangle = new LibraryFacetRectangle( this, width, librariesCollapsed );
+            libraryFacetRectangle.draw( gc, fx, fy );
+            fy += libraryFacetRectangle.getHeight();
+            width = computeWidth( width, libraryFacetRectangle, margin );
 
             if (gc == null) {
                 boundaries.setIfWider( width + margin );
@@ -198,6 +215,7 @@ public class DomainSprite extends DexSpriteBase {
         }
         // boundaries.draw( gc, false );
         return boundaries;
+
     }
 
 
@@ -213,12 +231,24 @@ public class DomainSprite extends DexSpriteBase {
     // }
     // }
 
+    /**
+     * 
+     * @return live list of libraries in the map
+     */
+    public Collection<LibraryRectangle> getLibraries() {
+        return libMap.values();
+    }
+
+    public Collection<String> getSubDomainNames() {
+        return subDomains;
+    }
+
     @Override
     public String getName() {
         return getDomainName( baseNamespace );
     }
 
-    public String getDomainName(String baseNamespace) {
+    public static String getDomainName(String baseNamespace) {
         String name = "Domain";
         if (baseNamespace != null) {
             int lastSlash = baseNamespace.lastIndexOf( '/' );
@@ -226,6 +256,10 @@ public class DomainSprite extends DexSpriteBase {
                 name = baseNamespace.substring( lastSlash + 1 );
         }
         return name;
+    }
+
+    public String getDomain() {
+        return baseNamespace;
     }
 
     @Override

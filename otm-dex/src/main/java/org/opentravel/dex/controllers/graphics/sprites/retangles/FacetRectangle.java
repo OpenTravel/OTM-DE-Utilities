@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils.DrawType;
@@ -52,7 +54,7 @@ import javafx.scene.paint.Paint;
  *
  */
 public class FacetRectangle extends Rectangle {
-    // private static Log log = LogFactory.getLog( FacetRectangle.class );
+    private static Log log = LogFactory.getLog( FacetRectangle.class );
 
     private OtmFacet<?> facet = null;
     private OtmObject otmObject = null;
@@ -103,7 +105,7 @@ public class FacetRectangle extends Rectangle {
         propertyMargin = settings.getMargin( Margins.PROPERTY );
         propertyOffset = settings.getOffset( Offsets.PROPERTY );
 
-        // log.debug( "Created facet rectangle: " + label );
+        log.debug( "Created facet rectangle: " + label );
     }
 
     public FacetRectangle(OtmFacet<?> facet, MemberSprite<?> parentSprite, double width) {
@@ -143,27 +145,18 @@ public class FacetRectangle extends Rectangle {
         return kids;
     }
 
-    /**
-     * Draw the facet.
-     * 
-     * @param gc
-     * @param filled
-     */
-    @Override
-    public Rectangle draw(GraphicsContext gc, boolean filled) {
+    protected void drawBackground(GraphicsContext gc) {
         if (gc != null) {
             Paint savedColor = gc.getFill();
+            // gc.setFill( javafx.scene.paint.Color.WHITE );
             gc.setFill( settings.getColor( this ) );
 
-            // super.draw( gc, false ); // draw outline
-            if (filled)
-                super.draw( gc, true ); // Draw fill
-
-            draw( gc );
+            // super.drawOutline( gc, false ); // draw outline
+            super.drawOutline( gc, true ); // Draw fill
 
             gc.setFill( savedColor );
+            log.debug( "Drew background " + this );
         }
-        return this;
     }
 
     private double drawControl(GraphicsContext gc) {
@@ -218,8 +211,10 @@ public class FacetRectangle extends Rectangle {
         boolean compute = gc == null;
         // Update the collapsed state saved in the facet facade.
         collapsed = otmObject instanceof OtmFacet && ((OtmFacet<?>) otmObject).isCollapsed();
-        height = 0;
 
+        drawBackground( gc );
+
+        height = 0; // Recompute height
         // Title line - control, name, prefix
         Rectangle r = drawTitleLine( gc );
         if (gc == null && r.getWidth() > width)
@@ -240,7 +235,7 @@ public class FacetRectangle extends Rectangle {
                 else if (c instanceof OtmActionResponse)
                     pRect = new PropertyRectangle( (OtmActionResponse) c, parent, width );
                 if (pRect != null) {
-                    pRect.set( px, py ).draw( gc, true );
+                    pRect.set( px, py ).draw( gc );
                     height += pRect.getHeight();
                     width = compute && pRect.getWidth() > width ? pRect.getWidth() : width;
                     py += pRect.getHeight();

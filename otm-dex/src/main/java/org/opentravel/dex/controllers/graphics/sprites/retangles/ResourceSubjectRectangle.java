@@ -62,7 +62,7 @@ public class ResourceSubjectRectangle extends PropertyRectangle {
             this.label += ": " + typeProvider.getName();
 
         // Compute the size
-        draw( null, font );
+        draw( null );
 
         if (resource != null && parent instanceof ResourceSprite) {
             this.setOnMouseClicked( e -> ((ResourceSprite) parent).connectSubject() );

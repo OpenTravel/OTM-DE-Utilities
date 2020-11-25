@@ -68,7 +68,7 @@ public class BaseTypeRectangle extends PropertyRectangle {
         }
 
         // Compute the size
-        draw( null, font );
+        draw( null );
 
         if (getConnectionPoint() != null && parent != null && baseType != null) {
             this.setOnMouseClicked( e -> parent.connect() );
