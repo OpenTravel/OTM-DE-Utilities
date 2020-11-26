@@ -31,20 +31,15 @@ import org.opentravel.dex.controllers.graphics.sprites.SpriteManager;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
+import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
 
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import javax.imageio.ImageIO;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventType;
@@ -84,8 +79,8 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     public static final Font DEFAULT_FONT = new Font( "Monospaced", 15 );
     public static final Font DEFAULT_FONT_ITALIC = Font.font( "Monospaced", FontWeight.NORMAL, FontPosture.ITALIC, 15 );
 
-    private static final EventType[] subscribedEvents =
-        {DexMemberSelectionEvent.MEMBER_SELECTED, DexMemberSelectionEvent.DOUBLE_CLICK_MEMBER_SELECTED};
+    private static final EventType[] subscribedEvents = {DexModelChangeEvent.MODEL_CHANGED,
+        DexMemberSelectionEvent.MEMBER_SELECTED, DexMemberSelectionEvent.DOUBLE_CLICK_MEMBER_SELECTED};
     private static final EventType[] publishedEvents = {DexMemberSelectionEvent.MEMBER_SELECTED};
 
     @FXML
@@ -121,17 +116,14 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     public void checkNodes() {
         if (graphicsPane == null)
             throw new IllegalStateException( "Null pane in graphics controller." );
-        // private Pane spriteArea;
         if (graphicsVBox == null)
             throw new IllegalStateException( "Null graphics vBox in graphics controller." );
     }
 
     @Override
     public void clear() {
-        // clearCanvas();
         spriteManager.clear();
         backgroundGC.clearRect( 0, 0, backgroundCanvas.getWidth(), backgroundCanvas.getHeight() );
-        // spriteManager.clear();
     }
 
     @Override
@@ -184,7 +176,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
     private ToolBar createToolBar(VBox parent) {
         Button clearB = new Button( "Clear" );
-        clearB.setOnAction( this::doClear );
+        clearB.setOnAction( e -> clear() );
 
         Button refreshB = new Button( "Refresh" );
         refreshB.setOnAction( this::doRefresh );
@@ -233,7 +225,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         return tb;
     }
 
-    public void doClear(ActionEvent e) {
+    public void doClear() {
         clear();
     }
 
@@ -323,10 +315,12 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
                 post( ((DexMemberSelectionEvent) event).getMember() );
             else if (tracking && event instanceof DexMemberSelectionEvent)
                 post( ((DexMemberSelectionEvent) event).getMember() );
+            else if (event instanceof DexModelChangeEvent)
+                clear();
             else
                 refresh();
 
-            // FIXME - handle clear, close, model change, object change
+            // FIXME - handle object change
         }
     }
 
@@ -340,10 +334,10 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         return isLocked;
     }
 
-    private DexSprite postBase(DexSprite memberSprite) {
-        DexSprite baseSprite = null;
+    private DexSprite postBase(MemberSprite<?> memberSprite) {
+        MemberSprite<?> baseSprite = null;
         if (memberSprite instanceof MemberSprite) {
-            OtmLibraryMember member = ((MemberSprite<?>) memberSprite).getMember();
+            OtmLibraryMember member = memberSprite.getMember();
             if (member.getBaseType() instanceof OtmLibraryMember && !(member instanceof OtmContextualFacet)) {
                 ColumnRectangle column = memberSprite.getColumn().getPrev();
                 boolean collapsed = true;
@@ -430,20 +424,21 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         clipboard.setContent( content );
     }
 
-    File file = new File( "C:/Users/dmh/Desktop/Sample Images/test.jpg" );
-    // File file = new File( "C:/Users/dmh/Desktop/test.jpg" );
-    BufferedImage bufferedImage = new BufferedImage( 550, 400, BufferedImage.TYPE_INT_ARGB );
-
-    private void saveImage(WritableImage snapshot) {
-        BufferedImage image;
-        image = javafx.embed.swing.SwingFXUtils.fromFXImage( snapshot, bufferedImage );
-        try {
-            Graphics2D gd = (Graphics2D) image.getGraphics();
-            gd.translate( scrollPane.getWidth(), scrollPane.getHeight() );
-            ImageIO.write( image, "png", file );
-        } catch (IOException ex) {
-            log.debug( "Error saving image. " + ex );
-        }
-    }
+    // This works - needs file picker
+    // File file = new File( "C:/Users/dmh/Desktop/Sample Images/test.jpg" );
+    // // File file = new File( "C:/Users/dmh/Desktop/test.jpg" );
+    // BufferedImage bufferedImage = new BufferedImage( 550, 400, BufferedImage.TYPE_INT_ARGB );
+    //
+    // private void saveImage(WritableImage snapshot) {
+    // BufferedImage image;
+    // image = javafx.embed.swing.SwingFXUtils.fromFXImage( snapshot, bufferedImage );
+    // try {
+    // Graphics2D gd = (Graphics2D) image.getGraphics();
+    // gd.translate( scrollPane.getWidth(), scrollPane.getHeight() );
+    // ImageIO.write( image, "png", file );
+    // } catch (IOException ex) {
+    // log.debug( "Error saving image. " + ex );
+    // }
+    // }
 
 }

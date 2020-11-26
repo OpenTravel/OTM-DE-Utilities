@@ -19,7 +19,6 @@ package org.opentravel.dex.controllers.graphics.sprites;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 import java.util.List;
@@ -57,21 +56,22 @@ public interface DexSprite {
      */
     void collapseOrExpand();
 
-    /**
-     * Connect this member to its base type. Create sprite for base type if not already managed. If there was a sprite,
-     * toggle its collapsed state.
-     * 
-     * @return
-     */
-    public DexSprite connect();
-
-    /**
-     * Connect to another library member.
-     * 
-     * @param member
-     * @return
-     */
-    DexSprite connect(OtmLibraryMember member);
+    // /**
+    // * Connect this member to its base type. Create sprite for base type if not already managed. If there was a
+    // sprite,
+    // * toggle its collapsed state.
+    // *
+    // * @return
+    // */
+    // public DexSprite connect();
+    //
+    // /**
+    // * Connect to another library member.
+    // *
+    // * @param member
+    // * @return
+    // */
+    // DexSprite connect(OtmLibraryMember member);
 
 
     // /**

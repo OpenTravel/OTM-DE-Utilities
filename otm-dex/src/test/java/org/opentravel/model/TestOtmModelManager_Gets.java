@@ -32,6 +32,7 @@ import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
 import org.opentravel.objecteditor.ObjectEditorApp;
@@ -46,6 +47,7 @@ import org.opentravel.utilities.testutil.TestFxMode;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Verifies the functions of the <code>Otm Model Manager</code>.
@@ -81,6 +83,31 @@ public class TestOtmModelManager_Gets extends AbstractFxTest {
         assertNotNull( empty );
     }
 
+    @Test
+    public void getSubDomains() {
+        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+        String base1 = "http://example.com/bns1";
+        String base2 = "http://example.com/bns2";
+
+        // When - no unmanaged user libraries
+        assertTrue( "Must be empty.", mgr.getSubDomains( base1 ).isEmpty() );
+        Set<String> baseNSs = mgr.getBaseNamespaces();
+        assertTrue( !baseNSs.contains( base1 ) );
+
+        // When - unmanaged libraries only in base namespace
+        OtmLibrary lib1 = TestLibrary.buildOtm( mgr, base1, "b1", "Base1a" );
+        baseNSs = mgr.getBaseNamespaces();
+        assertTrue( baseNSs.contains( base1 + "/" + lib1.getName() ) );
+
+        List<String> foundSubDomains = mgr.getSubDomains( base1 );
+        // assertTrue( "Must be empty.", foundSubDomains.isEmpty() );
+
+        OtmLibrary lib2 = TestLibrary.buildOtm( mgr, base1, "b1", "Base1b" );
+        foundSubDomains = mgr.getSubDomains( base1 );
+        // FIXME - assertTrue( baseNSs.contains( base1 + "/" + lib2.getName() ) );
+        // assertTrue( "Must be empty.", foundSubDomains.isEmpty() );
+
+    }
 
     /**
      * get(abstractLibrary) get(otmLibrary) get(String) get(TLLibrary)

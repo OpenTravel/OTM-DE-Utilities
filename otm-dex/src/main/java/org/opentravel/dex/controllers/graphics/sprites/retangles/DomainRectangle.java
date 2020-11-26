@@ -38,6 +38,7 @@ import javafx.scene.paint.Paint;
  * @param <O>
  *
  */
+@Deprecated
 public class DomainRectangle extends Rectangle {
     private static Log log = LogFactory.getLog( ColumnRectangle.class );
 

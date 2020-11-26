@@ -822,6 +822,7 @@ public class OtmModelManager implements TaskResultHandlerI {
      * @param baseNamespace
      * @return new list
      */
+    // TODO - test in junit. Test when there are no sub domains.
     public List<String> getSubDomains(String baseNamespace) {
         List<String> subs = new ArrayList<>();
         getBaseNamespaces().forEach( b -> {

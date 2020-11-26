@@ -151,6 +151,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         filters.add( new LibraryFilterWidget( this, librarySelector ) );
         filters.add( new ObjectTypeFilterWidget( this, memberTypeCombo ) );
         filters.add( new NameFilterWidget( this, memberNameFilter ) );
+
         filters.add( new ButtonFilterWidget( this, latestButton ).setSelector( OtmLibraryMember::isLatestVersion ) );
         filters.add( new ButtonFilterWidget( this, editableButton ).setSelector( OtmLibraryMember::isEditableMinor ) );
         filters.add( new ButtonFilterWidget( this, errorsButton ).setSelector( m -> !m.isValid( false ) ) );

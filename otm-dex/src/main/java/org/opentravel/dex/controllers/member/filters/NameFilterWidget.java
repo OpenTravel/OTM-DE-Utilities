@@ -57,6 +57,11 @@ public class NameFilterWidget extends FilterWidget {
         nameSelector.setText( "" );
     }
 
+    @Override
+    public void refresh() {
+        nameSelector.setText( "" );
+    }
+
     /**
      * {@inheritDoc}
      * <p>

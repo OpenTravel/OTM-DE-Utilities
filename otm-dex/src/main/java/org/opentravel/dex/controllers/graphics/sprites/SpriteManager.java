@@ -99,34 +99,22 @@ public class SpriteManager {
         spritePane.setOnMouseClicked( this::mouseClick );
     }
 
-    // /**
-    // * Add the sprite to the list and render into pane
-    // *
-    // * @param sprite
-    // */
-    // public void add(DexSprite<OtmLibraryMember> sprite, ColumnRectangle column) {
-    // column.add( sprite );
-    // // activeSprites.add( sprite );
-    // // spritePane.getChildren().add( sprite.render() );
-    // }
-
     public DomainSprite getDomainSprite(OtmLibrary library) {
         return !domainSprites.isEmpty() ? domainSprites.get( 0 ) : null;
     }
-
-    /**
-     * {@link #add(OtmLibraryMember, ColumnRectangle, boolean)} not collapsed.
-     * 
-     * @param member
-     */
-    // public DexSprite add(OtmLibraryMember member, ColumnRectangle column) {
-    // return add( member, column, false );
-    // }
 
     public MemberSprite<?> add(OtmLibraryMember member, ColumnRectangle column) {
         return add( member, column, !member.isExpanded() );
     }
 
+    /**
+     * Try to find the sprite with the domain name / base namespace. If not found, create one. Render the sprite into
+     * the passed column.
+     * 
+     * @param baseNamespace
+     * @param column
+     * @return
+     */
     public DomainSprite add(String baseNamespace, ColumnRectangle column) {
         DomainSprite subDomainS = findSprite( baseNamespace );
         if (subDomainS == null)

@@ -142,7 +142,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
     // return width;
     // }
 
-    @Override
+    // @Override
     public DexSprite connect() {
         if (!(getMember().getBaseType() instanceof OtmLibraryMember))
             return null;
@@ -169,7 +169,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
         return c;
     }
 
-    @Override
+    // @Override
     public DexSprite connect(OtmLibraryMember member) {
         DexSprite otherSprite = manager.get( member );
         if (otherSprite == null) {

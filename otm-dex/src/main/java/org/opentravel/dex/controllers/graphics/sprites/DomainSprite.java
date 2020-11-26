@@ -30,7 +30,6 @@ import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
 import org.opentravel.dex.controllers.graphics.sprites.retangles.SubDomainFR;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -86,9 +85,11 @@ public class DomainSprite extends DexSpriteBase {
         this.baseNamespace = baseNamespace;
         this.modelManager = manager.getModelManager();
 
-        Collection<OtmLibrary> libs = modelManager.getLibraries( baseNamespace );
-        libs.forEach( lib -> libMap.put( lib, new LibraryRectangle( this, lib ) ) );
-        subDomains = modelManager.getSubDomains( baseNamespace );
+        buildLibraries();
+        buildSubDomains();
+        // Collection<OtmLibrary> libs = modelManager.getLibraries( baseNamespace );
+        // libs.forEach( lib -> libMap.put( lib, new LibraryRectangle( this, lib ) ) );
+        // subDomains = modelManager.getSubDomains( baseNamespace );
 
         // Correct tool tip display relies on the canvas being clipped to this sprite's active boundaries
         String desc = "Domain defined by base namespace and its libraries.";
@@ -100,47 +101,35 @@ public class DomainSprite extends DexSpriteBase {
         draw( null, 0, 0 );
     }
 
+    private void buildLibraries() {
+        Collection<OtmLibrary> libs = modelManager.getLibraries( baseNamespace );
+        libs.forEach( lib -> libMap.put( lib, new LibraryRectangle( this, lib ) ) );
+    }
 
-    // public DomainSprite add(DexSprite sprite) {
-    // if (sprite instanceof MemberSprite)
-    // add( (MemberSprite<?>) sprite );
-    // return this;
-    // }
-    //
-    // public DomainSprite add(MemberSprite<?> sprite) {
-    // if (baseNamespace.isEmpty())
-    // baseNamespace = sprite.getMember().getLibrary().getBaseNamespace();
-    //
-    // if (LibraryRectangle.contains( baseNamespace, sprite )) {
-    // LibraryRectangle libR = new LibraryRectangle( sprite );
-    // baseNamespace = libR.getBaseNamespace();
-    // libMap.put( libR.getLibrary(), libR );
-    // }
-    // return this;
-    // }
+    private void buildSubDomains() {
+        subDomains = modelManager.getSubDomains( baseNamespace );
+    }
 
-    // @Override
+    @Override
+    public void clear() {
+        super.clear();
+        libMap.clear();
+        subDomains.clear();
+        subDomainRectangle = null;
+        libraryFacetRectangle = null;
+        buildLibraries();
+        buildSubDomains();
+    }
+
     public DexSprite connect(ClickableRectangle clickableRectangle, String subDomain) {
         log.debug( "Connect " + subDomain + " to " + clickableRectangle );
         DomainSprite subDomainS = null;
         if (subDomain != null && !subDomain.isEmpty()) {
             subDomainS = manager.add( subDomain, getColumn() );
-            subDomainS.collapseOrExpand();
             subDomainS.getCanvas().toFront();
-            subDomainS.refresh();
             // TODO - create connection?
         }
         return subDomainS;
-    }
-
-    @Override
-    public DexSprite connect() {
-        return null;
-    }
-
-    @Override
-    public DexSprite connect(OtmLibraryMember member) {
-        return null;
     }
 
     public void collapseOrExpand(CollapsableRectangle rec) {
