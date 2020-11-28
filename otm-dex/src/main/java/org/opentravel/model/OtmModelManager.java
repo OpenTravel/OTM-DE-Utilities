@@ -28,6 +28,7 @@ import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.model.TypeResolverTask;
 import org.opentravel.dex.tasks.model.ValidateModelManagerItemsTask;
 import org.opentravel.model.otmContainers.OtmBuiltInLibrary;
+import org.opentravel.model.otmContainers.OtmDomain;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
@@ -89,6 +90,9 @@ public class OtmModelManager implements TaskResultHandlerI {
 
     // All members - Library Members are TLLibraryMembers and contextual facets
     private Map<LibraryMember,OtmLibraryMember> members = new HashMap<>();
+
+    // Domains - one entry per unique base namespace
+    private List<OtmDomain> domains = new ArrayList<>();
 
     private DexActionManager readOnlyActionManager = new DexReadOnlyActionManager();
     private DexActionManager minorActionManager;
@@ -234,6 +238,8 @@ public class OtmModelManager implements TaskResultHandlerI {
         OtmLibrary otmLibrary = new OtmLibrary( absLibrary, this );
 
         libraries.put( absLibrary, otmLibrary );
+        addDomain( absLibrary );
+
         // Map of base namespaces with all libraries in that namespace
         if (absLibrary instanceof TLLibrary)
             if (versionChainFactory != null) {
@@ -253,6 +259,33 @@ public class OtmModelManager implements TaskResultHandlerI {
         return otmLibrary;
     }
 
+    // 11/26/2020 - the baseNamespace maps are "funky"
+    // Start using Domains and assure they are junit tested.
+    private void addDomain(AbstractLibrary absLibrary) {
+        String dn = null;
+        if (absLibrary instanceof TLLibrary)
+            dn = ((TLLibrary) absLibrary).getBaseNamespace();
+        if (dn != null && !dn.isEmpty() && getDomain( dn ) == null) {
+            add( new OtmDomain( dn, this ) );
+        }
+    }
+
+    // Domains are added when libraries are added.
+    private OtmDomain add(OtmDomain domain) {
+        if (!domains.contains( domain )) {
+            domains.add( domain );
+            log.debug( "Added " + domain + " to domain list." );
+        }
+        return domain;
+    }
+
+    public OtmDomain getDomain(String baseNamespace) {
+        for (OtmDomain d : domains)
+            if (d.getBaseNamespace().equals( baseNamespace ))
+                return d;
+        return null;
+    }
+
     protected OtmLibrary add(ProjectItem pi, VersionChainFactory versionChainFactory) {
         if (pi == null)
             return null;
@@ -269,6 +302,7 @@ public class OtmModelManager implements TaskResultHandlerI {
 
         // Add new library to the maps
         libraries.put( absLibrary, otmLibrary );
+        addDomain( absLibrary );
         // Map of base namespaces with all libraries in that namespace
         if (absLibrary instanceof TLLibrary)
             if (versionChainFactory != null) {
@@ -437,6 +471,7 @@ public class OtmModelManager implements TaskResultHandlerI {
         baseNSUnmanaged.clear();
         libraries.clear();
         members.clear();
+        domains.clear();
         getTlModel().clearModel();
         if (otmProjectManager != null)
             otmProjectManager.clear();
@@ -546,6 +581,15 @@ public class OtmModelManager implements TaskResultHandlerI {
         // return baseNSManaged.keySet();
     }
 
+    /**
+     * @return Live list of all domains (baseNamespaces) in the model.
+     */
+    public List<OtmDomain> getDomains() {
+        // List<String> dNames = new ArrayList<>();
+        // domains.forEach( d -> dNames.add( d.getDomain() ) );
+        return domains;
+    }
+
     public Collection<OtmLibrary> getLibraries() {
         return Collections.unmodifiableCollection( libraries.values() );
     }
@@ -556,8 +600,9 @@ public class OtmModelManager implements TaskResultHandlerI {
      * Note, some of these may be in a chain, see {@link OtmLibrary#getVersionChain()}
      * 
      * @param baseNamespace
+     * @return new list of libraries
      */
-    public Collection<OtmLibrary> getLibraries(String baseNamespace) {
+    public List<OtmLibrary> getLibraries(String baseNamespace) {
         List<OtmLibrary> libList = new ArrayList<>();
         getLibraries().forEach( l -> {
             if (l.getBaseNamespace().equals( baseNamespace ))
@@ -816,21 +861,22 @@ public class OtmModelManager implements TaskResultHandlerI {
         return resources;
     }
 
-    /**
-     * Get all base namespaces that start with the passed base namespace name.
-     * 
-     * @param baseNamespace
-     * @return new list
-     */
-    // TODO - test in junit. Test when there are no sub domains.
-    public List<String> getSubDomains(String baseNamespace) {
-        List<String> subs = new ArrayList<>();
-        getBaseNamespaces().forEach( b -> {
-            if (b.startsWith( baseNamespace ))
-                subs.add( b );
-        } );
-        return subs;
-    }
+    // /**
+    // * Get all base namespaces that start with the passed base namespace name.
+    // *
+    // * @param domain is the base namespace that identifies the domain
+    // * @return new list
+    // */
+    // // TODO - test in junit. Test when there are no sub domains.
+    // public List<String> getSubDomains(String domain) {
+    // List<String> subs = new ArrayList<>();
+    // getDomains().forEach( b -> {
+    // if (b.startsWith( domain ))
+    // subs.add( b );
+    // } );
+    // subs.remove( domain );
+    // return subs;
+    // }
 
     /**
      * @return

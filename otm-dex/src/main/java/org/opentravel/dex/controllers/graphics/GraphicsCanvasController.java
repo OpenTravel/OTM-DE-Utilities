@@ -178,7 +178,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         Button clearB = new Button( "Clear" );
         clearB.setOnAction( e -> clear() );
 
-        Button refreshB = new Button( "Refresh" );
+        Button refreshB = new Button( "Refresh", ImageManager.get( Icons.REFRESH ) );
         refreshB.setOnAction( this::doRefresh );
 
         Button clipboardB = new Button( "Copy", ImageManager.get( Icons.CLIPBOARD ) );

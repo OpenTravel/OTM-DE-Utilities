@@ -207,7 +207,7 @@ public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSprite
         if (toSprite == null) {
             // Place the new sprite and connect it
             toSprite = manager.add( provider, getColumn().getNext(), collapsed );
-            if (toSprite != null)
+            if (toSprite != null && pRect.getConnectionPoint() != null)
                 manager.addAndDraw( new TypeConnection( pRect, this, toSprite ) );
         } else {
             toSprite.setCollapsed( !toSprite.isCollapsed() );

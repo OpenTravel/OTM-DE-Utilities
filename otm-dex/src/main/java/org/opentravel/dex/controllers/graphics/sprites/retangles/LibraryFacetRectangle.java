@@ -42,7 +42,7 @@ public class LibraryFacetRectangle extends CollapsableRectangle {
     public LibraryFacetRectangle(DomainSprite parent, double width, boolean collapsed) {
         super( parent, width, "Libraries", null );
         this.collapsed = collapsed;
-        log.debug( "New library facet rectangle." );
+        // log.debug( "New library facet rectangle." );
     }
 
     // OtmVersionChain chain = null;

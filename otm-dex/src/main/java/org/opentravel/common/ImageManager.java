@@ -38,28 +38,32 @@ public class ImageManager {
 
     public enum Icons {
         // Navigation
-        NAV_GO("/icons/nav_go.gif"),
-        EXPAND("/icons/expand.gif"),
         COLLAPSE("/icons/collapse.gif"),
         CLOSE("/icons/close.gif"),
         CONN_SM("/icons/nav_go.gif"),
         CONN_M("/icons/nav_go.gif"),
         CONN_L("/icons/nav_go.gif"),
+        EXPAND("/icons/expand.gif"),
+        NAV_DOWN("icons/next_nav.gif"),
+        NAV_GO("/icons/nav_go.gif"),
+        NAV_UP("/icons/prev_nav.gif"),
         // Decorations
+        APPLICATION("/icons/alt_window_16.gif"),
+        CLIPBOARD("/icons/copy.gif"),
         ERROR("/icons/error.gif"),
+        LOCK("/icons/lock.png"),
+        REFRESH("/icons/refresh.gif"),
         RUN("/icons/run.gif"),
+        UNLOCK("/icons/unlock.png"),
+        URL("/icons/url.gif"),
         V_OK("/icons/checkmark.png"),
         V_ERROR("/icons/error_st_obj.gif"),
         V_WARN("/icons/warning_st_obj.gif"),
-        LOCK("/icons/lock.png"),
-        UNLOCK("/icons/unlock.png"),
-        CLIPBOARD("/icons/copy.gif"),
         // Containers
         DOMAIN("/icons/domain.gif"),
         LIBRARY("/icons/Library.png"),
         NAMESPACEFACET("/icons/namespace.gif"),
         // Otm Objects
-        APPLICATION("/icons/alt_window_16.gif"),
         ALIAS("/icons/Alias.gif"),
         ATTRIBUTE("/icons/Attribute.jpg"),
         BUSINESS("/icons/BusinessObject.png"),

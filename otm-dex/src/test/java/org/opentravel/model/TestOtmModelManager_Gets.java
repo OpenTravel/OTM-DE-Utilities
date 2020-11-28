@@ -30,6 +30,7 @@ import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
+import org.opentravel.model.otmContainers.OtmDomain;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.model.otmContainers.TestLibrary;
@@ -47,7 +48,6 @@ import org.opentravel.utilities.testutil.TestFxMode;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Verifies the functions of the <code>Otm Model Manager</code>.
@@ -84,29 +84,38 @@ public class TestOtmModelManager_Gets extends AbstractFxTest {
     }
 
     @Test
-    public void getSubDomains() {
+    public void getDomains() {
         OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
         String base1 = "http://example.com/bns1";
         String base2 = "http://example.com/bns2";
+        String subBase1 = "http://example.com/bns1/sub1";
+        String subBase2 = "http://example.com/bns2/sub2";
 
         // When - no unmanaged user libraries
-        assertTrue( "Must be empty.", mgr.getSubDomains( base1 ).isEmpty() );
-        Set<String> baseNSs = mgr.getBaseNamespaces();
-        assertTrue( !baseNSs.contains( base1 ) );
-
-        // When - unmanaged libraries only in base namespace
+        List<OtmDomain> domains = mgr.getDomains();
+        assertTrue( domains.isEmpty() );
+        assertTrue( "Must not be found.", mgr.getDomain( base1 ) == null );
+        //
+        // When - unmanaged library added
         OtmLibrary lib1 = TestLibrary.buildOtm( mgr, base1, "b1", "Base1a" );
-        baseNSs = mgr.getBaseNamespaces();
-        assertTrue( baseNSs.contains( base1 + "/" + lib1.getName() ) );
+        // Then
+        assertTrue( !domains.isEmpty() );
+        assertTrue( "Must be found.", mgr.getDomain( base1 ) != null );
+        assertTrue( "Must be found.", mgr.getDomain( base1 ).getBaseNamespace().equals( base1 ) );
 
-        List<String> foundSubDomains = mgr.getSubDomains( base1 );
-        // assertTrue( "Must be empty.", foundSubDomains.isEmpty() );
+        // When - second domain created
+        OtmLibrary lib2 = TestLibrary.buildOtm( mgr, base2, "b2", "Base2" );
+        assertTrue( "Must be found.", mgr.getDomain( base1 ) != null );
+        assertTrue( "Must be found.", mgr.getDomain( base1 ).getBaseNamespace().equals( base1 ) );
+        assertTrue( "Must be found.", mgr.getDomain( base2 ) != null );
+        assertTrue( "Must be found.", mgr.getDomain( base2 ).getBaseNamespace().equals( base2 ) );
 
-        OtmLibrary lib2 = TestLibrary.buildOtm( mgr, base1, "b1", "Base1b" );
-        foundSubDomains = mgr.getSubDomains( base1 );
-        // FIXME - assertTrue( baseNSs.contains( base1 + "/" + lib2.getName() ) );
-        // assertTrue( "Must be empty.", foundSubDomains.isEmpty() );
-
+        // When - sub-domain added to domain 1
+        OtmLibrary lib1s1 = TestLibrary.buildOtm( mgr, subBase1, "sb1", "SubBase1" );
+        assertTrue( "Must be found.", mgr.getDomain( base1 ) != null );
+        assertTrue( "Must be found.", mgr.getDomain( base1 ).getBaseNamespace().equals( base1 ) );
+        assertTrue( "Must be found.", mgr.getDomain( subBase1 ) != null );
+        assertTrue( "Must be found.", mgr.getDomain( subBase1 ).getBaseNamespace().equals( subBase1 ) );
     }
 
     /**

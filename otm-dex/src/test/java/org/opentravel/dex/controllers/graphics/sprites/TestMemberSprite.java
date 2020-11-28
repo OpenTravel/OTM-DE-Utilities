@@ -114,7 +114,7 @@ public class TestMemberSprite extends AbstractFxTest {
 
         // Assure that the correct property is retrieved when core is assigned to two or more
         List<PropertyRectangle> pRectList = boSprite.getPropertyRectangles();
-        assertTrue( boSprite.getPropertyRectangles().size() == 2 );
+        assertTrue( boSprite.getPropertyRectangles().size() >= 2 );
 
         for (PropertyRectangle pr : pRectList) {
             PropertyRectangle result = boSprite.get( pr.getProperty() );

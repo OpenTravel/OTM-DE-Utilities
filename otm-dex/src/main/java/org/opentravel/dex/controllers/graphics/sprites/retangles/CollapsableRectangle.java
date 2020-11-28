@@ -119,7 +119,7 @@ public abstract class CollapsableRectangle extends Rectangle {
             super.drawOutline( gc, true ); // Draw fill
 
             gc.setFill( savedColor );
-            log.debug( "Drew background " + this );
+            // log.debug( "Drew background " + this );
         }
     }
 

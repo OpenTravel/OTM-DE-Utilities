@@ -354,7 +354,7 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
 
         draw( gc, x, y );
 
-        log.debug( "Rendered at " + getBoundaries() );
+        // log.debug( "Rendered at " + getBoundaries() );
         return canvas;
     }
 

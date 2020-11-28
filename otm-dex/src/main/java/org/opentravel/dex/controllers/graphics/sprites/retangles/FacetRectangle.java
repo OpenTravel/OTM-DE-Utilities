@@ -105,7 +105,7 @@ public class FacetRectangle extends Rectangle {
         propertyMargin = settings.getMargin( Margins.PROPERTY );
         propertyOffset = settings.getOffset( Offsets.PROPERTY );
 
-        log.debug( "Created facet rectangle: " + label );
+        // log.debug( "Created facet rectangle: " + label );
     }
 
     public FacetRectangle(OtmFacet<?> facet, MemberSprite<?> parentSprite, double width) {
@@ -155,7 +155,7 @@ public class FacetRectangle extends Rectangle {
             super.drawOutline( gc, true ); // Draw fill
 
             gc.setFill( savedColor );
-            log.debug( "Drew background " + this );
+            // log.debug( "Drew background " + this );
         }
     }
 
@@ -241,16 +241,10 @@ public class FacetRectangle extends Rectangle {
                     if (gc == null)
                         width = pRect.getWidth() > width ? pRect.getWidth() : width;
                 }
-                log.debug( "Drew/sized - compute = " + compute + " " + pRect );
+                // log.debug( "Drew/sized - compute = " + compute + " " + pRect );
             }
-            // // Draw vertical line
-            // if (pRect != null && !compute) {
-            // px = px + propertyMargin - 1;
-            // double ly = y + height - 2 * propertyMargin - 1;
-            // gc.strokeLine( px, y + pRect.getHeight(), px, ly );
-            // }
         }
-        log.debug( "Drew/sized - compute = " + compute + " " + this );
+        // log.debug( "Drew/sized - compute = " + compute + " " + this );
         // super.draw( gc, false ); // debug
         return this;
     }
