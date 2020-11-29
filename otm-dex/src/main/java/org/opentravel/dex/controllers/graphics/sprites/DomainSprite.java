@@ -146,6 +146,35 @@ public class DomainSprite extends DexSpriteBase {
         return subDomainS;
     }
 
+    public DexSprite connect(DomainUsersCR usersR, DomainSprite ds) {
+        log.debug( "Connect users for " + ds );
+        UsersSprite us = null;
+        if (ds != null)
+            us = manager.addUsersSprite( ds, getColumn() );
+        // DomainSprite subDomainS = null;
+        // if (subDomain != null && !subDomain.isEmpty()) {
+        // subDomainS = manager.add( subDomain, getColumn() );
+        // subDomainS.getCanvas().toFront();
+        // // TODO - create connection?
+        // }
+        return us;
+    }
+
+    public DexSprite connect(DomainProvidersCR providersR, DomainSprite ds) {
+        log.debug( "Connect providers for " + ds );
+        ProvidersSprite ps = null;
+        if (ds != null) {
+            ps = manager.addProvidersSprite( ds, getColumn() );
+        }
+        // DomainSprite subDomainS = null;
+        // if (subDomain != null && !subDomain.isEmpty()) {
+        // subDomainS = manager.add( subDomain, getColumn() );
+        // subDomainS.getCanvas().toFront();
+        // // TODO - create connection?
+        // }
+        return ds;
+    }
+
     public void collapseOrExpand(CollapsableRectangle rec) {
         clear();
         if (rec instanceof LibraryFacetRectangle)
@@ -218,19 +247,6 @@ public class DomainSprite extends DexSpriteBase {
 
     }
 
-
-
-    // public void todo(GraphicsContext gc) {
-    // MouseEvent event = null;
-    // ArrayList<Circle> listOfCircles = new ArrayList<>();
-    // for (Circle circle : listOfCircles) {
-    // Point2D point2D = new Point2D( event.getX(), event.getY() );
-    // if (circle.contains( point2D )) {
-    // // log.debug( "circle clicked" );
-    // }
-    // }
-    // }
-
     /**
      * 
      * @return live list of libraries in the map
@@ -275,6 +291,10 @@ public class DomainSprite extends DexSpriteBase {
 
     public List<String> getProviderDomains() {
         return otmDomain.getProviderDomains();
+    }
+
+    public OtmDomain getOtmDomain() {
+        return otmDomain;
     }
 
     public int getProviderCount() {

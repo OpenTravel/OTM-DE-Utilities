@@ -17,7 +17,10 @@
 package org.opentravel.dex.controllers.graphics.sprites.retangles;
 
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
+import org.opentravel.dex.controllers.graphics.sprites.DomainSprite;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
+import org.opentravel.dex.controllers.graphics.sprites.ProvidersSprite;
+import org.opentravel.dex.controllers.graphics.sprites.UsersSprite;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import java.util.ArrayList;
@@ -128,6 +131,24 @@ public class ColumnRectangle extends Rectangle {
         for (DexSprite sprite : activeSprites)
             if (sprite instanceof MemberSprite && ((MemberSprite<?>) sprite).getMember() == member) {
                 return (MemberSprite<OtmLibraryMember>) sprite;
+            }
+        return selectedSprite;
+    }
+
+    public ProvidersSprite getProvidersSprite(DomainSprite domainSprite) {
+        ProvidersSprite selectedSprite = null;
+        for (DexSprite sprite : activeSprites)
+            if (sprite instanceof ProvidersSprite && ((ProvidersSprite) sprite).getDomain() == domainSprite) {
+                return (ProvidersSprite) sprite;
+            }
+        return selectedSprite;
+    }
+
+    public UsersSprite getUsersSprite(DomainSprite domainSprite) {
+        UsersSprite selectedSprite = null;
+        for (DexSprite sprite : activeSprites)
+            if (sprite instanceof UsersSprite && ((UsersSprite) sprite).getDomain() == domainSprite) {
+                return (UsersSprite) sprite;
             }
         return selectedSprite;
     }

@@ -68,6 +68,8 @@ public class SpriteManager {
     // private GraphicsContext domainGC;
     // private List<DomainSprite> domains;
     // private DomainRectangle domainR;
+
+    // FIXME - retain sprites in columns
     private List<DomainSprite> domainSprites = new ArrayList<>();
 
     /**
@@ -99,6 +101,7 @@ public class SpriteManager {
         spritePane.setOnMouseClicked( this::mouseClick );
     }
 
+    // FIXME
     public DomainSprite getDomainSprite(OtmLibrary library) {
         return !domainSprites.isEmpty() ? domainSprites.get( 0 ) : null;
     }
@@ -115,6 +118,7 @@ public class SpriteManager {
      * @param column
      * @return
      */
+    // FIXME - let column save domain sprite
     public DomainSprite add(String baseNamespace, ColumnRectangle column) {
         DomainSprite subDomainS = findSprite( baseNamespace );
         if (subDomainS == null)
@@ -153,6 +157,34 @@ public class SpriteManager {
             memberSprite.render( column, collapsed );
 
         return memberSprite;
+    }
+
+    public ProvidersSprite addProvidersSprite(DomainSprite domainSprite, ColumnRectangle column) {
+        if (column == null)
+            column = getColumn( 1 );
+
+        ProvidersSprite ps = column.getProvidersSprite( domainSprite );
+        if (ps == null)
+            ps = (ProvidersSprite) factory( domainSprite, false );
+
+        if (ps != null)
+            ps.render( column, false );
+
+        return ps;
+    }
+
+    public UsersSprite addUsersSprite(DomainSprite domainSprite, ColumnRectangle column) {
+        if (column == null)
+            column = getColumn( 1 );
+
+        UsersSprite us = column.getUsersSprite( domainSprite );
+        if (us == null)
+            us = (UsersSprite) factory( domainSprite, true );
+
+        if (us != null)
+            us.render( column, false );
+
+        return us;
     }
 
     /**
@@ -289,16 +321,27 @@ public class SpriteManager {
         return newSprite;
     }
 
+    protected DexSprite factory(DomainSprite domainSprite, boolean users) {
+        DexSprite ps = null;
+        if (users)
+            ps = new UsersSprite( this, domainSprite );
+        else
+            ps = new ProvidersSprite( this, domainSprite );
+        // retained in column - domainSprites.add( ps );
+        spritePane.getChildren().add( ps.getCanvas() );
+        return ps;
+    }
+
     protected DomainSprite factory(OtmLibrary library) {
         DomainSprite ds = new DomainSprite( this, library.getBaseNamespace() );
-        domainSprites.add( ds );
+        domainSprites.add( ds ); // FIXME
         spritePane.getChildren().add( ds.getCanvas() );
         return ds;
     }
 
     protected DomainSprite factory(String baseNamespace) {
         DomainSprite ds = new DomainSprite( this, baseNamespace );
-        domainSprites.add( ds );
+        domainSprites.add( ds );// FIXME
         spritePane.getChildren().add( ds.getCanvas() );
         return ds;
     }

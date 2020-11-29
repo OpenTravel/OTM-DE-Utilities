@@ -223,18 +223,10 @@ public class OtmDomain {
                 pLibs.addAll( lib.getProvidersMap().keySet() );
             }
             List<OtmLibrary> externalLibs = filterList( pLibs );
-            // // Remove all user libraries in this domain or its sub-domains
-            // List<OtmLibrary> externalLibs = new ArrayList<>();
-            // for (OtmLibrary lib : userLibs) {
-            // if (!lib.getBaseNamespace().startsWith( baseNamespace ))
-            // externalLibs.add( lib );
-            // }
             // De-dup and add to list field
             for (OtmLibrary lib : externalLibs)
                 if (!providerDomains.contains( lib.getBaseNamespace() ))
                     providerDomains.add( lib.getBaseNamespace() );
-
-            log.debug( "Found " + providerDomains.size() + " provider domains." );
         }
         return providerDomains;
     }

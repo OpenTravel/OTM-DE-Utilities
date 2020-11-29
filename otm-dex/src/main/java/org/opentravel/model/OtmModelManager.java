@@ -274,7 +274,7 @@ public class OtmModelManager implements TaskResultHandlerI {
     private OtmDomain add(OtmDomain domain) {
         if (!domains.contains( domain )) {
             domains.add( domain );
-            log.debug( "Added " + domain + " to domain list." );
+            // log.debug( "Added " + domain + " to domain list." );
         }
         return domain;
     }

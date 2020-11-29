@@ -416,7 +416,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     }
 
     private void snapshot() {
-        WritableImage snapshot = scrollPane.snapshot( new SnapshotParameters(), null );
+        WritableImage snapshot = spritePane.snapshot( new SnapshotParameters(), null );
         // saveImage( snapshot );
         Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();

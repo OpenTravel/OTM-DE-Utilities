@@ -210,6 +210,24 @@ public abstract class ClickableRectangle extends Rectangle {
     }
 
     /**
+     * {@link #drawLabel(GraphicsContext, double, double)} then add mouse click event handler for target.
+     * 
+     * @param target domain name string (base namespace)
+     * @return
+     */
+    protected LabelRectangle drawLabel(GraphicsContext gc, double x, double y, DomainSprite target) {
+        LabelRectangle lr = this.drawLabel( gc, x, y );
+        if (gc != null && sprite instanceof DomainSprite) {
+            if (this instanceof DomainProvidersCR)
+                this.setOnMouseClicked( e -> ((DomainSprite) sprite).connect( (DomainProvidersCR) this, target ) );
+            else if (this instanceof DomainUsersCR)
+                this.setOnMouseClicked( e -> ((DomainSprite) sprite).connect( (DomainUsersCR) this, target ) );
+            sprite.add( this );
+        }
+        return lr;
+    }
+
+    /**
      * Draw the label and icon. If gc == null, reset then adjust the width.
      * 
      * @param gc

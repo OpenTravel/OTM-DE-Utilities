@@ -48,12 +48,20 @@ public class DomainUsersCR extends ClickableRectangle {
 
     @Override
     public Rectangle draw(GraphicsContext gc, double x, double y) {
-        LabelRectangle lr = drawLabel( gc, x, y ); // todo - add data needed to create users
-        // drawVerticalLine( gc, lr, margin );
-        drawUnderline( gc, lr, width, margin );
-        drawConnector( gc, lr, connectorColor );
-        drawConnectorLabel( gc, lr, ((DomainSprite) sprite).getUserCount() + "  ", null, false );
-
+        int count = ((DomainSprite) sprite).getUserCount();
+        LabelRectangle lr;
+        if (count <= 0) {
+            String tLabel = label;
+            label = "No " + label;
+            lr = drawLabel( gc, x, y );
+            drawUnderline( gc, lr, lr.getWidth(), margin );
+            label = tLabel;
+        } else {
+            lr = drawLabel( gc, x, y, (DomainSprite) sprite );
+            drawUnderline( gc, lr, width, margin );
+            drawConnector( gc, lr, connectorColor );
+            drawConnectorLabel( gc, lr, count + "  ", null, false );
+        }
         // log.debug( "Drew/sized " + this );
         // drawOutline( gc, false ); // debug
         return this;
