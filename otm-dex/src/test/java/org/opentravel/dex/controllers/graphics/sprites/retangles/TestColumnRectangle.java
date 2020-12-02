@@ -27,6 +27,7 @@ import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SpriteManager;
 import org.opentravel.dex.controllers.graphics.sprites.TestSpriteManager;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.ColumnRectangle;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;

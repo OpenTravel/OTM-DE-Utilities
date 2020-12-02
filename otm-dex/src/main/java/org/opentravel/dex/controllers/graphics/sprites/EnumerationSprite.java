@@ -18,9 +18,9 @@ package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.FacetRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.LabelRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.Rectangle;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmEnumerationOpen;
 

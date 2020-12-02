@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.graphics.sprites.retangles;
+package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
-import org.opentravel.dex.controllers.graphics.sprites.ResourceSprite;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.otmLibraryMembers.OtmResource;
 
 import javafx.scene.input.MouseEvent;
 
@@ -32,8 +32,8 @@ import javafx.scene.input.MouseEvent;
  * @param <O>
  *
  */
-public class ResourceSubjectRectangle extends PropertyRectangle {
-    private static Log log = LogFactory.getLog( ResourceSubjectRectangle.class );
+public class BaseTypeRectangle extends PropertyRectangle {
+    private static Log log = LogFactory.getLog( BaseTypeRectangle.class );
 
     /**
      * Render methods that create rectangles may set the event to run if the implement this interface.
@@ -44,7 +44,7 @@ public class ResourceSubjectRectangle extends PropertyRectangle {
         public void onRectangleClick(MouseEvent e);
     }
 
-    private OtmResource resource = null;
+    private OtmTypeProvider baseType = null;
 
     /**
      * Create a base type property. Throws exception if base type is not a OtmTypeProvider.
@@ -53,34 +53,37 @@ public class ResourceSubjectRectangle extends PropertyRectangle {
      * @param member whose base type will be displayed as a property
      * @param width
      */
-    public ResourceSubjectRectangle(MemberSprite<?> parentSprite, OtmResource member, double width) {
-        super( parentSprite, width, "Exposes", null, member.isEditable(), false );
+    public BaseTypeRectangle(MemberSprite<?> parentSprite, OtmLibraryMember member, double width) {
+        super( parentSprite, width, "Extends", null, member.isEditable(), false );
 
-        setProvider( member.getSubject() );
-        resource = member;
-        if (typeProvider != null)
-            this.label += ": " + typeProvider.getName();
+        if (member.getBaseType() instanceof OtmTypeProvider) {
+            baseType = (OtmTypeProvider) member.getBaseType();
+            if (member.getBaseType() instanceof OtmTypeProvider)
+                setProvider( (OtmTypeProvider) member.getBaseType() );
+            this.providerLabel = member.getBaseType().getNameWithPrefix();
+
+            if (member.getBaseType() instanceof OtmLibraryMember
+                && !member.sameBaseNamespace( (OtmLibraryMember) member.getBaseType() ))
+                this.providerColor = GraphicsUtils.CONNECTOR_COLOR;
+        }
 
         // Compute the size
         draw( null );
 
-        if (resource != null && parent instanceof ResourceSprite) {
-            this.setOnMouseClicked( e -> ((ResourceSprite) parent).connectSubject() );
+        if (getConnectionPoint() != null && parent != null && baseType != null) {
+            this.setOnMouseClicked( e -> parent.connect() );
             parent.add( this );
         }
+
         // log.debug( "Created base type rectangle:" + this );
     }
 
     public OtmLibraryMember get() {
-        return resource.getSubject();
-    }
-
-    public OtmLibraryMember getResource() {
-        return resource;
+        return (OtmLibraryMember) baseType;
     }
 
     @Override
     public String toString() {
-        return "Subject: " + label + " x = " + x + " y = " + y + " width = " + width + " height = " + height;
+        return "BaseType: " + label + " x = " + x + " y = " + y + " width = " + width + " height = " + height;
     }
 }

@@ -28,7 +28,7 @@ import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
 import org.opentravel.dex.controllers.graphics.sprites.SpriteManager;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.ColumnRectangle;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
@@ -152,7 +152,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
         spriteManager = new SpriteManager( this, settingsManager );
 
-        log.debug( "Configured graphics canvas." );
+        // log.debug( "Configured graphics canvas." );
     }
 
     /**
@@ -327,7 +327,7 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     @Override
     @FXML
     public void initialize() {
-        log.debug( "Graphics canvas controller initialized." );
+        // log.debug( "Graphics canvas controller initialized." );
     }
 
     public boolean isLocked() {

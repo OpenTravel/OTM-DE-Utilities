@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.graphics.sprites.retangles;
+package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,7 +39,7 @@ import javafx.scene.paint.Paint;
  *
  */
 @Deprecated
-public class DomainRectangle extends Rectangle {
+public class DomainRectangleDEPRECATED extends Rectangle {
     private static Log log = LogFactory.getLog( ColumnRectangle.class );
 
     public static final int DOMAIN_HEIGHT_MIN = 50;
@@ -50,7 +50,7 @@ public class DomainRectangle extends Rectangle {
     // private Pane spritePane;
     private ColumnRectangle column = null;
 
-    public DomainRectangle(ColumnRectangle column) {
+    public DomainRectangleDEPRECATED(ColumnRectangle column) {
         super( 0, 0, DOMAIN_WIDTH_MIN, DOMAIN_HEIGHT_MIN );
         // this.spritePane = spritePane;
         this.column = column;
@@ -60,7 +60,7 @@ public class DomainRectangle extends Rectangle {
         log.debug( this );
     }
 
-    public DomainRectangle(SpriteManager manager) {
+    public DomainRectangleDEPRECATED(SpriteManager manager) {
         super( 0, 0, DOMAIN_WIDTH_MIN, DOMAIN_HEIGHT_MIN );
         // this.spritePane = spritePane;
         // this.column = column;

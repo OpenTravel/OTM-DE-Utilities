@@ -23,6 +23,10 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.TestLibraryMemberBase;
 
 import java.util.List;
 
@@ -35,9 +39,40 @@ public class TestOtmDomain {
     private static final String defaultDomain = "http://www.example.com/domains/domain1";
     private static OtmModelManager modelManager;
 
+    private static final String BASENAMESPACE = "http://www.example.com/OtmDomain";
+    private static final String BASENAME = "Domain1";
+    private static final String fullName = BASENAMESPACE + "/" + BASENAME;
+
     @BeforeClass
     public static void beforeClass() {
         modelManager = new OtmModelManager( null, null, null );
+    }
+
+
+    public static OtmLibraryMember assignTypes(OtmDomain domain, List<OtmTypeProvider> types) {
+        int i = 0;
+        OtmLibraryMember lastMember = null;
+        for (OtmLibrary lib : domain.getLibraries())
+            for (OtmLibraryMember member : lib.getMembers()) {
+                for (OtmTypeUser user : member.getDescendantsTypeUsers()) {
+                    user.setAssignedType( (OtmTypeProvider) types.get( i++ ) );
+                    if (i >= types.size())
+                        i = 0;
+                }
+                lastMember = member;
+            }
+        return lastMember;
+    }
+
+    /**
+     * Create domain with all object types in its libraries
+     * 
+     * @return
+     */
+    public static OtmDomain buildDomainWithMembers(String name, OtmModelManager mgr) {
+        OtmDomain domain = buildOtm( name, mgr );
+        domain.getLibraries().forEach( l -> TestLibraryMemberBase.buildOneOfEachWithProperties( mgr, l ) );
+        return domain;
     }
 
     /**
@@ -73,10 +108,11 @@ public class TestOtmDomain {
         OtmDomain domain = mgr.getDomain( fullName );
         assertTrue( domain != null );
         assertTrue( domain.getDomain().equals( fullName ) );
+        check( domain );
         return domain;
     }
 
-    public boolean check(OtmDomain domain) {
+    public static boolean check(OtmDomain domain) {
         assertTrue( domain.getBaseNamespace() != null );
         assertTrue( domain.getDomain() != null );
         // assertTrue( domain.getIcon() != null ); // Only true if image manager has been initialized
@@ -89,10 +125,6 @@ public class TestOtmDomain {
     }
 
     /** ****************************************************** **/
-
-    private static final String BASENAMESPACE = "http://www.example.com/OtmDomain";
-    private static final String BASENAME = "Domain1";
-    private static final String fullName = BASENAMESPACE + "/" + BASENAME;
 
     @Test
     public void testGetLibraries() {
@@ -121,11 +153,31 @@ public class TestOtmDomain {
         assertTrue( subs.size() == 3 );
     }
 
+
+    // // This is a private method - manually make it protected to run this test.
+    // @Test
+    // public void testFilterList() {
+    // OtmDomain rootDomain = buildOtmDomainWithSubDomains( fullName, modelManager );
+    // List<OtmLibrary> list = new ArrayList<>();
+    // modelManager.getDomains().forEach( d -> list.addAll( d.getLibraries() ) );
+    //
+    // for (OtmDomain domain : modelManager.getDomains()) {
+    // List<OtmLibrary> newList = domain.filterList( list );
+    // if (domain == rootDomain) {
+    // assertTrue( "Must filter out all sub-domains.", newList.isEmpty() );
+    // } else {
+    // for (OtmLibrary lib : domain.getLibraries()) {
+    // assertTrue( list.contains( lib ) );
+    // assertTrue( "Filter must have removed domain library.", !newList.contains( lib ) );
+    // }
+    // }
+    // }
+    // }
+
     @Test
     public void testSubDomainNames() {
         // Given - domain structure
         OtmDomain domain = buildOtmDomainWithSubDomains( fullName, modelManager );
-        check( domain );
 
         // When
         List<String> subs = domain.getSubDomainNames();

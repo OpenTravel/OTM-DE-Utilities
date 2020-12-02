@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.graphics.sprites.retangles;
+package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,8 +31,8 @@ import javafx.scene.canvas.GraphicsContext;
  * @param <O>
  *
  */
-public class DomainUsersCR extends ClickableRectangle {
-    private static Log log = LogFactory.getLog( DomainUsersCR.class );
+public class DomainProvidersCR extends ClickableRectangle {
+    private static Log log = LogFactory.getLog( DomainProvidersCR.class );
 
     // private String domain; // The property used in connect clicks
 
@@ -42,13 +42,13 @@ public class DomainUsersCR extends ClickableRectangle {
      * @param name - the base namespace
      * @param width
      */
-    public DomainUsersCR(DomainSprite sprite, double width) {
-        super( sprite, "Users of " + sprite.getName(), ImageManager.getImage( Icons.DOMAIN ), width );
+    public DomainProvidersCR(DomainSprite sprite, double width) {
+        super( sprite, "Providers to " + sprite.getName(), ImageManager.getImage( Icons.DOMAIN ), width );
     }
 
     @Override
     public Rectangle draw(GraphicsContext gc, double x, double y) {
-        int count = ((DomainSprite) sprite).getUserCount();
+        int count = ((DomainSprite) sprite).getProviderCount();
         LabelRectangle lr;
         if (count <= 0) {
             String tLabel = label;
@@ -57,11 +57,13 @@ public class DomainUsersCR extends ClickableRectangle {
             drawUnderline( gc, lr, lr.getWidth(), margin );
             label = tLabel;
         } else {
+            // Post name, icon and control - link to sprite
             lr = drawLabel( gc, x, y, (DomainSprite) sprite );
             drawUnderline( gc, lr, width, margin );
             drawConnector( gc, lr, connectorColor );
             drawConnectorLabel( gc, lr, count + "  ", null, false );
         }
+
         // log.debug( "Drew/sized " + this );
         // drawOutline( gc, false ); // debug
         return this;

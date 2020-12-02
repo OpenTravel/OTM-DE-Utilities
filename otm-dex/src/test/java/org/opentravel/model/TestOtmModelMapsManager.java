@@ -22,7 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentravel.model.otmContainers.OtmBuiltInLibrary;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmAlias;
@@ -213,16 +212,17 @@ public class TestOtmModelMapsManager {
         OtmCore core6T = TestCore.buildOtm( targetLib, "Core6InTargetLib" );
 
         // /XMLSchema 1.0=[ns1:Core1InTargetLib, ns1:Core2InTargetLib]
-        List<OtmLibraryMember> list = new ArrayList<OtmLibraryMember>();
-        list.add( core1T );
-        list.add( core2T );
-        list.add( core3T );
-        list.add( core4T );
-        list.add( core5T );
-        list.add( core6T );
-        for (OtmLibrary l : mgr.getLibraries())
-            if (l instanceof OtmBuiltInLibrary && l.getName().equals( "XMLSchema" ))
-                map.put( l, list );
+        // 12/2/2020 - changed map to exclude built-in libraries
+        // List<OtmLibraryMember> list = new ArrayList<OtmLibraryMember>();
+        // list.add( core1T );
+        // list.add( core2T );
+        // list.add( core3T );
+        // list.add( core4T );
+        // list.add( core5T );
+        // list.add( core6T );
+        // for (OtmLibrary l : mgr.getLibraries())
+        // if (l instanceof OtmBuiltInLibrary && l.getName().equals( "XMLSchema" ))
+        // map.put( l, list );
 
         //
         // Add objects in lib2 and lib3 that provide types to objects in target lib

@@ -17,8 +17,8 @@
 package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.dex.controllers.DexIncludedController;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.CollapsableRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.CollapsableRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.FacetRectangle;
 import org.opentravel.model.otmContainers.OtmLibrary;
 
 import java.util.HashMap;
@@ -69,6 +69,7 @@ public class SettingsManager {
 
     public enum Offsets {
         PROPERTY(10),
+        FACET(FACET_OFFSET),
         ID(FACET_OFFSET),
         SHARED(FACET_OFFSET),
         QUERY(FACET_OFFSET),

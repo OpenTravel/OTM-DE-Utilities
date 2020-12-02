@@ -151,6 +151,7 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
     @Test
     public void TestVWAasBaseAndValueType() {
         // Determine and assure Value and Base type are correct.
+        // OtmModelManager mgr = TestOtmModelManager.build();
         OtmLibrary lib = TestLibrary.buildOtm( staticModelManager, "http://example.com", "ex", "lib1" );
         OtmValueWithAttributes vwa1 = buildOtm( lib, "TestVWA1" );
         OtmValueWithAttributes vwa2 = buildOtm( lib, "TestVWA2" );

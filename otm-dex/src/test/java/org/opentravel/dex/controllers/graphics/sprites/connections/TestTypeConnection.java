@@ -29,7 +29,7 @@ import org.opentravel.dex.controllers.graphics.sprites.CoreObjectSprite;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SpriteManager;
 import org.opentravel.dex.controllers.graphics.sprites.TestSpriteManager;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.PropertyRectangle;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;

@@ -28,6 +28,7 @@ import org.opentravel.dex.controllers.graphics.sprites.ContextualFacetSprite;
 import org.opentravel.dex.controllers.graphics.sprites.ResourceSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SpriteManager;
 import org.opentravel.dex.controllers.graphics.sprites.TestSpriteManager;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.FacetRectangle;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;

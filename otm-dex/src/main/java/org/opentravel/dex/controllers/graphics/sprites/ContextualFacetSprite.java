@@ -17,8 +17,8 @@
 package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.FacetRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.Rectangle;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 
 import javafx.scene.canvas.GraphicsContext;

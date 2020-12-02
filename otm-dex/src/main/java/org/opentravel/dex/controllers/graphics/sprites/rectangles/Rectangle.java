@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.graphics.sprites.retangles;
+package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

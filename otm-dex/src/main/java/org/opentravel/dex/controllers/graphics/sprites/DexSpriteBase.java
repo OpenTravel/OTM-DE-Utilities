@@ -21,11 +21,11 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils.DrawType;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.ColumnRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle.RectangleEventHandler;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.ColumnRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.LabelRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.PropertyRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.Rectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.Rectangle.RectangleEventHandler;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 import java.util.ArrayList;

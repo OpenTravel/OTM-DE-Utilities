@@ -51,6 +51,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javafx.scene.image.Image;
+
 /**
  * OTM Object for libraries. Does <b>NOT</b> provide access to members.
  * 
@@ -275,6 +277,10 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
 
     public Icons getIconType() {
         return ImageManager.Icons.LIBRARY;
+    }
+
+    public Image getIcon() {
+        return ImageManager.getImage( this.getIconType() );
     }
 
     public List<OtmLibrary> getIncludes() {

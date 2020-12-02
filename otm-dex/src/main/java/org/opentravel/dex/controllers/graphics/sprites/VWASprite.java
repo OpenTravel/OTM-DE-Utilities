@@ -18,9 +18,9 @@ package org.opentravel.dex.controllers.graphics.sprites;
 
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.FacetRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.VWAPropertyRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.FacetRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.Rectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.VWAPropertyRectangle;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 
 import javafx.scene.canvas.GraphicsContext;

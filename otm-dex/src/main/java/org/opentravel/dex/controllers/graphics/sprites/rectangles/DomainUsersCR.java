@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.graphics.sprites.retangles;
+package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,16 +25,16 @@ import org.opentravel.dex.controllers.graphics.sprites.DomainSprite;
 import javafx.scene.canvas.GraphicsContext;
 
 /**
- * Rectangle for a click-able, single sub-domain property.
+ * Rectangle for a click-able, line for domain users.
  * 
  * @author dmh
  * @param <O>
  *
  */
-public class SubDomainCR extends ClickableRectangle {
-    private static Log log = LogFactory.getLog( SubDomainCR.class );
+public class DomainUsersCR extends ClickableRectangle {
+    private static Log log = LogFactory.getLog( DomainUsersCR.class );
 
-    private String sd; // The property used in connect clicks
+    // private String domain; // The property used in connect clicks
 
     /**
      * 
@@ -42,18 +42,26 @@ public class SubDomainCR extends ClickableRectangle {
      * @param name - the base namespace
      * @param width
      */
-    public SubDomainCR(DomainSprite sprite, String subDomain, double width) {
-        super( sprite, DomainSprite.getDomainName( subDomain ), ImageManager.getImage( Icons.DOMAIN ), width );
-        this.sd = subDomain;
+    public DomainUsersCR(DomainSprite sprite, double width) {
+        super( sprite, "Users of " + sprite.getName(), ImageManager.getImage( Icons.DOMAIN ), width );
     }
 
     @Override
     public Rectangle draw(GraphicsContext gc, double x, double y) {
-        LabelRectangle lr = drawLabel( gc, x, y, sd );
-        drawVerticalLine( gc, lr, margin );
-        drawUnderline( gc, lr, width, margin );
-        drawConnector( gc, lr, connectorColor );
-
+        int count = ((DomainSprite) sprite).getUserCount();
+        LabelRectangle lr;
+        if (count <= 0) {
+            String tLabel = label;
+            label = "No " + label;
+            lr = drawLabel( gc, x, y );
+            drawUnderline( gc, lr, lr.getWidth(), margin );
+            label = tLabel;
+        } else {
+            lr = drawLabel( gc, x, y, (DomainSprite) sprite );
+            drawUnderline( gc, lr, width, margin );
+            drawConnector( gc, lr, connectorColor );
+            drawConnectorLabel( gc, lr, count + "  ", null, false );
+        }
         // log.debug( "Drew/sized " + this );
         // drawOutline( gc, false ); // debug
         return this;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.graphics.sprites.retangles;
+package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,7 +44,7 @@ public abstract class CollapsableRectangle extends Rectangle {
     private static Log log = LogFactory.getLog( CollapsableRectangle.class );
 
     protected DexSprite parent;
-    private String label;
+    protected String label;
     protected Image icon;
 
     private SettingsManager settings;
@@ -65,6 +65,7 @@ public abstract class CollapsableRectangle extends Rectangle {
         this.parent = parent;
         this.icon = icon;
         this.label = label;
+        this.width = width;
 
         if (parent == null)
             throw new IllegalArgumentException( "Must have parent sprite." );
@@ -74,8 +75,8 @@ public abstract class CollapsableRectangle extends Rectangle {
         if (settings == null)
             throw new IllegalArgumentException( "Must have settings" );
 
-        margin = settings.getMargin( Margins.PROPERTY );
-        offset = settings.getOffset( Offsets.PROPERTY );
+        margin = settings.getMargin( Margins.FACET );
+        offset = settings.getOffset( Offsets.FACET );
     }
 
     public void collapseOrExpand() {
@@ -90,7 +91,7 @@ public abstract class CollapsableRectangle extends Rectangle {
      * <p>
      * Sub-types should call this before drawing facet members/properties.
      * 
-     * @see org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle#draw(javafx.scene.canvas.GraphicsContext)
+     * @see org.opentravel.dex.controllers.graphics.sprites.rectangles.Rectangle#draw(javafx.scene.canvas.GraphicsContext)
      */
     @Override
     public Rectangle draw(GraphicsContext gc) {

@@ -20,8 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.LabelRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.Rectangle;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmDomain;
 

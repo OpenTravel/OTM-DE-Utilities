@@ -20,10 +20,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
+import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.DomainProviderFR;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.LabelRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.Rectangle;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmDomain;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+
+import java.util.List;
+import java.util.Map;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;
@@ -53,6 +60,10 @@ public class ProvidersSprite extends DexSpriteBase {
     private DomainSprite domainS = null;
     private OtmDomain otmDomain = null;
     private OtmModelManager modelManager = null;
+
+    private List<OtmDomain> domains = null;
+    private List<String> domainIds = null;
+    private Map<OtmLibrary,List<OtmLibraryMember>> libraryMap = null;
 
     // private DomainUsersCR usersCR = null;
     // private DomainProvidersCR providersCR = null;
@@ -91,8 +102,12 @@ public class ProvidersSprite extends DexSpriteBase {
         // if (modelManager == null)
         // throw new IllegalArgumentException( "Domain must have access to model manager." );
 
+        // Each domain goes in a FR
+        // FR has libraries in FRs
+        // Library has CRs
+        // Chains?
+        // buildDomains();
         // buildLibraries();
-        // buildSubDomains();
 
         // Correct tool tip display relies on the canvas being clipped to this sprite's active boundaries
         String desc = "Providers to Domain " + otmDomain.getName();
@@ -104,9 +119,24 @@ public class ProvidersSprite extends DexSpriteBase {
         draw( null, 0, 0 );
     }
 
-    // private void buildLibraries() {
-    // Collection<OtmLibrary> libs = otmDomain.getLibraries();
-    // libs.forEach( lib -> libMap.put( lib, new LibraryRectangle( this, lib ) ) );
+    // private List<String> getProviderDomains() {
+    // if (domainIds == null) {
+    // domainIds = new ArrayList<>();
+    // getLibraryMap().forEach( (k, v) -> addDomainId( k.getBaseNamespace() ) );
+    // }
+    // return domainIds;
+    // }
+    //
+    // private void addDomainId(String libBaseNS) {
+    // if (!domainIds.contains( libBaseNS ))
+    // domainIds.add( libBaseNS );
+    // }
+    //
+    // private Map<OtmLibrary,List<OtmLibraryMember>> getLibraryMap() {
+    // if (libraryMap == null) {
+    // libraryMap = otmDomain.getProvidersMap();
+    // }
+    // return libraryMap;
     // }
 
     // private void buildSubDomains() {
@@ -169,6 +199,7 @@ public class ProvidersSprite extends DexSpriteBase {
     //
     @Override
     public Rectangle draw(GraphicsContext gc, double x, double y) {
+        log.debug( "Draw provider sprite." + this );
         set( x, y );
 
         Paint color = null;
@@ -176,8 +207,31 @@ public class ProvidersSprite extends DexSpriteBase {
             color = gc.getFill();
 
         double fy = y + drawSprite( gc, color, null, false );
-        // double width = boundaries.getWidth();
-        // double margin = settingsManager.getMargin( Margins.FACET );
+
+        double width = boundaries.getWidth();
+        double margin = settingsManager.getMargin( Margins.FACET );
+        double fx = x + margin;
+
+        OtmModelManager modelMgr = otmDomain.getModelManager();
+        if (modelMgr == null)
+            return boundaries; // This is an error
+
+        // List the domains that contribute
+        // domainsR = new DomainListFR();
+        DomainProviderFR dpf = null;
+        // List<String> providers = otmDomain.getProviderDomains();
+        for (String did : otmDomain.getProviderDomains()) {
+            log.debug( "TODO - create domain facet for " + did );
+            OtmDomain pd = modelMgr.getDomain( did );
+            if (pd != null) {
+                dpf = new DomainProviderFR( this, pd, width, false );
+                dpf.draw( gc, fx, fy );
+
+                fy += dpf.getHeight();
+                if (gc == null)
+                    width = dpf.getWidth() > width ? dpf.getWidth() : width;
+            }
+        }
 
         LabelRectangle lr = null;
         if (!collapsed) {
@@ -219,10 +273,10 @@ public class ProvidersSprite extends DexSpriteBase {
             // fy += libraryFacetRectangle.getHeight();
             // width = computeWidth( width, libraryFacetRectangle, margin );
             //
-            // if (gc == null) {
-            // boundaries.setIfWider( width + margin );
-            // boundaries.setIfHigher( fy - y );
-            // }
+            if (gc == null) {
+                boundaries.setIfWider( width + margin );
+                boundaries.setIfHigher( fy - y );
+            }
         }
         // boundaries.draw( gc, false );
         return boundaries;
@@ -249,6 +303,11 @@ public class ProvidersSprite extends DexSpriteBase {
     public DomainSprite getDomain() {
         return domainS;
     }
+
+    // public Map<OtmLibrary,List<OtmLibraryMember>> getMap() {
+    // return otmDomain.getProvidersMap();
+    // }
+
     //
     // public static String getDomainName(String baseNamespace) {
     // String name = "Domain";
@@ -294,5 +353,12 @@ public class ProvidersSprite extends DexSpriteBase {
     @Override
     public String toString() {
         return "Sprite for providers to " + otmDomain + " at " + getBoundaries();
+    }
+
+    /**
+     * @return
+     */
+    public OtmDomain getOtmDomain() {
+        return otmDomain;
     }
 }

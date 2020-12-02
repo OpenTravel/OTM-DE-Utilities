@@ -20,7 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.PropertyRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.PropertyRectangle;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;

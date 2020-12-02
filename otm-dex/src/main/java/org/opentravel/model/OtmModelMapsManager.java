@@ -171,7 +171,9 @@ public class OtmModelMapsManager implements TaskResultHandlerI {
     private void addToMap(OtmTypeUser user, Map<OtmLibrary,List<OtmLibraryMember>> map) {
         if (user != null && user.getAssignedType() != null && user.getAssignedType().getLibrary() != null) {
             OtmLibrary key = user.getAssignedType().getLibrary();
-            addToMap( key, user.getOwningMember(), map );
+            // Ignore built-in
+            if (!key.isBuiltIn())
+                addToMap( key, user.getOwningMember(), map );
         }
     }
 

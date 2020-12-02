@@ -18,7 +18,7 @@ package org.opentravel.dex.controllers.graphics.sprites.connections;
 
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.ResourceSprite;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.Rectangle;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;

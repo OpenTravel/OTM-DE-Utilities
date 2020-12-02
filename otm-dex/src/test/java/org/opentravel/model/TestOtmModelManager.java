@@ -28,6 +28,7 @@ import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.dex.action.manager.DexActionManager;
+import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
@@ -66,6 +67,19 @@ public class TestOtmModelManager extends AbstractFxTest {
     public static void setupTests() throws Exception {
         setupWorkInProcessArea( TestOtmModelManager.class );
         repoManager = repositoryManager.get();
+    }
+
+    /**
+     * Build a model manager with full action manager, built in libraries and repository manager.
+     * 
+     * @param actionManager action manager to assign as full action manager. can be null.
+     * @return
+     */
+    public static OtmModelManager build() {
+        DexFullActionManager fullMgr = new DexFullActionManager( null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, repoManager, null );
+        mgr.addBuiltInLibraries( new TLModel() );
+        return mgr;
     }
 
     /**

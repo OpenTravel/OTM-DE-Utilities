@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.controllers.graphics.sprites.retangles;
+package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,7 +24,7 @@ import org.opentravel.dex.controllers.graphics.sprites.DomainSprite;
 import javafx.scene.canvas.GraphicsContext;
 
 /**
- * Graphics utility for containing virtual facet containing libraries in a domain.
+ * Virtual facet with generic name containing LibraryRectangles as properties in a domain.
  * 
  * @author dmh
  * @param <O>
@@ -36,7 +36,7 @@ public class LibraryFacetRectangle extends CollapsableRectangle {
     /**
      * 
      * @param obj - must have object
-     * @param parent - must have parent with member
+     * @param parent - must have parent with member and library rectangles
      * @param width - overrides actual width if gc != null when drawn
      */
     public LibraryFacetRectangle(DomainSprite parent, double width, boolean collapsed) {
@@ -63,19 +63,9 @@ public class LibraryFacetRectangle extends CollapsableRectangle {
                 drawUnderline( gc, libr, 0, margin );
                 fy += libr.getHeight();
                 height += libr.getHeight();
-
-                // if (gc != null)
-                // log.debug( "Drew " + libr );
-                // else
-                // log.debug( "sized " + libr );
             }
         }
         height = height + 2 * margin;
-        // if (gc != null)
-        // log.debug( "Drew " + this );
-        // else
-        // log.debug( "sized " + this );
-        // super.draw( gc, false ); // debug
         return this;
     }
 

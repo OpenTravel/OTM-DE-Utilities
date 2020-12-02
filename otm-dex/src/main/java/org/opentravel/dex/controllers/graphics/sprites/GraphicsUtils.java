@@ -19,7 +19,7 @@ package org.opentravel.dex.controllers.graphics.sprites;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ImageManager;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.Rectangle;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;

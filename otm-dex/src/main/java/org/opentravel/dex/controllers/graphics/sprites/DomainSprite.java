@@ -22,15 +22,15 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Offsets;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.ClickableRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.CollapsableRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.DomainProvidersCR;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.DomainUsersCR;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.LabelRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.LibraryFacetRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.LibraryRectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.Rectangle;
-import org.opentravel.dex.controllers.graphics.sprites.retangles.SubDomainFR;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.ClickableRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.CollapsableRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.DomainProvidersCR;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.DomainUsersCR;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.LabelRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.LibraryFacetRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.LibraryRectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.Rectangle;
+import org.opentravel.dex.controllers.graphics.sprites.rectangles.SubDomainFR;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmDomain;
 import org.opentravel.model.otmContainers.OtmLibrary;
@@ -148,13 +148,9 @@ public class DomainSprite extends DexSpriteBase {
 
     public DexSprite connect(DomainUsersCR usersR, DomainSprite ds) {
         log.debug( "Connect users for " + ds );
-        UsersSprite us = null;
-        if (ds != null)
-            us = manager.addUsersSprite( ds, getColumn() );
-        // DomainSprite subDomainS = null;
-        // if (subDomain != null && !subDomain.isEmpty()) {
-        // subDomainS = manager.add( subDomain, getColumn() );
-        // subDomainS.getCanvas().toFront();
+        // UsersSprite us = null;
+        // if (ds != null)
+        // us = manager.addUsersSprite( ds, getColumn() );
         // // TODO - create connection?
         // }
         return us;
@@ -162,17 +158,12 @@ public class DomainSprite extends DexSpriteBase {
 
     public DexSprite connect(DomainProvidersCR providersR, DomainSprite ds) {
         log.debug( "Connect providers for " + ds );
-        ProvidersSprite ps = null;
-        if (ds != null) {
-            ps = manager.addProvidersSprite( ds, getColumn() );
-        }
-        // DomainSprite subDomainS = null;
-        // if (subDomain != null && !subDomain.isEmpty()) {
-        // subDomainS = manager.add( subDomain, getColumn() );
-        // subDomainS.getCanvas().toFront();
+        // ProvidersSprite ps = null;
+        // if (ds != null)
+        // ps = manager.addProvidersSprite( ds, getColumn() );
+
         // // TODO - create connection?
-        // }
-        return ds;
+        return ps;
     }
 
     public void collapseOrExpand(CollapsableRectangle rec) {
@@ -259,6 +250,12 @@ public class DomainSprite extends DexSpriteBase {
         return otmDomain.getSubDomainNames();
     }
 
+    /**
+     * The short name of this domain.
+     * 
+     * @see #getDomain() for full name
+     * @see org.opentravel.dex.controllers.graphics.sprites.DexSprite#getName()
+     */
     @Override
     public String getName() {
         return getDomainName( baseNamespace );
@@ -293,6 +290,8 @@ public class DomainSprite extends DexSpriteBase {
         return otmDomain.getProviderDomains();
     }
 
+
+
     public OtmDomain getOtmDomain() {
         return otmDomain;
     }
@@ -300,6 +299,10 @@ public class DomainSprite extends DexSpriteBase {
     public int getProviderCount() {
         return otmDomain.getProviderDomains().size();
     }
+
+    // public Map<OtmLibrary,List<OtmLibraryMember>> getProviderMap() {
+    // return otmDomain.getProvidersMap();
+    // }
 
     public List<String> getUserDomains() {
         return otmDomain.getUserDomains();
