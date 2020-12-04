@@ -101,7 +101,9 @@ public class TestLibrary extends AbstractFxTest {
 
         // Create business object
         OtmBusinessObject member = TestBusiness.buildOtm( mgr, "TestBusinessObject" );
+        // When
         lib1.add( member );
+        // Then
         assertTrue( "Given", member.getLibrary() == lib1 );
 
         // OtmLibrary lib2 = TestLibrary.buildOtm( mgr, "Namespace2", "p2", "Library2" );
@@ -157,7 +159,7 @@ public class TestLibrary extends AbstractFxTest {
                 a = element.setAssignedType( (OtmTypeProvider) member );
                 // Not all members can be assigned
                 if (a == member)
-                    assertTrue( member.getWhereUsed().contains( core ) );
+                    assertTrue( "must contain core", member.getWhereUsed().contains( core ) );
 
             }
             lib.delete( member );

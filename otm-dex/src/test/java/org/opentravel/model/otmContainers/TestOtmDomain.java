@@ -132,12 +132,18 @@ public class TestOtmDomain {
         modelManager.clear();
         OtmDomain domain = buildOtmDomainWithSubDomains( fullName, modelManager );
         check( domain );
+
+        // When - model manager provides libraries
         List<OtmLibrary> allLibs = modelManager.getUserLibraries();
+
+        // Then - all 5 built by the builder are returned
         assertTrue( allLibs.size() == 5 );
 
+        // Then - the domain has just the one library from the builder
         List<OtmLibrary> libs = domain.getLibraries();
         assertTrue( libs.size() == 1 );
 
+        // Then - all domains have the 1 library from the builder
         for (OtmDomain d : modelManager.getDomains())
             assertTrue( d.getLibraries().size() == 1 );
     }

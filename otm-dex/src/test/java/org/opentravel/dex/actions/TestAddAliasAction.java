@@ -62,6 +62,8 @@ public class TestAddAliasAction {
 
     }
 
+    // FIXME - i am getting NPE when validating a deleted alias.
+    //
     @Test
     public void testGettingAction() {
         assertTrue( "Given: ", globalBO.getActionManager() instanceof DexFullActionManager );

@@ -153,7 +153,8 @@ public class DomainSprite extends DexSpriteBase {
         // us = manager.addUsersSprite( ds, getColumn() );
         // // TODO - create connection?
         // }
-        return us;
+        // return us;
+        return null;
     }
 
     public DexSprite connect(DomainProvidersCR providersR, DomainSprite ds) {
@@ -163,7 +164,8 @@ public class DomainSprite extends DexSpriteBase {
         // ps = manager.addProvidersSprite( ds, getColumn() );
 
         // // TODO - create connection?
-        return ps;
+        // return ps;
+        return null;
     }
 
     public void collapseOrExpand(CollapsableRectangle rec) {

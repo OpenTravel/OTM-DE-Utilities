@@ -183,6 +183,7 @@ public class TestOtmDomain_Providers {
             assertTrue( list.contains( l ) );
         }
 
+        // When
         for (OtmDomain otmDomain : modelManager.getDomains()) {
             // When - data is retrieved from otm domain
             map = otmDomain.getProvidersMap();

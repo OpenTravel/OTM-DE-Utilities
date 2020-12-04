@@ -115,6 +115,8 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
             default:
                 return isNewProperty( subject );
         }
+        // case ADDALIAS:
+        // Need to be able to rename and delete before enabling add
     }
 
     /**
