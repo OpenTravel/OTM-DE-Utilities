@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.common.ValidationUtils;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.TestOtmModelManager;
@@ -36,14 +37,21 @@ import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmFacets.TestFacet;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
+import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
+import org.opentravel.schemacompiler.codegen.util.ResourceCodegenUtils;
+import org.opentravel.schemacompiler.model.TLAction;
+import org.opentravel.schemacompiler.model.TLActionFacet;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLIndicator;
 import org.opentravel.schemacompiler.model.TLModelElement;
+import org.opentravel.schemacompiler.model.TLParamGroup;
 import org.opentravel.schemacompiler.model.TLProperty;
+import org.opentravel.schemacompiler.model.TLResource;
+import org.opentravel.schemacompiler.model.TLResourceParentRef;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
@@ -359,6 +367,102 @@ public class TestInheritance extends AbstractFxTest {
             // assure the new property with changed type is not inherited
             // assure the property in the major that had type change is still has same parent as before
         }
+    }
+
+    // Model inherited children depends on codegen util behavior from compiler
+    @Test
+    public void testInheritedResourceCodegenUtils() {
+        // Givens
+        OtmResource r = TestResource.buildExtendedResource( true );
+        OtmResource rBase = r.getBaseType();
+        List<OtmObject> rKids = r.getChildren();
+        List<OtmObject> bKids = rBase.getChildren();
+
+        // When - base type set in builder
+
+        // Then - Returns r and rBase TLResources
+        List<TLResource> ex = ResourceCodegenUtils.getInheritanceHierarchy( r.getTL() );
+        assertTrue( "Codegen Utils must find inheritance hierarchy.", !ex.isEmpty() );
+
+        // Then - actions using the codegenUtils
+        for (TLAction tlA : ResourceCodegenUtils.getInheritedActions( r.getTL() )) {
+            // Returns both inherited and locally owned actions
+            assertTrue( tlA != null );
+            OtmAction action = (OtmAction) OtmModelElement.get( tlA );
+            TLResource tlOwner = tlA.getOwner();
+            assertTrue( tlOwner != null );
+            assertTrue( action != null );
+
+            if (rKids.contains( action )) {
+                // Locally Owned
+                assertTrue( !bKids.contains( action ) );
+                assertTrue( action.getOwningMember() == r );
+                assertTrue( tlOwner == r.getTL() );
+            } else {
+                // Inherited
+                assertTrue( "Inherited action must be owned by base resource.", action.getOwningMember() == rBase );
+                assertTrue( "Inherited action must be owned by base TL resource.", rBase.getTL() == tlOwner );
+                assertTrue( "TL Owner must be the resource.", OtmModelElement.get( tlOwner ) == rBase );
+                assertTrue( "Base resource must own inherited action.", bKids.contains( action ) );
+            }
+
+        }
+
+        // Then - Action facets, param groups and parent refs will return from hierarchy, filtered to just one of each
+        // name
+        List<TLModelElement> inheritedList = new ArrayList<>();
+        for (TLActionFacet tlAf : ResourceCodegenUtils.getInheritedActionFacets( r.getTL() ))
+            inheritedList.add( tlAf );
+        for (TLParamGroup tlPG : ResourceCodegenUtils.getInheritedParamGroups( r.getTL() ))
+            inheritedList.add( tlPG );
+        for (TLResourceParentRef tlPR : ResourceCodegenUtils.getInheritedParentRefs( r.getTL() ))
+            inheritedList.add( tlPR );
+        // Because the target resource has no children, all the inherited ones must be reported out.
+        assertTrue( "Codegen Utils must find 3 inherited children.", inheritedList.size() == 3 );
+
+    }
+
+    @Test
+    public void testInheritedResourceChildren() {
+
+        // Givens
+        OtmResource target = TestResource.buildExtendedResource( true );
+        OtmResource rBase = target.getBaseType();
+
+        // When - base type set in builder
+
+        // Then - base kids are not inherited
+        List<OtmObject> biKids = rBase.getInheritedChildren();
+        assertTrue( "Given: base does not have inherited kids.", biKids.isEmpty() );
+        rBase.getInheritedChildren().forEach( i -> assertTrue( !i.isInherited() ) );
+
+        // Then - target has inherited children
+        List<OtmObject> iKids = target.getInheritedChildren();
+        assertTrue( "Must have inherited kids.", !iKids.isEmpty() );
+        target.getInheritedChildren().forEach( i -> assertTrue( i.isInherited() ) );
+        assertTrue( "Must inherit all children.", rBase.getChildren().size() == target.getInheritedChildren().size() );
+
+        // Then - each type of getInherited* returns only inherited
+        target.getInheritedActions().forEach( ic -> assertTrue( ic.isInherited() ) );
+        target.getInheritedActionFacets().forEach( ic -> assertTrue( ic.isInherited() ) );
+        target.getInheritedParameterGroups().forEach( ic -> assertTrue( ic.isInherited() ) );
+        target.getInheritedParentRefs().forEach( ic -> assertTrue( ic.isInherited() ) );
+
+        // // Inheritance is set up when modeled by setting the inheritedFrom field
+        // // Inheritance test used for properties does not work. If it does, we should use it.
+        // for (OtmAction action : r.getInheritedActions()) {
+        //
+        // // Using these as the test confuses the constructor uses isInherited to add to correct list.
+        // boolean test = action.getTL().getOwner() != action.getParent().getTL();
+        // // assertTrue( "This is a viable inheritance test for resource children.", test );
+        // boolean test2 = ((OtmChildrenOwner) action.getParent()).getChildren().contains( action );
+        // // assertTrue( "This test works.", test2 );
+        //
+        // boolean test3 = action.getInheritedFrom() != null;
+        // boolean inherited = action.isInherited();
+        // log.debug( "Must be inherited: " + inherited + test + test2 + test3 );
+        // assertTrue( "Must be inherited.", inherited );
+        // }
     }
 
     // // Unused. Not sure the logic is correct.

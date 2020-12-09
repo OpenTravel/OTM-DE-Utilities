@@ -188,18 +188,28 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
             TreeItem<ResourcesDAO> rItem = new ResourcesDAO( resource ).createTreeItem( parent );
 
             // Parent Refs
+            resource.getInheritedParentRefs().forEach( pr -> new ResourcesDAO( pr ).createTreeItem( rItem ) );
             resource.getParentRefs().forEach( pr -> new ResourcesDAO( pr ).createTreeItem( rItem ) );
 
             // Parameter Groups
+            resource.getInheritedParameterGroups().forEach( pg -> {
+                TreeItem<ResourcesDAO> child = new ResourcesDAO( pg ).createTreeItem( rItem );
+                createChildrenItems( pg, child );
+            } );
             resource.getParameterGroups().forEach( pg -> {
                 TreeItem<ResourcesDAO> child = new ResourcesDAO( pg ).createTreeItem( rItem );
                 createChildrenItems( pg, child );
             } );
 
             // Action facets
+            resource.getInheritedActionFacets().forEach( af -> new ResourcesDAO( af ).createTreeItem( rItem ) );
             resource.getActionFacets().forEach( af -> new ResourcesDAO( af ).createTreeItem( rItem ) );
 
             // Actions
+            resource.getInheritedActions().forEach( a -> {
+                TreeItem<ResourcesDAO> child = new ResourcesDAO( a ).createTreeItem( rItem );
+                createChildrenItems( a, child );
+            } );
             resource.getActions().forEach( a -> {
                 TreeItem<ResourcesDAO> child = new ResourcesDAO( a ).createTreeItem( rItem );
                 createChildrenItems( a, child );

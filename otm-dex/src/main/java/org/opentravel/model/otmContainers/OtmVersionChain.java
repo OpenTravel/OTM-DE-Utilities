@@ -198,10 +198,13 @@ public class OtmVersionChain {
     }
 
     /**
+     * False if another library in the chain has a member with the same name.
+     * 
      * @param member
      * @return
      */
     public boolean isNewToChain(OtmLibraryMember member) {
+        // OtmLibrary mLib = member.getLibrary();
         for (OtmLibrary lib : libraries)
             if (lib != member.getLibrary() && lib.contains( member ))
                 return false;
@@ -304,6 +307,10 @@ public class OtmVersionChain {
     // Is there a newer minor version of this type provider?
     public boolean canAssignLaterVersion(OtmTypeUser subject) {
         if (subject == null || subject.getAssignedType() == null)
+            return false;
+        log.debug( "Can assign later version? " + !isLatestVersion( subject.getAssignedType().getOwningMember() ) );
+        // Return false if there is a later version of this subject
+        if (!isLatestVersion( (OtmLibraryMember) subject ))
             return false;
         return !isLatestVersion( subject.getAssignedType().getOwningMember() );
     }

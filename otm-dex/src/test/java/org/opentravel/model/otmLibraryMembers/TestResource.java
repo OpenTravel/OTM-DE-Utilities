@@ -108,6 +108,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         assertTrue( "Must have custom facets.", hasCustomFacet( subjectFacets ) );
     }
 
+
     /**
      * @param subjectFacets
      * @param result
@@ -308,6 +309,43 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
     /** ****************************************************** **/
 
     /**
+     * Create a "Parent", "Base" and "Target" resources in a new library and model. If deleteKids, Target has no
+     * children. Target extends Base. Base has parent reference to Parent.
+     * 
+     * @return
+     */
+    public static OtmResource buildExtendedResource(boolean deleteKids) {
+
+        // Given - a base resource with a parent
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmResource rBase = buildFullOtm( "http://example.com", "Base", lib, lib.getModelManager() );
+        OtmResource rParent = buildParentResource( rBase, "Parent", lib.getModelManager() );
+
+        // Given - a resource that will extend the base.
+        OtmResource r = TestResource.buildOtm( lib, "Target" );
+
+        if (deleteKids) {
+            // Make sure the tested resource start with no children to eliminate any name contention.
+            // TODO - test with a same name Action to simulate being in an edited minor.
+            List<OtmObject> rKids = new ArrayList<>( r.getChildren() );
+            rKids.forEach( k -> r.delete( k ) );
+            assertTrue( "Given: resource does NOT have kids.", r.getChildren().isEmpty() );
+        } else {
+            assertTrue( "Given: resource does have kids.", !r.getChildren().isEmpty() );
+
+        }
+
+        // Set base type
+        r.setBaseType( rBase );
+
+        assertTrue( "Given: ", r.getTL().getExtension() != null );
+        assertTrue( "Given: has base type.", r.getBaseType() == rBase );
+        assertTrue( "Given: base has kids.", !rBase.getChildren().isEmpty() );
+
+        return r;
+    }
+
+    /**
      * Return list of responses accumulated from each action.getResponses()
      * 
      * @param resource
@@ -338,7 +376,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
      * @param name
      * @return
      */
-    public static OtmLibraryMember buildOtm(OtmLibrary lib, String name) {
+    public static OtmResource buildOtm(OtmLibrary lib, String name) {
         OtmResource resource = buildOtm( lib.getModelManager() );
         resource.setName( name );
         lib.add( resource );

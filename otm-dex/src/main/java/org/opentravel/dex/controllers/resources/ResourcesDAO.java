@@ -47,7 +47,7 @@ public class ResourcesDAO implements DexDAO<OtmObject> {
     private static Log log = LogFactory.getLog( ResourcesDAO.class );
 
     protected OtmObject otmObject;
-    private OtmObject iniheritingParent = null;
+    // private OtmObject iniheritingParent = null;
 
     public ResourcesDAO(OtmObject member) {
         this.otmObject = member;
@@ -55,7 +55,7 @@ public class ResourcesDAO implements DexDAO<OtmObject> {
 
     public ResourcesDAO(OtmObject member, OtmObject inheritingParent) {
         this.otmObject = member;
-        this.iniheritingParent = inheritingParent;
+        // this.iniheritingParent = inheritingParent;
     }
 
     public ResourcesDAO(OtmTypeProvider provider) {
@@ -130,12 +130,13 @@ public class ResourcesDAO implements DexDAO<OtmObject> {
      * @param p
      */
     public TreeItem<ResourcesDAO> createTreeItem(TreeItem<ResourcesDAO> cfItem, OtmObject p) {
-        this.iniheritingParent = p;
+        // this.iniheritingParent = p;
         return createTreeItem( cfItem );
     }
 
     public boolean isInherited() {
-        return iniheritingParent != null;
+        return otmObject.isInherited();
+        // return iniheritingParent != null;
     }
 
     /**

@@ -48,4 +48,11 @@ public interface OtmResourceChild extends OtmObject {
      */
     public OtmObject getParent();
 
+    /**
+     * If set, this child is inherited from the passed base resource.
+     * 
+     * @param base
+     */
+    public void setInheritedFrom(OtmResource base);
+
 }

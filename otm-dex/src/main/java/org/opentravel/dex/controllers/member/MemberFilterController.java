@@ -267,6 +267,11 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
      */
     public void setMinorVersionFilter(OtmTypeProvider type) {
         MinorVersionFilterWidget w = getMinorVersionFilter();
+        if (w == null) {
+            w = new MinorVersionFilterWidget( this );
+            filters.add( w );
+        }
+
         if (w != null)
             w.set( type );
         // minorVersionMatch = type;

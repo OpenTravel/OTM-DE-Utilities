@@ -276,8 +276,10 @@ public abstract class DexActionManagerBase implements DexActionManager {
             String warning = "Error running action ";
             if (action != null)
                 warning += action.toString();
+            if (actionHandler == null)
+                warning += "\nAction was not enabled by " + this.getClass().getSimpleName() + ".";
             postWarning( warning );
-            log.warn( "Action is null or not a run action." );
+            log.warn( "Action is null or not a run action. " );
         }
         return result;
     }

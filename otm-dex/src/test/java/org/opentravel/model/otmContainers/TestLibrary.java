@@ -499,10 +499,12 @@ public class TestLibrary extends AbstractFxTest {
         tlLib.setName( "LibraryName" );
         tlLib.setPrefix( "pre" );
         tlLib.setNamespace( "http://example.com/ns/v0" );
+        tlLib.setOwningModel( mgr.getTlModel() );
         OtmLibrary lib = mgr.add( tlLib );
         assertTrue( "Given", lib.isEditable() );
         assertTrue( "Given - model manager must be able to find the library.", mgr.get( lib.getTL() ) == lib );
         assertTrue( "Given", lib.getStatus() == TLLibraryStatus.DRAFT );
+        assertTrue( "Given: library must be owned by model.", tlLib.getOwningModel() != null );
         assertTrue( "Given",
             lib.getState() == RepositoryItemState.MANAGED_WIP || lib.getState() == RepositoryItemState.UNMANAGED );
         return lib;

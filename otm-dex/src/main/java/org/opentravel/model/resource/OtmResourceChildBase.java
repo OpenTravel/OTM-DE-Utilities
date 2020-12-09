@@ -40,6 +40,8 @@ public abstract class OtmResourceChildBase<C> extends OtmModelElement<TLModelEle
     protected OtmResource owner = null;
     protected OtmResourceChild parent = null;
 
+    private OtmResource inheritedFrom = null;
+
     /**
      * Add this object to parent and set owner to parent.
      * 
@@ -84,6 +86,15 @@ public abstract class OtmResourceChildBase<C> extends OtmModelElement<TLModelEle
         return owner;
     }
 
+    // ActionResponses can be inherited from either the base or parentRef???
+    @Override
+    public boolean isInherited() {
+        // boolean result = false;
+        // if (getParent() instanceof OtmChildrenOwner)
+        // result = ((OtmChildrenOwner) getParent()).getChildren().contains( this );
+        return getInheritedFrom() != null;
+    }
+
     /**
      * {@inheritDoc}
      * <p>
@@ -107,5 +118,12 @@ public abstract class OtmResourceChildBase<C> extends OtmModelElement<TLModelEle
         return super.isValid( force );
     }
 
+    public void setInheritedFrom(OtmResource base) {
+        this.inheritedFrom = base;
+    }
+
+    public OtmResource getInheritedFrom() {
+        return inheritedFrom;
+    }
 
 }

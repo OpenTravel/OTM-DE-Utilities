@@ -284,6 +284,15 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         return getTL().isCommonAction();
     }
 
+    // 12/8/2020 - if enabled, the resource.add() fails to put action in right list.
+    // @Override
+    // public boolean isInherited() {
+    // boolean result = false;
+    // if (getParent() instanceof OtmChildrenOwner)
+    // result = !((OtmChildrenOwner) getParent()).getChildren().contains( this );
+    // return result;
+    // }
+
     // /**
     // * @see org.opentravel.model.OtmChildrenOwner#isExpanded()
     // */

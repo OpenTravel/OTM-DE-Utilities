@@ -116,26 +116,46 @@ public class AssignResourceSubjectAction extends DexRunAction {
 
         // If this resource is in an older minor version
         if (!resource.isEditable() && resource.getLibrary().isChainEditable()) {
-            // Limit selection to minor versions of the subject
+            // Flags that there needs to be a new minor created and limit selection to minor versions of the subject
             currentSubject = resource.getSubject();
-            // Create new minor version of resource
-            OtmLibraryMember newLM = resource.getLibrary().getVersionChain().getNewMinorLibraryMember( resource );
-            if (newLM instanceof OtmResource)
-                newResource = resource = (OtmResource) newLM;
-            else {
-                otm.getActionManager().postWarning( "Error creating minor version of resource " + resource );
-                return null;
-            }
+
+            // // Create new minor version of resource
+            // newResource = getNewMinorVersion( resource );
+            // OtmLibraryMember newLM = resource.getLibrary().getVersionChain().getNewMinorLibraryMember( resource );
+            // if (newLM instanceof OtmResource)
+            // newResource = (OtmResource) newLM;
+            // else {
+            // otm.getActionManager().postWarning( "Error creating minor version of resource " + resource );
+            // return null;
+            // }
         }
 
         // Get the user's selected business object
         OtmBusinessObject selection = getUserTypeSelection( resource.getModelManager(), currentSubject );
 
-        if (selection != null)
+        if (selection != null) {
+            if (currentSubject != null)
+                // Create new minor version of resource
+                resource = newResource = getNewMinorVersion( resource );
             doIt( selection );
+        }
+        // else
+        // resource.getLibrary().delete( newResource );
 
         return get();
 
+    }
+
+    private OtmResource getNewMinorVersion(OtmResource r) {
+        OtmResource newR = null;
+        OtmLibraryMember newLM = resource.getLibrary().getVersionChain().getNewMinorLibraryMember( r );
+        if (newLM instanceof OtmResource)
+            newR = (OtmResource) newLM;
+        else {
+            otm.getActionManager().postWarning( "Error creating minor version of resource " + r );
+            return null;
+        }
+        return newR;
     }
 
     /**

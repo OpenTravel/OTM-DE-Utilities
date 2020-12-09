@@ -42,6 +42,7 @@ import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmActionResponse;
 import org.opentravel.model.resource.OtmParameterGroup;
 import org.opentravel.model.resource.OtmParentRef;
+import org.opentravel.schemacompiler.codegen.util.ResourceCodegenUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLActionFacet;
@@ -729,6 +730,54 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return parents;
     }
 
+    /**
+     * @return non-null list of inherited parent refs
+     */
+    public List<OtmParentRef> getInheritedParentRefs() {
+        List<OtmParentRef> parents = new ArrayList<>();
+        getInheritedChildren().forEach( ic -> {
+            if (ic instanceof OtmParentRef)
+                parents.add( (OtmParentRef) ic );
+        } );
+        return parents;
+    }
+
+
+    /**
+     * @return non-null list of inherited parameter groups
+     */
+    public List<OtmParameterGroup> getInheritedParameterGroups() {
+        List<OtmParameterGroup> parents = new ArrayList<>();
+        getInheritedChildren().forEach( ic -> {
+            if (ic instanceof OtmParameterGroup)
+                parents.add( (OtmParameterGroup) ic );
+        } );
+        return parents;
+    }
+
+    /**
+     * @return non-null list of inherited actions
+     */
+    public List<OtmAction> getInheritedActions() {
+        List<OtmAction> parents = new ArrayList<>();
+        getInheritedChildren().forEach( ic -> {
+            if (ic instanceof OtmAction)
+                parents.add( (OtmAction) ic );
+        } );
+        return parents;
+    }
+
+    /**
+     * @return non-null list of inherited action facets
+     */
+    public List<OtmActionFacet> getInheritedActionFacets() {
+        List<OtmActionFacet> parents = new ArrayList<>();
+        getInheritedChildren().forEach( ic -> {
+            if (ic instanceof OtmActionFacet)
+                parents.add( (OtmActionFacet) ic );
+        } );
+        return parents;
+    }
 
     public String getPayloadExample(OtmActionRequest request) {
         // log.debug( DexParentRefsEndpointMap.getPayloadExample( request ) );
@@ -834,13 +883,61 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      */
     @Override
     public void modelChildren() {
-        // ResourceCodegenUtils.getInheritanceHierarchy( resource );
         getTL().getActionFacets().forEach( a -> new OtmActionFacet( a, this ) );
         getTL().getActions().forEach( a -> new OtmAction( a, this ) );
         getTL().getParamGroups().forEach( a -> new OtmParameterGroup( a, this ) );
         getTL().getParentRefs().forEach( a -> new OtmParentRef( a, this ) );
 
         // log.debug( "Modeled " + children.size() + " resource children for " + getName() );
+    }
+
+    @Override
+    public void modelInheritedChildren() {
+        log.debug( "Model inherited resource children for " + getName() );
+        if (inheritedChildren == null)
+            inheritedChildren = new ArrayList<>();
+        else
+            inheritedChildren.clear(); // force re-compute
+
+        OtmResource base = getBaseType();
+        if (base == null)
+            return;
+
+        // Get all the inherited TL model elements
+        // Create a new ResourceChild for each inherited element
+        // DE gathers list from the TLExtension on the resource. It does not use codegen utils.
+        //
+        // // List can include itself
+        // List<TLResource> foo = ResourceCodegenUtils.getInheritanceHierarchy( getTL() );
+        // log.debug( "Found " + foo.size() + " inheritance sources." );
+
+        // ResourceCodegenUtils.getInheritedActions( getTL() ).forEach( a -> new OtmAction( a, this ) );
+        // ResourceCodegenUtils.getInheritedActionFacets( getTL() ).forEach( a -> new OtmActionFacet( a, this ) );
+        // ResourceCodegenUtils.getInheritedParamGroups( getTL() ).forEach( a -> new OtmParameterGroup( a, this ) );
+        // ResourceCodegenUtils.getInheritedParentRefs( getTL() ).forEach( a -> new OtmParentRef( a, this ) );
+
+        for (TLAction tlA : ResourceCodegenUtils.getInheritedActions( getTL() ))
+            if (!getTL().getActions().contains( tlA ) && OtmModelElement.get( tlA ) != null)
+                makeInherited( new OtmAction( tlA, this ), base );
+
+        for (TLActionFacet tlAf : ResourceCodegenUtils.getInheritedActionFacets( getTL() ))
+            if (!getTL().getActionFacets().contains( tlAf ) && OtmModelElement.get( tlAf ) != null)
+                makeInherited( new OtmActionFacet( tlAf, this ), base );
+
+        for (TLParamGroup tlPG : ResourceCodegenUtils.getInheritedParamGroups( getTL() ))
+            if (!getTL().getParamGroups().contains( tlPG ) && OtmModelElement.get( tlPG ) != null)
+                makeInherited( new OtmParameterGroup( tlPG, this ), base );
+
+        for (TLResourceParentRef tlPR : ResourceCodegenUtils.getInheritedParentRefs( getTL() ))
+            if (!getTL().getParentRefs().contains( tlPR ) && OtmModelElement.get( tlPR ) != null)
+                makeInherited( new OtmParentRef( tlPR, this ), base );
+    }
+
+    private void makeInherited(OtmResourceChild iKid, OtmResource base) {
+        inheritedChildren.add( iKid );
+        children.remove( iKid );
+        iKid.setInheritedFrom( base );
+        log.debug( "Made " + iKid + " inherited." );
     }
 
     /**

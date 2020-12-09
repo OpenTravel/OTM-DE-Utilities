@@ -36,6 +36,8 @@ public class NameChangeAction extends DexStringAction {
     private static final String VETO2 = "";
     private static final String VETO3 = "org.opentravel.schemacompiler.TLProperty.name.PATTERN_MISMATCH";
     private static final String[] VETOKEYS = {VETO1, VETO2, VETO3};
+    // TODO - veto if it creates conflict in a version chain
+    // Test case - create minor resource with the same name as its Business Object from the chain
 
     public static boolean isEnabled(OtmObject subject) {
         if (subject == null || !subject.isRenameable())

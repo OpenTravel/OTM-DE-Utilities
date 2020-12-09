@@ -230,8 +230,8 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
      */
     private void setCSSClass(TreeTableRow<ResourcesDAO> tc, TreeItem<ResourcesDAO> item) {
         if (item != null && item.getValue() != null && item.getValue().getValue() != null) {
-            tc.pseudoClassStateChanged( EDITABLE, item.getValue().isEditable() );
 
+            tc.pseudoClassStateChanged( EDITABLE, item.getValue().isEditable() );
             tc.pseudoClassStateChanged( INHERITED, item.getValue().isInherited() );
 
             // Turn on/off context sensitive items

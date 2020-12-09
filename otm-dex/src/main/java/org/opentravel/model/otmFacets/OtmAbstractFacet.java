@@ -332,9 +332,11 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
             inheritedChildren = new ArrayList<>();
         else
             inheritedChildren.clear(); // RE-model
+
         // get the base type that provides inherited children
         if (getOwningMember().getBaseType() == null)
             return;
+
         // This should be overrides on the sub-types.
         if (this instanceof OtmContributedFacet || this instanceof OtmListFacet)
             return;

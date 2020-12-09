@@ -22,6 +22,7 @@ import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 /**
@@ -100,6 +101,12 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
         if (action == null)
             return false;
         switch (action) {
+            case NAMECHANGE:
+                // Allow name change to objects new to the chain
+                if (subject instanceof OtmLibraryMember && subject.getLibrary() != null
+                    && subject.getLibrary().getVersionChain() != null)
+                    return subject.getLibrary().getVersionChain().isNewToChain( (OtmLibraryMember) subject );
+                return isNewProperty( subject );
             case ASSIGNSUBJECT:
                 if (subject instanceof OtmTypeUser) {
                     if (subject.getLibrary() != null && subject.getLibrary().isChainEditable())
@@ -115,6 +122,7 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
             default:
                 return isNewProperty( subject );
         }
+
         // case ADDALIAS:
         // Need to be able to rename and delete before enabling add
     }

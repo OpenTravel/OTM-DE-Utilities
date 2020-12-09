@@ -50,6 +50,7 @@ public class MemberDetailsPopupController extends DexPopupControllerBase {
 
     protected static Stage dialogStage;
 
+    // TODO - if type assigned to resource, still allow name change
     /**
      * Initialize this controller using the passed FXML loader.
      * <p>

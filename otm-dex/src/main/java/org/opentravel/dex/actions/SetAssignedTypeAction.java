@@ -186,7 +186,8 @@ public class SetAssignedTypeAction extends DexRunAction {
             getSubject().setAssignedType( newProvider );
             // if (newProvider.isNameControlled()) {
             QName newQName = XsdCodegenUtils.getGlobalElementName( (NamedEntity) newProvider.getTL() );
-            if (newQName != null)
+            // Leave resource name alone so there will not be name collision
+            if (!(getSubject() instanceof OtmResource) && newQName != null)
                 getSubject().setName( newQName.getLocalPart() );
             // }
         }
