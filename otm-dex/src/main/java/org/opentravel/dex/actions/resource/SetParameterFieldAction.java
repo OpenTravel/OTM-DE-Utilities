@@ -46,6 +46,7 @@ public class SetParameterFieldAction extends DexStringAction {
 
     public void set(String value) {
         getSubject().setFieldString( value );
+        getSubject().getParent().refresh();
     }
 
     @Override

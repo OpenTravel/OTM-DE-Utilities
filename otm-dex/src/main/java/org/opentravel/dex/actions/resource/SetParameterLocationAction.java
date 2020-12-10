@@ -46,6 +46,7 @@ public class SetParameterLocationAction extends DexStringAction {
 
     public void set(String value) {
         getSubject().setLocationString( value );
+        getSubject().getParent().refresh();
     }
 
     @Override

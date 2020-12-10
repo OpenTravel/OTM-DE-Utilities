@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
@@ -117,8 +118,12 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
             case DEPRECATIONCHANGE:
             case EXAMPLECHANGE:
             case COPYLIBRARYMEMBER:
+            case NEWLIBRARYMEMBER:
             case ADDPROPERTY:
                 return true;
+            case ADDRESOURCECHILD:
+                // You can add a resource child in a minor version
+                return subject.getLibrary().isChainEditable();
             default:
                 return isNewProperty( subject );
         }
@@ -134,9 +139,10 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
      * @return
      */
     private boolean isNewProperty(OtmObject subject) {
-        if (subject instanceof OtmProperty) {
+        if (subject instanceof OtmProperty)
             return !subject.isInherited(); // if not in latest minor, the lib will not be editable
-        }
+        if (subject instanceof OtmResourceChild)
+            return !subject.isInherited();
         return false;
     }
 }

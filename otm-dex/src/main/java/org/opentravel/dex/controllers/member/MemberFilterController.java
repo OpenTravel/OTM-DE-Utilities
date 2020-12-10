@@ -197,14 +197,14 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     @Override
     public void handleEvent(AbstractOtmEvent event) {
         if (event instanceof DexLibrarySelectionEvent)
-            librarySelectionHandler( (DexLibrarySelectionEvent) event );
+            handleLibrarySelectionEvent( (DexLibrarySelectionEvent) event );
         else if (event instanceof DexModelChangeEvent)
             handleModelChange( (DexModelChangeEvent) event );
     }
 
     private void handleModelChange(DexModelChangeEvent e) {
-        modelMgr = e.getModelManager();
-        filters.forEach( DexFilterWidget::refresh );
+        // modelMgr = e.getModelManager();
+        // filters.forEach( DexFilterWidget::refresh );
     }
 
     @Override
@@ -239,7 +239,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         return true;
     }
 
-    public void librarySelectionHandler(DexLibrarySelectionEvent event) {
+    public void handleLibrarySelectionEvent(DexLibrarySelectionEvent event) {
         filters.forEach( w -> w.selectionHandler( event ) );
     }
 

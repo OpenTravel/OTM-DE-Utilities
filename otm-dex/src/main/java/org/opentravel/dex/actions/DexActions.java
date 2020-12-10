@@ -64,6 +64,8 @@ import org.opentravel.dex.events.OtmObjectChangeEvent;
 import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.model.OtmObject;
 
+import java.lang.reflect.Constructor;
+
 /**
  * Listing of all actions that can change model and their associated event object class (if any).
  * 
@@ -103,19 +105,25 @@ public enum DexActions {
     // Assigning resource subject can cause a new resource to be created.
     ASSIGNSUBJECT(AssignResourceSubjectAction.class, DexModelChangeEvent.class),
     BASEPATHCHANGE(BasePathChangeAction.class, DexResourceModifiedEvent.class),
+    REMOVEAFBASEPAYLOAD(RemoveActionFacetBasePayloadAction.class, DexResourceChildModifiedEvent.class),
     SETABSTRACT(SetAbstractAction.class, DexResourceModifiedEvent.class),
     SETFIRSTCLASS(SetFirstClassAction.class, DexResourceModifiedEvent.class),
     SETRESOURCEEXTENSION(SetResourceExtensionAction.class, DexResourceModifiedEvent.class),
-    REMOVEAFBASEPAYLOAD(RemoveActionFacetBasePayloadAction.class, DexResourceChildModifiedEvent.class),
+    // Parameter Group
+    SETIDGROUP(SetIdGroupAction.class, DexResourceChildModifiedEvent.class),
+    SETPARAMETERGROUPFACET(SetParameterGroupFacetAction.class, DexResourceChildModifiedEvent.class),
+    // Parameters
+    SETPARAMETERLOCATION(SetParameterLocationAction.class, DexResourceChildModifiedEvent.class),
+    SETPARAMETERFIELD(SetParameterFieldAction.class, DexResourceChildModifiedEvent.class),
+    //
     SETAFREFERENCETYPE(SetAFReferenceTypeAction.class, DexResourceChildModifiedEvent.class),
     SETAFREFERENCEFACET(SetAFReferenceFacetAction.class, DexResourceChildModifiedEvent.class),
     SETCOMMONACTION(SetCommonAction.class, DexResourceChildModifiedEvent.class),
-    SETIDGROUP(SetIdGroupAction.class, DexResourceChildModifiedEvent.class),
-    SETPARAMETERLOCATION(SetParameterLocationAction.class, DexResourceChildModifiedEvent.class),
-    SETPARAMETERGROUPFACET(SetParameterGroupFacetAction.class, DexResourceChildModifiedEvent.class),
+    //
     SETPARENTPARAMETERGROUP(SetParentParameterGroupAction.class, DexResourceChildModifiedEvent.class),
     SETPARENTPATHTEMPLATE(SetParentPathTemplateAction.class, DexResourceChildModifiedEvent.class),
     SETPARENTREFPARENT(SetParentRefParentAction.class, DexResourceChildModifiedEvent.class),
+    //
     SETMIMETYPES(SetMimeTypesAction.class, DexResourceChildModifiedEvent.class),
     SETREQUESTPAYLOAD(SetRequestPayloadAction.class, DexResourceChildModifiedEvent.class),
     SETREQUESTPARAMETERGROUP(SetRequestParameterGroupAction.class, DexResourceChildModifiedEvent.class),
@@ -123,7 +131,6 @@ public enum DexActions {
     SETREQUESTPATH(SetRequestPathAction.class, DexResourceChildModifiedEvent.class),
     SETRESPONSEPAYLOAD(SetResponsePayloadAction.class, DexResourceChildModifiedEvent.class),
     SETRESTSTATUSCODES(SetRestStatusCodesAction.class, DexResourceChildModifiedEvent.class),
-    SETPARAMETERFIELD(SetParameterFieldAction.class, DexResourceChildModifiedEvent.class),
     SETAFREFERENCEFACETCOUNT(SetAFReferenceCountAction.class, DexResourceChildModifiedEvent.class),
     // Simple Type Constraints
     SETCONSTRAINT_PATTERN(SetConstraintPatternAction.class, OtmObjectModifiedEvent.class),
@@ -198,11 +205,23 @@ public enum DexActions {
             handler.setType( action );
         return handler;
     }
-    // Reflection Development notes - Constructors take many sub-types of OtmObject which are not returned.
-    // Constructor<? extends DexAction<?>> constructor;
-    // constructor = action.actionClass.getDeclaredConstructor( OtmObject.class );
-    // if (constructor != null)
-    // handler = constructor.newInstance( subject );
+
+    /**
+     * Just for debugging
+     * <p>
+     * Reflection Development notes - Constructors take many sub-types of OtmObject which are not returned.
+     * 
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     */
+    public static Constructor<?> getConstructor(DexActions action) throws NoSuchMethodException, SecurityException {
+        Constructor<? extends DexAction<?>> constructor;
+        constructor = action.actionClass.getDeclaredConstructor();
+        return constructor;
+        // if (constructor != null)
+        // handler = constructor.newInstance( subject );
+    }
+
 
     /**
      * Get the event handler associated with the action.

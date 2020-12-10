@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.resources;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmObject;
@@ -148,20 +149,15 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         if (obj == null && controller.getSelection() != null
             && controller.getSelection().getValue() instanceof OtmObject)
             obj = (OtmObject) controller.getSelection().getValue();
-        // If there is nothing selected, use any object
-        if (obj == null)
-            obj = controller.getMainController().getModelManager().getResources( false ).get( 0 );
 
-        Object result = null;
-        // Run action
-        if (obj != null)
-            result = obj.getActionManager().run( DexActions.NEWLIBRARYMEMBER, obj, OtmLibraryMemberType.RESOURCE );
-        // // Update display
-        // if (result instanceof OtmObject) {
-        // TreeItem<ResourcesDAO> item =
-        // new ResourcesDAO( (OtmObject) result ).createTreeItem( getTreeItem().getParent() );
-        // super.updateTreeItem( item );
-        // }
+        // Get an action manager.
+        DexActionManager actionManager;
+        if (obj == null)
+            actionManager = controller.getModelManager().getActionManager( true );
+        else
+            actionManager = obj.getActionManager();
+
+        actionManager.run( DexActions.NEWLIBRARYMEMBER, obj, OtmLibraryMemberType.RESOURCE );
     }
 
     private void deleteChild(ActionEvent e) {
@@ -230,16 +226,22 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
      */
     private void setCSSClass(TreeTableRow<ResourcesDAO> tc, TreeItem<ResourcesDAO> item) {
         if (item != null && item.getValue() != null && item.getValue().getValue() != null) {
+            OtmObject obj = item.getValue().getValue();
 
             tc.pseudoClassStateChanged( EDITABLE, item.getValue().isEditable() );
             tc.pseudoClassStateChanged( INHERITED, item.getValue().isInherited() );
 
             // Turn on/off context sensitive items
-            addResource.setDisable( !item.getValue().isEditable() );
-            addMenu.setDisable( !item.getValue().isEditable() );
-            deleteItem.setDisable( !item.getValue().isEditable() );
+            addResource.setDisable( !obj.getModelManager().hasEditableLibraries() );
+            addMenu.setDisable( !obj.getActionManager().isEnabled( DexActions.ADDRESOURCECHILD, obj ) );
+            deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETERESOURCECHILD, obj ) );
             arItem.setDisable( !(getValue() instanceof OtmAction) );
             paramItem.setDisable( !(getValue() instanceof OtmParameterGroup) );
+            // addResource.setDisable( !item.getValue().isEditable() );
+            // addMenu.setDisable( !item.getValue().isEditable() );
+            // deleteItem.setDisable( !item.getValue().isEditable() );
+            // arItem.setDisable( !(getValue() instanceof OtmAction) );
+            // paramItem.setDisable( !(getValue() instanceof OtmParameterGroup) );
         } else
             addMenu.setDisable( true );
     }

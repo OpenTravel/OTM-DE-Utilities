@@ -85,7 +85,12 @@ public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implemen
      */
     public OtmActionFacet(TLActionFacet tla, OtmResource parent) {
         super( tla, parent );
-
+        // Make sure it is valid when created
+        if (tla.getReferenceType() == null)
+            if (tla.getBasePayload() != null)
+                tla.setReferenceType( TLReferenceType.NONE );
+            else
+                tla.setReferenceType( TLReferenceType.OPTIONAL );
         if (parent != null && tla.getOwningResource() == null)
             parent.getTL().addActionFacet( getTL() );
     }

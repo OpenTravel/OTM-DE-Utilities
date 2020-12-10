@@ -33,7 +33,7 @@ public class SetRequestPayloadAction extends DexStringAction {
         return false;
     }
 
-    SetRequestPayloadAction() {
+    public SetRequestPayloadAction() {
         // Constructor for reflection
     }
 

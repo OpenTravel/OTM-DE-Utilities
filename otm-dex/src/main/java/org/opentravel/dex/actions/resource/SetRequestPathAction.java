@@ -48,6 +48,7 @@ public class SetRequestPathAction extends DexStringAction {
 
     public void set(String value) {
         getSubject().setPathTemplate( value, false );
+        getSubject().getParent().refresh();
     }
 
     @Override

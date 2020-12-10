@@ -245,7 +245,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
         // Let the action update the action appropriate validation status
         action.isValid();
 
-        // log.debug( "Put action on queue: " + action.getClass().getSimpleName() );
+        log.debug( "Put action on queue: " + action.getClass().getSimpleName() );
     }
 
     @Override

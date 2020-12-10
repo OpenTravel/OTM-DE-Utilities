@@ -106,15 +106,20 @@ public class TestDexActionManager {
             // Test getting action objects
             Class<?> actionClass = a.actionClass();
             assertTrue( actionClass != null );
-            DexAction<?> action = DexActions.getAction( a, resource, resource.getActionManager() );
-            // Some of these will fail because the subject is the wrong class
-            log.debug( "Got action " + action + " for action type " + a );
-
-            // Test isEnabled - must be true if there is an action
-            if (action != null)
-                assertTrue( mgr.isEnabled( a, resource ) );
-            else
-                assertFalse( mgr.isEnabled( a, resource ) );
+            DexAction<?> action;
+            try {
+                action = DexActions.getAction( a, resource, resource.getActionManager() );
+                // Some of these will fail because the subject is the wrong class
+                log.debug( "Got action " + action + " for action type " + a );
+                // Test isEnabled - must be true if there is an action
+                if (action != null)
+                    assertTrue( mgr.isEnabled( a, resource ) );
+                else
+                    assertFalse( mgr.isEnabled( a, resource ) );
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.error( "Failed to get action handler. " + e.getLocalizedMessage() );
+            }
         }
 
         // Make sure setting listener works
@@ -199,7 +204,7 @@ public class TestDexActionManager {
     @Test
     public void testDescriptionChangeAction() {
         DexFullActionManager am = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( am, null );
+        OtmModelManager mgr = new OtmModelManager( am, null, null );
         assertTrue( am.getQueueSize() == 0 );
         lib = mgr.add( new TLLibrary() );
 

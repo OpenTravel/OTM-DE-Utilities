@@ -109,6 +109,7 @@ public class OtmActionRequestFieldManager {
     public ObservableList<String> getParameterGroupCandidates() {
         ObservableList<String> groups = FXCollections.observableArrayList();
         groups.add( "NONE" );
+        ar.getOwningMember().getInheritedParameterGroups().forEach( pg -> groups.add( pg.getName() ) );
         ar.getOwningMember().getParameterGroups().forEach( pg -> groups.add( pg.getName() ) );
         return groups;
     }
@@ -130,8 +131,10 @@ public class OtmActionRequestFieldManager {
     public ObservableList<String> getPayloadCandidates() {
         ObservableList<String> actionFacets = FXCollections.observableArrayList();
         actionFacets.add( OtmActionRequest.NO_PARAMETERS );
-        if (ar.getMethod() == null || !ar.getMethod().equals( TLHttpMethod.GET ))
+        if (ar.getMethod() == null || !ar.getMethod().equals( TLHttpMethod.GET )) {
+            ar.getOwningMember().getInheritedActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
             ar.getOwningMember().getActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
+        }
         return actionFacets;
     }
 

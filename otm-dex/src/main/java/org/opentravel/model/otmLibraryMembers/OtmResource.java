@@ -893,7 +893,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     @Override
     public void modelInheritedChildren() {
-        log.debug( "Model inherited resource children for " + getName() );
+        // log.debug( "Model inherited resource children for " + getName() );
         if (inheritedChildren == null)
             inheritedChildren = new ArrayList<>();
         else
@@ -937,7 +937,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         inheritedChildren.add( iKid );
         children.remove( iKid );
         iKid.setInheritedFrom( base );
-        log.debug( "Made " + iKid + " inherited." );
+        // log.debug( "Made " + iKid + " inherited." );
     }
 
     /**

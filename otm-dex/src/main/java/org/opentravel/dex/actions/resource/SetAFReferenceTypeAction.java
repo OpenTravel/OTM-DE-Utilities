@@ -47,6 +47,7 @@ public class SetAFReferenceTypeAction extends DexStringAction {
     }
 
     public void set(String value) {
+        String r = getSubject().getReferenceType().toString();
         getSubject().setReferenceTypeString( value );
     }
 

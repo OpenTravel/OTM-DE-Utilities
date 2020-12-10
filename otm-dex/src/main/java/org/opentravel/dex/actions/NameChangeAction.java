@@ -62,6 +62,7 @@ public class NameChangeAction extends DexStringAction {
     @Override
     protected void set(String value) {
         otm.setName( value );
+        otm.getOwningMember().refresh();
     }
 
     @Override

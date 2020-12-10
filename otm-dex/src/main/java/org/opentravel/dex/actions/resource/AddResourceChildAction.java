@@ -16,10 +16,13 @@
 
 package org.opentravel.dex.actions.resource;
 
-import org.opentravel.dex.actions.DexAction;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.schemacompiler.model.TLModelElement;
 
@@ -31,12 +34,16 @@ import org.opentravel.schemacompiler.model.TLModelElement;
  *
  */
 public class AddResourceChildAction extends DexRunAction {
-    // private static Log log = LogFactory.getLog( AddResourceChildAction.class );
+    private static Log log = LogFactory.getLog( AddResourceChildAction.class );
 
     private OtmResourceChild newChild = null;
+    private OtmResource newResource = null;
 
     public static boolean isEnabled(OtmObject otm) {
-        return otm instanceof OtmResource && otm.isEditable();
+        // Made to match AddPropertyAction
+        if (otm.getLibrary() == null)
+            return false;
+        return otm instanceof OtmResource && otm.getLibrary().isChainEditable();
     }
 
     public static boolean isEnabled(OtmObject subject, OtmObject value) {
@@ -46,10 +53,6 @@ public class AddResourceChildAction extends DexRunAction {
     public AddResourceChildAction() {
         super();
     }
-
-    // public Object doIt() {
-    // return doIt(null);
-    // }
 
     /**
      * @see org.opentravel.dex.actions.DexRunAction#doIt(java.lang.Object)
@@ -63,15 +66,21 @@ public class AddResourceChildAction extends DexRunAction {
 
     public OtmResourceChild doIt(OtmResource resource, TLModelElement tlChild) {
         if (resource != null && tlChild != null) {
+
+            // Create a minor version if the subject is in an older library in editable chain
+            OtmLibrary subjectLibrary = getSubject().getLibrary();
+            if (subjectLibrary == null)
+                return null;
+            if (!subjectLibrary.isEditable() && subjectLibrary.isChainEditable()) {
+                // Get the latest library in the chain that is editable
+                OtmLibraryMember newOTM = subjectLibrary.getVersionChain().getNewMinorLibraryMember( getSubject() );
+                if (!(newOTM instanceof OtmResource))
+                    return null;
+                newResource = (OtmResource) newOTM;
+                resource = newResource;
+            }
+
             newChild = resource.add( tlChild );
-            // if (tlChild instanceof TLResourceParentRef)
-            // newChild = resource.add( (TLResourceParentRef) tlChild, null );
-            // else if (tlChild instanceof TLParamGroup)
-            // newChild = resource.add( (TLParamGroup) tlChild );
-            // else if (tlChild instanceof TLAction)
-            // newChild = resource.add( (TLAction) tlChild );
-            // else if (tlChild instanceof TLActionFacet)
-            // newChild = resource.add( (TLActionFacet) tlChild );
             resource.setExpanded( true );
             newChild.setExpanded( true );
         }
