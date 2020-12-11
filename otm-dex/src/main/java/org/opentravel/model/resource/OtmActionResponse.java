@@ -16,8 +16,6 @@
 
 package org.opentravel.model.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.DexMimeTypeHandler;
 import org.opentravel.common.DexRestStatusCodesHandler;
@@ -47,21 +45,17 @@ import javafx.scene.control.Tooltip;
  * 
  */
 public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> implements OtmResourceChild {
-    private static Log log = LogFactory.getLog( OtmActionResponse.class );
+    // private static Log log = LogFactory.getLog( OtmActionResponse.class );
 
     private static final String TOOLTIP = "Specifies the characteristics and payload for a REST Action response.";
-
     private static final String PAYLOAD_LABEL = "Payload Type";
-
     private static final String PAYLOAD_TOOLTIP =
         "Name of the action facet or core object that specifies the payload (if any) for the response.";
 
     private static final String MIME_TYPE_LABEL = "MIME Types";
-
     private static final String MIME_TYPE_TOOLTIP = "List of supported MIME types.";
 
     private static final String STATUS_CODES_LABEL = " HTTP Status Codes";
-
     private static final String STATUS_CODES_TOOLTIP = "Specifies the acceptable HTTP response codes.";
 
     /**
@@ -196,24 +190,10 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
 
     private Node getStatus1Node() {
         return new DexRestStatusCodesHandler( this ).makeMimeTypeBox1();
-
-        // SortedMap<String,Boolean> values = new TreeMap<>();
-        // int cnt = 0;
-        // for (RestStatusCodes t : RestStatusCodes.values()) {
-        // if (cnt++ < 4)
-        // values.put( t.toString(), getTL().getStatusCodes().contains( t.value() ) );
-        // }
-        // return DexEditField.makeCheckBoxRow( values, this );
     }
 
     private Node getStatus2Node() {
         return new DexRestStatusCodesHandler( this ).makeMimeTypeBox2();
-        // SortedMap<String,Boolean> values = new TreeMap<>();
-        // int cnt = 0;
-        // for (RestStatusCodes t : RestStatusCodes.values())
-        // if (cnt++ >= 4)
-        // values.put( t.toString(), getTL().getStatusCodes().contains( t.value() ) );
-        // return DexEditField.makeCheckBoxRow( values, this );
     }
 
     @Override
@@ -264,12 +244,7 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
      * @return
      */
     public OtmActionFacet setPayloadActionFacetString(String value) {
-        // OtmActionFacet af = null;
         return setPayloadActionFacet( getOwningMember().getActionFacet( value ) );
-        // for (OtmActionFacet c : getOwningMember().getActionFacets())
-        // if (c.getName().equals( value ))
-        // af = c;
-        // return setPayloadActionFacet( af );
     }
 
     /**
@@ -284,8 +259,6 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
             codes.append( " [" + code + "] " );
         } );
         return new ReadOnlyStringWrapper( codes.toString() );
-        // return new ReadOnlyStringWrapper( getTL().getStatusCodes().toString() );
     }
-
 
 }

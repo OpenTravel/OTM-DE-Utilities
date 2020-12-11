@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import javafx.beans.property.SimpleBooleanProperty;
@@ -31,7 +29,7 @@ import javafx.beans.value.ObservableValue;
  *
  */
 public abstract class DexBooleanAction extends DexActionBase implements DexAction<Boolean> {
-    private static Log log = LogFactory.getLog( DexBooleanAction.class );
+    // private static Log log = LogFactory.getLog( DexBooleanAction.class );
 
     protected ObservableValue<? extends Boolean> observable;
 

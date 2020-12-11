@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.actions.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -34,7 +32,7 @@ import org.opentravel.schemacompiler.model.TLModelElement;
  *
  */
 public class AddResourceChildAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( AddResourceChildAction.class );
+    // private static Log log = LogFactory.getLog( AddResourceChildAction.class );
 
     private OtmResourceChild newChild = null;
     private OtmResource newResource = null;
@@ -99,14 +97,6 @@ public class AddResourceChildAction extends DexRunAction {
         getSubject().delete( newChild );
         return null;
     }
-
-    // /**
-    // * @see org.opentravel.dex.actions.DexAction#getVetoFindings()
-    // */
-    // @Override
-    // public ValidationFindings getVetoFindings() {
-    // return null;
-    // }
 
     /**
      * @see org.opentravel.dex.actions.DexAction#isValid()

@@ -33,7 +33,9 @@ public class SetParameterFieldAction extends DexStringAction {
         return false;
     }
 
-    public SetParameterFieldAction() {}
+    public SetParameterFieldAction() {
+        // Constructor for reflection
+    }
 
     public String get() {
         return getSubject().getFieldRefName();

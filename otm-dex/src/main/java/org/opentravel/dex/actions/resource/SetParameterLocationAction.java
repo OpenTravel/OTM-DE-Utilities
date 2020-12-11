@@ -33,7 +33,9 @@ public class SetParameterLocationAction extends DexStringAction {
         return false;
     }
 
-    public SetParameterLocationAction() {}
+    public SetParameterLocationAction() {
+        // Constructor for reflection
+    }
 
     public String get() {
         return getSubject().getLocation() != null ? getSubject().getLocation().toString() : "";

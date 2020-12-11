@@ -16,8 +16,6 @@
 
 package org.opentravel.common;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.resource.OtmActionResponse;
@@ -36,11 +34,11 @@ import javafx.scene.layout.HBox;
  *
  */
 public class DexRestStatusCodesHandler {
-    private static Log log = LogFactory.getLog( DexRestStatusCodesHandler.class );
+    // private static Log log = LogFactory.getLog( DexRestStatusCodesHandler.class );
 
     private OtmObject object;
     private RestStatusCodesMap codes;
-    private final static int boxSize = 4;
+    private static final int BOXSIZE = 4;
 
     public DexRestStatusCodesHandler(OtmObject object) {
         this.object = object;
@@ -57,7 +55,7 @@ public class DexRestStatusCodesHandler {
         hb.setSpacing( 10 );
         int cnt = 0;
         for (Entry<RestStatusCodes,Boolean> t : codes.get().entrySet()) {
-            if (cnt++ < boxSize) {
+            if (cnt++ < BOXSIZE) {
                 CheckBox box = new CheckBox( t.getKey().toString() );
                 box.setSelected( t.getValue() );
                 box.setDisable( !object.getOwningMember().isEditable() );

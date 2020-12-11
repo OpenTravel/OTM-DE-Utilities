@@ -17,7 +17,6 @@
 package org.opentravel.dex.actions.resource;
 
 import org.opentravel.dex.actions.DexRunAction;
-import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.resource.OtmParameter;
@@ -67,10 +66,10 @@ public class AddResourceParameterAction extends DexRunAction {
             newChild.setExpanded( true );
             group.setExpanded( true );
 
-            if (OtmModelElement.get( newChild.getTL() ) != newChild)
-                throw new IllegalStateException( "Incorrect identity listener." );
-            if (!group.getChildren().contains( newChild ))
-                throw new IllegalStateException( "Parent does not own new child." );
+            // if (OtmModelElement.get( newChild.getTL() ) != newChild)
+            // throw new IllegalStateException( "Incorrect identity listener." );
+            // if (!group.getChildren().contains( newChild ))
+            // throw new IllegalStateException( "Parent does not own new child." );
 
         }
         return newChild;

@@ -286,7 +286,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     public List<OtmLibrary> getIncludes() {
         List<OtmLibrary> libs = new ArrayList<>();
         List<TLInclude> includes = tlLib.getIncludes();
-        for (TLInclude include : tlLib.getIncludes()) {
+        for (TLInclude include : includes) {
             if (include.getOwningLibrary() != null)
                 libs.add( mgr.get( include.getOwningLibrary() ) );
         }

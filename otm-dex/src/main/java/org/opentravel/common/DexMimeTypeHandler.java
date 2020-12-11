@@ -16,8 +16,6 @@
 
 package org.opentravel.common;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.actions.resource.SetMimeTypesAction;
 import org.opentravel.model.OtmObject;
@@ -38,7 +36,7 @@ import javafx.scene.layout.HBox;
  *
  */
 public class DexMimeTypeHandler {
-    private static Log log = LogFactory.getLog( DexMimeTypeHandler.class );
+    // private static Log log = LogFactory.getLog( DexMimeTypeHandler.class );
 
     private OtmObject object;
     private MimeTypeMap values;

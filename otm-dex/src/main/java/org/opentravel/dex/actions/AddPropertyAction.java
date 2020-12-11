@@ -106,11 +106,6 @@ public class AddPropertyAction extends DexRunAction {
         return (OtmPropertyOwner) otm;
     }
 
-    // @Override
-    // public ValidationFindings getVetoFindings() {
-    // return null;
-    // }
-
     @Override
     public boolean isValid() {
         // Validate the parent - adding a property could change validation status

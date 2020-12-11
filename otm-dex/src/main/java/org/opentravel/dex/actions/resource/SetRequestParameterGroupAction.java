@@ -34,7 +34,7 @@ public class SetRequestParameterGroupAction extends DexStringAction {
     }
 
     public SetRequestParameterGroupAction() {
-        // actionType = DexActions.SETREQUESTPARAMETERGROUP;
+        // Constructor for reflection
     }
 
     public String get() {

@@ -16,7 +16,6 @@
 
 package org.opentravel.dex.actions.resource;
 
-import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -86,7 +85,6 @@ public class DeleteResourceChildAction extends DexRunAction {
             OtmObject parent = ((OtmResourceChild) otm).getParent();
             if (parent instanceof OtmResource)
                 ((OtmResource) parent).add( otm.getTL() );
-            // ((OtmResource) parent).add( (OtmResourceChild) otm );
             else if (parent instanceof OtmParameterGroup && otm instanceof OtmParameter)
                 ((OtmParameterGroup) parent).add( (OtmParameter) otm );
             else if (parent instanceof OtmAction && otm instanceof OtmActionResponse)

@@ -104,10 +104,6 @@ public class OtmVersionChain {
         }
         return result;
     }
-    // private String getBasePrefix(String prefix) {
-    // // log.debug( prefix + " became " + result );
-    // return result;
-    // }
 
     /**
      * @return first editable library found, or null

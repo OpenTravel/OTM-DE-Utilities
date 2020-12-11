@@ -87,47 +87,37 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     private static final String TOOLTIP =
         "Encapsulates all aspects of a RESTful resource used to expose and manage a particular business object.";
     private static final String businessObject_LABEL = "Business Object";
-
     private static final String businessObject_TOOLTIP =
         "The name of the business object with which this resource is associated. ";
 
     private static final String abstract_LABEL = "Abstract";
-
     private static final String abstract_TOOLTIP = "Indicates whether this is an abstract resource.";
 
     private static final String firstClass_LABEL = "First Class";
-
     private static final String firstClass_TOOLTIP =
         "Indicates whether this is a first-class resource. If checked the generated SWAGGER will have paths with and without the parent resource. First class resources may exist independently of a parent resource.";
 
     private static final String basePath_LABEL = "Base Path";
-
     private static final String BASEPATH_TOOLTIP =
         "Specifies the base path for this resource. Will be used as part of basePath in OpenAPI file. ";
-
     private static final String basePath_PROMPT = "Enter / to use the business object name as the collection name.";
 
     private static final String extension_LABEL = "Extends";
-
     private static final String extension_TOOLTIP =
         "Add parentRef to make this a sub-resource. Extension sets the resource from which this resource will inherit action facets and responses.";
 
     private static final String parent_LABEL = "Parent";
-
     private static final String parent_TOOLTIP = "Reference to the parent resource for this sub-resource.";
 
     private static final String baseResponseWizard_LABEL = "Base Response Wizard";
-
     private static final String baseResponseWizard_TOOLTIP =
         "Set base response on all Action Facets used for responses.";
 
     private static final String DEFAULT_MIME_LABEL = "Default Mime Types";
-
     private static final String DEFAULT_MIME_TOOLTIP =
         "Specifies the message MIME type for new actions. Can be changed on each request and response.";
 
     private static final String DEFAULT_BASE_PAYLOAD_LABEL = "Default Base Payload";
-
     private static final String DEFAULT_BASE_PAYLOAD_TOOLTIP =
         " Default reference to a core or choice object that indicates the basic structure of the message payload.";
 
@@ -298,17 +288,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return group;
     }
 
-    // /**
-    // * Add theTL parent reference to TL and Otm resource, set its path and parent if present
-    // *
-    // * @param parent the parent resource to reference (not owner)
-    // * @return
-    // */
-    // public OtmParentRef add(TLResourceParentRef tlParentRef) {
-    // return add( tlParentRef, null );
-    // // TODO - unused
-    // }
-
     /**
      * Create a parentRef and set its path template.
      * 
@@ -342,20 +321,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         refresh( true );
         return parentRef;
     }
-
-    // /**
-    // * Add the passed group to the TL resource, child list and set group's parent.
-    // *
-    // * @param group
-    // */
-    // @Deprecated
-    // public void addParameterGroup(OtmParameterGroup group) {
-    // if (group != null) {
-    // getTL().addParamGroup( group.getTL() );
-    // add( group ); // Add to children list
-    // group.setParent( this );
-    // }
-    // }
 
     /** ************************************** */
     /**
@@ -399,21 +364,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         // TODO - get defaults from settings
     }
 
-
-    // /**
-    // * Create a TL parent reference, set its path and parent if present, add to TL and Otm resource
-    // * <p>
-    // *
-    // * @deprecated - use {@link TestParentRef#buildOtm(OtmResource, OtmResource)}
-    // *
-    // * @param parent the parent resource to reference (not owner)
-    // * @return
-    // */
-    // @Deprecated
-    // public OtmParentRef createParentRef(OtmResource parent) {
-    // return add( new TLResourceParentRef(), parent );
-    // // TODO - only used in tests
-    // }
 
     /**
      * Get the list of action facets from the TL object and return their OtmActionFacet facades.

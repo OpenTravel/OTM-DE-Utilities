@@ -34,7 +34,7 @@ public class SetRequestPathAction extends DexStringAction {
     }
 
     public SetRequestPathAction() {
-        // actionType = DexActions.SETREQUESTPATH;
+        // constructor for reflection
     }
 
     public String get() {

@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.actions.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.RestStatusCodesMap;
 import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.model.OtmObject;
@@ -27,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class SetRestStatusCodesAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( SetRestStatusCodesAction.class );
+    // private static Log log = LogFactory.getLog( SetRestStatusCodesAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
         return (subject.isEditable() && subject instanceof OtmActionResponse);
@@ -70,11 +68,6 @@ public class SetRestStatusCodesAction extends DexRunAction {
             return ((OtmActionResponse) object).getRestStatusCodes();
         return Collections.emptyList();
     }
-
-    // @Override
-    // public ValidationFindings getVetoFindings() {
-    // return null;
-    // }
 
     @Override
     public boolean isValid() {

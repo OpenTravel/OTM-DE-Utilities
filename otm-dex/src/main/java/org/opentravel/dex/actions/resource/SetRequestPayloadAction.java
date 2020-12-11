@@ -48,6 +48,7 @@ public class SetRequestPayloadAction extends DexStringAction {
 
     public void set(String value) {
         getSubject().setPayloadActionFacetString( value );
+        getSubject().getParent().refresh();
     }
 
     @Override

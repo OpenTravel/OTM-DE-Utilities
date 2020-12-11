@@ -53,9 +53,7 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
     // private static Log log = LogFactory.getLog( OtmAction.class );
 
     private static final String TOOLTIP = "Specify an action request and possible responses.";
-
     private static final String COMMON_LABEL = "Common";
-
     private static final String COMMON_TOOLTIP =
         "Indicates that the action is a common or shared action, meaning that all other actions defined for the resource will inherit the characteristics (typically responses) defined for it.";
 
@@ -63,7 +61,7 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
         GET, POST
     }
 
-    private DexParentRefsEndpointMap endpoints = null;
+    // private DexParentRefsEndpointMap endpoints = null;
 
     public OtmAction(String name, OtmResource parent) {
         super( new TLAction(), parent );
@@ -293,14 +291,6 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
     // if (getParent() instanceof OtmChildrenOwner)
     // result = !((OtmChildrenOwner) getParent()).getChildren().contains( this );
     // return result;
-    // }
-
-    // /**
-    // * @see org.opentravel.model.OtmChildrenOwner#isExpanded()
-    // */
-    // @Override
-    // public boolean isExpanded() {
-    // return false;
     // }
 
     /**

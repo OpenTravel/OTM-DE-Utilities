@@ -16,8 +16,6 @@
 
 package org.opentravel.model.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
@@ -55,8 +53,15 @@ import javafx.scene.control.Tooltip;
  * 
  */
 public class OtmParameter extends OtmResourceChildBase<TLParameter> implements OtmResourceChild {
-    private static Log log = LogFactory.getLog( OtmParameter.class );
+    // private static Log log = LogFactory.getLog( OtmParameter.class );
     private static TLParamLocation defaultLocation = TLParamLocation.PATH;
+
+    private static final String TOOLTIP =
+        "Provides a reference to a property, attribute or element that should be used as a parameter in a REST request message.Tip: If you want to return a 404 (not found) error when the parameter value does not correspond to an existing resource then use a PATH parameter.";
+    private static final String FIELD_LABEL = "Field";
+    private static final String FIELD_TOOLTIP = "Name of the field to be used as a REST request parameter. ";
+    private static final String LOCATION_LABEL = "Location";
+    private static final String LOCATION_TOOLTIP = "Specifies the location of the parameter in the REST request. ";
 
     public OtmParameter(TLParameter tla, OtmParameterGroup parent) {
         super( tla, parent );
@@ -86,14 +91,6 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
     public OtmTypeProvider getFieldAssignedType() {
         return getFieldRef() instanceof OtmTypeUser ? ((OtmTypeUser) getFieldRef()).getAssignedType() : null;
     }
-    // /**
-    // *
-    // * @return the Otm library member that owns the TLFieldRef()
-    // */
-    // public OtmLibraryMember getFieldOwner() {
-    // OtmObject field = OtmModelElement.get( (TLModelElement) getTL().getFieldRef() );
-    // return field != null ? field.getOwningMember() : null;
-    // }
 
     @Override
     public Icons getIconType() {
@@ -202,20 +199,6 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
             if (example != null)
                 value = example.getValue();
             contribution.append( "=" + value );
-
-            // PropertyNode n = null;
-            // TLMemberField<?> field = ((TLParameter) param.getTLModelObject()).getFieldRef();
-            // if (field instanceof TLModelElement)
-            // n = (PropertyNode) getNode( ((TLModelElement) field).getListeners() );
-
-            // List<TLExample> examples = ((TLParameter) param.getTLModelObject()).getExamples();
-            // if (examples != null && !examples.isEmpty())
-            // ex = examples.get( 0 ).getValue();
-            // else if (n != null)
-            // ex = n.getExample( null ); // Try to get example from the actual field being referenced.
-            // if (ex.isEmpty())
-            // ex = "xxx";
-            // contribution.append( "=" + value);
         }
         return contribution.toString();
     }
@@ -270,13 +253,6 @@ public class OtmParameter extends OtmResourceChildBase<TLParameter> implements O
     public Tooltip getTooltip() {
         return new Tooltip( TOOLTIP );
     }
-
-    private static final String TOOLTIP =
-        "Provides a reference to a property, attribute or element that should be used as a parameter in a REST request message.Tip: If you want to return a 404 (not found) error when the parameter value does not correspond to an existing resource then use a PATH parameter.";
-    private static final String FIELD_LABEL = "Field";
-    private static final String FIELD_TOOLTIP = "Name of the field to be used as a REST request parameter. ";
-    private static final String LOCATION_LABEL = "Location";
-    private static final String LOCATION_TOOLTIP = "Specifies the location of the parameter in the REST request. ";
 
     public TLParamLocation getLocation() {
         return getTL().getLocation();

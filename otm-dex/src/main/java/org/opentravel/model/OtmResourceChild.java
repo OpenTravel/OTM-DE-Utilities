@@ -30,19 +30,22 @@ import java.util.List;
 public interface OtmResourceChild extends OtmObject {
 
     /**
+     * @return list of edit fields containing FX Nodes ready for posting
+     */
+    public abstract List<DexEditField> getFields();
+
+    /**
+     * @return Inheritance root or null if not inherited.
+     */
+    public OtmResource getInheritedFrom();
+
+    /**
      * Get the Owning Resource library member.
      * 
      * @see org.opentravel.model.OtmObject#getOwningMember()
      */
     @Override
     public OtmResource getOwningMember();
-
-    /**
-     * @return list of edit fields containing FX Nodes ready for posting
-     */
-    public abstract List<DexEditField> getFields();
-
-    public OtmResource getInheritedFrom();
 
     /**
      * 
