@@ -21,12 +21,15 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.model.OtmChildrenOwner;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionFacet;
+import org.opentravel.model.resource.OtmActionResponse;
 import org.opentravel.model.resource.OtmParameterGroup;
 import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLActionFacet;
@@ -176,6 +179,12 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         if (obj != null && obj.getOwningMember() instanceof OtmResource) {
             OtmResource resource = (OtmResource) obj.getOwningMember();
             result = resource.getActionManager().run( DexActions.ADDRESOURCECHILD, resource, tlChild );
+            // // Parameter groups must have at least one parameter.
+            // Don't do it -- the params are all deleted when facet is set
+            // if (result instanceof OtmParameterGroup) {
+            // ((OtmParameterGroup) result).getActionManager().run( DexActions.ADDRESOURCEPARAMETER,
+            // (OtmObject) result );
+            // }
             refresh( result );
         }
         return result;
@@ -190,14 +199,42 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
 
     private void addResponse() {
         OtmObject obj = getValue();
-        if (obj instanceof OtmAction)
-            refresh( obj.getActionManager().run( DexActions.ADDRESOURCERESPONSE, obj ) );
+        if (obj instanceof OtmAction) {
+            OtmAction action = (OtmAction) obj;
+            OtmObject newChild = null;
+            newChild = (OtmObject) action.getActionManager().run( DexActions.ADDRESOURCERESPONSE, action );
+            refresh( newChild );
+
+            check( (OtmActionResponse) newChild, action );
+            if (!action.getTL().getResponses().contains( ((OtmActionResponse) newChild).getTL() ))
+                throw new IllegalStateException( "Parent's TL must contain response's TL." );
+        }
+
     }
 
     private void addParameter() {
         OtmObject obj = getValue();
-        if (obj instanceof OtmParameterGroup)
-            refresh( obj.getActionManager().run( DexActions.ADDRESOURCEPARAMETER, obj ) );
+        if (obj instanceof OtmParameterGroup) {
+            OtmObject newChild = (OtmObject) obj.getActionManager().run( DexActions.ADDRESOURCEPARAMETER, obj );
+            refresh( newChild );
+
+            check( (OtmResourceChild) newChild, (OtmParameterGroup) obj );
+        }
+    }
+
+    private void check(OtmResourceChild newChild, OtmChildrenOwner parent) {
+        if (!(newChild instanceof OtmResourceChild))
+            throw new IllegalStateException( "Run action returned incorrect result." );
+        if (OtmModelElement.get( newChild.getTL() ) != newChild)
+            throw new IllegalStateException( "Incorrect identity listener." );
+        if (newChild.isInherited())
+            throw new IllegalStateException( "New response must not be inherited." );
+        if (!parent.getChildren().contains( newChild ))
+            throw new IllegalStateException( "Parent's children must contain new resource child." );
+        if (newChild.getParent() != parent)
+            throw new IllegalStateException( "Parent's TL must contain response's TL." );
+        if (newChild.getOwningMember() != parent.getOwningMember())
+            throw new IllegalStateException( "Parent and response must have same owner." );
     }
 
     // Update GUI
@@ -233,10 +270,18 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
 
             // Turn on/off context sensitive items
             addResource.setDisable( !obj.getModelManager().hasEditableLibraries() );
-            addMenu.setDisable( !obj.getActionManager().isEnabled( DexActions.ADDRESOURCECHILD, obj ) );
             deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETERESOURCECHILD, obj ) );
-            arItem.setDisable( !(getValue() instanceof OtmAction) );
-            paramItem.setDisable( !(getValue() instanceof OtmParameterGroup) );
+
+            // Add menu has 7 items. 2 (response, parameter) are context sensitive
+            boolean rc = obj.getActionManager().isEnabled( DexActions.ADDRESOURCECHILD, obj );
+            boolean ar = obj.getActionManager().isEnabled( DexActions.ADDRESOURCERESPONSE, obj );
+            boolean pa = obj.getActionManager().isEnabled( DexActions.ADDRESOURCEPARAMETER, obj );
+            boolean add = rc || ar || pa;
+            addMenu.setDisable( !add );
+            arItem.setDisable( !ar );
+            paramItem.setDisable( !pa );
+
+
             // addResource.setDisable( !item.getValue().isEditable() );
             // addMenu.setDisable( !item.getValue().isEditable() );
             // deleteItem.setDisable( !item.getValue().isEditable() );

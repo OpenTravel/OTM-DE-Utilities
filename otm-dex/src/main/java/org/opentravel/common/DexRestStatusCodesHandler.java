@@ -96,7 +96,7 @@ public class DexRestStatusCodesHandler {
 
             // Set the value into the status code map
             codes.set( cb.getText(), cb.isSelected() );
-            log.debug( "Check box " + cb.getText() + " = " + cb.isSelected() );
+            // log.debug( "Check box " + cb.getText() + " = " + cb.isSelected() );
             // values.print();
 
             // Create and run the action

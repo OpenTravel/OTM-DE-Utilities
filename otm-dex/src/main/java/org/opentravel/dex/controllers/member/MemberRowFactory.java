@@ -97,7 +97,7 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
                 ClipboardContent content = new ClipboardContent();
                 content.putString( objId );
                 db.setContent( content );
-                log.debug( "onDragDetected: dragging " + objId );
+                // log.debug( "onDragDetected: dragging " + objId );
             }
             event.consume();
         } );

@@ -97,7 +97,7 @@ public class DexMimeTypeHandler {
             CheckBox cb = (CheckBox) e.getTarget();
             // boolean v = values.get().get( cb.getText() );
             values.get().put( cb.getText(), cb.isSelected() );
-            log.debug( "Check box " + cb.getText() + " = " + cb.isSelected() );
+            // log.debug( "Check box " + cb.getText() + " = " + cb.isSelected() );
             // values.print();
 
             // If the user settings was passed in, update them

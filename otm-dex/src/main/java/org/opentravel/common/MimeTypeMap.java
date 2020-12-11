@@ -78,7 +78,7 @@ public class MimeTypeMap {
     public List<TLMimeType> getTLList() {
         List<TLMimeType> types = new ArrayList<>();
         values.forEach( (key, value) -> {
-            if (value)
+            if (value && !key.isEmpty())
                 types.add( TLMimeType.valueOf( key ) );
         } );
         return types;

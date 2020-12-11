@@ -296,14 +296,14 @@ public class DexEditField {
 
     // Create the action and use it to get and set the value from the spinner
     private void spinnerListener(Spinner<Integer> spinner, OtmObject simple, DexActions actionType) {
-        log.debug( "Listener start." );
+        // log.debug( "Listener start." );
         DexRunAction action = null;
         try {
             DexAction<?> a = DexActions.getAction( actionType, simple, null, simple.getActionManager() );
             if (a instanceof DexRunAction)
                 action = (DexRunAction) a;
         } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException e) {
-            log.debug( "Error getting action." );
+            // log.debug( "Error getting action." );
             return;
         }
 
@@ -318,10 +318,10 @@ public class DexEditField {
                 // If the value changed, run the action
                 if (spinner.getValue() != currentValue) {
                     simple.getActionManager().run( action, spinner.getValue() );
-                    log.debug( "Action ran." );
+                    // log.debug( "Action ran." );
                 }
             } catch (NumberFormatException e) {
-                log.debug( "Not a valid number format: " + spinner.getEditor().getText() );
+                // log.debug( "Not a valid number format: " + spinner.getEditor().getText() );
                 simple.getActionManager().run( action, null );
             }
         }

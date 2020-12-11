@@ -231,6 +231,8 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
     }
 
     /**
+     * Get the actionId from the TLAction
+     * 
      * @see org.opentravel.model.OtmModelElement#getName()
      */
     @Override
@@ -306,10 +308,21 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
      */
     @Override
     public void modelChildren() {
-        if (getTL().getRequest() != null)
-            new OtmActionRequest( getTL().getRequest(), this );
+        if (getTL().getRequest() != null) {
+            OtmObject obj = OtmModelElement.get( getTL().getRequest() );
+            if (obj == null)
+                new OtmActionRequest( getTL().getRequest(), this );
+            else
+                children.add( obj );
+        }
         if (getTL().getResponses() != null)
-            getTL().getResponses().forEach( r -> new OtmActionResponse( r, this ) );
+            getTL().getResponses().forEach( r -> {
+                OtmObject obj = OtmModelElement.get( r );
+                if (obj == null)
+                    new OtmActionResponse( r, this );
+                else
+                    children.add( obj );
+            } );
     }
 
     /**

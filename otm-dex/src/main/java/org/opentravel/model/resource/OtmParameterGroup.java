@@ -283,7 +283,13 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
      */
     @Override
     public void modelChildren() {
-        getTL().getParameters().forEach( p -> new OtmParameter( p, this ) );
+        getTL().getParameters().forEach( p -> {
+            OtmObject obj = OtmModelElement.get( p );
+            if (obj instanceof OtmParameter)
+                children.add( obj );
+            else
+                new OtmParameter( p, this );
+        } );
     }
 
     /**
@@ -291,6 +297,7 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
      */
     @Override
     public void modelInheritedChildren() {
+        // 12/11/2020 - the group can be inherited, but the children never are.
         // TODO - model inherited children ??
     }
 
@@ -321,7 +328,7 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         } else
             getTL().setFacetRef( null );
 
-        // log.debug( "Set reference facet to " + getReferenceFacet() );
+        log.debug( "Set reference facet to " + getReferenceFacet() );
         return getReferenceFacet();
     }
 

@@ -365,8 +365,8 @@ public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler 
             throw new IllegalArgumentException( "Required column missing to render into." );
 
         // What to do if the sprite is in a different column?
-        if (this.column == column)
-            log.debug( "TODO handle removing from column." );
+        // if (this.column == column)
+        // log.debug( "TODO handle removing from column." );
         setCollapsed( collapsed );
         Point2D p = column.getNextInColumn();
         column.add( this );

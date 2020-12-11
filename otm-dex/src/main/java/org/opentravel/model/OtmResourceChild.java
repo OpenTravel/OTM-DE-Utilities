@@ -42,6 +42,8 @@ public interface OtmResourceChild extends OtmObject {
      */
     public abstract List<DexEditField> getFields();
 
+    public OtmResource getInheritedFrom();
+
     /**
      * 
      * @return resource or resourceChild parent

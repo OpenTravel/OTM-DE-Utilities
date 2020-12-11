@@ -431,9 +431,29 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     /**
-     * Get all the actions in the resource
+     * Find either local or inherited action facet.
      * 
-     * @return new list of OtmAction
+     * @param name
+     * @return found action facet or null
+     */
+    public OtmActionFacet getActionFacet(String name) {
+        if (name != null && !name.equals( OtmActionRequest.NO_PAYLOAD )) {
+            // If there is a local AF with the name, return it.
+            for (OtmActionFacet c : getActionFacets())
+                if (c.getName().equals( name ))
+                    return c;
+            // If there is an inherited AF with the name, return it.
+            for (OtmActionFacet c : getInheritedActionFacets())
+                if (c.getName().equals( name ))
+                    return c;
+        }
+        return null;
+    }
+
+    /**
+     * TESTING use only. Get all the actions requests in the resource
+     * 
+     * @return new list of OtmActionRequest
      */
     public List<OtmActionRequest> getActionRequests() {
         List<OtmActionRequest> requests = new ArrayList<>();
@@ -710,6 +730,24 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         } );
         groups.sort( null );
         return groups;
+    }
+
+    /**
+     * Get the named parameter group from either the locally owned or inherited groups.
+     * 
+     * @param name
+     * @return found parameter group or null
+     */
+    public OtmParameterGroup getParameterGroup(String name) {
+        if (name != null && !name.equals( OtmActionRequest.NO_PARAMETERS )) {
+            for (OtmParameterGroup c : getParameterGroups())
+                if (c.getName().equals( name ))
+                    return c;
+            for (OtmParameterGroup c : getInheritedParameterGroups())
+                if (c.getName().equals( name ))
+                    return c;
+        }
+        return null;
     }
 
     public DexParentRefsEndpointMap getParentRefEndpointsMap() {

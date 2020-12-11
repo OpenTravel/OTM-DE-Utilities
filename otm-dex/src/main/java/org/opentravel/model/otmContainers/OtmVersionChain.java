@@ -308,9 +308,9 @@ public class OtmVersionChain {
     public boolean canAssignLaterVersion(OtmTypeUser subject) {
         if (subject == null || subject.getAssignedType() == null)
             return false;
-        log.debug( "Can assign later version? " + !isLatestVersion( subject.getAssignedType().getOwningMember() ) );
+        // log.debug( "Can assign later version? " + !isLatestVersion( subject.getAssignedType().getOwningMember() ) );
         // Return false if there is a later version of this subject
-        if (!isLatestVersion( (OtmLibraryMember) subject ))
+        if (!isLatestVersion( subject.getOwningMember() ))
             return false;
         return !isLatestVersion( subject.getAssignedType().getOwningMember() );
     }

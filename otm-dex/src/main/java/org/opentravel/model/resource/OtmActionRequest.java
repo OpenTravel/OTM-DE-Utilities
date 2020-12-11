@@ -276,13 +276,13 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      * @return
      */
     public OtmParameterGroup setParamGroupString(String value) {
-        OtmParameterGroup pg = null;
-        if (value != null && !value.equals( NO_PARAMETERS ))
-            for (OtmParameterGroup c : getOwningMember().getParameterGroups())
-                if (c.getName().equals( value ))
-                    pg = c;
-
-        return setParamGroup( pg );
+        // OtmParameterGroup pg = null;
+        // if (value != null && !value.equals( NO_PARAMETERS ))
+        // for (OtmParameterGroup c : getOwningMember().getParameterGroups())
+        // if (c.getName().equals( value ))
+        // pg = c;
+        //
+        return setParamGroup( getOwningMember().getParameterGroup( value ) );
     }
 
     /**
@@ -315,12 +315,12 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      * @return
      */
     public OtmActionFacet setPayloadActionFacetString(String value) {
-        OtmActionFacet af = null;
-        if (value != null && !value.equals( NO_PAYLOAD ))
-            for (OtmActionFacet c : getOwningMember().getActionFacets())
-                if (c.getName().equals( value ))
-                    af = c;
-        return setPayloadType( af );
+        // OtmActionFacet af = getOwningMember().getActionFacet( value );
+        // if (value != null && !value.equals( NO_PAYLOAD ))
+        // for (OtmActionFacet c : getOwningMember().getActionFacets())
+        // if (c.getName().equals( value ))
+        // af = c;
+        return setPayloadType( getOwningMember().getActionFacet( value ) );
     }
 
     /**

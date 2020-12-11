@@ -173,6 +173,7 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
     public ObservableList<String> getPayloadCandidates() {
         ObservableList<String> actionFacets = FXCollections.observableArrayList();
         actionFacets.add( "NONE" );
+        getOwningMember().getInheritedActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
         getOwningMember().getActionFacets().forEach( af -> actionFacets.add( af.getName() ) );
         return actionFacets;
     }
@@ -263,11 +264,12 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
      * @return
      */
     public OtmActionFacet setPayloadActionFacetString(String value) {
-        OtmActionFacet af = null;
-        for (OtmActionFacet c : getOwningMember().getActionFacets())
-            if (c.getName().equals( value ))
-                af = c;
-        return setPayloadActionFacet( af );
+        // OtmActionFacet af = null;
+        return setPayloadActionFacet( getOwningMember().getActionFacet( value ) );
+        // for (OtmActionFacet c : getOwningMember().getActionFacets())
+        // if (c.getName().equals( value ))
+        // af = c;
+        // return setPayloadActionFacet( af );
     }
 
     /**

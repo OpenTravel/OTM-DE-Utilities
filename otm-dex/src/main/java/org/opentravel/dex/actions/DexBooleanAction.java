@@ -89,7 +89,7 @@ public abstract class DexBooleanAction extends DexActionBase implements DexActio
         // Set value into model and observable
         set( !get() );
 
-        log.debug( "Set to: " + get() );
+        // log.debug( "Set to: " + get() );
         ignore = false;
         return get();
     }
@@ -101,7 +101,7 @@ public abstract class DexBooleanAction extends DexActionBase implements DexActio
         if (observable instanceof SimpleBooleanProperty)
             ((SimpleBooleanProperty) observable).set( !get() );
 
-        log.debug( "Undo - restored base path to " + get() );
+        // log.debug( "Undo - restored base path to " + get() );
         ignore = false;
         return get();
     }

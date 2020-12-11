@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
@@ -237,5 +238,23 @@ public class TestActionResponse<L extends TestOtmResourceBase<OtmActionResponse>
 
     public static void print(OtmActionResponse response) {
         log.debug( "Response: " + response.getName() + " MimeTypes = " + response.getMimeTypes() );
+    }
+
+    /**
+     * @param newRS
+     */
+    public static void check(OtmActionResponse newRS) {
+        assertTrue( "Null subject.", newRS != null );
+        assertTrue( "Must have TL action response.", newRS.getTL() instanceof TLActionResponse );
+        assertTrue( "Identity listener must be correct.", OtmModelElement.get( newRS.getTL() ) == newRS );
+    }
+
+    public static void check(OtmActionResponse newRS, OtmAction parent) {
+        check( newRS );
+        assertTrue( "Parent's children must contain response.", parent.getChildren().contains( newRS ) );
+        assertTrue( "Responses parent must be the parameter.", newRS.getParent() == parent );
+        assertTrue( "Parent's TL must contain response's TL.",
+            parent.getTL().getResponses().contains( newRS.getTL() ) );
+        assertTrue( "Parent and response must have same owner.", newRS.getOwningMember() == parent.getOwningMember() );
     }
 }

@@ -102,7 +102,7 @@ public class SetAssignedTypeAction extends DexRunAction {
      * This action will get the data from the user via modal dialog
      */
     public OtmTypeProvider doIt() {
-        log.debug( "Ready to set assigned type to " + otm + " " + ignore );
+        // log.debug( "Ready to set assigned type to " + otm + " " + ignore );
         if (ignore)
             return null;
         if (user == null || !(otm instanceof OtmTypeUser))
@@ -133,7 +133,7 @@ public class SetAssignedTypeAction extends DexRunAction {
             // set filter and event
             controller.getMemberFilterController().setMinorVersionFilter( user.getAssignedType() );
             event = new OtmObjectReplacedEvent( newUser, user );
-            log.debug( "Created new user in new minor version of " + newUser.getOwningMember() );
+            // log.debug( "Created new user in new minor version of " + newUser.getOwningMember() );
         }
 
         // Set applicable filters
@@ -149,7 +149,7 @@ public class SetAssignedTypeAction extends DexRunAction {
             doIt( selected );
         } else {
             // handle cancel and bad selection when newUser created
-            log.error( "Canceled or missing selection from Type Selection Controller" );
+            // log.error( "Canceled or missing selection from Type Selection Controller" );
             if (newUser != null && newUser.getLibrary() != null)
                 newUser.getLibrary().delete( newUser.getOwningMember() );
             return null;
@@ -260,7 +260,7 @@ public class SetAssignedTypeAction extends DexRunAction {
                 user.setAssignedType( null );
             otm.setName( oldName ); // May have been changed by assignment
         }
-        log.debug( "Undo type assignment. Set to " + get() );
+        // log.debug( "Undo type assignment. Set to " + get() );
         return oldProvider;
     }
 }

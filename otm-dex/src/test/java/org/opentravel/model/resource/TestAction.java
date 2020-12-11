@@ -23,8 +23,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.actions.resource.AddResourceResponseAction;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -40,6 +43,7 @@ import org.opentravel.schemacompiler.model.TLActionResponse;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
 import org.opentravel.schemacompiler.model.TLResource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,7 +59,7 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         baseObject = TestBusiness.buildOtm( staticModelManager );
         testResource = TestResource.buildOtm( staticModelManager );
 
@@ -65,8 +69,11 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
 
     public static void check(OtmAction a) {
         assertTrue( "Must have a request.", a.getRequest() != null );
+        assertTrue( "Must have a name (actionId)", a.getName() != null );
+
         if (a.getOwningMember() != null) {
             assertTrue( a.getOwningMember().getActions().contains( a ) );
+            // TLResource must have an action with the TLAction.actionID value
             assertTrue( a.getOwningMember().getTL().getAction( a.getTL().getActionId() ) != null );
         }
     }
@@ -142,6 +149,50 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
         assertTrue( a.isCommon() );
         a.setCommon( false );
         assertFalse( a.isCommon() );
+    }
+
+    @Test
+    public void testAddingResponseWithInheritedResponses() {
+        // Goal - make sure responses added in a minor version are correct and editable
+        OtmResource target = TestResource.buildExtendedResource( true );
+        OtmResource base = target.getBaseType();
+
+        List<OtmActionResponse> responses = getAllResponses( base );
+        assertTrue( "Given: must have responses.", !responses.isEmpty() );
+
+        List<OtmAction> iActions = target.getInheritedActions();
+        assertTrue( "Given: must have inherited actions.", !iActions.isEmpty() );
+
+        // Given - a new action
+        OtmResourceChild newRC = target.add( new TLAction() );
+        newRC.setName( "TestAction" );
+        assertTrue( newRC instanceof OtmAction );
+        OtmAction newAction = (OtmAction) newRC;
+        TestAction.check( newAction );
+
+        // When - new response created
+        OtmActionResponse newRS = newAction.add( new TLActionResponse() );
+        assertTrue( newRS != null );
+        assertTrue( !newRS.isInherited() );
+        TestActionResponse.check( newRS );
+
+        // When - Action is used
+        // TODO - move to test AddResourceResponseAction
+        try {
+            AddResourceResponseAction action = (AddResourceResponseAction) DexActions
+                .getAction( DexActions.ADDRESOURCERESPONSE, newAction, newAction.getActionManager() );
+            OtmActionResponse newRS2 = (OtmActionResponse) action.doIt( null );
+            TestActionResponse.check( newRS2, newAction );
+            assertTrue( "Must not be inherited.", !newRS2.isInherited() );
+        } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static List<OtmActionResponse> getAllResponses(OtmResource r) {
+        List<OtmActionResponse> responses = new ArrayList<>();
+        r.getActions().forEach( a -> responses.addAll( a.getAllResponses() ) );
+        return responses;
     }
 
     @Test

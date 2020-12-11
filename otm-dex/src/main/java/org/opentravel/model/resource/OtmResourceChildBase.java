@@ -34,13 +34,12 @@ import org.opentravel.schemacompiler.model.TLModelElement;
  * @author Dave Hollander
  * 
  */
-public abstract class OtmResourceChildBase<C> extends OtmModelElement<TLModelElement> {
+public abstract class OtmResourceChildBase<C> extends OtmModelElement<TLModelElement> implements OtmResourceChild {
     private static Log log = LogFactory.getLog( OtmResourceChildBase.class );
 
     protected OtmResource owner = null;
     protected OtmResourceChild parent = null;
-
-    private OtmResource inheritedFrom = null;
+    protected OtmResource inheritedFrom = null;
 
     /**
      * Add this object to parent and set owner to parent.
@@ -59,8 +58,11 @@ public abstract class OtmResourceChildBase<C> extends OtmModelElement<TLModelEle
         super( tlo );
         this.parent = parent;
         this.owner = parent.getOwningMember();
-        if (parent instanceof OtmChildrenOwner)
+        if (parent instanceof OtmChildrenOwner) {
             ((OtmChildrenOwner) parent).add( this );
+            // FIXME - Not Set Yet
+            // this.inheritedFrom = parent.getInheritedFrom();
+        }
     }
 
     // @Override
@@ -118,10 +120,14 @@ public abstract class OtmResourceChildBase<C> extends OtmModelElement<TLModelEle
         return super.isValid( force );
     }
 
+    @Override
     public void setInheritedFrom(OtmResource base) {
         this.inheritedFrom = base;
+        if (this instanceof OtmChildrenOwner)
+            ((OtmChildrenOwner) this).getChildren().forEach( c -> ((OtmResourceChild) c).setInheritedFrom( base ) );
     }
 
+    @Override
     public OtmResource getInheritedFrom() {
         return inheritedFrom;
     }

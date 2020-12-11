@@ -26,6 +26,7 @@ import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.dex.actions.DexStringAction;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexChangeEvent;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
@@ -245,7 +246,7 @@ public abstract class DexActionManagerBase implements DexActionManager {
         // Let the action update the action appropriate validation status
         action.isValid();
 
-        log.debug( "Put action on queue: " + action.getClass().getSimpleName() );
+        // log.debug( "Pushed action onto queue: " + action.getClass().getSimpleName() );
     }
 
     @Override
@@ -281,6 +282,10 @@ public abstract class DexActionManagerBase implements DexActionManager {
             postWarning( warning );
             log.warn( "Action is null or not a run action. " );
         }
+
+        if (result instanceof OtmObject && OtmModelElement.get( ((OtmObject) result).getTL() ) != result)
+            throw new IllegalStateException( "Incorrect identity listener." );
+
         return result;
     }
 
