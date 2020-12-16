@@ -50,7 +50,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMember> implements DexController {
-//    private static Log log = LogFactory.getLog( UsersTreeController.class );
+    private static Log log = LogFactory.getLog( UsersTreeController.class );
 
     //
     // FIXME - does not display an object when one of the choice facets is used as a type

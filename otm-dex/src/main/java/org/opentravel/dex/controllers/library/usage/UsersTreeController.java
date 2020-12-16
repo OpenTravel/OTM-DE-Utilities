@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.library.usage;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
@@ -48,7 +50,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class UsersTreeController extends DexIncludedControllerBase<OtmLibrary> implements DexController {
-    // private static Log log = LogFactory.getLog( UsersTreeController.class );
+    private static Log log = LogFactory.getLog( UsersTreeController.class );
 
     /*
      * FXML injected
