@@ -21,6 +21,7 @@ import org.opentravel.common.DexStyleSheetHandler;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
@@ -66,6 +67,11 @@ public interface DexMainController extends DexController {
      * @return
      */
     public OtmEventSubscriptionManager getEventSubscriptionManager();
+
+    /**
+     * @return the primary member filter controller
+     */
+    public DexFilter<OtmLibraryMember> getMemberFilter();
 
     /**
      * @return the model manager used by this controller or null

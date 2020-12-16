@@ -236,7 +236,7 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
 
     public TLHttpMethod setMethodString(String value) {
         TLHttpMethod method = null;
-        if (value != null)
+        if (value != null && !value.isEmpty())
             method = TLHttpMethod.valueOf( value );
         return setMethod( method );
     }

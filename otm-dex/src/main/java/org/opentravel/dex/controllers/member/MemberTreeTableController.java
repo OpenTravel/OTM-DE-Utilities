@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.member;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.cellfactories.ValidationMemberTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexController;
@@ -61,7 +63,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class MemberTreeTableController extends DexIncludedControllerBase<OtmModelManager> implements DexController {
-    // private static Log log = LogFactory.getLog( MemberTreeTableController.class );
+    private static Log log = LogFactory.getLog( MemberTreeTableController.class );
 
     // Column labels
     // TODO - externalize strings
@@ -92,6 +94,8 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     private boolean eventsLocked = false;
     // By default, the tree is editable. Setting this to false will prevent edits.
     private boolean treeEditingEnabled = true;
+
+    private DexMainController parentController;
 
     // All event types listened to by this controller's handlers
     // Object events may change validation state of members
@@ -178,8 +182,10 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     public void configure(DexMainController parent, int viewGroupId) {
         super.configure( parent, viewGroupId );
         // log.debug("Configuring Member Tree Table.");
+        this.parentController = parent;
         eventPublisherNode = memberTreeController;
-        configure( parent.getModelManager(), treeEditingEnabled );
+        if (parent != null)
+            configure( parent.getModelManager(), treeEditingEnabled );
     }
 
     /**
@@ -233,9 +239,10 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     public void createTreeItem(OtmLibraryMember member, TreeItem<MemberAndProvidersDAO> parent) {
         // log.debug( "Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName() );
 
-        // Apply Filter
-        if (filter != null && !filter.isSelected( member ))
-            return;
+        // 12/15/2020 - filter applied by model manager
+        // // Apply Filter
+        // if (filter != null && !filter.isSelected( member ))
+        // return;
 
         // 1/3/2020 - let the CFs be shown, the users expect to see them
         // Skip over contextual facets that have been injected into an object. Their contributed facets will be modeled.
@@ -272,6 +279,10 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     }
 
     public MemberFilterController getFilter() {
+        if (filter == null && getMainController() instanceof ObjectEditorController) {
+            filter = ((ObjectEditorController) getMainController()).getMemberFilterController();
+        }
+        filter.setController( this );
         return filter;
     }
 
@@ -285,14 +296,14 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     }
 
     private void handleEvent(DexFilterChangeEvent event) {
-        if (!ignoreEvents)
-            refresh();
+        // if (!ignoreEvents)
+        // refresh();
     }
 
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
+        log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (event instanceof DexEventLockEvent)
             handleEvent( (DexEventLockEvent) event );
         else if (!ignoreEvents && !eventsLocked) {
@@ -406,12 +417,9 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             currentModelMgr = modelMgr;
             clear();
 
-            // Get the filter to use if needed
-            if (filter == null && getMainController() instanceof ObjectEditorController)
-                filter = ((ObjectEditorController) getMainController()).getMemberFilterController();
-
             // create cells for members
-            currentModelMgr.getMembers().forEach( m -> createTreeItem( m, root ) );
+            currentModelMgr.getMembers( getFilter() ).forEach( m -> createTreeItem( m, root ) );
+            // currentModelMgr.getMembers().forEach( m -> createTreeItem( m, root ) );
 
             // If no members, post an empty row to allow row factory to add menu items
             if (root.getChildren().isEmpty())
@@ -436,6 +444,11 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     @Override
     public void refresh() {
         post( currentModelMgr );
+        // if (!ignoreEvents && parentController != null) {
+        // ignoreEvents = true;
+        // parentController.refresh();
+        // }
+        // ignoreEvents = false;
     }
 
     public void select(OtmLibraryMember otm) {

@@ -40,8 +40,8 @@ public class FilterWidget implements DexFilterWidget<OtmLibraryMember> {
     protected Selector selector;
 
     public FilterWidget(MemberFilterController parent) {
-        if (parent == null)
-            throw new IllegalArgumentException( "filter widget must have access filter controller." );
+        // if (parent == null)
+        // throw new IllegalArgumentException( "filter widget must have access filter controller." );
         this.parentController = parent;
     }
 
@@ -79,7 +79,8 @@ public class FilterWidget implements DexFilterWidget<OtmLibraryMember> {
 
     public void set(boolean state) {
         active = state;
-        parentController.fireFilterChangeEvent();
+        if (parentController != null)
+            parentController.fireFilterChangeEvent();
     }
 
     public FilterWidget setSelector(Selector s) {

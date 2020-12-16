@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
+import org.opentravel.dex.controllers.DexFilter;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.events.DexChangeEvent;
@@ -748,6 +749,21 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
     /**
+     * @param filter DexFilter to use to select members. If null, all members are selected.
+     * @return all the filter selected library members in an unmodifiableCollection
+     */
+    public Collection<OtmLibraryMember> getMembers(DexFilter<OtmLibraryMember> filter) {
+        if (filter == null)
+            return getMembers();
+        List<OtmLibraryMember> selected = new ArrayList<>();
+        members.values().forEach( m -> {
+            if (filter.isSelected( m ))
+                selected.add( m );
+        } );
+        return Collections.unmodifiableCollection( selected );
+    }
+
+    /**
      * @return new list with all the library members in that library
      */
     public List<OtmLibraryMember> getMembers(OtmLibrary library) {
@@ -854,6 +870,19 @@ public class OtmModelManager implements TaskResultHandlerI {
         List<OtmResource> resources = new ArrayList<>();
         members.values().forEach( m -> {
             if (m instanceof OtmResource)
+                resources.add( (OtmResource) m );
+        } );
+        if (sort)
+            resources.sort( (one, other) -> one.getName().compareTo( other.getName() ) );
+        return resources;
+    }
+
+    public List<OtmResource> getResources(DexFilter<OtmLibraryMember> filter, boolean sort) {
+        if (filter == null)
+            return getResources( sort );
+        List<OtmResource> resources = new ArrayList<>();
+        members.values().forEach( m -> {
+            if (m instanceof OtmResource && filter.isSelected( m ))
                 resources.add( (OtmResource) m );
         } );
         if (sort)

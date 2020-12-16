@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.actions;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.constraints.SetConstraintFractionDigitsAction;
 import org.opentravel.dex.actions.constraints.SetConstraintMaxExclusiveAction;
@@ -177,6 +179,8 @@ public enum DexActions {
         return getAction( action, subject, null, actionManager );
     }
 
+    private static Log log = LogFactory.getLog( DexActions.class );
+
     public static DexAction<?> getAction(DexActions action, OtmObject subject, OtmObject target,
         DexActionManager actionManager)
         throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
@@ -197,10 +201,12 @@ public enum DexActions {
         DexAction<?> handler = null;
         if (actionManager.isEnabled( action, subject, target )) {
             handler = action.actionClass.newInstance();
-            // do not return the handler if the subject can't be set
-            if (!handler.setSubject( subject ))
-                handler = null;
+        } else {
+            log.warn( "Tried to get an action that is not enabled. " + action );
         }
+        // do not return the handler if the subject can't be set
+        if (handler != null && !handler.setSubject( subject ))
+            handler = null;
         if (handler != null)
             handler.setType( action );
         return handler;

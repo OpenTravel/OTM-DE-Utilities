@@ -19,11 +19,13 @@ package org.opentravel.dex.controllers.member;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
+import org.opentravel.dex.controllers.DexFilter;
 import org.opentravel.dex.controllers.DexFilterWidget;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.member.filters.ButtonFilterWidget;
 import org.opentravel.dex.controllers.member.filters.ButtonToggleFilterWidget;
+import org.opentravel.dex.controllers.member.filters.FilterWidget;
 import org.opentravel.dex.controllers.member.filters.LibraryFilterWidget;
 import org.opentravel.dex.controllers.member.filters.MinorVersionFilterWidget;
 import org.opentravel.dex.controllers.member.filters.NameFilterWidget;
@@ -55,7 +57,7 @@ import javafx.scene.layout.HBox;
  * @author dmh
  *
  */
-public class MemberFilterController extends DexIncludedControllerBase<Void> {
+public class MemberFilterController extends DexIncludedControllerBase<Void> implements DexFilter<OtmLibraryMember> {
     private static Log log = LogFactory.getLog( MemberFilterController.class );
 
     // All event types fired by this controller.
@@ -73,7 +75,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
     @FXML
     private ChoiceBox<String> librarySelector;
     @FXML
-    private TextField memberNameFilter;
+    TextField memberNameFilter;
     @FXML
     private ComboBox<String> memberTypeCombo;
     @FXML
@@ -94,6 +96,14 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
 
     private boolean ignoreClear = false;
     private OtmModelManager modelMgr;
+
+    private FilterWidget latestButtonFilter;
+
+    private FilterWidget editableButtonFilter;
+
+    private FilterWidget errorsButtonFilter;
+
+    private MemberTreeTableController parentController;
 
     public MemberFilterController() {
         super( subscribedEvents, publishedEvents );
@@ -152,10 +162,23 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         filters.add( new ObjectTypeFilterWidget( this, memberTypeCombo ) );
         filters.add( new NameFilterWidget( this, memberNameFilter ) );
 
-        filters.add( new ButtonFilterWidget( this, latestButton ).setSelector( OtmLibraryMember::isLatestVersion ) );
-        filters.add( new ButtonFilterWidget( this, editableButton ).setSelector( OtmLibraryMember::isEditableMinor ) );
-        filters.add( new ButtonFilterWidget( this, errorsButton ).setSelector( m -> !m.isValid( false ) ) );
-        filters.add( new MinorVersionFilterWidget( this ) );
+        latestButtonFilter =
+            new ButtonFilterWidget( this, latestButton ).setSelector( OtmLibraryMember::isLatestVersion );
+        latestButton.setOnAction( e -> setLatestFilter() );
+        // filters.add( new ButtonFilterWidget( this, latestButton ).setSelector( OtmLibraryMember::isLatestVersion ) );
+
+        editableButtonFilter =
+            new ButtonFilterWidget( this, editableButton ).setSelector( OtmLibraryMember::isEditableMinor );
+        editableButton.setOnAction( e -> setEditableFilter() );
+        // filters.add( new ButtonFilterWidget( this, editableButton ).setSelector( OtmLibraryMember::isEditableMinor )
+        // );
+
+        errorsButtonFilter = new ButtonFilterWidget( this, errorsButton ).setSelector( m -> !m.isValid( false ) );
+        errorsButton.setOnAction( e -> setErrorsFilter() );
+        // filters.add( new ButtonFilterWidget( this, errorsButton ).setSelector( m -> !m.isValid( false ) ) );
+
+        if (popupController != null)
+            filters.add( new MinorVersionFilterWidget( this ) );
 
         this.builtInFilter = new ButtonToggleFilterWidget( this, builtInsButton );
         builtInFilter.set( false );
@@ -163,19 +186,54 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         filters.add( builtInFilter );
     }
 
+    private void setErrorsFilter() {
+        if (errorsButton.isSelected())
+            filters.add( errorsButtonFilter );
+        else {
+            filters.remove( errorsButtonFilter );
+        }
+        log.debug( "Set Errors Filter." );
+        fireFilterChangeEvent();
+    }
+
+    private void setEditableFilter() {
+        if (editableButton.isSelected())
+            filters.add( editableButtonFilter );
+        else {
+            filters.remove( editableButtonFilter );
+        }
+        fireFilterChangeEvent();
+    }
+
+    private void setLatestFilter() {
+        if (latestButton.isSelected())
+            filters.add( latestButtonFilter );
+        else {
+            filters.remove( latestButtonFilter );
+        }
+        fireFilterChangeEvent();
+    }
+
     /**
      * Make and fire a filter event. Set ignore clear in case event handler tries to clear() this controller.
      */
     public void fireFilterChangeEvent() {
-        if (eventPublisherNode != null) {
+        // log.debug( "Letting others know about filter change." );
+        // For performance, let the parent or pop-up controller know
+        if (parentController != null)
+            parentController.refresh();
+        else if (popupController != null) {
+            popupController.refresh();
+        }
+        // Let everyone else know
+        Platform.runLater( () -> {
             ignoreClear = true; // Set just in case event handler does a clear
             eventPublisherNode.fireEvent( new DexFilterChangeEvent( this, memberFilter ) );
             ignoreClear = false;
-        } else if (popupController != null) {
-            popupController.refresh();
-        }
+        } );
     }
 
+    @Override
     public OtmModelManager getModelManager() {
         return modelMgr;
     }
@@ -220,6 +278,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
      * @param member to test
      * @return true if the object passes the selection filters (should be displayed)
      */
+    @Override
     public boolean isSelected(OtmLibraryMember member) {
         if (member == null || member.getLibrary() == null) {
             log.warn( "Filter passed invalid member." );
@@ -248,6 +307,10 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> {
         if (mainController != null)
             modelMgr = mainController.getModelManager();
         filters.forEach( DexFilterWidget::refresh );
+    }
+
+    public void setController(MemberTreeTableController parent) {
+        this.parentController = parent;
     }
 
     /**

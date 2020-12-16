@@ -52,6 +52,7 @@ import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
 import org.opentravel.schemacompiler.model.TLMimeType;
 import org.opentravel.schemacompiler.model.TLParamGroup;
+import org.opentravel.schemacompiler.model.TLParamLocation;
 import org.opentravel.schemacompiler.model.TLParameter;
 import org.opentravel.schemacompiler.model.TLReferenceType;
 import org.opentravel.schemacompiler.model.TLResource;
@@ -309,6 +310,20 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
     /** ****************************************************** **/
 
     /**
+     * Create not-valid OtmResource with one action facet, one action and one parameter group
+     * 
+     * @param mgr
+     * @return
+     */
+    public static OtmResource buildOtm(OtmModelManager mgr) {
+        OtmResource resource = new OtmResource( buildTL(), mgr );
+        mgr.add( resource );
+        assertNotNull( resource );
+        assertTrue( resource.getChildren().size() == 3 );
+        return resource;
+    }
+
+    /**
      * Create a "Parent", "Base" and "Target" resources in a new library and model. If deleteKids, Target has no
      * children. Target extends Base. Base has parent reference to Parent.
      * 
@@ -322,7 +337,20 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         OtmResource rParent = buildParentResource( rBase, "Parent", lib.getModelManager() );
 
         // Given - a resource that will extend the base.
-        OtmResource r = TestResource.buildOtm( lib, "Target" );
+        // OtmResource r = TestResource.buildFullOtm( "http://example.com/resource", "Target", lib.getModelManager() );
+        OtmResource r = TestResource.buildOtm( TestBusiness.buildOtm( lib, "TargetSubject" ) );
+
+        // Set base type
+        r.setBaseType( rBase );
+
+        assertTrue( "Given: ", r.getTL().getExtension() != null );
+        assertTrue( "Given: has base type.", r.getBaseType() == rBase );
+        assertTrue( "Given: base has kids.", !rBase.getChildren().isEmpty() );
+
+        log.debug( rBase.getValidationFindingsAsString() );
+        assertTrue( "Given: resource must be valid.", r.isValid() );
+        assertTrue( "Given: resource must be valid.", rBase.isValid() );
+        assertTrue( "Given: resource must be valid.", rParent.isValid() );
 
         if (deleteKids) {
             // Make sure the tested resource start with no children to eliminate any name contention.
@@ -335,12 +363,11 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
 
         }
 
-        // Set base type
-        r.setBaseType( rBase );
 
-        assertTrue( "Given: ", r.getTL().getExtension() != null );
-        assertTrue( "Given: has base type.", r.getBaseType() == rBase );
-        assertTrue( "Given: base has kids.", !rBase.getChildren().isEmpty() );
+        assertTrue( r.isEditable() );
+        check( r, true );
+        check( rBase, true );
+        check( rParent, true );
 
         return r;
     }
@@ -357,19 +384,6 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         return responses;
     }
 
-    /**
-     * Create OtmResource with one action facet, one action and one parameter group
-     * 
-     * @param mgr
-     * @return
-     */
-    public static OtmResource buildOtm(OtmModelManager mgr) {
-        OtmResource resource = new OtmResource( buildTL(), mgr );
-        mgr.add( resource );
-        assertNotNull( resource );
-        assertTrue( resource.getChildren().size() == 3 );
-        return resource;
-    }
 
     /**
      * @param lib
@@ -379,11 +393,73 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
     public static OtmResource buildOtm(OtmLibrary lib, String name) {
         OtmResource resource = buildOtm( lib.getModelManager() );
         resource.setName( name );
+        resource.setFirstClass( true );
         lib.add( resource );
         assertTrue( lib.contains( resource ) );
         return resource;
     }
 
+    /**
+     * Build a valid, first class resource with the passed business object as subject.
+     * 
+     * @param business object - must be in a library
+     * @return
+     */
+    public static OtmResource buildOtm(OtmBusinessObject bo) {
+        assertTrue( bo.getLibrary() != null );
+
+        OtmResource resource = buildOtm( bo.getModelManager() );
+        resource.setName( bo.getName() + "Resource" );
+        resource.setFirstClass( true );
+        bo.getLibrary().add( resource );
+        resource.setSubject( bo );
+
+        for (OtmParameterGroup pg : resource.getParameterGroups()) {
+            // A facet reference is required for all parameter groups.
+            pg.setReferenceFacet( bo.getIdFacet() );
+            // At least one parameter must be declared or inherited for a parameter group.
+            TLParameter tlp = new TLParameter();
+            tlp.setLocation( TLParamLocation.PATH );
+            tlp.setFieldRef( TestParamGroup.getMemberField( bo ) );
+            pg.add( tlp );
+        }
+        for (OtmAction action : resource.getActions()) {
+            // At least one response must be declared or inherited for a resource action.
+            OtmActionResponse ar = TestActionResponse.buildOtm( action );
+            ar.setMimeTypes( null );
+            action.add( ar );
+        }
+
+        assertTrue( bo.getLibrary().contains( resource ) );
+        check( resource, true );
+        return resource;
+    }
+
+    public static void check(OtmResource r) {
+        check( r, false );
+    }
+
+    public static void check(OtmResource r, boolean testValid) {
+        if (r.getLibrary() != null)
+            assertTrue( "Library must contain resource.", r.getLibrary().getMembers().contains( r ) );
+        if (r.getSubject() != null)
+            assertTrue( r.getSubject().getWhereUsed().contains( r ) );
+        assertTrue( "Must have TL resource.", r.getTL() instanceof TLResource );
+        assertTrue( "Must have model manager.", r.getModelManager() != null );
+        // Must not NPE
+        r.getChildren();
+        r.getInheritedChildren();
+        r.getActionFacets();
+        r.getActions();
+        r.getParameterGroups();
+        r.getParentRefs();
+
+        if (testValid) {
+            if (!r.isValid())
+                log.debug( r.getValidationFindingsAsString() );
+            assertTrue( r.isValid() );
+        }
+    }
 
     public static final String BASEPATH = "/SomeBasePath";
 
@@ -434,27 +510,36 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
      * @return
      */
     public static OtmResource buildParentResource(OtmResource r, String name, OtmModelManager mgr) {
+
+        // Given - a valid resource parameter
+        check( r, true );
+
         // Given a subject for the resource
-        OtmBusinessObject parentBO = TestBusiness.buildOtm( mgr, name );
+        // OtmBusinessObject parentBO = TestBusiness.buildOtm( mgr, name );
+        OtmBusinessObject parentBO = TestBusiness.buildOtm( r.getLibrary(), name );
         // String parentNameString = name + "BO";
         // parentBO.setName( parentNameString );
 
         // Create the parent resource with path
         String parentPathString = "/" + name + "Path";
-        OtmResource parentR = TestResource.buildOtm( mgr );
-        parentR.setName( name );
-        parentR.setAssignedType( parentBO );
+        OtmResource parentR = TestResource.buildOtm( parentBO );
+        // parentR.setName( name );
+        // parentR.setAssignedType( parentBO );
         parentR.setBasePath( parentPathString );
-        parentR.getTL().setFirstClass( true );
-        OtmParameterGroup idGroup = TestParamGroup.buildIdGroup( parentR );
+        // parentR.getTL().setFirstClass( true );
+        // OtmParameterGroup idGroup = TestParamGroup.buildIdGroup( parentR );
+        // Add a parameter - which one?
 
         OtmParentRef parentRef = TestParentRef.buildOtm( r, parentR );
-        parentRef.getTL().setParentParamGroup( idGroup.getTL() );
+        // parentRef.getTL().setParentParamGroup( idGroup.getTL() );
         parentRef.getTL().setPathTemplate( null ); // do NOT use the override
 
         assertTrue( parentRef.getParentResource() == parentR );
-        assertTrue( parentRef.getParameterGroup() == idGroup );
-        assertTrue( idGroup.getOwningMember() == parentR );
+        // assertTrue( parentRef.getParameterGroup() == idGroup );
+        // assertTrue( idGroup.getOwningMember() == parentR );
+
+        check( parentR, true );
+        check( r, true );
 
         return parentR;
     }

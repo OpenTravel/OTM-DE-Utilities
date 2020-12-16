@@ -27,6 +27,8 @@ import org.junit.Test;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmIdFacet;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -54,7 +56,7 @@ public class TestParamGroup extends TestOtmResourceBase<OtmParameterGroup> {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         baseObject = TestBusiness.buildOtm( staticModelManager );
         testResource = TestResource.buildOtm( staticModelManager );
 
@@ -75,7 +77,11 @@ public class TestParamGroup extends TestOtmResourceBase<OtmParameterGroup> {
 
     @Test
     public void testIdGroup() {
-        OtmResource r = TestResource.buildOtm( staticModelManager );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
+        OtmResource r = TestResource.buildOtm( bo );
+
+        // When - static builder is called
         OtmParameterGroup idPg = buildIdGroup( r );
 
         assertTrue( idPg.getOwningMember() == r );
@@ -162,9 +168,13 @@ public class TestParamGroup extends TestOtmResourceBase<OtmParameterGroup> {
     }
 
     public static OtmParameterGroup buildIdGroup(OtmResource owner) {
+        assertTrue( owner != null );
+        assertTrue( owner.getSubject() != null );
+
         TLParamGroup tlpg = new TLParamGroup();
         tlpg.setName( "idGroup" );
         tlpg.setIdGroup( true );
+        tlpg.setFacetRef( owner.getSubject().getIdFacet().getTL() );
 
         TLParameter tlp = new TLParameter();
         tlp.setLocation( TLParamLocation.PATH );
@@ -172,7 +182,10 @@ public class TestParamGroup extends TestOtmResourceBase<OtmParameterGroup> {
         tlpg.addParameter( tlp );
         owner.getTL().addParamGroup( tlpg );
 
-        return new OtmParameterGroup( tlpg, owner );
+        OtmParameterGroup pg = new OtmParameterGroup( tlpg, owner );
+        assertTrue( pg.isValid() );
+
+        return pg;
     }
 
     private static TLMemberField<TLFacet> getMemberField() {
@@ -187,7 +200,11 @@ public class TestParamGroup extends TestOtmResourceBase<OtmParameterGroup> {
         return mf;
     }
 
-    private static TLMemberField<TLFacet> getMemberField(OtmBusinessObject bo) {
+    /**
+     * @param bo
+     * @return a TLMemberField for the first child of the id facet.
+     */
+    public static TLMemberField<TLFacet> getMemberField(OtmBusinessObject bo) {
         TLMemberField<TLFacet> mf = null;
         if (bo != null) {
             OtmIdFacet id = ((OtmBusinessObject) bo).getIdFacet();

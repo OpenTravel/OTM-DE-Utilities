@@ -163,6 +163,7 @@ public class ObjectEditorController extends DexMainControllerBase {
         menuBarWithProjectController.addViewItem( graphicsTabController );
 
         // Include controllers that are not in tabs
+        this.memberFilter = memberFilterController;
         addIncludedController( memberFilterController, eventManager, viewGroupId++ );
         memberTreeTableController.setFilter( memberFilterController );
         addIncludedController( memberTreeTableController, eventManager, viewGroupId++ );

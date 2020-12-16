@@ -33,6 +33,7 @@ import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.model.ValidateModelManagerItemsTask;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryException;
@@ -69,6 +70,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     protected DexStatusController statusController;
     protected MenuBarWithProjectController menuBarController;
     protected DialogBoxContoller dialogBoxController;
+    protected DexFilter<OtmLibraryMember> memberFilter;
 
     protected OtmEventSubscriptionManager eventManager = new OtmEventSubscriptionManager();
 
@@ -152,6 +154,11 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     @Override
     public OtmEventSubscriptionManager getEventSubscriptionManager() {
         return eventManager;
+    }
+
+    @Override
+    public DexFilter<OtmLibraryMember> getMemberFilter() {
+        return memberFilter;
     }
 
     public DialogBoxContoller getDialogBoxController() {

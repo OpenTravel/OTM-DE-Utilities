@@ -156,6 +156,7 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
         // Goal - make sure responses added in a minor version are correct and editable
         OtmResource target = TestResource.buildExtendedResource( true );
         OtmResource base = target.getBaseType();
+        assertTrue( target.isEditable() );
 
         List<OtmActionResponse> responses = getAllResponses( base );
         assertTrue( "Given: must have responses.", !responses.isEmpty() );
@@ -179,8 +180,11 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
         // When - Action is used
         // TODO - move to test AddResourceResponseAction
         try {
+            assertTrue( "Action must be editable.", newAction.isEditable() );
+            assertTrue( "Action must be enabled.", AddResourceResponseAction.isEnabled( newAction ) );
             AddResourceResponseAction action = (AddResourceResponseAction) DexActions
                 .getAction( DexActions.ADDRESOURCERESPONSE, newAction, newAction.getActionManager() );
+            assertTrue( "Must get a Dex Action.", action != null );
             OtmActionResponse newRS2 = (OtmActionResponse) action.doIt( null );
             TestActionResponse.check( newRS2, newAction );
             assertTrue( "Must not be inherited.", !newRS2.isInherited() );

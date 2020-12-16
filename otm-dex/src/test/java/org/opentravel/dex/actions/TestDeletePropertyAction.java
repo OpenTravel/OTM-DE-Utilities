@@ -42,7 +42,6 @@ import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestCore;
 import org.opentravel.model.otmLibraryMembers.TestLibraryMemberBase;
 import org.opentravel.model.otmLibraryMembers.TestOtmSimple;
-import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -65,8 +64,11 @@ public class TestDeletePropertyAction {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
-        lib = staticModelManager.add( new TLLibrary() );
+        // staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
+        // lib = staticModelManager.add( new TLLibrary() );
+        lib = TestLibrary.buildOtm();
+        staticModelManager = lib.getModelManager();
+
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 
@@ -254,10 +256,16 @@ public class TestDeletePropertyAction {
     public void testEachMemberType() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
         NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
         // Givens
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null );
-        OtmLibrary lib = TestLibrary.buildOtm( mgr );
+        // DexFullActionManager fullMgr = new DexFullActionManager( null );
+        // OtmModelManager mgr = new OtmModelManager( fullMgr, null );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmModelManager mgr = lib.getModelManager();
+        DexFullActionManager fullMgr = (DexFullActionManager) mgr.getActionManager( true );
         assertTrue( "Given", lib.isEditable() );
+        assertTrue( "Given", !lib.getName().isEmpty() );
+        assertTrue( "Given ", !lib.getBaseNamespace().isEmpty() );
+        String scheme = lib.getTL().getVersionScheme();
+        assertTrue( "Given ", !lib.getTL().getVersionScheme().isEmpty() );
 
         // Given one of each library member type in the library
         int i = 1;

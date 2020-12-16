@@ -31,6 +31,7 @@ public class NameFilterWidget extends FilterWidget {
     // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
 
     private TextField nameSelector;
+    private String selector = "";
 
     public NameFilterWidget(MemberFilterController parent, TextField nameSelector) {
         super( parent );
@@ -46,7 +47,11 @@ public class NameFilterWidget extends FilterWidget {
      * Filter on any case of the text in the memberNameFilter
      */
     private void applyTextFilter() {
-        parentController.fireFilterChangeEvent();
+        selector = "";
+        if (nameSelector.getText() != null && !nameSelector.getText().isEmpty())
+            selector = nameSelector.getText().toLowerCase();
+        if (parentController != null)
+            parentController.fireFilterChangeEvent();
     }
 
     /**
@@ -69,13 +74,15 @@ public class NameFilterWidget extends FilterWidget {
      */
     @Override
     public boolean isSelected(OtmLibraryMember member) {
-        if (nameSelector == null || nameSelector.getText().isEmpty())
+        if (selector.isEmpty())
+            // if (nameSelector == null || nameSelector.getText().isEmpty())
             return true; // Not activated
 
         if (member == null || member.getName() == null)
             return true;
 
         // Filter is active, return true if it matches
-        return member.getName().toLowerCase().contains( nameSelector.getText() );
+        // return member.getName().toLowerCase().contains( nameSelector.getText() );
+        return member.getName().toLowerCase().contains( selector );
     }
 }

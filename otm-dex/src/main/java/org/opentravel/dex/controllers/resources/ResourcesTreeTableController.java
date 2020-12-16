@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.cellfactories.ValidationResourceTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexController;
+import org.opentravel.dex.controllers.DexFilter;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.member.MemberFilterController;
@@ -96,6 +97,8 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
 
     private MemberFilterController filter = null;
 
+    private DexMainController parentController;
+
     // All event types listened to by this controller's handlers
     private static final EventType[] subscribedEvents = {DexResourceChildSelectionEvent.RESOURCE_CHILD_SELECTED,
         DexResourceChangeEvent.RESOURCE_CHANGED, DexResourceChildModifiedEvent.RESOURCE_CHILD_MODIFIED,
@@ -162,8 +165,10 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
     public void configure(DexMainController parent, int viewGroupId) {
         super.configure( parent, viewGroupId );
         // log.debug("Configuring Member Tree Table.");
+        this.parentController = parent;
         eventPublisherNode = resourcesTreeTableView;
-        this.currentModelMgr = parent.getModelManager();
+        if (parent != null)
+            this.currentModelMgr = parent.getModelManager();
 
         // Set the hidden root item
         root = new TreeItem<>();
@@ -343,13 +348,17 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
             resourcesTreeTable.getSelectionModel().clearSelection();
             resourcesTreeTable.getRoot().getChildren().clear();
             // create cells for sorted list of resources
-            List<OtmResource> resources = currentModelMgr.getResources( true );
+            List<OtmResource> resources = currentModelMgr.getResources( getFilter(), true );
             resources.forEach( r -> createTreeItem( r, root ) );
 
             resourcesTreeTable.refresh();
             // log.debug( "Posted " + resources.size() + " resources." );
         }
         ignoreEvents = false;
+    }
+
+    private DexFilter<OtmLibraryMember> getFilter() {
+        return parentController.getMemberFilter();
     }
 
     @Override

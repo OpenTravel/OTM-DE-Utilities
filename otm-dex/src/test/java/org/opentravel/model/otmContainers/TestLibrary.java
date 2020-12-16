@@ -496,10 +496,10 @@ public class TestLibrary extends AbstractFxTest {
      */
     public static OtmLibrary buildOtm(OtmModelManager mgr) {
         TLLibrary tlLib = buildTL();
+        tlLib.setOwningModel( mgr.getTlModel() );
         tlLib.setName( "LibraryName" );
         tlLib.setPrefix( "pre" );
         tlLib.setNamespace( "http://example.com/ns/v0" );
-        tlLib.setOwningModel( mgr.getTlModel() );
         OtmLibrary lib = mgr.add( tlLib );
         assertTrue( "Given", lib.isEditable() );
         assertTrue( "Given - model manager must be able to find the library.", mgr.get( lib.getTL() ) == lib );
