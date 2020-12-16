@@ -303,7 +303,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
+        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (event instanceof DexEventLockEvent)
             handleEvent( (DexEventLockEvent) event );
         else if (!ignoreEvents && !eventsLocked) {

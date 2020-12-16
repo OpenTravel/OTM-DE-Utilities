@@ -45,7 +45,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibraryMember> implements DexController {
-    private static Log log = LogFactory.getLog( TypeUsersTreeController.class );
+//    private static Log log = LogFactory.getLog( TypeUsersTreeController.class );
 
     /*
      * FXML injected

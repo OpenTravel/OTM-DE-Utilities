@@ -136,7 +136,7 @@ public class DomainSprite extends DexSpriteBase {
     }
 
     public DexSprite connect(ClickableRectangle clickableRectangle, String subDomain) {
-        log.debug( "Connect " + subDomain + " to " + clickableRectangle );
+        // log.debug( "Connect " + subDomain + " to " + clickableRectangle );
         DomainSprite subDomainS = null;
         if (subDomain != null && !subDomain.isEmpty()) {
             subDomainS = manager.add( subDomain, getColumn() );
@@ -147,7 +147,7 @@ public class DomainSprite extends DexSpriteBase {
     }
 
     public DexSprite connect(DomainUsersCR usersR, DomainSprite ds) {
-        log.debug( "Connect users for " + ds );
+        // log.debug( "Connect users for " + ds );
         // UsersSprite us = null;
         // if (ds != null)
         // us = manager.addUsersSprite( ds, getColumn() );
@@ -158,7 +158,7 @@ public class DomainSprite extends DexSpriteBase {
     }
 
     public DexSprite connect(DomainProvidersCR providersR, DomainSprite ds) {
-        log.debug( "Connect providers for " + ds );
+        // log.debug( "Connect providers for " + ds );
         // ProvidersSprite ps = null;
         // if (ds != null)
         // ps = manager.addProvidersSprite( ds, getColumn() );
