@@ -164,6 +164,11 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public List<OtmTypeProvider> getUsedTypes();
 
     /**
+     * @return number of type users for this member and its descendants.
+     */
+    public int getUsedTypesCount();
+
+    /**
      * Get all members that contain type users that use this member or any of its descendants as assigned types.
      *
      * @return list of where used or empty list
@@ -189,15 +194,21 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      */
     public StringProperty libraryProperty();
 
+    // /**
+    // * Update or clear any cached values (string properties).
+    // */
+    // public void refresh();
+
     /**
      * @return fx property for library prefix
      */
     public StringProperty prefixProperty();
 
-    // /**
-    // * Update or clear any cached values (string properties).
-    // */
-    // public void refresh();
+    /**
+     * @param otherMember
+     * @return true if the namespace base is same
+     */
+    public boolean sameBaseNamespace(OtmLibraryMember otherMember);
 
     /**
      * Set the base type if supported.
@@ -220,12 +231,6 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      * @return new FX string property containing library's version number
      */
     public StringProperty versionProperty();
-
-    /**
-     * @param otherMember
-     * @return true if the namespace base is same
-     */
-    public boolean sameBaseNamespace(OtmLibraryMember otherMember);
 
 
 }

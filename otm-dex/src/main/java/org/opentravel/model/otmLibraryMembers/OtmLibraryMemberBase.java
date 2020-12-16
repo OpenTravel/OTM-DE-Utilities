@@ -82,9 +82,14 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     // A list of all descendants that are type users. Created by getDescendantsTypeUsers.
     protected List<OtmTypeUser> memberTypeUsers = new ArrayList<>();
 
+    // A list of all the types used by this member or its descendants
+    protected List<OtmTypeProvider> typesUsed = new ArrayList<>();
+
     // A list of all members that have a descendant type user that assigned to this member and its descendants.
     protected List<OtmLibraryMember> whereUsed = null;
     // private DexActionManager actionMgr = null;
+
+    protected boolean editableMinor = false;
 
     private DexActionManager noLibraryActionManager;
 
@@ -95,6 +100,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         super( tl );
         this.mgr = mgr;
         this.noLibraryActionManager = getModelManager().getActionManager( false );
+        setEditableMinor();
     }
 
     @Override
@@ -116,6 +122,12 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         }
     }
 
+    /**
+     * Add user to passed list iff user's assigned type is not already in list.
+     * 
+     * @param user
+     * @param list
+     */
     private void addProvider(OtmTypeUser user, List<OtmTypeProvider> list) {
         if (user == null)
             return;
@@ -456,14 +468,21 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     // TODO - do i need a clearProviders() ???
     @Override
     public List<OtmTypeProvider> getUsedTypes() {
-        List<OtmTypeProvider> typesUsed = new ArrayList<>();
-        // Prevent concurrent modification
-        Collection<OtmTypeUser> descendants = new ArrayList<>( getDescendantsTypeUsers() );
-        descendants.forEach( d -> addProvider( d, typesUsed ) );
+        if (typesUsed == null) {
+            typesUsed = new ArrayList<>();
+            // Prevent concurrent modification
+            Collection<OtmTypeUser> descendants = new ArrayList<>( getDescendantsTypeUsers() );
+            descendants.forEach( d -> addProvider( d, typesUsed ) );
+            typesUsed.sort(
+                (OtmObject o1, OtmObject o2) -> o1.getNameWithPrefix().compareToIgnoreCase( o2.getNameWithPrefix() ) );
+        }
         // log.debug(this + " typesUsed size = " + typesUsed.size());
-        typesUsed.sort(
-            (OtmObject o1, OtmObject o2) -> o1.getNameWithPrefix().compareToIgnoreCase( o2.getNameWithPrefix() ) );
         return typesUsed;
+    }
+
+    @Override
+    public int getUsedTypesCount() {
+        return getUsedTypes().size();
     }
 
     @Override
@@ -510,12 +529,22 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public boolean isEditableMinor() {
-        if (isEditable())
-            return true;
+        return editableMinor;
+    }
+
+    /**
+     * this is an often used expensive operation
+     */
+    private void setEditableMinor() {
+        editableMinor = false;
         if (getLibrary() == null)
-            return false;
-        OtmVersionChain chain = getLibrary().getVersionChain();
-        return (chain.isChainEditable() && chain.isLatestChain() && chain.isLatestVersion( this ));
+            return;
+        if (isEditable())
+            editableMinor = true;
+        else {
+            OtmVersionChain chain = getLibrary().getVersionChain();
+            editableMinor = chain.isChainEditable() && chain.isLatestChain() && chain.isLatestVersion( this );
+        }
     }
 
     @Override
@@ -628,7 +657,9 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     public void refresh() {
         super.refresh();
         membersProviders = null; // Created by getDescendantsTypeProviders
+        typesUsed = null;
         getWhereUsed( true );
+        setEditableMinor();
     }
 
     @Override

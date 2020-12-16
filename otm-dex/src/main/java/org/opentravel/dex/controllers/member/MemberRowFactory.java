@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.member;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmObject;
@@ -75,6 +76,7 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         // Create sub-menu for new objects
         for (OtmLibraryMemberType type : OtmLibraryMemberType.values())
             addItem( newMenu, type.label(), e -> newMember( type ) );
+
         memberMenu.getItems().add( newMenu );
         validateItem = addItem( memberMenu, "Validate", e -> validateMember() );
         setContextMenu( memberMenu );
@@ -207,23 +209,29 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
      */
     private void setCSSClass(TreeTableRow<MemberAndProvidersDAO> tc, TreeItem<MemberAndProvidersDAO> newTreeItem) {
         OtmObject obj = getSelectedObject( newTreeItem );
-        if (obj != null) {
+        if (obj != null && obj.getModelManager() != null) {
             if (obj instanceof OtmLibraryMember)
                 setStateChanged( tc, obj.isDeprecated(), ((OtmLibraryMember) obj).isEditableMinor() );
             else
                 setStateChanged( tc, obj.isDeprecated(), obj.isEditable() );
-            // log.debug( obj.getNameWithPrefix() + " deprecated ? " + obj.isDeprecated() );
 
-            addAliasItem.setDisable( !obj.getActionManager().isEnabled( DexActions.ADDALIAS, obj ) );
             newMenu.setDisable( !obj.getModelManager().hasEditableLibraries() );
-            deprecateItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DEPRECATIONCHANGE, obj ) );
-            deleteItem.setDisable( true );
-            // TODO - confirm that there will never be contributed facet then remove from code
-            if ((obj instanceof OtmLibraryMember || obj instanceof OtmContributedFacet)
-                && obj.getActionManager() != null)
-                deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETELIBRARYMEMBER, obj ) );
-            if (obj instanceof OtmAlias && obj.getActionManager() != null)
-                deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETEALIAS, obj ) );
+
+            if (obj.getActionManager() == null)
+                return;
+
+            if (!(obj.getActionManager() instanceof DexReadOnlyActionManager)) {
+                addAliasItem.setDisable( !obj.getActionManager().isEnabled( DexActions.ADDALIAS, obj ) );
+                deprecateItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DEPRECATIONCHANGE, obj ) );
+
+                deleteItem.setDisable( true );
+                if (obj instanceof OtmAlias)
+                    deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETEALIAS, obj ) );
+                else if (obj instanceof OtmLibraryMember)
+                    deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETELIBRARYMEMBER, obj ) );
+                else if (obj instanceof OtmContributedFacet)
+                    deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETELIBRARYMEMBER, obj ) );
+            }
         }
 
     }

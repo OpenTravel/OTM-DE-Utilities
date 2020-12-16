@@ -162,6 +162,8 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
         filters.add( new ObjectTypeFilterWidget( this, memberTypeCombo ) );
         filters.add( new NameFilterWidget( this, memberNameFilter ) );
 
+        // 12/15/2020 - started making filters on demand to improve performance, but it proved to be insignificant
+        // performance hit.
         latestButtonFilter =
             new ButtonFilterWidget( this, latestButton ).setSelector( OtmLibraryMember::isLatestVersion );
         latestButton.setOnAction( e -> setLatestFilter() );
@@ -226,6 +228,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
             popupController.refresh();
         }
         // Let everyone else know
+        // 12/15/2020 - running events in background solved responsiveness issue.
         Platform.runLater( () -> {
             ignoreClear = true; // Set just in case event handler does a clear
             eventPublisherNode.fireEvent( new DexFilterChangeEvent( this, memberFilter ) );
@@ -284,10 +287,6 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
             log.warn( "Filter passed invalid member." );
             return true;
         }
-        // log.debug( "Is " + member + " selected?" );
-        // if (minorVersionMatch != null
-        // && !minorVersionMatch.getLibrary().getVersionChain().isLaterVersion( minorVersionMatch, member ))
-        // return false;
 
         for (DexFilterWidget<OtmLibraryMember> w : filters)
             if (!w.isSelected( member ))

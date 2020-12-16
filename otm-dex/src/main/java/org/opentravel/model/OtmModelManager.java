@@ -90,7 +90,8 @@ public class OtmModelManager implements TaskResultHandlerI {
     private Map<AbstractLibrary,OtmLibrary> libraries = new HashMap<>();
 
     // All members - Library Members are TLLibraryMembers and contextual facets
-    private Map<LibraryMember,OtmLibraryMember> members = new HashMap<>();
+    public static final int MEMBERCOUNT = 2666; // 2000 / .075 +1;
+    private Map<LibraryMember,OtmLibraryMember> members = new HashMap<>( MEMBERCOUNT );
 
     // Domains - one entry per unique base namespace
     private List<OtmDomain> domains = new ArrayList<>();
@@ -522,6 +523,8 @@ public class OtmModelManager implements TaskResultHandlerI {
     }
 
     /**
+     * Get the matching OTM library directly from the map.
+     * 
      * @param TL Abstract Library
      * @return OtmLibrary associated with the abstract library
      */
@@ -971,15 +974,6 @@ public class OtmModelManager implements TaskResultHandlerI {
      */
     public OtmXsdSimple getIdType() {
         return getXsdMember( XSD_ID_NAME );
-        // LibraryMember tlId = null;
-        // for (OtmLibrary lib : getLibraries()) {
-        // if (lib.getTL() instanceof BuiltInLibrary && lib.getTL().getNamespace().equals( XSD_LIBRARY_NAMESPACE ))
-        // tlId = lib.getTL().getNamedMember( XSD_ID_NAME );
-        // }
-        // OtmObject id = OtmModelElement.get( (TLModelElement) tlId );
-        // // if (id == null)
-        // // log.debug( "Missing ID type to return." );
-        // return id instanceof OtmXsdSimple ? (OtmXsdSimple) id : null;
     }
 
 

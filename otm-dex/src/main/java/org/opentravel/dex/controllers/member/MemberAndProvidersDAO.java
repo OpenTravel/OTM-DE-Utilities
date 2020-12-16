@@ -26,8 +26,6 @@ import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
-import java.util.List;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
@@ -157,9 +155,10 @@ public class MemberAndProvidersDAO implements DexDAO<OtmObject> {
     public StringProperty usedTypesProperty() {
         String usedTypeCount = "";
         if (otmObject instanceof OtmLibraryMember) {
-            List<OtmTypeProvider> u = ((OtmLibraryMember) otmObject).getUsedTypes();
-            if (u != null)
-                usedTypeCount = Integer.toString( u.size() );
+            usedTypeCount = Integer.toString( ((OtmLibraryMember) otmObject).getUsedTypesCount() );
+            // List<OtmTypeProvider> u = ((OtmLibraryMember) otmObject).getUsedTypes();
+            // if (u != null)
+            // usedTypeCount = Integer.toString( u.size() );
         }
         return new ReadOnlyStringWrapper( usedTypeCount );
     }

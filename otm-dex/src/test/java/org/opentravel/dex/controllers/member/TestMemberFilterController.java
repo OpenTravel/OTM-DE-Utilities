@@ -51,30 +51,6 @@ public class TestMemberFilterController extends AbstractFxTest {
         // repoManager = repositoryManager.get();
     }
 
-    // @Test
-    // public void testSelectProjectSetup() {
-    // // testSetup();
-    // }
-
-    // public OtmModelManager testSetup() {
-    // // OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
-    // // // Givens - 2 projects and library that does not belong to project
-    // // // Load first and second projects
-    // // TestDexFileHandler.loadAndAddManagedProject( mgr );
-    // // TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
-    // //
-    // // assertTrue( mgr.getProjects().size() == 2 );
-    // // int libraryCount = mgr.getLibraries().size();
-    // // assertTrue( libraryCount > 0 );
-    // //
-    // // // Library
-    // // TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLIBRARYNOTINPROJECT, mgr );
-    // // mgr.add();
-    // // assertTrue( mgr.getLibraries().size() > libraryCount );
-    // // libraryCount = mgr.getLibraries().size();
-    // // return mgr;
-    // }
-
     @Test
     public void testNameFilterWidget() {
         // MemberFilterController controller = new MemberFilterController();
@@ -103,39 +79,6 @@ public class TestMemberFilterController extends AbstractFxTest {
             if (member.getName() != null) // Extension point does not have name and is selected
                 assertTrue( "Object must NOT be selected.", !filter.isSelected( member ) );
         }
-
-        // OtmModelManager mgr = new OtmModelManager( new DexFullActionManager( null ), repoManager, null );
-        // // Givens - projects
-        // if (!TestDexFileHandler.loadVersionProject( mgr ))
-        // return; // No editable libraries
-        // assertTrue( "Given", !mgr.getMembers().isEmpty() );
-        //
-        // DexMainController controller = (DexMainController) application.getController();
-        // int bgTasks = controller.getStatusController().getQueueSize();
-        // // assertTrue( bgTasks == 0 );
-        //
-        // for (OtmLibraryMember member : mgr.getMembers()) {
-        // log.debug( "Testing member: " + member + " \t" );
-        // TestLibraryMemberBase.checkOwnership( member );
-        // PropertiesDAO dao = new PropertiesDAO( member, null );
-        // dao.createChildrenItems( null, null );
-        // TestLibraryMemberBase.checkOwnership( member );
-        // }
-        //
-        // List<OtmLibrary> chainEditable = new ArrayList<>();
-        // for (OtmLibrary lib : mgr.getLibraries())
-        // if (lib.isMajorVersion() && lib.getVersionChain().isChainEditable())
-        // chainEditable.add( lib );
-        // assertTrue( "Given: must have chain editable lib to run test.", !chainEditable.isEmpty() );
-        // chainEditable.forEach( l -> TestVersionChain.createMinorMembers( l ) );
-        //
-        // for (OtmLibraryMember member : mgr.getMembers()) {
-        // log.debug( "Testing member: " + member + " \t" );
-        // TestLibraryMemberBase.checkOwnership( member );
-        // PropertiesDAO dao = new PropertiesDAO( member, null );
-        // dao.createChildrenItems( null, null );
-        // TestLibraryMemberBase.checkOwnership( member );
-        // }
     }
 
     /** *************************************************************** */
