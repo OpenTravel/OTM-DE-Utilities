@@ -756,6 +756,7 @@ public class OtmModelManager implements TaskResultHandlerI {
      * @return all the filter selected library members in an unmodifiableCollection
      */
     public Collection<OtmLibraryMember> getMembers(DexFilter<OtmLibraryMember> filter) {
+        log.debug( "Starting to get filtered members." );
         if (filter == null)
             return getMembers();
         List<OtmLibraryMember> selected = new ArrayList<>();
@@ -763,6 +764,7 @@ public class OtmModelManager implements TaskResultHandlerI {
             if (filter.isSelected( m ))
                 selected.add( m );
         } );
+        log.debug( "Got " + selected.size() + " filtered members." );
         return Collections.unmodifiableCollection( selected );
     }
 
@@ -799,7 +801,6 @@ public class OtmModelManager implements TaskResultHandlerI {
 
     public void handleEvent(DexChangeEvent e) {
         // WARNING - This runs often so keep this light weight or put into a background task.
-        //
         // Something has happened, let the libraries know
         getLibraries().forEach( OtmLibrary::refreshMaps );
     }

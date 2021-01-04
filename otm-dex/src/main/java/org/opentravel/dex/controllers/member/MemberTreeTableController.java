@@ -312,12 +312,13 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     private void handleEvent(DexFilterChangeEvent event) {
         // if (!ignoreEvents)
         // refresh();
+        // refresh() is Called directly from filter controller
     }
 
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
+        log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (event instanceof DexEventLockEvent)
             handleEvent( (DexEventLockEvent) event );
         else if (!ignoreEvents && !eventsLocked) {
@@ -427,7 +428,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     @Override
     public void post(OtmModelManager modelMgr) {
         ignoreEvents = true;
-        // log.debug( "Posting member tree." );
+        log.debug( "Posting member tree." );
         if (modelMgr != null && memberTree != null) {
             currentModelMgr = modelMgr;
             clear();
@@ -446,7 +447,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             }
         }
         ignoreEvents = false;
-        // log.debug( "Posted member tree." );
+        log.debug( "Posted member tree." );
     }
 
     /**

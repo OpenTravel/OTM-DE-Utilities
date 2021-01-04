@@ -191,7 +191,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibrary> i
         Map<OtmLibrary,List<OtmLibraryMember>> map = library.getUsersMap();
         LibraryAndMembersDAO.createChildrenItemsNoLib( map, getRoot() );
 
-        usersTree.requestFocus();
+        // usersTree.requestFocus();
         // log.debug( "Posted library users." );
     }
 

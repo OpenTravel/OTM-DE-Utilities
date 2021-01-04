@@ -220,7 +220,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
      * Make and fire a filter event. Set ignore clear in case event handler tries to clear() this controller.
      */
     public void fireFilterChangeEvent() {
-        // log.debug( "Letting others know about filter change." );
+        log.debug( "Letting others know about filter change." );
         // For performance, let the parent or pop-up controller know
         if (parentController != null)
             parentController.refresh();

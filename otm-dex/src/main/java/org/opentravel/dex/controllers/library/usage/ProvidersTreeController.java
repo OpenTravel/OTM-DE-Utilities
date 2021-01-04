@@ -201,7 +201,7 @@ public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrar
         // log.debug( "Posting type providers to: " + member );
 
         LibraryAndMembersDAO.createChildrenItems( library.getProvidersMap(), getRoot() );
-        providersTree.requestFocus();
+        // providersTree.requestFocus();
         // log.debug( "Posted providers of types to " + library.getName() );
     }
 

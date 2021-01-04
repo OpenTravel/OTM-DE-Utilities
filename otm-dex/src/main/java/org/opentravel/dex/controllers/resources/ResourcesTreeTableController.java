@@ -275,25 +275,25 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
+        log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
-            if (event instanceof DexFilterChangeEvent)
+            else if (event instanceof DexFilterChangeEvent)
                 handleEvent( (DexFilterChangeEvent) event );
-            if (event instanceof DexModelChangeEvent)
+            else if (event instanceof DexModelChangeEvent)
                 post( ((DexModelChangeEvent) event).getModelManager() );
             //
             else if (event instanceof DexResourceChildModifiedEvent)
-                refresh();
+                refresh( true );
             else if (event instanceof DexResourceModifiedEvent)
-                refresh();
+                refresh( true );
             else if (event instanceof DexResourceChangeEvent)
-                refresh();
+                refresh( true );
             else if (event instanceof OtmObjectModifiedEvent)
                 refresh();
             else if (event instanceof OtmObjectChangeEvent)
-                refresh();
+                refresh( true );
             else
                 refresh();
 
@@ -341,6 +341,7 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
      */
     @Override
     public void post(OtmModelManager modelMgr) {
+        log.debug( "Posting resources." );
         ignoreEvents = true;
         if (modelMgr != null)
             currentModelMgr = modelMgr;
@@ -352,7 +353,7 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
             resources.forEach( r -> createTreeItem( r, root ) );
 
             resourcesTreeTable.refresh();
-            // log.debug( "Posted " + resources.size() + " resources." );
+            log.debug( "Posted " + resources.size() + " resources." );
         }
         ignoreEvents = false;
     }
@@ -363,8 +364,16 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
 
     @Override
     public void refresh() {
+        refresh( false );
+        // // Validate all resources
+        // currentModelMgr.getResources( false ).forEach( r -> r.isValid( true ) );
+        // post( currentModelMgr );
+    }
+
+    public void refresh(boolean validate) {
         // Validate all resources
-        currentModelMgr.getResources( false ).forEach( r -> r.isValid( true ) );
+        if (validate)
+            currentModelMgr.getResources( false ).forEach( r -> r.isValid( true ) );
         post( currentModelMgr );
     }
 

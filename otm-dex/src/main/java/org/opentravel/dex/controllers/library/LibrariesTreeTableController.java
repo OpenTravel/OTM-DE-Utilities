@@ -26,6 +26,7 @@ import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
@@ -254,7 +255,9 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         // log.debug( "library selection listener, library = " + lib );
 
         ignore = true;
-        fireEvent( new DexLibrarySelectionEvent( lib ) );
+        DexLibrarySelectionEvent event = new DexLibrarySelectionEvent( lib );
+        // fireEvent( event );
+        Platform.runLater( () -> fireEvent( event ) );
         ignore = false;
 
         // lag problem - sometimes the tree does not move to the selection.
