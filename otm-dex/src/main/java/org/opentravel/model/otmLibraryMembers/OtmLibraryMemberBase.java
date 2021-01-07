@@ -312,13 +312,15 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public synchronized Collection<OtmChildrenOwner> getDescendantsChildrenOwners() {
-        List<OtmObject> children = new ArrayList<>( getChildren() );
         List<OtmChildrenOwner> owners = new ArrayList<>();
-        for (OtmObject child : children) {
-            if (child instanceof OtmChildrenOwner) {
-                owners.add( (OtmChildrenOwner) child );
-                // Recurse
-                owners.addAll( ((OtmChildrenOwner) child).getDescendantsChildrenOwners() );
+        List<OtmObject> children = Collections.synchronizedList( new ArrayList<>( getChildren() ) );
+        synchronized (children) {
+            for (OtmObject child : children) {
+                if (child instanceof OtmChildrenOwner) {
+                    owners.add( (OtmChildrenOwner) child );
+                    // Recurse
+                    owners.addAll( ((OtmChildrenOwner) child).getDescendantsChildrenOwners() );
+                }
             }
         }
         return owners;
@@ -326,13 +328,15 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public synchronized Collection<OtmPropertyOwner> getDescendantsPropertyOwners() {
-        List<OtmObject> children = new ArrayList<>( getChildren() );
         List<OtmPropertyOwner> owners = new ArrayList<>();
-        for (OtmObject child : children) {
-            if (child instanceof OtmPropertyOwner) {
-                owners.add( (OtmPropertyOwner) child );
-                // Recurse
-                owners.addAll( ((OtmChildrenOwner) child).getDescendantsPropertyOwners() );
+        List<OtmObject> children = Collections.synchronizedList( new ArrayList<>( getChildren() ) );
+        synchronized (children) {
+            for (OtmObject child : children) {
+                if (child instanceof OtmPropertyOwner) {
+                    owners.add( (OtmPropertyOwner) child );
+                    // Recurse
+                    owners.addAll( ((OtmChildrenOwner) child).getDescendantsPropertyOwners() );
+                }
             }
         }
         return owners;
@@ -357,10 +361,12 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     public synchronized Collection<OtmTypeUser> getDescendantsTypeUsers() {
         // TODO - should this be cached?
         memberTypeUsers.clear();
-        List<OtmObject> children = new ArrayList<>( getChildren() );
-        for (OtmObject child : children) {
-            if (child instanceof OtmTypeUser)
-                memberTypeUsers.add( (OtmTypeUser) child );
+        List<OtmObject> children = Collections.synchronizedList( new ArrayList<>( getChildren() ) );
+        synchronized (children) {
+            for (OtmObject child : children) {
+                if (child instanceof OtmTypeUser)
+                    memberTypeUsers.add( (OtmTypeUser) child );
+            }
         }
         // Recurse
         for (OtmChildrenOwner co : getDescendantsChildrenOwners()) {
@@ -466,18 +472,20 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return (LibraryMember) getTL();
     }
 
-    // TODO - do i need a clearProviders() ???
     @Override
     public List<OtmTypeProvider> getUsedTypes() {
         if (typesUsed == null) {
             typesUsed = new ArrayList<>();
             // Prevent concurrent modification
-            Collection<OtmTypeUser> descendants = new ArrayList<>( getDescendantsTypeUsers() );
-            descendants.forEach( d -> addProvider( d, typesUsed ) );
+            Collection<OtmTypeUser> descendants =
+                Collections.synchronizedList( new ArrayList<>( getDescendantsTypeUsers() ) );
+            synchronized (descendants) {
+                descendants.forEach( d -> addProvider( d, typesUsed ) );
+            }
             typesUsed.sort(
                 (OtmObject o1, OtmObject o2) -> o1.getNameWithPrefix().compareToIgnoreCase( o2.getNameWithPrefix() ) );
         }
-        log.debug( this + " typesUsed size = " + typesUsed.size() );
+        // log.debug( this + " typesUsed size = " + typesUsed.size() );
         return typesUsed;
     }
 
@@ -553,12 +561,19 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         if (getLibrary() == null)
             return false; // Can't be valid if not in a library.
         if (force) {
-            synchronized (this) {
-                getChildren().forEach( c -> {
+            // prevent concurrent access - https://www.geeksforgeeks.org/synchronization-arraylist-java/
+            List<OtmObject> kids = Collections.synchronizedList( new ArrayList<>( getChildren() ) );
+            synchronized (kids) {
+                kids.forEach( c -> {
                     if (c != this)
                         c.isValid( force );
                 } );
-
+                // synchronized (this) {
+                // List<OtmObject> kids = getChildren();
+                // kids.forEach( c -> {
+                // if (c != this)
+                // c.isValid( force );
+                // } );
             }
         }
         return super.isValid( force );

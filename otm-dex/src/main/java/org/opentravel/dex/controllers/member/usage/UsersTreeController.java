@@ -31,7 +31,6 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javafx.application.Platform;
@@ -192,8 +191,8 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
         //
         // TODO - as parameter reference in a resource
 
-        List<OtmLibraryMember> users = member.getWhereUsed();
-        log.debug( "Posting " + users.size() + " users of " + member );
+        // List<OtmLibraryMember> users = member.getWhereUsed();
+        // log.debug( "Posting " + users.size() + " users of " + member );
 
         Map<String,UsersManager> namespaceMap = new HashMap<>();
 
@@ -311,7 +310,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
     public void post(OtmLibraryMember member) {
         if (member == null || member == postedData)
             return;
-        log.debug( "Posting users of type " + member );
+        // log.debug( "Posting users of type " + member );
 
         super.post( member );
         member.refresh(); // Recompute users and where used

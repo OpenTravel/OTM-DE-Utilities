@@ -760,7 +760,7 @@ public class OtmModelManager implements TaskResultHandlerI {
      * @return all the filter selected library members in an unmodifiableCollection
      */
     public Collection<OtmLibraryMember> getMembers(DexFilter<OtmLibraryMember> filter) {
-        log.debug( "Starting to get filtered members." );
+        // log.debug( "Starting to get filtered members." );
         if (filter == null)
             return getMembers();
         List<OtmLibraryMember> selected = new ArrayList<>();

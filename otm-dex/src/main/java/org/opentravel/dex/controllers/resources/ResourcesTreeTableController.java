@@ -275,7 +275,7 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
+        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
@@ -341,7 +341,7 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
      */
     @Override
     public void post(OtmModelManager modelMgr) {
-        log.debug( "Posting resources." );
+        // log.debug( "Posting resources." );
         ignoreEvents = true;
         if (modelMgr != null)
             currentModelMgr = modelMgr;
@@ -353,7 +353,7 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
             resources.forEach( r -> createTreeItem( r, root ) );
 
             resourcesTreeTable.refresh();
-            log.debug( "Posted " + resources.size() + " resources." );
+            // log.debug( "Posted " + resources.size() + " resources." );
         }
         ignoreEvents = false;
     }
