@@ -145,8 +145,13 @@ public abstract class DexTaskBase<T> extends Task<String> implements DexTask {
                 doIT();
             } catch (Exception e) {
                 errorException = e;
-                errorBuilder = new StringBuilder( getClass().getSimpleName() + " Error: \n" );
-                errorBuilder.append( e.getLocalizedMessage() );
+
+                errorBuilder = new StringBuilder( "Error in " + getClass().getSimpleName() + "\n" );
+                errorBuilder = errorBuilder.append( " Type    " + e.getClass().getSimpleName() + "\n" );
+                errorBuilder = errorBuilder.append( " Cause   " + e.getCause() + "\n" );
+                errorBuilder = errorBuilder.append( " Message " + e.getLocalizedMessage() + "\n" );
+                errorBuilder = errorBuilder.append( " Message " + e.getMessage() + "\n" );
+
                 result = errorBuilder.toString(); // Signal business error via result
                 if (result == null)
                     result = "Unknown exception performing Dex Task";

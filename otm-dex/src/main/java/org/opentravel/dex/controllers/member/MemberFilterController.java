@@ -229,11 +229,12 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
         }
         // Let everyone else know
         // 12/15/2020 - running events in background solved responsiveness issue.
-        Platform.runLater( () -> {
-            ignoreClear = true; // Set just in case event handler does a clear
-            eventPublisherNode.fireEvent( new DexFilterChangeEvent( this, memberFilter ) );
-            ignoreClear = false;
-        } );
+        if (eventPublisherNode != null)
+            Platform.runLater( () -> {
+                ignoreClear = true; // Set just in case event handler does a clear
+                eventPublisherNode.fireEvent( new DexFilterChangeEvent( this, memberFilter ) );
+                ignoreClear = false;
+            } );
     }
 
     @Override

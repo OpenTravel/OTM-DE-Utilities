@@ -176,6 +176,17 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public List<OtmLibraryMember> getWhereUsed();
 
     /**
+     * Get the lazy evaluated where used list.
+     * <p>
+     * When <i>forced</i> by type resolver or list is null, it will get users of the library member and all its type
+     * provider descendants.
+     * 
+     * @param force will clear list and recompute users to add to existing list
+     * @return
+     */
+    List<OtmLibraryMember> getWhereUsed(boolean force);
+
+    /**
      * Is this member editable as a minor version See {@link #isEditable()}
      * 
      * @return true if member is in editable library or is latest in an editable chain
@@ -189,15 +200,15 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      */
     boolean isLatestVersion();
 
-    /**
-     * @return a new FX property for library name
-     */
-    public StringProperty libraryProperty();
-
     // /**
     // * Update or clear any cached values (string properties).
     // */
     // public void refresh();
+
+    /**
+     * @return a new FX property for library name
+     */
+    public StringProperty libraryProperty();
 
     /**
      * @return fx property for library prefix

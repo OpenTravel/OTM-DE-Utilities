@@ -296,7 +296,10 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         if (filter == null && getMainController() instanceof ObjectEditorController) {
             filter = ((ObjectEditorController) getMainController()).getMemberFilterController();
         }
-        filter.setController( this );
+        if (filter != null)
+            filter.setController( this );
+        // else
+        // log.error( "Missing member filter controller." );
         return filter;
     }
 

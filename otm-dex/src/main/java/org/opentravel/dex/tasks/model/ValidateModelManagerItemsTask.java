@@ -43,7 +43,7 @@ public class ValidateModelManagerItemsTask extends DexTaskBase<OtmModelManager> 
     /**
      * Create a lock repository item task.
      * 
-     * @param taskData - an repository item to lock
+     * @param taskData - the model manager
      * @param handler - results handler
      * @param status - a status controller that can post message and progress indicator
      */
@@ -61,6 +61,7 @@ public class ValidateModelManagerItemsTask extends DexTaskBase<OtmModelManager> 
     public void doIT() throws RepositoryException {
         // Work from private copy since other tasks could change the collection
         Collection<OtmLibraryMember> members = new ArrayList<>( taskData.getMembers() );
+        log.debug( "Starting to validate " + members.size() + " model members." );
         members.forEach( m -> m.isValid( true ) );
     }
 

@@ -27,6 +27,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmModelMapsManager;
 import org.opentravel.model.OtmProjectManager;
 import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmServiceObject;
@@ -379,6 +380,22 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
 
     public OtmModelManager getModelManager() {
         return mgr;
+    }
+
+    /**
+     * Get all type users in this library.
+     * 
+     * @return new list that can be empty
+     */
+    // FIXME - add to junit tests
+    public List<OtmTypeUser> getUsers() {
+        List<OtmTypeUser> users = new ArrayList<>();
+        for (OtmLibraryMember member : getMembers()) {
+            if (member instanceof OtmTypeUser)
+                users.add( (OtmTypeUser) member );
+            users.addAll( member.getDescendantsTypeUsers() );
+        }
+        return users;
     }
 
     /**

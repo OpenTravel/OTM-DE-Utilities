@@ -92,6 +92,7 @@ public class OtmModelManager implements TaskResultHandlerI {
     // All members - Library Members are TLLibraryMembers and contextual facets
     public static final int MEMBERCOUNT = 2666; // 2000 / .075 +1;
     private Map<LibraryMember,OtmLibraryMember> members = new HashMap<>( MEMBERCOUNT );
+    private Map<LibraryMember,OtmLibraryMember> syncedMembers = Collections.synchronizedMap( members );
 
     // Domains - one entry per unique base namespace
     private List<OtmDomain> domains = new ArrayList<>();
@@ -491,9 +492,9 @@ public class OtmModelManager implements TaskResultHandlerI {
      */
     public List<OtmLibraryMember> findUsersOf(OtmTypeProvider provider) {
         // Changed 11/5/2019 - why copy list? The list is not changing.
-        List<OtmLibraryMember> values = new ArrayList<>( members.values() );
+        // List<OtmLibraryMember> values = new ArrayList<>( getMembers() );
         List<OtmLibraryMember> users = new ArrayList<>();
-        for (OtmLibraryMember m : values) {
+        for (OtmLibraryMember m : getMembers()) {
             if (m.getUsedTypes().contains( provider ))
                 users.add( m );
         }
@@ -510,7 +511,7 @@ public class OtmModelManager implements TaskResultHandlerI {
      */
     public List<OtmLibraryMember> findSubtypesOf(OtmLibraryMember member) {
         // Changed 11/5/2019 - why copy list? The list is not changing.
-        List<OtmLibraryMember> values = new ArrayList<>( members.values() );
+        List<OtmLibraryMember> values = new ArrayList<>( getMembers() );
         List<OtmLibraryMember> subTypes = new ArrayList<>();
         // Contextual facets use base type to define injection point
         for (OtmLibraryMember m : values) {
@@ -745,10 +746,13 @@ public class OtmModelManager implements TaskResultHandlerI {
 
 
     /**
+     * Synchronized access to members.values()
+     * 
      * @return all the library members being managed in a unmodifiableCollection
      */
     public Collection<OtmLibraryMember> getMembers() {
-        return Collections.unmodifiableCollection( members.values() );
+        // return Collections.unmodifiableCollection( members.values() );
+        return Collections.unmodifiableCollection( syncedMembers.values() );
     }
 
     /**
@@ -760,11 +764,11 @@ public class OtmModelManager implements TaskResultHandlerI {
         if (filter == null)
             return getMembers();
         List<OtmLibraryMember> selected = new ArrayList<>();
-        members.values().forEach( m -> {
+        getMembers().forEach( m -> {
             if (filter.isSelected( m ))
                 selected.add( m );
         } );
-        log.debug( "Got " + selected.size() + " filtered members." );
+        // log.debug( "Got " + selected.size() + " filtered members." );
         return Collections.unmodifiableCollection( selected );
     }
 
@@ -773,7 +777,7 @@ public class OtmModelManager implements TaskResultHandlerI {
      */
     public List<OtmLibraryMember> getMembers(OtmLibrary library) {
         List<OtmLibraryMember> libraryMembers = new ArrayList<>();
-        members.values().forEach( m -> {
+        getMembers().forEach( m -> {
             if (m.getLibrary() == library)
                 libraryMembers.add( m );
         } );
@@ -872,7 +876,7 @@ public class OtmModelManager implements TaskResultHandlerI {
      */
     public List<OtmResource> getResources(boolean sort) {
         List<OtmResource> resources = new ArrayList<>();
-        members.values().forEach( m -> {
+        getMembers().forEach( m -> {
             if (m instanceof OtmResource)
                 resources.add( (OtmResource) m );
         } );
@@ -885,7 +889,7 @@ public class OtmModelManager implements TaskResultHandlerI {
         if (filter == null)
             return getResources( sort );
         List<OtmResource> resources = new ArrayList<>();
-        members.values().forEach( m -> {
+        getMembers().forEach( m -> {
             if (m instanceof OtmResource && filter.isSelected( m ))
                 resources.add( (OtmResource) m );
         } );

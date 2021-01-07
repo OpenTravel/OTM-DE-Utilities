@@ -83,7 +83,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     protected List<OtmTypeUser> memberTypeUsers = new ArrayList<>();
 
     // A list of all the types used by this member or its descendants
-    protected List<OtmTypeProvider> typesUsed = new ArrayList<>();
+    protected List<OtmTypeProvider> typesUsed = null;
+    // protected List<OtmTypeProvider> typesUsed = new ArrayList<>();
 
     // A list of all members that have a descendant type user that assigned to this member and its descendants.
     protected List<OtmLibraryMember> whereUsed = null;
@@ -476,7 +477,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             typesUsed.sort(
                 (OtmObject o1, OtmObject o2) -> o1.getNameWithPrefix().compareToIgnoreCase( o2.getNameWithPrefix() ) );
         }
-        // log.debug(this + " typesUsed size = " + typesUsed.size());
+        log.debug( this + " typesUsed size = " + typesUsed.size() );
         return typesUsed;
     }
 
@@ -490,15 +491,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return getWhereUsed( false );
     }
 
-    /**
-     * Get the lazy evaluated where used list.
-     * <p>
-     * When <i>forced</i> by type resolver or list is null, it will get users of the library member and all its type
-     * provider descendants.
-     * 
-     * @param force will clear list and recompute users to add to existing list
-     * @return
-     */
+    @Override
     public List<OtmLibraryMember> getWhereUsed(boolean force) {
         if (whereUsed == null) {
             whereUsed = new ArrayList<>();

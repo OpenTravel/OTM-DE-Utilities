@@ -31,6 +31,7 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javafx.application.Platform;
@@ -191,6 +192,9 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
         //
         // TODO - as parameter reference in a resource
 
+        List<OtmLibraryMember> users = member.getWhereUsed();
+        log.debug( "Posting " + users.size() + " users of " + member );
+
         Map<String,UsersManager> namespaceMap = new HashMap<>();
 
         member.getWhereUsed().forEach( w -> addToMap( w, member, namespaceMap ) );
@@ -200,6 +204,8 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
     private void addToMap(OtmLibraryMember w, OtmLibraryMember member, Map<String,UsersManager> namespaceMap) {
         if (w == null)
             return;
+        log.debug( "Adding " + w + " to map." );
+
         if (!namespaceMap.containsKey( w.getPrefix() ))
             namespaceMap.put( w.getPrefix(), new UsersManager( w, member, root ) );
         // CF test must come first since they report having base type
@@ -272,8 +278,8 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents && event != null && event.getEventType() != null) {
+            // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
             if (event instanceof DexModelChangeEvent)
@@ -305,8 +311,10 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
     public void post(OtmLibraryMember member) {
         if (member == null || member == postedData)
             return;
+        log.debug( "Posting users of type " + member );
 
         super.post( member );
+        member.refresh(); // Recompute users and where used
         createTreeItems( member );
         if (columnLabel != null)
             columnLabel.setText( "Users " );

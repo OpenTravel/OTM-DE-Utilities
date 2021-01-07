@@ -38,6 +38,7 @@ import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javafx.event.EventType;
@@ -251,8 +252,8 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents && event != null && event.getEventType() != null) {
+            log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
             else if (event instanceof OtmObjectChangeEvent)
@@ -299,7 +300,7 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
         if (columnLabel != null)
             columnLabel.setText( "Providers" );
 
-        // log.debug( "Posting type providers to: " + member );
+        log.debug( "Posting type providers to: " + member );
 
         // Create map of namespace prefixes and tree items
         Map<String,TreeItem<MemberAndProvidersDAO>> usedPrefixes = new HashMap<>();
@@ -312,6 +313,9 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
                 nsItem.setExpanded( true );
             }
         } );
+
+        List<OtmTypeProvider> types = member.getUsedTypes();
+        log.debug( "Found " + types.size() + " used types." );
 
         member.getUsedTypes().forEach( u -> {
             TreeItem<MemberAndProvidersDAO> item = new TreeItem<>( new MemberAndProvidersDAO( u, member ) );
