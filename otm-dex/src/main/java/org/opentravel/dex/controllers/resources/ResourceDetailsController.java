@@ -217,12 +217,19 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
     }
 
     private void postTitle(OtmObject obj) {
-        objectImageView.setImage( ImageManager.getImage( obj.getIconType() ) );
-        if (obj instanceof OtmResource)
-            resourceDetailsPane.setText( obj.getOwningMember().getName() + " in " + obj.getLibrary().getFullName() );
-        else
-            resourceDetailsPane
-                .setText( obj.getObjectTypeName() + "   in " + obj.getOwningMember().getNameWithPrefix() );
+        if (obj instanceof OtmResource) {
+
+            String name = obj.getObjectTypeName();
+            if (obj.getOwningMember() != null)
+                name = obj.getOwningMember().getName();
+
+            String library = " (missing library) ";
+            if (obj.getLibrary() != null)
+                library = " in " + obj.getLibrary().getFullName();
+
+            objectImageView.setImage( ImageManager.getImage( obj.getIconType() ) );
+            resourceDetailsPane.setText( name + library );
+        }
     }
 
     private void postName(OtmObject obj) {

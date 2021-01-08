@@ -30,6 +30,7 @@ import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmServiceObject;
 import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryPermission;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
@@ -761,5 +762,17 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
      */
     public String getNameWithPrefix() {
         return getPrefix() + " : " + getName();
+    }
+
+    /**
+     * @return new list of resources or empty list
+     */
+    public List<OtmResource> getResources() {
+        List<OtmResource> resources = new ArrayList<>();
+        getMembers().forEach( m -> {
+            if (m instanceof OtmResource)
+                resources.add( (OtmResource) m );
+        } );
+        return resources;
     }
 }

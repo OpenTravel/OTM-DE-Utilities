@@ -23,8 +23,10 @@ import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
+import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
+import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.resource.OtmAction;
@@ -36,6 +38,8 @@ import org.opentravel.schemacompiler.model.TLActionFacet;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLParamGroup;
 import org.opentravel.schemacompiler.model.TLResourceParentRef;
+
+import java.util.List;
 
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
@@ -65,9 +69,9 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
     Menu addMenu = null;
     Menu addAFMenu = null;
     private MenuItem deleteItem = null;
-    private MenuItem addResource = null;
+    private MenuItem newResource = null;
     private MenuItem validateResource = null;
-    private MenuItem refreshItem = null;
+    // private MenuItem refreshItem = null;
 
     private DexIncludedController<?> controller;
 
@@ -104,73 +108,24 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         deleteItem = addItem( "Delete", this::deleteChild );
         //
         resourceMenu.getItems().add( new SeparatorMenuItem() );
-        addResource = addItem( "New Resource", e -> newResource() );
+        newResource = addItem( "New Resource", e -> newResource() );
 
         // validate
         resourceMenu.getItems().add( new SeparatorMenuItem() );
         validateResource = addItem( "Validate", e -> validateResource() );
         //
         resourceMenu.getItems().add( new SeparatorMenuItem() );
-        refreshItem = addItem( "Refresh", e -> refresh( null ) );
+        addItem( "Refresh", e -> refresh( null ) );
 
         // Add the menu to the factory
         setContextMenu( resourceMenu );
 
+        addMenu.setDisable( true );
+        deleteItem.setDisable( true );
+        validateResource.setDisable( true );
+
         // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
-    }
-
-    private MenuItem addItem(String label, EventHandler<ActionEvent> handler) {
-        MenuItem item = new MenuItem( label );
-        resourceMenu.getItems().add( item );
-        item.setOnAction( handler );
-        return item;
-    }
-
-    private MenuItem addItem(Menu menu, String label, EventHandler<ActionEvent> handler) {
-        MenuItem item = new MenuItem( label );
-        menu.getItems().add( item );
-        item.setOnAction( handler );
-        return item;
-    }
-
-    private void validateResource() {
-        OtmObject obj = getValue();
-        if (obj == null && controller.getSelection() != null
-            && controller.getSelection().getValue() instanceof OtmObject)
-            obj = (OtmObject) controller.getSelection().getValue();
-
-        if (obj != null)
-            obj.isValid( true );
-
-        controller.refresh();
-    }
-
-    private void newResource() {
-        // Get something to use as the subject. Where the menu item was, what was selected or just any resource.
-        OtmObject obj = getValue();
-        if (obj == null && controller.getSelection() != null
-            && controller.getSelection().getValue() instanceof OtmObject)
-            obj = (OtmObject) controller.getSelection().getValue();
-
-        // Get an action manager.
-        DexActionManager actionManager;
-        if (obj == null)
-            actionManager = controller.getModelManager().getActionManager( true );
-        else
-            actionManager = obj.getActionManager();
-
-        actionManager.run( DexActions.NEWLIBRARYMEMBER, obj, OtmLibraryMemberType.RESOURCE );
-    }
-
-    private void deleteChild(ActionEvent e) {
-        OtmObject obj = getValue();
-        Object parent = null;
-        // Run delete action
-        if (obj instanceof OtmResource)
-            obj.getActionManager().run( DexActions.DELETELIBRARYMEMBER, (OtmResource) obj );
-        else if (obj instanceof OtmResourceChild)
-            obj.getActionManager().run( DexActions.DELETERESOURCECHILD, obj );
     }
 
     private Object addChild(TLModelElement tlChild) {
@@ -197,6 +152,30 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         refresh( result );
     }
 
+    private MenuItem addItem(Menu menu, String label, EventHandler<ActionEvent> handler) {
+        MenuItem item = new MenuItem( label );
+        menu.getItems().add( item );
+        item.setOnAction( handler );
+        return item;
+    }
+
+    private MenuItem addItem(String label, EventHandler<ActionEvent> handler) {
+        MenuItem item = new MenuItem( label );
+        resourceMenu.getItems().add( item );
+        item.setOnAction( handler );
+        return item;
+    }
+
+    private void addParameter() {
+        OtmObject obj = getValue();
+        if (obj instanceof OtmParameterGroup) {
+            OtmObject newChild = (OtmObject) obj.getActionManager().run( DexActions.ADDRESOURCEPARAMETER, obj );
+            refresh( newChild );
+
+            check( (OtmResourceChild) newChild, (OtmParameterGroup) obj );
+        }
+    }
+
     private void addResponse() {
         OtmObject obj = getValue();
         if (obj instanceof OtmAction) {
@@ -210,16 +189,6 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
                 throw new IllegalStateException( "Parent's TL must contain response's TL." );
         }
 
-    }
-
-    private void addParameter() {
-        OtmObject obj = getValue();
-        if (obj instanceof OtmParameterGroup) {
-            OtmObject newChild = (OtmObject) obj.getActionManager().run( DexActions.ADDRESOURCEPARAMETER, obj );
-            refresh( newChild );
-
-            check( (OtmResourceChild) newChild, (OtmParameterGroup) obj );
-        }
     }
 
     private void check(OtmResourceChild newChild, OtmChildrenOwner parent) {
@@ -237,14 +206,14 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
             throw new IllegalStateException( "Parent and response must have same owner." );
     }
 
-    // Update GUI
-    private void refresh(Object newObject) {
-        if (newObject instanceof OtmResourceChild) {
-            TreeItem<ResourcesDAO> item =
-                new ResourcesDAO( (OtmObject) newObject ).createTreeItem( getTreeItem().getParent() );
-            super.updateTreeItem( item ); // needed to apply stylesheet to new item
-        } else
-            controller.refresh();
+    private void deleteChild(ActionEvent e) {
+        OtmObject obj = getValue();
+        Object parent = null;
+        // Run delete action
+        if (obj instanceof OtmResource)
+            obj.getActionManager().run( DexActions.DELETELIBRARYMEMBER, (OtmResource) obj );
+        else if (obj instanceof OtmResourceChild)
+            obj.getActionManager().run( DexActions.DELETERESOURCECHILD, obj );
     }
 
     /**
@@ -257,11 +226,67 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
         return null;
     }
 
+    private void newResource() {
+        // Need an model manager, editable libraries and an action manager
+        OtmModelManager mgr = controller.getModelManager();
+        if (mgr == null)
+            return;
+        if (!mgr.hasEditableLibraries())
+            return;
+        DexActionManager actionManager = mgr.getActionManager( true );
+        if (actionManager == null)
+            return;
+
+        // Get something to use as the subject.
+        // Where the menu item was, what was selected or just any resource.
+        OtmObject obj = getValue();
+        if (obj == null && controller.getSelection() != null
+            && controller.getSelection().getValue() instanceof OtmObject)
+            obj = (OtmObject) controller.getSelection().getValue();
+        else
+            obj = getObjectFromManager( mgr );
+
+        // Run needs both an object as subject and the type as value
+        if (obj != null)
+            actionManager.run( DexActions.NEWLIBRARYMEMBER, obj, OtmLibraryMemberType.RESOURCE );
+    }
+
+    private OtmObject getObjectFromManager(OtmModelManager mgr) {
+        List<OtmLibrary> eLibs = mgr.getEditableLibraries();
+        OtmObject object = null;
+
+        if (!eLibs.isEmpty() && !eLibs.get( 0 ).getMembers().isEmpty()) {
+            // Get a default object
+            object = eLibs.get( 0 ).getMembers().get( 0 );
+        }
+        // Prefer an editable library with resources
+        for (OtmLibrary lib : eLibs) {
+            if (!lib.getResources().isEmpty()) {
+                object = lib.getResources().get( 0 );
+                break;
+            }
+        }
+        return object;
+    }
+
+    // Update GUI
+    private void refresh(Object newObject) {
+        if (newObject instanceof OtmResourceChild) {
+            TreeItem<ResourcesDAO> item =
+                new ResourcesDAO( (OtmObject) newObject ).createTreeItem( getTreeItem().getParent() );
+            super.updateTreeItem( item ); // needed to apply stylesheet to new item
+        } else
+            controller.refresh();
+    }
+
     /**
      * @param row
      * @param item
      */
     private void setCSSClass(TreeTableRow<ResourcesDAO> tc, TreeItem<ResourcesDAO> item) {
+
+        newResource.setDisable( !controller.getModelManager().hasEditableLibraries() );
+
         if (item != null && item.getValue() != null && item.getValue().getValue() != null) {
             OtmObject obj = item.getValue().getValue();
 
@@ -269,8 +294,11 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
             tc.pseudoClassStateChanged( INHERITED, item.getValue().isInherited() );
 
             // Turn on/off context sensitive items
-            addResource.setDisable( !obj.getModelManager().hasEditableLibraries() );
-            deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETERESOURCECHILD, obj ) );
+            validateResource.setDisable( false );
+            if (obj instanceof OtmResource)
+                deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETELIBRARYMEMBER, obj ) );
+            else if (obj instanceof OtmResourceChild)
+                deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETERESOURCECHILD, obj ) );
 
             // Add menu has 7 items. 2 (response, parameter) are context sensitive
             boolean rc = obj.getActionManager().isEnabled( DexActions.ADDRESOURCECHILD, obj );
@@ -280,15 +308,23 @@ public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDA
             addMenu.setDisable( !add );
             arItem.setDisable( !ar );
             paramItem.setDisable( !pa );
-
-
-            // addResource.setDisable( !item.getValue().isEditable() );
-            // addMenu.setDisable( !item.getValue().isEditable() );
-            // deleteItem.setDisable( !item.getValue().isEditable() );
-            // arItem.setDisable( !(getValue() instanceof OtmAction) );
-            // paramItem.setDisable( !(getValue() instanceof OtmParameterGroup) );
-        } else
+        } else {
             addMenu.setDisable( true );
+            deleteItem.setDisable( true );
+            validateResource.setDisable( true );
+        }
+    }
+
+    private void validateResource() {
+        OtmObject obj = getValue();
+        if (obj == null && controller.getSelection() != null
+            && controller.getSelection().getValue() instanceof OtmObject)
+            obj = (OtmObject) controller.getSelection().getValue();
+
+        if (obj != null)
+            obj.isValid( true );
+
+        controller.refresh();
     }
 }
 
