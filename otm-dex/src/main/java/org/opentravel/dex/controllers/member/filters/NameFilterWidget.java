@@ -20,6 +20,7 @@ import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 
 /**
  * Widget for library selection.
@@ -32,6 +33,8 @@ public class NameFilterWidget extends FilterWidget {
 
     private TextField nameSelector;
     private String selector = "";
+    private static final String TOOLTIP = "Only show members whose name contains this string, ignoring case.";
+
 
     public NameFilterWidget(MemberFilterController parent, TextField nameSelector) {
         super( parent );
@@ -40,6 +43,7 @@ public class NameFilterWidget extends FilterWidget {
 
         this.nameSelector = nameSelector;
         nameSelector.textProperty().addListener( (v, o, n) -> applyTextFilter() );
+        nameSelector.setTooltip( new Tooltip( TOOLTIP ) );
         // log.debug("Configured library selection combo control.");
     }
 

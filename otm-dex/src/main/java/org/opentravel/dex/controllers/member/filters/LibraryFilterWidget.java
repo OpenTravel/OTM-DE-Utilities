@@ -28,6 +28,7 @@ import java.util.TreeMap;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Tooltip;
 
 /**
  * Widget for library selection.
@@ -38,7 +39,9 @@ import javafx.scene.control.ChoiceBox;
 public class LibraryFilterWidget extends FilterWidget {
     // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
 
-    private static final String ALLLIBS = "All Libraries";
+    private static final String ALLLIBS = "No Library Name Filter";
+    private static final String TOOLTIP = "Only show members from libraries that start with selected name.";
+
     private ChoiceBox<String> librarySelector;
     private OtmModelManager modelMgr;
     private TreeMap<String,OtmLibrary> libraryMap = new TreeMap<>();
@@ -58,6 +61,7 @@ public class LibraryFilterWidget extends FilterWidget {
 
         librarySelector.getSelectionModel().select( 0 );
         librarySelector.setOnAction( e -> setLibraryFilter() );
+        librarySelector.setTooltip( new Tooltip( TOOLTIP ) );
         // log.debug("Configured library selection combo control.");
     }
 

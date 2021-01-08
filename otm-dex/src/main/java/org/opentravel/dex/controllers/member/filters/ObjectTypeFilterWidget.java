@@ -26,6 +26,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Tooltip;
 
 /**
  * Widget for member object type filtering.
@@ -38,6 +39,8 @@ public class ObjectTypeFilterWidget implements DexFilterWidget<OtmLibraryMember>
     // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
 
     private static final String ALL = "All Objects";
+    private static final String TOOLTIP = "Only show members of selected object type.";
+
     private MemberFilterController parentController;
     private ComboBox<String> typeSelector;
     private OtmLibraryMemberType objectType = null;
@@ -56,6 +59,7 @@ public class ObjectTypeFilterWidget implements DexFilterWidget<OtmLibraryMember>
         typeSelector.getSelectionModel().select( 0 );
         typeSelector.setPromptText( "Object Type" );
         typeSelector.setOnAction( this::setFilter );
+        typeSelector.setTooltip( new Tooltip( TOOLTIP ) );
 
         // log.debug("Configured library selection combo control.");
     }
