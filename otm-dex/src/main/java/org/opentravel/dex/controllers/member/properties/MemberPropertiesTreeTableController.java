@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.member.properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.DexRepeatMaxConverter;
 import org.opentravel.common.cellfactories.AssignedTypePropertiesTreeTableCellFactory;
@@ -62,7 +64,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class MemberPropertiesTreeTableController extends DexIncludedControllerBase<OtmLibraryMember> {
-    // private static Log log = LogFactory.getLog( MemberPropertiesTreeTableController.class );
+    private static Log log = LogFactory.getLog( MemberPropertiesTreeTableController.class );
 
     private static final EventType[] publishedEvents =
         {DexMemberSelectionEvent.MEMBER_SELECTED, DexModelChangeEvent.MODEL_CHANGED,

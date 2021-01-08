@@ -45,7 +45,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibraryMember> implements DexController {
-//    private static Log log = LogFactory.getLog( TypeUsersTreeController.class );
+    private static Log log = LogFactory.getLog( TypeUsersTreeController.class );
 
     /*
      * FXML injected
@@ -153,7 +153,7 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
-        // log.debug(event.getEventType() + " event received. Ignore? " + ignoreEvents);
+        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );

@@ -251,8 +251,8 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
+        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents && event != null && event.getEventType() != null) {
-            // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
             else if (event instanceof OtmObjectChangeEvent)

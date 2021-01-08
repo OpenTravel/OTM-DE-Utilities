@@ -57,15 +57,15 @@ public class UsersManager {
     }
 
     protected void addContributed(OtmLibraryMember user) {
-        contributed = add( user, contributed, "Contributors" );
+        contributed = add( user, contributed, "Contributors to " + subject.getName() );
     }
 
     protected void addAssigned(OtmLibraryMember user) {
-        assignedTypes = add( user, assignedTypes, "Uses member as Assigned Type" );
+        assignedTypes = add( user, assignedTypes, "Members that use " + subject.getName() + " as Assigned Type" );
     }
 
     protected void addBase(OtmLibraryMember user) {
-        baseTypes = add( user, baseTypes, "Extended by" );
+        baseTypes = add( user, baseTypes, subject.getName() + " is extended by" );
     }
 
     protected void addResource(OtmLibraryMember user) {

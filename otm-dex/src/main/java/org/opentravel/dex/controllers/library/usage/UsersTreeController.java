@@ -147,8 +147,8 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibrary> i
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
+        // log.debug( "Users tree received: " + event.getEventType() );
         if (!ignoreEvents && event != null && event.getEventType() != null) {
-            // log.debug( "Users tree received: " + event.getEventType() );
             if (event instanceof DexLibrarySelectionEvent)
                 post( ((DexLibrarySelectionEvent) event).getLibrary() );
             else if (event instanceof DexModelChangeEvent)

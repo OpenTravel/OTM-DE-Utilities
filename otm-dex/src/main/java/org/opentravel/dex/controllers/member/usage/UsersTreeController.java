@@ -182,20 +182,10 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
         if (member == null || member.getWhereUsed() == null)
             return;
         // log.debug("Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName());
-        // Usage Categories
-        // As type
-        // As site where contributed
-        // As base type
-        // As object exposed by resource
-        // As extension facet in resource
-        //
-        // TODO - as parameter reference in a resource
-
         // List<OtmLibraryMember> users = member.getWhereUsed();
         // log.debug( "Posting " + users.size() + " users of " + member );
 
         Map<String,UsersManager> namespaceMap = new HashMap<>();
-
         member.getWhereUsed().forEach( w -> addToMap( w, member, namespaceMap ) );
         member.getChildrenContributedFacets().forEach( cf -> addToMap( cf.getContributor(), member, namespaceMap ) );
     }
@@ -203,7 +193,7 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
     private void addToMap(OtmLibraryMember w, OtmLibraryMember member, Map<String,UsersManager> namespaceMap) {
         if (w == null)
             return;
-        log.debug( "Adding " + w + " to map." );
+        // log.debug( "Adding " + w + " to map." );
 
         if (!namespaceMap.containsKey( w.getPrefix() ))
             namespaceMap.put( w.getPrefix(), new UsersManager( w, member, root ) );
@@ -217,47 +207,6 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
         else
             namespaceMap.get( w.getPrefix() ).addAssigned( w );
     }
-
-    // // Create map of namespace prefixes with their tree items
-    // Map<String,TreeItem<MemberAndUsersDAO>> usedPrefixes = new HashMap<>();
-    // member.getWhereUsed().forEach( u -> {
-    // if (!usedPrefixes.containsKey( u.getPrefix() )) {
-    // TreeItem<MemberAndUsersDAO> nsItem =
-    // new TreeItem<>( new MemberAndUsersDAO( new OtmNamespaceFacet( u ) ) );
-    // usedPrefixes.put( u.getPrefix(), nsItem );
-    // root.getChildren().add( nsItem );
-    // nsItem.setExpanded( true );
-    // }
-    // } );
-    //
-    // member.getWhereUsed().forEach( u -> {
-    // TreeItem<MemberAndUsersDAO> item = new TreeItem<>( new MemberAndUsersDAO( u ) );
-    // if (usedPrefixes.get( u.getPrefix() ) != null)
-    // usedPrefixes.get( u.getPrefix() ).getChildren().add( item );
-    // else
-    // root.getChildren().add( item );
-    // } );
-    // }
-
-
-    // public void createTreeItems(List<EntitySearchResult> results) {
-    // if (results == null)
-    // return;
-    // // log.debug("Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName());
-    //
-    // // Get all providers for this member
-    // List<OtmLibraryMember> foundObjects = new ArrayList<>();
-    // for (EntitySearchResult result : results) {
-    // // This won't work ... entities are not in the model!
-    // NamedEntity tl = result.findEntity( modelMgr.getTlModel() );
-    // OtmObject otm = OtmModelElement.get( (TLModelElement) tl );
-    // if (otm instanceof OtmLibraryMember)
-    // foundObjects.add( (OtmLibraryMember) otm );
-    // else
-    // log.debug( "found named entity that is not library member." );
-    // }
-    // foundObjects.forEach( o -> new MemberAndUsersDAO( o ).createTreeItem( root ) );
-    // }
 
     public TreeItem<MemberAndUsersDAO> getRoot() {
         return root;
@@ -277,8 +226,8 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
+        // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (!ignoreEvents && event != null && event.getEventType() != null) {
-            // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
             if (event instanceof DexModelChangeEvent)

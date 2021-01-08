@@ -23,6 +23,7 @@ import org.opentravel.common.cellfactories.ValidationMemberTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.dex.events.DexEventLockEvent;
 import org.opentravel.dex.events.DexFilterChangeEvent;
 import org.opentravel.dex.events.DexMemberDeleteEvent;
@@ -168,18 +169,8 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
 
         if (memberTree.getRoot() != null)
             memberTree.getRoot().getChildren().clear();
+        // log.debug( "Cleared member tree." );
     }
-
-    // /**
-    // * Configure the controller for use by main controller.
-    // */
-    // @Override
-    // public void configure(DexMainController parent) {
-    // configure( parent, 0 );
-    // // log.debug("Configuring Member Tree Table.");
-    // // eventPublisherNode = memberTreeController;
-    // // configure( parent.getModelManager(), treeEditingEnabled );
-    // }
 
     @Override
     public void configure(DexMainController parent, int viewGroupId) {
@@ -231,7 +222,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         refresh();
     }
 
-    private Map<OtmObject,TreeItem<MemberAndProvidersDAO>> daoMap = new HashMap<>( OtmModelManager.MEMBERCOUNT );
+    private Map<OtmObject,TreeItem<MemberAndProvidersDAO>> itemMap = new HashMap<>( OtmModelManager.MEMBERCOUNT );
 
     /**
      * Note: TreeItem class does not extend the Node class. Therefore, you cannot apply any visual effects or add menus
@@ -249,17 +240,18 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         // 12/15/2020 - filter applied by model manager
         // 1/3/2020 - let the CFs be shown, the users expect to see them
 
-        TreeItem<MemberAndProvidersDAO> item = daoMap.get( member );
+        TreeItem<MemberAndProvidersDAO> item = null;
+        item = itemMap.get( member );
         if (item != null) {
             parent.getChildren().add( item );
         } else {
             // Create item for the library member
             item = new MemberAndProvidersDAO( member ).createTreeItem( parent );
-            daoMap.put( member, item );
+            // itemMap.put( member, item );
+            // Create and add items for children
+            if (member instanceof OtmChildrenOwner)
+                createChildrenItems( member, item );
         }
-        // Create and add items for children
-        if (member instanceof OtmChildrenOwner)
-            createChildrenItems( member, item );
     }
 
     public void createTreeItem(OtmAbstractDisplayFacet member, TreeItem<MemberAndProvidersDAO> parent) {
@@ -271,14 +263,14 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
      */
     private void createChildrenItems(OtmChildrenOwner childrenOwner, TreeItem<MemberAndProvidersDAO> parentItem) {
         childrenOwner.getChildrenTypeProviders().forEach( p -> {
-            TreeItem<MemberAndProvidersDAO> item = daoMap.get( p );
-            if (item != null) {
-                parentItem.getChildren().add( item );
-            } else {
-                // Create item for the library member
-                item = new MemberAndProvidersDAO( p ).createTreeItem( parentItem );
-                daoMap.put( p, item );
-            }
+            TreeItem<MemberAndProvidersDAO> item = null;
+            // item = itemMap.get( p );
+            // if (item != null) {
+            // parentItem.getChildren().add( item );
+            // } else {
+            // Create item for the library member
+            item = new MemberAndProvidersDAO( p ).createTreeItem( parentItem );
+            // itemMap.put( p, item );
             // TreeItem<MemberAndProvidersDAO> cfItem = new MemberAndProvidersDAO( p ).createTreeItem( parentItem );
 
             // Only use contextual facet for recursing
@@ -289,6 +281,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             if (p instanceof OtmChildrenOwner)
                 createChildrenItems( (OtmChildrenOwner) p, item );
             // createChildrenItems( (OtmChildrenOwner) p, cfItem );
+            // }
         } );
     }
 
@@ -312,36 +305,41 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             ? memberTree.getSelectionModel().getSelectedItem().getValue() : null;
     }
 
-    private void handleEvent(DexFilterChangeEvent event) {
-        // if (!ignoreEvents)
-        // refresh();
-        // refresh() is Called directly from filter controller
-    }
+    // private void handleEvent(DexFilterChangeEvent event) {
+    // // if (!ignoreEvents)
+    // // refresh();
+    // // refresh() is Called directly from filter controller
+    // }
 
 
     @Override
     public void handleEvent(AbstractOtmEvent event) {
         // log.debug( event.getEventType() + " event received. Ignore? " + ignoreEvents );
         if (event instanceof DexEventLockEvent)
-            handleEvent( (DexEventLockEvent) event );
+            handleEvent( (DexEventLockEvent) event ); // super-type method
         else if (!ignoreEvents && !eventsLocked) {
             if (event instanceof DexMemberSelectionEvent)
                 handleEvent( (DexMemberSelectionEvent) event );
-            else if (event instanceof DexFilterChangeEvent)
-                handleEvent( (DexFilterChangeEvent) event );
-            else if (event instanceof OtmObjectChangeEvent)
-                refresh();
-            else if (event instanceof OtmObjectReplacedEvent)
-                handleEvent( (OtmObjectReplacedEvent) event );
-            else if (event instanceof DexMemberDeleteEvent)
-                refresh();
-            else if (event instanceof DexModelChangeEvent) {
-                daoMap.clear();
+            // else if (event instanceof DexFilterChangeEvent)
+            // handleEvent( (DexFilterChangeEvent) event );
+            else if (event instanceof DexChangeEvent) {
+                // Future - be selective using event member which may be a contextual facet
+                itemMap.clear();
                 refresh();
             } else
-                refresh();
+                refresh(); // else if (event instanceof OtmObjectChangeEvent)
+            // refresh();
+            // else if (event instanceof OtmObjectReplacedEvent)
+            // handleEvent( (OtmObjectReplacedEvent) event );
+            // else if (event instanceof DexMemberDeleteEvent)
+            // refresh();
+            // else if (event instanceof DexModelChangeEvent) {
+            // itemMap.clear();
+            // refresh();
         }
     }
+
+
 
     // private void handleEvent(DexEventLockEvent event) {
     // // TODO - only react to members of same parent as source
@@ -349,13 +347,9 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     // eventsLocked = event.get();
     // }
 
-    private void handleEvent(OtmObjectReplacedEvent event) {
-        // if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
-        // log.error( "BAD HERE" );
-        refresh();
-        // if (event.getOrginalObject().getOwningMember() == event.getReplacementObject().getOwningMember())
-        // log.error( "BAD HERE" );
-    }
+    // private void handleEvent(OtmObjectReplacedEvent event) {
+    // refresh();
+    // }
 
     private void handleEvent(DexMemberSelectionEvent event) {
         if (event.getEventType().equals( DexMemberSelectionEvent.RESOURCE_SELECTED ))
@@ -395,8 +389,8 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     private void memberSelectionListener(TreeItem<MemberAndProvidersDAO> item) {
         if (item == null)
             return;
-        // log.debug("Selection Listener: " + item.getValue());
-        assert item != null;
+        // log.debug( "Selection Listener: " + item.getValue() );
+        // assert item != null;
         boolean editable = false;
         if (treeEditingEnabled && item.getValue() != null)
             editable = item.getValue().isEditable();
@@ -436,7 +430,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             currentModelMgr = modelMgr;
             clear();
 
-            // create cells for selected members
+            // create cells for filter selected members
             currentModelMgr.getMembers( getFilter() ).forEach( m -> createTreeItem( m, root ) );
 
             // If no members, post an empty row to allow row factory to add menu items
@@ -462,11 +456,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     @Override
     public void refresh() {
         post( currentModelMgr );
-        // if (!ignoreEvents && parentController != null) {
-        // ignoreEvents = true;
-        // parentController.refresh();
-        // }
-        // ignoreEvents = false;
+        // log.debug( "Refreshed member tree." );
     }
 
     public void select(OtmLibraryMember otm) {
