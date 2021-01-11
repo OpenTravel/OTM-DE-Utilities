@@ -57,7 +57,7 @@ public class SetLibraryAction extends DexRunAction {
      * {@inheritDoc} This action will get the data from the user via modal dialog
      */
     public OtmLibrary doIt() {
-        if (ignore)
+        if (ignore || otm == null)
             return null;
         List<OtmLibrary> candidates = otm.getModelManager().getEditableLibraries();
         // No libraries
@@ -79,7 +79,7 @@ public class SetLibraryAction extends DexRunAction {
     /**
      * {@inheritDoc} Set the library in the library member.
      * 
-     * @return
+     * @return the member's library or null.
      */
     @Override
     public Object doIt(Object data) {
@@ -92,38 +92,52 @@ public class SetLibraryAction extends DexRunAction {
 
     /**
      * Add the member to the model and clear its no-library action
+     * <P>
+     * Note: The OtmLibrary is retrieved from the TL Library Member' library's listener
      * 
      * @param library
-     * @return
+     * @return the member's library or null.
      */
     public OtmLibrary doIt(OtmLibrary lib) {
-        if (lib != null && otm instanceof OtmLibraryMember) {
+        if (lib != null && otm instanceof OtmLibraryMember && lib != otm.getLibrary()) {
+            if (lib.getTL() == null)
+                return null;
             OtmLibraryMember member = (OtmLibraryMember) otm;
+            if (member.getTlLM() == null)
+                return null;
 
             // Save the old library for Undo
             oldLibrary = member.getLibrary();
 
+            // Remove from old library
+            if (oldLibrary != null && oldLibrary.getTL() != null)
+                oldLibrary.getTL().removeNamedMember( member.getTlLM() );
+
+            // Set TL member to new library
+            // If you add and remove from library instead of setting member,
+            // TL model will not update all the dependent type assignments.
             lib.getTL().addNamedMember( member.getTlLM() );
             member.getTlLM().setOwningLibrary( lib.getTL() );
             member.refresh();
-            // If you add and remove from library instead of setting member, TL will not update all the dependent type
-            // assignments.
+
             // Add to new library
             // lib.add( member );
-            // // Remove from old library
-            // if (oldLibrary != null)
-            // oldLibrary.getTL().removeNamedMember( member.getTlLM() );
 
             // Debugging
-            // assert member.getLibrary() == lib;
-            // assert member.getTlLM().getOwningLibrary() == lib.getTL();
-            // log.debug( "Set library to " + get() );
+            if (member.getLibrary() != lib)
+                log.error( "Missing library." );
+            if (member.getTlLM().getOwningLibrary() != lib.getTL())
+                log.error( "TL Member is missing library." );
+            if (oldLibrary != null && oldLibrary.getTL().getNamedMember( member.getName() ) != null)
+                log.error( "Old library still has member" );
+
+            log.debug( "Set library to " + get() );
         }
         return get();
     }
 
     /**
-     * Return the new member or null if none created.
+     * Return the member's library or null.
      * 
      * @see org.opentravel.dex.actions.DexRunAction#get()
      */

@@ -23,11 +23,13 @@ import org.opentravel.dex.actions.resource.AssignResourceSubjectAction;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.MemberDetailsPopupController;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.lang.reflect.InvocationTargetException;
@@ -76,25 +78,74 @@ public class NewLibraryMemberAction extends DexRunAction {
 
                 // Build and hold onto for undo
                 member = OtmLibraryMemberType.buildMember( (OtmLibraryMemberType) data, "New", otm.getModelManager() );
+                // Check: we have a member
+                if (member == null)
+                    return null;
 
                 // Provide a temporary wizardActionManager
                 member.setNoLibraryActionManager( new DexWizardActionManager( null ) );
 
-                // If the subject is editable, use it to set initial library - user may change it
-                if (otm.getLibrary() != null && otm.getLibrary().isEditable())
-                    otm.getLibrary().add( member );
+                // Try to add to an editable library. Note: user may change it later
+                // Check: Member is NOT in a library yet
+                if (member.getLibrary() != null)
+                    log.warn( "Member has a library: " + member.getLibraryName() );
+
+                // Get an editable library to assign
+                // If the subject is editable, use it to set initial library
+                OtmLibrary lib = otm.getLibrary();
+                // if (lib == null || !lib.isEditable()) {
+                // // else have the user to select a library
+                // SetLibraryAction action = new SetLibraryAction();
+                // action.setSubject( member );
+                // lib = action.doIt();
+                // }
+                if (lib == null) {
+                    member = null; // cancel
+                    return null;
+                }
+
+                // Add member to library. Increment name until add is successful
+                OtmLibraryMember result = null;
+                int i = 1;
+                do {
+                    result = otm.getLibrary().add( member );
+                    if (result == null)
+                        member.setName( "New" + Integer.toString( i++ ) );
+                } while (result == null && i < 100);
+                // Check: Member IS in a library
+                if (member.getLibrary() == null)
+                    log.warn( "Member does not have a library." );
 
                 // If it is a contextual facet, try to set the base type
                 if (member instanceof OtmContextualFacet)
                     ((OtmContextualFacet) member).setBaseType( otm );
 
                 // If in gui thread, Let user set library and other details
-                if (Platform.isFxApplicationThread()) {
+                if (member != null && Platform.isFxApplicationThread()) {
                     MemberDetailsPopupController controller = MemberDetailsPopupController.init();
                     controller.setMember( member );
                     if (controller.showAndWait( "MSG" ) != Results.OK)
-                        // Cancel
-                        member = null;
+                        member = null; // Cancel
+                }
+                // Check - make sure member is one library and only in one library
+                if (member != null) {
+                    if (!(member.getTL() instanceof LibraryMember))
+                        log.error( "Invalid library member." );;
+                    if (member.getLibrary() == null)
+                        log.error( "New member is not in a library." );
+                    if (member.getModelManager().get( member.getLibrary().getTL() ) == null)
+                        log.error( "Model manager can not find member's library." );
+                    if (!member.getLibrary().getMembers().contains( member ))
+                        log.error( "Member's library does not contain member." );
+                    if (member.getLibrary() != lib) {
+                        // Library was changed
+                        if (lib.getMembers().contains( member ))
+                            log.error( "Original library contain member." );
+                        if (lib.getTL().getNamedMembers().contains( (LibraryMember) member.getTL() ))
+                            log.error( "Original library contains TL Library Member." );
+                        if (lib.getTL().getNamedMember( member.getName() ) != null)
+                            log.error( "Member name found in original library." );
+                    }
                 }
 
                 if (member instanceof OtmResource && ((OtmResource) member).getSubject() == null) {
@@ -133,7 +184,8 @@ public class NewLibraryMemberAction extends DexRunAction {
             newMember = member;
             // Subject was only used to get a guess at library. Replace it so the event has useful subject.
             setSubject( newMember );
-            // Add member to model manager model and library
+
+            // Add member to model manager model and library (if needed)
             otm.getModelManager().add( newMember );
 
             // Remove temporary wizardActionManager

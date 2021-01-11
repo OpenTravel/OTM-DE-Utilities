@@ -180,13 +180,14 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
     private void newMember(OtmLibraryMemberType type) {
         OtmObject obj = getValue();
 
-        // FIXME - make sure there is an editable library! And in setCSSClass too.
         // If they didn't select anything
         if (obj == null && controller.getMainController() != null)
             // Use any member the model manager delivers
             for (OtmLibraryMember member : controller.getMainController().getModelManager().getMembers()) {
             obj = member;
+            if (member.isEditable()) {
             break;
+            }
             }
         // Run action
         if (obj != null)

@@ -102,27 +102,40 @@ public class TestSetLibraryAction {
     public void testSimpleChangeLibrary()
         throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
         DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
         OtmLibrary lib1 = mgr.add( new TLLibrary() );
         assertTrue( "Given", lib1.isEditable() );
+
         OtmLibrary lib2 = mgr.add( new TLLibrary() );
         assertTrue( "Given", lib2.isEditable() );
+
         DexActionManager actionManager = lib1.getActionManager();
         assertTrue( "Given", actionManager instanceof DexFullActionManager );
-        assertTrue( actionManager.getQueueSize() == 0 );
+        assertTrue( "Given", actionManager.getQueueSize() == 0 );
 
         OtmBusinessObject member = TestBusiness.buildOtm( mgr, "TestBusinessObject" );
         assertTrue( "Given", member.getModelManager() == mgr );
         lib1.add( member );
         assertTrue( "Given", member.getLibrary() == lib1 );
 
+        // Action handler with subject set to the member
         SetLibraryAction setLibraryHandler =
             (SetLibraryAction) DexActions.getAction( DexActions.SETLIBRARY, member, actionManager );
         assertTrue( "Given", setLibraryHandler != null );
 
         // When
-        setLibraryHandler.doIt( lib2 );
+        OtmLibrary result = setLibraryHandler.doIt( lib2 );
+        // Then - member is in the new library (lib2)
+        assertTrue( "doIt did not return the new library.", result == lib2 );
         assertTrue( "Then member's library is library 2.", member.getLibrary() == lib2 );
+        assertTrue( "New library must contain member.", lib2.contains( member ) );
+        assertTrue( "New TL Library must contain named member.",
+            lib2.getTL().getNamedMember( member.getName() ) != null );
+
+        // Then - member is not in the original library (lib1)
+        assertTrue( "Original library must not contain member.", !lib1.contains( member ) );
+        assertTrue( "Original TL Library must not contain named member.",
+            lib1.getTL().getNamedMember( member.getName() ) == null );
 
         // When
         setLibraryHandler.undoIt();
@@ -133,7 +146,7 @@ public class TestSetLibraryAction {
     public void testSetWhenAssigned()
         throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
         DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null );
+        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
         OtmLibrary lib1 = TestLibrary.buildOtm( mgr, "Namespace1", "p1", "Library1" );
         log.debug( "Lib 1 name is: " + lib1.getFullName() );
         OtmLibrary lib2 = TestLibrary.buildOtm( mgr, "Namespace2", "p2", "Library2" );

@@ -117,6 +117,9 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      */
     OtmFacet<TLFacet> getFacet(OtmFacet<TLFacet> facet);
 
+    /**
+     * @return the name of the owning TL Library
+     */
     public String getLibraryName();
 
     /**
