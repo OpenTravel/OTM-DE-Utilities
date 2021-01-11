@@ -18,6 +18,7 @@ package org.opentravel.dex.controllers.member;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedController;
@@ -83,6 +84,14 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
 
         // Set style listener (css class)
         treeItemProperty().addListener( (obs, oldTreeItem, newTreeItem) -> setCSSClass( this, newTreeItem ) );
+
+        // No selection settings
+        addAliasItem.setDisable( true );
+        copyItem.setDisable( true );
+        deleteItem.setDisable( true );
+        deprecateItem.setDisable( true );
+        validateItem.setDisable( true );
+        newMenu.setDisable( true );
 
         /*
          * Set up Drag-n-drop
@@ -208,32 +217,43 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
      * @return
      */
     private void setCSSClass(TreeTableRow<MemberAndProvidersDAO> tc, TreeItem<MemberAndProvidersDAO> newTreeItem) {
+        deleteItem.setDisable( true );
+        deprecateItem.setDisable( true );
+        copyItem.setDisable( true );
+        newMenu.setDisable( true );
+        validateItem.setDisable( true );
+
+        if (controller.getModelManager() == null)
+            return;
+        newMenu.setDisable( !controller.getModelManager().hasEditableLibraries() );
+
         OtmObject obj = getSelectedObject( newTreeItem );
-        if (obj != null && obj.getModelManager() != null) {
-            if (obj instanceof OtmLibraryMember)
-                setStateChanged( tc, obj.isDeprecated(), ((OtmLibraryMember) obj).isEditableMinor() );
-            else
-                setStateChanged( tc, obj.isDeprecated(), obj.isEditable() );
+        if (obj == null || obj.getModelManager() == null)
+            return;
 
-            newMenu.setDisable( !obj.getModelManager().hasEditableLibraries() );
+        // We have an object
+        validateItem.setDisable( false );
+        // Set font css class
+        if (obj instanceof OtmLibraryMember) {
+            setStateChanged( tc, obj.isDeprecated(), ((OtmLibraryMember) obj).isEditableMinor() );
+        } else
+            setStateChanged( tc, obj.isDeprecated(), obj.isEditable() );
 
-            if (obj.getActionManager() == null)
-                return;
+        DexActionManager actionManager = obj.getActionManager();
+        if (actionManager == null || actionManager instanceof DexReadOnlyActionManager)
+            return;
 
-            if (!(obj.getActionManager() instanceof DexReadOnlyActionManager)) {
-                addAliasItem.setDisable( !obj.getActionManager().isEnabled( DexActions.ADDALIAS, obj ) );
-                deprecateItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DEPRECATIONCHANGE, obj ) );
+        // We have an object and an action manager
+        addAliasItem.setDisable( !actionManager.isEnabled( DexActions.ADDALIAS, obj ) );
+        copyItem.setDisable( !actionManager.isEnabled( DexActions.COPYLIBRARYMEMBER, obj ) );
+        deprecateItem.setDisable( !actionManager.isEnabled( DexActions.DEPRECATIONCHANGE, obj ) );
 
-                deleteItem.setDisable( true );
-                if (obj instanceof OtmAlias)
-                    deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETEALIAS, obj ) );
-                else if (obj instanceof OtmLibraryMember)
-                    deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETELIBRARYMEMBER, obj ) );
-                else if (obj instanceof OtmContributedFacet)
-                    deleteItem.setDisable( !obj.getActionManager().isEnabled( DexActions.DELETELIBRARYMEMBER, obj ) );
-            }
-        }
-
+        if (obj instanceof OtmAlias)
+            deleteItem.setDisable( !actionManager.isEnabled( DexActions.DELETEALIAS, obj ) );
+        else if (obj instanceof OtmLibraryMember)
+            deleteItem.setDisable( !actionManager.isEnabled( DexActions.DELETELIBRARYMEMBER, obj ) );
+        else if (obj instanceof OtmContributedFacet)
+            deleteItem.setDisable( !actionManager.isEnabled( DexActions.DELETELIBRARYMEMBER, obj ) );
     }
 
     private void setStateChanged(TreeTableRow<MemberAndProvidersDAO> tc, boolean deprecated, boolean editable) {
