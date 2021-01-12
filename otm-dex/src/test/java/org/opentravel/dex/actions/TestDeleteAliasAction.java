@@ -52,6 +52,7 @@ public class TestDeleteAliasAction {
     public static void beforeClass() throws IOException {
         staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
         lib = staticModelManager.add( new TLLibrary() );
+        lib.getTL().setPrefix( "TLib" );
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 

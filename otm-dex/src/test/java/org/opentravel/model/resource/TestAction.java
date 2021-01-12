@@ -263,9 +263,10 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
         // Given a NOT 1st class resource with ID group
         OtmResource resource = TestResource.buildFullOtm( THEPATH, SUBJECTNAME, staticModelManager );
         TestParamGroup.buildIdGroup( resource );
-        resource.setFirstClass( false );
         // Given - a parent reference to another resource
         OtmResource parent = TestResource.buildParentResource( resource, "Parent", staticModelManager );
+        // Must be done after parent created to be valid
+        resource.setFirstClass( false );
 
         for (OtmAction a : resource.getActions()) {
             assertFalse( a.getEndpointURL().isEmpty() );
@@ -350,9 +351,12 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
         // Given a NOT 1st class resource with ID group
         OtmResource resource = TestResource.buildFullOtm( THEPATH, SUBJECTNAME, staticModelManager );
         TestParamGroup.buildIdGroup( resource );
-        resource.setFirstClass( false );
         // Given - a parent reference to another resource
         OtmResource parent = TestResource.buildParentResource( resource, "Parent", staticModelManager );
+
+        // Done after parent assigned to make it valid
+        // A non-first class resource without parent references is not allowed because no actions will be published.
+        resource.setFirstClass( false );
 
         // Then - the action's URLs are correct
         for (OtmAction a : resource.getActions()) {

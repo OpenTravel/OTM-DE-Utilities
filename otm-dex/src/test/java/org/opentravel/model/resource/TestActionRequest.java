@@ -25,6 +25,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
@@ -36,7 +38,11 @@ import org.opentravel.model.otmLibraryMembers.TestQueryFacet;
 import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
+import org.opentravel.schemacompiler.model.TLMimeType;
 import org.opentravel.schemacompiler.model.TLReferenceType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Test class for Action Request resource.
@@ -48,7 +54,7 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         baseObject = TestBusiness.buildOtm( staticModelManager );
         testResource = TestResource.buildOtm( staticModelManager );
 
@@ -64,17 +70,26 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
     @Test
     public void testExamplePayloadProperty() {
         // Given a business object
-        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
-        bo.add( TestCustomFacet.buildOtm( staticModelManager ) );
-        bo.add( TestQueryFacet.buildOtm( staticModelManager ) );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmModelManager mgr = lib.getModelManager();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
+        bo.add( TestCustomFacet.buildOtm( mgr ) );
+        bo.add( TestQueryFacet.buildOtm( mgr ) );
+
         // Given a resource
-        OtmResource resource = TestResource.buildOtm( staticModelManager );
-        resource.setSubject( bo );
-        // Given - request on the resource
+        OtmResource resource = TestResource.buildOtm( bo );
+        // OtmResource resource = TestResource.buildOtm( staticModelManager );
+        // resource.setSubject( bo );
+
+        // Given - request on the resource exists
         OtmActionRequest request = resource.getActionRequests().get( 0 );
         assertNotNull( request );
         // Request set to: POST, uses action facet as payload type
         request.setMethod( TLHttpMethod.POST );
+        // Mime type settings
+        List<TLMimeType> mimeTypes = new ArrayList<>();
+        mimeTypes.add( TLMimeType.APPLICATION_JSON );
+        request.setMimeTypes( mimeTypes );
 
         // Given - AF set to: ReferenceFacet = substitution group, No base payload
         OtmActionFacet af = TestActionFacet.buildOtm( resource );
@@ -82,7 +97,6 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
         af.setReferenceFacet( null ); // substitution group setting
         af.setReferenceType( TLReferenceType.REQUIRED ); // only used for response
         // ? What reference type?
-        // Mime type settings?
 
         // When - action facet is set
         request.setPayloadType( af );
@@ -99,6 +113,10 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
         // Then - example property is subject
         ex = request.examplePayloadProperty().get();
         assertTrue( request.examplePayloadProperty().get().contains( bo.getName() ) );
+
+        // Must be valid to use build parent resource
+        TestResource.check( resource, true );
+        // At least one MIME type must be specified when an action facet is referenced.
 
         // When - made into non-first class sub-resource to a parent resource
         OtmResource resourceParent = TestResource.buildParentResource( resource, "ParentResorce", staticModelManager );

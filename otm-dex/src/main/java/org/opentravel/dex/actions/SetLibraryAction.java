@@ -120,9 +120,6 @@ public class SetLibraryAction extends DexRunAction {
             member.getTlLM().setOwningLibrary( lib.getTL() );
             member.refresh();
 
-            // Add to new library
-            // lib.add( member );
-
             // Debugging
             if (member.getLibrary() != lib)
                 log.error( "Missing library." );
@@ -131,7 +128,7 @@ public class SetLibraryAction extends DexRunAction {
             if (oldLibrary != null && oldLibrary.getTL().getNamedMember( member.getName() ) != null)
                 log.error( "Old library still has member" );
 
-            log.debug( "Set library to " + get() );
+            // log.debug( "Set library to " + get() );
         }
         return get();
     }

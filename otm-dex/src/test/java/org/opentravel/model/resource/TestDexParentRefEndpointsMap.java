@@ -24,6 +24,8 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmIdFacet;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -87,6 +89,8 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
         String subName = "Passenger";
         // String parentPathTemplate = "/PaxPathTemplate";
         OtmResource resource = TestResource.buildFullOtm( subPath1, subName, staticModelManager );
+        OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
+        lib.add( resource );
 
         // Create parent resource
         String subjectName = "Reservation";
@@ -414,9 +418,15 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
         // When - multiple levels and multiple parents
         OtmResource parent1 = TestResource.buildParentResource( resource, "Parent1", staticModelManager );
         check( resource, 1 );
+        TestResource.check( resource, true );
+
         OtmResource gp1 = TestResource.buildParentResource( parent1, "GP_Parent1", staticModelManager );
         check( parent1, 1 );
         check( resource, 2 );
+        TestResource.check( parent1, true );
+        // A paremeter group is required for all parent resource references.
+        // A path template for the parent resource is required.
+
         OtmResource parent2 = TestResource.buildParentResource( resource, "Parent2", staticModelManager );
         OtmResource gp2 = TestResource.buildParentResource( parent2, "GP_Parent2", staticModelManager );
         OtmResource ggp2 = TestResource.buildParentResource( gp2, "GGP_Parent2", staticModelManager );

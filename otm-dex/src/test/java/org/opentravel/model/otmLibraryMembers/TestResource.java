@@ -401,6 +401,8 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
 
     /**
      * Build a valid, first class resource with the passed business object as subject.
+     * <p>
+     * Has id parameter group and action.
      * 
      * @param business object - must be in a library
      * @return
@@ -422,6 +424,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
             tlp.setLocation( TLParamLocation.PATH );
             tlp.setFieldRef( TestParamGroup.getMemberField( bo ) );
             pg.add( tlp );
+            pg.setIdGroup( true );
         }
         for (OtmAction action : resource.getActions()) {
             // At least one response must be declared or inherited for a resource action.
@@ -511,32 +514,44 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
      */
     public static OtmResource buildParentResource(OtmResource r, String name, OtmModelManager mgr) {
 
+        if (r.getLibrary() == null) {
+            OtmLibrary lib = TestLibrary.buildOtm( mgr );
+            lib.add( r );
+        }
+        assertTrue( "Given: illegal parameter.", r.getLibrary() != null );
+        // Only first class resources will be valid without parent set
+        boolean wasFirstClass = r.isFirstClass();
+        r.setFirstClass( true );
+
         // Given - a valid resource parameter
         check( r, true );
 
         // Given a subject for the resource
-        // OtmBusinessObject parentBO = TestBusiness.buildOtm( mgr, name );
         OtmBusinessObject parentBO = TestBusiness.buildOtm( r.getLibrary(), name );
-        // String parentNameString = name + "BO";
-        // parentBO.setName( parentNameString );
 
         // Create the parent resource with path
         String parentPathString = "/" + name + "Path";
         OtmResource parentR = TestResource.buildOtm( parentBO );
-        // parentR.setName( name );
-        // parentR.setAssignedType( parentBO );
         parentR.setBasePath( parentPathString );
-        // parentR.getTL().setFirstClass( true );
-        // OtmParameterGroup idGroup = TestParamGroup.buildIdGroup( parentR );
-        // Add a parameter - which one?
+        // Find the ID group in the parent resource
+        OtmParameterGroup idGroup = null;
+        for (OtmParameterGroup p : parentR.getParameterGroups())
+            if (p.isIdGroup())
+                idGroup = p;
+        assertTrue( "Must have an ID group in the parent resource.", idGroup != null );
 
         OtmParentRef parentRef = TestParentRef.buildOtm( r, parentR );
+        parentRef.setParameterGroup( idGroup );
         // parentRef.getTL().setParentParamGroup( idGroup.getTL() );
-        parentRef.getTL().setPathTemplate( null ); // do NOT use the override
+        parentRef.setPathTemplate( parentRef.getPathTemplateDefault() );
+        // 1/12/2021 WHY?
+        // parentRef.getTL().setPathTemplate( null ); // do NOT use the override
 
         assertTrue( parentRef.getParentResource() == parentR );
-        // assertTrue( parentRef.getParameterGroup() == idGroup );
-        // assertTrue( idGroup.getOwningMember() == parentR );
+        assertTrue( parentRef.getParameterGroup() != null );
+
+        // Restore original setting
+        r.setFirstClass( wasFirstClass );
 
         check( parentR, true );
         check( r, true );
