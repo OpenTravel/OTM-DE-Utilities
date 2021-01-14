@@ -39,8 +39,8 @@ import javafx.scene.control.Tooltip;
 public class LibraryFilterWidget extends FilterWidget {
     // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
 
-    private static final String ALLLIBS = "No Library Name Filter";
-    private static final String TOOLTIP = "Only show members from libraries that start with selected name.";
+    private static final String ALLLIBS = "All Libraries";
+    private static final String TOOLTIP = "Filter to only show members from libraries that start with selected name.";
 
     private ChoiceBox<String> librarySelector;
     private OtmModelManager modelMgr;
