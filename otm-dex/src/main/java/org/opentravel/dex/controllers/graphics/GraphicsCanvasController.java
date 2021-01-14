@@ -37,6 +37,7 @@ import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObjects;
+import org.opentravel.objecteditor.UserSettings;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,6 +46,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -55,11 +58,13 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -103,10 +108,11 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
     private boolean ignoreEvents = false;
 
+    private UserSettings globalSettings;
+    private double globalSize = 5;
     private boolean isLocked = false;
     private boolean tracking = true;
     private boolean showDomains = true;
-
 
     public GraphicsCanvasController() {
         super( subscribedEvents, publishedEvents );
@@ -131,6 +137,14 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         super.configure( parent, viewGroupId );
         eventPublisherNode = graphicsPane;
         parentController = parent;
+
+        // Global User Settings
+        globalSettings = parent.getUserSettings();
+        if (globalSettings != null) {
+            tracking = globalSettings.getGraphicsTracking();
+            globalSize = globalSettings.getGraphicsSize();
+            showDomains = globalSettings.getGraphicsDomains();
+        }
 
         createToolBar( graphicsVBox ); // to first to have at top
 
@@ -185,31 +199,31 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         clipboardB.setOnAction( e -> snapshot() );
 
         Separator tSep = new Separator( Orientation.VERTICAL );
-        ToggleSwitch trackS = new ToggleSwitch( "Track" );
+        ToggleSwitch trackS = new ToggleSwitch();
         trackS.selectedProperty().addListener( (v, o, n) -> doTrack( n ) );
         trackS.setSelected( tracking );
+        trackS.setTooltip( new Tooltip( "Track object selected in members panel." ) );
+        Node trackBox = decorateControl( trackS, "Track", null );
 
         Separator lockSep = new Separator( Orientation.VERTICAL );
-        ToggleSwitch lockS = new ToggleSwitch( "Lock" );
-        ImageView lockI = ImageManager.get( Icons.LOCK );
+        ToggleSwitch lockS = new ToggleSwitch();
         lockS.selectedProperty().addListener( (v, o, n) -> doLock( n ) );
+        lockS.setSelected( isLocked );
+        lockS.setTooltip( new Tooltip( "Lock display." ) );
+        Node lockVBox = decorateControl( lockS, " Lock ", ImageManager.get( Icons.LOCK ) );
 
         Separator domainSep = new Separator( Orientation.VERTICAL );
-        ToggleSwitch domainS = new ToggleSwitch( "Domains" );
-        ImageView domainI = ImageManager.get( Icons.DOMAIN );
+        ToggleSwitch domainS = new ToggleSwitch();
         domainS.selectedProperty().addListener( (v, o, n) -> doDomains( n ) );
         domainS.setSelected( showDomains );
+        domainS.setTooltip( new Tooltip( "Show domain relationships. (Experimental)" ) );
+        Node domainBox = decorateControl( domainS, "Domains ", ImageManager.get( Icons.DOMAIN ) );
 
-        // Separator cSep = new Separator( Orientation.VERTICAL );
-        // ToggleSwitch collapseS = new ToggleSwitch( "Collapse" );
-        // collapseS.selectedProperty().addListener( (v, o, n) -> doCollapse( n ) );
-        //
         Separator fontSep = new Separator( Orientation.VERTICAL );
-        Label fontL = new Label( "Size" );
-        // Slider fontS = new Slider( 8, 24, 14 ); // Min, max, current
-        Slider fontS = new Slider( 1, 10, 5 ); // Min, max, current
+        Slider fontS = new Slider( 1, 10, globalSize ); // Min, max, current
         fontS.setShowTickMarks( true );
         fontS.valueProperty().addListener( (v, o, n) -> doSize( n ) );
+        Node sizeBox = decorateControl( fontS, " Size ", null );
 
         Separator dSep = new Separator( Orientation.VERTICAL );
         ToggleSwitch doodleS = new ToggleSwitch( "Draw" );
@@ -218,11 +232,44 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
         ColorPicker colorP = new ColorPicker();
         colorP.setOnAction( this::doColor );
 
-        ToolBar tb = new ToolBar( clearB, refreshB, clipboardB, tSep, trackS, lockSep, lockS, lockI, domainSep, domainI,
-            domainS, fontSep, fontL, fontS, colorP, dSep, doodleS );
+        ToolBar tb = new ToolBar( clearB, refreshB, clipboardB, tSep, trackBox, lockSep, lockVBox, domainSep, domainBox,
+            fontSep, sizeBox, new Separator( Orientation.VERTICAL ), colorP, dSep, doodleS );
+        // ToolBar tb = new ToolBar( clearB, refreshB, clipboardB, tSep, trackS, lockSep, lockS, lockI, domainSep,
+        // domainS,
+        // domainI, fontSep, fontL, fontS, colorP, dSep, doodleS );
+
         parent.getChildren().add( tb );
         tb.setStyle( "-fx-background-color: #7cafc2" );
         return tb;
+    }
+
+    /**
+     * Create vbox with hbox to contain the switch/slider and its lable and icon.
+     * 
+     * @return
+     */
+    private Node decorateControl(Node tSwitch, String label, ImageView icon) {
+        double width = 50;
+        VBox sBox = new VBox();
+        sBox.setAlignment( Pos.CENTER_RIGHT );
+        sBox.setMinWidth( width );
+
+        HBox swBox = new HBox();
+        swBox.setAlignment( Pos.CENTER );
+        swBox.getChildren().add( tSwitch );
+        if (tSwitch instanceof ToggleSwitch)
+            swBox.getChildren().add( new Label( "     " ) );
+        sBox.getChildren().add( swBox );
+
+        HBox sLabel = new HBox();
+        sLabel.setAlignment( Pos.CENTER );
+        sLabel.setMinWidth( width );
+        sLabel.getChildren().add( new Label( label ) );
+        if (icon != null)
+            sLabel.getChildren().add( icon );
+        sBox.getChildren().add( sLabel );
+
+        return sBox;
     }
 
     public void doClear() {
@@ -288,6 +335,12 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
     public void doSize(Number v) {
         // log.debug( "Change font size to: " + v.intValue() );
         spriteManager.update( v.intValue() );
+
+        if (globalSettings != null) {
+            globalSettings.setGraphicsSize( v.intValue() );
+            globalSettings.save();
+            // log.debug( "Size set to: " + tracking );
+        }
     }
 
     public void doLock(boolean lock) {
@@ -296,6 +349,10 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
     public void doDomains(boolean show) {
         showDomains = show;
+        if (globalSettings != null) {
+            globalSettings.setGraphicsDomains( showDomains );
+            globalSettings.save();
+        }
     }
 
     public void doRefresh(ActionEvent e) {
@@ -305,6 +362,11 @@ public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObjec
 
     public void doTrack(boolean track) {
         this.tracking = track;
+        if (globalSettings != null) {
+            globalSettings.setGraphicsTracking( tracking );
+            globalSettings.save();
+            // log.debug( "Tracking set to: " + tracking );
+        }
     }
 
     @Override

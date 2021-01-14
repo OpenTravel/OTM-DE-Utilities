@@ -45,205 +45,29 @@ import java.util.Properties;
  * <li>Add {@link #getDefaultSettings()}
  */
 public class UserSettings extends AbstractUserSettings {
+    private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
 
     private static final int EXAMPLE_MAX_REPEAT = 3;
     private static final int EXAMPLE_MAX_DEPTH = 3;
-
-
-    public String getServiceEndpointUrl() {
-        return serviceEndpointUrl;
-    }
-
-    public void setServiceEndpointUrl(String serviceEndpointUrl) {
-        this.serviceEndpointUrl = serviceEndpointUrl;
-    }
-
-    public String getResourceBaseUrl() {
-        return resourceBaseUrl;
-    }
-
-    public void setResourceBaseUrl(String resourceBaseUrl) {
-        this.resourceBaseUrl = resourceBaseUrl;
-    }
-
-    public boolean isSuppressOtmExtensions() {
-        return suppressOtmExtensions;
-    }
-
-    public void setSuppressOtmExtensions(boolean suppressOtmExtensions) {
-        this.suppressOtmExtensions = suppressOtmExtensions;
-    }
-
-    public boolean isSuppressOptionalFields() {
-        return suppressOptionalFields;
-    }
-
-    public void setSuppressOptionalFields(boolean suppressOptionalFields) {
-        this.suppressOptionalFields = suppressOptionalFields;
-    }
-
-    public boolean isCompileSchemas() {
-        return compileSchemas;
-    }
-
-    public void setCompileSchemas(boolean compileSchemas) {
-        this.compileSchemas = compileSchemas;
-    }
-
-    public boolean isCompileJsonSchemas() {
-        return compileJsonSchemas;
-    }
-
-    public void setCompileJsonSchemas(boolean compileJson) {
-        this.compileJsonSchemas = compileJson;
-    }
-
-    public boolean isCompileServices() {
-        return compileServices;
-    }
-
-    public void setCompileServices(boolean compileServices) {
-        this.compileServices = compileServices;
-    }
-
-    public boolean isCompileSwagger() {
-        return compileSwagger;
-    }
-
-    public void setCompileSwagger(boolean compileSwagger) {
-        this.compileSwagger = compileSwagger;
-    }
-
-    public boolean isCompileHtml() {
-        return compileHtml;
-    }
-
-    public void setCompileHtml(boolean compileHtml) {
-        this.compileHtml = compileHtml;
-    }
-
-    public boolean isGenerateExamples() {
-        return generateExamples;
-    }
-
-    public void setGenerateExamples(boolean generateExamples) {
-        this.generateExamples = generateExamples;
-    }
-
-    public boolean isGenerateMaxDetailsForExamples() {
-        return generateMaxDetailsForExamples;
-    }
-
-    public void setGenerateMaxDetailsForExamples(boolean generateMaxDetailsForExamples) {
-        this.generateMaxDetailsForExamples = generateMaxDetailsForExamples;
-    }
-
-    public String getExampleContext() {
-        return exampleContext;
-    }
-
-
-    public String getDisplaySize() {
-        return displaySize;
-    }
-
-    public void setDisplaySize(String size) {
-        displaySize = size;
-    }
-
-    /**
-     * Default request payload
-     */
-    public OtmObject getDefaultRequestPayload(OtmModelManager mgr) {
-        return mgr.getMember( defaultRequestPayload );
-    }
-
-    public void setDefaultRequestPayload(String nameWithPrefix) {
-        this.defaultRequestPayload = nameWithPrefix;
-    }
-
-    public void setDefaultRequestPayload(OtmObject payload) {
-        if (payload != null)
-            setDefaultRequestPayload( payload.getNameWithPrefix() );
-    }
-
-    /**
-     * Default resource mime types
-     */
-    public String getDefaultMimeTypes() {
-        return defaultMimeTypes;
-    }
-
-    public void setDefaultMimeTypes(String values) {
-        defaultMimeTypes = values;
-    }
-
-    /**
-     * Default response payload
-     */
-    public OtmObject getDefaultResponsePayload(OtmModelManager mgr) {
-        return mgr.getMember( defaultResponsePayload );
-    }
-
-    public void setDefaultResponsePayload(OtmObject payload) {
-        setDefaultResponsePayload( payload.getNameWithPrefix() );
-    }
-
-    public void setDefaultResponsePayload(String nameWithPrefix) {
-        this.defaultResponsePayload = nameWithPrefix;
-    }
-
-    public void setExampleContext(String exampleContext) {
-        this.exampleContext = exampleContext;
-    }
-
-    public int getExampleMaxRepeat() {
-        return exampleMaxRepeat;
-    }
-
-    public void setExampleMaxRepeat(int exampleMaxRepeat) {
-        this.exampleMaxRepeat = exampleMaxRepeat;
-    }
-
-    public void setExampleMaxRepeat(String exampleMaxRepeatString) {
-        try {
-            if (exampleMaxRepeatString != null && !exampleMaxRepeatString.isEmpty())
-                this.exampleMaxRepeat = Integer.parseInt( exampleMaxRepeatString );
-        } catch (NumberFormatException e) {
-            exampleMaxRepeat = EXAMPLE_MAX_REPEAT;
-        }
-    }
-
-    public int getExampleMaxDepth() {
-        return exampleMaxDepth;
-    }
-
-    public void setExampleMaxDepth(int exampleMaxDepth) {
-        this.exampleMaxDepth = exampleMaxDepth;
-    }
-
-    public void setExampleMaxDepth(String exampleMaxDepthString) {
-        try {
-            if (exampleMaxDepthString != null && !exampleMaxDepthString.isEmpty())
-                this.exampleMaxDepth = Integer.parseInt( exampleMaxDepthString );
-        } catch (NumberFormatException e) {
-            exampleMaxDepth = EXAMPLE_MAX_DEPTH;
-        }
-    }
-
     private static final String USER_SETTINGS_FILE = "/.ota2/.dex-settings.properties";
     private static final String PROJECT_DIRECTORY_LABEL = "lastProjectFolder";
     private static final String HIDE_PROJECT_OPEN_DIALOG = "hideOpenProjectDialog";
     private static final String PROJECT_ARRAY_LABEL = "recentlyUsedProject";
     private static final int MAX_PROJECTS = 9;
 
+    private static final String GRAPHICS_DOMAINS = "graphicsDomains";
+    private static final String GRAPHICS_SIZE = "graphicsSize";
+    private static final String GRAPHICS_TRACKING = "graphicsTracking";
+
     private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
-    private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
 
     private int repeatCount;
+
     // private File lastModelFile;
     private File lastProjectFile;
+
     private boolean hideProjectOpenDialog;
+
     // Compiler Options
     private boolean compileSchemas = true;
     private boolean compileJsonSchemas = true;
@@ -264,68 +88,19 @@ public class UserSettings extends AbstractUserSettings {
     private String exampleContext;
     private int exampleMaxRepeat;
     private int exampleMaxDepth;
+
     private boolean suppressOptionalFields = false;
+
     private String lastRepositoryId = "";
+
     private String displaySize = "Normal";
 
     private List<String> recentProjects = new ArrayList<>();
 
-
-    public String getLastRepositoryId() {
-        return lastRepositoryId;
-    }
-
-    public void setLastRepositoryId(String lastRepositoryId) {
-        if (lastRepositoryId == null)
-            lastRepositoryId = "";
-        this.lastRepositoryId = lastRepositoryId;
-    }
-
-    /**
-     * Returns the user settings from the prior session. If no prior settings exist, default settings are returned.
-     * 
-     * @return UserSettings
-     */
-    public static UserSettings load() {
-        UserSettings settings;
-
-        if (!settingsFile.exists()) {
-            settings = getDefaultSettings();
-        } else {
-            try (InputStream is = new FileInputStream( settingsFile )) {
-                Properties usProps = new Properties();
-
-                usProps.load( is );
-                settings = new UserSettings();
-                settings.load( usProps );
-
-            } catch (Exception e) {
-                log.warn( "Error loading settings from prior session (using defaults).", e );
-                settings = getDefaultSettings();
-            }
-
-        }
-        return settings;
-    }
-
-    /**
-     * @see org.opentravel.application.common.AbstractUserSettings#save()
-     */
-    @Override
-    public void save() {
-        if (!settingsFile.getParentFile().exists()) {
-            settingsFile.getParentFile().mkdirs();
-        }
-        try (OutputStream out = new FileOutputStream( settingsFile )) {
-            Properties usProps = new Properties();
-
-            save( usProps );
-            usProps.store( out, null );
-
-        } catch (IOException e) {
-            log.error( "Error saving user settings.", e );
-        }
-    }
+    // Graphics settings
+    private boolean graphicsDomains = false;
+    private boolean graphicsTracking = true;
+    private double graphicsSize = 5;
 
     /**
      * Returns the default user settings.
@@ -366,8 +141,171 @@ public class UserSettings extends AbstractUserSettings {
         settings.setExampleMaxDepth( EXAMPLE_MAX_DEPTH );
         settings.setSuppressOptionalFields( false );
 
+        // Graphics Options
+        settings.graphicsDomains = false;
+        settings.graphicsTracking = true;
+        settings.graphicsSize = 5;
+
         settings.setDisplaySize( "Normal" );
         return settings;
+    }
+
+    /**
+     * Returns the user settings from the prior session. If no prior settings exist, default settings are returned.
+     * 
+     * @return UserSettings
+     */
+    public static UserSettings load() {
+        UserSettings settings;
+
+        if (!settingsFile.exists()) {
+            settings = getDefaultSettings();
+        } else {
+            try (InputStream is = new FileInputStream( settingsFile )) {
+                Properties usProps = new Properties();
+
+                usProps.load( is );
+                settings = new UserSettings();
+                settings.load( usProps );
+
+            } catch (Exception e) {
+                log.warn( "Error loading settings from prior session (using defaults).", e );
+                settings = getDefaultSettings();
+            }
+
+        }
+        return settings;
+    }
+
+    /**
+     * Default resource mime types
+     */
+    public String getDefaultMimeTypes() {
+        return defaultMimeTypes;
+    }
+
+    /**
+     * Default request payload
+     */
+    public OtmObject getDefaultRequestPayload(OtmModelManager mgr) {
+        return mgr.getMember( defaultRequestPayload );
+    }
+
+    /**
+     * Default response payload
+     */
+    public OtmObject getDefaultResponsePayload(OtmModelManager mgr) {
+        return mgr.getMember( defaultResponsePayload );
+    }
+
+    public String getDisplaySize() {
+        return displaySize;
+    }
+
+    public String getExampleContext() {
+        return exampleContext;
+    }
+
+    public int getExampleMaxDepth() {
+        return exampleMaxDepth;
+    }
+
+    public int getExampleMaxRepeat() {
+        return exampleMaxRepeat;
+    }
+
+    public boolean getHideOpenProjectDialog() {
+        return hideProjectOpenDialog;
+    }
+
+    /**
+     * Returns the folder location where the last EXAMPLE file was saved.
+     *
+     * @return File
+     */
+    public File getLastProjectFolder() {
+        return lastProjectFile;
+    }
+
+    public String getLastRepositoryId() {
+        return lastRepositoryId;
+    }
+
+    /**
+     * Get Files from the saved absolute paths
+     * 
+     * @return
+     */
+    public List<File> getRecentProjects() {
+        List<File> files = new ArrayList<>();
+        for (String pf : recentProjects)
+            files.add( new File( pf ) );
+        return files;
+    }
+
+    /**
+     * Returns the value of the repeat-count spinner.
+     *
+     * @return int
+     */
+    public int getRepeatCount() {
+        return repeatCount;
+    }
+
+    public String getResourceBaseUrl() {
+        return resourceBaseUrl;
+    }
+
+    public String getServiceEndpointUrl() {
+        return serviceEndpointUrl;
+    }
+
+    public boolean getGraphicsDomains() {
+        return graphicsDomains;
+    }
+
+    public double getGraphicsSize() {
+        return graphicsSize;
+    }
+
+    public boolean getGraphicsTracking() {
+        return graphicsTracking;
+    }
+
+    public boolean isCompileHtml() {
+        return compileHtml;
+    }
+
+    public boolean isCompileJsonSchemas() {
+        return compileJsonSchemas;
+    }
+
+    public boolean isCompileSchemas() {
+        return compileSchemas;
+    }
+
+    public boolean isCompileServices() {
+        return compileServices;
+    }
+
+    public boolean isCompileSwagger() {
+        return compileSwagger;
+    }
+
+    public boolean isGenerateExamples() {
+        return generateExamples;
+    }
+
+    public boolean isGenerateMaxDetailsForExamples() {
+        return generateMaxDetailsForExamples;
+    }
+
+    public boolean isSuppressOptionalFields() {
+        return suppressOptionalFields;
+    }
+
+    public boolean isSuppressOtmExtensions() {
+        return suppressOtmExtensions;
     }
 
     /**
@@ -408,6 +346,14 @@ public class UserSettings extends AbstractUserSettings {
 
         setDisplaySize( settingsProps.getProperty( "displaySize" ) );
 
+        try {
+            graphicsSize = Double.valueOf( settingsProps.getProperty( GRAPHICS_SIZE ) );
+        } catch (NumberFormatException e) {
+            graphicsSize = 5;
+        }
+        setGraphicsDomains( Boolean.valueOf( settingsProps.getProperty( GRAPHICS_DOMAINS ) ) );
+        setGraphicsTracking( Boolean.valueOf( settingsProps.getProperty( GRAPHICS_TRACKING ) ) );
+
         // setLastModelFile( (modelFile == null) ? null : new File( modelFile ) );
         super.load( settingsProps );
     }
@@ -426,52 +372,31 @@ public class UserSettings extends AbstractUserSettings {
         }
     }
 
-    /**
-     * Save strings in recentProjects array into settings
-     * 
-     * @param settingsProps
-     */
-    private void saveRecentlyUsedProjects(Properties settingsProps) {
-        String project = "";
-        if (recentProjects.isEmpty())
+    private void putString(Properties settingsProps, String key, String value) {
+        if (key == null)
             return;
-        for (int i = 0; i < recentProjects.size(); i++) {
-            project = recentProjects.get( i );
-            if (!project.isEmpty())
-                settingsProps.put( PROJECT_ARRAY_LABEL + i, project );
-        }
-    }
-
-    // TODO - how to assure least recently used order?
-    // List maintains insertion order
-    /**
-     * Set the project's absolute path into the top of the recentProjects array.
-     * 
-     * @param project
-     */
-    public void setRecentProject(OtmProject project) {
-        // Get a string for the project
-        if (project != null && project.getTL() != null && project.getTL().getProjectFile() != null) {
-            String pf = project.getTL().getProjectFile().getAbsolutePath();
-            if (recentProjects.contains( pf ))
-                recentProjects.remove( pf ); // It will get added at front
-            while (recentProjects.size() >= MAX_PROJECTS)
-                recentProjects.remove( MAX_PROJECTS - 1 ); // remove from end
-            if (recentProjects.size() < MAX_PROJECTS)
-                recentProjects.add( 0, pf ); // set to front
-        }
+        if (value == null)
+            value = "";
+        settingsProps.put( key, value );
     }
 
     /**
-     * Get Files from the saved absolute paths
-     * 
-     * @return
+     * @see org.opentravel.application.common.AbstractUserSettings#save()
      */
-    public List<File> getRecentProjects() {
-        List<File> files = new ArrayList<>();
-        for (String pf : recentProjects)
-            files.add( new File( pf ) );
-        return files;
+    @Override
+    public void save() {
+        if (!settingsFile.getParentFile().exists()) {
+            settingsFile.getParentFile().mkdirs();
+        }
+        try (OutputStream out = new FileOutputStream( settingsFile )) {
+            Properties usProps = new Properties();
+
+            save( usProps );
+            usProps.store( out, null );
+
+        } catch (IOException e) {
+            log.error( "Error saving user settings.", e );
+        }
     }
 
     /**
@@ -516,65 +441,127 @@ public class UserSettings extends AbstractUserSettings {
 
         putString( settingsProps, "displaySize", displaySize );
 
+        settingsProps.put( GRAPHICS_DOMAINS, Boolean.toString( graphicsDomains ) );
+        settingsProps.put( GRAPHICS_SIZE, Double.toString( graphicsSize ) );
+        settingsProps.put( GRAPHICS_TRACKING, Boolean.toString( graphicsTracking ) );
+
         super.save( settingsProps );
     }
 
-    private void putString(Properties settingsProps, String key, String value) {
-        if (key == null)
+    /**
+     * Save strings in recentProjects array into settings
+     * 
+     * @param settingsProps
+     */
+    private void saveRecentlyUsedProjects(Properties settingsProps) {
+        String project = "";
+        if (recentProjects.isEmpty())
             return;
-        if (value == null)
-            value = "";
-        settingsProps.put( key, value );
+        for (int i = 0; i < recentProjects.size(); i++) {
+            project = recentProjects.get( i );
+            if (!project.isEmpty())
+                settingsProps.put( PROJECT_ARRAY_LABEL + i, project );
+        }
     }
 
-    /**
-     * Returns the value of the repeat-count spinner.
-     *
-     * @return int
-     */
-    public int getRepeatCount() {
-        return repeatCount;
+    public void setCompileHtml(boolean compileHtml) {
+        this.compileHtml = compileHtml;
     }
 
-    /**
-     * Assigns the value of the repeat-count spinner.
-     *
-     * @param repeatCount the repeat count value to assign
-     */
-    public void setRepeatCount(int repeatCount) {
-        this.repeatCount = repeatCount;
-    }
-    //
-    // /**
-    // * Returns the file location of the last OTM model that was opened.
-    // *
-    // * @return File
-    // */
-    // public File getLastModelFile() {
-    // return lastModelFile;
-    // }
-    //
-    // /**
-    // * Assigns the file location of the last OTM model that was opened.
-    // *
-    // * @param lastModelFile
-    // * the file location to assign
-    // */
-    // public void setLastModelFile(File lastModelFile) {
-    // this.lastModelFile = lastModelFile;
-    // }
-
-    /**
-     * Returns the folder location where the last EXAMPLE file was saved.
-     *
-     * @return File
-     */
-    public File getLastProjectFolder() {
-        return lastProjectFile;
+    public void setCompileJsonSchemas(boolean compileJson) {
+        this.compileJsonSchemas = compileJson;
     }
 
-    public boolean getHideOpenProjectDialog() {
-        return hideProjectOpenDialog;
+    public void setCompileSchemas(boolean compileSchemas) {
+        this.compileSchemas = compileSchemas;
+    }
+
+    public void setCompileServices(boolean compileServices) {
+        this.compileServices = compileServices;
+    }
+
+    public void setCompileSwagger(boolean compileSwagger) {
+        this.compileSwagger = compileSwagger;
+    }
+
+    public void setDefaultMimeTypes(String values) {
+        defaultMimeTypes = values;
+    }
+
+    public void setDefaultRequestPayload(OtmObject payload) {
+        if (payload != null)
+            setDefaultRequestPayload( payload.getNameWithPrefix() );
+    }
+
+    public void setDefaultRequestPayload(String nameWithPrefix) {
+        this.defaultRequestPayload = nameWithPrefix;
+    }
+
+    public void setDefaultResponsePayload(OtmObject payload) {
+        setDefaultResponsePayload( payload.getNameWithPrefix() );
+    }
+
+
+    public void setDefaultResponsePayload(String nameWithPrefix) {
+        this.defaultResponsePayload = nameWithPrefix;
+    }
+
+    public void setDisplaySize(String size) {
+        displaySize = size;
+    }
+
+    public void setExampleContext(String exampleContext) {
+        this.exampleContext = exampleContext;
+    }
+
+    public void setExampleMaxDepth(int exampleMaxDepth) {
+        this.exampleMaxDepth = exampleMaxDepth;
+    }
+
+    public void setExampleMaxDepth(String exampleMaxDepthString) {
+        try {
+            if (exampleMaxDepthString != null && !exampleMaxDepthString.isEmpty())
+                this.exampleMaxDepth = Integer.parseInt( exampleMaxDepthString );
+        } catch (NumberFormatException e) {
+            exampleMaxDepth = EXAMPLE_MAX_DEPTH;
+        }
+    }
+
+    public void setExampleMaxRepeat(int exampleMaxRepeat) {
+        this.exampleMaxRepeat = exampleMaxRepeat;
+    }
+
+    public void setExampleMaxRepeat(String exampleMaxRepeatString) {
+        try {
+            if (exampleMaxRepeatString != null && !exampleMaxRepeatString.isEmpty())
+                this.exampleMaxRepeat = Integer.parseInt( exampleMaxRepeatString );
+        } catch (NumberFormatException e) {
+            exampleMaxRepeat = EXAMPLE_MAX_REPEAT;
+        }
+    }
+
+    public void setGenerateExamples(boolean generateExamples) {
+        this.generateExamples = generateExamples;
+    }
+
+    public void setGenerateMaxDetailsForExamples(boolean generateMaxDetailsForExamples) {
+        this.generateMaxDetailsForExamples = generateMaxDetailsForExamples;
+    }
+
+    public void setGraphicsDomains(boolean value) {
+        this.graphicsDomains = value;
+    }
+
+    public void setGraphicsSize(double value) {
+        this.graphicsSize = value;
+    }
+
+    public void setGraphicsTracking(boolean value) {
+        this.graphicsTracking = value;
+    }
+
+    public void setHideOpenProjectDialog(boolean value) {
+        this.hideProjectOpenDialog = value;
     }
 
     /**
@@ -586,8 +573,55 @@ public class UserSettings extends AbstractUserSettings {
         this.lastProjectFile = lastProjectFolder;
     }
 
-    public void setHideOpenProjectDialog(boolean value) {
-        this.hideProjectOpenDialog = value;
+    public void setLastRepositoryId(String lastRepositoryId) {
+        if (lastRepositoryId == null)
+            lastRepositoryId = "";
+        this.lastRepositoryId = lastRepositoryId;
+    }
+
+    // TODO - how to assure least recently used order?
+    // List maintains insertion order
+    /**
+     * Set the project's absolute path into the top of the recentProjects array.
+     * 
+     * @param project
+     */
+    public void setRecentProject(OtmProject project) {
+        // Get a string for the project
+        if (project != null && project.getTL() != null && project.getTL().getProjectFile() != null) {
+            String pf = project.getTL().getProjectFile().getAbsolutePath();
+            if (recentProjects.contains( pf ))
+                recentProjects.remove( pf ); // It will get added at front
+            while (recentProjects.size() >= MAX_PROJECTS)
+                recentProjects.remove( MAX_PROJECTS - 1 ); // remove from end
+            if (recentProjects.size() < MAX_PROJECTS)
+                recentProjects.add( 0, pf ); // set to front
+        }
+    }
+
+    /**
+     * Assigns the value of the repeat-count spinner.
+     *
+     * @param repeatCount the repeat count value to assign
+     */
+    public void setRepeatCount(int repeatCount) {
+        this.repeatCount = repeatCount;
+    }
+
+    public void setResourceBaseUrl(String resourceBaseUrl) {
+        this.resourceBaseUrl = resourceBaseUrl;
+    }
+
+    public void setServiceEndpointUrl(String serviceEndpointUrl) {
+        this.serviceEndpointUrl = serviceEndpointUrl;
+    }
+
+    public void setSuppressOptionalFields(boolean suppressOptionalFields) {
+        this.suppressOptionalFields = suppressOptionalFields;
+    }
+
+    public void setSuppressOtmExtensions(boolean suppressOtmExtensions) {
+        this.suppressOtmExtensions = suppressOtmExtensions;
     }
 
 }
