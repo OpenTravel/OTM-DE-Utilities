@@ -772,6 +772,10 @@ public class OtmModelManager implements TaskResultHandlerI {
         return Collections.unmodifiableCollection( selected );
     }
 
+    public Collection<OtmLibraryMember> getMembersContextualFacets() {
+        return getMembers( d -> d instanceof OtmContextualFacet );
+    }
+
     /**
      * @return new list with all the library members in that library
      */

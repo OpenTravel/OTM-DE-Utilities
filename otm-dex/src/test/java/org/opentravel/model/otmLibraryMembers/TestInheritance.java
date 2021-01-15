@@ -25,39 +25,36 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractOTMApplication;
-import org.opentravel.common.ValidationUtils;
-import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestVersionChain;
+import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmFacets.TestFacet;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
-import org.opentravel.model.resource.OtmAction;
-import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
-import org.opentravel.schemacompiler.codegen.util.ResourceCodegenUtils;
-import org.opentravel.schemacompiler.model.TLAction;
-import org.opentravel.schemacompiler.model.TLActionFacet;
+import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLAttribute;
+import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLIndicator;
+import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLModelElement;
-import org.opentravel.schemacompiler.model.TLParamGroup;
 import org.opentravel.schemacompiler.model.TLProperty;
-import org.opentravel.schemacompiler.model.TLResource;
-import org.opentravel.schemacompiler.model.TLResourceParentRef;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Verifies the functions related to inheritance.
@@ -82,82 +79,104 @@ public class TestInheritance extends AbstractFxTest {
      * @throws VersionSchemeException
      */
     @Test
-    public void testResourceActionFacets() throws VersionSchemeException {
+    public void testInheritedCustomFacets() throws VersionSchemeException {
+        // Given - the unmanaged project with lots of contextual facets
         mgr.clear();
-        if (!TestDexFileHandler.loadVersionProject( mgr ))
-            return; // No editable libraries
+        TestDexFileHandler.loadUnmanagedProject( mgr );
+        assertTrue( mgr.getTlModel().getAllLibraries().size() == 6 );
 
-        OtmLibrary minorLibrary = TestVersionChain.getMinorInChain( mgr );
-        assertTrue( "Given", minorLibrary != null );
-        assertTrue( "Given", minorLibrary.isEditable() );
-        assertTrue( "Given - minor is empty.", mgr.getMembers( minorLibrary ).isEmpty() );
-
-        OtmLibrary majorLibrary = minorLibrary.getVersionChain().getMajor();
-        assertTrue( "Given", majorLibrary != null );
-        assertTrue( "Given", !majorLibrary.isEditable() );
-        List<OtmLibraryMember> members = majorLibrary.getMembers();
-        assertTrue( "Given - major is not empty.", !members.isEmpty() );
-        OtmBusinessObject bo = null;
-        for (OtmLibraryMember member : members) {
-            if (member instanceof OtmBusinessObject)
-                bo = (OtmBusinessObject) member;
+        // Given - list of tl contextual facets
+        List<TLContextualFacet> tlCFacets = new ArrayList<>();
+        for (TLLibrary tlLib : mgr.getTlModel().getUserDefinedLibraries()) {
+            for (LibraryMember tlm : tlLib.getNamedMembers())
+                if (tlm instanceof TLContextualFacet)
+                    tlCFacets.add( (TLContextualFacet) tlm );
         }
-        assertTrue( "Given - business object must be found.", bo != null );
-        assertTrue( "Business object must be valid.", bo.isValid( true ) );
 
-        // Given - a minor version of the business object
-        OtmBusinessObject minorBO = (OtmBusinessObject) bo.createMinorVersion( minorLibrary );
-        assertTrue( "Must have a minor business object.", minorBO != null );
+        // Given - tl projects added to manager
+        mgr.addProjects();
+        Collection<OtmLibrary> libs = mgr.getUserLibraries();
+        Collection<OtmLibraryMember> members = mgr.getMembers();
 
-        // Given - a resource in the minor library
-        OtmResource resource = TestResource.buildFullOtm( "http://example.com", "TestResource", minorLibrary, mgr );
-        resource.setSubject( bo );
-        assertTrue( "Given: ", resource.getSubject() == bo );
-        resource.isValid( true );
-        // log.debug( ValidationUtils.getMessagesAsString( resource.getFindings() ) );
-        // assertTrue( "Must be valid.", resource.isValid() );
+        // Given - the list of contextual facets to test
+        List<OtmContextualFacet> cFacets = new ArrayList<>();
+        members.forEach( m -> {
+            if (m instanceof OtmContextualFacet)
+                cFacets.add( (OtmContextualFacet) m );
+        } );
+        // Collection<OtmLibraryMember> cFacets = mgr.getMembersContextualFacets();
 
-        // Given - BO must have custom facets
-        OtmContextualFacet cf = TestCustomFacet.buildOtm( mgr, bo );
-        minorLibrary.add( cf );
-        assertTrue( "Given: ", cf.getWhereContributed().getOwningMember() == bo );
-        // TODO - move test into BO and allow for contributed facets
-        // TestBusiness.
-        // assertTrue( "Given: ", TestResource.hasCustomFacet( bo.getChildren() ) );
+        // Givens
+        assertTrue( !libs.isEmpty() );
+        assertTrue( !members.isEmpty() );
+        assertTrue( tlCFacets.size() >= 24 );
+        assertTrue( cFacets.size() >= 24 );
 
-        List<OtmObject> baseBoFacets = resource.getSubjectFacets();
-        resource.setSubject( minorBO );
-        List<OtmObject> minorBoFacets = resource.getSubjectFacets();
-        OtmCustomFacet mcf = null;
-        for (OtmObject f : minorBoFacets)
-            if (f instanceof OtmCustomFacet)
-                mcf = (OtmCustomFacet) f;
-        assertTrue( "Must have custom facet.", mcf != null );
-        assertTrue( "Must have facets from minor bo.", !minorBoFacets.isEmpty() );
-        assertTrue( "Must have custom facet.", TestResource.hasCustomFacet( minorBoFacets ) );
+        // Then - check TL facets and add those missing owning entity to list
+        List<TLContextualFacet> tlcfs_MissingOwningEntity = new ArrayList<>();
+        List<OtmContextualFacet> cfs_MissingOwningEntity = new ArrayList<>();
+        Map<String,TLContextualFacet> knownFacets = new HashMap<>();
+        for (TLContextualFacet tlcf : tlCFacets) {
+            assertTrue( tlcf != null );
+            assertTrue( tlcf.getOwningModel() != null );
+            assertTrue( tlcf.getOwningLibrary() != null );
+            assertTrue( tlcf.getOwningEntityName() != null );
+            OtmContextualFacet cf = (OtmContextualFacet) OtmLibraryMemberBase.get( tlcf );
+            String localName = tlcf.getOwningLibrary().getPrefix() + ":" + tlcf.getLocalName();
+            String otmName = cf.getName();
+            assertTrue( cf != null );
+            if (tlcf.getOwningEntity() == null) {
+                // log.debug( tlcf.getName() + " is missing Owning entity named: " + tlcf.getOwningEntityName() );
+                tlcfs_MissingOwningEntity.add( tlcf );
+                cfs_MissingOwningEntity.add( cf );
+                // assertTrue( localName.startsWith( "UNKNOWN" ) );
+            } else {
+                // assertTrue( !localName.startsWith( "UNKNOWN" ) );
+                knownFacets.put( localName, tlcf );
+                log.debug( "Added " + localName + " to knownFacets map." );
+            }
+            assertTrue( tlcf.getChildFacets() != null );
+        }
+        libs.forEach( l -> log.debug( l.getPrefix() ) );
+        log.debug( tlcfs_MissingOwningEntity.size() + " tl contextual facets are missing owning entity." );
 
-        // When - action facet is assigned the custom facet from minor version.
-        OtmActionFacet af = resource.getActionFacets().get( 0 );
-        af.setReferenceFacet( mcf );
-        // Then
-        minorBO.refresh();
-        List<OtmObject> ik = minorBO.getInheritedChildren();
-        List<OtmObject> minorBoFacets2 = resource.getSubjectFacets();
-        assertTrue( "Must have facets from minor bo.", !minorBoFacets2.isEmpty() );
-        assertTrue( "Must have custom facet.", TestResource.hasCustomFacet( minorBoFacets2 ) );
+        // See if any of the missing owning entities are in the map
+        for (TLContextualFacet tlcf : tlcfs_MissingOwningEntity) {
+            log.debug( tlcf.getName() + " is trying to find owner named: " + tlcf.getOwningEntityName() );
+            TLContextualFacet candidate = knownFacets.get( tlcf.getOwningEntityName() );
+            if (candidate != null)
+                log.debug( "Candidate: " + candidate.getName() );
+        }
 
-        // Then - resource is still valid
-        resource.isValid( true );
-        log.debug( "Validation Results\n" + ValidationUtils.getMessagesAsString( resource.getFindings() ) );
 
-        // FIXME - should be valid, awaiting fix to compiler/tlModel
-        // assertTrue( "Must be valid.", resource.isValid( true ) );
 
-        // TODO
-        // Test if minor version of BO has inherited custom facets.
-        // Then create resource that uses BO and assure it has custom subject facets
-        // Then set resource to minor version of BO
-        // Assure it has custom facets in subjectFacets list
+        // Then - If owning entity is missing, findWhereContributed() will try to look it up.
+        for (TLContextualFacet tlcf : tlcfs_MissingOwningEntity) {
+            OtmLibraryMember candidate = mgr.getMember( tlcf.getOwningEntityName() );
+            if (candidate == null) {
+                log.debug( "Model manager can not find owner." );
+                // All the missing owners are facets
+                for (TLContextualFacet f : tlCFacets) {
+                    String name = f.getName();
+                    if (name.equals( tlcf.getOwningEntityName() ))
+                        log.debug( "Found facet with name: " + f.getName() );
+                }
+            }
+        }
+        log.debug( "" );
+
+        // Then - look at contributed facets
+        for (OtmContextualFacet cf : cFacets) {
+            OtmContributedFacet contrib = cf.getWhereContributed();
+            if (contrib == null) {
+                log.debug( "Trouble: missing contributor for: " + cf );
+            } else {
+                OtmLibraryMember member = contrib.getOwningMember();
+                assertTrue( contrib != null );
+                assertTrue( member != null );
+                TestContextualFacet.testContributedFacet( contrib, cf, member );
+            }
+        }
     }
 
     @Ignore
@@ -367,117 +386,6 @@ public class TestInheritance extends AbstractFxTest {
         }
     }
 
-    // Model inherited children depends on codegen util behavior from compiler
-    @Test
-    public void testInheritedResourceCodegenUtils() {
-        // Givens
-        OtmResource r = TestResource.buildExtendedResource( true );
-        OtmResource rBase = r.getBaseType();
-        List<OtmObject> rKids = r.getChildren();
-        List<OtmObject> bKids = rBase.getChildren();
-
-        // When - base type set in builder
-
-        // Then - Returns r and rBase TLResources
-        List<TLResource> ex = ResourceCodegenUtils.getInheritanceHierarchy( r.getTL() );
-        assertTrue( "Codegen Utils must find inheritance hierarchy.", !ex.isEmpty() );
-
-        // Then - actions using the codegenUtils
-        for (TLAction tlA : ResourceCodegenUtils.getInheritedActions( r.getTL() )) {
-            // Returns both inherited and locally owned actions
-            assertTrue( tlA != null );
-            OtmAction action = (OtmAction) OtmModelElement.get( tlA );
-            TLResource tlOwner = tlA.getOwner();
-            assertTrue( tlOwner != null );
-            assertTrue( action != null );
-
-            if (rKids.contains( action )) {
-                // Locally Owned
-                assertTrue( !bKids.contains( action ) );
-                assertTrue( action.getOwningMember() == r );
-                assertTrue( tlOwner == r.getTL() );
-            } else {
-                // Inherited
-                assertTrue( "Inherited action must be owned by base resource.", action.getOwningMember() == rBase );
-                assertTrue( "Inherited action must be owned by base TL resource.", rBase.getTL() == tlOwner );
-                assertTrue( "TL Owner must be the resource.", OtmModelElement.get( tlOwner ) == rBase );
-                // 1/12/2021 - bKids contains a different action with the same name
-                // assertTrue( "Base resource must own inherited action.", bKids.contains( action ) );
-            }
-
-        }
-
-        // Then - Action facets, param groups and parent refs will return from hierarchy, filtered to just one of each
-        // name
-        List<TLModelElement> inheritedList = new ArrayList<>();
-        for (TLActionFacet tlAf : ResourceCodegenUtils.getInheritedActionFacets( r.getTL() ))
-            inheritedList.add( tlAf );
-        for (TLParamGroup tlPG : ResourceCodegenUtils.getInheritedParamGroups( r.getTL() ))
-            inheritedList.add( tlPG );
-        for (TLResourceParentRef tlPR : ResourceCodegenUtils.getInheritedParentRefs( r.getTL() ))
-            inheritedList.add( tlPR );
-        // Because the target resource has no children, all the inherited ones must be reported out.
-        assertTrue( "Codegen Utils must find 3 inherited children.", inheritedList.size() == 3 );
-
-    }
-
-    @Test
-    public void testInheritedResourceChildren() {
-
-        // Givens
-        OtmResource target = TestResource.buildExtendedResource( true );
-        OtmResource rBase = target.getBaseType();
-
-        // When - base type set in builder
-
-        // Then - base kids are not inherited
-        List<OtmObject> biKids = rBase.getInheritedChildren();
-        assertTrue( "Given: base does not have inherited kids.", biKids.isEmpty() );
-        rBase.getInheritedChildren().forEach( i -> assertTrue( !i.isInherited() ) );
-
-        // Then - target has inherited children
-        List<OtmObject> iKids = target.getInheritedChildren();
-        assertTrue( "Must have inherited kids.", !iKids.isEmpty() );
-        target.getInheritedChildren().forEach( i -> assertTrue( i.isInherited() ) );
-        assertTrue( "Must inherit all children.", rBase.getChildren().size() == target.getInheritedChildren().size() );
-
-        // Then - each type of getInherited* returns only inherited
-        target.getInheritedActions().forEach( ic -> assertTrue( ic.isInherited() ) );
-        target.getInheritedActionFacets().forEach( ic -> assertTrue( ic.isInherited() ) );
-        target.getInheritedParameterGroups().forEach( ic -> assertTrue( ic.isInherited() ) );
-        target.getInheritedParentRefs().forEach( ic -> assertTrue( ic.isInherited() ) );
-
-        // // Inheritance is set up when modeled by setting the inheritedFrom field
-        // // Inheritance test used for properties does not work. If it does, we should use it.
-        // for (OtmAction action : r.getInheritedActions()) {
-        //
-        // // Using these as the test confuses the constructor uses isInherited to add to correct list.
-        // boolean test = action.getTL().getOwner() != action.getParent().getTL();
-        // // assertTrue( "This is a viable inheritance test for resource children.", test );
-        // boolean test2 = ((OtmChildrenOwner) action.getParent()).getChildren().contains( action );
-        // // assertTrue( "This test works.", test2 );
-        //
-        // boolean test3 = action.getInheritedFrom() != null;
-        // boolean inherited = action.isInherited();
-        // log.debug( "Must be inherited: " + inherited + test + test2 + test3 );
-        // assertTrue( "Must be inherited.", inherited );
-        // }
-    }
-
-    // // Unused. Not sure the logic is correct.
-    // public void getUnmanagedProject() {
-    // TestDexFileHandler.loadUnmanagedProject( mgr );
-    // int initialMemberCount = mgr.getMembers().size();
-    // TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr.getTlModel() );
-    //
-    // // int initialMemberCount = mgr.getMembers().size();
-    // log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
-    // + " members." );
-    // mgr.getTlModel().getUserDefinedLibraries().forEach( tlLib -> mgr.add( tlLib ) );
-    // log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
-    // + " members." );
-    // assertTrue( mgr.getMembers().size() > initialMemberCount );
-    // }
 
 
     /**

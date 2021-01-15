@@ -49,7 +49,7 @@ public class ContextualFacetSprite extends MemberSprite<OtmContextualFacet> impl
         double width = 0;
         Rectangle rect = null;
 
-        if (!isCollapsed() && !getMember().getChildren().isEmpty()) {
+        if (!isCollapsed() && !getMember().getChildren().isEmpty() && member.getWhereContributed() != null) {
             width = getBoundaries().getWidth();
             rect = new FacetRectangle( (OtmContextualFacet) member, this, width );
             width = draw( rect, gc, width, x, dx, fy );

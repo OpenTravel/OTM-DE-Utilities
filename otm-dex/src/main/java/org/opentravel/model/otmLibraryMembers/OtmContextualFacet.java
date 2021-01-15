@@ -336,10 +336,8 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
     /*
      * See if the model manager has the owning entity by name. If so, create and set contributed facet.
      */
-    private void findWhereContributed() {
-        if (getTL().getOwningEntityName() == null)
-            return;
-        if (!getTL().getOwningEntityName().isEmpty()) {
+    protected void findWhereContributed() {
+        if (getTL().getOwningEntityName() != null && !getTL().getOwningEntityName().isEmpty()) {
             OtmLibraryMember candidate = mgr.getMember( getTL().getOwningEntityName() );
             if (candidate != null && candidate.getTL() instanceof TLFacetOwner) {
                 log.debug( "Name Match Found for contextual facet with no owner: " + candidate );

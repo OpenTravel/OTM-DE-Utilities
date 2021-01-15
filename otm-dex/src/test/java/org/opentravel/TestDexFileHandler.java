@@ -168,6 +168,9 @@ public class TestDexFileHandler extends AbstractFxTest {
 
     /**
      * Load the project that uses local library files but do NOT add to the model.
+     * <p>
+     * To load into the OtmModelManager, use {@link OtmModelManager#addProjects()} or
+     * {@link #loadAndAddUnmanagedProject(OtmModelManager)}
      * 
      * @param modelManager
      */
