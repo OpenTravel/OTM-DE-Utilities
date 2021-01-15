@@ -27,9 +27,11 @@ import org.opentravel.dex.actions.BaseTypeChangeAction;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmProperties.OtmAttribute;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
 import org.opentravel.schemacompiler.codegen.util.FacetCodegenUtils;
@@ -58,7 +60,7 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         // Needed for library member tests
         subject = TestChoiceFacet.buildOtm( staticModelManager );
         baseObject = TestChoice.buildOtm( staticModelManager );
@@ -337,137 +339,53 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         assertTrue( "Must not have orginial name component.", !contribName.contains( baseCfName ) );
     }
 
-    //
-    // @Test
-    // public void testDeletingAsLibraryMember() {
-    // // Given - a Choice object and contextual facet
-    // OtmChoiceObject co1 = TestChoice.buildOtm( staticModelManager );
-    // OtmContextualFacet cf = buildOtm( staticModelManager );
-    // OtmContributedFacet contrib = co1.add( cf );
-    // // Given - a choice object and contextual facet
-    // OtmChoiceObject co2 = TestChoice.buildOtm( staticModelManager );
-    // OtmChoiceFacet cf2 = buildOtm( staticModelManager );
-    // OtmContributedFacet contrib2 = co2.add( cf2 );
-    //
-    // // Given - a library for the objects
-    // OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
-    // lib.add( co1 );
-    // lib.add( co2 );
-    // lib.add( cf );
-    // lib.add( cf2 );
-    // assertTrue( cf.getLibrary() != null );
-    // assertTrue( cf.getModelManager().contains( cf ) );
-    // //
-    // testContributedFacet( contrib, cf, co1 );
-    // testContributedFacet( contrib2, cf2, co2 );
-    //
-    // // When deleted
-    // lib.delete( cf );
-    // assertFalse( cf.getModelManager().contains( cf ) );
-    // assertFalse( co1.getChildren().contains( contrib ) );
-    // assertFalse( co1.getTL().getChoiceFacets().contains( cf.getTL() ) );
-    // //
-    // lib.delete( cf2 );
-    // assertFalse( co2.getChildren().contains( contrib2 ) );
-    // assertFalse( co2.getTL().getChoiceFacets().contains( cf2.getTL() ) );
-    // }
-    //
-    //
-    // @Test
-    // public void testDeletingWithContributedFacet() {
-    // // Given - a Choice object and contextual facet
-    // OtmChoiceObject co = TestChoice.buildOtm( staticModelManager );
-    // OtmContextualFacet cf = buildOtm( staticModelManager );
-    // OtmContributedFacet contrib = co.add( cf );
-    // testContributedFacet( contrib, cf, co );
-    //
-    // OtmContextualFacet cf2 = buildOtm( staticModelManager );
-    // testContributedFacet( contrib, cf, co );
-    //
-    // OtmContributedFacet contrib2 = co.add( cf2 );
-    // // testContributedFacet( contrib2, cf2, bo ); // Performs lazy-eval on contributor
-    // // assertTrue( "Lazy-evaluation on contributor.", contrib2.getContributor() == cf2 );
-    // assertTrue( "Contextual facet knows where it is contributed.", cf2.getWhereContributed() == contrib2 );
-    // assertTrue( contrib.getContributor() == cf );
-    //
-    // testContributedFacet( contrib, cf, co );
-    // assertTrue( co.getChildren().contains( contrib ) );
-    // assertTrue( co.getChildren().contains( contrib2 ) );
-    // assertTrue( co.getTL().getChoiceFacets().contains( cf.getTL() ) );
-    // assertTrue( co.getTL().getChoiceFacets().contains( cf2.getTL() ) );
-    //
-    // // When deleted
-    // co.delete( contrib );
-    // assertFalse( co.getChildren().contains( contrib ) );
-    // assertFalse( co.getTL().getChoiceFacets().contains( cf.getTL() ) );
-    // co.delete( contrib2 );
-    // assertFalse( co.getChildren().contains( contrib2 ) );
-    // assertFalse( co.getTL().getChoiceFacets().contains( cf2.getTL() ) );
-    // }
-    //
-    // @Test
-    // public void testFacets() {}
-    //
-    // /** ****************************************************** **/
-    //
-    // @Test
-    // public void testInheritance() {
-    // OtmChoiceObject baseBo = TestChoice.buildOtm( staticModelManager );
-    // baseBo.setName( "BaseBO" );
-    // OtmContextualFacet inheritedCf = buildOtm( staticModelManager, baseBo );
-    // assertTrue( "Given", !inheritedCf.isInherited() );
-    //
-    // OtmChoiceObject bo = TestChoice.buildOtm( staticModelManager );
-    // OtmContextualFacet cf = buildOtm( staticModelManager, bo );
-    // bo.setName( "SubType" );
-    // assertTrue( "Given", !cf.isInherited() );
-    //
-    // // When - bo extends baseBo
-    // bo.setBaseType( baseBo );
-    // assertTrue( "Given", bo.getBaseType() == baseBo );
-    // assertTrue( "Given", bo.getTL().getExtension() != null );
-    // assertTrue( "Given", bo.getTL().getExtension().getExtendsEntity() == baseBo.getTL() );
-    //
-    // // Then
-    // List<OtmObject> ic1 = bo.getInheritedChildren();
-    // List<OtmObject> ic2 = baseBo.getInheritedChildren();
-    // // assertTrue( "Extension must have inherited CF", bo.getInheritedChildren().contains( inheritedCf ) );
-    // }
-    //
-    // @Test
-    // public void testMovingFacet() {
-    // // Given - a cf contributed to a bo
-    // OtmChoiceObject co = TestChoice.buildOtm( staticModelManager );
-    // OtmChoiceObject co2 = TestChoice.buildOtm( staticModelManager );
-    // co2.setName( "TheOtherBO" );
-    // OtmContextualFacet cf = buildOtm( staticModelManager );
-    // assertTrue( "Has not been injected yet.", cf.getWhereContributed() == null );
-    // OtmContributedFacet contrib = co.add( cf );
-    // testContributedFacet( contrib, cf, co );
-    //
-    // // When base type changed (moved)
-    // cf.setBaseType( co2 );
-    // OtmContributedFacet newContrib = cf.getWhereContributed();
-    // // Then
-    // assertTrue( cf.getBaseType() == co2 );
-    // assertTrue( contrib.getParent() == co2 );
-    // assertTrue( newContrib == contrib );
-    // assertTrue( cf.getWhereContributed() == newContrib );
-    // assertTrue( contrib.getChildren().size() == newContrib.getChildren().size() );
-    // testContributedFacet( cf.getWhereContributed(), cf, co2 );
-    // }
-    //
-    //
-    // @Test
-    // public void testWhenContributed() {
-    // // Given - a Choice object and contextual facet
-    // OtmChoiceObject bo = TestChoice.buildOtm( staticModelManager );
-    // OtmContextualFacet cf = buildOtm( staticModelManager );
-    // assertTrue( "Has not been injected yet.", cf.getWhereContributed() == null );
-    //
-    // // When added
-    // OtmContributedFacet contrib = bo.add( cf );
-    // // Then (lazy evaluation)
-    // testContributedFacet( contrib, cf, bo );
-    // }
+    /**
+     * Test inheritance of contextual facets injected into contextual facets on both base object and extensions of that
+     * base object.
+     */
+    @Test
+    public void testInheritedNestedCFs() {
+        // Given two libraries
+        OtmLibrary baseLib = TestLibrary.buildOtm();
+        OtmModelManager mgr = baseLib.getModelManager();
+        OtmLibrary exLib = TestLibrary.buildOtm( mgr, baseLib.getBaseNamespace() + "/ex", "ex", "ExtensionLib" );
+
+        // Given two Business Objects
+        OtmBusinessObject baseBO = TestBusiness.buildOtm( baseLib, "BaseBO" );
+        OtmBusinessObject exBO = TestBusiness.buildOtm( exLib, "ExBO" );
+        exBO.setBaseType( baseBO );
+
+        // Given two contextual facets, one injecting on the other on the base BO
+        OtmCustomFacet baseCF = TestCustomFacet.buildOtm( baseBO, "BaseCF" );
+        OtmCustomFacet exCF = TestCustomFacet.buildOtm( baseCF, "ExCF" );
+
+        // Given Tests
+        assertTrue( exBO.getBaseType() == baseBO );
+        assertTrue( baseCF.getContributedObject() == baseBO );
+        assertTrue( exCF.getContributedObject() == baseCF );
+
+        // Issues
+        // When saved and opened:
+        // Member Tree: baseBO does not list exCF
+        // Member Tree: baseCF does not list exCF
+        // Member Tree: exBO does not list baseCF or exCF , baseCF is shown in properties tree
+        // > OK - top level : currentModelMgr.getMembers(filter);
+        // >> Recursion - childrenOwner.getChildrenTypeProviders()
+        // >> Does NOT find exCF
+        assertTrue( "Must have contributed facet child.", baseCF.getChildren().contains( exCF.getWhereContributed() ) );
+        Collection<OtmTypeProvider> bcfKids = baseCF.getChildrenTypeProviders();
+        assertTrue( "Must have contributed facet in type provider children list.",
+            bcfKids.contains( exCF.getWhereContributed() ) );
+        // assertTrue( "Missing injected facet as child.", bcfKids.contains( exCF ) );
+        // Why - is isn't the children handler catching the contextual facet?
+
+        //
+        // Properties Tree: baseBO does not show exCF,
+        // Properties Tree: baseCF does not show exCF,
+        // Properties Tree: exBO does not show exCF, it does show baseCF inherited from base
+        //
+        // Graphics: TODO
+        // When constructed in DEX, the properties and graphics displays do not show CFs
+        // When saved and opened, display changes but not fully correct.
+    }
 }

@@ -32,6 +32,7 @@ import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmChoiceFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
+import org.opentravel.model.otmFacets.OtmFacetFactory;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
@@ -68,16 +69,53 @@ public class TestCustomFacet extends TestContextualFacet {
     public static OtmCustomFacet buildOtm(OtmModelManager mgr) {
         OtmCustomFacet custom = new OtmCustomFacet( buildTL(), mgr );
         assertNotNull( custom );
-        // custom.getTL().addAttribute( new TLAttribute() );
-        // custom.getTL().addElement( new TLProperty() );
 
         // Will only have children when contributed is modeled.
         return custom;
     }
 
     /**
+     * Create tested custom facet and contribute it to the passed business object.
+     * 
+     * @param name
+     * @param bo must have model manager
+     * @return
+     */
+    public static OtmCustomFacet buildOtm(OtmBusinessObject bo, String name) {
+        assertTrue( "Illegal arguement - must have model manager.", bo.getModelManager() != null );
+        OtmCustomFacet cf = buildOtm( bo.getModelManager() );
+        bo.add( cf );
+        cf.setName( name );
+        testContributedFacet( cf.getWhereContributed(), cf, bo );
+        return cf;
+    }
+
+    /**
+     * Create tested custom facet and contribute it to the passed custom facet.
+     * 
+     * @param name
+     * @param bcf custom facet must have model manager
+     * @return
+     */
+    public static OtmCustomFacet buildOtm(OtmCustomFacet bcf, String name) {
+        assertTrue( "Illegal arguement - must have model manager.", bcf.getModelManager() != null );
+        TLContextualFacet tl = buildTL();
+        tl.setName( name );
+
+        OtmLibraryMember cf2 = OtmFacetFactory.create( tl, bcf.getModelManager() );
+        assertTrue( cf2 != null ); // custom facet, no where contributed
+        assertTrue( cf2 instanceof OtmCustomFacet );
+        OtmCustomFacet cf = (OtmCustomFacet) cf2;
+        cf.setBaseType( bcf );
+
+        testContributedFacet( cf.getWhereContributed(), cf, bcf );
+        return cf;
+    }
+
+    /**
      * Create custom facet and contribute it to the passed business object.
      * 
+     * @deprecated - use buildOtm(BO, Name);
      * @param modelManager
      * @param bo
      * @return

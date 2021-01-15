@@ -80,6 +80,13 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         return (OtmProperty) otm;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This add is very different than {@link OtmBusinessObject#add(OtmContextualFacet)}
+     * 
+     * @see org.opentravel.model.OtmChildrenOwner#add(org.opentravel.model.OtmObject)
+     */
     @Override
     public OtmObject add(OtmObject child) {
         if (child instanceof OtmContextualFacet)
@@ -380,6 +387,15 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         children.remove( child );
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Set the owningEntity on this TLContextualFacet.
+     * <p>
+     * Create or update contributed facet and set this whereContributed property.
+     * 
+     * @see org.opentravel.model.otmLibraryMembers.OtmLibraryMemberBase#setBaseType(org.opentravel.model.OtmObject)
+     */
     @Override
     public OtmObject setBaseType(OtmObject baseObj) {
         if (baseObj instanceof OtmContributedFacet)

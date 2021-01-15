@@ -228,6 +228,12 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
      * Note: TreeItem class does not extend the Node class. Therefore, you cannot apply any visual effects or add menus
      * to the tree items. Use the cell factory mechanism to overcome this obstacle and define as much custom behavior
      * for the tree items as your application requires.
+     * <p>
+     * // 12/16/2020 - added map to cache DAOs
+     * <p>
+     * // 12/15/2020 - filter applied by model manager
+     * <p>
+     * // 1/3/2020 - let the CFs be shown, the users expect to see them
      * 
      * @param member the Otm Library Member to add to the tree
      * @param parent the tree root or parent member
@@ -235,20 +241,15 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
      */
     public void createTreeItem(OtmLibraryMember member, TreeItem<MemberAndProvidersDAO> parent) {
         // log.debug( "Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName() );
-
-        // 12/16/2020 - added map to cache DAOs
-        // 12/15/2020 - filter applied by model manager
-        // 1/3/2020 - let the CFs be shown, the users expect to see them
-
-        TreeItem<MemberAndProvidersDAO> item = null;
-        item = itemMap.get( member );
+        TreeItem<MemberAndProvidersDAO> item = itemMap.get( member );
         if (item != null) {
             parent.getChildren().add( item );
         } else {
             // Create item for the library member
             item = new MemberAndProvidersDAO( member ).createTreeItem( parent );
-            // itemMap.put( member, item );
-            // Create and add items for children
+            itemMap.put( member, item );
+
+            // Create and add items for children of this member
             if (member instanceof OtmChildrenOwner)
                 createChildrenItems( member, item );
         }
@@ -262,16 +263,23 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
      * Create tree items for the type provider children of this child owning member
      */
     private void createChildrenItems(OtmChildrenOwner childrenOwner, TreeItem<MemberAndProvidersDAO> parentItem) {
+        // log.debug( "Creating children items of: " + childrenOwner );
+        // if (childrenOwner instanceof OtmContributedFacet) {
+        // log.debug( "Processing contributed facet." );
+        // log.debug( "Children" + childrenOwner.getChildrenTypeProviders() );
+        // }
+        // if (childrenOwner instanceof OtmContextualFacet) {
+        // log.debug( "Processing contextual facet." );
+        // Collection<OtmTypeProvider> children = childrenOwner.getChildrenTypeProviders();
+        // log.debug( "Children" + children );
+        // }
+
         childrenOwner.getChildrenTypeProviders().forEach( p -> {
+            // log.debug( "Creating child item of: " + p );
             TreeItem<MemberAndProvidersDAO> item = null;
-            // item = itemMap.get( p );
-            // if (item != null) {
-            // parentItem.getChildren().add( item );
-            // } else {
+
             // Create item for the library member
             item = new MemberAndProvidersDAO( p ).createTreeItem( parentItem );
-            // itemMap.put( p, item );
-            // TreeItem<MemberAndProvidersDAO> cfItem = new MemberAndProvidersDAO( p ).createTreeItem( parentItem );
 
             // Only use contextual facet for recursing
             if (p instanceof OtmContributedFacet && ((OtmContributedFacet) p).getContributor() != null)
@@ -280,8 +288,6 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             // Recurse
             if (p instanceof OtmChildrenOwner)
                 createChildrenItems( (OtmChildrenOwner) p, item );
-            // createChildrenItems( (OtmChildrenOwner) p, cfItem );
-            // }
         } );
     }
 
@@ -425,7 +431,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     @Override
     public void post(OtmModelManager modelMgr) {
         ignoreEvents = true;
-        // log.debug( "Posting member tree." );
+        // log.debug( "\nPosting member tree." );
         if (modelMgr != null && memberTree != null) {
             currentModelMgr = modelMgr;
             clear();
@@ -437,6 +443,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
             if (root.getChildren().isEmpty())
                 createTreeItem( new OtmEmptyTableFacet( currentModelMgr ), root );
 
+            // Sort members
             try {
                 memberTree.sort();
             } catch (Exception e) {

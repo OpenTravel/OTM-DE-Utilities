@@ -288,8 +288,6 @@ public class TestInheritance extends AbstractFxTest {
 
         assertTrue( exBO.getSummary().getInheritedChildren() != null );
         assertTrue( !exBO.getSummary().getInheritedChildren().isEmpty() );
-
-
     }
 
     @Test
