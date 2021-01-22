@@ -254,15 +254,15 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      * @param group can be null
      */
     public OtmParameterGroup setParamGroup(OtmParameterGroup group) {
-        if (group != null)
+        // Also set path template if the group is ID group and has path parameters, update the path template
+        if (group != null) {
             getTL().setParamGroup( group.getTL() );
-        else
+            setPathTemplate( getPathTemplate(), true );
+        } else {
             getTL().setParamGroup( null );
+            setPathTemplate( getPathTemplateDefault(), false );
+        }
         // log.debug( "Set parameter group to " + group );
-
-        // If the group is ID group and has path parameters, update the path template
-        setPathTemplate( getPathTemplate(), true );
-
         return group;
     }
 

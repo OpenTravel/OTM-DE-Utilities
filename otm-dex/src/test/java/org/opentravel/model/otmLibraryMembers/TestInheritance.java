@@ -116,15 +116,19 @@ public class TestInheritance extends AbstractFxTest {
         List<TLContextualFacet> tlcfs_MissingOwningEntity = new ArrayList<>();
         List<OtmContextualFacet> cfs_MissingOwningEntity = new ArrayList<>();
         Map<String,TLContextualFacet> knownFacets = new HashMap<>();
+
         for (TLContextualFacet tlcf : tlCFacets) {
             assertTrue( tlcf != null );
             assertTrue( tlcf.getOwningModel() != null );
             assertTrue( tlcf.getOwningLibrary() != null );
             assertTrue( tlcf.getOwningEntityName() != null );
+
             OtmContextualFacet cf = (OtmContextualFacet) OtmLibraryMemberBase.get( tlcf );
             String localName = tlcf.getOwningLibrary().getPrefix() + ":" + tlcf.getLocalName();
             String otmName = cf.getName();
             assertTrue( cf != null );
+
+            // Separate out those whose owning entity is known from those not known
             if (tlcf.getOwningEntity() == null) {
                 // log.debug( tlcf.getName() + " is missing Owning entity named: " + tlcf.getOwningEntityName() );
                 tlcfs_MissingOwningEntity.add( tlcf );
@@ -179,7 +183,7 @@ public class TestInheritance extends AbstractFxTest {
         }
     }
 
-    @Ignore
+    // @Ignore
     @Test
     public void testFacetPropertyCodegenUtils() {
         OtmBusinessObject baseBO = TestBusiness.buildOtm( mgr, "BaseBO" );

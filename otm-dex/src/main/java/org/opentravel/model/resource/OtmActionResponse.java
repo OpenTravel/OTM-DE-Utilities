@@ -229,8 +229,10 @@ public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> im
                 && getOwningMember().getMimeHandler() != null) {
                 getTL().setMimeTypes( getOwningMember().getMimeHandler().getTLValues() );
             }
-        } else
+        } else {
             getTL().setPayloadType( null );
+            getTL().setMimeTypes( null ); // clear mime types
+        }
         // log.debug( "Set action facet to " + getPayloadActionFacet() );
         return getPayloadActionFacet();
     }
