@@ -72,6 +72,8 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         assertTrue( contrib != null );
         assertTrue( cf != null );
         assertTrue( lm != null );
+        if (lm.getLibrary() != null)
+            assertTrue( cf.getLibrary() != null );
         //
         assertTrue( "Contributor must be owned by Library member.", contrib.getOwningMember() == lm );
         assertTrue( "Contextual facet must have contributed owner.", cf.getContributedObject() == lm );

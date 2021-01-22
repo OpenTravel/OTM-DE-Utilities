@@ -86,6 +86,8 @@ public class TestCustomFacet extends TestContextualFacet {
         OtmCustomFacet cf = buildOtm( bo.getModelManager() );
         bo.add( cf );
         cf.setName( name );
+        if (bo.getLibrary() != null)
+            bo.getLibrary().add( cf );
         testContributedFacet( cf.getWhereContributed(), cf, bo );
         return cf;
     }
@@ -107,6 +109,8 @@ public class TestCustomFacet extends TestContextualFacet {
         assertTrue( cf2 instanceof OtmCustomFacet );
         OtmCustomFacet cf = (OtmCustomFacet) cf2;
         cf.setBaseType( bcf );
+        if (bcf.getLibrary() != null)
+            bcf.getLibrary().add( cf );
 
         testContributedFacet( cf.getWhereContributed(), cf, bcf );
         return cf;

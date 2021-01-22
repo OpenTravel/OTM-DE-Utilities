@@ -465,13 +465,15 @@ public class TestLibrary extends AbstractFxTest {
      * example.com namespace.
      * <p>
      * Assure library is: editable, DRAFT, MANAGED_WIP or UNMANAGED, and manager can find it
+     * <p>
+     * Assure TL Library has a model.
      * 
      * @param mgr
      * @return
      */
     public static OtmLibrary buildOtm() {
         OtmLibrary lib = TestLibrary.buildOtm( new OtmModelManager( new DexFullActionManager( null ), null, null ) );
-
+        assertTrue( lib.getTL().getOwningModel() != null );
         return lib;
     }
 

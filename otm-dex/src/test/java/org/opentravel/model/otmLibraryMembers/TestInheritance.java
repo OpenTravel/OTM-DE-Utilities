@@ -29,6 +29,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmContainers.TestVersionChain;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
@@ -190,7 +191,8 @@ public class TestInheritance extends AbstractFxTest {
     @Test
     public void testNestedContextualFacetPropertyCodegenUtils() {
         // Given - a business object with all types of properties in each of its native facets
-        OtmBusinessObject baseBO = TestBusiness.buildOtm( mgr, "BaseBO" );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject baseBO = TestBusiness.buildOtm( lib, "BaseBO" );
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getSummary() );
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getIdFacet() );
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getDetail() );
@@ -216,6 +218,7 @@ public class TestInheritance extends AbstractFxTest {
 
         //
         // When - accessed as done in OtmLibraryMemberBase#modelChildren
+        //
         // children of business object
         List<TLFacet> baseFacets = ((TLFacetOwner) baseBO.getTL()).getAllFacets();
         assertTrue( "Then - must find base facets.", !baseFacets.isEmpty() );
@@ -225,10 +228,27 @@ public class TestInheritance extends AbstractFxTest {
         // QUESTION - BO reports out injected child but facet does not, why? How to find custom from base?
         // When - children of base custom
         List<TLFacet> baseFacets2 = ((TLFacetOwner) baseCustom.getTL()).getAllFacets();
-        // FAILS - assertTrue( "Then - must find nested facet.", !baseFacets2.isEmpty() );
+        // FAILS -
+        assertTrue( "Then - must find nested facet.", !baseFacets2.isEmpty() );
+    }
+
+    @Test
+    public void testNestedInheritedContextualFacetPropertyCodegenUtils() {
+        // Given - same setup as testNestedContextualFacetPropertyCodegenUtils()
+        // Given - a business object with all types of properties in each of its native facets
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject baseBO = TestBusiness.buildOtm( lib, "BaseBO" );
+        assertTrue( "Given - builder added a custom facet.", !baseBO.getChildrenContributedFacets().isEmpty() );
+        // Put a custom facet on the base BO
+        OtmCustomFacet baseCustom = TestCustomFacet.buildOtm( baseBO, "BaseCustom" );
+        assertTrue( "Base custom must have a library.", baseCustom.getLibrary() != null );
+        assertTrue( "Base custom must have a TL library.", baseCustom.getLibrary().getTL() != null );
+
+        // Put a nested custom facet on the custom facet.
+        OtmCustomFacet nestedCustom = TestCustomFacet.buildOtm( baseCustom, "NestedCustom" );
 
         // Given a second BO with no children
-        OtmBusinessObject exBO = TestBusiness.buildOtm( mgr, "ExBO" );
+        OtmBusinessObject exBO = TestBusiness.buildOtm( lib, "ExBO" );
         List<OtmObject> iKids = new ArrayList<>();
         iKids.addAll( exBO.getSummary().getInheritedChildren() );
         assertTrue( iKids.isEmpty() );
@@ -240,31 +260,36 @@ public class TestInheritance extends AbstractFxTest {
         exBO.setBaseType( baseBO );
         assertTrue( "Given - ex must extend base.", exBO.getTL().getExtension().getExtendsEntity() == baseBO.getTL() );
 
+        //
         // When - accessed as done in OtmLibraryMemberBase#modelIhneritedChildren
+        //
         TLBusinessObject extendedOwner = exBO.getTL();
         List<TLContextualFacet> ghosts = FacetCodegenUtils.findGhostFacets( extendedOwner, TLFacetType.CUSTOM );
 
         // Then
         assertTrue( "Must find ghost facets.", !ghosts.isEmpty() );
+        TLContextualFacet inheritedCustom = ghosts.get( 0 );
         // Only the base is reported out...but it is a new instance of the facet
-        assertTrue( "Must have base custom name.", ghosts.get( 0 ).getName().equals( baseCustom.getTL().getName() ) );
+        assertTrue( "Must have base custom name.", inheritedCustom.getName().equals( baseCustom.getTL().getName() ) );
 
         // When - accessed as done in OtmLibraryMemberBase#modelIhneritedChildren
-        TLContextualFacet extendedOwner2 = baseCustom.getTL();
+        TLContextualFacet extendedOwner2 = inheritedCustom;
         List<TLContextualFacet> ghosts2 = FacetCodegenUtils.findGhostFacets( extendedOwner2, TLFacetType.CUSTOM );
-
+        List<TLContextualFacet> nlGhosts =
+            FacetCodegenUtils.findNonLocalGhostFacets( (TLLibrary) baseCustom.getLibrary().getTL() );
         // Then
-        // FAILS - assertTrue( "Must find ghost facets.", !ghosts2.isEmpty() );
+        // FAILS -
+        assertTrue( "Must find ghost facets.", !ghosts2.isEmpty() );
     }
 
     /**
      * Create test Business Objects to test codegen utils against.
      */
-    // @Ignore
     @Test
-    public void testFacetPropertyCodegenUtils() {
+    public void testPropertyCodegenUtils_InheritedFacetProperties() {
         // Given - a business object with all types of properties in each of its native facets
-        OtmBusinessObject baseBO = TestBusiness.buildOtm( mgr, "BaseBO" );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject baseBO = TestBusiness.buildOtm( lib, "BaseBO" );
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getSummary() );
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getIdFacet() );
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getDetail() );
@@ -276,7 +301,7 @@ public class TestInheritance extends AbstractFxTest {
             tlBaseProps.size() == expectedCount_Summary );
 
         // Given a second BO with no children
-        OtmBusinessObject exBO = TestBusiness.buildOtm( mgr, "ExBO" );
+        OtmBusinessObject exBO = TestBusiness.buildOtm( lib, "ExBO" );
         List<OtmObject> iKids = new ArrayList<>();
         iKids.addAll( exBO.getSummary().getInheritedChildren() );
         assertTrue( iKids.isEmpty() );
@@ -290,18 +315,24 @@ public class TestInheritance extends AbstractFxTest {
 
         // When - codegenUtils used to report out inherited properties, attributes and indicators
         TLFacet tlFacet = exBO.getSummary().getTL();
-        List<TLModelElement> tli = new ArrayList<>();
         List<TLProperty> props = PropertyCodegenUtils.getInheritedFacetProperties( tlFacet );
         List<TLAttribute> attrs = PropertyCodegenUtils.getInheritedFacetAttributes( tlFacet );
         List<TLIndicator> inds = PropertyCodegenUtils.getInheritedFacetIndicators( tlFacet );
         assertTrue( !props.isEmpty() && !attrs.isEmpty() && !inds.isEmpty() );
 
-        // FAILS
-        // Then - all base BO properties are included in inherited properties
+        // Then - all TL base BO summary properties are included in inherited properties
         List<TLProperty> baseElements = baseBO.getSummary().getTL().getElements();
+        assertTrue( "All baseBO attributes must have been reported by codegen utils.",
+            attrs.size() == baseBO.getSummary().getTL().getAttributes().size() );
+        assertTrue( "All baseBO indicators must have been reported by codegen utils.",
+            inds.size() == baseBO.getSummary().getTL().getIndicators().size() );
+        // FAILS
+        log.debug( "Base has " + baseElements.size() + " and " + props.size()
+            + " returned by PropertyCodegenUtils.getInheritedFacetProperties" );
         assertTrue( "All baseBO elements must have been reported by codegen utils.",
             props.size() == baseElements.size() );
 
+        List<TLModelElement> tli = new ArrayList<>();
         tli.addAll( props );
         tli.addAll( attrs );
         tli.addAll( inds );
