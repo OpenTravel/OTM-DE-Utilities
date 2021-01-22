@@ -37,11 +37,15 @@ import org.opentravel.model.otmFacets.TestFacet;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
 import org.opentravel.objecteditor.ObjectEditorApp;
+import org.opentravel.schemacompiler.codegen.util.FacetCodegenUtils;
 import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
 import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLAttribute;
+import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLFacet;
+import org.opentravel.schemacompiler.model.TLFacetOwner;
+import org.opentravel.schemacompiler.model.TLFacetType;
 import org.opentravel.schemacompiler.model.TLIndicator;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -183,18 +187,45 @@ public class TestInheritance extends AbstractFxTest {
         }
     }
 
-    // @Ignore
     @Test
-    public void testFacetPropertyCodegenUtils() {
+    public void testNestedContextualFacetPropertyCodegenUtils() {
+        // Given - a business object with all types of properties in each of its native facets
         OtmBusinessObject baseBO = TestBusiness.buildOtm( mgr, "BaseBO" );
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getSummary() );
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getIdFacet() );
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getDetail() );
-
-        // Given - count of children of base bo's summary facet.
+        // Given - check count of children of base bo's summary facet.
         List<TLModelElement> tlBaseProps = baseBO.getSummary().getTLChildren();
         int expectedCount_Summary = baseBO.getSummary().getChildren().size();
-        assertTrue( "TLFacet and OtmFacet must have same child count.", tlBaseProps.size() == expectedCount_Summary );
+        assertTrue( "Given - TLFacet and OtmFacet must have same child count.",
+            tlBaseProps.size() == expectedCount_Summary );
+        assertTrue( "Given - builder added a custom facet.", !baseBO.getChildrenContributedFacets().isEmpty() );
+
+        // Put a custom facet on the base BO
+        OtmCustomFacet baseCustom = TestCustomFacet.buildOtm( baseBO, "BaseCustom" );
+
+        // Put a nested custom facet on the custom facet.
+        OtmCustomFacet nestedCustom = TestCustomFacet.buildOtm( baseCustom, "NestedCustom" );
+        // Given - check injection
+        assertTrue( "Given - base custom must have nested as child.",
+            baseCustom.getChildren().contains( nestedCustom.getWhereContributed() ) );
+        assertTrue( "Given - nested custom is contributed to base custom.",
+            nestedCustom.getContributedObject() == baseCustom );
+        assertTrue( "Given - nested custom's owning entity is base custom",
+            nestedCustom.getTL().getOwningEntity() == baseCustom.getTL() );
+
+        //
+        // When - accessed as done in OtmLibraryMemberBase#modelChildren
+        // children of business object
+        List<TLFacet> baseFacets = ((TLFacetOwner) baseBO.getTL()).getAllFacets();
+        assertTrue( "Then - must find base facets.", !baseFacets.isEmpty() );
+        assertTrue( "Then - base facets must include the base custom.", baseFacets.contains( baseCustom.getTL() ) );
+        assertTrue( "Then - all facets must be retrieved.", baseFacets.size() == baseBO.getChildren().size() );
+
+        // QUESTION - BO reports out injected child but facet does not, why? How to find custom from base?
+        // When - children of base custom
+        List<TLFacet> baseFacets2 = ((TLFacetOwner) baseCustom.getTL()).getAllFacets();
+        // FAILS - assertTrue( "Then - must find nested facet.", !baseFacets2.isEmpty() );
 
         // Given a second BO with no children
         OtmBusinessObject exBO = TestBusiness.buildOtm( mgr, "ExBO" );
@@ -203,11 +234,59 @@ public class TestInheritance extends AbstractFxTest {
         assertTrue( iKids.isEmpty() );
         // Make sure there are no kids
         exBO.getSummary().deleteAll();
-        assertTrue( exBO.getSummary().getChildren().isEmpty() );
+        assertTrue( "Given - must not have children.", exBO.getSummary().getChildren().isEmpty() );
 
-        // When extended
+        // Given base extended by ex
         exBO.setBaseType( baseBO );
-        assertTrue( exBO.getTL().getExtension().getExtendsEntity() == baseBO.getTL() );
+        assertTrue( "Given - ex must extend base.", exBO.getTL().getExtension().getExtendsEntity() == baseBO.getTL() );
+
+        // When - accessed as done in OtmLibraryMemberBase#modelIhneritedChildren
+        TLBusinessObject extendedOwner = exBO.getTL();
+        List<TLContextualFacet> ghosts = FacetCodegenUtils.findGhostFacets( extendedOwner, TLFacetType.CUSTOM );
+
+        // Then
+        assertTrue( "Must find ghost facets.", !ghosts.isEmpty() );
+        // Only the base is reported out...but it is a new instance of the facet
+        assertTrue( "Must have base custom name.", ghosts.get( 0 ).getName().equals( baseCustom.getTL().getName() ) );
+
+        // When - accessed as done in OtmLibraryMemberBase#modelIhneritedChildren
+        TLContextualFacet extendedOwner2 = baseCustom.getTL();
+        List<TLContextualFacet> ghosts2 = FacetCodegenUtils.findGhostFacets( extendedOwner2, TLFacetType.CUSTOM );
+
+        // Then
+        // FAILS - assertTrue( "Must find ghost facets.", !ghosts2.isEmpty() );
+    }
+
+    /**
+     * Create test Business Objects to test codegen utils against.
+     */
+    // @Ignore
+    @Test
+    public void testFacetPropertyCodegenUtils() {
+        // Given - a business object with all types of properties in each of its native facets
+        OtmBusinessObject baseBO = TestBusiness.buildOtm( mgr, "BaseBO" );
+        TestOtmPropertiesBase.buildOneOfEach2( baseBO.getSummary() );
+        TestOtmPropertiesBase.buildOneOfEach2( baseBO.getIdFacet() );
+        TestOtmPropertiesBase.buildOneOfEach2( baseBO.getDetail() );
+
+        // Given - count of children of base bo's summary facet.
+        List<TLModelElement> tlBaseProps = baseBO.getSummary().getTLChildren();
+        int expectedCount_Summary = baseBO.getSummary().getChildren().size();
+        assertTrue( "Given - TLFacet and OtmFacet must have same child count.",
+            tlBaseProps.size() == expectedCount_Summary );
+
+        // Given a second BO with no children
+        OtmBusinessObject exBO = TestBusiness.buildOtm( mgr, "ExBO" );
+        List<OtmObject> iKids = new ArrayList<>();
+        iKids.addAll( exBO.getSummary().getInheritedChildren() );
+        assertTrue( iKids.isEmpty() );
+        // Make sure there are no kids
+        exBO.getSummary().deleteAll();
+        assertTrue( "Given - must not have children.", exBO.getSummary().getChildren().isEmpty() );
+
+        // Given extended
+        exBO.setBaseType( baseBO );
+        assertTrue( "Given - ex must extend base.", exBO.getTL().getExtension().getExtendsEntity() == baseBO.getTL() );
 
         // When - codegenUtils used to report out inherited properties, attributes and indicators
         TLFacet tlFacet = exBO.getSummary().getTL();
@@ -216,9 +295,14 @@ public class TestInheritance extends AbstractFxTest {
         List<TLAttribute> attrs = PropertyCodegenUtils.getInheritedFacetAttributes( tlFacet );
         List<TLIndicator> inds = PropertyCodegenUtils.getInheritedFacetIndicators( tlFacet );
         assertTrue( !props.isEmpty() && !attrs.isEmpty() && !inds.isEmpty() );
-        tli.addAll( props );
+
         // FAILS
-        assertTrue( "Must have same element count.", props.size() == baseBO.getSummary().getTL().getElements().size() );
+        // Then - all base BO properties are included in inherited properties
+        List<TLProperty> baseElements = baseBO.getSummary().getTL().getElements();
+        assertTrue( "All baseBO elements must have been reported by codegen utils.",
+            props.size() == baseElements.size() );
+
+        tli.addAll( props );
         tli.addAll( attrs );
         tli.addAll( inds );
 
