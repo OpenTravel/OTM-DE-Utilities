@@ -33,6 +33,8 @@ import org.opentravel.model.otmProperties.OtmPropertyFactory;
 import org.opentravel.schemacompiler.model.TLAlias;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeOwner;
+import org.opentravel.schemacompiler.model.TLBusinessObject;
+import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLFacetOwner;
 import org.opentravel.schemacompiler.model.TLIndicator;
@@ -400,8 +402,11 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
             baseObj = ((OtmContributedFacet) baseObj).getContributor();
         if (baseObj instanceof OtmLibraryMember && baseObj.getTL() instanceof TLFacetOwner) {
             OtmLibraryMember lm = (OtmLibraryMember) baseObj;
+
+            // TODO: Dave - Please review this change to make sure there are no unintended consequences
             // Set the TL Owning entity
-            getTL().setOwningEntity( (TLFacetOwner) lm.getTL() );
+            // getTL().setOwningEntity( (TLFacetOwner) lm.getTL() );
+            setOwningEntity( getTL(), (TLFacetOwner) lm.getTL() );
 
             // Create or change where contributed
             if (getWhereContributed() == null)
@@ -411,6 +416,39 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         }
         // Where used
         return getBaseType();
+    }
+
+    /**
+     * When assigning the owner of a facet, the relationship must be established by adding the facet to the owner - not
+     * simply by directly assigning the owning entity of the facet. By assigning it to the owner, not only will the
+     * facet assignment be done, but the owner will be aware that the facet was added as one of its children.
+     * 
+     * @param facet the contextual facet whose owner is to be assigned
+     * @param owningEntity the entity that will own the facet
+     */
+    private void setOwningEntity(TLContextualFacet facet, TLFacetOwner owningEntity) {
+        if (owningEntity instanceof TLContextualFacet) {
+            ((TLContextualFacet) owningEntity).addChildFacet( facet );
+
+        } else {
+            switch (facet.getFacetType()) {
+                case CUSTOM:
+                    ((TLBusinessObject) owningEntity).addCustomFacet( facet );
+                    break;
+                case QUERY:
+                    ((TLBusinessObject) owningEntity).addQueryFacet( facet );
+                    break;
+                case UPDATE:
+                    ((TLBusinessObject) owningEntity).addUpdateFacet( facet );
+                    break;
+                case CHOICE:
+                    ((TLChoiceObject) owningEntity).addChoiceFacet( facet );
+                    break;
+                default:
+                    // Fallback default behavior (but should never happen)
+                    facet.setOwningEntity( owningEntity );
+            }
+        }
     }
 
     @Override

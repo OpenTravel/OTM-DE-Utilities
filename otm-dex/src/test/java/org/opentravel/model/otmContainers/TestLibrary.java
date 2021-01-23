@@ -50,6 +50,7 @@ import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.repository.RepositoryItemState;
+import org.opentravel.schemacompiler.util.URLUtils;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
@@ -502,6 +503,7 @@ public class TestLibrary extends AbstractFxTest {
         tlLib.setName( "LibraryName" );
         tlLib.setPrefix( "pre" );
         tlLib.setNamespace( "http://example.com/ns/v0" );
+        tlLib.setLibraryUrl( URLUtils.toURL( "file://exampleLib.otm" ) );
         OtmLibrary lib = mgr.add( tlLib );
         assertTrue( "Given", lib.isEditable() );
         assertTrue( "Given - model manager must be able to find the library.", mgr.get( lib.getTL() ) == lib );
