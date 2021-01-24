@@ -18,6 +18,8 @@ package org.opentravel.model.otmFacets;
 
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLFacetType;
 
@@ -29,7 +31,6 @@ import org.opentravel.schemacompiler.model.TLFacetType;
  */
 public class OtmChoiceFacet extends OtmContextualFacet {
     // private static Log log = LogFactory.getLog( OtmChoiceFacet.class );
-    // private static final String OBJECTNAME = "Choice Facet";
 
     /**
      */
@@ -45,4 +46,12 @@ public class OtmChoiceFacet extends OtmContextualFacet {
         setName( name );
         getTL().setFacetType( TLFacetType.CHOICE );
     }
+
+    @Override
+    protected void setOwningEntity(OtmLibraryMember owner) {
+        super.setOwningEntity( owner );
+        if (owner.getTL() instanceof TLChoiceObject)
+            ((TLChoiceObject) owner.getTL()).addChoiceFacet( getTL() );
+    }
+
 }

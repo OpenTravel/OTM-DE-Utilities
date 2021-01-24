@@ -23,7 +23,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentravel.TestDexFileHandler;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
@@ -53,7 +52,7 @@ public class TestCustomFacet extends TestContextualFacet {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         subject = buildOtm( staticModelManager );
         baseObject = buildOtm( staticModelManager );
         // baseObject.setName( "BaseCF" );
@@ -300,23 +299,24 @@ public class TestCustomFacet extends TestContextualFacet {
         super.testNestedContributedFacets( nestedCF );
     }
 
-    /**
-     * On load from file, the compiler delivers: LibraryMemberFactory - choiceF1 - ChoiceFacet created but no
-     * contributed. TLOwner is set (FacetTestChoice). LibraryMemberFactory - choiceF1 - ChoiceFacet created but no
-     * contributed. TLOwner is set (FacetTestChoice). LibraryMemberFactory - choiceF1A - ChoiceFacet created but no
-     * contributed. TLOwner is set (ChoiceF1).
-     * 
-     * WhereContributed computed when MemberTReeTable.createTreeItem checks where contributed Factory never used when
-     * parent is contextual facet
-     */
-    @Test
-    public void testNestedContributedFacetsFromFactory() {
-        OtmModelManager mgr = new OtmModelManager( null, null, null );
-
-        TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr );
-        TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY1, mgr );
-        TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY2, mgr );
-    }
+    // This test class is not set up to use test files
+    // /**
+    // * On load from file, the compiler delivers: LibraryMemberFactory - choiceF1 - ChoiceFacet created but no
+    // * contributed. TLOwner is set (FacetTestChoice). LibraryMemberFactory - choiceF1 - ChoiceFacet created but no
+    // * contributed. TLOwner is set (FacetTestChoice). LibraryMemberFactory - choiceF1A - ChoiceFacet created but no
+    // * contributed. TLOwner is set (ChoiceF1).
+    // *
+    // * WhereContributed computed when MemberTReeTable.createTreeItem checks where contributed Factory never used when
+    // * parent is contextual facet
+    // */
+    // @Test
+    // public void testNestedContributedFacetsFromFactory() {
+    // OtmModelManager mgr = new OtmModelManager( null, null, null );
+    //
+    // TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr );
+    // TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY1, mgr );
+    // TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY2, mgr );
+    // }
 
     @Test
     public void testWhenContributed() {

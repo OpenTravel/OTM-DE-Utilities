@@ -25,6 +25,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractOTMApplication;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.TestOtmModelManager;
@@ -135,7 +136,7 @@ public class TestInheritance extends AbstractFxTest {
 
             // Separate out those whose owning entity is known from those not known
             if (tlcf.getOwningEntity() == null) {
-                // log.debug( tlcf.getName() + " is missing Owning entity named: " + tlcf.getOwningEntityName() );
+                log.debug( tlcf.getName() + " is missing Owning entity named: " + tlcf.getOwningEntityName() );
                 tlcfs_MissingOwningEntity.add( tlcf );
                 cfs_MissingOwningEntity.add( cf );
                 // assertTrue( localName.startsWith( "UNKNOWN" ) );
@@ -146,33 +147,47 @@ public class TestInheritance extends AbstractFxTest {
             }
             assertTrue( tlcf.getChildFacets() != null );
         }
+
+        // Debugging output
         libs.forEach( l -> log.debug( l.getPrefix() ) );
         log.debug( tlcfs_MissingOwningEntity.size() + " tl contextual facets are missing owning entity." );
+        log.debug( knownFacets.size() + " tl contextual facets have owning entity." );
+        log.debug( "" );
 
-        // See if any of the missing owning entities are in the map
-        for (TLContextualFacet tlcf : tlcfs_MissingOwningEntity) {
-            log.debug( tlcf.getName() + " is trying to find owner named: " + tlcf.getOwningEntityName() );
-            TLContextualFacet candidate = knownFacets.get( tlcf.getOwningEntityName() );
-            if (candidate != null)
-                log.debug( "Candidate: " + candidate.getName() );
-        }
+        // // Check - to see if any of the missing owning entities are in the map.
+        // // They are NOT.
+        // for (TLContextualFacet tlcf : tlcfs_MissingOwningEntity) {
+        // log.debug( tlcf.getName() + " is searching map trying to find owner named: " + tlcf.getOwningEntityName() );
+        // TLContextualFacet candidate = knownFacets.get( tlcf.getOwningEntityName() );
+        // if (candidate != null)
+        // log.debug( " Map contained: " + candidate.getName() );
+        // }
 
-
+        // // Check - If owning entity is missing, See if model manager knows them by name.
+        // // findWhereContributed() uses names search in model manager.
+        // // Will not find the owners that are facets. Will find owners that are business and choice objects.
+        // for (TLContextualFacet tlcf : tlcfs_MissingOwningEntity) {
+        // log.debug( tlcf.getName() + " is searching model manger trying to find owner named: "
+        // + tlcf.getOwningEntityName() );
+        // OtmLibraryMember candidate = mgr.getMember( tlcf.getOwningEntityName() );
+        // if (candidate != null)
+        // log.debug( " Found." );
+        // else {
+        // log.debug( " Model manager can not find owner." );
+        // }
+        // }
+        log.debug( "" );
 
         // Then - If owning entity is missing, findWhereContributed() will try to look it up.
         for (TLContextualFacet tlcf : tlcfs_MissingOwningEntity) {
-            OtmLibraryMember candidate = mgr.getMember( tlcf.getOwningEntityName() );
-            if (candidate == null) {
-                log.debug( "Model manager can not find owner." );
-                // All the missing owners are facets
-                for (TLContextualFacet f : tlCFacets) {
-                    String name = f.getName();
-                    if (name.equals( tlcf.getOwningEntityName() ))
-                        log.debug( "Found facet with name: " + f.getName() );
-                }
-            }
+            assertTrue( "Must find facade.", OtmModelElement.get( tlcf ) instanceof OtmContextualFacet );
+            OtmContextualFacet cf = (OtmContextualFacet) OtmModelElement.get( tlcf );
+
+            log.debug( cf + " findWhereContributed() is trying to find owner named: " + tlcf.getOwningEntityName() );
+            cf.findWhereContributed();
+            if (cf.getWhereContributed() != null)
+                log.debug( "   Found." );
         }
-        log.debug( "" );
 
         // Then - look at contributed facets
         for (OtmContextualFacet cf : cFacets) {
@@ -228,7 +243,7 @@ public class TestInheritance extends AbstractFxTest {
         // QUESTION - BO reports out injected child but facet does not, why? How to find custom from base?
         // When - children of base custom
         List<TLFacet> baseFacets2 = ((TLFacetOwner) baseCustom.getTL()).getAllFacets();
-        // FAILS -
+        // FIXED 1/23/2021
         assertTrue( "Then - must find nested facet.", !baseFacets2.isEmpty() );
     }
 
@@ -278,7 +293,7 @@ public class TestInheritance extends AbstractFxTest {
         List<TLContextualFacet> nlGhosts =
             FacetCodegenUtils.findNonLocalGhostFacets( (TLLibrary) baseCustom.getLibrary().getTL() );
         // Then
-        // FAILS -
+        // FIXED 1/23/2021
         assertTrue( "Must find ghost facets.", !ghosts2.isEmpty() );
     }
 
@@ -326,7 +341,7 @@ public class TestInheritance extends AbstractFxTest {
             attrs.size() == baseBO.getSummary().getTL().getAttributes().size() );
         assertTrue( "All baseBO indicators must have been reported by codegen utils.",
             inds.size() == baseBO.getSummary().getTL().getIndicators().size() );
-        // FAILS
+        // FIXED 1/23/2021
         log.debug( "Base has " + baseElements.size() + " and " + props.size()
             + " returned by PropertyCodegenUtils.getInheritedFacetProperties" );
         assertTrue( "All baseBO elements must have been reported by codegen utils.",

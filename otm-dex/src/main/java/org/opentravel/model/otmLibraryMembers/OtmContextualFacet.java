@@ -33,8 +33,6 @@ import org.opentravel.model.otmProperties.OtmPropertyFactory;
 import org.opentravel.schemacompiler.model.TLAlias;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeOwner;
-import org.opentravel.schemacompiler.model.TLBusinessObject;
-import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLFacetOwner;
 import org.opentravel.schemacompiler.model.TLIndicator;
@@ -105,6 +103,9 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
             else if (contains( inheritedChildren, child ))
                 return null;
 
+            // Not already added - add it now
+            // if (child instanceof OtmContextualFacet)
+            // log.debug( "HERE" );
             if (!child.isInherited())
                 children.add( child );
             else
@@ -279,6 +280,9 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
 
 
     /**
+     * Get the contributed facet that is a child of the owning object. Will attempt to find missing owners using model
+     * manager search.
+     * <p>
      * NOTE: detection of "ghost" inherited facets depends on Contributor will not have ghost set as where contributed.
      * 
      * @return the non-ghost contributed facet where this facet is used
@@ -342,8 +346,8 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         if (getTL().getOwningEntityName() != null && !getTL().getOwningEntityName().isEmpty()) {
             OtmLibraryMember candidate = mgr.getMember( getTL().getOwningEntityName() );
             if (candidate != null && candidate.getTL() instanceof TLFacetOwner) {
-                log.debug( "Name Match Found for contextual facet with no owner: " + candidate );
-                getTL().setOwningEntity( (TLFacetOwner) candidate.getTL() );
+                log.debug( "Name Match Found for contextual facet with no TL owner: " + candidate );
+                // setOwningEntity( candidate ); // Done by business and choice add
                 whereContributed = new OtmContributedFacet( candidate, this );
                 candidate.add( whereContributed );
             } else {
@@ -369,7 +373,8 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
     @Override
     public void modelChildren() {
         if (getTL() instanceof TLIndicatorOwner)
-            ((TLIndicatorOwner) getTL()).getIndicators().forEach( p -> OtmPropertyFactory.create( p, this ) );
+            getTL().getIndicators().forEach( p -> OtmPropertyFactory.create( p, this ) );
+        // ((TLIndicatorOwner) getTL()).getIndicators().forEach( p -> OtmPropertyFactory.create( p, this ) );
         if (getTL() instanceof TLAttributeOwner)
             ((TLAttributeOwner) getTL()).getAttributes().forEach( p -> OtmPropertyFactory.create( p, this ) );
         if (getTL() instanceof TLPropertyOwner)
@@ -403,10 +408,12 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         if (baseObj instanceof OtmLibraryMember && baseObj.getTL() instanceof TLFacetOwner) {
             OtmLibraryMember lm = (OtmLibraryMember) baseObj;
 
-            // TODO: Dave - Please review this change to make sure there are no unintended consequences
-            // Set the TL Owning entity
-            // getTL().setOwningEntity( (TLFacetOwner) lm.getTL() );
-            setOwningEntity( getTL(), (TLFacetOwner) lm.getTL() );
+            // 1/23/2021 - changed to add to owner instead of setting owning entity
+            setOwningEntity( lm );
+            //// TODO: Dave - Please review this change to make sure there are no unintended consequences
+            //// Set the TL Owning entity
+            //// getTL().setOwningEntity( (TLFacetOwner) lm.getTL() );
+            //// setOwningEntity( getTL(), (TLFacetOwner) lm.getTL() );
 
             // Create or change where contributed
             if (getWhereContributed() == null)
@@ -422,34 +429,45 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
      * When assigning the owner of a facet, the relationship must be established by adding the facet to the owner - not
      * simply by directly assigning the owning entity of the facet. By assigning it to the owner, not only will the
      * facet assignment be done, but the owner will be aware that the facet was added as one of its children.
-     * 
-     * @param facet the contextual facet whose owner is to be assigned
-     * @param owningEntity the entity that will own the facet
      */
-    private void setOwningEntity(TLContextualFacet facet, TLFacetOwner owningEntity) {
-        if (owningEntity instanceof TLContextualFacet) {
-            ((TLContextualFacet) owningEntity).addChildFacet( facet );
-
-        } else {
-            switch (facet.getFacetType()) {
-                case CUSTOM:
-                    ((TLBusinessObject) owningEntity).addCustomFacet( facet );
-                    break;
-                case QUERY:
-                    ((TLBusinessObject) owningEntity).addQueryFacet( facet );
-                    break;
-                case UPDATE:
-                    ((TLBusinessObject) owningEntity).addUpdateFacet( facet );
-                    break;
-                case CHOICE:
-                    ((TLChoiceObject) owningEntity).addChoiceFacet( facet );
-                    break;
-                default:
-                    // Fallback default behavior (but should never happen)
-                    facet.setOwningEntity( owningEntity );
-            }
-        }
+    protected void setOwningEntity(OtmLibraryMember owner) {
+        if (owner instanceof OtmContextualFacet)
+            ((OtmContextualFacet) owner).getTL().addChildFacet( getTL() );
     }
+
+    // /**
+    // * When assigning the owner of a facet, the relationship must be established by adding the facet to the owner -
+    // not
+    // * simply by directly assigning the owning entity of the facet. By assigning it to the owner, not only will the
+    // * facet assignment be done, but the owner will be aware that the facet was added as one of its children.
+    // *
+    // * @param facet the contextual facet whose owner is to be assigned
+    // * @param owningEntity the entity that will own the facet
+    // */
+    // private void setOwningEntity(TLContextualFacet facet, TLFacetOwner owningEntity) {
+    // if (owningEntity instanceof TLContextualFacet) {
+    // ((TLContextualFacet) owningEntity).addChildFacet( facet );
+    //
+    // } else {
+    // switch (facet.getFacetType()) {
+    // case CUSTOM:
+    // ((TLBusinessObject) owningEntity).addCustomFacet( facet );
+    // break;
+    // case QUERY:
+    // ((TLBusinessObject) owningEntity).addQueryFacet( facet );
+    // break;
+    // case UPDATE:
+    // ((TLBusinessObject) owningEntity).addUpdateFacet( facet );
+    // break;
+    // case CHOICE:
+    // ((TLChoiceObject) owningEntity).addChoiceFacet( facet );
+    // break;
+    // default:
+    // // Fallback default behavior (but should never happen)
+    // facet.setOwningEntity( owningEntity );
+    // }
+    // }
+    // }
 
     @Override
     public String setName(String name) {

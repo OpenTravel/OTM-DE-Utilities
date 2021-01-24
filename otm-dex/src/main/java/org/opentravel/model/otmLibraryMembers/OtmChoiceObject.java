@@ -94,8 +94,10 @@ public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
         else {
             OtmObject result = null;
             result = super.add( child );
-            if (child instanceof OtmContributedFacet) {
-                ((OtmContributedFacet) child).getTL().setOwningEntity( getTL() );
+            if (child instanceof OtmContributedFacet && ((OtmContributedFacet) child).getContributor() != null) {
+                ((OtmContributedFacet) child).getContributor().setOwningEntity( this );
+                // getTL().addChoiceFacet( ((OtmContributedFacet) child).getTL() );
+                // ((OtmContributedFacet) child).getTL().setOwningEntity( getTL() );
             }
             return result;
         }

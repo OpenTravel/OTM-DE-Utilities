@@ -79,8 +79,10 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
         else {
             OtmObject result = null;
             result = super.add( child );
-            if (child instanceof OtmContributedFacet) {
-                ((OtmContributedFacet) child).getTL().setOwningEntity( getTL() );
+            if (child instanceof OtmContributedFacet && ((OtmContributedFacet) child).getContributor() != null) {
+                ((OtmContributedFacet) child).getContributor().setOwningEntity( this );
+                // if (child instanceof OtmContributedFacet) {
+                // ((OtmContributedFacet) child).getTL().setOwningEntity( getTL() );
             }
             return result;
         }

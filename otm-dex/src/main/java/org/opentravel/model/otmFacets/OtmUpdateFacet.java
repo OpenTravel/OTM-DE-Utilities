@@ -20,11 +20,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLFacetType;
 
 /**
- * Abstract OTM Node for Facets.
+ * OTM Node for Update contextual Facets.
  * 
  * @author Dave Hollander
  * 
@@ -39,13 +41,19 @@ public class OtmUpdateFacet extends OtmContextualFacet {
 
         if (tl.getFacetType() != TLFacetType.UPDATE)
             throw new IllegalArgumentException(
-                "Tried to create detail facet from wrong facet type: " + tl.getFacetType() );
+                "Tried to create update facet from wrong facet type: " + tl.getFacetType() );
     }
 
     @Override
     public String setName(String text) {
-        // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    protected void setOwningEntity(OtmLibraryMember owner) {
+        super.setOwningEntity( owner );
+        if (owner.getTL() instanceof TLBusinessObject)
+            ((TLBusinessObject) owner.getTL()).addUpdateFacet( getTL() );
     }
 
 

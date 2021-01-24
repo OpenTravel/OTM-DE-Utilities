@@ -772,6 +772,10 @@ public class OtmModelManager implements TaskResultHandlerI {
         return Collections.unmodifiableCollection( selected );
     }
 
+    /**
+     * 
+     * @return new collection of all contextual facets in the model.
+     */
     public Collection<OtmLibraryMember> getMembersContextualFacets() {
         return getMembers( d -> d instanceof OtmContextualFacet );
     }

@@ -23,6 +23,7 @@ import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.DexTaskSingleton;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberBase;
 
@@ -58,6 +59,10 @@ public class TypeResolverTask extends DexTaskBase<OtmModelManager> implements De
     // To Do - create dispatcher that eliminates multiple simultaneous requests
     @Override
     public synchronized void doIT() {
+        // Resolve contextual facet owners.
+        Collection<OtmLibraryMember> cfs = taskData.getMembersContextualFacets();
+        cfs.forEach( TypeResolverTask::getWhereContributed );
+
         // Create local copy because other tasks may update
         Collection<OtmLibraryMember> members = new ArrayList<>( taskData.getMembers() );
         // For each member in the model, force a computation of where used.
@@ -70,8 +75,17 @@ public class TypeResolverTask extends DexTaskBase<OtmModelManager> implements De
      * @param mgr
      */
     public static void runResolver(OtmModelManager mgr) {
+        // Resolve contextual facet owners.
+        Collection<OtmLibraryMember> cfs = mgr.getMembersContextualFacets();
+        cfs.forEach( TypeResolverTask::getWhereContributed );
+
         Collection<OtmLibraryMember> members = new ArrayList<>( mgr.getMembers() );
         // For each member in the model, force a computation of where used.
         members.forEach( m -> ((OtmLibraryMemberBase<?>) m).getWhereUsed( true ) );
+    }
+
+    private static void getWhereContributed(OtmLibraryMember member) {
+        if (member instanceof OtmContextualFacet)
+            ((OtmContextualFacet) member).getWhereContributed();
     }
 }

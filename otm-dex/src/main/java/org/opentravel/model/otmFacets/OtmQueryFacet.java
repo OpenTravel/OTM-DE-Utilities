@@ -18,6 +18,8 @@ package org.opentravel.model.otmFacets;
 
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLFacetType;
 
@@ -44,6 +46,13 @@ public class OtmQueryFacet extends OtmContextualFacet {
         super( new TLContextualFacet(), manager );
         setName( name );
         getTL().setFacetType( TLFacetType.QUERY );
+    }
+
+    @Override
+    protected void setOwningEntity(OtmLibraryMember owner) {
+        super.setOwningEntity( owner );
+        if (owner.getTL() instanceof TLBusinessObject)
+            ((TLBusinessObject) owner.getTL()).addQueryFacet( getTL() );
     }
 
 }

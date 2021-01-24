@@ -134,6 +134,8 @@ public class TestDexFileHandler extends AbstractFxTest {
         File localLibrary = new File( wipFolder.get(), "/" + path );
         assertNotNull( localLibrary );
         assertTrue( localLibrary.exists() );
+        // Path should be:
+        // C:\Users\dmh\Git\OTM-DE-Utilities\otm-dex\target\test-workspace\TestDexFileHandler\wip\StandAloneLibrary.otm
 
         // int initialLibCount = tlModel.getAllLibraries().size();
         new DexFileHandler().openLibrary( localLibrary, modelManager, null );
