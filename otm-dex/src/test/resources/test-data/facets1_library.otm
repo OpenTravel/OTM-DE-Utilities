@@ -60,7 +60,7 @@
         <ns2:Indicator name="indicatorQueryF2Ind" publishAsElement="false"/>
     </ns2:ContextualFacet>
     <ns2:ContextualFacet facetNamespace=""
-        facetOwner="FacetTestBO_Query_QueryF2" name="QueryF2A"
+        facetOwner="b:FacetTestBO_Query_QueryF2" name="QueryF2A"
         notExtendable="false" type="Query">
         <ns2:Attribute name="attributeQueryF2A" referenceRepeat="0" type="xsd:string"/>
         <ns2:Element name="String" repeat="0" type="xsd:string"/>

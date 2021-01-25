@@ -242,10 +242,8 @@ public class TestChoiceFacet extends TestContextualFacet {
     public static OtmChoiceFacet buildOtm(OtmModelManager mgr) {
         OtmChoiceFacet choice = new OtmChoiceFacet( buildTL(), mgr );
         assertNotNull( choice );
-        // choice.getTL().addAttribute( new TLAttribute() );
-        // choice.getTL().addElement( new TLProperty() );
+        mgr.add( choice );
 
-        // Will only have children when contributed is modeled.
         return choice;
     }
 

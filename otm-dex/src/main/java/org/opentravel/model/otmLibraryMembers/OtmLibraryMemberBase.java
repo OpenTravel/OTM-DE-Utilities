@@ -510,6 +510,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             whereUsed.addAll( mgr.findUsersOf( this ) );
             whereUsed.addAll( mgr.findSubtypesOf( this ) ); // base types
             // FIXME - get resources when they expose this library member
+            // FIXME - aliases???
 
             // Will re-populate children using modelChildren()
             getDescendantsTypeProviders().forEach( p -> whereUsed.addAll( mgr.findUsersOf( p ) ) );

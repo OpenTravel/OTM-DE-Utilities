@@ -196,8 +196,11 @@ public class TestInheritance extends AbstractFxTest {
                 log.debug( "Trouble: missing contributor for: " + cf );
             } else {
                 OtmLibraryMember member = contrib.getOwningMember();
+                OtmLibraryMember owner = cf.getContributedObject();
+                assertTrue( owner != null );
                 assertTrue( contrib != null );
                 assertTrue( member != null );
+                // FAILS - member has different contributed facet
                 TestContextualFacet.testContributedFacet( contrib, cf, member );
             }
         }

@@ -525,6 +525,7 @@ public class TestLibrary extends AbstractFxTest {
         tlLib.setName( name );
         tlLib.setPrefix( prefix );
         tlLib.setNamespace( namespace );
+        tlLib.setLibraryUrl( URLUtils.toURL( "File://example.otm" ) );
         return tlLib;
     }
 

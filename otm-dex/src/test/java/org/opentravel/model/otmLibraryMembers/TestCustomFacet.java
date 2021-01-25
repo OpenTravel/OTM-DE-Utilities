@@ -68,6 +68,7 @@ public class TestCustomFacet extends TestContextualFacet {
     public static OtmCustomFacet buildOtm(OtmModelManager mgr) {
         OtmCustomFacet custom = new OtmCustomFacet( buildTL(), mgr );
         assertNotNull( custom );
+        mgr.add( custom );
 
         // Will only have children when contributed is modeled.
         return custom;
@@ -87,6 +88,7 @@ public class TestCustomFacet extends TestContextualFacet {
         cf.setName( name );
         if (bo.getLibrary() != null)
             bo.getLibrary().add( cf );
+        // FIXME - where do business objects get added to model manager?
         testContributedFacet( cf.getWhereContributed(), cf, bo );
         return cf;
     }
@@ -124,10 +126,11 @@ public class TestCustomFacet extends TestContextualFacet {
      * @return
      */
     public static OtmCustomFacet buildOtm(OtmModelManager modelManager, OtmBusinessObject bo) {
-        OtmCustomFacet cf = buildOtm( modelManager );
-        bo.add( cf );
-        testContributedFacet( cf.getWhereContributed(), cf, bo );
-        return cf;
+        // OtmCustomFacet cf = buildOtm( modelManager );
+        // bo.add( cf );
+        // testContributedFacet( cf.getWhereContributed(), cf, bo );
+        // return cf;
+        return buildOtm( bo, "SomeName" );
     }
 
     public static TLContextualFacet buildTL() {

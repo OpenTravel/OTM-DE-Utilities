@@ -172,7 +172,11 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public int getUsedTypesCount();
 
     /**
+     * Get all type users and base-type extensions of this member.
+     * <p>
      * Get all members that contain type users that use this member or any of its descendants as assigned types.
+     * <p>
+     * List includes all extensions of this object.
      *
      * @return list of where used or empty list
      */

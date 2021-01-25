@@ -924,7 +924,7 @@ public class OtmModelManager implements TaskResultHandlerI {
     // }
 
     /**
-     * @return
+     * @return new list of editable libraries, may be empty
      */
     public List<OtmLibrary> getEditableLibraries() {
         List<OtmLibrary> libs = new ArrayList<>();

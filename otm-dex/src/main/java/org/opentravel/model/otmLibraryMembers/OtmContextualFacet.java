@@ -189,12 +189,16 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
      */
     @Override
     public OtmObject getBaseType() {
+        // Using the TL instead of contributed assures the facade is correct.
         if (getTL().getOwningEntity() != null)
             return OtmModelElement.get( (TLModelElement) getTL().getOwningEntity() );
-        // Using the TL instead of contributed assures the facade is correct.
-        // Must have same result as:
-        // if (getWhereContributed() != null)
+        // else {
+        // if (getWhereContributed() != null) {
+        // // Fail safe - if contributed exists, use it and set tl
+        // setOwningEntity( getWhereContributed().getOwningMember() );
         // return getWhereContributed().getOwningMember();
+        // }
+        // }
         return null;
     }
 
@@ -280,8 +284,9 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
 
 
     /**
-     * Get the contributed facet that is a child of the owning object. Will attempt to find missing owners using model
-     * manager search.
+     * Get the contributed facet that is a child of the owning object.
+     * <p>
+     * Will attempt to find missing owners using model manager search.
      * <p>
      * NOTE: detection of "ghost" inherited facets depends on Contributor will not have ghost set as where contributed.
      * 
@@ -315,16 +320,18 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
     }
 
     /**
-     * See if the children owner has a contributed facet with the same TL as this contextual facet
+     * If the children owner has a contributed facet with the same TL as this contextual facet, set whereContributed and
+     * set the contributed facets's contributor.
+     * <p>
+     * This is more reliable than NAME match used in {@link #findWhereContributed()}!
      * 
      * @param owner
      */
     private void findWhereContributed(OtmChildrenOwner owner) {
         for (OtmObject c : owner.getChildren()) {
-            // NAME match is not reliable!
             // if (c instanceof OtmContributedFacet && c.getName().equals( this.getName() )) {
             if (c instanceof OtmContributedFacet && c.getTL() == this.getTL()) {
-                whereContributed = (OtmContributedFacet) c;
+                setWhereContributed( (OtmContributedFacet) c );
                 ((OtmContributedFacet) c).setContributor( this );
             }
         }
@@ -346,12 +353,12 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         if (getTL().getOwningEntityName() != null && !getTL().getOwningEntityName().isEmpty()) {
             OtmLibraryMember candidate = mgr.getMember( getTL().getOwningEntityName() );
             if (candidate != null && candidate.getTL() instanceof TLFacetOwner) {
-                log.debug( "Name Match Found for contextual facet with no TL owner: " + candidate );
-                // setOwningEntity( candidate ); // Done by business and choice add
+                log.debug( "Found where " + this + " is contributed: " + candidate );
                 whereContributed = new OtmContributedFacet( candidate, this );
-                candidate.add( whereContributed );
+                if (getTL().getOwningEntity() == null)
+                    candidate.add( whereContributed );
             } else {
-                log.warn( "Can't find where contributed. Member = " + this + "  owning entity = "
+                log.warn( "Can't find where " + this + " is contributed. Owning entity name: "
                     + getTL().getOwningEntityName() );
             }
         }

@@ -22,6 +22,7 @@ import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedController;
+import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmFacets.OtmAlias;
@@ -56,6 +57,7 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
     private static final PseudoClass DEPRECATED = PseudoClass.getPseudoClass( "deprecate" );
     private static final PseudoClass EDITANDDEPRECATED = PseudoClass.getPseudoClass( "editableanddeprecated" );
     private DexIncludedController<?> controller;
+    private OtmModelManager modelManager = null;
 
     Menu newMenu = null;
     MenuItem deleteItem = null;
@@ -64,8 +66,11 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
     MenuItem addAliasItem = null;
     MenuItem deprecateItem = null;
 
+
     public MemberRowFactory(DexIncludedController<?> controller) {
         this.controller = controller;
+        if (controller != null && controller.getMainController() != null)
+            modelManager = controller.getMainController().getModelManager();
 
         // Create Context menu
         addAliasItem = addItem( memberMenu, "Add Alias", e -> addAlias() );
@@ -180,22 +185,29 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
     private void newMember(OtmLibraryMemberType type) {
         OtmObject obj = getValue();
 
-        // If they didn't select anything
-        if (obj == null && controller.getMainController() != null)
-            // Use any member the model manager delivers
-            for (OtmLibraryMember member : controller.getMainController().getModelManager().getMembers()) {
-            obj = member;
-            if (member.isEditable()) {
-            break;
-            }
-            }
+        // If they didn't select anything,
+        // use the first editable member the model manager delivers
+        if (obj == null && modelManager != null)
+            for (OtmLibraryMember member : modelManager.getMembers())
+                if (member.isEditable()) {
+                    obj = member;
+                    break;
+                }
+
         // Run action
         if (obj != null)
             obj.getModelManager().getActionManager( true ).run( DexActions.NEWLIBRARYMEMBER, obj, type );
+        else {
+            // post dialog - should never happen
+            if (controller.getMainController() != null)
+                controller.getMainController().postError( null, "Must have editable library" );
+        }
         controller.refresh();
     }
 
     /**
+     * obj might be instanceof OtmEmptyTableFacet
+     * 
      * @return the value OtmObject or null
      */
     private OtmObject getValue() {
@@ -205,6 +217,7 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         return null;
     }
 
+    // TODO - make into one method: getValue(), getSelectedObject()
     private OtmObject getSelectedObject(TreeItem<MemberAndProvidersDAO> item) {
         if (item != null && item.getValue() != null && item.getValue().getValue() instanceof OtmObject)
             return (item.getValue().getValue());

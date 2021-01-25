@@ -33,6 +33,7 @@ import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import javafx.application.Platform;
 
@@ -91,14 +92,15 @@ public class NewLibraryMemberAction extends DexRunAction {
                     log.warn( "Member has a library: " + member.getLibraryName() );
 
                 // Get an editable library to assign
+                //
                 // If the subject is editable, use it to set initial library
                 OtmLibrary lib = otm.getLibrary();
-                // if (lib == null || !lib.isEditable()) {
-                // // else have the user to select a library
-                // SetLibraryAction action = new SetLibraryAction();
-                // action.setSubject( member );
-                // lib = action.doIt();
-                // }
+                if (lib == null || !lib.isEditable()) {
+                    // Otherwise, get any one from the model manager
+                    List<OtmLibrary> libs = otm.getModelManager().getEditableLibraries();
+                    if (libs != null && !libs.isEmpty())
+                        lib = libs.get( 0 );
+                }
                 if (lib == null) {
                     member = null; // cancel
                     return null;
@@ -108,7 +110,7 @@ public class NewLibraryMemberAction extends DexRunAction {
                 OtmLibraryMember result = null;
                 int i = 1;
                 do {
-                    result = otm.getLibrary().add( member );
+                    result = lib.add( member );
                     if (result == null)
                         member.setName( "New" + Integer.toString( i++ ) );
                 } while (result == null && i < 100);

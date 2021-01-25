@@ -123,6 +123,7 @@ public class TestQueryFacet extends TestContextualFacet {
     public static OtmQueryFacet buildOtm(OtmModelManager mgr) {
         OtmQueryFacet query = new OtmQueryFacet( buildTL(), mgr );
         assertNotNull( query );
+        mgr.add( query );
 
         // Will only have children when contributed is modeled.
         return query;

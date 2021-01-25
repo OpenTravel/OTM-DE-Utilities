@@ -27,15 +27,21 @@ import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmProperties.OtmElement;
+import org.opentravel.schemacompiler.codegen.util.FacetCodegenUtils;
 import org.opentravel.schemacompiler.model.LibraryElement;
 import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
+import org.opentravel.schemacompiler.model.TLComplexTypeBase;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLExample;
 import org.opentravel.schemacompiler.model.TLExampleOwner;
+import org.opentravel.schemacompiler.model.TLFacet;
+import org.opentravel.schemacompiler.model.TLFacetOwner;
+import org.opentravel.schemacompiler.model.TLFacetType;
 import org.opentravel.schemacompiler.model.TLProperty;
 
 import java.util.ArrayList;
@@ -64,6 +70,49 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
 
         assertNotNull( bo.getSummary() );
         assertNotNull( bo.getDetail() );
+    }
+
+    @Test
+    public void testGhostFacets() {
+        OtmLibrary lib = TestLibrary.buildOtm();
+        // OtmModelManager mgr = lib.getModelManager();
+
+        OtmBusinessObject baseBO = TestBusiness.buildOtm( lib, "BaseBO" );
+        OtmBusinessObject exBO = TestBusiness.buildOtm( lib, "ExBO" );
+        TLFacetOwner exTL = (TLFacetOwner) exBO.getTL();
+
+        // Initially, there should be no ghosts.
+        Collection<OtmContributedFacet> cFacets = baseBO.getChildrenContributedFacets();
+        List<TLContextualFacet> ghosts = FacetCodegenUtils.findGhostFacets( exTL, TLFacetType.CUSTOM );
+        assertTrue( "Given: Extension not set yet, there must be no ghosts.", ghosts.isEmpty() );
+
+        // When - Add another CF -before extension-
+        OtmContextualFacet cf = TestCustomFacet.buildOtm( baseBO, "CF1" );
+        TestContextualFacet.testContributedFacet( cf.getWhereContributed(), cf, baseBO );
+        // Then - still no ghosts
+        ghosts = FacetCodegenUtils.findGhostFacets( exTL, TLFacetType.CUSTOM );
+        assertTrue( "Given: Extension not set yet, there must be no ghosts.", ghosts.isEmpty() );
+
+        // When - Extension set
+        exBO.setBaseType( baseBO );
+        assertTrue( "When - must have extension.", exBO.getBaseType() == baseBO );
+        assertTrue( "When - TL must have extension.", exBO.getTL().getExtension() != null );
+        assertTrue( "When - TL extend base TL.", exBO.getTL().getExtension().getExtendsEntity() == baseBO.getTL() );
+        assertTrue( "When - TL must not have extension.", baseBO.getTL().getExtension() == null );
+
+        // Then - ??? Only finds CF1
+        List<TLFacet> tlFacets = FacetCodegenUtils.getAvailableFacets( (TLComplexTypeBase) exTL );
+        ghosts = FacetCodegenUtils.findGhostFacets( exTL, TLFacetType.CUSTOM );
+        cFacets = baseBO.getChildrenContributedFacets();
+        // assertTrue( "Given: Extension not set yet, there must be no ghosts.", ghosts.isEmpty() );
+
+        // When - add another CF
+        cf = TestCustomFacet.buildOtm( baseBO, "CF2" );
+        TestContextualFacet.testContributedFacet( cf.getWhereContributed(), cf, baseBO );
+
+        // Then - ???
+        ghosts = FacetCodegenUtils.findGhostFacets( exTL, TLFacetType.CUSTOM );
+
     }
 
     @Override
@@ -123,6 +172,48 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
         // Then
         assertTrue( copy.getChildrenContributedFacets().isEmpty() );
         assertTrue( copy.getTL().getCustomFacets().isEmpty() );
+    }
+
+    /**
+     * What should be inherited from base business object?
+     * <p>
+     * Contextual facets are inherited but the name should start with the extension object name.
+     * <p>
+     * Aliases are <b> not </b> inherited.
+     * 
+     * @see org.opentravel.model.otmLibraryMembers.TestOtmLibraryMemberBase#testInheritance(org.opentravel.model.otmLibraryMembers.OtmLibraryMember)
+     */
+    @Override
+    public void testInheritance(OtmBusinessObject otm) {
+        assertTrue( "Given: must have object to test inheritance.", otm != null );
+
+        OtmBusinessObject base = (OtmBusinessObject) otm.getBaseType();
+        assertTrue( "Given: must have base to test inheritance.", base != null );
+
+        // Check - already has custom facet
+        Collection<OtmContributedFacet> baseCFs = base.getChildrenContributedFacets();
+        for (OtmContributedFacet contrib : baseCFs) {
+            OtmContextualFacet cf = contrib.getContributor();
+            assertTrue( "Given: must have contributor.", cf != null );
+            TestContextualFacet.testContributedFacet( contrib, cf, base );
+        }
+
+        TLFacetOwner extendedOwner = (TLFacetOwner) otm.getTL();
+        List<TLContextualFacet> ghosts = FacetCodegenUtils.findGhostFacets( extendedOwner, TLFacetType.CUSTOM );
+        List<OtmObject> otmInherited = otm.getInheritedChildren();
+        // FAILS
+        // assertTrue( otmInherited.isEmpty() == baseCFs.isEmpty() );
+
+        // Add some children to be inherited.
+        OtmContextualFacet cf = TestCustomFacet.buildOtm( base, "CF1" );
+        TestContextualFacet.testContributedFacet( cf.getWhereContributed(), cf, base );
+        cf = TestCustomFacet.buildOtm( base, "CF2" );
+        TestContextualFacet.testContributedFacet( cf.getWhereContributed(), cf, base );
+
+        ghosts = FacetCodegenUtils.findGhostFacets( extendedOwner, TLFacetType.CUSTOM );
+        // Only finds those just added, not the ones from before extended
+
+        super.testInheritance( otm );
     }
 
     public void testTLCopy(OtmLibraryMember member) {
@@ -226,8 +317,11 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
         assertTrue( bo.getSummary().getChildren().size() == 2 );
         assertTrue( "Must have identity listener.", OtmModelElement.get( bo.getTL() ) == bo );
 
-        OtmContextualFacet cf = TestCustomFacet.buildOtm( mgr, bo );
-        cf.setName( "SomeCustom" );
+        OtmContextualFacet cf = TestCustomFacet.buildOtm( bo, "SomeOtherCustom" );
+        OtmContextualFacet cf2 = TestCustomFacet.buildOtm( bo, "SomeOtherCustom2" );
+        OtmContextualFacet cf3 = TestCustomFacet.buildOtm( bo, "SomeOtherCustom3" );
+        // OtmContextualFacet cf = TestCustomFacet.buildOtm( mgr, bo );
+        // cf.setName( "SomeCustom" );
 
         return bo;
     }

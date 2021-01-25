@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<otp:Project xmlns="http://www.w3.org/2001/XMLSchema" xmlns:otp="http://www.OpenTravel.org/ns/OTA2/Project_v01_00">
+    <otp:projectId>TestCustomFacets</otp:projectId>
+    <otp:name>TestCustomFacets</otp:name>
+    <otp:description>TestCustomFacets</otp:description>
+    <otp:defaultContextId>TestCustomFacets</otp:defaultContextId>
+    <otp:UnmanagedProjectItem defaultItem="true">
+        <otp:FileLocation>TestCustomFacets.otm</otp:FileLocation>
+    </otp:UnmanagedProjectItem>
+</otp:Project>

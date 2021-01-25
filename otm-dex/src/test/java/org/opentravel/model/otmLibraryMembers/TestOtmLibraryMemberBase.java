@@ -31,10 +31,8 @@ import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmFacets.OtmAbstractFacet;
+import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmRoleEnumeration;
-import org.opentravel.schemacompiler.model.NamedEntity;
-import org.opentravel.schemacompiler.model.TLExtension;
-import org.opentravel.schemacompiler.model.TLExtensionOwner;
 import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.lang.reflect.InvocationTargetException;
@@ -215,17 +213,21 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void testInheritance(L otm) {
-        if (otm.getBaseType() == null)
+        L base = (L) otm.getBaseType();
+        if (base == null)
             return;
 
         if (otm instanceof OtmChildrenOwner) {
             List<OtmObject> otmInherited = otm.getInheritedChildren();
-            List<OtmObject> baseKids = ((OtmChildrenOwner) otm.getBaseType()).getChildren();
+            List<OtmObject> baseKids = ((OtmChildrenOwner) base).getChildren();
             // Remove the kids that can't be inherited
             // Note: this list was based on test results and not analysis after fixing enumeration inheritance
             List<OtmObject> candidates = new ArrayList<OtmObject>( baseKids );
             for (OtmObject k : candidates) {
+                if (k instanceof OtmContributedFacet)
+                    continue;
                 if (k instanceof OtmAbstractFacet)
                     baseKids.remove( k );
                 if (k instanceof OtmRoleEnumeration)
@@ -238,30 +240,34 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
             for (OtmObject i : otmInherited) {
                 assertTrue( "Inherited child must report it is inherited.", i.isInherited() );
             }
-            // otmInherited.forEach( i -> assertTrue( "Inherited child must report it is inherited.", i.isInherited() )
-            // );
         }
     }
 
     /**
      * Extend the base object with the extension object. Return the extension object if successful. Example:
-     * extendObject(animals, pig);
+     * extendObject(animals, cat);
+     * <p>
+     * Note, extension only changes the underlying TL objects.
      * 
      * @param base
      * @param extension object to become a sub-type of base
      * @return extension if successful or null
      */
     public L extendObject(L base, L extension) {
-        if (base.getTL() instanceof NamedEntity && extension.getTL() instanceof TLExtensionOwner) {
-            TLExtension tlex = new TLExtension();
-            tlex.setExtendsEntity( (NamedEntity) base.getTL() );
-            ((TLExtensionOwner) extension.getTL()).setExtension( tlex );
+        // Equivalent code
+        // if (base.getTL() instanceof NamedEntity && extension.getTL() instanceof TLExtensionOwner) {
+        // TLExtension tlex = new TLExtension();
+        // tlex.setExtendsEntity( (NamedEntity) base.getTL() );
+        // ((TLExtensionOwner) extension.getTL()).setExtension( tlex );
+        // }
+        OtmObject result = extension.setBaseType( base );
+        assertTrue( result == base );
 
-            assertTrue( extension.getBaseType() != null );
-            assertTrue( extension.getBaseType() == base );
-            return extension;
-        }
-        return null;
+        assertTrue( extension.getBaseType() != null );
+        assertTrue( extension.getBaseType() == base );
+        assertTrue( base.getWhereUsed().contains( extension ) );
+        return extension;
+        // return null;
     }
 
     // public static O buildOtm(OtmModelManager mgr) {}

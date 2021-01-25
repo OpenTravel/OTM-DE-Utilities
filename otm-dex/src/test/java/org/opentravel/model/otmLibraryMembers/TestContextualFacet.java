@@ -30,12 +30,16 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
+import org.opentravel.model.otmFacets.OtmChoiceFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
+import org.opentravel.model.otmFacets.OtmQueryFacet;
 import org.opentravel.model.otmProperties.OtmAttribute;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
 import org.opentravel.schemacompiler.codegen.util.FacetCodegenUtils;
 import org.opentravel.schemacompiler.model.TLAttribute;
+import org.opentravel.schemacompiler.model.TLBusinessObject;
+import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLExtensionOwner;
 import org.opentravel.schemacompiler.model.TLFacetOwner;
@@ -75,20 +79,31 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         if (lm.getLibrary() != null)
             assertTrue( cf.getLibrary() != null );
         //
+        assertTrue( contrib.getParent() == lm );
+        assertTrue( contrib.getActionManager() != null );
+        assertTrue( contrib.getModelManager() != null );
         assertTrue( "Contributor must be owned by Library member.", contrib.getOwningMember() == lm );
-        assertTrue( "Contextual facet must have contributed owner.", cf.getContributedObject() == lm );
+        assertTrue( "Contextual facet must have contributed object.", cf.getContributedObject() == lm );
         assertTrue( "Library member has contributor child.", lm.getChildren().contains( contrib ) );
         assertTrue( "Contributor linked to contextual facet.", contrib.getContributor() == cf );
         assertTrue( "Contextual facet knows where it is contributed.", cf.getWhereContributed() == contrib );
+        assertTrue( "Model manager must have facet as member.", lm.getModelManager().getMembers().contains( cf ) );
+        //
         assertTrue( "Both facets have same TL facet", cf.getTL() == contrib.getTL() );
         assertTrue( "TL is a TLContextual facet", cf.getTL() instanceof TLContextualFacet );
+        if (cf instanceof OtmCustomFacet)
+            assertTrue( "Member's TL must have contributor's TL. ",
+                ((TLBusinessObject) lm.getTL()).getCustomFacets().contains( contrib.getTL() ) );
+        if (cf instanceof OtmQueryFacet)
+            assertTrue( "Member's TL must have contributor's TL. ",
+                ((TLBusinessObject) lm.getTL()).getQueryFacets().contains( contrib.getTL() ) );
+        if (cf instanceof OtmChoiceFacet)
+            assertTrue( "Member's TL must have contributor's TL. ",
+                ((TLChoiceObject) lm.getTL()).getChoiceFacets().contains( contrib.getTL() ) );
 
         // Verify the contributed owner is the same as the TL contextual facet's owner
         if (cf.getTL().getOwningEntity() != null && cf.getWhereContributed() != null)
             assertTrue( lm == OtmModelElement.get( (TLModelElement) cf.getTL().getOwningEntity() ) );
-        assertTrue( contrib.getParent() == lm );
-        assertTrue( contrib.getActionManager() != null );
-        assertTrue( contrib.getModelManager() != null );
     }
 
     public void testAdd() {
