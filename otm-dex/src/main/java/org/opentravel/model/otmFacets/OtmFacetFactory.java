@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -116,14 +117,30 @@ public class OtmFacetFactory {
             case CUSTOM:
             case UPDATE:
             case QUERY:
+                // 1/26/2021 - changing the contributed facet was causing debugging problems.
+                // Reinstated trying to recover contributed facet from listener.
+                OtmObject obj = OtmModelElement.get( tlFacet );
+                if (obj instanceof OtmContextualFacet)
+                    facet = ((OtmContextualFacet) obj).getWhereContributed();
+                else if (obj instanceof OtmContributedFacet)
+                    facet = (OtmContributedFacet) obj;
+
+                if (facet == null) {
+                    log.debug( "Facet factory passed an unmodeled facet: " + tlFacet.getNamespace() + " : "
+                        + tlFacet.getLocalName() );
+                    log.debug( " parent: " + parent.getNamespace() + " : " + parent.getName() );
+                    if (parent instanceof OtmLibraryMember && tlFacet instanceof TLContextualFacet)
+                        facet = new OtmContributedFacet( (TLContextualFacet) tlFacet, parent );
+                }
+
                 // if (OtmModelElement.get( tlFacet ) == null) {
                 // log.debug( "Facet factory passed an unmodeled facet: " + tlFacet.getNamespace() + " : "
                 // + tlFacet.getLocalName() );
                 // log.debug( " parent: " + parent.getNamespace() + " : "
                 // + parent.getName() );
                 // }
-                if (parent instanceof OtmLibraryMember && tlFacet instanceof TLContextualFacet)
-                    facet = new OtmContributedFacet( (TLContextualFacet) tlFacet, parent );
+                // if (parent instanceof OtmLibraryMember && tlFacet instanceof TLContextualFacet)
+                // facet = new OtmContributedFacet( (TLContextualFacet) tlFacet, parent );
                 break;
             case SIMPLE:
             default:
@@ -135,6 +152,7 @@ public class OtmFacetFactory {
             facet.modelChildren();
 
         return facet;
+
     }
 
     public static String getObjectName(OtmFacet<?> member) {

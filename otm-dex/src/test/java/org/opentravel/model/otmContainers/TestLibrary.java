@@ -101,7 +101,8 @@ public class TestLibrary extends AbstractFxTest {
         // log.debug( "Lib 1 name is: " + lib1.getFullName() );
 
         // Create business object
-        OtmBusinessObject member = TestBusiness.buildOtm( mgr, "TestBusinessObject" );
+        OtmBusinessObject member = TestBusiness.buildOtm( mgr );
+        member.setName( "TestBusinessObject" );
         // When
         lib1.add( member );
         // Then

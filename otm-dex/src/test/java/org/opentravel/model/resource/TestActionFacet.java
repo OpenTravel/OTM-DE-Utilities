@@ -24,6 +24,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -45,7 +47,7 @@ public class TestActionFacet<L extends TestOtmResourceBase<OtmActionFacet>>
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         baseObject = TestBusiness.buildOtm( staticModelManager );
         testResource = TestResource.buildOtm( staticModelManager );
 
@@ -55,9 +57,12 @@ public class TestActionFacet<L extends TestOtmResourceBase<OtmActionFacet>>
 
     @Test
     public void testName() {
-        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
-        bo.add( TestCustomFacet.buildOtm( staticModelManager ) );
-        bo.add( TestQueryFacet.buildOtm( staticModelManager ) );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
+        TestCustomFacet.buildOtm( bo, "CF1" );
+        TestCustomFacet.buildOtm( bo, "CF2" );
+        TestQueryFacet.buildOtm( bo, "QF1" );
+
         // Given a resource
         OtmResource resource = TestResource.buildOtm( staticModelManager );
         resource.setSubject( bo );
@@ -76,10 +81,11 @@ public class TestActionFacet<L extends TestOtmResourceBase<OtmActionFacet>>
 
     @Test
     public void testSetters() {
-        // Given a business object
-        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
-        bo.add( TestCustomFacet.buildOtm( staticModelManager ) );
-        bo.add( TestQueryFacet.buildOtm( staticModelManager ) );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
+        TestCustomFacet.buildOtm( bo, "CF1" );
+        TestQueryFacet.buildOtm( bo, "QF1" );
+
         // Given a resource
         OtmResource resource = TestResource.buildOtm( staticModelManager );
         resource.setSubject( bo );
@@ -97,9 +103,10 @@ public class TestActionFacet<L extends TestOtmResourceBase<OtmActionFacet>>
     @Test
     public void testGetReferenceFacet() {
         // Given a business object
-        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
-        bo.add( TestCustomFacet.buildOtm( staticModelManager ) );
-        bo.add( TestQueryFacet.buildOtm( staticModelManager ) );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
+        TestCustomFacet.buildOtm( bo, "CF1" );
+        TestQueryFacet.buildOtm( bo, "QF1" );
         // Given a resource
         OtmResource resource = TestResource.buildOtm( staticModelManager );
         resource.setSubject( bo );

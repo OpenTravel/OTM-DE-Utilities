@@ -52,13 +52,14 @@ public class TestAddAliasAction {
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 
-        globalBO = (OtmBusinessObject) lib.add( TestBusiness.buildOtm( staticModelManager, "GlobalBO" ) );
+        globalBO = TestBusiness.buildOtm( lib, "GlobalBO" );
 
-        assertTrue( globalBO != null );
-        assertTrue( globalBO.getLibrary() == lib );
-        assertTrue( globalBO.isEditable() );
-        assertTrue( globalBO.getActionManager() == lib.getActionManager() );
-        assertTrue( staticModelManager.getMembers().contains( globalBO ) );
+        // Tested in buildOtm()
+        // assertTrue( globalBO != null );
+        // assertTrue( globalBO.getLibrary() == lib );
+        // assertTrue( globalBO.isEditable() );
+        // assertTrue( globalBO.getActionManager() == lib.getActionManager() );
+        // assertTrue( staticModelManager.getMembers().contains( globalBO ) );
 
     }
 

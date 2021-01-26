@@ -63,17 +63,7 @@ public class TestDeleteResourceChildAction {
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 
-        globalBO = (OtmBusinessObject) lib.add( TestBusiness.buildOtm( staticModelManager, "GlobalBO" ) );
-
-        assertTrue( globalBO != null );
-        assertTrue( globalBO.getLibrary() == lib );
-        assertTrue( globalBO.isEditable() );
-        assertTrue( globalBO.getActionManager() == lib.getActionManager() );
-        assertTrue( staticModelManager.getMembers().contains( globalBO ) );
-
-        // resource = TestResource.buildFullOtm( "http://example.com/TestResource", "TestResource", staticModelManager
-        // );
-
+        globalBO = TestBusiness.buildOtm( lib, "GlobalBO" ); // Tested in buildOtm()
     }
 
 

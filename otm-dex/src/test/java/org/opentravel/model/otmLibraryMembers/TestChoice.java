@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLChoiceObject;
@@ -46,9 +47,17 @@ public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
     @BeforeClass
     public static void beforeClass() {
         staticModelManager = new OtmModelManager( null, null, null );
-        subject = buildOtm( staticModelManager );
-        baseObject = buildOtm( staticModelManager );
-        baseObject.setName( "BaseCH" );
+        staticLib = TestLibrary.buildOtm( staticModelManager );
+        subject = buildOtm( staticLib, "SubjectCH" );
+        baseObject = buildOtm( staticLib, "BaseCH" );
+    }
+
+    @Override
+    public void testConstructors(OtmChoiceObject subject) {
+        super.testConstructors( subject );
+
+        assertTrue( "Choice constructor must create shared facet.", subject.getShared() != null );
+        assertTrue( "Choice constructor must create children.", !subject.getChildren().isEmpty() );
     }
 
     @Override
@@ -122,12 +131,19 @@ public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
      */
     public static OtmChoiceObject buildOtm(OtmLibrary library, String name) {
         assertTrue( "Library must have model manager.", library.getModelManager() != null );
-        OtmChoiceObject ch = new OtmChoiceObject( buildTL(), library.getModelManager() );
+        OtmChoiceObject ch = new OtmChoiceObject( buildTL_WithProperties(), library.getModelManager() );
         if (name != null)
             ch.setName( name );
         library.add( ch );
+
+        TestChoiceFacet.buildOtm( ch, "CHF1" );
+
         assertTrue( ch.getLibrary() == library );
         assertTrue( library.getTL().getNamedMembers().contains( ch.getTL() ) );
+        assertTrue( !ch.getChildren().isEmpty() );
+        assertTrue( ch.getShared() != null );
+        assertTrue( ch.getShared().getChildren() != null );
+        assertTrue( ch.getShared().getChildren().size() == 2 );
         return ch;
     }
 
@@ -153,6 +169,14 @@ public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
     public static TLChoiceObject buildTL() {
         TLChoiceObject tlch = new TLChoiceObject();
         tlch.setName( CH_NAME );
+        return tlch;
+    }
+
+    public static TLChoiceObject buildTL_WithProperties() {
+        TLChoiceObject tlch = new TLChoiceObject();
+        tlch.setName( CH_NAME );
+        tlch.getSharedFacet().addAttribute( new TLAttribute() );
+        tlch.getSharedFacet().addElement( new TLProperty() );
         return tlch;
     }
 

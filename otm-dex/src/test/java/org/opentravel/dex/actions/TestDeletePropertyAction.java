@@ -64,22 +64,13 @@ public class TestDeletePropertyAction {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        // staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
-        // lib = staticModelManager.add( new TLLibrary() );
         lib = TestLibrary.buildOtm();
         staticModelManager = lib.getModelManager();
 
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 
-        globalBO = (OtmBusinessObject) lib.add( TestBusiness.buildOtm( staticModelManager, "GlobalBO" ) );
-
-        assertTrue( globalBO != null );
-        assertTrue( globalBO.getLibrary() == lib );
-        assertTrue( globalBO.isEditable() );
-        assertTrue( globalBO.getActionManager() == lib.getActionManager() );
-        assertTrue( staticModelManager.getMembers().contains( globalBO ) );
-
+        globalBO = TestBusiness.buildOtm( lib, "GlobalBO" ); // Tested in buildOtm()
     }
 
     // TODO Re-factor this to have the action take place on a passed in type provider, then use library members and

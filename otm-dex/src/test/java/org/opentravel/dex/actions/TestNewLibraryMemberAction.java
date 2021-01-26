@@ -28,6 +28,7 @@ import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.action.manager.DexWizardActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
@@ -54,29 +55,23 @@ public class TestNewLibraryMemberAction {
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 
-        globalBO = (OtmBusinessObject) lib.add( TestBusiness.buildOtm( staticModelManager, "GlobalBO" ) );
-
-        assertTrue( globalBO != null );
-        assertTrue( globalBO.getLibrary() == lib );
-        assertTrue( globalBO.isEditable() );
-        assertTrue( globalBO.getActionManager() == lib.getActionManager() );
-        assertTrue( staticModelManager.getMembers().contains( globalBO ) );
-
+        globalBO = TestBusiness.buildOtm( lib, "GlobalBO" ); // Tested in buildOtm()
     }
 
 
     @Test
     public void testMultipleMembers() {
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        // DexFullActionManager fullMgr = new DexFullActionManager( null );
+        // OtmModelManager mgr = new OtmModelManager( fullMgr, null , null);
+        // OtmLibrary lib = mgr.add( new TLLibrary() );
+
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmModelManager mgr = lib.getModelManager();
         DexActionManager actionManager = lib.getActionManager();
         assertTrue( "Given", actionManager instanceof DexFullActionManager );
         assertTrue( actionManager.getQueueSize() == 0 );
-        OtmBusinessObject testBO = TestBusiness.buildOtm( mgr, "TestBusinessObject" );
-        assertTrue( "Given", testBO.getModelManager() == mgr );
-        lib.add( testBO );
-        assertTrue( "Given", testBO.getLibrary() == lib );
+
+        OtmBusinessObject testBO = TestBusiness.buildOtm( lib, "TestBusinessObject" );
 
         Object result = null;
         OtmLibraryMember member = null;
@@ -101,12 +96,13 @@ public class TestNewLibraryMemberAction {
 
     @Test
     public void testUsingWizardActionManager() {
-        OtmModelManager mgr = new OtmModelManager( null, null );
+        OtmModelManager mgr = new OtmModelManager( null, null, null );
         OtmLibrary lib = mgr.add( new TLLibrary() );
         DexActionManager actionManager = lib.getActionManager();
         assertTrue( actionManager.getQueueSize() == 0 );
         DexActionManager wizardAM = new DexWizardActionManager( null );
-        OtmBusinessObject testBO = TestBusiness.buildOtm( mgr, "TestBusinessObject" );
+
+        OtmBusinessObject testBO = TestBusiness.buildOtm( lib, "TestBusinessObject" );
         assertTrue( "Given", testBO.getModelManager() == mgr );
         lib.add( testBO );
         assertTrue( "Given", testBO.getLibrary() == lib );

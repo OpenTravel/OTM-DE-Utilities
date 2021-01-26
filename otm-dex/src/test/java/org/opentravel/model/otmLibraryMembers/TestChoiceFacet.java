@@ -46,7 +46,9 @@ public class TestChoiceFacet extends TestContextualFacet {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
+        staticLib = TestLibrary.buildOtm( staticModelManager );
+
         // Needed for library member tests
         subject = buildOtm( staticModelManager );
         baseObject = buildOtm( staticModelManager );
@@ -87,6 +89,10 @@ public class TestChoiceFacet extends TestContextualFacet {
         cf.setBaseType( co2 );
         OtmContributedFacet newContrib = cf.getWhereContributed();
         // Then
+        assertTrue( "Old object must NOT have new contributor as child.", !co.getChildren().contains( newContrib ) );
+        assertTrue( "Old object must NOT have old contributor as child.", !co.getChildren().contains( contrib ) );
+        assertTrue( "New object must have child.", co2.getChildren().contains( newContrib ) );
+        assertTrue( "getBaseType needs correct TL owner.", cf.getTL().getOwningEntity() == co2.getTL() );
         assertTrue( cf.getBaseType() == co2 );
         assertTrue( contrib.getParent() == co2 );
         assertTrue( newContrib == contrib );
@@ -98,13 +104,16 @@ public class TestChoiceFacet extends TestContextualFacet {
     @Test
     public void testWhenContributed() {
         // Given - a Choice object and contextual facet
-        OtmChoiceObject bo = TestChoice.buildOtm( staticModelManager );
-        OtmContextualFacet cf = buildOtm( staticModelManager );
+        OtmChoiceObject co = TestChoice.buildOtm( staticLib, "TestCH" );
+        OtmContextualFacet cf = buildOtm( co, "CHF1" );
+
+        // OtmChoiceObject co = TestChoice.buildOtm( staticModelManager );
+        // OtmContextualFacet cf = buildOtm( staticModelManager );
 
         // When added
-        OtmContributedFacet contrib = bo.add( cf );
+        OtmContributedFacet contrib = co.add( cf );
         // Then (lazy evaluation)
-        testContributedFacet( contrib, cf, bo );
+        testContributedFacet( contrib, cf, co );
     }
 
 
@@ -208,15 +217,42 @@ public class TestChoiceFacet extends TestContextualFacet {
     /** ****************************************************** **/
 
     /**
-     * Create Choice facet and contribute it to the passed Choice object.
-     * 
-     * @param modelManager
-     * @param bo
+     * @param co
+     * @param name
      * @return
      */
-    public static OtmChoiceFacet buildOtm(OtmModelManager modelManager, OtmChoiceObject bo) {
+    public static OtmChoiceFacet buildOtm(OtmChoiceObject co, String name) {
+        assertTrue( "Builder - parameter must have model manager.", co.getModelManager() != null );
+        assertTrue( "Builder - parameter must have library.", co.getLibrary() != null );
+
+        OtmChoiceFacet cf = buildOtm( co.getModelManager() );
+        co.getLibrary().add( cf );
+        cf.setName( name );
+        OtmContributedFacet contrib = co.add( cf );
+
+        assertTrue( "Builder - new facet must have library.", cf.getLibrary() != null );
+        assertTrue( "Builder - new facet must have model manager.", cf.getModelManager() != null );
+        assertTrue( "Builder - new facet must be managed.", cf.getModelManager().getMembers().contains( cf ) );
+        assertTrue( "Builder - new facet must have contributor.", cf.getWhereContributed() != null );
+        assertTrue( "Builder - new facet must get correct contributor.", cf.getWhereContributed() == contrib );
+
+        TestContextualFacet.testContributedFacet( cf.getWhereContributed(), cf, co );
+        TestContextualFacet.testContributedFacet( contrib, cf, co );
+        return cf;
+    }
+
+    /**
+     * Create Choice facet and add() it to the passed Choice object. Creates contributor.
+     * <p>
+     * No tests!
+     * 
+     * @param modelManager
+     * @param co
+     * @return
+     */
+    public static OtmChoiceFacet buildOtm(OtmModelManager modelManager, OtmChoiceObject co) {
         OtmChoiceFacet cf = buildOtm( modelManager );
-        bo.add( cf );
+        co.add( cf );
         return cf;
     }
 
@@ -234,7 +270,9 @@ public class TestChoiceFacet extends TestContextualFacet {
     }
 
     /**
-     * Build a choice facet. It will not have where contributed or children! Contributed to a new choice object.
+     * Build a choice facet and add to manager.
+     * <p>
+     * It is not in a library. It will not have where contributed or children!
      * 
      * @param mgr
      * @return
@@ -260,4 +298,5 @@ public class TestChoiceFacet extends TestContextualFacet {
         tlbo.addChoiceFacet( tlcf );
         return tlcf;
     }
+
 }

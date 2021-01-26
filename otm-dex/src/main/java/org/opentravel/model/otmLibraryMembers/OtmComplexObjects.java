@@ -23,8 +23,6 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.model.otmFacets.OtmAbstractFacet;
-import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmFacets.OtmDetailFacet;
 import org.opentravel.model.otmFacets.OtmSummaryFacet;
 import org.opentravel.schemacompiler.model.TLComplexTypeBase;
@@ -61,13 +59,17 @@ public abstract class OtmComplexObjects<T extends TLComplexTypeBase> extends Otm
      */
     @Override
     public OtmObject add(OtmObject child) {
-        if (child instanceof OtmAbstractFacet<?> && !children.contains( child )) {
-            children.add( child );
-            return child;
-        } else if (child instanceof OtmAlias) {
+        if (!getChildren().contains( child )) {
             children.add( child );
             return child;
         }
+        // if (child instanceof OtmAbstractFacet<?> && !getChildren().contains( child )) {
+        // getChildren().add( child );
+        // return child;
+        // } else if (child instanceof OtmAlias) {
+        // getChildren().add( child );
+        // return child;
+        // }
         log.debug( "Could not add " + child.getName() + " to " + getName() );
         return null;
     }

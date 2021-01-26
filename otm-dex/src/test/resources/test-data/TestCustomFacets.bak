@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:Library
+    xmlns:ns2="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.OpenTravel.org/ns/OTA2/LibraryModel_v01_06 OTA2_LibraryModel_v1.6.0.xsd">
+    
+    <ns2:VersionScheme>OTA2</ns2:VersionScheme>
+    <ns2:Status>Draft</ns2:Status>
+    <ns2:Namespace>http://example.com/junkns/v1</ns2:Namespace>
+    <ns2:Prefix>pf1</ns2:Prefix>
+    <ns2:Name>TestCustomFacets</ns2:Name>
+    <ns2:Import namespace="http://www.w3.org/2001/XMLSchema" prefix="xsd"/>
+    
+    <ns2:BusinessObject name="BaseBO" notExtendable="false">
+        <ns2:Aliases>BaseBOAlias</ns2:Aliases>
+        <ns2:ID>
+            <ns2:Attribute name="id" referenceRepeat="0" type="xsd:ID"/>
+        </ns2:ID>
+        <ns2:Summary>
+            <ns2:Attribute name="baseA1" referenceRepeat="0" type="xsd:decimal"/>
+            <ns2:Element name="BaseE1" repeat="0" type="xsd:date"/>
+        </ns2:Summary>
+        <ns2:Detail/>
+    </ns2:BusinessObject>
+    <ns2:ContextualFacet facetNamespace="" facetOwner="BaseBO"
+        name="CustomB1" notExtendable="false" type="Custom">
+        <ns2:Element name="CustomE1" repeat="0" type="xsd:time"/>
+    </ns2:ContextualFacet>
+    
+    <ns2:BusinessObject name="ExBO" notExtendable="false">
+        <ns2:Extension extends="BaseBO"/>
+        <ns2:Aliases/>
+        <ns2:ID/>
+        <ns2:Summary>
+            <ns2:Element name="ExE1" repeat="0" type="xsd:string"/>
+        </ns2:Summary>
+        <ns2:Detail/>
+    </ns2:BusinessObject>
+    <ns2:ContextualFacet facetNamespace="" facetOwner="BaseBO"
+        name="QueryB1" notExtendable="false" type="Query">
+        <ns2:Element name="QueryE1" repeat="0" type="xsd:date"/>
+    </ns2:ContextualFacet>
+    
+</ns2:Library>

@@ -56,13 +56,8 @@ public class TestDeleteAliasAction {
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 
-        globalBO = (OtmBusinessObject) lib.add( TestBusiness.buildOtm( staticModelManager, "GlobalBO" ) );
-        assertTrue( globalBO != null );
-        assertTrue( globalBO.getLibrary() == lib );
-        assertTrue( globalBO.isEditable() );
-        assertTrue( globalBO.getActionManager() == lib.getActionManager() );
-        assertTrue( staticModelManager.getMembers().contains( globalBO ) );
-        assertTrue( "Given: ", globalBO.getActionManager() instanceof DexFullActionManager );
+        globalBO = TestBusiness.buildOtm( lib, "GlobalBO" );
+        // Tested in buildOtm()
     }
 
     @Test

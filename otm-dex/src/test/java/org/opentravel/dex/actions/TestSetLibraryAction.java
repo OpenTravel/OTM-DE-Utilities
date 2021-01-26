@@ -49,19 +49,12 @@ public class TestSetLibraryAction {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
+        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
         lib = staticModelManager.add( new TLLibrary() );
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 
-        globalBO = (OtmBusinessObject) lib.add( TestBusiness.buildOtm( staticModelManager, "GlobalBO" ) );
-
-        assertTrue( globalBO != null );
-        assertTrue( globalBO.getLibrary() == lib );
-        assertTrue( globalBO.isEditable() );
-        assertTrue( globalBO.getActionManager() == lib.getActionManager() );
-        assertTrue( staticModelManager.getMembers().contains( globalBO ) );
-
+        globalBO = TestBusiness.buildOtm( lib, "GlobalBO" ); // Tested in buildOtm()
     }
 
 
@@ -113,9 +106,8 @@ public class TestSetLibraryAction {
         assertTrue( "Given", actionManager instanceof DexFullActionManager );
         assertTrue( "Given", actionManager.getQueueSize() == 0 );
 
-        OtmBusinessObject member = TestBusiness.buildOtm( mgr, "TestBusinessObject" );
+        OtmBusinessObject member = TestBusiness.buildOtm( lib1, "TestBusinessObject" );
         assertTrue( "Given", member.getModelManager() == mgr );
-        lib1.add( member );
         assertTrue( "Given", member.getLibrary() == lib1 );
 
         // Action handler with subject set to the member
@@ -153,8 +145,7 @@ public class TestSetLibraryAction {
         DexActionManager actionManager = lib1.getActionManager();
 
         // Create business object and vwa. Use VWA as type on an element
-        OtmBusinessObject member = TestBusiness.buildOtm( mgr, "TestBusinessObject" );
-        lib1.add( member );
+        OtmBusinessObject member = TestBusiness.buildOtm( lib1, "TestBusinessObject" );
         assertTrue( "Given", member.getLibrary() == lib1 );
         OtmElement<?> element = TestBusiness.getElement( member );
         assertTrue( "Given", element != null );

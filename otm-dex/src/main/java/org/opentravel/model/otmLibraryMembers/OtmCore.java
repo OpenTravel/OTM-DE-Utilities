@@ -159,11 +159,11 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
         Collection<OtmObject> ch = new ArrayList<>();
         ch.add( new OtmCoreValueFacet( this ) );
         // Add aliases first
-        children.forEach( c -> {
+        getChildren().forEach( c -> {
             if (c instanceof OtmAlias)
                 ch.add( c );
         } );
-        children.forEach( c -> {
+        getChildren().forEach( c -> {
             if (c instanceof OtmSummaryFacet)
                 ch.add( c );
             if (c instanceof OtmRoleEnumeration)

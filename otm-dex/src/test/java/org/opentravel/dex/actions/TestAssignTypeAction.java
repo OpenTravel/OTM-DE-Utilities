@@ -66,16 +66,16 @@ public class TestAssignTypeAction {
         staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
         lib = staticModelManager.add( new TLLibrary() );
         assertTrue( lib.isEditable() );
-        // DexActionManager am = lib.getActionManager();
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 
-        globalBO = (OtmBusinessObject) lib.add( TestBusiness.buildOtm( staticModelManager, "GlobalBO" ) );
+        globalBO = TestBusiness.buildOtm( lib, "GlobalBO" );
 
-        assertTrue( globalBO != null );
-        assertTrue( globalBO.getLibrary() == lib );
-        assertTrue( globalBO.isEditable() );
-        assertTrue( globalBO.getActionManager() == lib.getActionManager() );
-        assertTrue( staticModelManager.getMembers().contains( globalBO ) );
+        // Tested in buildOtm()
+        // assertTrue( globalBO != null );
+        // assertTrue( globalBO.getLibrary() == lib );
+        // assertTrue( globalBO.isEditable() );
+        // assertTrue( globalBO.getActionManager() == lib.getActionManager() );
+        // assertTrue( staticModelManager.getMembers().contains( globalBO ) );
     }
 
     @Test
@@ -87,8 +87,7 @@ public class TestAssignTypeAction {
         assertTrue( am.getQueueSize() == 0 );
 
         // Given - a type user
-        OtmBusinessObject thisBO = TestBusiness.buildOtm( mgr, "ThisBO" );
-        lib.add( thisBO );
+        OtmBusinessObject thisBO = TestBusiness.buildOtm( lib, "ThisBO" );
         OtmTypeUser child = (OtmTypeUser) thisBO.getSummary().getChildren().get( 0 );
         assertNotNull( child );
 

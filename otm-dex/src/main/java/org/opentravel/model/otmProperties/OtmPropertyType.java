@@ -152,7 +152,8 @@ public enum OtmPropertyType {
     }
 
     /**
-     * Build a new property of the given type. Add to the owner (both facade and TL).
+     * Use Property Factory {@link OtmPropertyFactory} to build a new property of the given type. Add to the owner (both
+     * facade and TL).
      * 
      * @param propertyType
      * @param owner

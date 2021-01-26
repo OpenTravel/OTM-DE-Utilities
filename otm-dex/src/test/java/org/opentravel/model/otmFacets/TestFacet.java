@@ -66,8 +66,8 @@ public class TestFacet {
         OtmLibrary lib = TestLibrary.buildOtm( mgr, "http://test.com/ns", "t", "TestLib" );
         assertTrue( "Given", lib.isEditable() );
 
-        OtmBusinessObject baseBo = TestBusiness.buildOtm( mgr, "BaseBo" );
-        OtmBusinessObject exBo = TestBusiness.buildOtm( mgr, "ExtendsionBo" );
+        OtmBusinessObject baseBo = TestBusiness.buildOtm( lib, "BaseBo" );
+        OtmBusinessObject exBo = TestBusiness.buildOtm( lib, "ExtendsionBo" );
         lib.add( baseBo );
         lib.add( exBo );
         exBo.setBaseType( baseBo );

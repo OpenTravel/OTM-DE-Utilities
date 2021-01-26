@@ -182,11 +182,11 @@ public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
         Collection<OtmObject> ch = new ArrayList<>();
-        children.forEach( c -> {
+        getChildren().forEach( c -> {
             if (c instanceof OtmAlias)
                 ch.add( c );
         } );
-        children.forEach( c -> {
+        getChildren().forEach( c -> {
             if (c instanceof OtmSharedFacet)
                 ch.add( c );
         } );

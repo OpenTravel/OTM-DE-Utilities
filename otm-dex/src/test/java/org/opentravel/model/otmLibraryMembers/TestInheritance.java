@@ -366,7 +366,8 @@ public class TestInheritance extends AbstractFxTest {
 
     @Test
     public void testFacetFinding() {
-        OtmBusinessObject bo = TestBusiness.buildOtm( mgr, "BaseBO" );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "BaseBO" );
         TestOtmPropertiesBase.buildOneOfEach2( bo.getSummary() );
         OtmCustomFacet cf = TestCustomFacet.buildOtm( mgr );
         bo.add( cf );
@@ -375,10 +376,10 @@ public class TestInheritance extends AbstractFxTest {
         assertTrue( bo.getFacet( bo.getSummary() ) == bo.getSummary() );
         assertTrue( bo.getFacet( bo.getDetail() ) == bo.getDetail() );
 
-        OtmBusinessObject exBo1 = TestBusiness.buildOtm( mgr, "ExBO1" );
+        OtmBusinessObject exBo1 = TestBusiness.buildOtm( lib, "ExBO1" );
         exBo1.setBaseType( bo );
 
-        OtmBusinessObject exBo = TestBusiness.buildOtm( mgr, "ExBO" );
+        OtmBusinessObject exBo = TestBusiness.buildOtm( lib, "ExBO" );
         exBo.setBaseType( exBo1 );
 
         // Test a private method
@@ -392,15 +393,15 @@ public class TestInheritance extends AbstractFxTest {
 
     @Test
     public void testFacetsAndObjects() {
-        OtmBusinessObject bo = TestBusiness.buildOtm( mgr, "BaseBO" );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "BaseBO" );
         TestOtmPropertiesBase.buildOneOfEach2( bo.getSummary() );
-        OtmCustomFacet cf = TestCustomFacet.buildOtm( mgr );
-        bo.add( cf );
+        OtmCustomFacet cf = TestCustomFacet.buildOtm( bo, "CF1" );
 
-        OtmBusinessObject exBo1 = TestBusiness.buildOtm( mgr, "ExBO1" );
+        OtmBusinessObject exBo1 = TestBusiness.buildOtm( lib, "ExBO1" );
         exBo1.setBaseType( bo );
 
-        OtmBusinessObject exBo = TestBusiness.buildOtm( mgr, "ExBO" );
+        OtmBusinessObject exBo = TestBusiness.buildOtm( lib, "ExBO" );
         exBo.setBaseType( exBo1 );
 
         // Modeling done via lazy evaluation when getInheritedChildren() invoked.
@@ -415,7 +416,8 @@ public class TestInheritance extends AbstractFxTest {
     @Ignore
     @Test
     public void testFacetModelInheritedChildren() {
-        OtmBusinessObject baseBO = TestBusiness.buildOtm( mgr, "BaseBO" );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject baseBO = TestBusiness.buildOtm( lib, "BaseBO" );
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getSummary() );
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getIdFacet() );
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getDetail() );
@@ -426,7 +428,7 @@ public class TestInheritance extends AbstractFxTest {
         assertTrue( "TLFacet and OtmFacet must have same child count.", tlBaseProps.size() == expectedCount_Summary );
 
         // Given a second BO with no children
-        OtmBusinessObject exBO = TestBusiness.buildOtm( mgr, "ExBO" );
+        OtmBusinessObject exBO = TestBusiness.buildOtm( lib, "ExBO" );
         List<OtmObject> iKids = new ArrayList<>();
         iKids.addAll( exBO.getSummary().getInheritedChildren() );
         assertTrue( iKids.isEmpty() );

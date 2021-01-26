@@ -84,7 +84,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
     public void testGetSubjectFacets() {
         OtmLibrary lib = TestLibrary.buildOtm();
         OtmBusinessObject bbo = TestBusiness.buildOtm( lib, "BaseBo" );
-        OtmContextualFacet cf = TestCustomFacet.buildOtm( lib.getModelManager(), bbo );
+        OtmContextualFacet cf = TestCustomFacet.buildOtm( bbo, "BaseCF" );
         OtmBusinessObject ebo = TestBusiness.buildOtm( lib, "ExtendedBo" );
         ebo.setBaseType( bbo );
         assertTrue( "Given", ebo.getBaseType() == bbo );
@@ -208,8 +208,10 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
 
     @Test
     public void testSubject() {
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject testBO = TestBusiness.buildOtm( lib, "TestBO" );
+
         OtmResource resource = buildOtm( staticModelManager );
-        OtmBusinessObject testBO = TestBusiness.buildOtm( staticModelManager );
 
         // Initially, no subject is set
         assertTrue( resource.getSubject() == null );

@@ -25,6 +25,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmQueryFacet;
 import org.opentravel.schemacompiler.model.TLAttribute;
@@ -64,8 +66,10 @@ public class TestQueryFacet extends TestContextualFacet {
     @Test
     public void testWhenContributed() {
         // Given - a business object and contextual facet
-        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
-        OtmContextualFacet cf = buildOtm( staticModelManager );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
+        TestCustomFacet.buildOtm( bo, "CF1" );
+        TestQueryFacet.buildOtm( bo, "QF1" );
 
         // When added
         OtmContributedFacet contrib = bo.add( cf );
@@ -100,12 +104,28 @@ public class TestQueryFacet extends TestContextualFacet {
     /** ****************************************************** **/
 
     /**
+     * Create query facet, add it to the model and inject onto the passed business object.
+     * 
+     * @param bo
+     * @param name
+     */
+    public static OtmQueryFacet buildOtm(OtmBusinessObject bo, String name) {
+        assertTrue( "Builder: must have model manager.", bo.getModelManager() != null );
+        OtmQueryFacet qf = buildOtm( bo.getModelManager() );
+        qf.setName( name );
+        bo.add( qf );
+        testContributedFacet( qf.getWhereContributed(), qf, bo );
+        return qf;
+    }
+
+    /**
      * Create query facet and contribute it to the passed business object.
      * 
      * @param modelManager
      * @param bo
      * @return
      */
+    @Deprecated
     public static OtmQueryFacet buildOtm(OtmModelManager modelManager, OtmBusinessObject bo) {
         OtmQueryFacet cf = buildOtm( modelManager );
         bo.add( cf );
@@ -125,7 +145,6 @@ public class TestQueryFacet extends TestContextualFacet {
         assertNotNull( query );
         mgr.add( query );
 
-        // Will only have children when contributed is modeled.
         return query;
     }
 
@@ -141,4 +160,5 @@ public class TestQueryFacet extends TestContextualFacet {
         tlbo.addQueryFacet( tlcf );
         return tlcf;
     }
+
 }

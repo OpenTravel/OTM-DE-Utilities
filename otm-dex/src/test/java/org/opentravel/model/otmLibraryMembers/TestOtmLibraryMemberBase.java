@@ -63,6 +63,7 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
     static Log log = LogFactory.getLog( TestOtmLibraryMemberBase.class );
 
     protected static OtmModelManager staticModelManager = null;
+    protected static OtmLibrary staticLib = null;
     protected static OtmLibraryMember subject;
     protected static OtmLibraryMember baseObject;
 
@@ -84,6 +85,7 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
      * <ol>
      * <li>Must be its own owner
      * <li>Must have identity listener
+     * <li>It is managed in its model manager
      * </ol>
      * 
      * @param otm
@@ -92,6 +94,8 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
         assertNotNull( otm );
         assertTrue( "Must be its own owner", otm.getOwningMember() == otm );
         assertTrue( "Must have identity listner.", OtmModelElement.get( otm.getTL() ) == otm );
+        if (otm.getModelManager() != null)
+            assertTrue( "Must be managed in model manager.", otm.getModelManager().getMembers().contains( otm ) );
         log.debug( "Constuctor OK." );
     }
 

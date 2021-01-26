@@ -145,9 +145,8 @@ public class TestLibraryMemberBase {
 
         // Create a core and assign to elements in a BO
         OtmCore core = TestCore.buildOtm( mgr, "TestCore" );
-        OtmBusinessObject bo = TestBusiness.buildOtm( mgr, "TestBo" );
         lib.add( core );
-        lib.add( bo );
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBo" ); // Tested in buildOtm()
 
         for (OtmTypeUser user : bo.getDescendantsTypeUsers())
             user.setAssignedType( core );

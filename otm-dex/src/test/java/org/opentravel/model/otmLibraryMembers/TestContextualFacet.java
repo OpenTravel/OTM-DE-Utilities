@@ -226,19 +226,21 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         log.debug( "Testing contextual facets in model manager." );
 
         // Given - a Choice object and contextual facet
-        OtmChoiceObject co1 = TestChoice.buildOtm( staticModelManager );
-        staticModelManager.add( co1 );
-        assertTrue( "Model manager must contain choice object.", staticModelManager.getMembers().contains( co1 ) );
+        OtmChoiceObject co1 = TestChoice.buildOtm( TestLibrary.buildOtm(), "TestCH" );
+        assertTrue( "Model manager must contain choice object.", co1.getModelManager().getMembers().contains( co1 ) );
 
         // Given - a contextual facet contributed to the choice object
-        OtmContextualFacet cf = TestChoiceFacet.buildOtm( staticModelManager );
-        OtmContributedFacet contrib = co1.add( cf );
+        OtmContextualFacet cf = TestChoiceFacet.buildOtm( co1.getModelManager() );
         assertTrue( "Manager must not contain contextual facet.", !staticModelManager.getMembers().contains( cf ) );
-        assertTrue( "Manager must not contain contributed.", !staticModelManager.getMembers().contains( contrib ) );
 
         // When - contextual facet added to model manager
         staticModelManager.add( cf );
         assertTrue( "Manager must contain contextual facet.", staticModelManager.getMembers().contains( cf ) );
+
+        // When - contributed to the choice object
+        OtmContributedFacet contrib = co1.add( cf );
+        assertTrue( "Choice object must contain facet.", co1.getChildren().contains( contrib ) );
+        assertTrue( "Manager must not contain contributed.", !staticModelManager.getMembers().contains( contrib ) );
 
         // Given - a contextual facet NOT contributed
         OtmContextualFacet cf2 = TestChoiceFacet.buildOtm( staticModelManager );

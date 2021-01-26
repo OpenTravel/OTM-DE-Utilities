@@ -137,11 +137,11 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
         Collection<OtmObject> ch = new ArrayList<>();
-        children.forEach( c -> {
+        getChildren().forEach( c -> {
             if (c instanceof OtmAlias)
                 ch.add( c );
         } );
-        children.forEach( c -> {
+        getChildren().forEach( c -> {
             if (c instanceof OtmIdFacet)
                 ch.add( c );
             if (c instanceof OtmContributedFacet && ((OtmContributedFacet) c).getContributor() instanceof OtmQueryFacet)

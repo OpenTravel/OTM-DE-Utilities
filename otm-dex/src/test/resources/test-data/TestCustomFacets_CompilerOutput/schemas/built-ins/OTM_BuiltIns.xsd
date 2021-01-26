@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.opentravel.org/OTM/Common/v0" xmlns:otm="http://www.OpenTravel.org/ns/OTA2/AppInfo_v01_00"
+	xmlns:ota2="http://www.opentravel.org/OTM/Common/v0" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	attributeFormDefault="unqualified" elementFormDefault="qualified">
+
+	<xsd:simpleType name="Empty">
+		<xsd:annotation>
+			<xsd:documentation source="Description">An empty string used when the simple content of a complex type or
+				attribute is to be omitted.
+			</xsd:documentation>
+			<xsd:appinfo>
+				<otm:OTA2Entity type="Simple">Empty</otm:OTA2Entity>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string" />
+	</xsd:simpleType>
+
+	<xsd:simpleType name="String_EnumExtension">
+		<xsd:annotation>
+			<xsd:documentation source="Description">A string used for an open enumeration literal value.</xsd:documentation>
+			<xsd:documentation source="Implementer">Place a literal in this attribute if you have selected the "other_" value
+				in the enumerated list. Note that this value should be known to your trading partners.
+			</xsd:documentation>
+			<xsd:appinfo>
+				<otm:OTA2Entity type="Simple">String_EnumExtension</otm:OTA2Entity>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1" />
+			<xsd:maxLength value="128" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="UTCDateTime">
+		<xsd:annotation>
+			<xsd:documentation source="Description">ISO date-time type.  Example: 2010-12-31T11:55:00-06:00</xsd:documentation>
+			<xsd:documentation source="Implementer">Assigned XSD Type: {http://www.w3.org/2001/XMLSchema}dateTime</xsd:documentation>
+			<xsd:appinfo>
+				<otm:OTA2Entity type="Simple">UTCDateTime</otm:OTA2Entity>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:dateTime" />
+	</xsd:simpleType>
+
+	<xsd:simpleType name="UTCDate">
+		<xsd:annotation>
+			<xsd:documentation source="Description">ISO date type.  Example: 2010-12-31</xsd:documentation>
+			<xsd:documentation source="Implementer">Assigned XSD Type: {http://www.w3.org/2001/XMLSchema}date</xsd:documentation>
+			<xsd:appinfo>
+				<otm:OTA2Entity type="Simple">UTCDate</otm:OTA2Entity>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:date" />
+	</xsd:simpleType>
+
+	<xsd:simpleType name="UTCTime">
+		<xsd:annotation>
+			<xsd:documentation source="Description">ISO time type.  Example: 11:55:00-06:00</xsd:documentation>
+			<xsd:documentation source="Implementer">Assigned XSD Type: {http://www.w3.org/2001/XMLSchema}dateTime</xsd:documentation>
+			<xsd:appinfo>
+				<otm:OTA2Entity type="Simple">UTCTime</otm:OTA2Entity>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:time" />
+	</xsd:simpleType>
+
+	<xsd:simpleType name="LocalDateTime">
+		<xsd:annotation>
+			<xsd:documentation source="Description">ISO date-time type without UTC offset or Z for Zulu restriction indicating it
+				is representing Local Time.  Example: 2010-12-31T11:55:00</xsd:documentation>
+			<xsd:documentation source="Implementer">Assigned XSD Type: {http://www.w3.org/2001/XMLSchema}dateTime</xsd:documentation>
+			<xsd:appinfo>
+				<otm:OTA2Entity type="Simple">LocalDateTime</otm:OTA2Entity>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:dateTime">
+			<xsd:pattern value=".+T[^Z+\-]+" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="LocalDate">
+		<xsd:annotation>
+			<xsd:documentation source="Description">ISO date type without UTC offset or Z for Zulu restriction indicating it
+				is representing Local Time.  Example: 2010-12-31</xsd:documentation>
+			<xsd:documentation source="Implementer">Assigned XSD Type: {http://www.w3.org/2001/XMLSchema}date</xsd:documentation>
+			<xsd:appinfo>
+				<otm:OTA2Entity type="Simple">LocalDate</otm:OTA2Entity>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:date">
+			<xsd:pattern value="[^:Z]*" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="LocalTime">
+		<xsd:annotation>
+			<xsd:documentation source="Description">ISO time type without UTC offset or Z for Zulu restriction indicating it
+				is representing Local Time.  Example: 11:55:00</xsd:documentation>
+			<xsd:documentation source="Implementer">Assigned XSD Type: {http://www.w3.org/2001/XMLSchema}dateTime</xsd:documentation>
+			<xsd:appinfo>
+				<otm:OTA2Entity type="Simple">LocalTime</otm:OTA2Entity>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:time">
+			<xsd:pattern value="[^Z\+-]*" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:element name="ExtensionPoint" type="ota2:ExtensionPoint" />
+	<xsd:element name="ExtensionPoint_Detail" type="ota2:ExtensionPoint" />
+	<xsd:element name="ExtensionPoint_Custom" type="ota2:ExtensionPoint" />
+	<xsd:element name="ExtensionPoint_Query" type="ota2:ExtensionPoint" />
+	<xsd:element name="ExtensionPoint_Update" type="ota2:ExtensionPoint" />
+	<xsd:element name="ExtensionPoint_Choice" type="ota2:ExtensionPoint" />
+	<xsd:complexType name="ExtensionPoint">
+		<xsd:sequence>
+			<xsd:any minOccurs="0" maxOccurs="unbounded" namespace="##other" processContents="lax" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+</xsd:schema>

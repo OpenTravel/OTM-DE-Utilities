@@ -101,7 +101,8 @@ public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
      */
     public void setParent(OtmLibraryMember parent, OtmContextualFacet cf) {
         if (getParent() != null)
-            getParent().delete( cf );
+            getParent().remove( cf );
+        // getParent().delete( cf ); // FIXME - when used by setBaseType, it removes the new base
         this.parent = parent;
         parent.add( this );
         tlObject = cf.getTL();

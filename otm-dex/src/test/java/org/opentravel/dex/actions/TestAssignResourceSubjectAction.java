@@ -64,11 +64,7 @@ public class TestAssignResourceSubjectAction {
         assertNotNull( resource );
         assertTrue( resource.isEditable() );
 
-        globalBO = (OtmBusinessObject) lib.add( TestBusiness.buildOtm( staticModelManager, "GlobalBO" ) );
-        assertTrue( globalBO != null );
-        assertTrue( globalBO.getLibrary() == lib );
-        assertTrue( globalBO.isEditable() );
-        assertTrue( staticModelManager.getMembers().contains( globalBO ) );
+        globalBO = TestBusiness.buildOtm( lib, "GlobalBO" ); // Tested in buildOtm()
     }
 
     @Test
@@ -85,7 +81,7 @@ public class TestAssignResourceSubjectAction {
     public void testDoAndUndo() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
         NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
 
-        OtmBusinessObject otherBO = TestBusiness.buildOtm( staticModelManager, "OtherBO" );
+        OtmBusinessObject otherBO = TestBusiness.buildOtm( lib, "OtherBO" );
         OtmBusinessObject originalSubject = resource.getSubject();
         // Given - the original set of parameter groups
         List<OtmParameterGroup> groups = resource.getParameterGroups();

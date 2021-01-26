@@ -66,7 +66,8 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
 
     @Test
     public void testFacets() {
-        OtmBusinessObject bo = buildOtm( staticModelManager );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
 
         assertNotNull( bo.getSummary() );
         assertNotNull( bo.getDetail() );
@@ -75,8 +76,6 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
     @Test
     public void testGhostFacets() {
         OtmLibrary lib = TestLibrary.buildOtm();
-        // OtmModelManager mgr = lib.getModelManager();
-
         OtmBusinessObject baseBO = TestBusiness.buildOtm( lib, "BaseBO" );
         OtmBusinessObject exBO = TestBusiness.buildOtm( lib, "ExBO" );
         TLFacetOwner exTL = (TLFacetOwner) exBO.getTL();
@@ -274,19 +273,20 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
         return bo;
     }
 
-    /**
-     * Build business object with attribute and element in ID and Summary facets.
-     * <p>
-     * <b>Note: </b>Contextual facet will not have a library.
-     * 
-     * @param mgr
-     * @param name
-     * @return
-     */
-    public static OtmBusinessObject buildOtm(OtmModelManager mgr, String name) {
-        BoName = name;
-        return buildOtm( mgr );
-    }
+    // /**
+    // * Build business object with attribute and element in ID and Summary facets.
+    // * <p>
+    // * <b>Note: </b>Contextual facet will not have a library.
+    // *
+    // * @param mgr
+    // * @param name
+    // * @return
+    // */
+    // @Deprecated
+    // public static OtmBusinessObject buildOtm(OtmModelManager mgr, String name) {
+    // BoName = name;
+    // return buildOtm( mgr );
+    // }
 
     /**
      * Get an element from the summary facet
@@ -302,8 +302,10 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
     }
 
     /**
+     * Simply create a business object and add to model manager.
      * <p>
-     * <b>Note: </b>Contextual facet will not have a library.
+     * <b>Note: </b>New business object and its contextual facets will not have library. Preferred builder for general
+     * us is {@link #buildOtm(OtmLibrary, String)}
      * 
      * @param mgr
      * @return
@@ -320,8 +322,6 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
         OtmContextualFacet cf = TestCustomFacet.buildOtm( bo, "SomeOtherCustom" );
         OtmContextualFacet cf2 = TestCustomFacet.buildOtm( bo, "SomeOtherCustom2" );
         OtmContextualFacet cf3 = TestCustomFacet.buildOtm( bo, "SomeOtherCustom3" );
-        // OtmContextualFacet cf = TestCustomFacet.buildOtm( mgr, bo );
-        // cf.setName( "SomeCustom" );
 
         return bo;
     }

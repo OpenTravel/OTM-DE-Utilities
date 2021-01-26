@@ -31,6 +31,8 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
@@ -75,11 +77,13 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
     public void testBuildOneOfEach() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
         NoSuchMethodException, InvocationTargetException {
         // Given - a model manager with full range of actions
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
-        OtmChoiceObject choice = TestChoice.buildOtm( staticModelManager );
+        // staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
+
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmChoiceObject choice = TestChoice.buildOtm( lib, "TestChoice" );
         OtmFacet<?> facet = choice.getShared();
 
-        buildOneOfEach( facet );
+        buildOneOfEach2( facet );
         facet.getChildren().forEach( c -> test( (OtmPropertyBase) c ) );
     }
 
@@ -296,7 +300,8 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
     }
 
     /**
-     * Add one of each compatible property type to the owner
+     * Use the enumeration's builder {@link OtmPropertyType#build(OtmPropertyType, OtmPropertyOwner)} to add one of each
+     * compatible property type to the owner. Uses {@link OtmPropertyFactory}.
      * 
      * @param owner
      */
@@ -311,7 +316,9 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
     }
 
     /**
-     * @deprecated - use buildOneOfEach2 Add one of each type of property to the passed property owner
+     * Explicitly build a new TL then add to the owner.
+     * 
+     * @deprecated - use buildOneOfEach2 which uses the property type enumeration and factory
      */
     public static void buildOneOfEach(OtmPropertyOwner owner) {
         TLModelElement tl = null;

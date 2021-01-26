@@ -671,6 +671,13 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         setEditableMinor();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * If a contextual facet is passed, it's whereContributed is removed.
+     * 
+     * @see org.opentravel.model.OtmChildrenOwner#remove(org.opentravel.model.OtmObject)
+     */
     @Override
     public void remove(OtmObject child) {
         if (child instanceof OtmContextualFacet)

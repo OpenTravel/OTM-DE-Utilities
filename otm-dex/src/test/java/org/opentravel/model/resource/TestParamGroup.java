@@ -115,9 +115,10 @@ public class TestParamGroup extends TestOtmResourceBase<OtmParameterGroup> {
     @Test
     public void testSetters() {
         // Given a business object
-        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
-        bo.add( TestCustomFacet.buildOtm( staticModelManager ) );
-        bo.add( TestQueryFacet.buildOtm( staticModelManager ) );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
+        TestCustomFacet.buildOtm( bo, "CF1" );
+        TestQueryFacet.buildOtm( bo, "QF1" );
         // Given a resource
         OtmResource resource = TestResource.buildOtm( staticModelManager );
         resource.setSubject( bo );

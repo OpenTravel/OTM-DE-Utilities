@@ -176,20 +176,22 @@ public class TestCustomFacet extends TestContextualFacet {
     @Test
     public void testDeletingAsLibraryMember() {
         // Given - a business object and contextual facet
-        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
-        OtmContextualFacet cf = buildOtm( staticModelManager );
-        OtmContributedFacet contrib = bo.add( cf );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
+        OtmContextualFacet cf = buildOtm( bo, "CF1" );
+
         // Given - a choice object and contextual facet
-        OtmChoiceObject co = TestChoice.buildOtm( staticModelManager );
-        OtmChoiceFacet cf2 = TestChoiceFacet.buildOtm( staticModelManager, co );
-        OtmContributedFacet contrib2 = co.add( cf2 );
+        OtmChoiceObject co = TestChoice.buildOtm( lib, "TestCH" );
+        OtmChoiceFacet cf2 = TestChoiceFacet.buildOtm( co, "CHF1" );
+        OtmContributedFacet contrib2 = cf2.getWhereContributed();
+        // OtmContributedFacet contrib2 = co.add( cf2 );
 
         // Given - a library for the objects
-        OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
-        lib.add( bo );
-        lib.add( co );
-        lib.add( cf );
-        lib.add( cf2 );
+        // OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
+        // lib.add( bo );
+        // lib.add( co );
+        // lib.add( cf );
+        // lib.add( cf2 );
         assertTrue( cf.getLibrary() != null );
         assertTrue( cf.getModelManager().contains( cf ) );
         //
@@ -215,10 +217,15 @@ public class TestCustomFacet extends TestContextualFacet {
     @Test
     public void testDeletingWithContributedFacet() {
         // Given - a business object and contextual facet
-        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
-        OtmContextualFacet cf = buildOtm( staticModelManager );
-        OtmContributedFacet contrib = bo.add( cf );
-        testContributedFacet( contrib, cf, bo );
+        // OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        // OtmContextualFacet cf = buildOtm( staticModelManager );
+        // OtmContributedFacet contrib = bo.add( cf );
+        // testContributedFacet( contrib, cf, bo );
+
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
+        OtmContextualFacet cf = buildOtm( bo, "CF1" );
+        OtmContributedFacet contrib = cf.getWhereContributed();
 
         OtmContextualFacet cf2 = buildOtm( staticModelManager );
         testContributedFacet( contrib, cf, bo );
@@ -275,12 +282,10 @@ public class TestCustomFacet extends TestContextualFacet {
     @Test
     public void testMovingFacet() {
         // Given - a cf contributed to a bo
-        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
-        OtmBusinessObject bo2 = TestBusiness.buildOtm( staticModelManager );
-        bo2.setName( "TheOtherBO" );
-        OtmContextualFacet cf = buildOtm( staticModelManager );
-        OtmContributedFacet contrib = bo.add( cf );
-        testContributedFacet( contrib, cf, bo );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TheBO" );
+        OtmBusinessObject bo2 = TestBusiness.buildOtm( lib, "TheOtherBO" );
+        OtmContextualFacet cf = buildOtm( bo, "TheCF" );
 
         // When base type changed (moved)
         cf.setBaseType( bo2 );
@@ -324,7 +329,8 @@ public class TestCustomFacet extends TestContextualFacet {
     @Test
     public void testWhenContributed() {
         // Given - a business object and contextual facet
-        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
         OtmContextualFacet cf = buildOtm( staticModelManager );
         // Was injected by buildOtm
         // assertTrue( "Has not been injected yet.", cf.getWhereContributed() == null );

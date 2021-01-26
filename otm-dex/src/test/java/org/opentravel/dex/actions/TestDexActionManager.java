@@ -64,12 +64,7 @@ public class TestDexActionManager {
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 
-        globalBO = (OtmBusinessObject) lib.add( TestBusiness.buildOtm( staticModelManager, "GlobalBO" ) );
-
-        assertTrue( globalBO != null );
-        assertTrue( globalBO.getLibrary() == lib );
-        assertTrue( globalBO.isEditable() );
-        assertTrue( staticModelManager.getMembers().contains( globalBO ) );
+        globalBO = TestBusiness.buildOtm( lib, "GlobalBO" ); // Tested in buildOtm()
     }
 
     @Test
@@ -284,7 +279,7 @@ public class TestDexActionManager {
         DexActionManager am = new DexReadOnlyActionManager();
         OtmModelManager mgr = new OtmModelManager( am, null, null );
         lib = mgr.add( new TLLibrary() );
-        OtmBusinessObject newBO = TestBusiness.buildOtm( mgr, "NewBO" );
+        OtmBusinessObject newBO = TestBusiness.buildOtm( lib, "NewBO" );
         lib.add( newBO );
         assertTrue( newBO.isEditable() );
 

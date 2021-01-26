@@ -314,8 +314,8 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
                     findWhereContributed();
                 }
             }
+            log.debug( "Set whereContributed on: " + this + " to: " + whereContributed );
         }
-
         return whereContributed;
     }
 
