@@ -84,11 +84,9 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     // A list of all the types used by this member or its descendants
     protected List<OtmTypeProvider> typesUsed = null;
-    // protected List<OtmTypeProvider> typesUsed = new ArrayList<>();
 
     // A list of all members that have a descendant type user that assigned to this member and its descendants.
     protected List<OtmLibraryMember> whereUsed = null;
-    // private DexActionManager actionMgr = null;
 
     protected boolean editableMinor = false;
 
@@ -411,17 +409,6 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     }
 
     @Override
-    public List<OtmTypeUser> getTypeUsers(OtmTypeProvider provider) {
-        List<OtmTypeUser> users = new ArrayList<>();
-        if (this instanceof OtmTypeUser && ((OtmTypeUser) this).getAssignedType() == provider)
-            users.add( (OtmTypeUser) this );
-        for (OtmTypeUser candidate : getDescendantsTypeUsers())
-            if (candidate.getAssignedType() == provider)
-                users.add( candidate );
-        return users;
-    }
-
-    @Override
     public OtmTypeProvider getMatchingProvider(OtmTypeProvider provider) {
         OtmTypeProvider match = null;
         if (this.getClass() == provider.getClass())
@@ -470,6 +457,17 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     @Override
     public LibraryMember getTlLM() {
         return (LibraryMember) getTL();
+    }
+
+    @Override
+    public List<OtmTypeUser> getTypeUsers(OtmTypeProvider provider) {
+        List<OtmTypeUser> users = new ArrayList<>();
+        if (this instanceof OtmTypeUser && ((OtmTypeUser) this).getAssignedType() == provider)
+            users.add( (OtmTypeUser) this );
+        for (OtmTypeUser candidate : getDescendantsTypeUsers())
+            if (candidate.getAssignedType() == provider)
+                users.add( candidate );
+        return users;
     }
 
     @Override
@@ -532,21 +530,6 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     @Override
     public boolean isEditableMinor() {
         return editableMinor;
-    }
-
-    /**
-     * this is an often used expensive operation
-     */
-    private void setEditableMinor() {
-        editableMinor = false;
-        if (getLibrary() == null)
-            return;
-        if (isEditable())
-            editableMinor = true;
-        else {
-            OtmVersionChain chain = getLibrary().getVersionChain();
-            editableMinor = chain.isChainEditable() && chain.isLatestChain() && chain.isLatestVersion( this );
-        }
     }
 
     @Override
@@ -653,12 +636,6 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         return new ReadOnlyStringWrapper( getPrefix() );
     }
 
-    // Can't do this or contextual facet will not be able to override
-    // @Override
-    // public TLLibraryMember getTL() {
-    // return getTL();
-    // }
-
     /**
      * {@inheritDoc} Null out member providers and where used lists.
      */
@@ -737,6 +714,21 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
                     assert contributed.isInherited();
                     break;
                 }
+    }
+
+    /**
+     * this is an often used expensive operation
+     */
+    private void setEditableMinor() {
+        editableMinor = false;
+        if (getLibrary() == null)
+            return;
+        if (isEditable())
+            editableMinor = true;
+        else {
+            OtmVersionChain chain = getLibrary().getVersionChain();
+            editableMinor = chain.isChainEditable() && chain.isLatestChain() && chain.isLatestVersion( this );
+        }
     }
 
     /**

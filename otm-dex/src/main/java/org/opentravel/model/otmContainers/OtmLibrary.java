@@ -593,11 +593,6 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         if (isEditable())
             return true;
         return getVersionChain().isChainEditable();
-        // boolean editableLibFound = false;
-        // for (OtmLibrary lib : mgr.getVersionChain( this ))
-        // if (lib.isEditable())
-        // editableLibFound = true;
-        // return editableLibFound;
     }
 
     // FIXME - clear version chain when new library added
@@ -774,5 +769,16 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
                 resources.add( (OtmResource) m );
         } );
         return resources;
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    public OtmLibraryMember getMember(String name) {
+        for (OtmLibraryMember m : getMembers())
+            if (m.getName().equals( name ))
+                return m;
+        return null;
     }
 }

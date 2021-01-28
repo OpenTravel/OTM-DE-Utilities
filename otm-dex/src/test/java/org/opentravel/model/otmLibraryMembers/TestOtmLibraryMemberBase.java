@@ -27,7 +27,6 @@ import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmFacets.OtmAbstractFacet;
@@ -211,6 +210,10 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
     @SuppressWarnings("unchecked")
     @Test
     public void testInheritance() {
+        // Make sure the subject does not have children that could conflict
+        List<OtmObject> kids = new ArrayList<>( subject.getChildren() );
+        kids.forEach( c -> subject.delete( c ) );
+
         if (subject != null && baseObject != null) {
             extendObject( (L) baseObject, (L) subject );
             testInheritance( (L) subject );
@@ -235,8 +238,6 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
                 if (k instanceof OtmAbstractFacet)
                     baseKids.remove( k );
                 if (k instanceof OtmRoleEnumeration)
-                    baseKids.remove( k );
-                if (k instanceof OtmResourceChild)
                     baseKids.remove( k );
             }
 
@@ -265,7 +266,7 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
         // ((TLExtensionOwner) extension.getTL()).setExtension( tlex );
         // }
         OtmObject result = extension.setBaseType( base );
-        assertTrue( result == base );
+        assertTrue( "Util: extension must return base type.", result == base );
 
         assertTrue( extension.getBaseType() != null );
         assertTrue( extension.getBaseType() == base );

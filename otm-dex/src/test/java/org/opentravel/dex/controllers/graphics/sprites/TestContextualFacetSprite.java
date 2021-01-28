@@ -75,8 +75,8 @@ public class TestContextualFacetSprite extends AbstractFxTest {
         gc = spriteMgr.getSettingsManager().getGc();
 
         OtmBusinessObject bo = TestBusiness.buildOtm( lib, "Bo1" );
-        OtmContextualFacet cfC = TestCustomFacet.buildOtm( mgr, bo );
-        OtmContextualFacet cfE = TestCustomFacet.buildOtm( mgr, bo );
+        OtmContextualFacet cfC = TestCustomFacet.buildOtm( bo, "CF1" );
+        OtmContextualFacet cfE = TestCustomFacet.buildOtm( bo, "CF2" );
         OtmAttribute<?> attr = TestOtmPropertiesBase.buildAttribute( cfE );
         assertTrue( attr != null );
         attr.setName( "thisisareallyreallyreallylongnametoassureexpandedwidthiswiderthancollapsed" );

@@ -41,7 +41,7 @@ public class TestEnumerationClosed extends TestOtmLibraryMemberBase<OtmEnumerati
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         subject = buildOtm( staticModelManager );
         baseObject = buildOtm( staticModelManager );
         baseObject.setName( "BaseBO" );
@@ -125,6 +125,7 @@ public class TestEnumerationClosed extends TestOtmLibraryMemberBase<OtmEnumerati
      */
     public static OtmEnumerationClosed buildOtm(OtmModelManager mgr) {
         OtmEnumerationClosed oec = new OtmEnumerationClosed( buildTL(), mgr );
+        mgr.add( oec );
         assertNotNull( oec );
         return oec;
     }

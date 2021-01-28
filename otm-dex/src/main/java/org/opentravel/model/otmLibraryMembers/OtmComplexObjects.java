@@ -63,13 +63,6 @@ public abstract class OtmComplexObjects<T extends TLComplexTypeBase> extends Otm
             children.add( child );
             return child;
         }
-        // if (child instanceof OtmAbstractFacet<?> && !getChildren().contains( child )) {
-        // getChildren().add( child );
-        // return child;
-        // } else if (child instanceof OtmAlias) {
-        // getChildren().add( child );
-        // return child;
-        // }
         log.debug( "Could not add " + child.getName() + " to " + getName() );
         return null;
     }

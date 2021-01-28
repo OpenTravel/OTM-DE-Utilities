@@ -16,11 +16,13 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.schemacompiler.model.TLAttribute;
@@ -30,7 +32,7 @@ import org.opentravel.schemacompiler.model.TLProperty;
 /**
  * Verifies the functions of the <code>OtmContextualFacet</code> class.
  */
-public class TestExtensionPointFacet extends TestOtmLibraryMemberBase<OtmContextualFacet> {
+public class TestExtensionPointFacet extends TestOtmLibraryMemberBase<OtmExtensionPointFacet> {
     private static Log log = LogFactory.getLog( TestExtensionPointFacet.class );
     private static final String EPF_NAME = "TestEPF";
 
@@ -45,6 +47,15 @@ public class TestExtensionPointFacet extends TestOtmLibraryMemberBase<OtmContext
         subject = buildOtm( staticModelManager, ((OtmCore) baseObject).getSummary() );
     }
 
+    @Override
+    public void testConstructors(OtmExtensionPointFacet otm) {
+        assertNotNull( otm );
+        assertTrue( "Must be its own owner", otm.getOwningMember() == otm );
+        assertTrue( "Must have identity listner.", OtmModelElement.get( otm.getTL() ) == otm );
+        // if (otm.getModelManager() != null)
+        // assertTrue( "Must be managed in model manager.", otm.getModelManager().getMembers().contains( otm ) );
+        log.debug( "Simple Constuctor OK." );
+    }
 
     public static void testExtensionPointFacet(OtmExtensionPointFacet epf, OtmObject baseFacet) {
         log.debug( "Testing extension point facet: " + epf );

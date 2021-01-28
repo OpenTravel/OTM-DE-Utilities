@@ -115,7 +115,7 @@ public class TestFacetRectangle extends AbstractFxTest {
         spriteMgr = TestSpriteManager.buildSpriteManager();
 
         OtmBusinessObject bo = TestBusiness.buildOtm( lib, "Bo1" );
-        OtmContextualFacet cf = TestCustomFacet.buildOtm( mgr, bo );
+        OtmContextualFacet cf = TestCustomFacet.buildOtm( bo, "CF1" );
 
         ContextualFacetSprite cfSprite = new ContextualFacetSprite( cf, spriteMgr );
         cfSprite.render( spriteMgr.getColumn( 1 ), false ); // 186 x 151

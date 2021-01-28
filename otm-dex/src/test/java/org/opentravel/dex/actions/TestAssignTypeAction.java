@@ -203,15 +203,15 @@ public class TestAssignTypeAction {
         throws ExceptionInInitializerError, InstantiationException, IllegalAccessException, NoSuchMethodException,
         SecurityException, IllegalArgumentException, InvocationTargetException {
         DexFullActionManager am = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( am, null );
+        OtmModelManager mgr = new OtmModelManager( am, null, null );
         assertTrue( am.getQueueSize() == 0 );
         lib = TestLibrary.buildOtm( mgr );
 
         // Given a OtmObjects
-        OtmEnumeration<?> closedEnum = TestEnumerationClosed.buildOtm( mgr );
-        lib.add( closedEnum );
-        OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtm( mgr );
-        lib.add( vwa );
+        OtmEnumeration<?> closedEnum = TestEnumerationClosed.buildOtm( lib, "TypeTestEC" );
+        // lib.add( closedEnum );
+        OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtm( lib, "TypeTestVWA" );
+        // lib.add( vwa );
         assertFalse( "Must not have type.", vwa.getAssignedType() == closedEnum );
         OtmTypeProvider originalType = vwa.getAssignedType();
         assertTrue( vwa.getActionManager() instanceof DexFullActionManager );

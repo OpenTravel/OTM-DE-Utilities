@@ -50,6 +50,7 @@ public class OtmPropertyFactory {
         // NO-OP - only static methods
     }
 
+
     @SuppressWarnings("unchecked")
     public static OtmAttribute<TLAttribute> create(TLAttribute tlAttribute, OtmPropertyOwner parent) {
         OtmAttribute<TLAttribute> attribute;
@@ -58,6 +59,7 @@ public class OtmPropertyFactory {
         if (tlAttribute.getOwner() == null && parent != null && parent.getTL() instanceof TLAttributeOwner)
             ((TLAttributeOwner) parent.getTL()).addAttribute( tlAttribute );
 
+        // If it was already modeled, add it to the parent and return the otm facade.
         OtmObject otm = OtmModelElement.get( tlAttribute );
         if ((otm instanceof OtmAttribute && parent != null && ((OtmProperty) otm).getParent() == parent)) {
             parent.add( otm );
@@ -140,7 +142,7 @@ public class OtmPropertyFactory {
      * {@link OtmAbstractFacet#add(TLModelElement)} .
      * 
      * @param tl
-     * @param parent
+     * @param parent add new OtmProperty to parent. For inherited, pass null.
      */
     public static OtmProperty create(TLModelElement tl, OtmPropertyOwner parent) {
         OtmProperty p = null;

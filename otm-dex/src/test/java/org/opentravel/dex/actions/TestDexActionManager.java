@@ -30,6 +30,7 @@ import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -135,13 +136,15 @@ public class TestDexActionManager {
 
     @Test
     public void testPushAction() {
-        lib = staticModelManager.add( new TLLibrary() );
+        // lib = staticModelManager.add( new TLLibrary() );
+        // DexActionManager am = lib.getActionManager();
+        lib = TestLibrary.buildOtm();
         DexActionManager am = lib.getActionManager();
         assertTrue( am.getQueueSize() == 0 );
 
         // Given an OtmObject with action added
-        OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtm( staticModelManager );
-        lib.add( vwa );
+        OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtm( lib, "TestPushVWA" );
+        // lib.add( vwa );
         SimpleStringProperty nameProperty = (SimpleStringProperty) am.add( DexActions.NAMECHANGE, vwa.getName(), vwa );
         assertTrue( !(nameProperty instanceof ReadOnlyStringWrapper) );
 

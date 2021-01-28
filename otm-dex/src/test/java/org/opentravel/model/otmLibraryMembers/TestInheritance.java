@@ -369,8 +369,7 @@ public class TestInheritance extends AbstractFxTest {
         OtmLibrary lib = TestLibrary.buildOtm();
         OtmBusinessObject bo = TestBusiness.buildOtm( lib, "BaseBO" );
         TestOtmPropertiesBase.buildOneOfEach2( bo.getSummary() );
-        OtmCustomFacet cf = TestCustomFacet.buildOtm( mgr );
-        bo.add( cf );
+        OtmCustomFacet cf = TestCustomFacet.buildOtm( bo, "CF1" );
 
         assertTrue( bo.getFacet( bo.getIdFacet() ) == bo.getIdFacet() );
         assertTrue( bo.getFacet( bo.getSummary() ) == bo.getSummary() );

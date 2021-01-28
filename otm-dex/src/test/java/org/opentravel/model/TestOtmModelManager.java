@@ -30,15 +30,11 @@ import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
-import org.opentravel.model.otmFacets.OtmContributedFacet;
-import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.otmLibraryMembers.TestContextualFacet;
 import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.objecteditor.ObjectEditorController;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.model.LibraryMember;
-import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLModel;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.repository.ProjectItem;
@@ -307,33 +303,35 @@ public class TestOtmModelManager extends AbstractFxTest {
     // mapTests( mgr );
     // }
 
-    // ?? Where do file open, object specific tests belong?
-    @Test
-    public void testOpenedContextualFacets() {
-        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
-        // Given a project that uses local library files
-        TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
-        for (OtmLibrary lib : mgr.getLibraries())
-            log.debug( "Library " + lib + " opened." );
-        assertTrue( "Must have project items.", !mgr.getProjectManager().getAllProjectItems().isEmpty() );
-
-        for (OtmLibraryMember m : mgr.getMembers()) {
-            if (m instanceof OtmContextualFacet) {
-                OtmContributedFacet contrib = ((OtmContextualFacet) m).getWhereContributed();
-                OtmLibraryMember base = ((OtmContextualFacet) m).getContributedObject();
-                if (contrib != null && base != null)
-                    TestContextualFacet.testContributedFacet( contrib, (OtmContextualFacet) m, base );
-                else {
-                    String oeName = ((TLContextualFacet) m.getTL()).getOwningEntityName();
-                    log.debug( "Bad contextual facet: " + m + " Entity name = " + oeName );
-                    for (OtmLibraryMember candidate : mgr.getMembers()) {
-                        if (candidate.getNameWithPrefix().equals( oeName ))
-                            log.debug( "Name Match Found " );
-                    }
-                }
-            }
-        }
-    }
+    // /**
+    // * moved to {@link TestContextualFacet}
+    // */
+    // @Test
+    // public void testOpenedContextualFacets() {
+    // OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+    // // Given a project that uses local library files
+    // TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
+    // for (OtmLibrary lib : mgr.getLibraries())
+    // log.debug( "Library " + lib + " opened." );
+    // assertTrue( "Must have project items.", !mgr.getProjectManager().getAllProjectItems().isEmpty() );
+    //
+    // for (OtmLibraryMember m : mgr.getMembers()) {
+    // if (m instanceof OtmContextualFacet) {
+    // OtmContributedFacet contrib = ((OtmContextualFacet) m).getWhereContributed();
+    // OtmLibraryMember base = ((OtmContextualFacet) m).getContributedObject();
+    // if (contrib != null && base != null)
+    // TestContextualFacet.testContributedFacet( contrib, (OtmContextualFacet) m, base );
+    // else {
+    // String oeName = ((TLContextualFacet) m.getTL()).getOwningEntityName();
+    // log.debug( "Bad contextual facet: " + m + " Entity name = " + oeName );
+    // for (OtmLibraryMember candidate : mgr.getMembers()) {
+    // if (candidate.getNameWithPrefix().equals( oeName ))
+    // log.debug( "Name Match Found " );
+    // }
+    // }
+    // }
+    // }
+    // }
 
     /**
      * Test hasEditableLibraries() hasEditableLibraries(library) hasProjects()

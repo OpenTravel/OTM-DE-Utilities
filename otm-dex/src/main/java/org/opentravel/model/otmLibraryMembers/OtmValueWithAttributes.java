@@ -29,6 +29,7 @@ import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.OtmTypeUserUtils;
+import org.opentravel.model.otmFacets.OtmAbstractFacet;
 import org.opentravel.model.otmFacets.OtmVWAAttributeFacet;
 import org.opentravel.model.otmFacets.OtmVWAValueFacet;
 import org.opentravel.model.otmProperties.OtmAttribute;
@@ -248,11 +249,6 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
         return ImageManager.Icons.VWA;
     }
 
-    // @Override
-    // public boolean isRenameable() {
-    // return false;
-    // }
-
     @Override
     public List<OtmObject> getInheritedChildren() {
         modelInheritedChildren();
@@ -297,21 +293,35 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
 
     @Override
     public void modelInheritedChildren() {
-        // Only model once
         if (inheritedChildren == null)
             inheritedChildren = new ArrayList<>();
         else
             inheritedChildren.clear(); // RE-model
 
         if (getBaseType() != null) {
-            PropertyCodegenUtils.getInheritedAttributes( getTL() ).forEach( i -> OtmPropertyFactory.create( i, this ) );
-            PropertyCodegenUtils.getInheritedIndicators( getTL() ).forEach( i -> OtmPropertyFactory.create( i, this ) );
+            PropertyCodegenUtils.getInheritedAttributes( getTL() ).forEach( this::createInherited );
+            PropertyCodegenUtils.getInheritedIndicators( getTL() ).forEach( this::createInherited );
 
-            // log.debug("Modeled inherited children of " + this);
-            for (OtmObject child : inheritedChildren)
-                if (!child.isInherited())
-                    log.error( "Inherited child doen't know it is inherited!." );
+            // // DEBUGGING
+            // log.debug( "Modeled " + inheritedChildren.size() + " inherited children of " + this );
+            // for (OtmObject child : inheritedChildren)
+            // if (!child.isInherited())
+            // log.error( "Inherited child doen't know it is inherited!." );
+        }
+    }
 
+    /**
+     * Add to inheritedChildren list <i>if</i> it is a property, was already modeled, and its parent is not the passed
+     * property owner
+     * <p>
+     * Cloned from {@link OtmAbstractFacet#createInherited()}
+     */
+    protected void createInherited(TLModelElement tlProp) {
+        OtmObject otm = OtmModelElement.get( tlProp );
+        if (otm instanceof OtmProperty && ((OtmProperty) otm).getParent() != this) {
+            OtmProperty p = OtmPropertyFactory.create( tlProp, null );
+            p.setParent( this );
+            add( p );
         }
     }
 

@@ -73,8 +73,10 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
         OtmLibrary lib = TestLibrary.buildOtm();
         OtmModelManager mgr = lib.getModelManager();
         OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
-        bo.add( TestCustomFacet.buildOtm( mgr ) );
-        bo.add( TestQueryFacet.buildOtm( mgr ) );
+        // bo.add( TestCustomFacet.buildOtm( mgr ) );
+        // bo.add( TestQueryFacet.buildOtm( mgr ) );
+        TestCustomFacet.buildOtm( bo, "CF1" );
+        TestQueryFacet.buildOtm( bo, "QF1" );
 
         // Given a resource
         OtmResource resource = TestResource.buildOtm( bo );

@@ -130,14 +130,6 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      */
     public OtmTypeProvider getMatchingProvider(OtmTypeProvider provider);
 
-    // OtmModelManager getModelManager();
-
-    // /**
-    // * @return
-    // */
-    // @Override
-    // public String getObjectTypeName();
-
     /**
      * Get the actual type users that use this library member or descendants as assigned type.
      * 

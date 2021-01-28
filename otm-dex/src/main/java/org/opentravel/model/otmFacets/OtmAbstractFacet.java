@@ -55,8 +55,6 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
     implements OtmPropertyOwner, OtmTypeProvider {
     private static Log log = LogFactory.getLog( OtmAbstractFacet.class );
 
-    // private OtmLibraryMember parent;
-
     // Collapsed is only for graphical views. Tree and table views should use Expanded.
     private boolean collapsed;
 
@@ -261,21 +259,6 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
         return tlObject.getFacetType().getIdentityName();
     }
 
-    // /**
-    // * Facet edit-ability is the ability to add/remove properties.
-    // *
-    // * @see org.opentravel.model.OtmModelElement#isEditable()
-    // */
-    // @Override
-    // public boolean isEditable() {
-    // return getOwningMember().isEditable();
-    // }
-
-    // @Override
-    // public boolean isExpanded() {
-    // return true;
-    // }
-
     /**
      * {@inheritDoc}
      * <p>
@@ -384,6 +367,19 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
         // }
     }
 
+    /**
+     * Add to inheritedChildren list <i>if</i> it is a property, was already modeled, and its parent is not the passed
+     * property owner
+     */
+    protected void createInherited(TLModelElement tlProp) {
+        OtmObject otm = OtmModelElement.get( tlProp );
+        if (otm instanceof OtmProperty && ((OtmProperty) otm).getParent() != this) {
+            OtmProperty p = OtmPropertyFactory.create( tlProp, null );
+            p.setParent( this );
+            add( p );
+        }
+    }
+
     private List<OtmFacet<TLFacet>> getAncestors() {
         if (!(this instanceof OtmFacet))
             return Collections.emptyList();
@@ -435,9 +431,4 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
     public boolean isCollapsed() {
         return collapsed;
     }
-    // @Override
-    // public String toString() {
-    // return getNameWithPrefix();
-    // }
-
 }

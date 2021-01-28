@@ -52,12 +52,13 @@ public class TestCustomFacet extends TestContextualFacet {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null, null );
-        subject = buildOtm( staticModelManager );
-        baseObject = buildOtm( staticModelManager );
-        // baseObject.setName( "BaseCF" );
-        // Needed for contextual facet tests
+        staticLib = TestLibrary.buildOtm();
+        staticModelManager = staticLib.getModelManager();
+        subject = buildOtm( staticLib, "SubjectCF" );
+        baseObject = buildOtm( staticLib, "BaseCF" );
     }
+
+    /** ******************* Static Builders **************************************/
 
     /**
      * Build a custom facet. It will not have where contributed or children!
@@ -65,10 +66,25 @@ public class TestCustomFacet extends TestContextualFacet {
      * @param mgr
      * @return
      */
-    public static OtmCustomFacet buildOtm(OtmModelManager mgr) {
+    private static OtmCustomFacet buildOtm(OtmModelManager mgr) {
         OtmCustomFacet custom = new OtmCustomFacet( buildTL(), mgr );
         assertNotNull( custom );
         mgr.add( custom );
+        return custom;
+    }
+
+    /**
+     * Build a custom facet and add to library. It will not have where contributed or children!
+     * 
+     * @param mgr
+     * @return
+     */
+    public static OtmCustomFacet buildOtm(OtmLibrary lib, String name) {
+        assertTrue( "Builder - must not already have member with name.", lib.getMember( name ) == null );
+        OtmCustomFacet custom = buildOtm( lib.getModelManager() );
+        assertNotNull( custom );
+        lib.add( custom );
+        custom.setName( name );
 
         // Will only have children when contributed is modeled.
         return custom;
@@ -84,11 +100,11 @@ public class TestCustomFacet extends TestContextualFacet {
     public static OtmCustomFacet buildOtm(OtmBusinessObject bo, String name) {
         assertTrue( "Illegal arguement - must have model manager.", bo.getModelManager() != null );
         OtmCustomFacet cf = buildOtm( bo.getModelManager() );
+        bo.getModelManager().add( cf );
         bo.add( cf );
         cf.setName( name );
         if (bo.getLibrary() != null)
             bo.getLibrary().add( cf );
-        // FIXME - where do business objects get added to model manager?
         testContributedFacet( cf.getWhereContributed(), cf, bo );
         return cf;
     }
@@ -117,22 +133,6 @@ public class TestCustomFacet extends TestContextualFacet {
         return cf;
     }
 
-    /**
-     * Create custom facet and contribute it to the passed business object.
-     * 
-     * @deprecated - use buildOtm(BO, Name);
-     * @param modelManager
-     * @param bo
-     * @return
-     */
-    public static OtmCustomFacet buildOtm(OtmModelManager modelManager, OtmBusinessObject bo) {
-        // OtmCustomFacet cf = buildOtm( modelManager );
-        // bo.add( cf );
-        // testContributedFacet( cf.getWhereContributed(), cf, bo );
-        // return cf;
-        return buildOtm( bo, "SomeName" );
-    }
-
     public static TLContextualFacet buildTL() {
         TLContextualFacet tlcf = new TLContextualFacet();
         tlcf.setName( CF_NAME );
@@ -151,7 +151,7 @@ public class TestCustomFacet extends TestContextualFacet {
     @Before
     public void beforeTest() {
         member = TestBusiness.buildOtm( staticModelManager );
-        cf = buildOtm( staticModelManager );
+        cf = buildOtm( (OtmBusinessObject) member, "CF1" );
         contrib = (OtmContributedFacet) member.add( cf );
         testContributedFacet( contrib, cf, member );
     }
@@ -179,19 +179,13 @@ public class TestCustomFacet extends TestContextualFacet {
         OtmLibrary lib = TestLibrary.buildOtm();
         OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
         OtmContextualFacet cf = buildOtm( bo, "CF1" );
+        OtmContributedFacet contrib = cf.getWhereContributed();
 
         // Given - a choice object and contextual facet
         OtmChoiceObject co = TestChoice.buildOtm( lib, "TestCH" );
         OtmChoiceFacet cf2 = TestChoiceFacet.buildOtm( co, "CHF1" );
         OtmContributedFacet contrib2 = cf2.getWhereContributed();
-        // OtmContributedFacet contrib2 = co.add( cf2 );
 
-        // Given - a library for the objects
-        // OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
-        // lib.add( bo );
-        // lib.add( co );
-        // lib.add( cf );
-        // lib.add( cf2 );
         assertTrue( cf.getLibrary() != null );
         assertTrue( cf.getModelManager().contains( cf ) );
         //
@@ -217,20 +211,15 @@ public class TestCustomFacet extends TestContextualFacet {
     @Test
     public void testDeletingWithContributedFacet() {
         // Given - a business object and contextual facet
-        // OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
-        // OtmContextualFacet cf = buildOtm( staticModelManager );
-        // OtmContributedFacet contrib = bo.add( cf );
-        // testContributedFacet( contrib, cf, bo );
-
         OtmLibrary lib = TestLibrary.buildOtm();
         OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
         OtmContextualFacet cf = buildOtm( bo, "CF1" );
         OtmContributedFacet contrib = cf.getWhereContributed();
-
-        OtmContextualFacet cf2 = buildOtm( staticModelManager );
         testContributedFacet( contrib, cf, bo );
 
-        OtmContributedFacet contrib2 = bo.add( cf2 );
+        OtmContextualFacet cf2 = buildOtm( bo, "CF2" );
+        OtmContributedFacet contrib2 = cf2.getWhereContributed();
+
         // testContributedFacet( contrib2, cf2, bo ); // Performs lazy-eval on contributor
         // assertTrue( "Lazy-evaluation on contributor.", contrib2.getContributor() == cf2 );
         assertTrue( "Contextual facet knows where it is contributed.", cf2.getWhereContributed() == contrib2 );
@@ -257,14 +246,13 @@ public class TestCustomFacet extends TestContextualFacet {
 
     @Test
     public void testInheritance() {
-        OtmBusinessObject baseBo = TestBusiness.buildOtm( staticModelManager );
-        baseBo.setName( "BaseBO" );
-        OtmContextualFacet inheritedCf = buildOtm( staticModelManager, baseBo );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject baseBo = TestBusiness.buildOtm( lib, "BaseBO" );
+        OtmContextualFacet inheritedCf = buildOtm( baseBo, "CF1" );
         assertTrue( "Given", !inheritedCf.isInherited() );
 
         OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
-        OtmContextualFacet cf = buildOtm( staticModelManager, bo );
-        bo.setName( "SubType" );
+        OtmContextualFacet cf = buildOtm( bo, "SubType" );
         assertTrue( "Given", !cf.isInherited() );
 
         // When - bo extends baseBo
@@ -286,13 +274,20 @@ public class TestCustomFacet extends TestContextualFacet {
         OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TheBO" );
         OtmBusinessObject bo2 = TestBusiness.buildOtm( lib, "TheOtherBO" );
         OtmContextualFacet cf = buildOtm( bo, "TheCF" );
+        OtmContributedFacet contrib = cf.getWhereContributed();
+        testContributedFacet( contrib, cf, bo );
 
         // When base type changed (moved)
         cf.setBaseType( bo2 );
         OtmContributedFacet newContrib = cf.getWhereContributed();
         // Then
+        assertTrue( "Old object must NOT have new contributor as child.", !bo.getChildren().contains( newContrib ) );
+        assertTrue( "Old object must NOT have old contributor as child.", !bo.getChildren().contains( contrib ) );
+        assertTrue( "New object must have child.", bo2.getChildren().contains( newContrib ) );
+        assertTrue( "getBaseType needs correct TL owner.", cf.getTL().getOwningEntity() == bo2.getTL() );
+        //
         assertTrue( cf.getBaseType() == bo2 );
-        assertTrue( contrib.getParent() == bo2 );
+        assertTrue( contrib.getParent() == bo2 ); // SEE CHOICE FACET
         assertTrue( newContrib == contrib );
         assertTrue( cf.getWhereContributed() == newContrib );
         assertTrue( contrib.getChildren().size() == newContrib.getChildren().size() );
@@ -301,37 +296,19 @@ public class TestCustomFacet extends TestContextualFacet {
 
     @Test
     public void testNestedContributedFacets() {
-        OtmContextualFacet nestedCF = buildOtm( staticModelManager );
+        // FIXME - what is this supposed to do???
+        OtmContextualFacet nestedCF = buildOtm( staticLib, "NestedCF" );
         TestOtmPropertiesBase.buildOneOfEach2( nestedCF );
 
         super.testNestedContributedFacets( nestedCF );
     }
-
-    // This test class is not set up to use test files
-    // /**
-    // * On load from file, the compiler delivers: LibraryMemberFactory - choiceF1 - ChoiceFacet created but no
-    // * contributed. TLOwner is set (FacetTestChoice). LibraryMemberFactory - choiceF1 - ChoiceFacet created but no
-    // * contributed. TLOwner is set (FacetTestChoice). LibraryMemberFactory - choiceF1A - ChoiceFacet created but no
-    // * contributed. TLOwner is set (ChoiceF1).
-    // *
-    // * WhereContributed computed when MemberTReeTable.createTreeItem checks where contributed Factory never used when
-    // * parent is contextual facet
-    // */
-    // @Test
-    // public void testNestedContributedFacetsFromFactory() {
-    // OtmModelManager mgr = new OtmModelManager( null, null, null );
-    //
-    // TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr );
-    // TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY1, mgr );
-    // TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY2, mgr );
-    // }
 
     @Test
     public void testWhenContributed() {
         // Given - a business object and contextual facet
         OtmLibrary lib = TestLibrary.buildOtm();
         OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
-        OtmContextualFacet cf = buildOtm( staticModelManager );
+        OtmContextualFacet cf = buildOtm( bo, "CF1" );
         // Was injected by buildOtm
         // assertTrue( "Has not been injected yet.", cf.getWhereContributed() == null );
 

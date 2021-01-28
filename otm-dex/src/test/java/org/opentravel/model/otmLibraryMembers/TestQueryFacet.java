@@ -46,16 +46,18 @@ public class TestQueryFacet extends TestContextualFacet {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
-        subject = buildOtm( staticModelManager );
-        baseObject = buildOtm( staticModelManager );
+        staticLib = TestLibrary.buildOtm();
+        staticModelManager = staticLib.getModelManager();
+        member = TestBusiness.buildOtm( staticLib, "MemberBO" );
+        subject = buildOtm( (OtmBusinessObject) member, "Subject" );
+        baseObject = buildOtm( (OtmBusinessObject) member, "Base" );
         // baseObject.setName( "BaseCF" );
     }
 
     @Before
     public void beforeTest() {
-        member = TestBusiness.buildOtm( staticModelManager );
-        cf = buildOtm( staticModelManager );
+        // member = TestBusiness.buildOtm( staticLib, "MemberBO" );
+        cf = buildOtm( (OtmBusinessObject) member, "QF1" );
         contrib = (OtmContributedFacet) member.add( cf );
         testContributedFacet( contrib, cf, member );
     }
@@ -101,7 +103,8 @@ public class TestQueryFacet extends TestContextualFacet {
         assertFalse( ((TLBusinessObject) member.getTL()).getCustomFacets().contains( cf.getTL() ) );
     }
 
-    /** ****************************************************** **/
+
+    /** ************************ Query Facet Builders ***************************** **/
 
     /**
      * Create query facet, add it to the model and inject onto the passed business object.
@@ -110,28 +113,31 @@ public class TestQueryFacet extends TestContextualFacet {
      * @param name
      */
     public static OtmQueryFacet buildOtm(OtmBusinessObject bo, String name) {
-        assertTrue( "Builder: must have model manager.", bo.getModelManager() != null );
+        assertTrue( "Builder: parameter must have model manager.", bo.getModelManager() != null );
+        assertTrue( "Builder: parameter must have library.", bo.getLibrary() != null );
         OtmQueryFacet qf = buildOtm( bo.getModelManager() );
+        bo.getLibrary().add( qf );
         qf.setName( name );
         bo.add( qf );
+
         testContributedFacet( qf.getWhereContributed(), qf, bo );
         return qf;
     }
 
-    /**
-     * Create query facet and contribute it to the passed business object.
-     * 
-     * @param modelManager
-     * @param bo
-     * @return
-     */
-    @Deprecated
-    public static OtmQueryFacet buildOtm(OtmModelManager modelManager, OtmBusinessObject bo) {
-        OtmQueryFacet cf = buildOtm( modelManager );
-        bo.add( cf );
-        testContributedFacet( cf.getWhereContributed(), cf, bo );
-        return cf;
-    }
+    // /**
+    // * Create query facet and contribute it to the passed business object.
+    // *
+    // * @param modelManager
+    // * @param bo
+    // * @return
+    // */
+    // @Deprecated
+    // public static OtmQueryFacet buildOtm(OtmModelManager modelManager, OtmBusinessObject bo) {
+    // OtmQueryFacet cf = buildOtm( modelManager );
+    // bo.add( cf );
+    // testContributedFacet( cf.getWhereContributed(), cf, bo );
+    // return cf;
+    // }
 
 
     /**
@@ -140,11 +146,10 @@ public class TestQueryFacet extends TestContextualFacet {
      * @param mgr
      * @return
      */
-    public static OtmQueryFacet buildOtm(OtmModelManager mgr) {
+    private static OtmQueryFacet buildOtm(OtmModelManager mgr) {
         OtmQueryFacet query = new OtmQueryFacet( buildTL(), mgr );
         assertNotNull( query );
         mgr.add( query );
-
         return query;
     }
 

@@ -142,13 +142,17 @@ public class TestLibrary extends AbstractFxTest {
     @Test
     public void testWhereUsedWhenDeleted() {
         // Given - a library
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = TestLibrary.buildOtm( mgr, "Namespace1", "p1", "Library1" );
+        // DexFullActionManager fullMgr = new DexFullActionManager( null );
+        // OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
+        // OtmLibrary lib = TestLibrary.buildOtm( mgr, "Namespace1", "p1", "Library1" );
+        // addOneOfEach( lib );
+
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmModelManager mgr = lib.getModelManager();
         addOneOfEach( lib );
 
         // Given an element to set and un-set assigned type
-        OtmCore core = TestCore.buildOtm( mgr, "TestCore" );
+        OtmCore core = TestCore.buildOtm( lib, "TestCore" );
         OtmElement<?> element = TestElement.buildOtm( core.getSummary() );
 
         ArrayList<OtmLibraryMember> members = new ArrayList<>( mgr.getMembers() );

@@ -77,18 +77,6 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
         return (TLCoreObject) tlObject;
     }
 
-    // @Override
-    // public OtmObject setBaseType(OtmObject baseObj) {
-    // if (baseObj instanceof OtmCore) {
-    // TLExtension tlExt = getTL().getExtension();
-    // if (tlExt == null)
-    // tlExt = new TLExtension();
-    // tlExt.setExtendsEntity( ((OtmCore) baseObj).getTL() );
-    // getTL().setExtension( tlExt );
-    // }
-    // return getBaseType();
-    // }
-
     @Override
     public String setName(String name) {
         getTL().setName( name );
@@ -240,20 +228,4 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
         if (getTL().getExtension() != null)
             log.warn( "TODO - model inherited children" );
     }
-
-    // @Override
-    // public void delete(OtmObject property) {
-    // // NO-OP - no delete-able children
-    // }
-
-
-    //
-    // @Override
-    // public ComponentNode createMinorVersionComponent() {
-    // TLBusinessObject tlMinor = (TLBusinessObject) createMinorTLVersion(this);
-    // if (tlMinor != null)
-    // return super.createMinorVersionComponent(new BusinessObjectNode(tlMinor));
-    // return null;
-    // }
-    //
 }

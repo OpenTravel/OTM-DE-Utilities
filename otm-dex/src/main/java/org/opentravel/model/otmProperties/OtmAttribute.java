@@ -109,7 +109,7 @@ public class OtmAttribute<T extends TLAttribute> extends OtmPropertyBase<TLAttri
 
     @Override
     public boolean isInherited() {
-        return getTL().getOwner() != getParent().getTL();
+        return getParent() != null && getTL().getOwner() != getParent().getTL();
     }
 
     @Override

@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.common.ValidationUtils;
+import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
@@ -78,6 +79,21 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         baseObject.setName( "BaseR" );
 
         exposedObject = TestBusiness.buildOtm( staticModelManager );
+    }
+
+    @Override
+    public void testInheritance(OtmResource otm) {
+        OtmResource base = (OtmResource) otm.getBaseType();
+        if (base == null)
+            return;
+
+        if (otm instanceof OtmChildrenOwner) {
+            List<OtmObject> otmInherited = otm.getInheritedChildren();
+            List<OtmObject> baseKids = ((OtmChildrenOwner) base).getChildren();
+            assertTrue( otmInherited != null );
+            assertTrue( baseKids != null );
+        }
+        super.testInheritance( otm );
     }
 
     @Test

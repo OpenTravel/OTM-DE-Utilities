@@ -109,7 +109,8 @@ public class TestResourceInheritance extends AbstractFxTest {
         // assertTrue( "Must be valid.", resource.isValid() );
 
         // Given - BO must have custom facets
-        OtmContextualFacet cf = TestCustomFacet.buildOtm( mgr, bo );
+        OtmContextualFacet cf = TestCustomFacet.buildOtm( bo, "CF2" );
+        cf.getLibrary().delete( cf );
         minorLibrary.add( cf );
         assertTrue( "Given: ", cf.getWhereContributed().getOwningMember() == bo );
         // TODO - move test into BO and allow for contributed facets

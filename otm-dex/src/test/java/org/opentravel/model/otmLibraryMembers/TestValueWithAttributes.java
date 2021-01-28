@@ -23,16 +23,21 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.actions.BaseTypeChangeAction;
 import org.opentravel.dex.actions.SetAssignedTypeAction;
+import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
+import org.opentravel.model.otmProperties.OtmAttribute;
+import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeType;
 import org.opentravel.schemacompiler.model.TLValueWithAttributes;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Verifies the functions of the <code>UserSettings</code> class.
@@ -44,23 +49,26 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null, null );
-        subject = buildOtm( staticModelManager );
-        baseObject = buildOtm( staticModelManager );
-        baseObject.setName( "BaseVWA" );
+        // staticModelManager = new OtmModelManager( null, null, null );
+        staticLib = TestLibrary.buildOtm();
+        staticModelManager = staticLib.getModelManager();
+        subject = buildOtm( staticLib, "SubjectVWA" );
+        baseObject = buildOtm( staticLib, "BaseVWA" );
+        // baseObject.setName( "BaseVWA" );
     }
 
-    public static OtmValueWithAttributes buildOtm(OtmModelManager mgr) {
+    /** *************** VWA Builders ********************* **/
+
+    private static OtmValueWithAttributes buildOtm(OtmModelManager mgr) {
         OtmTypeProvider simple = TestXsdSimple.buildOtm( mgr );
         OtmValueWithAttributes vwa = new OtmValueWithAttributes( buildTL( (TLAttributeType) simple.getTL() ), mgr );
         assertNotNull( vwa );
-
+        mgr.add( vwa );
 
         OtmTypeProvider p = vwa.getAssignedType();
         return vwa;
     }
 
-    /** ******************************************************** **/
 
     /**
      * @param lib
@@ -69,45 +77,63 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
      */
     public static OtmValueWithAttributes buildOtm(OtmLibrary lib, String name) {
         assertTrue( lib.isEditable() );
+        assertTrue( "Builder - trying to build a second VWA with same name.",
+            lib.getTL().getNamedMember( name ) == null );
+
         OtmValueWithAttributes vwa = buildOtm( lib.getModelManager() );
         vwa.setName( name );
         lib.add( vwa );
-        assertTrue( lib.contains( vwa ) );
+
+        assertTrue( "Builder - new TLVWA must be in TL library.", lib.getTL() == vwa.getTL().getOwningLibrary() );
+        assertTrue( "Builder - new TLVWA must be in TL Model.",
+            lib.getModelManager().getTlModel() == vwa.getTL().getOwningModel() );
+
+        assertTrue( "Builder - new VWA must be managed in library.", lib.contains( vwa ) );
+        assertTrue( "Builder - new VWA must be managed in model manager.",
+            lib.getModelManager().getMembers().contains( vwa ) );
+
         return vwa;
     }
+
+    // /**
+    // * @param mgr
+    // * @param string
+    // * @return
+    // */
+    // @Deprecated
+    // public static OtmValueWithAttributes buildOtm(OtmModelManager mgr, String string) {
+    // OtmValueWithAttributes vwa = buildOtm( mgr );
+    // vwa.setName( string );
+    // return vwa;
+    // }
+
+    //
+    // public static TLValueWithAttributes buildTL() {
+    // TLValueWithAttributes tlvwa = new TLValueWithAttributes();
+    // tlvwa.setName( NAME );
+    // // tlvwa.setParentType( TestXsdSimple.buildTL() );
+    //
+    // // add attributes
+    // int i = 1;
+    // while (i < 5) {
+    // TLAttribute tla = new TLAttribute();
+    // tla.setName( NAME + i );
+    // // tla.setType( TestXsdSimple.buildTL() );
+    // tlvwa.addAttribute( tla );
+    // i++;
+    // }
+    //
+    // // assertNotNull( tlvwa.getParentType() );
+    // assertTrue( tlvwa.getAttributes().size() == i - 1 );
+    // return tlvwa;
+    // }
 
     /**
-     * @param mgr
-     * @param string
+     * Create a TL Value With Attributes with 4 attribute children.
+     * 
+     * @param type if not null, set as parent type
      * @return
      */
-    public static OtmValueWithAttributes buildOtm(OtmModelManager mgr, String string) {
-        OtmValueWithAttributes vwa = buildOtm( mgr );
-        vwa.setName( string );
-        return vwa;
-    }
-
-
-    public static TLValueWithAttributes buildTL() {
-        TLValueWithAttributes tlvwa = new TLValueWithAttributes();
-        tlvwa.setName( NAME );
-        // tlvwa.setParentType( TestXsdSimple.buildTL() );
-
-        // add attributes
-        int i = 1;
-        while (i < 5) {
-            TLAttribute tla = new TLAttribute();
-            tla.setName( NAME + i );
-            // tla.setType( TestXsdSimple.buildTL() );
-            tlvwa.addAttribute( tla );
-            i++;
-        }
-
-        // assertNotNull( tlvwa.getParentType() );
-        assertTrue( tlvwa.getAttributes().size() == i - 1 );
-        return tlvwa;
-    }
-
     public static TLValueWithAttributes buildTL(TLAttributeType type) {
         TLValueWithAttributes tlvwa = new TLValueWithAttributes();
         tlvwa.setName( NAME );
@@ -128,19 +154,58 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
         return tlvwa;
     }
 
-    /** ****************************************************** **/
+    /** ***************** VWA extensions to standard tests ********************** **/
+
+    @Override
+    public void testChildrenOwner(OtmChildrenOwner otm) {
+        super.testChildrenOwner( otm );
+
+        OtmChildrenOwner co = (OtmChildrenOwner) otm;
+        List<OtmObject> kids = co.getChildren();
+        assertTrue( !kids.isEmpty() );
+
+        // assertTrue( !co.getChildrenHierarchy().isEmpty() );
+        // assertNotNull( co.getChildrenTypeProviders() );
+        // assertNotNull( co.getDescendantsTypeUsers() );
+        // assertNotNull( co.getDescendantsChildrenOwners() );
+        // assertNotNull( co.getDescendantsTypeUsers() );
+        // log.debug( "Children owner methods OK." );
+    }
+
+    @Override
+    public void testInheritance(OtmValueWithAttributes otm) {
+
+        OtmValueWithAttributes base = (OtmValueWithAttributes) otm.getBaseType();
+        List<OtmObject> baseKids = ((OtmChildrenOwner) base).getChildren();
+        assertTrue( "Given: base VWA must have children.", baseKids.size() >= 4 );
+
+        List<OtmObject> otmInherited = otm.getInheritedChildren();
+
+        // If inherited children are missing, check how the inherited children are modeled.
+        if (otmInherited.size() != baseKids.size()) {
+            baseKids.forEach( k -> assertTrue( "Only attributes, no indicators.", k instanceof OtmAttribute ) );
+            // TODO - make more robust
+            // tlList.addAll( PropertyCodegenUtils.getInheritedIndicators( otm.getTL() ));
+            // Check - Inherited children are found using property code gen utils.
+            List<TLAttribute> tlList = PropertyCodegenUtils.getInheritedAttributes( otm.getTL() );
+            assertTrue( "Then - inherited tl list must be same size as base list.", tlList.size() == baseKids.size() );
+        }
+        super.testInheritance( otm );
+    }
+
+    /** *************** VWA Specific Tests **************** **/
 
     @Test
     public void testDescendentsTypeUsers() {
-        OtmValueWithAttributes vwa = buildOtm( staticModelManager, "TestVwa" );
+        OtmValueWithAttributes vwa = buildOtm( staticLib, "TestDescendentsVwa" );
         Collection<OtmTypeUser> d = vwa.getDescendantsTypeUsers();
         assertTrue( !d.isEmpty() );
     }
 
     @Test
     public void testBaseType() {
-        OtmValueWithAttributes vwa = buildOtm( staticModelManager, "TestVwa" );
-        OtmValueWithAttributes baseVwa = buildOtm( staticModelManager, "BaseVwa" );
+        OtmValueWithAttributes vwa = buildOtm( staticLib, "TestVwa" );
+        OtmValueWithAttributes baseVwa = buildOtm( staticLib, "BaseVwa" );
 
         OtmValueWithAttributes base = vwa.getBaseType();
         vwa.setBaseType( baseVwa );
@@ -152,7 +217,8 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
     public void TestVWAasBaseAndValueType() {
         // Determine and assure Value and Base type are correct.
         // OtmModelManager mgr = TestOtmModelManager.build();
-        OtmLibrary lib = TestLibrary.buildOtm( staticModelManager, "http://example.com", "ex", "lib1" );
+        // OtmLibrary lib = TestLibrary.buildOtm( staticModelManager, "http://example.com", "ex", "lib1" );
+        OtmLibrary lib = TestLibrary.buildOtm();
         OtmValueWithAttributes vwa1 = buildOtm( lib, "TestVWA1" );
         OtmValueWithAttributes vwa2 = buildOtm( lib, "TestVWA2" );
         OtmValueWithAttributes vwa3 = buildOtm( lib, "TestVWA3" );

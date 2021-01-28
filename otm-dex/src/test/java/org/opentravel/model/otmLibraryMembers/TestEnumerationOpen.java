@@ -116,6 +116,7 @@ public class TestEnumerationOpen extends TestOtmLibraryMemberBase<OtmEnumeration
 
     public static OtmEnumerationOpen buildOtm(OtmModelManager mgr) {
         OtmEnumerationOpen oto = new OtmEnumerationOpen( buildTL(), mgr );
+        mgr.add( oto );
         assertNotNull( oto );
         assertTrue( "Given", oto.getChildren().size() == LITERALCOUNT );
         return oto;

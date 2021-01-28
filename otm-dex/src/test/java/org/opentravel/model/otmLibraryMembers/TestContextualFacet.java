@@ -67,9 +67,30 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         staticModelManager = new OtmModelManager( null, null, null );
         // Needed for library member tests
         subject = TestChoiceFacet.buildOtm( staticModelManager );
-        baseObject = TestChoice.buildOtm( staticModelManager );
+        baseObject = TestChoiceFacet.buildOtm( staticModelManager );
     }
 
+    /** *************** Contextual facet overrides ********************/
+    @Override
+    public OtmContextualFacet extendObject(OtmContextualFacet base, OtmContextualFacet extension) {
+        // This sets injection site, not base type.
+        OtmObject result = extension.setBaseType( base );
+
+        assertTrue( result == base );
+        assertTrue( extension.getBaseType() != null );
+        assertTrue( extension.getBaseType() == base );
+        // Not true for injection.
+        // assertTrue( base.getWhereUsed().contains( extension ) );
+
+        return extension;
+    }
+
+    @Override
+    public void testInheritance(OtmContextualFacet otm) {
+        // Nothing to test - properties are not inherited from base object
+    }
+
+    /** *************** Static Contextual Facet Tests ********************/
 
     public static void testContributedFacet(OtmContributedFacet contrib, OtmContextualFacet cf, OtmLibraryMember lm) {
         log.debug( "Testing contributed facet: " + cf );
@@ -91,15 +112,16 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         //
         assertTrue( "Both facets have same TL facet", cf.getTL() == contrib.getTL() );
         assertTrue( "TL is a TLContextual facet", cf.getTL() instanceof TLContextualFacet );
-        if (cf instanceof OtmCustomFacet)
+        if (cf instanceof OtmCustomFacet && lm instanceof OtmBusinessObject)
             assertTrue( "Member's TL must have contributor's TL. ",
                 ((TLBusinessObject) lm.getTL()).getCustomFacets().contains( contrib.getTL() ) );
-        if (cf instanceof OtmQueryFacet)
+        if (cf instanceof OtmQueryFacet && lm instanceof OtmBusinessObject)
             assertTrue( "Member's TL must have contributor's TL. ",
                 ((TLBusinessObject) lm.getTL()).getQueryFacets().contains( contrib.getTL() ) );
-        if (cf instanceof OtmChoiceFacet)
+        if (cf instanceof OtmChoiceFacet && lm instanceof OtmChoiceObject)
             assertTrue( "Member's TL must have contributor's TL. ",
                 ((TLChoiceObject) lm.getTL()).getChoiceFacets().contains( contrib.getTL() ) );
+        // TODO - test if LM is contextual facet
 
         // Verify the contributed owner is the same as the TL contextual facet's owner
         if (cf.getTL().getOwningEntity() != null && cf.getWhereContributed() != null)
@@ -219,6 +241,36 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         member.delete( cf );
         assertFalse( member.getChildren().contains( contrib ) );
     }
+
+    // /**
+    // */
+    //
+    // @Test
+    // public void testOpenedContextualFacets() {
+    // OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+    // // Given a project that uses local library files
+    // TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
+    // for (OtmLibrary lib : mgr.getLibraries())
+    // log.debug( "Library " + lib + " opened." );
+    // assertTrue( "Must have project items.", !mgr.getProjectManager().getAllProjectItems().isEmpty() );
+    //
+    // for (OtmLibraryMember m : mgr.getMembers()) {
+    // if (m instanceof OtmContextualFacet) {
+    // OtmContributedFacet contrib = ((OtmContextualFacet) m).getWhereContributed();
+    // OtmLibraryMember base = ((OtmContextualFacet) m).getContributedObject();
+    // if (contrib != null && base != null)
+    // TestContextualFacet.testContributedFacet( contrib, (OtmContextualFacet) m, base );
+    // else {
+    // String oeName = ((TLContextualFacet) m.getTL()).getOwningEntityName();
+    // log.debug( "Bad contextual facet: " + m + " Entity name = " + oeName );
+    // for (OtmLibraryMember candidate : mgr.getMembers()) {
+    // if (candidate.getNameWithPrefix().equals( oeName ))
+    // log.debug( "Name Match Found " );
+    // }
+    // }
+    // }
+    // }
+    // }
 
 
     @Test

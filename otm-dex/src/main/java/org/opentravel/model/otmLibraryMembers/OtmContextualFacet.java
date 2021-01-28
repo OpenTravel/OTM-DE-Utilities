@@ -131,24 +131,6 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
     public void addAlias(TLAlias tla) {
         // NO-OP
     }
-    // public OtmContextualFacet addCF(OtmContextualFacet child) {
-    // if (children == null)
-    // children = new ArrayList<>();
-    // else if (contains( children, child ))
-    // return null;
-    //
-    // if (inheritedChildren == null)
-    // inheritedChildren = new ArrayList<>();
-    // else if (contains( inheritedChildren, child ))
-    // return null;
-    //
-    // if (!child.isInherited())
-    // children.add( child );
-    // else
-    // inheritedChildren.add( child );
-    // return child;
-    // }
-
 
     @Override
     public StringProperty baseTypeProperty() {
@@ -243,11 +225,6 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         return ImageManager.Icons.FACET_CONTEXTUAL;
     }
 
-    // @Override
-    // public boolean isExpanded() {
-    // return true;
-    // }
-
     @Override
     public List<OtmObject> getInheritedChildren() {
         return Collections.emptyList();
@@ -259,10 +236,7 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
      */
     @Override
     public String getName() {
-        // String ln = getTL().getLocalName(); // ObjectName_FacetName
-        // String sn = getTL().getName(); // FacetName
         return getTL().getLocalName();
-        // return this.getClass().getSimpleName();
     }
 
     /**
@@ -417,7 +391,7 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
 
             // 1/23/2021 - changed to add to owner instead of setting owning entity
             setOwningEntity( lm );
-            //// TODO: Dave - Please review this change to make sure there are no unintended consequences
+            //// DONE: Dave - Please review this change to make sure there are no unintended consequences
             //// Set the TL Owning entity
             //// getTL().setOwningEntity( (TLFacetOwner) lm.getTL() );
             //// setOwningEntity( getTL(), (TLFacetOwner) lm.getTL() );
@@ -441,40 +415,6 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
         if (owner instanceof OtmContextualFacet)
             ((OtmContextualFacet) owner).getTL().addChildFacet( getTL() );
     }
-
-    // /**
-    // * When assigning the owner of a facet, the relationship must be established by adding the facet to the owner -
-    // not
-    // * simply by directly assigning the owning entity of the facet. By assigning it to the owner, not only will the
-    // * facet assignment be done, but the owner will be aware that the facet was added as one of its children.
-    // *
-    // * @param facet the contextual facet whose owner is to be assigned
-    // * @param owningEntity the entity that will own the facet
-    // */
-    // private void setOwningEntity(TLContextualFacet facet, TLFacetOwner owningEntity) {
-    // if (owningEntity instanceof TLContextualFacet) {
-    // ((TLContextualFacet) owningEntity).addChildFacet( facet );
-    //
-    // } else {
-    // switch (facet.getFacetType()) {
-    // case CUSTOM:
-    // ((TLBusinessObject) owningEntity).addCustomFacet( facet );
-    // break;
-    // case QUERY:
-    // ((TLBusinessObject) owningEntity).addQueryFacet( facet );
-    // break;
-    // case UPDATE:
-    // ((TLBusinessObject) owningEntity).addUpdateFacet( facet );
-    // break;
-    // case CHOICE:
-    // ((TLChoiceObject) owningEntity).addChoiceFacet( facet );
-    // break;
-    // default:
-    // // Fallback default behavior (but should never happen)
-    // facet.setOwningEntity( owningEntity );
-    // }
-    // }
-    // }
 
     @Override
     public String setName(String name) {

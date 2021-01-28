@@ -78,6 +78,7 @@ public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
      */
     public static OtmCore buildOtm(OtmModelManager mgr) {
         OtmCore core = new OtmCore( buildTL(), mgr );
+        mgr.add( core );
         assertNotNull( core );
         core.setAssignedType( TestXsdSimple.buildOtm( mgr ) );
         // core.getTL().getSummaryFacet().addAttribute( new TLAttribute() );
@@ -89,6 +90,7 @@ public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
 
         assertTrue( core.getChildren().size() > 3 );
         assertTrue( core.getSummary().getChildren().size() == 2 );
+        assertTrue( "Builder - must be managed.", mgr.getMembers().contains( core ) );
         return core;
     }
 

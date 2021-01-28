@@ -77,12 +77,11 @@ public class TestChoiceFacet extends TestContextualFacet {
 
     @Test
     public void testMovingFacet() {
-        // Given - a cf contributed to a bo
-        OtmChoiceObject co = TestChoice.buildOtm( staticModelManager );
-        OtmChoiceObject co2 = TestChoice.buildOtm( staticModelManager );
-        co2.setName( "TheOtherBO" );
-        OtmContextualFacet cf = buildOtm( staticModelManager );
-        OtmContributedFacet contrib = co.add( cf );
+        // Given - a cf contributed to a choice
+        OtmChoiceObject co = TestChoice.buildOtm( staticLib, "FirstChoice" );
+        OtmChoiceObject co2 = TestChoice.buildOtm( staticLib, "SecondChoice" );
+        OtmContextualFacet cf = buildOtm( co, "CHF1" );
+        OtmContributedFacet contrib = cf.getWhereContributed();
         testContributedFacet( contrib, cf, co );
 
         // When base type changed (moved)
@@ -169,23 +168,26 @@ public class TestChoiceFacet extends TestContextualFacet {
     @Test
     public void testDeletingAsLibraryMember() {
         // Given - a Choice object and contextual facet
-        OtmChoiceObject co1 = TestChoice.buildOtm( staticModelManager );
-        OtmContextualFacet cf1 = buildOtm( staticModelManager );
-        OtmContributedFacet contrib = co1.add( cf1 );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmChoiceObject co1 = TestChoice.buildOtm( lib, "CH1" );
+        OtmContextualFacet cf1 = buildOtm( co1, "CHF1" );
+        OtmContributedFacet contrib = cf1.getWhereContributed();
+        // OtmContributedFacet contrib = co1.add( cf1 );
 
         // Given - a second choice object and contextual facet
-        OtmChoiceObject co2 = TestChoice.buildOtm( staticModelManager );
-        co2.setName( co2.getName() + "2" );
-        OtmChoiceFacet cf2 = buildOtm( staticModelManager );
-        OtmContributedFacet contrib2 = co2.add( cf2 );
-        cf2.setName( cf2.getName() + "2" );
+        OtmChoiceObject co2 = TestChoice.buildOtm( lib, "CH2" );
+        // co2.setName( co2.getName() + "2" );
+        OtmChoiceFacet cf2 = buildOtm( co2, "CHF2" );
+        OtmContributedFacet contrib2 = cf2.getWhereContributed();
+        // OtmContributedFacet contrib2 = co2.add( cf2 );
+        // cf2.setName( cf2.getName() + "2" );
 
         // Given - a library for the objects
-        OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
-        addAndTest( co1, lib );
-        addAndTest( co2, lib );
-        addAndTest( cf1, lib );
-        addAndTest( cf2, lib );
+        // OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
+        // addAndTest( co1, lib );
+        // addAndTest( co2, lib );
+        // addAndTest( cf1, lib );
+        // addAndTest( cf2, lib );
         //
         testContributedFacet( contrib, cf1, co1 );
         testContributedFacet( contrib2, cf2, co2 );

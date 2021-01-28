@@ -16,10 +16,14 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.opentravel.model.OtmChildrenOwner;
+import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.schemacompiler.model.XSDSimpleType;
 import org.w3._2001.xmlschema.TopLevelSimpleType;
@@ -34,8 +38,17 @@ public class TestXsdSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
     public static void beforeClass() {
         staticModelManager = new OtmModelManager( null, null, null );
         subject = buildOtm( staticModelManager );
-        baseObject = buildOtm( staticModelManager );
-        baseObject.setName( "BaseSimple" );
+        baseObject = null;
+    }
+
+    @Override
+    public void testConstructors(OtmXsdSimple otm) {
+        assertNotNull( otm );
+        assertTrue( "Must be its own owner", otm.getOwningMember() == otm );
+        assertTrue( "Must have identity listner.", OtmModelElement.get( otm.getTL() ) == otm );
+        // if (otm.getModelManager() != null)
+        // assertTrue( "Must be managed in model manager.", otm.getModelManager().getMembers().contains( otm ) );
+        log.debug( "Simple Constuctor OK." );
     }
 
 
@@ -52,10 +65,11 @@ public class TestXsdSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
         // NO-OP
     }
 
-    /** ****************************************************** **/
+    /** ****************** Static XSD Simple builders ************************************ **/
 
     public static OtmXsdSimple buildOtm(OtmModelManager mgr) {
         OtmXsdSimple simple = new OtmXsdSimple( buildTL(), mgr );
+        // mgr.add( simple );
         return simple;
     }
 

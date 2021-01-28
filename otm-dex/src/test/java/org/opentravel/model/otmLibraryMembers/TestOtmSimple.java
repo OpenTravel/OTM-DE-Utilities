@@ -34,10 +34,9 @@ public class TestOtmSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         subject = buildOtm( staticModelManager );
-        baseObject = buildOtm( staticModelManager );
-        baseObject.setName( "BaseSimple" );
+        baseObject = null;
     }
 
 
@@ -74,6 +73,7 @@ public class TestOtmSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
     public static OtmSimpleObject buildOtm(OtmModelManager mgr) {
         OtmSimpleObject simple = new OtmSimpleObject( buildTL(), mgr );
         simple.setAssignedType( TestXsdSimple.buildOtm( mgr ) );
+        mgr.add( simple );
         return simple;
     }
 

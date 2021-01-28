@@ -96,25 +96,10 @@ public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
             result = super.add( child );
             if (child instanceof OtmContributedFacet && ((OtmContributedFacet) child).getContributor() != null) {
                 ((OtmContributedFacet) child).getContributor().setOwningEntity( this );
-                // getTL().addChoiceFacet( ((OtmContributedFacet) child).getTL() );
-                // ((OtmContributedFacet) child).getTL().setOwningEntity( getTL() );
             }
             return result;
         }
     }
-
-    // @Override
-    // public OtmObject setBaseType(OtmObject baseObj) {
-    // if (baseObj instanceof OtmChoiceObject) {
-    // TLExtension tlExt = getTL().getExtension();
-    // if (tlExt == null)
-    // tlExt = new TLExtension();
-    // tlExt.setExtendsEntity( ((OtmChoiceObject) baseObj).getTL() );
-    // getTL().setExtension( tlExt );
-    // }
-    // return getBaseType();
-    // }
-
 
     @Override
     public void refresh() {
@@ -147,12 +132,6 @@ public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
         for (OtmContributedFacet contrib : contribs) {
             copy.delete( contrib );
         }
-
-        // if (!copy.getChildrenContributedFacets().isEmpty())
-        // log.warn( "Error - still has contributed facets." );
-        // if (!((TLBusinessObject) copy.getTL()).getCustomFacets().isEmpty())
-        // log.warn( "Error - still has custom facets." );
-
         log.debug( "Copied a Choice object." + copy.getChildren() );
         return (OtmChoiceObject) copy;
     }

@@ -101,7 +101,7 @@ public class TestMemberSprite extends AbstractFxTest {
         OtmBusinessObject bo = TestBusiness.buildOtm( lib, "Bo1" );
         OtmElement<?> propertyBO = TestElement.buildOtm( bo.getSummary() );
         propertyBO.setAssignedType( core );
-        OtmQueryFacet cf = TestQueryFacet.buildOtm( mgr, bo );
+        OtmQueryFacet cf = TestQueryFacet.buildOtm( bo, "QF1" );
         OtmElement<?> propertyCF = TestElement.buildOtm( cf );
         propertyCF.setAssignedType( core );
 
