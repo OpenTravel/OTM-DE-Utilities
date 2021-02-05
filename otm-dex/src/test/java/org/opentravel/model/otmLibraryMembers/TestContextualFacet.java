@@ -99,17 +99,23 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         assertTrue( lm != null );
         if (lm.getLibrary() != null)
             assertTrue( cf.getLibrary() != null );
-        //
+
+        // Library Member Tests
+        assertTrue( "Library member has contributor child.", lm.getChildren().contains( contrib ) );
+        assertTrue( "Library Member must contain contributed facet.",
+            lm.getChildrenContributedFacets().contains( contrib ) );
+
+        // Contributed Facet Tests
         assertTrue( contrib.getParent() == lm );
         assertTrue( contrib.getActionManager() != null );
         assertTrue( contrib.getModelManager() != null );
         assertTrue( "Contributor must be owned by Library member.", contrib.getOwningMember() == lm );
         assertTrue( "Contextual facet must have contributed object.", cf.getContributedObject() == lm );
-        assertTrue( "Library member has contributor child.", lm.getChildren().contains( contrib ) );
         assertTrue( "Contributor linked to contextual facet.", contrib.getContributor() == cf );
         assertTrue( "Contextual facet knows where it is contributed.", cf.getWhereContributed() == contrib );
         assertTrue( "Model manager must have facet as member.", lm.getModelManager().getMembers().contains( cf ) );
-        //
+
+        // TL Facet Tests
         assertTrue( "Both facets have same TL facet", cf.getTL() == contrib.getTL() );
         assertTrue( "TL is a TLContextual facet", cf.getTL() instanceof TLContextualFacet );
         if (cf instanceof OtmCustomFacet && lm instanceof OtmBusinessObject)

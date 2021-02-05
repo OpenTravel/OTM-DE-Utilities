@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.common.ValidationUtils;
+import org.opentravel.dex.actions.SetLibraryAction;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
@@ -78,11 +79,13 @@ public class TestResourceInheritance extends AbstractFxTest {
         if (!TestDexFileHandler.loadVersionProject( mgr ))
             return; // No editable libraries
 
+        // Given - the latest minor in the chain
         OtmLibrary minorLibrary = TestVersionChain.getMinorInChain( mgr );
         assertTrue( "Given", minorLibrary != null );
         assertTrue( "Given", minorLibrary.isEditable() );
         assertTrue( "Given - minor is empty.", mgr.getMembers( minorLibrary ).isEmpty() );
 
+        // Given - a business object from the Major version of the library
         OtmLibrary majorLibrary = minorLibrary.getVersionChain().getMajor();
         assertTrue( "Given", majorLibrary != null );
         assertTrue( "Given", !majorLibrary.isEditable() );
@@ -96,7 +99,7 @@ public class TestResourceInheritance extends AbstractFxTest {
         assertTrue( "Given - business object must be found.", bo != null );
         assertTrue( "Business object must be valid.", bo.isValid( true ) );
 
-        // Given - a minor version of the business object
+        // Given - create a minor version of the business object
         OtmBusinessObject minorBO = (OtmBusinessObject) bo.createMinorVersion( minorLibrary );
         assertTrue( "Must have a minor business object.", minorBO != null );
 
@@ -104,18 +107,20 @@ public class TestResourceInheritance extends AbstractFxTest {
         OtmResource resource = TestResource.buildFullOtm( "http://example.com", "TestResource", minorLibrary, mgr );
         resource.setSubject( bo );
         assertTrue( "Given: ", resource.getSubject() == bo );
-        resource.isValid( true );
+        // Not Valid: The referenced facet is not declared or inherited by the owning resource's business object
+        // "Bo010".
+        // resource.isValid( true );
         // log.debug( ValidationUtils.getMessagesAsString( resource.getFindings() ) );
         // assertTrue( "Must be valid.", resource.isValid() );
 
         // Given - BO must have custom facets
         OtmContextualFacet cf = TestCustomFacet.buildOtm( bo, "CF2" );
-        cf.getLibrary().delete( cf );
-        minorLibrary.add( cf );
-        assertTrue( "Given: ", cf.getWhereContributed().getOwningMember() == bo );
-        // TODO - move test into BO and allow for contributed facets
-        // TestBusiness.
-        // assertTrue( "Given: ", TestResource.hasCustomFacet( bo.getChildren() ) );
+        TestContextualFacet.testContributedFacet( cf.getWhereContributed(), cf, bo );
+        // Given - move new facet to minor library
+        SetLibraryAction action = new SetLibraryAction();
+        action.setSubject( cf );
+        action.doIt( minorLibrary );
+        TestContextualFacet.testContributedFacet( cf.getWhereContributed(), cf, bo );
 
         List<OtmObject> baseBoFacets = resource.getSubjectFacets();
         resource.setSubject( minorBO );

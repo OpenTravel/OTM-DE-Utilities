@@ -233,7 +233,8 @@ public class TestDexFileHandler extends AbstractFxTest {
         for (OtmLibrary lib : libs)
             if (lib.isEditable())
                 editable = true;
-        log.warn( "No editable libraries. Check access to repository for libraries in " + FILE_TESTVERSIONS_REPO );
+        if (!editable)
+            log.warn( "No editable libraries. Check access to repository for libraries in " + FILE_TESTVERSIONS_REPO );
         return editable;
     }
 

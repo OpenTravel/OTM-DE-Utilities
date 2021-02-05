@@ -105,6 +105,7 @@ public class TestCustomFacet extends TestContextualFacet {
         cf.setName( name );
         if (bo.getLibrary() != null)
             bo.getLibrary().add( cf );
+
         testContributedFacet( cf.getWhereContributed(), cf, bo );
         return cf;
     }
