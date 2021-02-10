@@ -46,10 +46,15 @@ public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
 
     @BeforeClass
     public static void beforeClass() {
+        // staticLib = TestLibrary.buildOtm();
+        // staticModelManager = staticLib.getModelManager();
+        // subject = buildOtm( staticLib, "SubjectCH" );
+        // baseObject = buildOtm( staticLib, "BaseCH" );
         staticModelManager = new OtmModelManager( null, null, null );
-        staticLib = TestLibrary.buildOtm( staticModelManager );
-        subject = buildOtm( staticLib, "SubjectCH" );
-        baseObject = buildOtm( staticLib, "BaseCH" );
+        subject = buildOtm( staticModelManager );
+        subject.setName( "SubjectCH" );
+        baseObject = buildOtm( staticModelManager );
+        baseObject.setName( "BaseCH" );
     }
 
     @Override
@@ -107,8 +112,15 @@ public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
         // testCopySteps( member ); // Test each step in the copy process
 
         OtmChoiceObject co = (OtmChoiceObject) member;
+
+        // Assure member is in a library and has a choice facet
+        if (co.getLibrary() == null) {
+            OtmLibrary lib = TestLibrary.buildOtm( co.getModelManager() );
+            lib.add( co );
+        }
+        TestChoiceFacet.buildOtm( co, "OriginalCF" );
         assertTrue( "Given: must have contributed facet.", !co.getChildrenContributedFacets().isEmpty() );
-        List<OtmObject> kids_member = co.getChildren();
+        // List<OtmObject> kids_member = co.getChildren();
 
         // When - copied
         OtmChoiceObject copy = co.copy();
@@ -130,15 +142,27 @@ public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
      * @return
      */
     public static OtmChoiceObject buildOtm(OtmLibrary library, String name) {
-        assertTrue( "Library must have model manager.", library.getModelManager() != null );
-        OtmChoiceObject ch = new OtmChoiceObject( buildTL_WithProperties(), library.getModelManager() );
-        if (name != null)
-            ch.setName( name );
+        assertTrue( "Builder Parameter Error: Library must have model manager.", library.getModelManager() != null );
+
+        // CoName = name; // set global static
+        OtmChoiceObject ch = buildOtm( library.getModelManager() );
+        ch.setName( name );
         library.add( ch );
 
-        TestChoiceFacet.buildOtm( ch, "CHF1" );
+        for (OtmContributedFacet cf : ch.getChildrenContributedFacets()) {
+            assertTrue( "Contributed facet must have contributor.", cf.getContributor() != null );
+            library.add( cf.getContributor() );
+            assertTrue( "Contributor must be in library.", library.contains( cf.getContributor() ) );
+        }
 
-        assertTrue( ch.getLibrary() == library );
+        // OtmChoiceObject ch = new OtmChoiceObject( buildTL_WithProperties(), library.getModelManager() );
+        // if (name != null)
+        // ch.setName( name );
+        // library.add( ch );
+        //
+        // TestChoiceFacet.buildOtm( ch, "CHF1" );
+
+        assertTrue( "Builder error: wrong library", ch.getLibrary() == library );
         assertTrue( library.getTL().getNamedMembers().contains( ch.getTL() ) );
         assertTrue( !ch.getChildren().isEmpty() );
         assertTrue( ch.getShared() != null );
@@ -162,9 +186,11 @@ public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
         assertTrue( !ch.getChildren().isEmpty() );
         assertTrue( ch.getShared().getChildren().size() == 2 );
 
-        TestChoiceFacet.buildOtm( mgr, ch );
+        // TestChoiceFacet.buildOtm( ch, CH_NAME );
         return ch;
     }
+
+    /** ******************************** Static TL Choice Builders ********************/
 
     public static TLChoiceObject buildTL() {
         TLChoiceObject tlch = new TLChoiceObject();

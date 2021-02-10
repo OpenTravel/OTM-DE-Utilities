@@ -198,21 +198,19 @@ public class TestLibraryMemberBase {
      * 
      * @param subject
      * @return the new member set as base type
-     * @throws ExceptionInInitializerError
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
      */
     public static OtmLibraryMember testBaseType(OtmLibraryMember subject) throws ExceptionInInitializerError,
         InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        // Get another of the same type
+
+        // Build another of the same type
         OtmLibraryMember base = OtmLibraryMemberType.buildMember( OtmLibraryMemberType.get( subject ),
             "Base" + subject.getName(), subject.getModelManager() );
+
         // When - extension set
         if (subject.getLibrary() != null)
             subject.getLibrary().add( base );
         OtmObject result = subject.setBaseType( base );
+
         // Then
         if (subject.getTL() instanceof TLExtensionOwner) {
             assertTrue( "Then", ((TLExtensionOwner) subject.getTL()).getExtension() != null );

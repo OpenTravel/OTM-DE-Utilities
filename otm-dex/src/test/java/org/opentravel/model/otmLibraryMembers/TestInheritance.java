@@ -83,13 +83,24 @@ public class TestInheritance extends AbstractFxTest {
      * Uses {@link TestResource#hasCustomFacets()}
      * 
      * @throws VersionSchemeException
+     * @throws InterruptedException
      */
     @Test
-    public void testInheritedCustomFacets() throws VersionSchemeException {
+    public void testInheritedCustomFacets() throws VersionSchemeException, InterruptedException {
         // Given - the unmanaged project with lots of contextual facets
         mgr.clear();
-        TestDexFileHandler.loadUnmanagedProject( mgr );
+        TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
         assertTrue( mgr.getTlModel().getAllLibraries().size() == 6 );
+
+        // Wait for type resolver and validation tasks to complete
+        // Consider moving this into TestDexFileHandler
+        int waitCount = 0;
+        while (mgr.getBackgroundTaskCount() > 0) {
+            // no-op
+            waitCount++;
+            Thread.sleep( 100 ); // doesn't matter how long this runs
+        }
+        log.debug( "Waited " + waitCount + " iterations." );
 
         // Given - list of tl contextual facets
         List<TLContextualFacet> tlCFacets = new ArrayList<>();
@@ -99,8 +110,6 @@ public class TestInheritance extends AbstractFxTest {
                     tlCFacets.add( (TLContextualFacet) tlm );
         }
 
-        // Given - tl projects added to manager
-        mgr.addProjects();
         Collection<OtmLibrary> libs = mgr.getUserLibraries();
         Collection<OtmLibraryMember> members = mgr.getMembers();
 
@@ -110,43 +119,47 @@ public class TestInheritance extends AbstractFxTest {
             if (m instanceof OtmContextualFacet)
                 cFacets.add( (OtmContextualFacet) m );
         } );
-        // Collection<OtmLibraryMember> cFacets = mgr.getMembersContextualFacets();
 
         // Givens
-        assertTrue( !libs.isEmpty() );
+        assertTrue( libs.size() == 4 );
         assertTrue( !members.isEmpty() );
         assertTrue( tlCFacets.size() >= 24 );
         assertTrue( cFacets.size() >= 24 );
+        assertTrue( cFacets.size() == tlCFacets.size() );
 
-        // Then - check TL facets and add those missing owning entity to list
-        List<TLContextualFacet> tlcfs_MissingOwningEntity = new ArrayList<>();
-        List<OtmContextualFacet> cfs_MissingOwningEntity = new ArrayList<>();
-        Map<String,TLContextualFacet> knownFacets = new HashMap<>();
-
+        // Verify the TL Contextual Facets have facade, and owning: Model, Library and Entity Name
         for (TLContextualFacet tlcf : tlCFacets) {
             assertTrue( tlcf != null );
             assertTrue( tlcf.getOwningModel() != null );
             assertTrue( tlcf.getOwningLibrary() != null );
             assertTrue( tlcf.getOwningEntityName() != null );
+            assertTrue( (OtmContextualFacet) OtmModelElement.get( tlcf ) != null );
+            assertTrue( tlcf.getChildFacets() != null ); // May be empty
+        }
 
-            OtmContextualFacet cf = (OtmContextualFacet) OtmLibraryMemberBase.get( tlcf );
-            String localName = tlcf.getOwningLibrary().getPrefix() + ":" + tlcf.getLocalName();
-            String otmName = cf.getName();
-            assertTrue( cf != null );
+        // Then - check TL facets and add those missing owning entity to list
+        List<TLContextualFacet> tlcfs_MissingOwningEntity = new ArrayList<>();
+        Map<String,TLContextualFacet> knownFacets = new HashMap<>();
+
+        for (TLContextualFacet tlcf : tlCFacets) {
+            OtmContextualFacet cf = (OtmContextualFacet) OtmModelElement.get( tlcf );
 
             // Separate out those whose owning entity is known from those not known
             if (tlcf.getOwningEntity() == null) {
-                log.debug( tlcf.getName() + " is missing Owning entity named: " + tlcf.getOwningEntityName() );
                 tlcfs_MissingOwningEntity.add( tlcf );
-                cfs_MissingOwningEntity.add( cf );
-                // assertTrue( localName.startsWith( "UNKNOWN" ) );
             } else {
-                // assertTrue( !localName.startsWith( "UNKNOWN" ) );
-                knownFacets.put( localName, tlcf );
-                log.debug( "Added " + localName + " to knownFacets map." );
+                // Get a prefix:localName to use in the map of known facets
+                String nameWithPrefix = tlcf.getOwningLibrary().getPrefix() + ":" + tlcf.getLocalName();
+                knownFacets.put( nameWithPrefix, tlcf );
             }
-            assertTrue( tlcf.getChildFacets() != null );
         }
+        // Print out the two lists
+        for (TLContextualFacet tlcf : knownFacets.values())
+            log.debug( "Known " + tlcf.getName() + "\t LocalName = " + tlcf.getOwningLibrary().getPrefix() + " "
+                + tlcf.getLocalName() );
+        for (TLContextualFacet tlcf : tlcfs_MissingOwningEntity)
+            log.debug( "Unknown " + tlcf.getOwningLibrary().getPrefix() + " " + tlcf.getName() + "\t Owner   = "
+                + tlcf.getOwningEntityName() );
 
         // Debugging output
         libs.forEach( l -> log.debug( l.getPrefix() ) );
@@ -154,54 +167,41 @@ public class TestInheritance extends AbstractFxTest {
         log.debug( knownFacets.size() + " tl contextual facets have owning entity." );
         log.debug( "" );
 
-        // // Check - to see if any of the missing owning entities are in the map.
-        // // They are NOT.
-        // for (TLContextualFacet tlcf : tlcfs_MissingOwningEntity) {
-        // log.debug( tlcf.getName() + " is searching map trying to find owner named: " + tlcf.getOwningEntityName() );
-        // TLContextualFacet candidate = knownFacets.get( tlcf.getOwningEntityName() );
-        // if (candidate != null)
-        // log.debug( " Map contained: " + candidate.getName() );
-        // }
-
-        // // Check - If owning entity is missing, See if model manager knows them by name.
-        // // findWhereContributed() uses names search in model manager.
-        // // Will not find the owners that are facets. Will find owners that are business and choice objects.
-        // for (TLContextualFacet tlcf : tlcfs_MissingOwningEntity) {
-        // log.debug( tlcf.getName() + " is searching model manger trying to find owner named: "
-        // + tlcf.getOwningEntityName() );
-        // OtmLibraryMember candidate = mgr.getMember( tlcf.getOwningEntityName() );
-        // if (candidate != null)
-        // log.debug( " Found." );
-        // else {
-        // log.debug( " Model manager can not find owner." );
-        // }
-        // }
-        log.debug( "" );
-
         // Then - If owning entity is missing, findWhereContributed() will try to look it up.
         for (TLContextualFacet tlcf : tlcfs_MissingOwningEntity) {
             assertTrue( "Must find facade.", OtmModelElement.get( tlcf ) instanceof OtmContextualFacet );
             OtmContextualFacet cf = (OtmContextualFacet) OtmModelElement.get( tlcf );
 
-            log.debug( cf + " findWhereContributed() is trying to find owner named: " + tlcf.getOwningEntityName() );
-            cf.findWhereContributed();
-            if (cf.getWhereContributed() != null)
+            log.debug( cf + " getWhereContributed() is trying to find owner named: " + tlcf.getOwningEntityName() );
+            if (cf.getWhereContributed() != null) {
                 log.debug( "   Found." );
+                // Verify correctly assigned
+                TLModelElement tlOwner = (TLModelElement) cf.getTL().getOwningEntity();
+                OtmObject owner = OtmModelElement.get( (TLModelElement) cf.getTL().getOwningEntity() );
+                TestContextualFacet.testContributedFacet( cf.getWhereContributed(), cf, cf.getContributedObject() );
+            }
         }
 
-        // Then - look at contributed facets
+        // Then - look at ALL contributed facets
         for (OtmContextualFacet cf : cFacets) {
             OtmContributedFacet contrib = cf.getWhereContributed();
-            if (contrib == null) {
-                log.debug( "Trouble: missing contributor for: " + cf );
-            } else {
+            if (contrib != null) {
                 OtmLibraryMember member = contrib.getOwningMember();
                 OtmLibraryMember owner = cf.getContributedObject();
                 assertTrue( owner != null );
                 assertTrue( contrib != null );
                 assertTrue( member != null );
-                // FAILS - member has different contributed facet
                 TestContextualFacet.testContributedFacet( contrib, cf, member );
+            }
+        }
+
+        log.debug( "" );
+        log.debug( "The following were never resolved." );
+        for (OtmContextualFacet cf : cFacets) {
+            OtmContributedFacet contrib = cf.getWhereContributed();
+            if (contrib == null) {
+                log.debug( "Trouble: missing contributor for: " + cf );
+                assertTrue( false );
             }
         }
     }

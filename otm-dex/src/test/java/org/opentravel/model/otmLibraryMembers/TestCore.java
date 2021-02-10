@@ -43,7 +43,7 @@ public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         subject = buildOtm( staticModelManager );
         baseObject = buildOtm( staticModelManager );
         baseObject.setName( "BaseCO" );
@@ -112,7 +112,8 @@ public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
     }
 
     /**
-     * Create a core object with the passed name in the library and model manager.
+     * Create a core object with the passed name in the library and model manager with an ID attribute and element in
+     * the summary facet.
      * 
      * @param library
      * @param name

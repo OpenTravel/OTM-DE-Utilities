@@ -29,6 +29,7 @@ import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmQueryFacet;
+import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
@@ -154,15 +155,27 @@ public class TestQueryFacet extends TestContextualFacet {
     }
 
     public static TLContextualFacet buildTL() {
+        return buildTL( null, null, CF_NAME );
+    }
+
+    public static TLContextualFacet buildTL(AbstractLibrary abstractLibrary, String name) {
+        return buildTL( abstractLibrary, null, name );
+    }
+
+    public static TLContextualFacet buildTL(AbstractLibrary abstractLibrary, TLBusinessObject tlBO, String name) {
         TLContextualFacet tlcf = new TLContextualFacet();
-        tlcf.setName( CF_NAME );
+        tlcf.setName( name );
         tlcf.setFacetType( TLFacetType.QUERY );
         tlcf.addAttribute( new TLAttribute() );
         tlcf.addElement( new TLProperty() );
 
-        TLBusinessObject tlbo = TestBusiness.buildTL();
-        // does NOT tell BO that it has custom facet - tlcf.setOwningEntity( tlbo );
-        tlbo.addQueryFacet( tlcf );
+        if (abstractLibrary != null)
+            abstractLibrary.addNamedMember( tlcf );
+
+        // // setOwningEntity does NOT tell BO that it has custom facet - tlcf.setOwningEntity( tlbo );
+        if (tlBO != null)
+            tlBO.addQueryFacet( tlcf );
+
         return tlcf;
     }
 

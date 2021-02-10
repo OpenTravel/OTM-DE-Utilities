@@ -63,6 +63,7 @@ public class ValidateModelManagerItemsTask extends DexTaskBase<OtmModelManager> 
         Collection<OtmLibraryMember> members = new ArrayList<>( taskData.getMembers() );
         log.debug( "Starting to validate " + members.size() + " model members." );
         members.forEach( m -> m.isValid( true ) );
+        log.debug( "Finished validating " + members.size() + " model members." );
     }
 
     /**

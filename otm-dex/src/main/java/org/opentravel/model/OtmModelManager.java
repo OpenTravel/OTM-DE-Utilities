@@ -113,6 +113,8 @@ public class OtmModelManager implements TaskResultHandlerI {
 
     private UserSettings userSettings;
 
+    private int backgroundTaskCount = 0;
+
 
 
     /**
@@ -410,7 +412,22 @@ public class OtmModelManager implements TaskResultHandlerI {
         new ValidateModelManagerItemsTask( this, this, statusController ).go();
         // Start a background task to resolve type relationships
         new TypeResolverTask( this, this, statusController ).go();
+        backgroundTaskCount = 2;
     }
+    // Attempt to publish event when resolver complete. Too complicated to pass through project open chain.
+    // /**
+    // * Start the validation and type resolver tasks.
+    // * Use the passed handler for type resolver results and model manager to handle validation results.
+    // * Use model manager's status controller.
+    // */
+    // public void startValidatingAndResolvingTasks(TaskResultHandlerI resultHandler) {
+    // if (resultHandler == null) resultHandler = this;
+    // // Start a background task to validate the objects
+    // new ValidateModelManagerItemsTask( this, this, statusController ).go();
+    // // Start a background task to resolve type relationships
+    // new TypeResolverTask( this, resultHandler, statusController ).go();
+    // backgroundTaskCount = 2;
+    // }
 
     /**
      * Add the built in libraries to the libraries and member maps
@@ -827,6 +844,14 @@ public class OtmModelManager implements TaskResultHandlerI {
         // log.debug( "Validation Task complete" );
         // } else
         // log.debug( "Task complete" );
+        // if (backgroundTaskCount == 1) {
+        // // model change event
+        // }
+        backgroundTaskCount--;
+    }
+
+    public int getBackgroundTaskCount() {
+        return backgroundTaskCount;
     }
 
     /**

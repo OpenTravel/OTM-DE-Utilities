@@ -28,11 +28,11 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
-import org.opentravel.model.otmFacets.OtmChoiceFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmFacets.OtmFacetFactory;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
+import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
@@ -46,6 +46,7 @@ import java.util.List;
  * owning object.
  */
 public class TestCustomFacet extends TestContextualFacet {
+    // Extends TestOtmLibraryMemberBase
     // private static Log log = LogFactory.getLog( TestContextualFacet.class );
     private static final String CF_NAME = "TestCF";
 
@@ -83,8 +84,10 @@ public class TestCustomFacet extends TestContextualFacet {
         assertTrue( "Builder - must not already have member with name.", lib.getMember( name ) == null );
         OtmCustomFacet custom = buildOtm( lib.getModelManager() );
         assertNotNull( custom );
-        lib.add( custom );
         custom.setName( name );
+        lib.add( custom );
+
+        assertTrue( "Builder error: wrong library", custom.getLibrary() == lib );
 
         // Will only have children when contributed is modeled.
         return custom;
@@ -99,15 +102,17 @@ public class TestCustomFacet extends TestContextualFacet {
      */
     public static OtmCustomFacet buildOtm(OtmBusinessObject bo, String name) {
         assertTrue( "Illegal arguement - must have model manager.", bo.getModelManager() != null );
-        OtmCustomFacet cf = buildOtm( bo.getModelManager() );
-        bo.getModelManager().add( cf );
-        bo.add( cf );
-        cf.setName( name );
-        if (bo.getLibrary() != null)
-            bo.getLibrary().add( cf );
+        assertTrue( "Illegal arguement - must have library.", bo.getLibrary() != null );
 
-        testContributedFacet( cf.getWhereContributed(), cf, bo );
-        return cf;
+        // OtmLibrary#add() uses factory
+        TLContextualFacet tlCF = buildTL( bo.getLibrary().getTL(), name );
+        OtmCustomFacet custom = (OtmCustomFacet) OtmLibraryMemberFactory.create( tlCF, bo.getModelManager() );
+        // Contribute the custom to the business object
+        OtmContributedFacet contrib = bo.add( custom );
+
+        assertTrue( "Builder - new facet must get correct contributor.", custom.getWhereContributed() == contrib );
+        testContributedFacet( custom.getWhereContributed(), custom, bo );
+        return custom;
     }
 
     /**
@@ -119,8 +124,7 @@ public class TestCustomFacet extends TestContextualFacet {
      */
     public static OtmCustomFacet buildOtm(OtmCustomFacet bcf, String name) {
         assertTrue( "Illegal arguement - must have model manager.", bcf.getModelManager() != null );
-        TLContextualFacet tl = buildTL();
-        tl.setName( name );
+        TLContextualFacet tl = buildTL( null, null, name );
 
         OtmLibraryMember cf2 = OtmFacetFactory.create( tl, bcf.getModelManager() );
         assertTrue( cf2 != null ); // custom facet, no where contributed
@@ -134,16 +138,33 @@ public class TestCustomFacet extends TestContextualFacet {
         return cf;
     }
 
+    /**
+     * Create TLCustomFacet and add to newly created TLBusiness
+     * 
+     * @return
+     */
     public static TLContextualFacet buildTL() {
+        return buildTL( null, null, CF_NAME );
+    }
+
+    public static TLContextualFacet buildTL(AbstractLibrary abstractLibrary, String name) {
+        return buildTL( abstractLibrary, null, name );
+    }
+
+    public static TLContextualFacet buildTL(AbstractLibrary abstractLibrary, TLBusinessObject tlBO, String name) {
         TLContextualFacet tlcf = new TLContextualFacet();
-        tlcf.setName( CF_NAME );
+        tlcf.setName( name );
         tlcf.setFacetType( TLFacetType.CUSTOM );
         tlcf.addAttribute( new TLAttribute() );
         tlcf.addElement( new TLProperty() );
 
-        TLBusinessObject tlbo = TestBusiness.buildTL();
-        // does NOT tell BO that it has custom facet - tlcf.setOwningEntity( tlbo );
-        tlbo.addCustomFacet( tlcf );
+        if (abstractLibrary != null)
+            abstractLibrary.addNamedMember( tlcf );
+
+        // // setOwningEntity does NOT tell BO that it has custom facet - tlcf.setOwningEntity( tlbo );
+        if (tlBO != null)
+            tlBO.addCustomFacet( tlcf );
+
         return tlcf;
     }
 
@@ -151,7 +172,8 @@ public class TestCustomFacet extends TestContextualFacet {
 
     @Before
     public void beforeTest() {
-        member = TestBusiness.buildOtm( staticModelManager );
+        staticLib = TestLibrary.buildOtm( staticModelManager );
+        member = TestBusiness.buildOtm( staticLib, "BeforeBO" );
         cf = buildOtm( (OtmBusinessObject) member, "CF1" );
         contrib = (OtmContributedFacet) member.add( cf );
         testContributedFacet( contrib, cf, member );
@@ -168,6 +190,12 @@ public class TestCustomFacet extends TestContextualFacet {
     }
 
 
+    /**
+     * ******************************************************
+     * 
+     * Facet Specific Tests
+     * 
+     **/
     @Test
     public void testDeleting() {
         super.testDeleteFromMember();
@@ -179,19 +207,19 @@ public class TestCustomFacet extends TestContextualFacet {
         // Given - a business object and contextual facet
         OtmLibrary lib = TestLibrary.buildOtm();
         OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
-        OtmContextualFacet cf = buildOtm( bo, "CF1" );
+        OtmCustomFacet cf = buildOtm( bo, "CF1" );
         OtmContributedFacet contrib = cf.getWhereContributed();
 
-        // Given - a choice object and contextual facet
-        OtmChoiceObject co = TestChoice.buildOtm( lib, "TestCH" );
-        OtmChoiceFacet cf2 = TestChoiceFacet.buildOtm( co, "CHF1" );
+        // Given - a 2nd custom facet
+        OtmBusinessObject bo2 = TestBusiness.buildOtm( lib, "TestBO2" );
+        OtmCustomFacet cf2 = buildOtm( bo2, "CF2" );
         OtmContributedFacet contrib2 = cf2.getWhereContributed();
 
+        // Givens Tests
         assertTrue( cf.getLibrary() != null );
         assertTrue( cf.getModelManager().contains( cf ) );
-        //
         testContributedFacet( contrib, cf, bo );
-        testContributedFacet( contrib2, cf2, co );
+        testContributedFacet( contrib2, cf2, bo2 );
 
         // When deleted
         lib.delete( cf );
@@ -200,8 +228,8 @@ public class TestCustomFacet extends TestContextualFacet {
         assertFalse( bo.getTL().getCustomFacets().contains( cf.getTL() ) );
         //
         lib.delete( cf2 );
-        assertFalse( co.getChildren().contains( contrib2 ) );
-        assertFalse( co.getTL().getChoiceFacets().contains( cf2.getTL() ) );
+        assertFalse( bo2.getChildren().contains( contrib2 ) );
+        assertFalse( bo2.getTL().getCustomFacets().contains( cf2.getTL() ) );
     }
 
     @Test
@@ -276,7 +304,7 @@ public class TestCustomFacet extends TestContextualFacet {
         OtmBusinessObject bo2 = TestBusiness.buildOtm( lib, "TheOtherBO" );
         OtmContextualFacet cf = buildOtm( bo, "TheCF" );
         OtmContributedFacet contrib = cf.getWhereContributed();
-        testContributedFacet( contrib, cf, bo );
+        // Done in builder: testContributedFacet( contrib, cf, bo );
 
         // When base type changed (moved)
         cf.setBaseType( bo2 );

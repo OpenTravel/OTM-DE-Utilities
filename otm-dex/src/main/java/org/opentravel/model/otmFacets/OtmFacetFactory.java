@@ -121,7 +121,7 @@ public class OtmFacetFactory {
                 // Reinstated trying to recover contributed facet from listener.
                 OtmObject obj = OtmModelElement.get( tlFacet );
                 if (obj instanceof OtmContextualFacet)
-                    facet = ((OtmContextualFacet) obj).getWhereContributed();
+                    facet = ((OtmContextualFacet) obj).getWhereContributed( parent );
                 else if (obj instanceof OtmContributedFacet)
                     facet = (OtmContributedFacet) obj;
 

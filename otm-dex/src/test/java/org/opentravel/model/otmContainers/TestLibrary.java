@@ -39,6 +39,7 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
+import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestCore;
 import org.opentravel.model.otmLibraryMembers.TestLibraryMemberBase;
@@ -158,6 +159,9 @@ public class TestLibrary extends AbstractFxTest {
         ArrayList<OtmLibraryMember> members = new ArrayList<>( mgr.getMembers() );
         OtmTypeProvider a;
         for (OtmLibraryMember member : members) {
+            // Skip over the xsd simple object that are used in Core#buildOTM
+            if (member instanceof OtmXsdSimple)
+                continue;
             assertTrue( member.getWhereUsed().isEmpty() );
             if (member instanceof OtmTypeProvider) {
 

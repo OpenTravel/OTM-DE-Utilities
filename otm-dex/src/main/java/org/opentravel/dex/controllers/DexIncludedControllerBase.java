@@ -208,7 +208,8 @@ public abstract class DexIncludedControllerBase<C> implements DexIncludedControl
 
     @Override
     public void publishEvent(DexEvent event) {
-        eventPublisherNode.fireEvent( event );
+        if (eventPublisherNode != null)
+            eventPublisherNode.fireEvent( event );
     }
 
     @Override

@@ -29,6 +29,7 @@ import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmChoiceFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
@@ -227,36 +228,37 @@ public class TestChoiceFacet extends TestContextualFacet {
         assertTrue( "Builder - parameter must have model manager.", co.getModelManager() != null );
         assertTrue( "Builder - parameter must have library.", co.getLibrary() != null );
 
-        OtmChoiceFacet cf = buildOtm( co.getModelManager() );
-        co.getLibrary().add( cf );
-        cf.setName( name );
-        OtmContributedFacet contrib = co.add( cf );
+        // OtmLibrary#add() uses factory
+        TLContextualFacet tlCF = buildTL( co.getLibrary().getTL(), name );
+        OtmChoiceFacet choice = (OtmChoiceFacet) OtmLibraryMemberFactory.create( tlCF, co.getModelManager() );
+        // Contribute the custom to the business object
+        OtmContributedFacet contrib = co.add( choice );
 
-        assertTrue( "Builder - new facet must have library.", cf.getLibrary() != null );
-        assertTrue( "Builder - new facet must have model manager.", cf.getModelManager() != null );
-        assertTrue( "Builder - new facet must be managed.", cf.getModelManager().getMembers().contains( cf ) );
-        assertTrue( "Builder - new facet must have contributor.", cf.getWhereContributed() != null );
-        assertTrue( "Builder - new facet must get correct contributor.", cf.getWhereContributed() == contrib );
+        assertTrue( "Builder - new facet must have library.", choice.getLibrary() != null );
+        assertTrue( "Builder - new facet must have model manager.", choice.getModelManager() != null );
+        assertTrue( "Builder - new facet must be managed.", choice.getModelManager().getMembers().contains( choice ) );
+        assertTrue( "Builder - new facet must have contributor.", choice.getWhereContributed() != null );
+        assertTrue( "Builder - new facet must get correct contributor.", choice.getWhereContributed() == contrib );
 
-        TestContextualFacet.testContributedFacet( cf.getWhereContributed(), cf, co );
-        TestContextualFacet.testContributedFacet( contrib, cf, co );
-        return cf;
+        TestContextualFacet.testContributedFacet( choice.getWhereContributed(), choice, co );
+        TestContextualFacet.testContributedFacet( contrib, choice, co );
+        return choice;
     }
 
-    /**
-     * Create Choice facet and add() it to the passed Choice object. Creates contributor.
-     * <p>
-     * No tests!
-     * 
-     * @param modelManager
-     * @param co
-     * @return
-     */
-    public static OtmChoiceFacet buildOtm(OtmModelManager modelManager, OtmChoiceObject co) {
-        OtmChoiceFacet cf = buildOtm( modelManager );
-        co.add( cf );
-        return cf;
-    }
+    // /**
+    // * Create Choice facet and add() it to the passed Choice object. Creates contributor.
+    // * <p>
+    // * No tests!
+    // *
+    // * @param modelManager
+    // * @param co
+    // * @return
+    // */
+    // public static OtmChoiceFacet buildOtm(OtmModelManager modelManager, OtmChoiceObject co) {
+    // OtmChoiceFacet cf = buildOtm( modelManager );
+    // co.add( cf );
+    // return cf;
+    // }
 
     /**
      * Build a choice facet. It will not have where contributed or children! Contributed to a new choice object.
@@ -280,24 +282,37 @@ public class TestChoiceFacet extends TestContextualFacet {
      * @return
      */
     public static OtmChoiceFacet buildOtm(OtmModelManager mgr) {
+        assertTrue( "Builder - parameter must have model manager.", mgr != null );
         OtmChoiceFacet choice = new OtmChoiceFacet( buildTL(), mgr );
-        assertNotNull( choice );
         mgr.add( choice );
 
+        assertNotNull( choice );
         return choice;
     }
 
 
     public static TLContextualFacet buildTL() {
+        return buildTL( null, null, CF_NAME );
+    }
+
+    public static TLContextualFacet buildTL(AbstractLibrary abstractLibrary, String name) {
+        return buildTL( abstractLibrary, null, name );
+    }
+
+    public static TLContextualFacet buildTL(AbstractLibrary abstractLibrary, TLChoiceObject tlCO, String name) {
         TLContextualFacet tlcf = new TLContextualFacet();
-        tlcf.setName( CF_NAME );
+        tlcf.setName( name );
         tlcf.setFacetType( TLFacetType.CHOICE );
         tlcf.addAttribute( new TLAttribute() );
         tlcf.addElement( new TLProperty() );
 
-        TLChoiceObject tlbo = TestChoice.buildTL();
-        // does NOT tell BO that it has Choice facet - tlcf.setOwningEntity( tlbo );
-        tlbo.addChoiceFacet( tlcf );
+        if (abstractLibrary != null)
+            abstractLibrary.addNamedMember( tlcf );
+
+        // // setOwningEntity does NOT tell CO that it has choice facet - tlcf.setOwningEntity( tlbo );
+        if (tlCO != null)
+            tlCO.addChoiceFacet( tlcf );
+
         return tlcf;
     }
 

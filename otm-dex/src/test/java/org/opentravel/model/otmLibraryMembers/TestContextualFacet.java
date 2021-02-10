@@ -64,7 +64,8 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null, null );
+        staticLib = TestLibrary.buildOtm();
+        staticModelManager = staticLib.getModelManager();
         // Needed for library member tests
         subject = TestChoiceFacet.buildOtm( staticModelManager );
         baseObject = TestChoiceFacet.buildOtm( staticModelManager );

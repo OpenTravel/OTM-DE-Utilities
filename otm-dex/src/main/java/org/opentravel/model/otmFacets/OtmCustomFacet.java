@@ -24,7 +24,9 @@ import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLFacetType;
 
 /**
- * Abstract OTM Node for Custom contributed Facets.
+ * OTM Facade for Custom Contextual Facets.
+ * 
+ * @see OtmContextualFacet
  * 
  * @author Dave Hollander
  * 

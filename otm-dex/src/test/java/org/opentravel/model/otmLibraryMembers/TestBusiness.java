@@ -52,9 +52,9 @@ import java.util.List;
  * Verifies the functions of the <code>OtmBusinessObject</code> class.
  */
 public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
-    private static String BoName = "Testbo";
 
     private static Log log = LogFactory.getLog( TestBusiness.class );
+    private static String BoName = "Testbo";
 
     @BeforeClass
     public static void beforeClass() {
@@ -254,21 +254,24 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
      * @param name
      * @return
      */
-    public static OtmBusinessObject buildOtm(OtmLibrary lib, String name) {
+    public static OtmBusinessObject buildOtm(OtmLibrary library, String name) {
+        assertTrue( "Library must have model manager.", library.getModelManager() != null );
         BoName = name; // set global static
-        OtmBusinessObject bo = buildOtm( lib.getModelManager() );
-        lib.add( bo );
+        OtmBusinessObject bo = buildOtm( library.getModelManager() );
+        bo.setName( name );
+        library.add( bo );
 
         for (OtmContributedFacet cf : bo.getChildrenContributedFacets()) {
-            assertTrue( cf.getContributor() != null );
-            lib.add( cf.getContributor() );
-            assertTrue( lib.contains( cf.getContributor() ) );
+            assertTrue( "Contributed facet must have contributor.", cf.getContributor() != null );
+            library.add( cf.getContributor() );
+            assertTrue( "Contributor must be in library.", library.contains( cf.getContributor() ) );
         }
+
         assertTrue( bo != null );
-        assertTrue( bo.getLibrary() == lib );
+        assertTrue( bo.getLibrary() == library );
         assertTrue( bo.isEditable() );
-        assertTrue( bo.getActionManager() == lib.getActionManager() );
-        assertTrue( lib.getModelManager().getMembers().contains( bo ) );
+        assertTrue( bo.getActionManager() == library.getActionManager() );
+        assertTrue( library.getModelManager().getMembers().contains( bo ) );
 
         return bo;
     }
@@ -319,9 +322,10 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
         assertTrue( bo.getSummary().getChildren().size() == 2 );
         assertTrue( "Must have identity listener.", OtmModelElement.get( bo.getTL() ) == bo );
 
-        OtmContextualFacet cf = TestCustomFacet.buildOtm( bo, "SomeOtherCustom" );
-        OtmContextualFacet cf2 = TestCustomFacet.buildOtm( bo, "SomeOtherCustom2" );
-        OtmContextualFacet cf3 = TestCustomFacet.buildOtm( bo, "SomeOtherCustom3" );
+        // Must have a library to build custom facets
+        // OtmContextualFacet cf = TestCustomFacet.buildOtm( bo, "SomeOtherCustom" );
+        // OtmContextualFacet cf2 = TestCustomFacet.buildOtm( bo, "SomeOtherCustom2" );
+        // OtmContextualFacet cf3 = TestCustomFacet.buildOtm( bo, "SomeOtherCustom3" );
 
         return bo;
     }

@@ -115,7 +115,7 @@ public class TestResourceInheritance extends AbstractFxTest {
 
         // Given - BO must have custom facets
         OtmContextualFacet cf = TestCustomFacet.buildOtm( bo, "CF2" );
-        TestContextualFacet.testContributedFacet( cf.getWhereContributed(), cf, bo );
+        // This test done by buildOtm: TestContextualFacet.testContributedFacet( cf.getWhereContributed(), cf, bo );
         // Given - move new facet to minor library
         SetLibraryAction action = new SetLibraryAction();
         action.setSubject( cf );
