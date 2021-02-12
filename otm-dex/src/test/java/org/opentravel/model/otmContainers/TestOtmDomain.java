@@ -71,7 +71,7 @@ public class TestOtmDomain {
      */
     public static OtmDomain buildDomainWithMembers(String name, OtmModelManager mgr) {
         OtmDomain domain = buildOtm( name, mgr );
-        domain.getLibraries().forEach( l -> TestLibraryMemberBase.buildOneOfEachWithProperties( mgr, l ) );
+        domain.getLibraries().forEach( l -> TestLibraryMemberBase.buildOneOfEachWithProperties( l ) );
         return domain;
     }
 

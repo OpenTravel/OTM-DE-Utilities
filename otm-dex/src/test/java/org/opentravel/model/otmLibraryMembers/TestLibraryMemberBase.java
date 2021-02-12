@@ -166,7 +166,7 @@ public class TestLibraryMemberBase {
         OtmLibrary lib = TestLibrary.buildOtm( mgr );
         assertTrue( "Given", lib.isEditable() );
 
-        buildOneOfEachWithProperties( mgr, lib );
+        buildOneOfEachWithProperties( lib );
 
         for (OtmLibraryMember lm : mgr.getMembers()) {
             if (lm instanceof OtmResource)
@@ -261,12 +261,12 @@ public class TestLibraryMemberBase {
     /**
      * Create one of each library member and give each property owner one of each property.
      * 
-     * @param mgr
      * @param lib
      */
-    public static void buildOneOfEachWithProperties(OtmModelManager mgr, OtmLibrary lib) {
+    public static void buildOneOfEachWithProperties(OtmLibrary lib) {
         // Givens
         assertTrue( "Given", lib.isEditable() );
+        OtmModelManager mgr = lib.getModelManager();
         assertTrue( "Given", mgr != null );
 
         // Build one of each library member type
@@ -306,5 +306,7 @@ public class TestLibraryMemberBase {
             assertTrue( d.getLibrary() == member.getLibrary() );
         }
     }
+
+
 
 }

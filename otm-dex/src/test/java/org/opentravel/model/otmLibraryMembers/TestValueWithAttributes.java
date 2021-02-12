@@ -31,11 +31,15 @@ import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmProperties.OtmAttribute;
+import org.opentravel.model.otmProperties.TestOtmTypeProviderInterface;
+import org.opentravel.model.otmProperties.TestOtmTypeUserInterface;
 import org.opentravel.schemacompiler.codegen.util.PropertyCodegenUtils;
+import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLAttributeType;
 import org.opentravel.schemacompiler.model.TLValueWithAttributes;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -55,6 +59,28 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
         subject = buildOtm( staticLib, "SubjectVWA" );
         baseObject = buildOtm( staticLib, "BaseVWA" );
         // baseObject.setName( "BaseVWA" );
+    }
+
+    /** *********************** VWA Tester ******************** **/
+    public static void check(OtmValueWithAttributes vwa) {
+        log.debug( "VWA Tester: testing " + vwa.getNameWithPrefix() );
+        assertTrue( "VWA Tester: ", vwa != null );
+        assertTrue( "VWA Tester: ", vwa.getLibrary() != null );
+        assertTrue( "VWA Tester: ", vwa.getModelManager() != null );
+        // assertTrue( "VWA Tester: ", vwa.getAssignedType() != null );
+        // assertTrue( "VWA Tester: ", vwa.getBaseType() != null );
+        // log.debug( "VWA Tester: assigned type = " + vwa.getAssignedType() );
+        // log.debug( "VWA Tester: base type = " + vwa.getBaseType() );
+        // log.debug( "VWA Tester: parent type = " + vwa.getTL().getParentType() );
+
+        // TL Tests
+        TLValueWithAttributes tlVwa = vwa.getTL();
+        assertTrue( "VWA Tester: ", tlVwa instanceof TLValueWithAttributes );
+        assertTrue( "VWA Tester: ", tlVwa.getOwningLibrary() instanceof AbstractLibrary );
+        assertTrue( "VWA Tester: ", tlVwa.getOwningModel() != null );
+        // assertTrue( "VWA Tester: ", tlVwa.getParentType() != null );
+        assertTrue( "VWA Tester: ", tlVwa.getAttributes() != null );
+        assertTrue( "VWA Tester: ", tlVwa.getIndicators() != null );
     }
 
     /** *************** VWA Builders ********************* **/
@@ -95,38 +121,6 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
         return vwa;
     }
 
-    // /**
-    // * @param mgr
-    // * @param string
-    // * @return
-    // */
-    // @Deprecated
-    // public static OtmValueWithAttributes buildOtm(OtmModelManager mgr, String string) {
-    // OtmValueWithAttributes vwa = buildOtm( mgr );
-    // vwa.setName( string );
-    // return vwa;
-    // }
-
-    //
-    // public static TLValueWithAttributes buildTL() {
-    // TLValueWithAttributes tlvwa = new TLValueWithAttributes();
-    // tlvwa.setName( NAME );
-    // // tlvwa.setParentType( TestXsdSimple.buildTL() );
-    //
-    // // add attributes
-    // int i = 1;
-    // while (i < 5) {
-    // TLAttribute tla = new TLAttribute();
-    // tla.setName( NAME + i );
-    // // tla.setType( TestXsdSimple.buildTL() );
-    // tlvwa.addAttribute( tla );
-    // i++;
-    // }
-    //
-    // // assertNotNull( tlvwa.getParentType() );
-    // assertTrue( tlvwa.getAttributes().size() == i - 1 );
-    // return tlvwa;
-    // }
 
     /**
      * Create a TL Value With Attributes with 4 attribute children.
@@ -164,12 +158,6 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
         List<OtmObject> kids = co.getChildren();
         assertTrue( !kids.isEmpty() );
 
-        // assertTrue( !co.getChildrenHierarchy().isEmpty() );
-        // assertNotNull( co.getChildrenTypeProviders() );
-        // assertNotNull( co.getDescendantsTypeUsers() );
-        // assertNotNull( co.getDescendantsChildrenOwners() );
-        // assertNotNull( co.getDescendantsTypeUsers() );
-        // log.debug( "Children owner methods OK." );
     }
 
     @Override
@@ -194,6 +182,39 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
     }
 
     /** *************** VWA Specific Tests **************** **/
+
+    /**
+     * Something about VWA caused error when running in {@link TestOtmTypeUserInterface#test_setAssignedType()}
+     * 
+     * @throws InterruptedException
+     */
+    @Test
+    public void test_CircularAssignments() {
+        OtmLibrary lib = TestLibrary.buildOtm();
+
+        OtmValueWithAttributes vwaBase = TestValueWithAttributes.buildOtm( lib, "TypeUserVWABase" );
+        OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtm( lib, "TypeUserVWA2" );
+        List<OtmTypeUser> users = new ArrayList<>();
+        users.add( vwa );
+
+        List<OtmTypeProvider> providers = TestOtmTypeProviderInterface.buildOneOfEach( lib );
+        List<OtmValueWithAttributes> vwaProviders = new ArrayList<>();
+        providers.forEach( p -> {
+            if (p instanceof OtmValueWithAttributes)
+                vwaProviders.add( (OtmValueWithAttributes) p );
+        } );
+
+        // Note: one has base type (tlParent) and one does not.
+        for (OtmTypeProvider p : vwaProviders) {
+            log.debug( "Testing assigment of " + p.getNameWithPrefix() + " to " + vwa.getNameWithPrefix() );
+
+            check( (OtmValueWithAttributes) p );
+            check( vwa );
+
+            vwa.setAssignedType( p );
+            // goes into never-never land on getAssignedTLType() in setAssignedTLType()
+        }
+    }
 
     @Test
     public void testDescendentsTypeUsers() {

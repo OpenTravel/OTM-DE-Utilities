@@ -331,7 +331,7 @@ public class TestLibrary extends AbstractFxTest {
         // Given - a subject library that uses types, base types, contextual facets
         OtmLibrary subjectLib = TestLibrary.buildOtm( mgr, "NamespaceS1", "s1", "LibraryS1" );
         addOneOfEach( subjectLib );
-        TestLibraryMemberBase.buildOneOfEachWithProperties( mgr, subjectLib );
+        TestLibraryMemberBase.buildOneOfEachWithProperties( subjectLib );
 
         // Given - a provider library that provides types, base types, contextual facets
         OtmLibrary providerLib = TestLibrary.buildOtm( mgr, "NamespaceP1", "p1", "LibraryP1" );

@@ -280,7 +280,7 @@ public class TestCustomFacet extends TestContextualFacet {
         OtmContextualFacet inheritedCf = buildOtm( baseBo, "CF1" );
         assertTrue( "Given", !inheritedCf.isInherited() );
 
-        OtmBusinessObject bo = TestBusiness.buildOtm( staticModelManager );
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "TestBO" );
         OtmContextualFacet cf = buildOtm( bo, "SubType" );
         assertTrue( "Given", !cf.isInherited() );
 

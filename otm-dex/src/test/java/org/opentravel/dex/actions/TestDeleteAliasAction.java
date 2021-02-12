@@ -145,7 +145,7 @@ public class TestDeleteAliasAction {
     @Test
     public void testDoIt() {
         // Given - library with one of each member type in it
-        TestLibraryMemberBase.buildOneOfEachWithProperties( staticModelManager, lib );
+        TestLibraryMemberBase.buildOneOfEachWithProperties( lib );
         addAliases( lib, "TestAlias" );
         // Given - initial size of library
         int initialSize = lib.getMembers().size();

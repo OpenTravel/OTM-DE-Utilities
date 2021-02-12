@@ -87,7 +87,7 @@ public class TestDeletePropertyAction {
         assertTrue( "Given", lib.isEditable() );
 
         // Given one of each library member type in the library
-        TestLibraryMemberBase.buildOneOfEachWithProperties( mgr, lib );
+        TestLibraryMemberBase.buildOneOfEachWithProperties( lib );
 
         // Run test with simple object as type to assign
         OtmSimpleObject simple = TestOtmSimple.buildOtm( lib );

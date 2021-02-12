@@ -29,6 +29,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.schemacompiler.codegen.util.FacetCodegenUtils;
 import org.opentravel.schemacompiler.model.LibraryElement;
@@ -59,9 +60,11 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
     @BeforeClass
     public static void beforeClass() {
         staticModelManager = new OtmModelManager( null, null, null );
-        subject = buildOtm( staticModelManager );
-        baseObject = buildOtm( staticModelManager );
-        baseObject.setName( "BaseBO" );
+        OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
+        subject = buildOtm( lib, "SubjectBo" );
+        baseObject = buildOtm( lib, "BaseBo" );
+        OtmCustomFacet cf = TestCustomFacet.buildOtm( (OtmBusinessObject) subject, "CF" );
+        OtmCustomFacet bcf = TestCustomFacet.buildOtm( (OtmBusinessObject) baseObject, "BCF" );
     }
 
     @Test

@@ -29,12 +29,14 @@ import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestCore;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Verifies the functions of the <code>new library member action</code> class.
@@ -144,38 +146,50 @@ public class TestSetLibraryAction {
         OtmLibrary lib2 = TestLibrary.buildOtm( mgr, "Namespace2", "p2", "Library2" );
         DexActionManager actionManager = lib1.getActionManager();
 
-        // Create business object and vwa. Use VWA as type on an element
+        // Given - a member with element to assign the moved object.
         OtmBusinessObject member = TestBusiness.buildOtm( lib1, "TestBusinessObject" );
         assertTrue( "Given", member.getLibrary() == lib1 );
         OtmElement<?> element = TestBusiness.getElement( member );
         assertTrue( "Given", element != null );
         assertTrue( "Given", element.getOwningMember() == member );
         assertTrue( "Given", element.getLibrary() == lib1 );
-        OtmCore assignedType = TestCore.buildOtm( mgr, "TestVWA" );
-        lib1.add( assignedType );
+
+        // Given - the object to move assigned to the member's element
+        OtmCore assignedType = TestCore.buildOtm( lib1, "AssignedCore" );
         element.setAssignedType( assignedType );
         assertTrue( "Given", element.getTL().getType() == assignedType.getTL() );
         assertTrue( "Given", element.getAssignedType() == assignedType );
         assertTrue( "Given - property set.", element.assignedTypeProperty().get().equals( assignedType.getName() ) );
         log.debug(
             element.getAssignedType().getNameWithPrefix() + "  property = " + element.assignedTypeProperty().get() );
+        List<OtmLibraryMember> initialFoundUsers = mgr.findUsersOf( assignedType );
 
-        // The action to test
+        // Given - The action to test with subject set to assignedType object
         SetLibraryAction setLibraryHandler =
             (SetLibraryAction) DexActions.getAction( DexActions.SETLIBRARY, assignedType, actionManager );
         assertTrue( "Given", setLibraryHandler != null );
 
         // When
         setLibraryHandler.doIt( lib2 );
-        assertTrue( "When assignedType's library is library 2.", assignedType.getLibrary() == lib2 );
-        assertTrue( "When assignedType;s TLlib is tlLib 2.", assignedType.getTL().getOwningLibrary() == lib2.getTL() );
-        assertTrue( "When assignedType;s TLlib is tlLib 2.", assignedType.getLibrary().getTL() == lib2.getTL() );
 
-        assertTrue( "Then - TL type must still be assignedType's TL.",
-            element.getTL().getType() == assignedType.getTL() );
+        // Then - library must be lib2
+        assertTrue( "Then - assignedType's library be library 2.", assignedType.getLibrary() == lib2 );
+        assertTrue( "Then - assignedType's TL's owning library must be tlLib 2.",
+            assignedType.getTL().getOwningLibrary() == lib2.getTL() );
+        assertTrue( "Then - assignedType's library's TLlib must be tlLib 2.",
+            assignedType.getLibrary().getTL() == lib2.getTL() );
+
+        // Then - must still be assigned to element
         assertTrue( "Then - element must still be assigned to type.", element.getAssignedType() == assignedType );
-        assertTrue( "Then - assigned type still has element's member in where used.",
-            assignedType.getWhereUsed().contains( member ) );
+        assertTrue( "Then - element's TL type must still be assignedType's TL.",
+            element.getTL().getType() == assignedType.getTL() );
+
+        // Then - the whereUsed list must still contain member
+        List<OtmLibraryMember> foundUsers = mgr.findUsersOf( assignedType );
+        List<OtmLibraryMember> wu = assignedType.getWhereUsed();
+        assertTrue( "Then - the whereUsed list must still contain member.", wu.contains( member ) );
+
+        // Then - the FX Property must have lib2's prefix
         log.debug(
             element.getAssignedType().getNameWithPrefix() + "  property = " + element.assignedTypeProperty().get() );
         assertTrue( "Then - property p2 prefix.",

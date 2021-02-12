@@ -126,7 +126,7 @@ public class TestCopyPropertyAction {
     @Test
     public void testDoIt() {
         // Given - library with one of each member type in it
-        TestLibraryMemberBase.buildOneOfEachWithProperties( staticModelManager, lib );
+        TestLibraryMemberBase.buildOneOfEachWithProperties( lib );
         for (OtmLibraryMember lm : lib.getMembers()) {
             assertTrue( lm.isEditable() );
             for (OtmObject d : lm.getDescendants())

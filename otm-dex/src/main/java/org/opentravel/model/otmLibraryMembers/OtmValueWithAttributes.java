@@ -350,6 +350,10 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
 
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
+        // Prevent circular assignment.
+        if (type == this)
+            return null;
+
         // Take this's owning member out of the current assigned type's where used list
         if (getAssignedType() != null && getAssignedType().getOwningMember() != null)
             getAssignedType().getOwningMember().changeWhereUsed( getOwningMember(), null );
@@ -360,6 +364,7 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
             setAssignedTLType( (TLAttributeType) type.getTL() );
             type.getOwningMember().changeWhereUsed( null, getOwningMember() );
         }
+        // log.debug( "Set assigned type" );
         return getAssignedType();
     }
 

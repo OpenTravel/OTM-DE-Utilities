@@ -214,12 +214,14 @@ public class TestInheritance extends AbstractFxTest {
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getSummary() );
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getIdFacet() );
         TestOtmPropertiesBase.buildOneOfEach2( baseBO.getDetail() );
+
         // Given - check count of children of base bo's summary facet.
         List<TLModelElement> tlBaseProps = baseBO.getSummary().getTLChildren();
         int expectedCount_Summary = baseBO.getSummary().getChildren().size();
         assertTrue( "Given - TLFacet and OtmFacet must have same child count.",
             tlBaseProps.size() == expectedCount_Summary );
-        assertTrue( "Given - builder added a custom facet.", !baseBO.getChildrenContributedFacets().isEmpty() );
+
+        // assertTrue( "Given - builder added a custom facet.", !baseBO.getChildrenContributedFacets().isEmpty() );
 
         // Put a custom facet on the base BO
         OtmCustomFacet baseCustom = TestCustomFacet.buildOtm( baseBO, "BaseCustom" );
@@ -256,6 +258,7 @@ public class TestInheritance extends AbstractFxTest {
         // Given - a business object with all types of properties in each of its native facets
         OtmLibrary lib = TestLibrary.buildOtm();
         OtmBusinessObject baseBO = TestBusiness.buildOtm( lib, "BaseBO" );
+        TestCustomFacet.buildOtm( baseBO, "BCF" );
         assertTrue( "Given - builder added a custom facet.", !baseBO.getChildrenContributedFacets().isEmpty() );
         // Put a custom facet on the base BO
         OtmCustomFacet baseCustom = TestCustomFacet.buildOtm( baseBO, "BaseCustom" );

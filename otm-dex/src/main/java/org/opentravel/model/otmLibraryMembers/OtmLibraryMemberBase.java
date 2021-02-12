@@ -472,17 +472,23 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public List<OtmTypeProvider> getUsedTypes() {
-        if (typesUsed == null) {
-            typesUsed = new ArrayList<>();
-            // Prevent concurrent modification
-            Collection<OtmTypeUser> descendants =
-                Collections.synchronizedList( new ArrayList<>( getDescendantsTypeUsers() ) );
-            synchronized (descendants) {
-                descendants.forEach( d -> addProvider( d, typesUsed ) );
-            }
-            typesUsed.sort(
-                (OtmObject o1, OtmObject o2) -> o1.getNameWithPrefix().compareToIgnoreCase( o2.getNameWithPrefix() ) );
+        // if (typesUsed == null) {
+        typesUsed = new ArrayList<>();
+
+        // Type used by this type users
+        if (this instanceof OtmTypeUser)
+            addProvider( (OtmTypeUser) this, typesUsed );
+
+        // Types used by all descendant type users
+        // Prevent concurrent modification
+        Collection<OtmTypeUser> descendants =
+            Collections.synchronizedList( new ArrayList<>( getDescendantsTypeUsers() ) );
+        synchronized (descendants) {
+            descendants.forEach( d -> addProvider( d, typesUsed ) );
         }
+        typesUsed.sort(
+            (OtmObject o1, OtmObject o2) -> o1.getNameWithPrefix().compareToIgnoreCase( o2.getNameWithPrefix() ) );
+        // }
         // log.debug( this + " typesUsed size = " + typesUsed.size() );
         return typesUsed;
     }

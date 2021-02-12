@@ -81,7 +81,7 @@ public class TestCopyLibraryMemberAction {
     @Test
     public void testDoIt() {
         // Given - library with one of each member type in it
-        TestLibraryMemberBase.buildOneOfEachWithProperties( staticModelManager, lib );
+        TestLibraryMemberBase.buildOneOfEachWithProperties( lib );
         // Given - another library to copy to
         OtmLibrary targetLib = TestLibrary.buildOtm( staticModelManager );
         assertTrue( "Given: ", targetLib.isEditable() );
