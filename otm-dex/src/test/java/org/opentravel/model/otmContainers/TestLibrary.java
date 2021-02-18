@@ -32,7 +32,6 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -255,72 +254,6 @@ public class TestLibrary extends AbstractFxTest {
         }
     }
 
-    // Used in OtmDomain to create domain provider's map
-    @Test
-    public void testGetProvidersMap() {
-        // Given - action and model managers
-        OtmModelManager mgr = TestOtmModelManager.build();
-
-        // Given - full set of cross-dependencies
-        TestOtmDomain_Providers.buildCrossDependendDomains( mgr );
-        assertTrue( TestOtmDomain_Providers.domain1 != null );
-        List<OtmTypeProvider> providers = TestOtmDomain_Providers.providers;
-        assertTrue( "Given: ", !providers.isEmpty() );
-
-        // Given - the sub-domain library and its type providing member
-        OtmLibrary lib22 = TestOtmDomain_Providers.domain22.getLibraries().get( 0 );
-
-        assertTrue( "Given: ", lib22 != null );
-        OtmLibraryMember member22 = null;
-        for (OtmLibraryMember m : lib22.getMembers())
-            if (m.getWhereUsed() != null)
-                member22 = m;
-        assertTrue( "Given: ", member22 != null );
-
-        // Each domain has at least one library
-
-        // When - domain 1's map created
-        OtmLibrary lib = TestOtmDomain_Providers.domain1.getLibraries().get( 0 );
-        Map<OtmLibrary,List<OtmLibraryMember>> map = lib.getProvidersMap();
-        List<OtmLibrary> pLibs = new ArrayList<>( map.keySet() );
-        // Then - it provides no types to the other libraries
-        assertTrue( "Domain 1 must provider no types.", map.isEmpty() );
-
-        // When - domain 3's map created
-        lib = TestOtmDomain_Providers.domain3.getLibraries().get( 0 );
-        map = lib.getProvidersMap();
-        pLibs = new ArrayList<>( map.keySet() );
-        // Then - all other libraries are in the map
-        for (OtmLibrary l : mgr.getUserLibraries()) {
-            // FIXME - This fails when run with other tests ...
-            // A different instance of l with namespace as expected
-            // if (!l.getBaseNamespace().equals( TestOtmDomain_Providers.domain3.getBaseNamespace() ))
-            // assertTrue( pLibs.contains( l ) );
-        }
-        // Assure all users are from providers
-        List<OtmTypeProvider> foundProviders = new ArrayList<>();
-        for (OtmLibraryMember m : lib.getMembers())
-            for (OtmTypeUser u : m.getDescendantsTypeUsers()) {
-                OtmTypeProvider at = u.getAssignedType();
-                if (at != null) {
-                    if (at.getLibrary() == null)
-                        log.debug( "Error: provider did not have library " + u + " assigned type " + at );
-                    else {
-                        if (!at.getLibrary().isBuiltIn() && !providers.contains( at )) {
-                            log.debug( "Error: providers did not contain " + u + " assigned type " + at );
-                            assertTrue( providers.contains( at ) );
-                            if (!foundProviders.contains( at ))
-                                foundProviders.add( at );
-                        }
-                    }
-                }
-            }
-        // Assure all providers are used
-        // FIXME - fails
-        // assertTrue( foundProviders.size() == providers.size() );
-        // foundProviders.forEach( p -> assertTrue( providers.contains( p ) ) );
-        // providers.forEach( p -> assertTrue( foundProviders.contains( p ) ) );
-    }
 
     @Test
     public void testGetProviders() {
@@ -398,7 +331,6 @@ public class TestLibrary extends AbstractFxTest {
 
         // TODO - is this finding dependencies in Resources?
     }
-    // TODO - add usersMap test
 
     @Test
     public void testGetActionManager() {
