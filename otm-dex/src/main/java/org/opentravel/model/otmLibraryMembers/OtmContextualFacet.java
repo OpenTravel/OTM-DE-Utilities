@@ -22,14 +22,18 @@ import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
+import org.opentravel.model.OtmModelElementListener;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmFacets.OtmAbstractFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmFacets.OtmFacet;
+import org.opentravel.model.otmFacets.OtmFacetFactory;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.model.otmProperties.OtmPropertyFactory;
+import org.opentravel.schemacompiler.event.ModelElementListener;
 import org.opentravel.schemacompiler.model.TLAlias;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
@@ -122,6 +126,22 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
     @Override
     public void addAlias(TLAlias tla) {
         // NO-OP
+    }
+
+    /**
+     * This may already have listener for contributed facet. If so, still add listener.
+     * 
+     * @see org.opentravel.model.OtmModelElement#addListener()
+     */
+    @Override
+    protected void addListener() {
+        for (ModelElementListener l : tlObject.getListeners())
+            if (l instanceof OtmModelElementListener) {
+                OtmObject o = ((OtmModelElementListener) l).get();
+                if (o instanceof OtmContributedFacet && o.getTL() != tlObject)
+                    return; // already has listener for something else
+            }
+        tlObject.addListener( new OtmModelElementListener( this ) );
     }
 
 
@@ -269,12 +289,22 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
     }
 
     /**
+     * @return Simply return whereContributed field. Do <b>not</b> attempt to find or create one.
+     */
+    public OtmContributedFacet getExistingContributed() {
+        return whereContributed;
+    }
+
+    /**
      * Get the contributed facet that is a child of the owning object.
      * <p>
      * Will attempt to find missing owners using model manager search.
      * <p>
      * NOTE: detection of "ghost" inherited facets depends on Contributor will not have ghost set as where contributed.
      * 
+     * @see #getExistingContributed()
+     * @see #findWhereContributedByName()
+     * @see #getWhereContributed(OtmChildrenOwner)
      * @return the non-ghost contributed facet where this facet is used
      */
     public OtmContributedFacet getWhereContributed() {
@@ -319,8 +349,6 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
     public OtmContributedFacet getWhereContributed(OtmChildrenOwner owner) {
         for (OtmObject c : owner.getChildren()) {
             if (c instanceof OtmContributedFacet && c.getTL() == this.getTL()) {
-                // setWhereContributed( (OtmContributedFacet) c );
-                // ((OtmContributedFacet) c).setContributor( this );
                 return (OtmContributedFacet) c;
             }
         }
@@ -334,22 +362,17 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
 
     @Override
     public void modelChildren() {
-        // if (getTL() instanceof TLIndicatorOwner)
         getTL().getIndicators().forEach( p -> OtmPropertyFactory.create( p, this ) );
-        // if (getTL() instanceof TLAttributeOwner)
         getTL().getAttributes().forEach( p -> OtmPropertyFactory.create( p, this ) );
-        // if (getTL() instanceof TLPropertyOwner)
         getTL().getElements().forEach( p -> OtmPropertyFactory.create( p, this ) );
-        // if (getTL() instanceof TLFacetOwner) {
-        // ((TLFacetOwner) getTL()).getAllFacets().forEach( f -> log.debug( "TODO - model facet child." ) );
+
         for (TLFacet f : getTL().getAllFacets()) {
-            //
-            // OtmFacet<?> facet = OtmFacetFactory.create( f, this );
-            // if (facet != null)
-            // children.add( facet );
-            log.debug( "TEST - model facet child." );
+            // 2/12/21 - Added as needed to model nested facets
+            OtmFacet<?> facet = OtmFacetFactory.create( f, this );
+            if (facet != null)
+                children.add( facet );
+            // log.debug( "TEST - model facet child." );
         }
-        // TODO - add other facets???
     }
 
     @Override

@@ -31,7 +31,6 @@ import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmFacets.OtmFacetFactory;
-import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
@@ -151,6 +150,14 @@ public class TestCustomFacet extends TestContextualFacet {
         return buildTL( abstractLibrary, null, name );
     }
 
+    /**
+     * Create facet. set name, facet type, add attribute and element
+     * 
+     * @param abstractLibrary - add facet to library if not null
+     * @param tlBO add facet to BO if not null
+     * @param name
+     * @return
+     */
     public static TLContextualFacet buildTL(AbstractLibrary abstractLibrary, TLBusinessObject tlBO, String name) {
         TLContextualFacet tlcf = new TLContextualFacet();
         tlcf.setName( name );
@@ -323,14 +330,9 @@ public class TestCustomFacet extends TestContextualFacet {
         testContributedFacet( cf.getWhereContributed(), cf, bo2 );
     }
 
+    // TODO - move to testContextualFacet
     @Test
-    public void testNestedContributedFacets() {
-        // FIXME - what is this supposed to do???
-        OtmContextualFacet nestedCF = buildOtm( staticLib, "NestedCF" );
-        TestOtmPropertiesBase.buildOneOfEach2( nestedCF );
-
-        super.testNestedContributedFacets( nestedCF );
-    }
+    public void testNestedContributedFacets() {}
 
     @Test
     public void testWhenContributed() {

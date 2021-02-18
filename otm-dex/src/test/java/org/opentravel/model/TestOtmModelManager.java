@@ -239,9 +239,10 @@ public class TestOtmModelManager extends AbstractFxTest {
             for (LibraryMember lm : pi.getContent().getNamedMembers()) {
                 // log.debug( "Testing " + lm.getLocalName() );
 
-                OtmLibraryMember otm = (OtmLibraryMember) OtmModelElement.get( (TLModelElement) lm );
-                if (otm == null)
+                OtmLibraryMember otmL = (OtmLibraryMember) OtmModelElement.get( (TLModelElement) lm );
+                if (otmL == null)
                     log.debug( "ERROR - missing otm from listener on a " + lm.getClass().getSimpleName() );
+                OtmLibraryMember otm = (OtmLibraryMember) OtmModelElement.get( (TLModelElement) lm );
                 assertTrue( "Must have Otm object from listener.", otm != null );
                 assertTrue( "Must contain Otm object from named member.", mgr.contains( otm ) );
 

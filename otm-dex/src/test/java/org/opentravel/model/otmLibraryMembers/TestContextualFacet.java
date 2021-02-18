@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.actions.BaseTypeChangeAction;
+import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
@@ -37,6 +38,7 @@ import org.opentravel.model.otmFacets.OtmQueryFacet;
 import org.opentravel.model.otmProperties.OtmAttribute;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
 import org.opentravel.schemacompiler.codegen.util.FacetCodegenUtils;
+import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLChoiceObject;
@@ -117,6 +119,8 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         assertTrue( "Model manager must have facet as member.", lm.getModelManager().getMembers().contains( cf ) );
 
         // TL Facet Tests
+        assertTrue( "Contextual facet must have TLContextualFacet", cf.getTL() instanceof TLContextualFacet );
+        assertTrue( "Contributed facet must have TLContextualFacet", contrib.getTL() instanceof TLContextualFacet );
         assertTrue( "Both facets have same TL facet", cf.getTL() == contrib.getTL() );
         assertTrue( "TL is a TLContextual facet", cf.getTL() instanceof TLContextualFacet );
         if (cf instanceof OtmCustomFacet && lm instanceof OtmBusinessObject)
@@ -130,8 +134,13 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
                 ((TLChoiceObject) lm.getTL()).getChoiceFacets().contains( contrib.getTL() ) );
         // TODO - test if LM is contextual facet
 
+        // Identity listener tests
+        assertTrue( "TLContextual facet must have identity listener.", cf == OtmModelElement.get( cf.getTL() ) );
+        assertTrue( "Must have two identity listeners.", cf.getTL().getListeners().size() == 2 );
+        // if (l instanceof OtmModelElementListener)
+
         // Verify the contributed owner is the same as the TL contextual facet's owner
-        if (cf.getTL().getOwningEntity() != null && cf.getWhereContributed() != null)
+        if (cf.getTL().getOwningEntity() != null)
             assertTrue( lm == OtmModelElement.get( (TLModelElement) cf.getTL().getOwningEntity() ) );
     }
 
@@ -193,20 +202,102 @@ public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualF
         assertTrue( cfKids.size() == iKids.size() );
     }
 
-    public void testNestedContributedFacets(OtmContextualFacet nestedCF) {
-        // Given - a cf with children contributed to a member
-        // Given - a second CF with children
+    /**
+     * Simulate loaded nested contextual facets.
+     */
+    @Test
+    public void testLoadNestedContextualFacet() {
+        AbstractLibrary tlLib = TestLibrary.buildTL( "http://example.com/foo/v1", "foo", "Foo" );
+        tlLib.setOwningModel( staticModelManager.getTlModel() );
+        assertTrue( "Given: ", tlLib.getOwningModel() != null );
 
-        // When - injection point set
-        OtmObject result = nestedCF.setBaseType( cf );
+        TLBusinessObject tlBo = TestBusiness.buildTL();
+        tlLib.addNamedMember( tlBo );
+        assertTrue( "Given: ", tlBo.getOwningLibrary() == tlLib );
+        assertTrue( "Given: ", tlBo.getOwningModel() == tlLib.getOwningModel() );
+
+        // Set up the TL Objects as they would be found during load
+        TLContextualFacet tlCf = TestCustomFacet.buildTL( tlLib, tlBo, "BaseCF" );
+        TLContextualFacet tlExCf = TestCustomFacet.buildTL( tlLib, null, "ExCF" );
+        tlCf.addChildFacet( tlExCf );
+
+        assertTrue( "Given: ", tlCf.getOwningEntity() == tlBo );
+        assertTrue( "Given: ", tlExCf.getOwningEntity() == tlCf );
+
+        // When - OtmModelManager to add abstract library
+        OtmLibrary lib = staticModelManager.add( tlLib );
+        assertTrue( "When: must have created library.", lib != null );
+        List<OtmLibraryMember> members = lib.getMembers();
+        OtmContextualFacet exCf = null;
+        for (OtmLibraryMember m : members) {
+            if (m instanceof OtmContextualFacet && m.getBaseType() instanceof OtmContextualFacet)
+                exCf = (OtmContextualFacet) m;
+        }
+        assertTrue( "When: Must have created nested CF.", exCf != null );
+
         // Then
-        assertTrue( "Non-null result.", result == cf );
-        assertTrue( "TL Owning entity is set.", nestedCF.getTL().getOwningEntity() == cf.getTL() );
-        // Then - cf has nested as child
-        List<OtmObject> kids = cf.getChildren();
-        assertTrue( "Nested CF is a child of CF.", kids.contains( nestedCF.getWhereContributed() ) );
-        assertTrue( "Nested CF is contributed to CF.", nestedCF.getContributedObject() == cf );
-        testContributedFacet( nestedCF.getWhereContributed(), nestedCF, cf );
+        assertTrue( "Then: ", exCf.getTL() != null );
+        assertTrue( "Then: ", exCf.getTL().getOwningEntity() != null );
+        //
+        // Then - Assure getWhereContributed works
+        // uses the owning entities identity listener to find the owner.
+        OtmObject o = OtmModelElement.get( (TLModelElement) exCf.getTL().getOwningEntity() );
+        assertTrue( "Then: TL Owning entity must have OTM facade.", o instanceof OtmCustomFacet );
+        OtmContextualFacet baseCf = (OtmContextualFacet) o;
+        // getWhereContributed()
+        assertTrue( "Then: base facet must have contributed child.", !baseCf.getChildrenContributedFacets().isEmpty() );
+        // getWhereContributed() uses this to find contributed facet
+        OtmContributedFacet contrib = exCf.getWhereContributed( (OtmChildrenOwner) o );
+        assertTrue( "Then: ", contrib != null );
+        // Final check on getWhereContributed()
+        contrib = exCf.getWhereContributed();
+        assertTrue( "Then: ", contrib != null );
+
+        assertTrue( "Then: ", true );
+        assertTrue( "Then: ", true );
+        // Finally, run generic test
+        checkNestedContextualFacet( exCf );
+    }
+
+    /**
+     * MemberTreeController uses: Collection<OtmTypeProvider> children = childrenOwner.getChildrenTypeProviders();
+     * <p>
+     * This must report out any contextual facets injected onto a contextual facet.
+     */
+    @Test
+    public void testNestedContextualFacets() {
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmBusinessObject bo = TestBusiness.buildOtm( lib, "Bo" );
+        OtmCustomFacet baseCF = TestCustomFacet.buildOtm( bo, "BaseCF" );
+        OtmCustomFacet exCF = TestCustomFacet.buildOtm( baseCF, "ExCF" );
+
+        checkNestedContextualFacet( exCF );
+    }
+
+    public static void checkNestedContextualFacet(OtmContextualFacet nestedCF) {
+        // Check Contributor
+        OtmContributedFacet nestedContrib = nestedCF.getWhereContributed();
+        assertTrue( "Check Nested CF: nestedCF must have contributor", nestedContrib != null );
+        assertTrue( "Check Nested CF: nestedCF's contributor must have parent", nestedContrib.getParent() != null );
+        assertTrue( "Check Nested CF: ", true );
+
+        // Check where injected
+        assertTrue( "Check Nested CF: CF base type is not a contextual facet.",
+            nestedCF.getBaseType() instanceof OtmContextualFacet );
+        OtmContextualFacet baseCF = (OtmContextualFacet) nestedCF.getBaseType();
+        List<OtmObject> kids = baseCF.getChildren();
+        assertTrue( "Check Nested CF: nested CF is not a child of the base",
+            kids.contains( nestedCF.getWhereContributed() ) );
+        assertTrue( "Nested CF is contributed to CF.", baseCF == nestedCF.getContributedObject() );
+        assertTrue( "Check Nested CF: ", baseCF instanceof OtmChildrenOwner );
+        assertTrue( "Check Nested CF: ", baseCF.getChildrenTypeProviders().contains( nestedContrib ) );
+
+        // assertTrue( "Check Nested CF: ", true );
+
+        testContributedFacet( nestedContrib, nestedCF, baseCF );
+
+        // Check TL Relationships
+        // assertTrue( "TL Owning entity is set.", nestedCF.getTL().getOwningEntity() == cf.getTL() );
     }
     // Test via OtmFacetFactory
 

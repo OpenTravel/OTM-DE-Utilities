@@ -473,6 +473,7 @@ public class OtmModelManager implements TaskResultHandlerI {
             libraries.get( absLibrary ).add( pi );
         } else {
             // Model and Add newly discovered library to the libraries and baseNS maps
+            // For each named member use the factory to create and add OtmLibraryMember
             add( pi, getVersionChainFactory() );
         }
         OtmLibrary lib = libraries.get( absLibrary );

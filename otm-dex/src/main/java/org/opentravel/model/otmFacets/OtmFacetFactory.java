@@ -118,29 +118,22 @@ public class OtmFacetFactory {
             case UPDATE:
             case QUERY:
                 // 1/26/2021 - changing the contributed facet was causing debugging problems.
-                // Reinstated trying to recover contributed facet from listener.
+                // Contextual facets are fundamentally different than the facets above.
+                // Contextual facets have to OTM Facades: one as a library member and one as a child where injected.
+                // This factory produces the child facade.
+                // The LibraryMemberFactory uses OtmFacetFactory#create(TLContextualFacet, OtmModelManager) to produce
+                // the library member.
+
+                // Try to recover contributed facet from listener.
                 OtmObject obj = OtmModelElement.get( tlFacet );
                 if (obj instanceof OtmContextualFacet)
-                    facet = ((OtmContextualFacet) obj).getWhereContributed( parent );
+                    facet = ((OtmContextualFacet) obj).getExistingContributed();
                 else if (obj instanceof OtmContributedFacet)
                     facet = (OtmContributedFacet) obj;
 
-                if (facet == null) {
-                    log.debug( "Facet factory passed an unmodeled facet: " + tlFacet.getNamespace() + " : "
-                        + tlFacet.getLocalName() );
-                    log.debug( " parent: " + parent.getNamespace() + " : " + parent.getName() );
-                    if (parent instanceof OtmLibraryMember && tlFacet instanceof TLContextualFacet)
-                        facet = new OtmContributedFacet( (TLContextualFacet) tlFacet, parent );
-                }
-
-                // if (OtmModelElement.get( tlFacet ) == null) {
-                // log.debug( "Facet factory passed an unmodeled facet: " + tlFacet.getNamespace() + " : "
-                // + tlFacet.getLocalName() );
-                // log.debug( " parent: " + parent.getNamespace() + " : "
-                // + parent.getName() );
-                // }
-                // if (parent instanceof OtmLibraryMember && tlFacet instanceof TLContextualFacet)
-                // facet = new OtmContributedFacet( (TLContextualFacet) tlFacet, parent );
+                // If not recovered, create a new contributed facet.
+                if (facet == null && parent instanceof OtmLibraryMember && tlFacet instanceof TLContextualFacet)
+                    facet = new OtmContributedFacet( (TLContextualFacet) tlFacet, parent );
                 break;
             case SIMPLE:
             default:

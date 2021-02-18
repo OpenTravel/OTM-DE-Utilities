@@ -53,6 +53,8 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     /**
      * Utility to <i>get</i> the OTM facade object that wraps the TL Model object. Uses the listener added to all TL
      * objects in the facade's constructor.
+     * <p>
+     * Contextual facets will have two listeners, return just the contextual facet
      * 
      * @param tlObject the wrapped TLModelElement. Can be null.
      * @return otm facade wrapper or null if no listener found.
@@ -106,8 +108,11 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
 
     /**
      * Add a OtmModelElement listener if it does not already have one.
+     * <p>
+     * Note: TLContextualFacets may have two listeners, one for the OtmContextualFacet and one for the
+     * OtmContributedFacet.
      */
-    private void addListener() {
+    protected void addListener() {
         for (ModelElementListener l : tlObject.getListeners())
             if (l instanceof OtmModelElementListener)
                 return;
