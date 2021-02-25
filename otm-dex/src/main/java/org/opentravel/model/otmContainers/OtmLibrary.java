@@ -95,7 +95,12 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
 
     @Override
     public int compareTo(OtmLibrary o) {
-        return getName().compareTo( o.getName() );
+        return getVersionedName().compareTo( o.getVersionedName() );
+        // return getName().compareTo( o.getName() );
+    }
+
+    public String getVersionedName() {
+        return getName() + "_v" + getVersion();
     }
 
     /**

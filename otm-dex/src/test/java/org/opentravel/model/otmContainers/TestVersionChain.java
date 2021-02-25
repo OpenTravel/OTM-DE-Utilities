@@ -57,9 +57,9 @@ public class TestVersionChain extends AbstractFxTest {
     public static final boolean RUN_HEADLESS = true;
     final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.
 
-    final static String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector
-    final static String FILE_TESTOPENTRAVELREPO = "TestOpenTravelRepo.otp";
-    final static String FILE_TESTLOCAL = "TestLocalFiles.otp";
+    // final static String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector
+    // final static String FILE_TESTOPENTRAVELREPO = "TestOpenTravelRepo.otp";
+    // final static String FILE_TESTLOCAL = "TestLocalFiles.otp";
 
     @BeforeClass
     public static void setupTests() throws Exception {

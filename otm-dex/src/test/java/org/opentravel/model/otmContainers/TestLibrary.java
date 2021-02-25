@@ -414,21 +414,9 @@ public class TestLibrary extends AbstractFxTest {
      * @return
      */
     public static OtmLibrary buildOtm() {
-        OtmLibrary lib = TestLibrary.buildOtm( new OtmModelManager( new DexFullActionManager( null ), null, null ) );
-        assertTrue( lib.getTL().getOwningModel() != null );
-        return lib;
+        return TestLibrary.buildOtm( new OtmModelManager( new DexFullActionManager( null ), null, null ) );
     }
 
-    /**
-     * Assure library contents are editable.
-     */
-    public static void checkContentsAreEditable(OtmLibrary lib) {
-        for (OtmLibraryMember lm : lib.getMembers()) {
-            assertTrue( lm.isEditable() );
-            for (OtmObject d : lm.getDescendants())
-                assertTrue( d.isEditable() );
-        }
-    }
 
     /**
      * Create a TL_library and OtmLibrary named "LibraryName" in example.com namespace
@@ -439,24 +427,26 @@ public class TestLibrary extends AbstractFxTest {
      * @return
      */
     public static OtmLibrary buildOtm(OtmModelManager mgr) {
-        TLLibrary tlLib = buildTL();
-        tlLib.setOwningModel( mgr.getTlModel() );
-        tlLib.setName( "LibraryName" );
-        tlLib.setPrefix( "pre" );
-        tlLib.setNamespace( "http://example.com/ns/v0" );
-        tlLib.setLibraryUrl( URLUtils.toURL( "file://exampleLib.otm" ) );
-        OtmLibrary lib = mgr.add( tlLib );
-        assertTrue( "Given", lib.isEditable() );
-        assertTrue( "Given - model manager must be able to find the library.", mgr.get( lib.getTL() ) == lib );
-        assertTrue( "Given", lib.getStatus() == TLLibraryStatus.DRAFT );
-        assertTrue( "Given: library must be owned by model.", tlLib.getOwningModel() != null );
-        assertTrue( "Given",
-            lib.getState() == RepositoryItemState.MANAGED_WIP || lib.getState() == RepositoryItemState.UNMANAGED );
-        return lib;
+        return buildOtm( mgr, "http://example.com/ns/v0", "pre", "LibraryName" );
     }
 
     public static OtmLibrary buildOtm(OtmModelManager mgr, String namespace, String prefix, String name) {
-        OtmLibrary lib = mgr.add( buildTL( namespace, prefix, name ) );
+        TLLibrary tlLib = buildTL();
+        tlLib.setOwningModel( mgr.getTlModel() );
+        tlLib.setName( name );
+        tlLib.setPrefix( prefix );
+        tlLib.setNamespace( namespace );
+        tlLib.setLibraryUrl( URLUtils.toURL( "file://exampleLib.otm" ) );
+
+        OtmLibrary lib = mgr.add( tlLib );
+
+        assertTrue( "Builder", lib.isEditable() );
+        assertTrue( "Builder - model manager must be able to find the library.", mgr.get( lib.getTL() ) == lib );
+        assertTrue( "Builder", lib.getStatus() == TLLibraryStatus.DRAFT );
+        assertTrue( "Builder: library must be owned by model.", tlLib.getOwningModel() != null );
+        assertTrue( "Builder",
+            lib.getState() == RepositoryItemState.MANAGED_WIP || lib.getState() == RepositoryItemState.UNMANAGED );
+
         check( lib );
         return lib;
     }
@@ -477,15 +467,24 @@ public class TestLibrary extends AbstractFxTest {
     public static void check(OtmLibrary library) {
         assertTrue( library.getModelManager() != null );
         assertTrue( library.getModelManager().getTlModel() != null );
-
+        //
         assertTrue( !library.getPrefix().isEmpty() );
         assertTrue( !library.getName().isEmpty() );
         assertTrue( !library.getBaseNamespace().isEmpty() );
         //
         assertTrue( library.getTL() instanceof TLLibrary );
         assertTrue( library.contains( library.getTL() ) );
-        // FIXME - why are some test failing here?
-        // assertTrue( library.getTL().getOwningModel() != null );
+    }
+
+    /**
+     * Assure library contents are editable.
+     */
+    public static void checkContentsAreEditable(OtmLibrary lib) {
+        for (OtmLibraryMember lm : lib.getMembers()) {
+            assertTrue( lm.isEditable() );
+            for (OtmObject d : lm.getDescendants())
+                assertTrue( d.isEditable() );
+        }
     }
 
     /**

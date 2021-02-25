@@ -263,8 +263,12 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     }
 
     private DialogBoxContoller getDialogBox(UserSettings settings) {
+        // if (getMainController() instanceof DexMainControllerBase)
+        // dialogBox = ((DexMainControllerBase) getMainController()).getDialogBoxController();
+        // else {
         dialogBox = DialogBoxContoller.init();
         dialogBox.setUserSettings( settings );
+        // }
         return dialogBox;
     }
 

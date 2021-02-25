@@ -24,6 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
+import org.opentravel.model.otmContainers.TestLibraryMaps;
 import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
@@ -47,7 +48,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Tests and utilities for testing facets.
+ * Tests and utilities for testing maps of providers and users. {@link TestLibraryMaps} for tests in versioned
+ * libraries.
  * <p>
  */
 public class TestOtmModelMapsManager {
@@ -275,5 +277,16 @@ public class TestOtmModelMapsManager {
         map.put( lib3, providers3 );
 
         return targetLib;
+    }
+
+    public static void print(OtmLibrary lib) {
+        log.debug( lib + " Provider Map contains" );
+        print( lib.getProvidersMap() );
+    }
+
+    public static void print(Map<OtmLibrary,List<OtmLibraryMember>> map) {
+        for (OtmLibrary l : map.keySet()) {
+            log.debug( "\t" + l.getNameWithPrefix() + " provides types to " + map.get( l ) );
+        }
     }
 }

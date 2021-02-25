@@ -29,6 +29,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.otmContainers.OtmVersionChain;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmProperties.OtmIdAttribute;
@@ -59,10 +60,24 @@ public class SetAssignedTypeAction extends DexRunAction {
             return false;
         if (!(subject instanceof OtmTypeUser))
             return false;
-        if (subject.isEditable())
+        if (subject.getLibrary() == null)
+            return false;
+        if (!subject.isEditable())
+            return false;
+        // If editable, major versions can always have subject set
+        if (subject.getLibrary().isMajorVersion())
             return true;
-        if (subject.getLibrary() != null && subject.getLibrary().isChainEditable())
-            return subject.getLibrary().getVersionChain().canAssignLaterVersion( (OtmTypeUser) subject );
+
+        // Deal with minor versions
+        OtmVersionChain chain = subject.getLibrary().getVersionChain();
+        if (chain != null) {
+            // If it is new to the chain, allow the subject to be set to anything
+            if (chain.isNewToChain( subject.getOwningMember() ))
+                return true;
+            // Otherwise, only allow if there is a later version of the assigned type (subject)
+            if (subject.getLibrary().isChainEditable())
+                return chain.canAssignLaterVersion( (OtmTypeUser) subject );
+        }
         return false;
     }
 
@@ -98,6 +113,22 @@ public class SetAssignedTypeAction extends DexRunAction {
         return event == null ? super.getEvent() : event;
     }
 
+    private boolean restrictType() {
+        if (otm.getLibrary().isMajorVersion())
+            return false;
+        OtmVersionChain chain = otm.getLibrary().getVersionChain();
+        if (chain == null)
+            return false;
+        // If it is new to the chain, allow the subject to be set to anything
+        if (chain.isNewToChain( otm.getOwningMember() ))
+            return false;
+
+        return true;
+        // Otherwise, only allow if there is a later version of the assigned type (subject)
+        // if (subject.getLibrary().isChainEditable())
+        // return chain.canAssignLaterVersion( (OtmTypeUser) subject );
+    }
+
     /**
      * This action will get the data from the user via modal dialog
      */
@@ -130,13 +161,16 @@ public class SetAssignedTypeAction extends DexRunAction {
                 // otm.getActionManager().postWarning( "Error creating minor version of " + otm.getOwningMember() );
                 return null;
             }
-            // set filter and event
-            controller.getMemberFilterController().setMinorVersionFilter( user.getAssignedType() );
+            // set event
+            // controller.getMemberFilterController().setMinorVersionFilter( user.getAssignedType() );
             event = new OtmObjectReplacedEvent( newUser, user );
             // log.debug( "Created new user in new minor version of " + newUser.getOwningMember() );
         }
 
         // Set applicable filters
+        if (restrictType())
+            controller.getMemberFilterController().setMinorVersionFilter( user.getAssignedType() );
+        // 2/25/21 - dmh - no long used for resources. see AssignedResourceSubjectAction
         if (otm instanceof OtmResource)
             controller.getMemberFilterController().setTypeFilterValue( OtmLibraryMemberType.BUSINESS );
         if (otm instanceof OtmActionFacet)

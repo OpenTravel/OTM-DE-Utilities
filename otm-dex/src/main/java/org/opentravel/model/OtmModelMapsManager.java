@@ -116,7 +116,9 @@ public class OtmModelMapsManager implements TaskResultHandlerI {
                 usersInTargetLibrary.add( (OtmTypeUser) m );
             usersInTargetLibrary.addAll( m.getDescendantsTypeUsers() );
         }
-        usersInTargetLibrary.forEach( u -> addToMap( u, providerMap ) );
+        // Add each user to the entry found using assigned type's library.
+        // TODO - pass in the library to filter out user's with types from the library
+        usersInTargetLibrary.forEach( u -> addToMap( u, library, providerMap ) );
 
         // Add all the users of base types from other libraries.
         for (OtmLibraryMember m : library.getMembers()) {
@@ -168,22 +170,36 @@ public class OtmModelMapsManager implements TaskResultHandlerI {
         // return providerMap;
     }
 
-    private void addToMap(OtmTypeUser user, Map<OtmLibrary,List<OtmLibraryMember>> map) {
+    /**
+     * Add this user to the entry found using assigned type's library.
+     * 
+     * @param user - assigned type's owning library is key, owning member is member
+     * @param lib - the library the map is being built for
+     * @param map
+     */
+    private void addToMap(OtmTypeUser user, OtmLibrary lib, Map<OtmLibrary,List<OtmLibraryMember>> map) {
         if (user != null && user.getAssignedType() != null && user.getAssignedType().getLibrary() != null) {
             OtmLibrary key = user.getAssignedType().getLibrary();
             // Ignore built-in
-            if (!key.isBuiltIn())
+            if (!key.isBuiltIn() && key != lib)
                 addToMap( key, user.getOwningMember(), map );
         }
     }
 
+    /**
+     * 
+     * @param key - map key to access list of members
+     * @param member - member to add if unique
+     * @param map
+     */
     private void addToMap(OtmLibrary key, OtmLibraryMember member, Map<OtmLibrary,List<OtmLibraryMember>> map) {
         List<OtmLibraryMember> values = map.get( key );
         if (values == null)
             values = new ArrayList<>();
-        if (!values.contains( member ))
+        if (!values.contains( member )) {
             values.add( member );
-        map.put( key, values );
+        }
+        map.put( key, values ); // replaces old values
     }
 
 

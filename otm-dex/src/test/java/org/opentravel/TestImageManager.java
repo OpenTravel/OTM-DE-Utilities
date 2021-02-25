@@ -47,7 +47,7 @@ public class TestImageManager extends AbstractFxTest {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null ); // no action manager
+        staticModelManager = new OtmModelManager( null, null, null ); // no action manager
     }
 
     @Test

@@ -51,10 +51,10 @@ public class TestOtmTypeProviderInterface {
     public static void checkTypeAssignment(List<OtmTypeProvider> users, OtmTypeProvider provider) {}
 
     /**
-     * Build one of each type user in the passed library. Properties will be owned by the created core object.
+     * Build one of each type provider in the passed library.
      * 
      * @param lib
-     * @return
+     * @return list of providers including non-members
      */
     public static List<OtmTypeProvider> buildOneOfEach(OtmLibrary lib) {
         List<OtmTypeProvider> typeProviders = new ArrayList<>();

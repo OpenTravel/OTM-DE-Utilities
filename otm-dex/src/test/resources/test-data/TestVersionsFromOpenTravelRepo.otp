@@ -12,8 +12,8 @@
     <otp:ManagedProjectItem>
         <otp:Repository>Opentravel</otp:Repository>
         <otp:BaseNamespace>http://www.opentravel.org/Sandbox</otp:BaseNamespace>
-        <otp:Filename>VersionTest_1_1_0.otm</otp:Filename>
-        <otp:Version>1.1.0</otp:Version>
+        <otp:Filename>VersionTest_1_2_0.otm</otp:Filename>
+        <otp:Version>1.2.0</otp:Version>
     </otp:ManagedProjectItem>
     <otp:RepositoryReferences>
         <otp:RepositoryRef repositoryId="Opentravel">http://opentravelmodel.net</otp:RepositoryRef>

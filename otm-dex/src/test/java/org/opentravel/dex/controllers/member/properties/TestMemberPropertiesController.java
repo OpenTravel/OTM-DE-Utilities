@@ -85,7 +85,7 @@ public class TestMemberPropertiesController extends AbstractFxTest {
     }
 
     @Test
-    public void testPropertiesDAO_MinorMembers() {
+    public void testPropertiesDAO_MinorMembers() throws InterruptedException {
         OtmModelManager mgr = new OtmModelManager( new DexFullActionManager( null ), repoManager, null );
         // Givens - projects
         if (!TestDexFileHandler.loadVersionProject( mgr ))
@@ -121,7 +121,7 @@ public class TestMemberPropertiesController extends AbstractFxTest {
     }
 
     @Test
-    public void testPropertiesDAO_MinorTypeUsers() throws VersionSchemeException {
+    public void testPropertiesDAO_MinorTypeUsers() throws VersionSchemeException, InterruptedException {
         OtmModelManager mgr = new OtmModelManager( new DexFullActionManager( null ), repoManager, null );
         // Given - vesioned project
         if (!TestDexFileHandler.loadVersionProject( mgr ))

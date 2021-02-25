@@ -92,16 +92,16 @@ public class OtmVersionChain {
         if (library == null)
             return "";
         String result = library.getPrefix();
-        // If there is more than one library in the minor version chain, change the prefix
-        int dash = result.indexOf( '-' );
-        if (dash > 0)
-            result = result.substring( 0, dash );
-        try {
-            result += "-" + Integer.toString( library.getMajorVersion() );
-            result += ".*";
-        } catch (Exception e) {
-            // NO-OP
-        }
+        // // If there is more than one library in the minor version chain, change the prefix
+        // int dash = result.indexOf( '-' );
+        // if (dash > 0)
+        // result = result.substring( 0, dash );
+        // try {
+        // result += "-" + Integer.toString( library.getMajorVersion() );
+        // result += ".*";
+        // } catch (Exception e) {
+        // // NO-OP
+        // }
         return result;
     }
 
@@ -166,6 +166,9 @@ public class OtmVersionChain {
         return getLatestVersion() != null ? getLatestVersion().isLatestVersion() : false;
     }
 
+    /**
+     * @return the library with the largest minor version number
+     */
     public OtmLibrary getLatestVersion() {
         OtmLibrary latest = null;
         if (libraries != null && !libraries.isEmpty()) {
@@ -292,22 +295,31 @@ public class OtmVersionChain {
         return newTypeUser;
     }
 
-    // From language specification document:
-    // . For one term to be considered a later minor version of another term, all of the following conditions MUST be
-    // met:
-    // 1. The terms must be of the same type (business object, core, etc.) and have the same name
-    // 2. The terms MUST be declared in different libraries, and both libraries must have the same name, version scheme,
-    // and base namespace URI
-    // 3. The version of the extended term’s library MUST be lower than that of the extending term’s library version,
-    // but both libraries MUST belong to the same major version chain
-    // Is there a newer minor version of this type provider?
+    /**
+     * Is there a newer minor version of the subject's assigned type provider?
+     * <ul>
+     * <li>The subject must be the latest version of the subject.
+     * <li>The assigned type must not be the latest version.
+     * </ul>
+     * <p>
+     * From language specification document:
+     * <p>
+     * For one term to be considered a later minor version of another term, all of the following conditions MUST be met:
+     * <li>1. The terms must be of the same type (business object, core, etc.) and have the same name
+     * <li>2. The terms MUST be declared in different libraries, and both libraries must have the same name, version
+     * scheme, and base namespace URI
+     * <li>3. The version of the extended term’s library MUST be lower than that of the extending term’s library
+     * version, but both libraries MUST belong to the same major version chain
+     */
     public boolean canAssignLaterVersion(OtmTypeUser subject) {
         if (subject == null || subject.getAssignedType() == null)
             return false;
-        // log.debug( "Can assign later version? " + !isLatestVersion( subject.getAssignedType().getOwningMember() ) );
+        log.debug( "Can assign later version? " + !isLatestVersion( subject.getAssignedType().getOwningMember() ) );
+
         // Return false if there is a later version of this subject
         if (!isLatestVersion( subject.getOwningMember() ))
             return false;
+        // Return false if assigned type is the latest version
         return !isLatestVersion( subject.getAssignedType().getOwningMember() );
     }
 

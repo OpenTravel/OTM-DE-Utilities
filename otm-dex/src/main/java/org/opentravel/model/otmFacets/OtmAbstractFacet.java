@@ -228,6 +228,12 @@ public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmMod
                 if (c instanceof OtmTypeUser)
                     users.add( (OtmTypeUser) c );
             } );
+        // 2/22/21 dmh - added inherited children that are type users
+        if (getInheritedChildren() != null)
+            getInheritedChildren().forEach( c -> {
+                if (c instanceof OtmTypeUser)
+                    users.add( (OtmTypeUser) c );
+            } );
         return users;
     }
 

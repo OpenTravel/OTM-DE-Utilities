@@ -215,13 +215,23 @@ public class TestDexFileHandler extends AbstractFxTest {
     /**
      * Load project that uses the OpenTravel repository. Note: it uses credentials so may not contain editable
      * libraries.
+     * <p>
+     * FILE_TESTVERSIONS_REPO = "TestVersionsFromOpenTravelRepo.otp";
+     * <p>
+     * 1 Library with version 0.0, 0.1, 1.0 and 1.1
+     * <p>
+     * 11 objects, one of each type
      * 
      * @return true if there is an editable library
+     * @throws InterruptedException
      */
-    public static boolean loadVersionProject(OtmModelManager modelManager) {
+    public static boolean loadVersionProject(OtmModelManager modelManager) throws InterruptedException {
         File repoProject = new File( wipFolder.get(), "/" + FILE_TESTVERSIONS_REPO );
         assertNotNull( repoProject );
         assertNotNull( modelManager );
+        // Check wipFolder
+        log.debug( "WipFolder = " + wipFolder.get() );
+        assertTrue( "Loader: must be able to read wipFolder.", repoProject.canRead() );
 
         new DexFileHandler().openProject( repoProject, modelManager, null );
         assertTrue( "Must have project items.", modelManager.getProjectManager().getAllProjectItems().size() > 1 );
@@ -235,6 +245,11 @@ public class TestDexFileHandler extends AbstractFxTest {
                 editable = true;
         if (!editable)
             log.warn( "No editable libraries. Check access to repository for libraries in " + FILE_TESTVERSIONS_REPO );
+
+        // Wait for the background tasks to complete
+        while (modelManager.getBackgroundTaskCount() > 0)
+            Thread.sleep( 100 );
+
         return editable;
     }
 

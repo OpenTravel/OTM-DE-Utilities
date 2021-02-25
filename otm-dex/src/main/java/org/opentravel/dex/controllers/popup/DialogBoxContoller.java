@@ -140,6 +140,10 @@ public class DialogBoxContoller extends DexPopupControllerBase {
      * @param message
      */
     public void show(String title, String message) {
+        log.debug( "TextArea: " + dialogText.getParagraphs() );
+        // log.debug( "TextFlow: "+dialogTitle );
+        log.debug( "Label: " + dialogTitleLabel.getText() );
+
         setTitle( title );
         show( message );
     }
@@ -225,6 +229,8 @@ public class DialogBoxContoller extends DexPopupControllerBase {
 
     @Override
     public void clear() {
+        // if (dialogText != null && dialogText.getParagraphs() != null)
+        // dialogText.getParagraphs().clear();
         dialogTitle.getChildren().clear();
     }
 

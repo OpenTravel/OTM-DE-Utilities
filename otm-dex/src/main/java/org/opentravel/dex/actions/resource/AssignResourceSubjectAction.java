@@ -19,6 +19,7 @@ package org.opentravel.dex.actions.resource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexRunAction;
+import org.opentravel.dex.actions.SetAssignedTypeAction;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
@@ -27,7 +28,6 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeProvider;
-import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
@@ -41,15 +41,6 @@ import javafx.application.Platform;
 
 public class AssignResourceSubjectAction extends DexRunAction {
     private static Log log = LogFactory.getLog( AssignResourceSubjectAction.class );
-
-    /**
-     * Get the users business object selection from the type selection controller.
-     * 
-     * @return selected business object or null
-     */
-    public static OtmBusinessObject getUserTypeSelection(OtmModelManager mgr) {
-        return getUserTypeSelection( mgr, null );
-    }
 
     /**
      * Get the users business object selection from the type selection controller.
@@ -80,10 +71,7 @@ public class AssignResourceSubjectAction extends DexRunAction {
 
     public static boolean isEnabled(OtmObject subject) {
         if (subject instanceof OtmResource) {
-            if (subject.isEditable())
-                return true;
-            if (subject.getLibrary() != null && subject.getLibrary().isChainEditable())
-                return subject.getLibrary().getVersionChain().canAssignLaterVersion( (OtmTypeUser) subject );
+            return SetAssignedTypeAction.isEnabled( subject );
         }
         return false;
     }
@@ -112,38 +100,28 @@ public class AssignResourceSubjectAction extends DexRunAction {
             return null;
         if (resource.getActionManager() == null)
             return null;
+        if (resource.getLibrary() == null)
+            return null;
+        if (resource.getLibrary().isMinorVersion() && resource.getLibrary().getVersionChain() == null)
+            return null;
+
+        // currentSubject flags the need to limit selection to minor versions of the subject
         OtmBusinessObject currentSubject = null;
-
-        // If this resource is in an older minor version
-        if (!resource.isEditable() && resource.getLibrary().isChainEditable()) {
-            // Flags that there needs to be a new minor created and limit selection to minor versions of the subject
+        if (resource.getLibrary().isMinorVersion() && !resource.getLibrary().getVersionChain().isNewToChain( resource ))
             currentSubject = resource.getSubject();
-
-            // // Create new minor version of resource
-            // newResource = getNewMinorVersion( resource );
-            // OtmLibraryMember newLM = resource.getLibrary().getVersionChain().getNewMinorLibraryMember( resource );
-            // if (newLM instanceof OtmResource)
-            // newResource = (OtmResource) newLM;
-            // else {
-            // otm.getActionManager().postWarning( "Error creating minor version of resource " + resource );
-            // return null;
-            // }
-        }
 
         // Get the user's selected business object
         OtmBusinessObject selection = getUserTypeSelection( resource.getModelManager(), currentSubject );
 
         if (selection != null) {
-            if (currentSubject != null)
-                // Create new minor version of resource
+            // Create new minor version of resource If this resource is in an older minor version
+            if (!resource.isEditable() && resource.getLibrary().isChainEditable())
                 resource = newResource = getNewMinorVersion( resource );
+
             doIt( selection );
         }
-        // else
-        // resource.getLibrary().delete( newResource );
 
         return get();
-
     }
 
     private OtmResource getNewMinorVersion(OtmResource r) {

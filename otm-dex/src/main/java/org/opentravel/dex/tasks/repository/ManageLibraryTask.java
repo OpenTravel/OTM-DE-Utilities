@@ -54,6 +54,10 @@ public class ManageLibraryTask extends DexTaskBase<OtmLibrary> {
     private static String errorMsg;
     private Repository repository = null;
 
+    // public ManageLibraryTask() {
+    // super( null, null, null );
+    // }
+
     /**
      * Create a lock library task.
      * 

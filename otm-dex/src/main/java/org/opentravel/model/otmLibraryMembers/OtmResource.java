@@ -23,7 +23,7 @@ import org.opentravel.common.DexMimeTypeHandler;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.actions.DexActions;
-import org.opentravel.dex.actions.SetAssignedTypeAction;
+import org.opentravel.dex.actions.resource.AssignResourceSubjectAction;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
 import org.opentravel.model.OtmModelElement;
@@ -778,8 +778,10 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     private Node getSubectNode() {
         Button button = new Button( getSubjectName() );
-        button.setDisable( !SetAssignedTypeAction.isEnabled( this ) );
-        // button.setDisable( !isEditable() );
+        // Why is SetAssignedTypeAction used for enable while AssignResourceSubjectAction the action?
+        button.setDisable( !AssignResourceSubjectAction.isEnabled( this ) );
+        // button.setDisable( !SetAssignedTypeAction.isEnabled( this ) );
+        // log.debug( "Set subject node enabled? " + SetAssignedTypeAction.isEnabled( this ) );
         button.setOnAction( a -> assignSubject() );
         return button;
     }

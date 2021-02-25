@@ -25,10 +25,12 @@ import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmFacets.OtmSummaryFacet;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.schemacompiler.model.TLProperty;
 import org.opentravel.schemacompiler.model.TLPropertyOwner;
+import org.opentravel.schemacompiler.model.TLPropertyType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +99,25 @@ public class TestElement extends TestOtmPropertiesBase<OtmElement<?>> {
      * **********************************************************************************
      * 
      */
+
+    /**
+     * @param facet
+     * @param cm
+     * @return
+     */
+    public static OtmElement<?> buildOtm(OtmPropertyOwner parent, OtmTypeProvider assignedType) {
+        assert (parent.getTL() instanceof TLPropertyOwner);
+        OtmElement<?> e = new OtmElement<TLProperty>( buildTL( (TLPropertyOwner) parent.getTL() ), parent );
+        if (assignedType != null && assignedType.getTL() instanceof TLPropertyType) {
+            e.setName( "E_" + assignedType.getName() );
+            e.setAssignedType( assignedType );
+            assertTrue( "Builder: must have assigned type.", e.getAssignedType() == assignedType );
+            assertTrue( "Builder: must have this owner in assigned types.",
+                assignedType.getOwningMember().getWhereUsed().contains( parent.getOwningMember() ) );
+        }
+        return e;
+    }
+
     /**
      * Build an element.
      * 
@@ -104,8 +125,9 @@ public class TestElement extends TestOtmPropertiesBase<OtmElement<?>> {
      * @return
      */
     public static OtmElement<?> buildOtm(OtmPropertyOwner parent) {
-        assert (parent.getTL() instanceof TLPropertyOwner);
-        return new OtmElement<TLProperty>( buildTL( (TLPropertyOwner) parent.getTL() ), parent );
+        return buildOtm( parent, null );
+        // assert (parent.getTL() instanceof TLPropertyOwner);
+        // return new OtmElement<TLProperty>( buildTL( (TLPropertyOwner) parent.getTL() ), parent );
     }
 
     public static TLProperty buildTL(TLPropertyOwner owner) {

@@ -458,7 +458,7 @@ public class TestInheritance extends AbstractFxTest {
     }
 
     @Test
-    public void testInheritanceInMinorVersion() throws VersionSchemeException {
+    public void testInheritanceInMinorVersion() throws VersionSchemeException, InterruptedException {
         mgr.clear();
         if (!TestDexFileHandler.loadVersionProject( mgr ))
             return; // No editable libraries
@@ -466,7 +466,7 @@ public class TestInheritance extends AbstractFxTest {
         OtmLibrary minorLibrary = TestVersionChain.getMinorInChain( mgr );
         assertTrue( "Given", minorLibrary != null );
         assertTrue( "Given", minorLibrary.isEditable() );
-        assertTrue( "Given - minor is empty.", mgr.getMembers( minorLibrary ).isEmpty() );
+        // assertTrue( "Given - minor is empty.", mgr.getMembers( minorLibrary ).isEmpty() );
 
         for (OtmLibraryMember member : mgr.getMembers( minorLibrary.getVersionChain().getMajor() )) {
             List<OtmObject> kids = member.getChildren();
