@@ -75,6 +75,11 @@ public class OtmIdReferenceAttribute<TL extends TLAttribute> extends OtmAttribut
         return getAssignedType();
     }
 
+    @Override
+    public boolean isRenameable() {
+        return false;
+    }
+
     /**
      * Let the compiler return the corrected name.
      * 
@@ -83,6 +88,20 @@ public class OtmIdReferenceAttribute<TL extends TLAttribute> extends OtmAttribut
     protected String getTypeBasedName() {
         QName qn = PropertyCodegenUtils.getDefaultSchemaElementName( getAssignedTLType(), true );
         return qn != null ? fixName( qn.getLocalPart() ) : "";
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Get the name from the compiler based on the assigned type. responsible for setting the name to *Ref
+     * 
+     * @param name <b>ignored</b> unless compiler does not return a name
+     */
+    @Override
+    public String setName(String name) {
+        getTL().setName( getTypeBasedName().isEmpty() ? name : getTypeBasedName() );
+        isValid( true );
+        return getName();
     }
 
 }

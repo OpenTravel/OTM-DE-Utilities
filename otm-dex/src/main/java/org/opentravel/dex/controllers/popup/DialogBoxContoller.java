@@ -25,6 +25,7 @@ import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -141,8 +142,14 @@ public class DialogBoxContoller extends DexPopupControllerBase {
      */
     public void show(String title, String message) {
         log.debug( "TextArea: " + dialogText.getParagraphs() );
-        // log.debug( "TextFlow: "+dialogTitle );
+        for (CharSequence p : dialogText.getParagraphs())
+            log.debug( "Para: " + p );
+        for (Node c : dialogTitle.getChildren())
+            if (c instanceof Text)
+                log.debug( "Text: " + ((Text) c).getText() );
         log.debug( "Label: " + dialogTitleLabel.getText() );
+        log.debug( "New Title: " + title );
+        log.debug( "New Message: " + message );
 
         setTitle( title );
         show( message );

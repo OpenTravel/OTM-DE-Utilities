@@ -83,6 +83,12 @@ public class OtmIdReferenceElement<TL extends TLProperty> extends OtmElement<TLP
         return qn != null ? qn.getLocalPart() : "";
     }
 
+    @Override
+    public boolean isRenameable() {
+        return false;
+    }
+
+
     /**
      * {@inheritDoc}
      * <p>

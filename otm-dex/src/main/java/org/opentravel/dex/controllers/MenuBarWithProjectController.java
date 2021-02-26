@@ -211,11 +211,6 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         controller.showAndWait( "" );
         e.consume(); // take the event away from windows in case they answer no.
 
-        // TODO
-        // 1. make dialog hand save and close as well as exit
-        // 2. create default button
-        //
-
         if (controller.okResult())
             stage.close();
     }

@@ -70,6 +70,7 @@ public class AssignResourceSubjectAction extends DexRunAction {
     }
 
     public static boolean isEnabled(OtmObject subject) {
+        // return false;
         if (subject instanceof OtmResource) {
             return SetAssignedTypeAction.isEnabled( subject );
         }

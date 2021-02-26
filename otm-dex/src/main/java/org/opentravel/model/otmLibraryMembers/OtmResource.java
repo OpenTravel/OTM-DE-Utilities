@@ -778,10 +778,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     private Node getSubectNode() {
         Button button = new Button( getSubjectName() );
-        // Why is SetAssignedTypeAction used for enable while AssignResourceSubjectAction the action?
         button.setDisable( !AssignResourceSubjectAction.isEnabled( this ) );
-        // button.setDisable( !SetAssignedTypeAction.isEnabled( this ) );
-        // log.debug( "Set subject node enabled? " + SetAssignedTypeAction.isEnabled( this ) );
         button.setOnAction( a -> assignSubject() );
         return button;
     }
