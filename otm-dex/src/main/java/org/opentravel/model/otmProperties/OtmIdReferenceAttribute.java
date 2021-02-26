@@ -75,6 +75,11 @@ public class OtmIdReferenceAttribute<TL extends TLAttribute> extends OtmAttribut
         return getAssignedType();
     }
 
+    /**
+     * {@inheritDoc} While re-nameable, setName() has no control over the name.
+     * 
+     * @see org.opentravel.model.OtmModelElement#isRenameable()
+     */
     @Override
     public boolean isRenameable() {
         return false;

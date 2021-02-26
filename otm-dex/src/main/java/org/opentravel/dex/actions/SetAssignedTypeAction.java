@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.action.manager.DexActionManagerBase;
+import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
 import org.opentravel.dex.events.DexChangeEvent;
@@ -40,6 +41,9 @@ import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import javax.xml.namespace.QName;
 
+/**
+ * TYPECHANGE(SetAssignedTypeAction.class, OtmObjectChangeEvent.class),
+ */
 public class SetAssignedTypeAction extends DexRunAction {
     private static Log log = LogFactory.getLog( SetAssignedTypeAction.class );
 
@@ -69,15 +73,14 @@ public class SetAssignedTypeAction extends DexRunAction {
             return true;
 
         // Deal with minor versions
+        if (DexMinorVersionActionManager.isNewToChain( subject ))
+            return true;
+
+        // Otherwise, only allow if there is a later version of the assigned type (subject)
         OtmVersionChain chain = subject.getLibrary().getVersionChain();
-        if (chain != null) {
-            // If it is new to the chain, allow the subject to be set to anything
-            if (chain.isNewToChain( subject.getOwningMember() ))
-                return true;
-            // Otherwise, only allow if there is a later version of the assigned type (subject)
-            if (subject.getLibrary().isChainEditable())
-                return chain.canAssignLaterVersion( (OtmTypeUser) subject );
-        }
+        if (chain != null && subject.getLibrary().isChainEditable())
+            return chain.canAssignLaterVersion( (OtmTypeUser) subject );
+
         return false;
     }
 

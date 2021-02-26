@@ -138,11 +138,32 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
      * @param subject
      * @return
      */
-    private boolean isNewProperty(OtmObject subject) {
+    public static boolean isNewProperty(OtmObject subject) {
         if (subject instanceof OtmProperty)
             return !subject.isInherited(); // if not in latest minor, the lib will not be editable
         if (subject instanceof OtmResourceChild)
             return !subject.isInherited();
+        return false;
+    }
+
+    /**
+     * Is the subject new to a chain?
+     * <p>
+     * <li>If a property, is it inherited?
+     * <li>If a resource child, is it inherited?
+     * <li>Is the owning member new to chain?
+     * 
+     * @param subject
+     * @return
+     */
+    public static boolean isNewToChain(OtmObject subject) {
+        if (subject instanceof OtmProperty)
+            return !subject.isInherited(); // if not in latest minor, the lib will not be editable
+        if (subject instanceof OtmResourceChild)
+            return !subject.isInherited();
+        if (subject.getLibrary() != null && subject.getLibrary().getVersionChain() != null)
+            return (subject.getLibrary().getVersionChain().isNewToChain( subject.getOwningMember() ));
+
         return false;
     }
 }
