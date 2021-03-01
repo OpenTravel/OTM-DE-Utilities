@@ -59,7 +59,7 @@ public class TypeResolverTask extends DexTaskBase<OtmModelManager> implements De
     // To Do - create dispatcher that eliminates multiple simultaneous requests
     @Override
     public synchronized void doIT() {
-        log.debug( "Starting Type resolver task." );
+        // log.debug( "Starting Type resolver task." );
 
         // Resolve contextual facet owners.
         Collection<OtmLibraryMember> cfs = taskData.getMembersContextualFacets();
@@ -70,7 +70,7 @@ public class TypeResolverTask extends DexTaskBase<OtmModelManager> implements De
         // For each member in the model, force a computation of where used.
         members.forEach( m -> ((OtmLibraryMemberBase<?>) m).getWhereUsed( true ) );
 
-        log.debug( "Type resolver task ran against " + members.size() + " model members." );
+        // log.debug( "Type resolver task ran against " + members.size() + " model members." );
     }
 
     /**

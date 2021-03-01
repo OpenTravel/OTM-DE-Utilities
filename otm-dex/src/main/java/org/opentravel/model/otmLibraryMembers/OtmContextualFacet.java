@@ -330,7 +330,7 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
             if (contrib != null)
                 setWhereContributed( contrib );
 
-            log.debug( "getWhereContributed() for " + this + " evaluated to: " + whereContributed );
+            // log.debug( "getWhereContributed() for " + this + " evaluated to: " + whereContributed );
         }
         return whereContributed;
     }

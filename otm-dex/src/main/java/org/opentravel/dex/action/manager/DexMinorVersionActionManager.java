@@ -23,7 +23,7 @@ import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmContainers.OtmVersionChain;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 /**
@@ -104,15 +104,21 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
         switch (action) {
             case NAMECHANGE:
                 // Allow name change to objects new to the chain
-                if (subject instanceof OtmLibraryMember && subject.getLibrary() != null
-                    && subject.getLibrary().getVersionChain() != null)
-                    return subject.getLibrary().getVersionChain().isNewToChain( (OtmLibraryMember) subject );
-                return isNewProperty( subject );
+                return isNewToChain( subject );
+            // if (subject instanceof OtmLibraryMember && subject.getLibrary() != null
+            // && subject.getLibrary().getVersionChain() != null)
+            // return subject.getLibrary().getVersionChain().isNewToChain( (OtmLibraryMember) subject );
+            // return isNewProperty( subject );
+            //
+            case TYPECHANGE:
             case ASSIGNSUBJECT:
-                if (subject instanceof OtmTypeUser) {
-                    if (subject.getLibrary() != null && subject.getLibrary().isChainEditable())
-                        return subject.getLibrary().getVersionChain().canAssignLaterVersion( (OtmTypeUser) subject );
-                }
+                if (subject instanceof OtmTypeUser)
+                    return canAssignLaterVersion( (OtmTypeUser) subject );
+
+                // if (subject instanceof OtmTypeUser) {
+                // if (subject.getLibrary() != null && subject.getLibrary().isChainEditable())
+                // return subject.getLibrary().getVersionChain().canAssignLaterVersion( (OtmTypeUser) subject );
+                // }
                 return false;
             case DESCRIPTIONCHANGE:
             case DEPRECATIONCHANGE:
@@ -144,6 +150,25 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
         if (subject instanceof OtmResourceChild)
             return !subject.isInherited();
         return false;
+    }
+
+    /**
+     * See {@link OtmVersionChain#canAssignLaterVersion(OtmTypeUser) }
+     * 
+     * @param subject type user
+     * @return true only if there is a later version of the type assigned to the subject type user
+     */
+    public static boolean canAssignLaterVersion(OtmTypeUser subject) {
+        if (subject == null || subject.getLibrary() == null)
+            return false;
+
+        if (subject.getLibrary().getVersionChain() == null)
+            return false;
+
+        if (!subject.getLibrary().isChainEditable())
+            return false;
+
+        return subject.getLibrary().getVersionChain().canAssignLaterVersion( subject );
     }
 
     /**

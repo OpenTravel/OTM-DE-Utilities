@@ -209,7 +209,11 @@ public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrar
     public void refresh() {
         OtmLibrary lib = postedData;
         postedData = null;
-        post( lib );
+        if (lib != null && getModelManager().contains( lib.getTL() ))
+            post( lib );
+        else
+            clear();
         ignoreEvents = false;
+
     }
 }

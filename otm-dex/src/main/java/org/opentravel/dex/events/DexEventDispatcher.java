@@ -88,8 +88,8 @@ public class DexEventDispatcher implements EventDispatcher {
     public Event dispatchEvent(Event event, EventDispatchChain tail) {
         if (event instanceof DexEvent)
             if (!ignoreNext) {
-                // log.debug(
-                // "Using my dispatcher on my event: " + event.getClass().getSimpleName() + " Ignore? " + ignoreNext );
+                log.debug(
+                    "Using my dispatcher on my event: " + event.getClass().getSimpleName() + " Ignore? " + ignoreNext );
                 if (event instanceof DexChangeEvent) {
                     OtmObject otm = ((DexChangeEvent) event).getOtmObject();
                     if (otm != null) {

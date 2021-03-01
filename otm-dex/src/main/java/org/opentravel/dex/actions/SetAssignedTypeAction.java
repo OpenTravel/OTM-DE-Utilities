@@ -72,14 +72,16 @@ public class SetAssignedTypeAction extends DexRunAction {
         if (subject.getLibrary().isMajorVersion())
             return true;
 
-        // Deal with minor versions
+        // Allow if new to a minor version
         if (DexMinorVersionActionManager.isNewToChain( subject ))
             return true;
+        // Only allow if there is a later version of the assigned type (subject)
+        if (DexMinorVersionActionManager.canAssignLaterVersion( (OtmTypeUser) subject ))
+            return true;
 
-        // Otherwise, only allow if there is a later version of the assigned type (subject)
-        OtmVersionChain chain = subject.getLibrary().getVersionChain();
-        if (chain != null && subject.getLibrary().isChainEditable())
-            return chain.canAssignLaterVersion( (OtmTypeUser) subject );
+        // OtmVersionChain chain = subject.getLibrary().getVersionChain();
+        // if (chain != null && subject.getLibrary().isChainEditable())
+        // return chain.canAssignLaterVersion( (OtmTypeUser) subject );
 
         return false;
     }

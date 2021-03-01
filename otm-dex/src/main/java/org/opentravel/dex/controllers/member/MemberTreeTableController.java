@@ -35,15 +35,12 @@ import org.opentravel.dex.events.OtmObjectReplacedEvent;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmEmptyTableFacet;
-import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.objecteditor.ObjectEditorController;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -266,16 +263,16 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
      * Create tree items for the type provider children of this child owning member
      */
     private void createChildrenItems(OtmChildrenOwner childrenOwner, TreeItem<MemberAndProvidersDAO> parentItem) {
-        log.debug( "Creating children items of: " + childrenOwner );
-        if (childrenOwner instanceof OtmContributedFacet) {
-            log.debug( "Processing contributed facet." );
-            log.debug( "Children" + childrenOwner.getChildrenTypeProviders() );
-        }
-        if (childrenOwner instanceof OtmContextualFacet) {
-            log.debug( "Processing contextual facet." );
-            Collection<OtmTypeProvider> children = childrenOwner.getChildrenTypeProviders();
-            log.debug( "Children" + children );
-        }
+        // log.debug( "Creating children items of: " + childrenOwner );
+        // if (childrenOwner instanceof OtmContributedFacet) {
+        // log.debug( "Processing contributed facet." );
+        // log.debug( "Children" + childrenOwner.getChildrenTypeProviders() );
+        // }
+        // if (childrenOwner instanceof OtmContextualFacet) {
+        // log.debug( "Processing contextual facet." );
+        // Collection<OtmTypeProvider> children = childrenOwner.getChildrenTypeProviders();
+        // log.debug( "Children" + children );
+        // }
 
         childrenOwner.getChildrenTypeProviders().forEach( p -> {
             // log.debug( "Creating child item of: " + p );

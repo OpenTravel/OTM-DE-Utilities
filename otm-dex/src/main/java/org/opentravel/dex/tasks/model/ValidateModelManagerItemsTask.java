@@ -53,17 +53,15 @@ public class ValidateModelManagerItemsTask extends DexTaskBase<OtmModelManager> 
 
         // Replace start message from super-type.
         msgBuilder = new StringBuilder( "Validating model." );
-        // msgBuilder.append(taskData.getName());
-        // updateMessage(msgBuilder.toString());
     }
 
     @Override
     public void doIT() throws RepositoryException {
         // Work from private copy since other tasks could change the collection
         Collection<OtmLibraryMember> members = new ArrayList<>( taskData.getMembers() );
-        log.debug( "Starting to validate " + members.size() + " model members." );
+        // log.debug( "Starting to validate " + members.size() + " model members." );
         members.forEach( m -> m.isValid( true ) );
-        log.debug( "Finished validating " + members.size() + " model members." );
+        // log.debug( "Finished validating " + members.size() + " model members." );
     }
 
     /**
