@@ -53,9 +53,9 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Verifies the functions of the <code>UserSettings</code> class.
  */
-public class TestAssignTypeAction {
+public class TestSetAssignedTypeAction {
 
-    private static Log log = LogFactory.getLog( TestAssignTypeAction.class );
+    private static Log log = LogFactory.getLog( TestSetAssignedTypeAction.class );
 
     private static OtmModelManager staticModelManager = null;
     static OtmLibrary lib = null;

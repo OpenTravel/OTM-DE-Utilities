@@ -26,10 +26,15 @@ import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.SortType;
@@ -176,6 +181,8 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         librariesTreeTable.getSelectionModel().setCellSelectionEnabled( true ); // allow individual cells to be edited
         librariesTreeTable.setTableMenuButtonVisible( true ); // allow users to select columns
 
+        librariesTreeTable.getSelectionModel().setSelectionMode( SelectionMode.MULTIPLE );
+
         // add a listener for tree selections
         librariesTreeTable.getSelectionModel().selectedItemProperty()
             .addListener( (v, o, n) -> librarySelectionListener( n ) );
@@ -213,12 +220,22 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
             ? librariesTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
     }
 
-    private void setSelectedItem(OtmLibrary lib) {
-        // for (TreeItem<LibraryDAO> item : librariesTreeTable.getRoot().getChildren()) {
-        // if (item.getValue().getValue() == lib)
-        // librariesTreeTable.getSelectionModel().select( item );
-        // }
+    protected List<OtmLibrary> getSelectedLibraries() {
+        List<OtmLibrary> libs = new ArrayList<>();
+        ObservableList<TreeItem<LibraryDAO>> items = librariesTreeTable.getSelectionModel().getSelectedItems();
+        items.forEach( i -> {
+            if (i.getValue() != null)
+                libs.add( i.getValue().getValue() );
+        } );
+        return libs;
     }
+
+    // private void setSelectedItem(OtmLibrary lib) {
+    // // for (TreeItem<LibraryDAO> item : librariesTreeTable.getRoot().getChildren()) {
+    // // if (item.getValue().getValue() == lib)
+    // // librariesTreeTable.getSelectionModel().select( item );
+    // // }
+    // }
 
     /**
      * @return the currently selected library or null

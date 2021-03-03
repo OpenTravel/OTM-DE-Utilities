@@ -18,12 +18,16 @@ package org.opentravel.common;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.controllers.popup.SelectProjectDialogController;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Handle requests for project related services.
@@ -46,13 +50,21 @@ public class DexProjectHandler {
         List<OtmProject> projects = library.getModelManager().getProjects();
 
         // Remove projects the library is already in
-        library.getProjects().forEach( p -> projects.remove( p ) );
+        library.getProjects().forEach( projects::remove );
+        // library.getProjects().forEach( p -> projects.remove( p ) );
 
         OtmProject project = selectOneProject( projects );
 
         // Add the library to the selected project
         if (project != null)
-            project.add( library );
+            try {
+                project.add( library );
+            } catch (Exception e) {
+                log.warn( "Could not add library to project: " + e.getLocalizedMessage() );
+                DialogBoxContoller dbc = DialogBoxContoller.init();
+                if (dbc != null)
+                    dbc.show( "Add Library Error", e.getLocalizedMessage() );
+            }
     }
 
     /**
@@ -70,28 +82,37 @@ public class DexProjectHandler {
     }
 
     /**
+     * Remove the libraries in the list from the user selected project. If libraries are only in one project, remove
+     * from that project.
+     * 
+     * @param libraries
+     */
+    public void remove(List<OtmLibrary> libraries) {
+        // Select one project from all that any library is in
+        OtmProject project = null;
+        Set<OtmProject> ps = new HashSet<>();
+        libraries.forEach( l -> ps.addAll( l.getProjects() ) );
+        List<OtmProject> projects = new ArrayList<>( ps );
+
+        if (projects.size() == 1)
+            project = projects.get( 0 );
+        else if (projects.size() > 1)
+            project = selectOneProject( projects );
+
+        if (project != null)
+            project.remove( libraries );
+    }
+
+    /**
      * Remove the library from the project the user selects.
      * 
      * @param library
      */
-    // FIXME - doen't seem to do anything
     public void removeLibrary(OtmLibrary library) {
         // Select one project
         List<OtmProject> projects = library.getProjects();
         OtmProject project = null;
-        // if (projects.isEmpty())
-        // return;
         project = selectOneProject( projects );
-        // if (projects.size() <= 1)
-        // project = projects.get( 0 );
-        // else {
-        // // post selection dialog
-        // SelectProjectDialogController spdc = SelectProjectDialogController.init();
-        // spdc.setProjectList( projects );
-        // spdc.showAndWait( "" );
-        // project = spdc.getSelection();
-        //
-        // }
         // Remove the library from selected project
         if (project != null)
             project.remove( library );

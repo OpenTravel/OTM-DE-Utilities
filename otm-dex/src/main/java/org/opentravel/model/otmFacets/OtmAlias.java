@@ -62,19 +62,19 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
             throw new IllegalStateException( "Created alias without parent." );
     }
 
-    // /**
-    // * Create an alias and add to the TL model and OTM parent
-    // *
-    // * @param owning library member
-    // */
-    // public OtmAlias(String name, OtmLibraryMember parent) {
-    // this( new TLAlias(), parent );
-    // if (parent.getTL() instanceof TLAliasOwner) {
-    // ((TLAliasOwner) parent.getTL()).addAlias( tlObject );
-    // parent.addAlias( getTL() );
-    // setName( name );
-    // }
-    // }
+    /**
+     * Create an alias and add to the TL model and OTM parent
+     *
+     * @param owning library member
+     */
+    public OtmAlias(String name, OtmLibraryMember parent) {
+        this( new TLAlias(), parent );
+        if (parent.getTL() instanceof TLAliasOwner) {
+            ((TLAliasOwner) parent.getTL()).addAlias( tlObject );
+            parent.addAlias( getTL() );
+            setName( name );
+        }
+    }
 
     @Override
     public String setName(String name) {

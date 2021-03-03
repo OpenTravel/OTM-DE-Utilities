@@ -226,6 +226,12 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         if (errMsg != null) {
             getActionManager().postError( exception, errMsg );
             log.debug( errMsg );
+        } else if (lm != null) {
+            // Clone the aliases
+            for (OtmObject c : getChildren()) {
+                if (c instanceof OtmAlias)
+                    new OtmAlias( c.getName(), lm );
+            }
         }
         return lm;
     }
@@ -617,6 +623,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             inheritedChildren.clear(); // force re-compute
 
         OtmObject baseType = getBaseType();
+        // AliasCodegenUtils - there is nothing in the utils about inheritance
         if (getTL() instanceof TLFacetOwner && baseType != null) {
 
             TLFacetOwner extendedOwner = (TLFacetOwner) getTL();

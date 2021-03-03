@@ -29,6 +29,8 @@ import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.schemacompiler.saver.LibrarySaveException;
 
+import java.util.List;
+
 /**
  * OTM Object Node for business objects. Project does NOT extend model element
  * 
@@ -60,22 +62,28 @@ public class OtmProject {
         return getTL().getProjectId();
     }
 
+    public void remove(List<OtmLibrary> libraries) {
+        libraries.forEach( l -> remove( l, false ) );
+        save();
+    }
+
     public void remove(OtmLibrary library) {
+        remove( library, true );
+    }
+
+    public void remove(OtmLibrary library, boolean save) {
         // Remove this project from the library's list
         ProjectItem pi = getProjectItem( library );
         if (pi == null)
             log.warn( "Missing PI for this library " + library );
 
         getTL().remove( library.getTL() );
-        log.debug( "Removed " + library.getName() + " from " + getName() + "  Library now is in "
-            + library.getProjects().size() + " projects." );
+        // log.debug( "Removed " + library.getName() + " from " + getName() + " Library now is in "
+        // + library.getProjects().size() + " projects." );
 
         // Shouldn't be needed, but is required to change file as of 7/16/2019
-        try {
-            getTL().getProjectManager().saveProject( getTL() );
-        } catch (LibrarySaveException e) {
-            log.error( "Error saving project: " + e.getLocalizedMessage() );
-        }
+        if (save)
+            save();
 
         library.remove( pi );
         // Note - no check to see if there are any projects that own this library.
@@ -85,6 +93,14 @@ public class OtmProject {
         // assert pi.getContent() != library.getTL();
     }
 
+    public void save() {
+        try {
+            getTL().getProjectManager().saveProject( getTL() );
+        } catch (LibrarySaveException e) {
+            log.error( "Error saving project: " + e.getLocalizedMessage() );
+        }
+    }
+
     public ProjectItem getProjectItem(OtmLibrary lib) {
         for (ProjectItem pi : lib.getProjectItems())
             if (getTL().getProjectItems().contains( pi ))
@@ -92,16 +108,23 @@ public class OtmProject {
         return null;
     }
 
-    public void add(OtmLibrary library) {
+    public void add(OtmLibrary library) throws RepositoryException {
         if (library != null) {
-            try {
-                // use modelManager's projectManager
-                ProjectItem pi = modelManager.getProjectManager().addUnmanagedProjectItem( library.getTL(), getTL() );
-                // ProjectItem pi = getTL().getProjectManager().addUnmanagedProjectItem( library.getTL(), getTL() );
-                library.add( pi ); // let the library know it is now part of this project
-            } catch (RepositoryException e) {
-                log.warn( "Could not add library to project: " + e.getLocalizedMessage() );
-            }
+            ProjectItem pi = null;
+            // if (library.isUnmanaged()) {
+            // use modelManager's projectManager
+            pi = modelManager.getProjectManager().addUnmanagedProjectItem( library.getTL(), getTL() );
+            // } else {
+            // FIXME - find out how to the the repoItem! This does not work as is.
+            // String itemUri = library.getProjectItem().toURI().toString();
+            // RepositoryItem repoItem = library.getProjectItem().getRepository().getRepositoryItem( itemUri );
+            // pi = getTL().getProjectManager().addManagedProjectItem( repoItem, getTL() );
+            // // List<RepositoryItem> repoItems = null;
+            // // library.getProjectItem();
+            // // List<ProjectItem> pis = modelManager.getProjectManager().addManagedProjectItems( repoItems, getTL()
+            // // );
+            // }
+            library.add( pi ); // let the library know it is now part of this project
             log.debug( "Added " + library.getName() + " to " + getName() );
         }
     }

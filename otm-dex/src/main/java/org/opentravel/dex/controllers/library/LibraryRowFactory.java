@@ -38,6 +38,9 @@ import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ContextMenu;
@@ -248,10 +251,15 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     }
 
     private void removeLibrary(ActionEvent e) {
-        OtmLibrary library = getSelected();
-        if (library == null)
-            return;
-        new DexProjectHandler().removeLibrary( library );
+        // OtmLibrary library = getSelected();
+        // if (library == null)
+        // return;
+        // new DexProjectHandler().removeLibrary( library );
+
+        List<OtmLibrary> libraries = new ArrayList<>();
+        if (controller != null)
+            libraries = controller.getSelectedLibraries();
+        new DexProjectHandler().remove( libraries );
         refreshView();
     }
 

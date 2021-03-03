@@ -102,6 +102,8 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
         if (action == null)
             return false;
         switch (action) {
+            case ADDALIAS:
+                return true;
             case NAMECHANGE:
                 // Allow name change to objects new to the chain
                 return isNewToChain( subject );
@@ -112,6 +114,8 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
             //
             case TYPECHANGE:
             case ASSIGNSUBJECT:
+                if (isNewToChain( subject ))
+                    return true;
                 if (subject instanceof OtmTypeUser)
                     return canAssignLaterVersion( (OtmTypeUser) subject );
 
@@ -182,6 +186,8 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
      * @return
      */
     public static boolean isNewToChain(OtmObject subject) {
+        if (subject == null)
+            return false;
         if (subject instanceof OtmProperty)
             return !subject.isInherited(); // if not in latest minor, the lib will not be editable
         if (subject instanceof OtmResourceChild)
