@@ -102,10 +102,10 @@ public class PromoteLibraryTask extends DexTaskBase<OtmLibrary> {
 
     @Override
     public void doIT() throws RepositoryException {
-        log.debug( "Promote library task: " + library );
+        // log.debug( "Promote library task: " + library );
 
         if (proj != null) {
-            log.debug( "Promote with project item: " + proj.getProjectItem( library.getTL() ).hashCode() );
+            // log.debug( "Promote with project item: " + proj.getProjectItem( library.getTL() ).hashCode() );
             proj.getTL().getProjectManager().promote( proj.getProjectItem( library.getTL() ) );
         }
     }

@@ -30,8 +30,8 @@ import org.opentravel.schemacompiler.model.TLChoiceObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 import org.opentravel.schemacompiler.model.TLFacetType;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * OTM Object Node for business objects.
@@ -160,7 +160,7 @@ public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
 
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
-        Collection<OtmObject> ch = new ArrayList<>();
+        Collection<OtmObject> ch = new HashSet<>();
         getChildren().forEach( c -> {
             if (c instanceof OtmAlias)
                 ch.add( c );

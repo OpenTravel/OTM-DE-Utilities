@@ -45,18 +45,60 @@ import javafx.application.Platform;
  *
  */
 public class ManageLibraryTask extends DexTaskBase<OtmLibrary> {
-    public static final String LOCAL_REPO = "Local";
-
     private static Log log = LogFactory.getLog( ManageLibraryTask.class );
 
-    private OtmProject proj = null;
-    private OtmLibrary library = null;
     private static String errorMsg;
-    private Repository repository = null;
+    public static final String LOCAL_REPO = "Local";
+    private static final String VETO =
+        "org.opentravel.schemacompiler.TLLibrary.namespace.INVALID_NAMESPACE_FOR_VERSION_SCHEME";
+    private static final String[] VETOKEYS = {VETO};
 
-    // public ManageLibraryTask() {
-    // super( null, null, null );
-    // }
+    /**
+     * In spite of java-doc, getVersionIdentifier will supply default version scheme if not on URL
+     * <p>
+     * VersionScheme vs = VersionSchemeFactory.getInstance().getVersionScheme( lib.getTL().getVersionScheme() );
+     * <p>
+     * vId = vs.getVersionIdentifier( lib.getTL().getNamespace() );
+     * 
+     * @return null string if valid, validation findings otherwise
+     */
+    private static String checkUrl(OtmLibrary lib) {
+        ValidationFindings rFindings = null;
+        if (lib != null) {
+            lib.validate();
+            rFindings = ValidationUtils.getRelevantFindings( VETOKEYS, lib.getFindings() );
+            // log.debug( ValidationUtils.getMessagesAsString( lib.getFindings() ) );
+        }
+        return ValidationUtils.hasErrors( rFindings ) ? ValidationUtils.getMessagesAsString( rFindings ) : null;
+    }
+    public static String getReason(OtmLibrary library) {
+        if (errorMsg == null)
+            isEnabled( library );
+        return errorMsg;
+    }
+    /**
+     * 
+     * @param lib
+     * @return false if task should be disabled in menus
+     */
+    public static boolean isEnabled(OtmLibrary lib) {
+        errorMsg = null;
+        if (lib == null)
+            errorMsg = "Null library.";
+        else if (!(lib.getTL() instanceof TLLibrary))
+            errorMsg = "This type of library can't be versioned.";
+        else if (lib.getState() != RepositoryItemState.UNMANAGED)
+            errorMsg = "State is already managed. " + lib;
+        else if (lib.getModelManager().getManagingProject( lib ) == null)
+            errorMsg = "Managing project for the library is missing.";
+        return errorMsg == null;
+    }
+
+    private OtmProject proj = null;
+
+    private OtmLibrary library = null;
+
+    private Repository repository = null;
 
     /**
      * Create a lock library task.
@@ -85,25 +127,45 @@ public class ManageLibraryTask extends DexTaskBase<OtmLibrary> {
         updateMessage( msgBuilder.toString() );
     }
 
-    public static boolean isEnabled(OtmLibrary lib) {
-        errorMsg = null;
-        if (lib == null)
-            errorMsg = "Null library.";
-        else if (!(lib.getTL() instanceof TLLibrary))
-            errorMsg = "This type of library can't be versioned.";
-        else if (lib.getState() != RepositoryItemState.UNMANAGED)
-            errorMsg = "State is already managed. " + lib;
-        else if (lib.getModelManager().getManagingProject( lib ) == null)
-            errorMsg = "Managing project for the library is missing.";
-        else if (checkUrl( lib ) != null)
-            errorMsg = "Invalid Namespace. Note, namespace must end with version (e.g. xxx/v1). \n" + checkUrl( lib );
-        return errorMsg == null;
-    }
 
-    public static String getReason(OtmLibrary library) {
-        if (errorMsg == null)
-            isEnabled( library );
-        return errorMsg;
+    /**
+     * @see org.opentravel.dex.tasks.DexTaskBase#doIT()
+     */
+    @Override
+    public void doIT() throws DexTaskException {
+        // log.debug( "Manage library task: " + library );
+
+        // Re-check isEnabled()
+        if (!isEnabled( library ))
+            throw new DexTaskException( errorMsg );
+
+        // Check conditions that are not checked for in isEnabled()
+        String relevantFindingMessages = checkUrl( library );
+        if (relevantFindingMessages != null)
+            throw new DexTaskException(
+                "Invalid Namespace. Namespace must end with version (e.g. xxx/v1). \n " + relevantFindingMessages );
+        if (library.getProjectItem() == null)
+            throw new DexTaskException( "Missing library project item. Try closing and opening the project." );
+        if (proj == null)
+            throw new DexTaskException( "Missing project. Try closing and opening the project." );
+        if (repository == null)
+            throw new DexTaskException( "Missing repository." );
+
+        if (dialogBoxController != null)
+            Platform.runLater( () -> dialogBoxController.show( "Manage Library Task", "Please wait." ) );
+
+        // Manage the library in the repository
+        try {
+            ProjectManager pm = proj.getTL().getProjectManager();
+            ProjectItem item = library.getProjectItem();
+            pm.publish( item, repository );
+        } catch (IllegalArgumentException | RepositoryException | PublishWithLocalDependenciesException e) {
+            if (dialogBoxController != null)
+                Platform.runLater( () -> dialogBoxController.close() );
+            throw new DexTaskException( e );
+        }
+        if (dialogBoxController != null)
+            Platform.runLater( () -> dialogBoxController.close() );
     }
 
     /**
@@ -123,68 +185,5 @@ public class ManageLibraryTask extends DexTaskBase<OtmLibrary> {
                     repo = null;
                 }
         return repo;
-    }
-
-    private static final String VETO =
-        "org.opentravel.schemacompiler.TLLibrary.namespace.INVALID_NAMESPACE_FOR_VERSION_SCHEME";
-    private static final String[] VETOKEYS = {VETO};
-
-    private static String checkUrl(OtmLibrary lib) {
-        ValidationFindings rFindings = null;
-        if (lib != null) {
-            // In spite of java-doc, getVersionIdentifier will supply default version scheme if not on URL
-            // VersionScheme vs = VersionSchemeFactory.getInstance().getVersionScheme( lib.getTL().getVersionScheme() );
-            // vId = vs.getVersionIdentifier( lib.getTL().getNamespace() );
-            // log.debug( "Version ID = " + vId + " for library uri: " + lib.getTL().getNamespace() );
-            lib.validate();
-            rFindings = ValidationUtils.getRelevantFindings( VETOKEYS, lib.getFindings() );
-            // log.debug( ValidationUtils.getMessagesAsString( lib.getFindings() ) );
-        }
-        return ValidationUtils.hasErrors( rFindings ) ? ValidationUtils.getMessagesAsString( rFindings ) : null;
-    }
-
-    /**
-     * 1. pass in DBC 2. return DBC 3. Implement catch and taskException
-     * 
-     * @see org.opentravel.dex.tasks.DexTaskBase#doIT()
-     */
-    @Override
-    public void doIT() throws DexTaskException {
-        log.debug( "Manage library task: " + library );
-
-        // test URL for version scheme (must end in /vX)
-        String relevantFindingMessages = checkUrl( library );
-        if (relevantFindingMessages != null) {
-            Platform.runLater( () -> dialogBoxController.show( "Warning", relevantFindingMessages ) );
-            return;
-        }
-        log.debug( "Version scheme is OK" );
-
-        // FIXME
-        // project item is null for new libraries trying to be managed in local repository
-
-        if (proj != null && repository != null && library != null && library.getProjectItem() != null) {
-            log.debug( "Manage library: " + library + " in " + repository.getDisplayName() );
-
-            if (dialogBoxController != null)
-                Platform.runLater( () -> dialogBoxController.show( "Manage Library Task", "Please wait." ) );
-
-            // Manage the library in the repository
-            try {
-                ProjectManager pm = proj.getTL().getProjectManager();
-                ProjectItem item = library.getProjectItem();
-                pm.publish( item, repository );
-                // VersionSchemeException| ValidationException| LibrarySaveException|
-            } catch (IllegalArgumentException | RepositoryException | PublishWithLocalDependenciesException e) {
-                if (dialogBoxController != null)
-                    Platform.runLater( () -> dialogBoxController.close() );
-                throw new DexTaskException( e );
-            }
-            if (dialogBoxController != null)
-                Platform.runLater( () -> dialogBoxController.close() );
-        } else
-            // TODO - get more specific about the error
-            throw new DexTaskException(
-                "DEX Error: Missing project, repository or library information. Try closing and opening the project." );
     }
 }

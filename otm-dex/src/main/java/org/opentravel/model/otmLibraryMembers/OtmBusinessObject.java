@@ -32,8 +32,8 @@ import org.opentravel.model.otmFacets.OtmUpdateFacet;
 import org.opentravel.schemacompiler.model.TLBusinessObject;
 import org.opentravel.schemacompiler.model.TLContextualFacet;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * OTM Object Node for business objects.
@@ -136,7 +136,8 @@ public class OtmBusinessObject extends OtmComplexObjects<TLBusinessObject> {
 
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
-        Collection<OtmObject> ch = new ArrayList<>();
+        // Collection<OtmObject> ch = new ArrayList<>();
+        Collection<OtmObject> ch = new HashSet<>();
         getChildren().forEach( c -> {
             if (c instanceof OtmAlias)
                 ch.add( c );

@@ -56,7 +56,7 @@ public class RepositoryResultHandler implements TaskResultHandlerI {
         if (event != null) {
             if (event.getEventType() != WorkerStateEvent.WORKER_STATE_SUCCEEDED) {
                 title = TITLE_ERROR;
-                log.warn( "Invalid event in result handler." );
+                log.warn( "Event in result handler - Worker task did not succeed." );
             }
             if (event.getSource() instanceof Task) {
                 Task<?> src = (Task<?>) event.getSource();
@@ -67,6 +67,9 @@ public class RepositoryResultHandler implements TaskResultHandlerI {
                 data += (String) ((Task<?>) event.getTarget()).getValue();
                 log.debug( event.getTarget().getClass().getSimpleName() + " task complete. " );
             }
+            // This is run in the application thread
+            // if (Platform.isFxApplicationThread())
+            // log.debug( "In application thread." );
             // Post a dialog if the task has string value
             if (!data.isEmpty()) {
                 DialogBoxContoller dbc = DialogBoxContoller.init();

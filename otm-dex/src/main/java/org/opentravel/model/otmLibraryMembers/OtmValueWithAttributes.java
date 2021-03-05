@@ -47,6 +47,7 @@ import org.opentravel.schemacompiler.model.TLValueWithAttributes;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -232,15 +233,12 @@ public class OtmValueWithAttributes extends OtmLibraryMemberBase<TLValueWithAttr
 
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
-        Collection<OtmObject> hierarchy = new ArrayList<>();
+        Collection<OtmObject> hierarchy = new HashSet<>();
         // Value facet
         hierarchy.add( new OtmVWAValueFacet( (OtmPropertyOwner) this ) );
         // Attribute Facet
         hierarchy.add( new OtmVWAAttributeFacet( (OtmPropertyOwner) this ) );
 
-        // if (getInheritedChildren() != null)
-        // getInheritedChildren().forEach( hierarchy::add );
-        // getChildren().forEach( hierarchy::add );
         return hierarchy;
     }
 

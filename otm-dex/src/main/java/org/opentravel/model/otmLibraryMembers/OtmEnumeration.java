@@ -31,6 +31,7 @@ import org.opentravel.schemacompiler.model.TLModelElement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -100,7 +101,7 @@ public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
 
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
-        Collection<OtmObject> hierarchy = new ArrayList<>();
+        Collection<OtmObject> hierarchy = new HashSet<>();
         hierarchy.add( new OtmEnumerationValueFacet( (OtmPropertyOwner) this ) );
         return hierarchy;
     }

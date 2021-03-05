@@ -58,8 +58,8 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
         if (tl.getOwningEntity() == null && parent.getTL() instanceof TLAliasOwner)
             ((TLAliasOwner) parent.getTL()).addAlias( tl );
 
-        if (this.parent == null)
-            throw new IllegalStateException( "Created alias without parent." );
+        // if (this.parent == null)
+        // throw new IllegalStateException( "Created alias without parent." );
     }
 
     /**
@@ -73,6 +73,7 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
             ((TLAliasOwner) parent.getTL()).addAlias( tlObject );
             parent.addAlias( getTL() );
             setName( name );
+            // Consider adding an description or other comment about being inherited.
         }
     }
 
@@ -105,6 +106,17 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
     @Override
     public boolean isNameControlled() {
         return true;
+    }
+
+    @Override
+    public boolean isInherited() {
+        if (getLibrary().isMajorVersion())
+            return false;
+        // TODO - inherited aliases should not be edited. How to know if inherited?
+        // for (OtmLibrary cl : getLibrary().getVersionChain().getLibraries())
+        // for (OtmLibraryMember m : cl.getMembers())
+        // if ((m.getAliases()))
+        return false;
     }
 
     @Override
@@ -149,7 +161,7 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
 
     @Override
     public void modelChildren() {
-        // no-op
+        // No-Op
     }
 
     /**
@@ -166,12 +178,12 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
 
     @Override
     public List<OtmObject> getInheritedChildren() {
-        return Collections.emptyList(); // TODO
+        return Collections.emptyList(); // No-Op
     }
 
     @Override
     public void modelInheritedChildren() {
-        // TODO - model child ?? do we need to?
+        // No-Op
     }
 
     @Override

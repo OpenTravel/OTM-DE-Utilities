@@ -241,6 +241,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
      */
     public void createTreeItem(OtmLibraryMember member, TreeItem<MemberAndProvidersDAO> parent) {
         // log.debug( "Creating member tree item for: " + member + " of type " + member.getClass().getSimpleName() );
+        // TreeItem<MemberAndProvidersDAO> item = null;
         TreeItem<MemberAndProvidersDAO> item = itemMap.get( member );
         if (item != null) {
             parent.getChildren().add( item );
@@ -263,6 +264,8 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
      * Create tree items for the type provider children of this child owning member
      */
     private void createChildrenItems(OtmChildrenOwner childrenOwner, TreeItem<MemberAndProvidersDAO> parentItem) {
+        // Collection<OtmTypeProvider> providers = childrenOwner.getChildrenTypeProviders();
+        // List<OtmObject> kids = childrenOwner.getChildren();
         // log.debug( "Creating children items of: " + childrenOwner );
         // if (childrenOwner instanceof OtmContributedFacet) {
         // log.debug( "Processing contributed facet." );
@@ -275,7 +278,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         // }
 
         childrenOwner.getChildrenTypeProviders().forEach( p -> {
-            // log.debug( "Creating child item of: " + p );
+            // log.debug( " Creating child item: " + p );
             TreeItem<MemberAndProvidersDAO> item = null;
 
             // Create item for the library member

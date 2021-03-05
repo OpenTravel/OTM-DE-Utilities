@@ -147,10 +147,12 @@ public abstract class DexTaskBase<T> extends Task<String> implements DexTask {
                 errorException = e;
 
                 errorBuilder = new StringBuilder( "Error in " + getClass().getSimpleName() + "\n" );
-                errorBuilder = errorBuilder.append( " Type    " + e.getClass().getSimpleName() + "\n" );
-                errorBuilder = errorBuilder.append( " Cause   " + e.getCause() + "\n" );
-                errorBuilder = errorBuilder.append( " Message " + e.getLocalizedMessage() + "\n" );
-                errorBuilder = errorBuilder.append( " Message " + e.getMessage() + "\n" );
+                errorBuilder = errorBuilder.append( " Type: " + e.getClass().getSimpleName() + "\n" );
+                if (e.getCause() != null)
+                    errorBuilder = errorBuilder.append( " Cause: " + e.getCause() + "\n" );
+                errorBuilder = errorBuilder.append( " Message: " + e.getLocalizedMessage() + "\n" );
+                if (!e.getMessage().equals( e.getLocalizedMessage() ))
+                    errorBuilder = errorBuilder.append( " Message: " + e.getMessage() + "\n" );
 
                 result = errorBuilder.toString(); // Signal business error via result
                 if (result == null)
@@ -190,13 +192,13 @@ public abstract class DexTaskBase<T> extends Task<String> implements DexTask {
     @Override
     protected void failed() {
         super.failed();
-        updateMessage( "Failed!" );
+        updateMessage( "Failed!" + getMessage() );
         if (statusController != null)
             statusController.finish( this );
         // TEST - use global dbc
-        if (dialogBoxController == null)
-            dialogBoxController = DialogBoxContoller.init();
-        dialogBoxController.show( "Failed", errorBuilder != null ? errorBuilder.toString() : "" );
+        // if (dialogBoxController == null)
+        // dialogBoxController = DialogBoxContoller.init();
+        // dialogBoxController.show( "Failed", errorBuilder != null ? errorBuilder.toString() : "" );
     }
 
     public String getErrorMsg() {

@@ -111,14 +111,10 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
     Button dialogButtonOK;
     @FXML
     TextField nameField;
-    // @FXML
-    // TextField nsField;
     @FXML
     ComboBox<String> nsCombo;
     @FXML
     ComboBox<String> projectCombo;
-    // @FXML
-    // TextField projectField;
     @FXML
     TextField descriptionField;
     @FXML
@@ -136,11 +132,8 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
     private OtmModelManager modelMgr;
     private OtmLibrary otmLibrary = null;
     private OtmProject selectedProject = null;
-
     private String resultText;
-
     private UserSettings userSettings;
-
     private Map<String,OtmProject> projectFileMap;
 
     public String getResultText() {
@@ -161,15 +154,6 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         dialogHelp.getChildren().clear();
     }
 
-    // @FXML
-    // void doOpenProject(ActionEvent e) {
-    // DexProjectHandler handler = new DexProjectHandler();
-    // selectedProject = handler.selectProject( modelMgr );
-    // if (selectedProject != null)
-    // projectField.setText( selectedProject.getName() );
-    // // FIXME - also implement open the project
-    // }
-
     /**
      * Event handler invoked by fxml when the selection button is pushed.
      * 
@@ -189,11 +173,6 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
      */
     @Override
     public void doOK() {
-        // FIXME
-        // 2. Name, Namespace, Comments, Project
-        // When they enter a name or fileName copy to other field
-
-        // 3. DONE - assure namespace has version suffix
 
         if (selectedProject == null) {
             postResults( "Must select a project for the new library. " );
@@ -212,43 +191,15 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         if (nsCombo.getValue().isEmpty())
             nsCombo.setValue( "http://opentravel.org/Sandbox" );
 
-        //
-        // final File file = new File(metaData.getPath());
-        // final URL fileURL = URLUtils.toURL(file);
-        // final TLLibrary tlLib = new TLLibrary();
-        // tlLib.setStatus(TLLibraryStatus.DRAFT);
-        // tlLib.setLibraryUrl(fileURL);
-
-        // tlLib.setPrefix(metaData.getNsPrefix());
-        // tlLib.setName(metaData.getName());
-        // tlLib.setComments(metaData.getComments());
-        // tlLib.setNamespace(metaData.getNamespace());
-
-
-        // If the project file has not been selected, try to create one using the name
-        libraryFile = new File( getFileName() );
-        try {
-            if (!libraryFile.createNewFile()) {
-                postResults( "Could not create new library file: " + libraryFile.getPath() + " already exists." );
-                return;
-            }
-        } catch (SecurityException se) {
-            log.error( "Security error creating library file: " + se.getLocalizedMessage() );
-            postResults( "Access denied while creating library file: " + se.getLocalizedMessage() );
-            return;
-        } catch (IOException e1) {
-            log.error( "IO error creating library file: " + e1.getLocalizedMessage() );
-            postResults( "Error creating library file: " + e1.getLocalizedMessage() );
-            return;
-        }
-        if (!libraryFile.canWrite()) {
-            postResults( "Newly created file can not be written to. " + libraryFile.getAbsolutePath() );
+        DexFileHandler fileHandler = new DexFileHandler();
+        libraryFile = fileHandler.createLibraryFile( getFileName() );
+        if (libraryFile == null) {
+            postResults( fileHandler.getErrorMessage() );
             return;
         }
 
         if (modelMgr != null)
             try {
-                log.debug( "TODO - create library in model manager: " + libraryFile.getName() );
                 AbstractLibrary tlLib = DexFileHandler.createLibrary( libraryFile );
                 tlLib.setOwningModel( modelMgr.getTlModel() );
                 tlLib.setName( nameField.getText() );
@@ -259,15 +210,13 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
                     selectedProject.getTL() );
                 if (pi == null) {
                     postResults( "Error adding new library to project." );
-                    // Files.delete( libraryFile.toPath() );
                     libraryFile.delete();
                     return;
                 }
                 if (tlLib instanceof TLLibrary)
                     ((TLLibrary) tlLib).setComments( "" );
-                // modelMgr.newProject( libraryFile, nameField.getText(), contextIdField.getText(), idField.getText(),
-                // descriptionField.getText() );
                 otmLibrary = modelMgr.addUnmanaged( tlLib );
+                otmLibrary.add( pi );
                 otmLibrary.save();
             } catch (IllegalArgumentException er) {
                 postResults( "Could not create new library in model. " + er.getLocalizedMessage() );
@@ -281,7 +230,7 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
                 return;
             }
 
-        log.debug( "Created library: " + libraryFile.getAbsolutePath() );
+        // log.debug( "Created library: " + libraryFile.getAbsolutePath() );
         super.doOK(); // all OK - close window
     }
 
@@ -320,7 +269,6 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
      * @param initialProjectFolder used in user file selection dialog
      */
     public void configure(OtmModelManager manager, UserSettings settings) {
-        // TODO - the settings should be abstracted for Dex applications
         this.modelMgr = manager;
         this.userSettings = settings;
     }
@@ -346,7 +294,6 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         // Get the namespaces from the projects
         modelMgr.getBaseNamespaces().forEach( ns -> nsCombo.getItems().add( ns ) );
         nsCombo.setEditable( true );
-        // nsCombo.valueProperty().addListener( (ov, o, n) -> checkNS( n ) );
     }
 
     private String checkNS(String ns) {
@@ -356,8 +303,6 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         if (!suffix.matches( "/v[0-9].*" ))
             ns += "/v1";
 
-        // ns = ns.replace( "//", "/" );
-        // nsCombo.setValue( ns );
         log.debug( "NS check: " + ns );
         return ns;
     }
@@ -371,14 +316,6 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         dialogButtonOK.setOnAction( e -> doOK() );
         postHelp( helpText, dialogHelp );
 
-        // Initial settings
-        //
-        // projectField.setEditable( false );
-        // projectField.setDisable( true ); // Grey it out
-        // if (!modelMgr.getOtmProjectManager().hasProjects()) {
-        // postResults( "Must have a project for the new library." );
-        // dialogButtonOK.setDisable( true );
-        // }
         setupNS();
         setupProject();
 

@@ -24,6 +24,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmVersionChain;
+import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 /**
@@ -188,6 +189,8 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
     public static boolean isNewToChain(OtmObject subject) {
         if (subject == null)
             return false;
+        if (subject instanceof OtmAlias)
+            return !subject.isInherited();
         if (subject instanceof OtmProperty)
             return !subject.isInherited(); // if not in latest minor, the lib will not be editable
         if (subject instanceof OtmResourceChild)

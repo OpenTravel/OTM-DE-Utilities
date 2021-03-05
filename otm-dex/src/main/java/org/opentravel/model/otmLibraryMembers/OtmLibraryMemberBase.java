@@ -55,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -293,7 +294,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
-        Collection<OtmObject> hierarchy = new ArrayList<>();
+        Collection<OtmObject> hierarchy = new HashSet<>();
         if (getInheritedChildren() != null)
             getInheritedChildren().forEach( hierarchy::add );
         getChildren().forEach( hierarchy::add );
@@ -591,6 +592,9 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     @Override
     public void modelChildren() {
         assert children.isEmpty();
+        if (!children.isEmpty())
+            log.debug( "OOPS - model children already has children." );
+        Collection<OtmObject> kids = new HashSet<>(); // assure no duplications or co-modification
         // Must do aliases first so facet aliases will have a parent
         // Aliases from contextual facets come from the member where injected (contributed)
         if (getTL() instanceof TLAliasOwner && !(this instanceof OtmContextualFacet)) {
@@ -599,7 +603,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
                 if (obj == null)
                     new OtmAlias( t, this );
                 else
-                    children.add( obj );
+                    kids.add( obj );
             } );
         }
 
@@ -607,9 +611,15 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             for (TLFacet tlFacet : ((TLFacetOwner) getTL()).getAllFacets()) {
                 OtmFacet<?> facet = OtmFacetFactory.create( tlFacet, this );
                 if (facet != null) {
-                    children.add( facet );
+                    kids.add( facet );
                 }
             }
+
+        synchronized (children) {
+            for (OtmObject k : kids)
+                if (!children.contains( k ))
+                    children.add( k );
+        }
     }
 
     /**

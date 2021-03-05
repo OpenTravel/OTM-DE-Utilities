@@ -39,6 +39,7 @@ import org.opentravel.schemacompiler.util.URLUtils;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
@@ -319,6 +320,29 @@ public class DexFileHandler extends AbstractMainWindowController {
     @Override
     protected void updateControlStates() {
         // TODO
+    }
+
+    public File createLibraryFile(String filename) {
+        File libraryFile = new File( filename );
+        try {
+            if (!libraryFile.createNewFile()) {
+                errorMessage = "Could not create new library file: " + libraryFile.getPath() + " already exists.";
+                return null;
+            }
+        } catch (SecurityException se) {
+            log.error( "Security error creating library file: " + se.getLocalizedMessage() );
+            errorMessage = "Access denied while creating library file: " + se.getLocalizedMessage();
+            return null;
+        } catch (IOException e1) {
+            log.error( "IO error creating library file: " + e1.getLocalizedMessage() );
+            errorMessage = "Error creating library file: " + e1.getLocalizedMessage();
+            return null;
+        }
+        if (!libraryFile.canWrite()) {
+            errorMessage = "Newly created file can not be written to. " + libraryFile.getAbsolutePath();
+            return null;
+        }
+        return libraryFile;
     }
 
 }

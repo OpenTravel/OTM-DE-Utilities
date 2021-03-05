@@ -36,9 +36,9 @@ import org.opentravel.schemacompiler.model.TLCoreObject;
 import org.opentravel.schemacompiler.model.TLFacetType;
 import org.opentravel.schemacompiler.model.TLListFacet;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -144,7 +144,7 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
 
     @Override
     public Collection<OtmObject> getChildrenHierarchy() {
-        Collection<OtmObject> ch = new ArrayList<>();
+        Collection<OtmObject> ch = new HashSet<>();
         ch.add( new OtmCoreValueFacet( this ) );
         // Add aliases first
         getChildren().forEach( c -> {
