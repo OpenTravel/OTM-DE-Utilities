@@ -64,7 +64,7 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
     public static final String LAYOUT_FILE = "/Dialogs/NewLibraryDialog.fxml";
 
     protected static Stage dialogStage;
-    private static String helpText = "Create new Library.";
+    private static String helpText = "Create a new library.";
     private static String dialogTitle = "Create Library Dialog";
 
     /**

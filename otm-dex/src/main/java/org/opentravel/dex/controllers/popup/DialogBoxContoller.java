@@ -161,13 +161,13 @@ public class DialogBoxContoller extends DexPopupControllerBase {
         super.show( message );
 
         dialogButtonClose.setOnAction( e -> close() );
-        if (userSettings != null) {
-            hideDialog.setOnAction( this::setHideDialog );
-            hideDialog.setSelected( userSettings.getHideOpenProjectDialog() );
-        } else {
-            dialogTitleLabel.setVisible( false );
-            hideDialog.setVisible( false );
-        }
+        // if (userSettings != null) {
+        // hideDialog.setOnAction( this::setHideDialog );
+        // hideDialog.setSelected( userSettings.getHideOpenProjectDialog() );
+        // } else {
+        // dialogTitleLabel.setVisible( false );
+        // hideDialog.setVisible( false );
+        // }
 
         // TODO - how to know if/when to show OK or not?
         if (dialogButtonOK != null) {

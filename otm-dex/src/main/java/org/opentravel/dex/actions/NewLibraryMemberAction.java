@@ -67,6 +67,7 @@ public class NewLibraryMemberAction extends DexRunAction {
     /**
      * {@inheritDoc} The new library action adds library members to the model manager.
      * 
+     * @param data is an OtmLibraryMemberType enumeration value to create
      * @return
      */
     @Override
@@ -126,8 +127,11 @@ public class NewLibraryMemberAction extends DexRunAction {
                 if (member != null && Platform.isFxApplicationThread()) {
                     MemberDetailsPopupController controller = MemberDetailsPopupController.init();
                     controller.setMember( member );
-                    if (controller.showAndWait( "MSG" ) != Results.OK)
+                    if (controller.showAndWait( "MSG" ) != Results.OK) {
+                        // remove member
+                        member.getLibrary().delete( member );
                         member = null; // Cancel
+                    }
                 }
                 // Check - make sure member is one library and only in one library
                 if (member != null) {

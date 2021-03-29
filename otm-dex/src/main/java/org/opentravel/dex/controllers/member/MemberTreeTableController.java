@@ -224,6 +224,8 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
 
     private Map<OtmObject,TreeItem<MemberAndProvidersDAO>> itemMap = new HashMap<>( OtmModelManager.MEMBERCOUNT );
 
+    private OtmEmptyTableFacet emptyTableFacet = null;
+
     /**
      * Note: TreeItem class does not extend the Node class. Therefore, you cannot apply any visual effects or add menus
      * to the tree items. Use the cell factory mechanism to overcome this obstacle and define as much custom behavior
@@ -426,6 +428,10 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         }
     }
 
+    public OtmEmptyTableFacet getEmptyTableObject() {
+        return new OtmEmptyTableFacet( currentModelMgr );
+    }
+
     /**
      * Get the library members from the model manager and put them into a cleared tree.
      * 
@@ -444,7 +450,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
 
             // If no members, post an empty row to allow row factory to add menu items
             if (root.getChildren().isEmpty())
-                createTreeItem( new OtmEmptyTableFacet( currentModelMgr ), root );
+                createTreeItem( getEmptyTableObject(), root );
 
             // Sort members
             try {

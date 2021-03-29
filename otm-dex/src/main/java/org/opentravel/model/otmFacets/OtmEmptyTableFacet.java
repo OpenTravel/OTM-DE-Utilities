@@ -33,7 +33,7 @@ public class OtmEmptyTableFacet extends OtmAbstractDisplayFacet {
     // private static Log log = LogFactory.getLog( OtmEmptyTableFacet.class );
 
     private OtmModelManager modelManager;
-    private String label = "No Content in Table";
+    private String label = "No Content. Select to add new content.";
 
     public OtmEmptyTableFacet(OtmModelManager modelManager) {
         super( null );
