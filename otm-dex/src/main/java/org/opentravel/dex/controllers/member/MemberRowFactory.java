@@ -243,12 +243,15 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
             setStateChanged( tc, obj.isDeprecated(), obj.isEditable() );
 
         DexActionManager actionManager = obj.getActionManager();
-        if (actionManager == null || actionManager instanceof DexReadOnlyActionManager)
+        if (actionManager == null)
             return;
+        if (actionManager instanceof DexReadOnlyActionManager) {
+            copyItem.setDisable( !actionManager.isEnabled( DexActions.COPYLIBRARYMEMBER, obj ) );
+            return;
+        }
 
         // We have an object and an action manager
         addAliasItem.setDisable( !actionManager.isEnabled( DexActions.ADDALIAS, obj ) );
-        copyItem.setDisable( !actionManager.isEnabled( DexActions.COPYLIBRARYMEMBER, obj ) );
         deprecateItem.setDisable( !actionManager.isEnabled( DexActions.DEPRECATIONCHANGE, obj ) );
 
         if (obj instanceof OtmAlias)
