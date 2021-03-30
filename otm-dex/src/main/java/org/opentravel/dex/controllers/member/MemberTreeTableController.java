@@ -169,6 +169,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
 
         if (memberTree.getRoot() != null)
             memberTree.getRoot().getChildren().clear();
+
         // log.debug( "Cleared member tree." );
     }
 
@@ -465,6 +466,8 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
 
     /**
      * {@inheritDoc} Clear the tree and post the model.
+     * <p>
+     * Also clear the item cache.
      * 
      * @see #post(OtmModelManager)
      * @see org.opentravel.dex.controllers.DexIncludedControllerBase#refresh()
