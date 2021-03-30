@@ -19,7 +19,6 @@ package org.opentravel.dex.controllers.member;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
-import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmModelManager;
@@ -245,7 +244,7 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         DexActionManager actionManager = obj.getActionManager();
         if (actionManager == null)
             return;
-        if (actionManager instanceof DexReadOnlyActionManager) {
+        if (actionManager instanceof DexActionManager) {
             copyItem.setDisable( !actionManager.isEnabled( DexActions.COPYLIBRARYMEMBER, obj ) );
             return;
         }

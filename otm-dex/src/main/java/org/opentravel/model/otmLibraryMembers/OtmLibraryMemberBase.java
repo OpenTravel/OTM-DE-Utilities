@@ -558,19 +558,19 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         if (getLibrary() == null)
             return false; // Can't be valid if not in a library.
         if (force) {
-            // prevent concurrent access - https://www.geeksforgeeks.org/synchronization-arraylist-java/
-            List<OtmObject> kids = Collections.synchronizedList( new ArrayList<>( getChildren() ) );
-            synchronized (kids) {
+            // // prevent concurrent access - https://www.geeksforgeeks.org/synchronization-arraylist-java/
+            // List<OtmObject> kids = Collections.synchronizedList( new ArrayList<>( getChildren() ) );
+            // synchronized (kids) {
+            // kids.forEach( c -> {
+            // if (c != this)
+            // c.isValid( force );
+            // } );
+            synchronized (this) {
+                List<OtmObject> kids = getChildren();
                 kids.forEach( c -> {
                     if (c != this)
                         c.isValid( force );
                 } );
-                // synchronized (this) {
-                // List<OtmObject> kids = getChildren();
-                // kids.forEach( c -> {
-                // if (c != this)
-                // c.isValid( force );
-                // } );
             }
         }
         return super.isValid( force );

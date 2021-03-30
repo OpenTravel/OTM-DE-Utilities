@@ -29,7 +29,6 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.StringProperty;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeItem.TreeModificationEvent;
 import javafx.scene.image.ImageView;
@@ -76,13 +75,21 @@ public class MemberAndProvidersDAO implements DexDAO<OtmObject> {
         // Track the expansion state of the object.
         item.addEventHandler( TreeItem.branchExpandedEvent(), this::expansionHandler );
         item.addEventHandler( TreeItem.branchCollapsedEvent(), this::expansionHandler );
+        // item.addEventHandler( TreeItem.valueChangedEvent(), this::changeHandler );
 
         // Decorate if possible
         ImageView graphic = ImageManager.get( otmObject );
         item.setGraphic( graphic );
-        Tooltip.install( graphic, new Tooltip( otmObject.getObjectTypeName() ) );
+
+        // 3/30/2021 dmh - commented out to see if this is causing mac users to get the extra icons
+        // Tooltip.install( graphic, new Tooltip( otmObject.getObjectTypeName() ) );
         return item;
     }
+
+    // public void changeHandler(TreeModificationEvent<TreeItem<PropertiesDAO>> e) {
+    // // 3/30/2021 dmh - Never fired ... I assume because the object doesn't change, just its properties.
+    // log.debug( "Tree Item change: " + e );
+    // }
 
     public void expansionHandler(TreeModificationEvent<TreeItem<PropertiesDAO>> e) {
         OtmObject obj = null;

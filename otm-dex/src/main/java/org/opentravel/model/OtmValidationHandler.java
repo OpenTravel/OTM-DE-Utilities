@@ -103,9 +103,12 @@ public class OtmValidationHandler {
             return true;
 
         if (findings == null || refresh) {
+            validationProperty = null;
+            validationImageProperty = null;
             findings = isValid( getTL() );
-            if (validationProperty != null)
-                validationProperty.setValue( ValidationUtils.getCountsString( findings ) );
+
+            if (validationProperty() != null)
+                validationProperty().setValue( ValidationUtils.getCountsString( findings ) );
             if (validationImageProperty() != null)
                 validationImageProperty().setValue( validationImage() );
         }

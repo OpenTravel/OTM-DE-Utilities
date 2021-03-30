@@ -471,6 +471,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
      */
     @Override
     public void refresh() {
+        itemMap.clear();
         post( currentModelMgr );
         // log.debug( "Refreshed member tree." );
     }

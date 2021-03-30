@@ -49,6 +49,7 @@ public class BaseTypeChangeAction extends DexRunAction {
 
     public static boolean isEnabled(OtmObject subject) {
         // VWA is not member of TLExtensionOwner!
+        log.debug( "Is subject editable? " + subject.isEditable() );
         if (subject != null && subject.isEditable()) {
             return subject instanceof OtmValueWithAttributes || subject instanceof OtmContextualFacet
                 || subject.getTL() instanceof TLExtensionOwner;

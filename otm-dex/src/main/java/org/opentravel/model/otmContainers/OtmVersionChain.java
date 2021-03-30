@@ -23,6 +23,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
+import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmEnumeration;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
@@ -203,6 +204,10 @@ public class OtmVersionChain {
      * @return
      */
     public boolean isNewToChain(OtmLibraryMember member) {
+        // 3/30/2021 dmh - contextual facets are always considered new to chain
+        if (member instanceof OtmContextualFacet)
+            return true;
+
         // OtmLibrary mLib = member.getLibrary();
         for (OtmLibrary lib : libraries)
             if (lib != member.getLibrary() && lib.contains( member ))
