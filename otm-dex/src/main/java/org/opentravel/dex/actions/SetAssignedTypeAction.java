@@ -31,9 +31,11 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmVersionChain;
+import org.opentravel.model.otmFacets.OtmSharedFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmProperties.OtmIdAttribute;
+import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.schemacompiler.codegen.util.XsdCodegenUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
@@ -64,7 +66,7 @@ public class SetAssignedTypeAction extends DexRunAction {
             return false;
         if (!(subject instanceof OtmTypeUser))
             return false;
-        if (subject.getLibrary() == null)
+        if (subject == null || subject.getLibrary() == null)
             return false;
         if (!subject.isEditable())
             return false;
@@ -91,7 +93,7 @@ public class SetAssignedTypeAction extends DexRunAction {
         return isEnabled( subject );
     }
 
-    private OtmTypeUser user = null;
+    private OtmTypeUser user = null; // otm cast to type user
     private OtmTypeUser newUser = null;
 
     private OtmTypeProvider oldProvider;
@@ -107,7 +109,6 @@ public class SetAssignedTypeAction extends DexRunAction {
         // Constructor for reflection
     }
 
-
     /**
      * {@inheritDoc} Override with the Delete member event constructed by undo when a minor version change that creates
      * new library member
@@ -118,6 +119,10 @@ public class SetAssignedTypeAction extends DexRunAction {
         return event == null ? super.getEvent() : event;
     }
 
+    /**
+     * 
+     * @return true if the type should be restricted to only minors in the same chain
+     */
     private boolean restrictType() {
         if (otm.getLibrary().isMajorVersion())
             return false;
@@ -127,11 +132,11 @@ public class SetAssignedTypeAction extends DexRunAction {
         // If it is new to the chain, allow the subject to be set to anything
         if (chain.isNewToChain( otm.getOwningMember() ))
             return false;
+        // Property may be new to the object
+        if (otm instanceof OtmProperty && !otm.isInherited() && otm.getOwningMember().isEditable())
+            return false;
 
         return true;
-        // Otherwise, only allow if there is a later version of the assigned type (subject)
-        // if (subject.getLibrary().isChainEditable())
-        // return chain.canAssignLaterVersion( (OtmTypeUser) subject );
     }
 
     /**
@@ -184,6 +189,7 @@ public class SetAssignedTypeAction extends DexRunAction {
         // Get the user's selected new provider
         controller.showAndWait( "MSG" );
         OtmTypeProvider selected = controller.getSelectedProvider();
+
         if (selected != null && controller.getResult() == Results.OK) {
             doIt( selected );
         } else {
@@ -211,6 +217,12 @@ public class SetAssignedTypeAction extends DexRunAction {
             return null;
 
         if (data instanceof OtmTypeProvider) {
+            newProvider = (OtmTypeProvider) data;
+
+            // 3/30/2021 dmh - Do not allow shared facets to be selected.
+            // MemberControllerFilters can not prevent facets from being displayed and selected.
+            if (newProvider instanceof OtmSharedFacet && newProvider.getOwningMember() instanceof OtmTypeProvider)
+                newProvider = (OtmTypeProvider) newProvider.getOwningMember();
 
             // Hold onto old values
             // user = (OtmTypeUser) otm;
@@ -220,7 +232,6 @@ public class SetAssignedTypeAction extends DexRunAction {
             if (oldTLType != null)
                 oldTLTypeName = oldTLType.getLocalName();
 
-            newProvider = (OtmTypeProvider) data;
             // Set value into model
             getSubject().setAssignedType( newProvider );
             // if (newProvider.isNameControlled()) {

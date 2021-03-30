@@ -98,9 +98,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
     private OtmModelManager modelMgr;
 
     private FilterWidget latestButtonFilter;
-
     private FilterWidget editableButtonFilter;
-
     private FilterWidget errorsButtonFilter;
 
     private MemberTreeTableController parentController;
@@ -363,4 +361,14 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
         if (w != null)
             w.set( value );
     }
+
+    // /**
+    // *
+    // */
+    // public void setExcludeShared() {
+    // if (filters.contains( sharedFilter ))
+    // filters.remove( sharedFilter );
+    // else
+    // filters.add( sharedFilter );
+    // }
 }
