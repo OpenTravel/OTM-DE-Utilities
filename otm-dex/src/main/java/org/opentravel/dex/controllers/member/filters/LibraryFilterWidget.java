@@ -66,7 +66,7 @@ public class LibraryFilterWidget extends FilterWidget {
     }
 
     /**
-     * Simply add the library to the map.
+     * Simply add the library to the map. Map entries are name string and library OTM facade.
      * 
      * @param lib
      * @return library or null

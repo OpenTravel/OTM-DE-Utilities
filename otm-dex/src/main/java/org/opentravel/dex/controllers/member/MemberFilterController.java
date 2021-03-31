@@ -25,6 +25,7 @@ import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.member.filters.ButtonFilterWidget;
 import org.opentravel.dex.controllers.member.filters.ButtonToggleFilterWidget;
+import org.opentravel.dex.controllers.member.filters.ExcludeResourcesFilterWidget;
 import org.opentravel.dex.controllers.member.filters.FilterWidget;
 import org.opentravel.dex.controllers.member.filters.LibraryFilterWidget;
 import org.opentravel.dex.controllers.member.filters.MinorVersionFilterWidget;
@@ -100,6 +101,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
     private FilterWidget latestButtonFilter;
     private FilterWidget editableButtonFilter;
     private FilterWidget errorsButtonFilter;
+    private FilterWidget excludeResouresFilter;
 
     private MemberTreeTableController parentController;
 
@@ -135,6 +137,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
             if (mainController != null)
                 modelMgr = mainController.getModelManager();
             filters.forEach( DexFilterWidget::clear );
+            filters.remove( excludeResouresFilter );
         }
     }
 
@@ -145,14 +148,14 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
         eventPublisherNode = memberFilter;
     }
 
-    public void configure(OtmModelManager modelManager) {
-        modelMgr = modelManager;
-        configureFilters();
-    }
-
     public void configure(OtmModelManager modelManager, DexPopupController popupController) {
         configure( modelManager );
         this.popupController = popupController;
+    }
+
+    private void configure(OtmModelManager modelManager) {
+        modelMgr = modelManager;
+        configureFilters();
     }
 
     private void configureFilters() {
@@ -214,6 +217,12 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
         fireFilterChangeEvent();
     }
 
+    public void setExcludeResources() {
+        if (excludeResouresFilter == null)
+            excludeResouresFilter = new ExcludeResourcesFilterWidget( this );
+        filters.add( excludeResouresFilter );
+    }
+
     /**
      * Make and fire a filter event. Set ignore clear in case event handler tries to clear() this controller.
      */
@@ -263,8 +272,9 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
     }
 
     private void handleModelChange(DexModelChangeEvent e) {
+        log.debug( "Model change event received." );
         // modelMgr = e.getModelManager();
-        // filters.forEach( DexFilterWidget::refresh );
+        filters.forEach( DexFilterWidget::refresh );
     }
 
     @Override

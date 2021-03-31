@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.action.manager.DexActionManagerBase;
 import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
+import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.TypeSelectionContoller;
 import org.opentravel.dex.events.DexChangeEvent;
@@ -178,13 +179,17 @@ public class SetAssignedTypeAction extends DexRunAction {
         }
 
         // Set applicable filters
-        if (restrictType())
-            controller.getMemberFilterController().setMinorVersionFilter( user.getAssignedType() );
-        // 2/25/21 - dmh - no long used for resources. see AssignedResourceSubjectAction
-        if (otm instanceof OtmResource)
-            controller.getMemberFilterController().setTypeFilterValue( OtmLibraryMemberType.BUSINESS );
-        if (otm instanceof OtmActionFacet)
-            controller.getMemberFilterController().setTypeFilterValue( OtmLibraryMemberType.CORE );
+        MemberFilterController fc = controller.getMemberFilterController();
+        if (fc != null) {
+            fc.setExcludeResources();
+            if (restrictType())
+                fc.setMinorVersionFilter( user.getAssignedType() );
+            // 2/25/21 - dmh - no long used for resources. see AssignedResourceSubjectAction
+            if (otm instanceof OtmResource)
+                fc.setTypeFilterValue( OtmLibraryMemberType.BUSINESS );
+            if (otm instanceof OtmActionFacet)
+                fc.setTypeFilterValue( OtmLibraryMemberType.CORE );
+        }
 
         // Get the user's selected new provider
         controller.showAndWait( "MSG" );
@@ -199,6 +204,9 @@ public class SetAssignedTypeAction extends DexRunAction {
                 newUser.getLibrary().delete( newUser.getOwningMember() );
             return null;
         }
+
+        if (fc != null)
+            fc.clear();
 
         return get();
     }
