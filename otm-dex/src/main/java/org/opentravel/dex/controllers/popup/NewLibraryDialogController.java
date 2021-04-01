@@ -304,17 +304,6 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         nsCombo.setEditable( true );
     }
 
-    // private String checkNS(String ns) {
-    // String suffix = ns;
-    // if (ns.lastIndexOf( '/' ) > 0)
-    // suffix = ns.substring( ns.lastIndexOf( '/' ) );
-    // if (!suffix.matches( "/v[0-9].*" ))
-    // ns += "/v1";
-    //
-    // log.debug( "NS check: " + ns );
-    // return ns;
-    // }
-
     @Override
     protected void setup(String message) {
         super.setStage( dialogTitle, dialogStage );

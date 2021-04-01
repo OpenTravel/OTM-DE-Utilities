@@ -246,7 +246,7 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
             return;
         if (actionManager instanceof DexActionManager) {
             copyItem.setDisable( !actionManager.isEnabled( DexActions.COPYLIBRARYMEMBER, obj ) );
-            return;
+            // return;
         }
 
         // We have an object and an action manager
