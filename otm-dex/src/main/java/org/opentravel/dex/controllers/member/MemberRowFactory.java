@@ -226,11 +226,13 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
 
         if (controller.getModelManager() == null)
             return;
-        newMenu.setDisable( !controller.getModelManager().hasEditableLibraries() );
+        if (!controller.getModelManager().hasEditableLibraries())
+            return;
+        newMenu.setDisable( false );
 
         // May get an OtmEmptyTableFacet
         OtmObject obj = getSelectedObject( newTreeItem );
-        if (obj == null || obj.getModelManager() == null)
+        if (obj == null)
             return;
 
         // We have an object
@@ -244,10 +246,10 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         DexActionManager actionManager = obj.getActionManager();
         if (actionManager == null)
             return;
-        if (actionManager instanceof DexActionManager) {
+
+        // Allow copy on anything that has any action manger (and there are editable libraries).
+        if (actionManager instanceof DexActionManager)
             copyItem.setDisable( !actionManager.isEnabled( DexActions.COPYLIBRARYMEMBER, obj ) );
-            // return;
-        }
 
         // We have an object and an action manager
         addAliasItem.setDisable( !actionManager.isEnabled( DexActions.ADDALIAS, obj ) );
