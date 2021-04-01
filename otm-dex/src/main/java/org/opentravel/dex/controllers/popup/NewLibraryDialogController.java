@@ -19,6 +19,7 @@ package org.opentravel.dex.controllers.popup;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexFileHandler;
+import org.opentravel.common.DexNamespaceHandler;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
@@ -136,6 +137,8 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
     private UserSettings userSettings;
     private Map<String,OtmProject> projectFileMap;
 
+    private DexNamespaceHandler nsHandler;
+
     public String getResultText() {
         return resultText;
     }
@@ -201,10 +204,14 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         if (modelMgr != null)
             try {
                 AbstractLibrary tlLib = DexFileHandler.createLibrary( libraryFile );
+                String namespace = DexNamespaceHandler.fixNamespaceVersion( nsCombo.getValue() );
+                String prefix = nsHandler.getPrefix( namespace );
+
                 tlLib.setOwningModel( modelMgr.getTlModel() );
                 tlLib.setName( nameField.getText() );
-                tlLib.setPrefix( "pf1" );
-                tlLib.setNamespace( checkNS( nsCombo.getValue() ) );
+                tlLib.setNamespace( namespace );
+                tlLib.setPrefix( prefix );
+
                 // TODO - refactor how lib added to project. see DexProjectHandler
                 ProjectItem pi = selectedProject.getTL().getProjectManager().addUnmanagedProjectItem( tlLib,
                     selectedProject.getTL() );
@@ -271,6 +278,7 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
     public void configure(OtmModelManager manager, UserSettings settings) {
         this.modelMgr = manager;
         this.userSettings = settings;
+        this.nsHandler = new DexNamespaceHandler( manager );
     }
 
     private void setupProject() {
@@ -291,21 +299,21 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
     }
 
     private void setupNS() {
-        // Get the namespaces from the projects
-        modelMgr.getBaseNamespaces().forEach( ns -> nsCombo.getItems().add( ns ) );
+        // Get the namespaces
+        nsHandler.getBaseNamespaces().forEach( ns -> nsCombo.getItems().add( ns ) );
         nsCombo.setEditable( true );
     }
 
-    private String checkNS(String ns) {
-        String suffix = ns;
-        if (ns.lastIndexOf( '/' ) > 0)
-            suffix = ns.substring( ns.lastIndexOf( '/' ) );
-        if (!suffix.matches( "/v[0-9].*" ))
-            ns += "/v1";
-
-        log.debug( "NS check: " + ns );
-        return ns;
-    }
+    // private String checkNS(String ns) {
+    // String suffix = ns;
+    // if (ns.lastIndexOf( '/' ) > 0)
+    // suffix = ns.substring( ns.lastIndexOf( '/' ) );
+    // if (!suffix.matches( "/v[0-9].*" ))
+    // ns += "/v1";
+    //
+    // log.debug( "NS check: " + ns );
+    // return ns;
+    // }
 
     @Override
     protected void setup(String message) {
