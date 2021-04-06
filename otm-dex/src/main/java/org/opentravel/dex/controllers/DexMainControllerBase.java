@@ -41,6 +41,7 @@ import org.opentravel.schemacompiler.repository.RepositoryException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -162,7 +163,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
     }
 
     public DialogBoxContoller getDialogBoxController() {
-        if (dialogBoxController == null)
+        if (dialogBoxController == null && Platform.isFxApplicationThread())
             dialogBoxController = DialogBoxContoller.init();
         return dialogBoxController;
     }

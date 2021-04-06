@@ -52,6 +52,8 @@ public class TestDexNamespaceHandler extends AbstractFxTest {
     public static void beforeClass() throws IOException {
         setupWorkInProcessArea( TestDexNamespaceHandler.class );
         repoManager = repositoryManager.get();
+        // Prevent java.nio.BufferOverflowException
+        System.setProperty( "headless.geometry", "2600x2200-32" );
 
         staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
         lib = staticModelManager.add( new TLLibrary() );

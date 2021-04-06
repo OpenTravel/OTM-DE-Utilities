@@ -63,6 +63,10 @@ public class TestDexFileHandler extends AbstractFxTest {
         setupWorkInProcessArea( TestDexFileHandler.class );
         // startTestServer( "versions-repository", 9480, repositoryConfig, true, false, TestDexFileHandler.class );
         repoManager = repositoryManager.get();
+
+        // Prevent java.nio.BufferOverflowException
+        System.setProperty( "headless.geometry", "2600x2200-32" );
+
     }
 
     /**
@@ -233,6 +237,8 @@ public class TestDexFileHandler extends AbstractFxTest {
         log.debug( "WipFolder = " + wipFolder.get() );
         assertTrue( "Loader: must be able to read wipFolder.", repoProject.canRead() );
 
+        // List<OtmProject> initialProjects = modelManager.getProjects();
+
         new DexFileHandler().openProject( repoProject, modelManager, null );
         assertTrue( "Must have project items.", modelManager.getProjectManager().getAllProjectItems().size() > 1 );
         // log.debug( "Model now has " + modelManager.getTlModel().getAllLibraries().size() + " libraries." );
@@ -245,6 +251,13 @@ public class TestDexFileHandler extends AbstractFxTest {
                 editable = true;
         if (!editable)
             log.warn( "No editable libraries. Check access to repository for libraries in " + FILE_TESTVERSIONS_REPO );
+
+        // List<OtmProject> newProjects = new ArrayList<>();
+        // modelManager.getProjects().forEach( p -> {
+        // if (!initialProjects.contains( p ))
+        // newProjects.add( p );
+        // } );
+        // log.debug( newProjects.size() + " projects loaded." );
 
         // Wait for the background tasks to complete
         while (modelManager.getBackgroundTaskCount() > 0)

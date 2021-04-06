@@ -67,6 +67,8 @@ public class TestMemberSprite extends AbstractFxTest {
     public static void setupTests() throws Exception {
         setupWorkInProcessArea( TestMemberSprite.class );
         repoManager = repositoryManager.get();
+        // Prevent java.nio.BufferOverflowException
+        System.setProperty( "headless.geometry", "2600x2200-32" );
     }
 
     @Test

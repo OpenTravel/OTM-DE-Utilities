@@ -63,6 +63,8 @@ public class TestOtmModelManager extends AbstractFxTest {
     public static void setupTests() throws Exception {
         setupWorkInProcessArea( TestOtmModelManager.class );
         repoManager = repositoryManager.get();
+        // Prevent java.nio.BufferOverflowException
+        System.setProperty( "headless.geometry", "2600x2200-32" );
     }
 
     /**

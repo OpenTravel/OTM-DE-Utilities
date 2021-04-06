@@ -638,7 +638,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     /**
-     * @return
+     * @return true if the state equals RepositoryItemStage.UNMANAGED
      */
     public boolean isUnmanaged() {
         return getState() == RepositoryItemState.UNMANAGED;

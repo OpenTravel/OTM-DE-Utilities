@@ -489,22 +489,29 @@ public class TestLibrary extends AbstractFxTest {
 
     /**
      * Build one of each library member type.
+     * <p>
      * 
+     * @see OtmLibraryMemberType for enumeration of member types
      * @param lib
      */
-    public static void addOneOfEach(OtmLibrary lib) {
+    public static int addOneOfEach(OtmLibrary lib) {
         int i = 1;
+        assertTrue( "Must be an editable library.", lib.isEditable() );
+
         for (OtmLibraryMemberType value : OtmLibraryMemberType.values()) {
             try {
                 OtmLibraryMember member =
                     OtmLibraryMemberType.buildMember( value, "TestObj" + i++, lib.getModelManager() );
                 OtmLibraryMember result = lib.add( member );
                 // Checks
-                if (lib.isEditable() && result != null) {
+                if (result != null) {
                     assertTrue( member.isEditable() );
                     assertTrue( member.getTlLM().getOwningLibrary() == lib.getTL() );
                     // if (member instanceof OtmContextualFacet)
                     // log.debug( "Here" );
+                } else {
+                    i--;
+                    log.debug( "Could not add an " + value );
                 }
             } catch (ExceptionInInitializerError e) {
                 // TODO Auto-generated catch block
@@ -526,6 +533,8 @@ public class TestLibrary extends AbstractFxTest {
         // Attach the contextual facets
         for (OtmLibraryMember m : lib.getMembers()) {
         }
+        log.debug( "Added " + i + " to " + lib );
+        return i;
     }
 
     /** **********************************************************************/
