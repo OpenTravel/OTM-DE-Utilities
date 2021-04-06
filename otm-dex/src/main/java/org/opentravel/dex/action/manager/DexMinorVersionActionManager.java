@@ -25,6 +25,7 @@ import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmVersionChain;
 import org.opentravel.model.otmFacets.OtmAlias;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 /**
@@ -105,6 +106,7 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
         switch (action) {
             case ADDALIAS:
                 return true;
+            case DELETELIBRARYMEMBER:
             case NAMECHANGE:
                 // Allow name change to objects new to the chain
                 return isNewToChain( subject );
@@ -179,6 +181,7 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
     /**
      * Is the subject new to a chain?
      * <p>
+     * <li>If a library member, is it in the latest version of the chain?
      * <li>If a property, is it inherited?
      * <li>If a resource child, is it inherited?
      * <li>Is the owning member new to chain?
@@ -189,6 +192,8 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
     public static boolean isNewToChain(OtmObject subject) {
         if (subject == null)
             return false;
+        if (subject instanceof OtmLibraryMember)
+            return subject.getLibrary().isLatestVersion();
         if (subject instanceof OtmAlias)
             return !subject.isInherited();
         if (subject instanceof OtmProperty)

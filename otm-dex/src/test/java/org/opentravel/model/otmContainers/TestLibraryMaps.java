@@ -61,6 +61,8 @@ public class TestLibraryMaps extends AbstractFxTest {
     @BeforeClass
     public static void setupTests() throws Exception {
         setupWorkInProcessArea( TestLibraryMaps.class );
+        // Prevent java.nio.BufferOverflowException
+        System.setProperty( "headless.geometry", "2600x2200-32" );
         // repoManager = repositoryManager.get();
         // assertTrue( "Given: ", repositoryManager != null );
         // assertTrue( "Given: ", repoManager != null );

@@ -18,6 +18,7 @@ package org.opentravel.model.otmLibraryMembers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
@@ -47,6 +48,7 @@ import org.opentravel.schemacompiler.model.TLFacetType;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.validate.ValidationException;
+import org.opentravel.schemacompiler.validate.ValidationFindings;
 import org.opentravel.schemacompiler.version.MinorVersionHelper;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
 import org.opentravel.schemacompiler.version.Versioned;
@@ -212,26 +214,33 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         if (!(minorLibrary.getTL() instanceof TLLibrary))
             errMsg = "Not a TL library.";
 
+        //
         if (errMsg == null) {
             TLLibrary targetTLLib = (TLLibrary) minorLibrary.getTL();
             try {
                 MinorVersionHelper helper = new MinorVersionHelper();
                 v = helper.createNewMinorVersion( (Versioned) getTL(), targetTLLib );
                 lm = OtmLibraryMemberFactory.create( (LibraryMember) v, getModelManager() );
-            } catch (VersionSchemeException | ValidationException e) {
+            } catch (VersionSchemeException e) {
                 errMsg = "Minor Version Error: " + targetTLLib.getPrefix() + ":" + targetTLLib.getName();
                 exception = e;
                 lm = null;
+            } catch (ValidationException e) {
+                errMsg = "Minor Version Error: " + targetTLLib.getPrefix() + ":" + targetTLLib.getName();
+                ValidationFindings findings = e.getFindings();
+                log.debug( ValidationUtils.getMessagesAsString( findings ) );
+                exception = e;
+                lm = null;
             }
-        }
-        if (errMsg != null) {
-            getActionManager().postError( exception, errMsg );
-            log.debug( errMsg );
-        } else if (lm != null) {
-            // Clone the aliases
-            for (OtmObject c : getChildren()) {
-                if (c instanceof OtmAlias)
-                    new OtmAlias( c.getName(), lm );
+            if (errMsg != null) {
+                getActionManager().postError( exception, errMsg );
+                log.debug( errMsg );
+            } else if (lm != null) {
+                // Clone the aliases
+                for (OtmObject c : getChildren()) {
+                    if (c instanceof OtmAlias)
+                        new OtmAlias( c.getName(), lm );
+                }
             }
         }
         return lm;

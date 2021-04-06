@@ -25,13 +25,20 @@ import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.common.DexFileHandler;
+import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.tasks.DexTaskException;
+import org.opentravel.dex.tasks.repository.ManageLibraryTask;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmProjectManager;
 import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.repository.ProjectItem;
+import org.opentravel.schemacompiler.repository.ProjectManager;
+import org.opentravel.schemacompiler.repository.PublishWithLocalDependenciesException;
 import org.opentravel.schemacompiler.repository.RemoteRepository;
+import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
+import org.opentravel.schemacompiler.repository.RepositoryManager;
 import org.opentravel.schemacompiler.repository.impl.RemoteRepositoryClient;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
@@ -63,69 +70,176 @@ public class TestProject extends AbstractFxTest {
     }
 
     /** ******************************************************************* **/
-    // // Test MOVED to TestVersionChain
-    // //@Test
-    // public void testAddingVersionedProject() throws Exception {
-    //
-    // // Given a project that uses the OpenTravel repository
-    // OtmModelManager mgr = new OtmModelManager( new DexFullActionManager( null ), repoManager );
-    // boolean editable = TestDexFileHandler.loadVersionProject( mgr );
-    // assertNotNull( mgr.getActionManager( true ) );
-    //
-    // // String BASENS0 = "http://www.opentravel.org/Sandbox/Test/VersionTest_Unmanaged";
-    // // String BASENS1 = "http://www.opentravel.org/Sandbox/Test/v1";
-    // //
-    // OtmLibrary latestLib = null;
-    // int highestMajor = 0;
-    // for (OtmLibrary lib : mgr.getLibraries()) {
-    // if (lib.isBuiltIn())
-    // continue;
-    // // log.debug( "Library " + lib + " opened." );
-    // // log.debug( "Is latest? " + lib.isLatestVersion() );
-    // // log.debug( "Is minor? " + lib.isMinorVersion() );
-    // // log.debug( "Version number " + lib.getMajorVersion() + " " + lib.getMinorVersion() );
-    // // log.debug( "Is editable? " + lib.isEditable() );
-    // // // DexActionManager am = lib.getActionManager();
-    // // log.debug( "What action manager? " + lib.getActionManager().getClass().getSimpleName() );
-    // //
-    // // // List<OtmLibrary> chain = mgr.getVersionChain( lib );
-    // // log.debug( "Version chain contains " + mgr.getVersionChain( lib ).size() + " libraries" );
-    // // log.debug( "" );
-    //
-    // if (lib.getMajorVersion() > highestMajor)
-    // highestMajor = lib.getMajorVersion();
-    // if (lib.isLatestVersion())
-    // latestLib = lib;
-    // }
-    //
-    // //
-    // // Test adding properties to object in latest major
-    // //
-    // // Get the latest library and make sure we can add properties to the objects
-    // if (editable) {
-    // assertTrue( "Given: Library in repository must be editable.", latestLib.isEditable() );
-    // OtmLibraryMember vlm = null;
-    // for (OtmLibraryMember member : mgr.getMembers( latestLib.getVersionChain().getMajor() )) {
-    // assertTrue( "This must be chain editable: ", member.getLibrary().isChainEditable() );
-    // vlm = member.createMinorVersion( latestLib );
-    // log.debug( "Created minor version of " + member );
-    // // Services are not versioned
-    // if (vlm == null)
-    // assertTrue( !(member.getTL() instanceof Versioned) );
-    // else {
-    // // Post Checks
-    // assertTrue( vlm != null );
-    // if (!(vlm instanceof OtmValueWithAttributes) && !(vlm instanceof OtmSimpleObject)) // FIXME
-    // assertTrue( vlm.getBaseType() == member );
-    // assertTrue( vlm.getName().equals( member.getName() ) );
-    // assertTrue( ((LibraryMember) vlm.getTL()).getOwningLibrary() == latestLib.getTL() );
-    // assertTrue( vlm.getLibrary() == latestLib );
-    // }
-    // }
-    // } else
-    // log.warn( "No editable libraries - could not test adding properties." );
-    // }
 
+    /**
+     * Class for testing using otm projects.
+     * <p>
+     * TestProject.ProjectTestSet pts = new TestProject().new ProjectTestSet( application );
+     * <p>
+     * OtmProject px = new TestProject().new ProjectTestSet( application ).create();
+     */
+    public class ProjectTestSet {
+        AbstractOTMApplication application = null;
+        public DexMainController controller;
+        public RepositoryManager repoMgr;
+        public OtmModelManager modelMgr;
+        public OtmProjectManager projMgr;
+
+        public RemoteRepository remoteRepo = null;
+        public String remoteRepoId;
+        public String localRepoID = null;
+        public String localRepoName = null;
+
+        // the project creation call parameters
+        public String name = "testProj";
+        public String defaultContextId = "testContext";
+        public String projectId = "http://opentravel.org/temp/projectNS1/v1";
+        public String description = "some description";
+
+        public File projectFile = null;
+        public OtmProject p = null;
+
+        public ProjectTestSet(AbstractOTMApplication application) {
+            this.application = application;
+
+            if (application == null)
+                throw new IllegalArgumentException( "Must have application as argument." );
+            if (!(application.getController() instanceof DexMainController))
+                throw new IllegalArgumentException( "Must have access to Dex Main Controller." );
+
+            controller = (DexMainController) application.getController();
+            repoMgr = controller.getRepositoryManager();
+            modelMgr = new OtmModelManager( new DexFullActionManager( controller ), repoManager, null );
+            projMgr = modelMgr.getOtmProjectManager();
+
+            localRepoID = repoMgr.getLocalRepositoryId();
+            localRepoName = repoMgr.getLocalRepositoryDisplayName();
+
+            List<RemoteRepository> repos = repoMgr.listRemoteRepositories();
+            remoteRepo = repos.get( 0 );
+            assertTrue( remoteRepo != null );
+            remoteRepoId = remoteRepo.getId();
+
+            // Not needed - creates exception about directory already exists
+            // try {
+            // repoMgr.createLocalRepository( localRepoID, localRepoName );
+            // } catch (RepositoryException e) {
+            // // TODO Auto-generated catch block
+            // e.printStackTrace();
+            // }
+
+            if (controller == null)
+                throw new IllegalArgumentException( "Must have controller." );
+            if (repoMgr == null)
+                throw new IllegalArgumentException( "Must have application repository manager." );
+            if (modelMgr == null)
+                throw new IllegalArgumentException( "Must have application model manager." );
+            if (projMgr == null)
+                throw new IllegalArgumentException( "Must have application project manager." );
+
+        }
+
+        /**
+         * Create a library and manage in the project
+         * 
+         * @return
+         * @throws RepositoryException
+         */
+        public OtmLibrary createLibrary() throws RepositoryException {
+            // Create major library and manage in project
+            OtmLibrary ml = TestLibrary.buildOtm( modelMgr );
+            ml.getTL().setNamespace( p.getTL().getProjectId() );
+            p.add( ml );
+
+            assertTrue( modelMgr.getManagingProject( ml ) == p );
+            return ml;
+        }
+
+        /**
+         * Create a library and manage in this project and in the repository
+         * 
+         * @return
+         * @throws RepositoryException
+         * @throws DexTaskException
+         */
+        public OtmLibrary createManagedLibrary() throws RepositoryException {
+            OtmLibrary major = createLibrary();
+            assertTrue( ManageLibraryTask.isEnabled( major ) );
+            //
+            // ManageLibraryTask manageTask = new ManageLibraryTask( repo.getId(), major, null, controller );
+            OtmProject proj = modelMgr.getManagingProject( major );
+            ProjectManager pm = proj.getTL().getProjectManager();
+            ProjectItem item = major.getProjectItem();
+            try {
+                pm.publish( item, remoteRepo );
+            } catch (IllegalArgumentException | RepositoryException | PublishWithLocalDependenciesException e) {
+                log.debug( e.getCause() );
+            }
+
+            // try {
+            // manageTask.doIT();
+            // } catch (DexTaskException e) {
+            // log.debug( manageTask.getErrorMsg() );
+            // log.debug( e.getCause() );
+            // assertTrue( false );
+            // }
+            // assertTrue( manageTask.getErrorMsg() == null );
+
+            assertTrue( !major.isUnmanaged() );
+            assertTrue( major.isMajorVersion() );
+            return major;
+        }
+
+        /**
+         * @param application the abstract application from setup
+         */
+        public OtmProject create() {
+
+
+            // Get temporary project file
+            try {
+                projectFile = TestDexFileHandler.getTempFile( "tProj.otp", "testNewProject" );
+            } catch (Exception e) {
+                log.debug( "Error creating temp project file." );
+            }
+            // Create project
+            try {
+                p = projMgr.newProject( projectFile, name, defaultContextId, projectId, description );
+            } catch (Exception e) {
+                log.debug( "Unexpected error creating project." );
+            }
+
+            assertTrue( p != null );
+            assertTrue( modelMgr.getProjects().contains( p ) );
+            return p;
+        }
+
+        public OtmProject loadVersionedProject() throws InterruptedException {
+            p = null;
+            List<OtmProject> initialProjects = modelMgr.getProjects();
+
+            // Load versioned project
+            boolean result = TestDexFileHandler.loadVersionProject( modelMgr );
+            if (result) {
+                List<OtmProject> newProjects = new ArrayList<>();
+                modelMgr.getProjects().forEach( p -> {
+                    if (!initialProjects.contains( p ))
+                        newProjects.add( p );
+                } );
+                log.debug( newProjects.size() + " projects loaded." );
+                assertTrue( newProjects.size() == 1 );
+                p = newProjects.get( 0 );
+            }
+            return p;
+        }
+    }
+
+    /** ******************************************* TESTS ********************************** */
+    @Test
+    public void testTestClass() throws Exception {
+        OtmProject project = new ProjectTestSet( application ).create();
+        assertTrue( project != null );
+    }
 
     @Test
     public void testNewProject() throws Exception {
@@ -254,6 +368,7 @@ public class TestProject extends AbstractFxTest {
     // }
 
 
+    /** ************************************************************************************ **/
     /**
      * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
      */

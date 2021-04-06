@@ -34,6 +34,7 @@ import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -125,6 +126,10 @@ public class OtmVersionChain {
 
     public String getPrefix() {
         return prefix;
+    }
+
+    public List<OtmLibrary> getLibraries() {
+        return new ArrayList<>( libraries );
     }
 
     /**

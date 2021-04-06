@@ -189,7 +189,7 @@ public class TestVersionChain extends AbstractFxTest {
     /**
      * Create a minor version of all members of the library chain.
      * <p>
-     * Must be a chain and have a minor version.
+     * Must be a chain and have a minor version library in the chain.
      * 
      * @param library
      * @return
