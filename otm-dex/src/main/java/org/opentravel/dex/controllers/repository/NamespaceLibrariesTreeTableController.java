@@ -32,10 +32,13 @@ import java.util.HashMap;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 
 /**
  * Tree table controller for all libraries in a namespace view. Creates table containing repository item properties.
@@ -175,6 +178,15 @@ public class NamespaceLibrariesTreeTableController extends DexIncludedController
         return root;
     }
 
+    private void putInClipboard(Label label) {
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        content.putString( label.getText() );
+        clipboard.setContent( content );
+        label.setTooltip( new Tooltip( "Copied to clipboard: " + label.getText() ) );
+        mainController.postStatus( "Copied to clipboard: " + label.getText() );
+    }
+
     @Override
     public void post(NamespacesDAO nsNode) {
         super.post( nsNode );
@@ -214,6 +226,8 @@ public class NamespaceLibrariesTreeTableController extends DexIncludedController
                     }
                 }
             }
+
+        putInClipboard( namespaceLabel );
     }
 
     @Override
