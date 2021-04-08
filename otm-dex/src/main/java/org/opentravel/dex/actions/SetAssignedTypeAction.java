@@ -63,18 +63,18 @@ public class SetAssignedTypeAction extends DexRunAction {
      */
     public static boolean isEnabled(OtmObject subject) {
         // Id is a type user but can't be changed.
+        if (subject == null || subject.getLibrary() == null)
+            return false;
         if (subject instanceof OtmIdAttribute)
             return false;
         if (!(subject instanceof OtmTypeUser))
             return false;
-        if (subject == null || subject.getLibrary() == null)
-            return false;
         if (!subject.isEditable())
             return false;
+
         // If editable, major versions can always have subject set
         if (subject.getLibrary().isMajorVersion())
             return true;
-
         // Allow if new to a minor version
         if (DexMinorVersionActionManager.isNewToChain( subject ))
             return true;

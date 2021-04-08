@@ -69,8 +69,14 @@ public class AssignResourceSubjectAction extends DexRunAction {
         return selection;
     }
 
+    /**
+     * Note: when the subject has a minor version, the subject does NOT have to change to use it. The minor version of
+     * the subject will automatically be used in the JSON SWAGGER/OpenAPI.
+     * 
+     * @param subject
+     * @return
+     */
     public static boolean isEnabled(OtmObject subject) {
-        // return false;
         if (subject instanceof OtmResource) {
             return SetAssignedTypeAction.isEnabled( subject );
         }
@@ -138,7 +144,10 @@ public class AssignResourceSubjectAction extends DexRunAction {
     }
 
     /**
-     * This action will get the data from the user via modal dialog
+     * This action will get the data from the user via modal dialog.
+     * <p>
+     * Note: when the subject has a minor version, the subject does NOT have to change to use it. The minor version of
+     * the subject will automatically be used in the JSON SWAGGER/OpenAPI.
      * 
      * @return
      */

@@ -106,6 +106,7 @@ public class TestDeleteLibraryMemberActionVersioned extends AbstractFxTest {
         throws VersionSchemeException, InterruptedException, RepositoryException, DexTaskException {
         // Given - test set of libraries in a model with action managers
         ActionsTestSet ts = new ActionsTestSet( application );
+        ts.load();
         // VersionTestSet ts = new VersionTestSet();
 
         // Given - minor has minor members for all major members

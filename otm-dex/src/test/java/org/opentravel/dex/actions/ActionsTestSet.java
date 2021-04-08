@@ -45,6 +45,8 @@ import org.opentravel.schemacompiler.version.VersionSchemeException;
 public class ActionsTestSet {
     private static Log log = LogFactory.getLog( ActionsTestSet.class );
 
+    TestProject.ProjectTestSet pts;
+
     // public class VersionTestSet {
     public OtmModelManager mgr;
     public DexActionManager fullAM;
@@ -60,11 +62,10 @@ public class ActionsTestSet {
     public OtmQueryFacet majorQF;
     public OtmQueryFacet minorQF;
 
-    public ActionsTestSet(AbstractOTMApplication application)
-        throws InterruptedException, VersionSchemeException, DexTaskException, RepositoryException {
+    public ActionsTestSet(AbstractOTMApplication application) throws DexTaskException, RepositoryException {
 
         // Create a project
-        TestProject.ProjectTestSet pts = new TestProject().new ProjectTestSet( application );
+        pts = new TestProject().new ProjectTestSet( application );
         // OtmProject px = pts.create();
 
         // Given - model manager and its action managers
@@ -75,35 +76,60 @@ public class ActionsTestSet {
         assertTrue( "Given", fullAM instanceof DexFullActionManager );
         assertTrue( "Given", minorAM instanceof DexMinorVersionActionManager );
         assertTrue( "Given", roAM instanceof DexReadOnlyActionManager );
+    }
 
-        // I don't know how to create new managed libraries without loading them.
-        // // Create project and repository managed major library
-        // OtmLibrary major = pts.createManagedLibrary();
-        //
-        // // Promote to final
-        // // TODO
-        //
-        // VersionType type = VersionType.MINOR;
-        // VersionLibraryTask task =
-        // new VersionLibraryTask( type, major, new RepositoryResultHandler( null ), null, null, mgr );
-        // task.doIT();
-        // log.debug( task.getErrorMsg() );
-        // assertTrue( task.getErrorMsg() == null );
+    // I don't know how to create new managed libraries without loading them.
+    // // Create project and repository managed major library
+    // OtmLibrary major = pts.createManagedLibrary();
+    //
+    // // Promote to final
+    // // TODO
+    //
+    // VersionType type = VersionType.MINOR;
+    // VersionLibraryTask task =
+    // new VersionLibraryTask( type, major, new RepositoryResultHandler( null ), null, null, mgr );
+    // task.doIT();
+    // log.debug( task.getErrorMsg() );
+    // assertTrue( task.getErrorMsg() == null );
+    //
+    // log.debug( "Is major editable? " + major.isEditable() );
+    // ProjectManager tlPM = pts.p.getTL().getProjectManager();
+    // ProjectItem pi = pts.p.getProjectItem( major.getTL() );
+    // // Fails - "Unable to obtain lock - only draft repository items can be edited"
+    // tlPM.lock( pi );
+    // log.debug( "Is major editable? " + major.isEditable() );
 
+
+    public void loadWithResource() throws InterruptedException, VersionSchemeException {
         // Load versioned project
-        OtmProject vProj = pts.loadVersionedProject();
+        OtmProject vProj = pts.loadVersionedProjectWithResource();
+        // OtmProject vProj = pts.loadVersionedProject();
         assertTrue( vProj != null );
 
         minor = TestVersionChain.getMinorInChain( mgr );
         chain = minor.getVersionChain();
         major = chain.getMajor();
 
-        // log.debug( "Is major editable? " + major.isEditable() );
-        // ProjectManager tlPM = pts.p.getTL().getProjectManager();
-        // ProjectItem pi = pts.p.getProjectItem( major.getTL() );
-        // // Fails - "Unable to obtain lock - only draft repository items can be edited"
-        // tlPM.lock( pi );
-        // log.debug( "Is major editable? " + major.isEditable() );
+        assertTrue( "Given", chain != null );
+        assertTrue( "Given", chain.getLatestVersion() == minor );
+        assertTrue( "Given", chain.getMajor() == major );
+        assertTrue( "Given", major != null );
+        assertTrue( "Given", minor != null );
+        assertTrue( "Given", minor.isEditable() );
+
+        for (OtmLibrary lib : chain.getLibraries())
+            assertTrue( "Given", lib.isValid() );
+    }
+
+    public void load() throws InterruptedException, VersionSchemeException {
+        // Load versioned project
+        // OtmProject vProj = pts.loadVersionedProjectWithResource();
+        OtmProject vProj = pts.loadVersionedProject();
+        assertTrue( vProj != null );
+
+        minor = TestVersionChain.getMinorInChain( mgr );
+        chain = minor.getVersionChain();
+        major = chain.getMajor();
 
         assertTrue( "Given", chain != null );
         assertTrue( "Given", chain.getLatestVersion() == minor );

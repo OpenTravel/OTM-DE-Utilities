@@ -232,6 +232,26 @@ public class TestProject extends AbstractFxTest {
             }
             return p;
         }
+
+        public OtmProject loadVersionedProjectWithResource() throws InterruptedException {
+            p = null;
+            List<OtmProject> initialProjects = modelMgr.getProjects();
+
+            // Load versioned project
+            boolean result = TestDexFileHandler.loadVersionProjectWithResource( modelMgr );
+            if (result) {
+                List<OtmProject> newProjects = new ArrayList<>();
+                modelMgr.getProjects().forEach( p -> {
+                    if (!initialProjects.contains( p ))
+                        newProjects.add( p );
+                } );
+                log.debug( newProjects.size() + " projects loaded." );
+                assertTrue( newProjects.size() == 1 );
+                p = newProjects.get( 0 );
+            }
+            return p;
+        }
+
     }
 
     /** ******************************************* TESTS ********************************** */

@@ -51,6 +51,7 @@ public class TestDexFileHandler extends AbstractFxTest {
     // 27 named objects in 2 libraries. All valid, one warning.
     public final static String FILE_TESTOPENTRAVELREPO = "TestOpenTravelRepo.otp";
     public final static String FILE_TESTVERSIONS_REPO = "TestVersionsFromOpenTravelRepo.otp";
+    public final static String FILE_TESTVERSIONSWITHRESOURCE_REPO = "TestVersionsFromRepoWithResource.otp";
     public final static String FILE_TESTLOCAL = "TestLocalFiles.otp";
     public final static String FILE_TESTLOCALLIBRARY = "StandAloneLibrary.otm";
     public final static String FILE_TESTLOCALLIBRARYBASE = "base_library.otm";
@@ -231,6 +232,17 @@ public class TestDexFileHandler extends AbstractFxTest {
      */
     public static boolean loadVersionProject(OtmModelManager modelManager) throws InterruptedException {
         File repoProject = new File( wipFolder.get(), "/" + FILE_TESTVERSIONS_REPO );
+        return loadVersionProject( repoProject, modelManager );
+    }
+
+    public static boolean loadVersionProjectWithResource(OtmModelManager modelManager) throws InterruptedException {
+        File repoProject = new File( wipFolder.get(), "/" + FILE_TESTVERSIONSWITHRESOURCE_REPO );
+        return loadVersionProject( repoProject, modelManager );
+    }
+
+    public static boolean loadVersionProject(File repoProject, OtmModelManager modelManager)
+        throws InterruptedException {
+        // File repoProject = new File( wipFolder.get(), "/" + FILE_TESTVERSIONS_REPO );
         assertNotNull( repoProject );
         assertNotNull( modelManager );
         // Check wipFolder

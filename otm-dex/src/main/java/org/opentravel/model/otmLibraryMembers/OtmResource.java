@@ -53,6 +53,7 @@ import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLParamGroup;
 import org.opentravel.schemacompiler.model.TLResource;
 import org.opentravel.schemacompiler.model.TLResourceParentRef;
+import org.opentravel.schemacompiler.version.VersionSchemeException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -88,7 +89,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         "Encapsulates all aspects of a RESTful resource used to expose and manage a particular business object.";
     private static final String businessObject_LABEL = "Business Object";
     private static final String businessObject_TOOLTIP =
-        "The name of the business object with which this resource is associated. ";
+        "Name and major version of the business object this resource exposes.  ";
 
     private static final String abstract_LABEL = "Abstract";
     private static final String abstract_TOOLTIP = "Indicates whether this is an abstract resource.";
@@ -818,13 +819,21 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     /**
      * Get the name of the business object. First trys the business object and if that is missing, trys the business
      * object reference name field.
+     * <p>
+     * Note: SWAGGER will use the latest minor version of a subject so just show the major version number.
      * 
      * @return name of the business object assigned or empty string
      */
     public String getSubjectName() {
         if (getAssignedType() == null)
             return getTlAssignedTypeName();
-        return getAssignedType().getNameWithPrefix();
+        int major = -1;
+        try {
+            major = getAssignedType().getLibrary().getMajorVersion();
+        } catch (VersionSchemeException e) {
+        }
+        return getAssignedType().getName() + " /v" + major;
+        // return getAssignedType().getNameWithPrefix();
     }
 
     @Override
