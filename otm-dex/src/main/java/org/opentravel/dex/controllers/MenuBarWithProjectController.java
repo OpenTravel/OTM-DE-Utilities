@@ -178,6 +178,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     }
 
     public void updateNavigationButtons() {
+        doNewLibraryItem.setDisable( modelMgr.getProjects().isEmpty() );
         if (eventDispatcher != null) {
             navBackButton.setDisable( !eventDispatcher.canGoBack() );
             navForwardButton.setDisable( !eventDispatcher.canGoForward() );
@@ -348,11 +349,15 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
 
     @FXML
     void doNewLibrary(ActionEvent e) {
-        NewLibraryDialogController nldc = NewLibraryDialogController.init();
-        nldc.configure( modelMgr, userSettings );
-        Results results = nldc.showAndWait( "" );
-        if (results == Results.OK) {
-            fireEvent( new DexModelChangeEvent( modelMgr ) );
+        if (modelMgr.getProjects().isEmpty())
+            mainController.postError( null, "Must have project open before creating libraries." );
+        else {
+            NewLibraryDialogController nldc = NewLibraryDialogController.init();
+            nldc.configure( modelMgr, userSettings );
+            Results results = nldc.showAndWait( "" );
+            if (results == Results.OK) {
+                fireEvent( new DexModelChangeEvent( modelMgr ) );
+            }
         }
     }
 
