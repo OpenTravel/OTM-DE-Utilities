@@ -149,8 +149,9 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         setColumnProps( valColumn, true, false, false, 25 );
 
         // Add columns to table
-        memberTree.getColumns().addAll( nameColumn, valColumn, libColumn, versionColumn, prefixColumn, usedTypesCol );
+        memberTree.getColumns().addAll( nameColumn, valColumn, prefixColumn, libColumn, versionColumn, usedTypesCol );
         memberTree.getSortOrder().add( nameColumn );
+        memberTree.getSortOrder().add( prefixColumn );
     }
 
     @Override
