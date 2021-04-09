@@ -23,6 +23,7 @@ import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.DexTaskSingleton;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.otmContainers.OtmProject;
+import org.opentravel.objecteditor.UserCompilerSettings;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.task.CompileAllCompilerTask;
 import org.opentravel.schemacompiler.util.SchemaCompilerException;
@@ -143,19 +144,20 @@ public class CompileProjectTask extends DexTaskBase<OtmProject> implements DexTa
 
     public static void setOptions(CompileAllCompilerTask options, UserSettings userSettings) {
         if (options != null && userSettings != null) {
-            options.setCompileSchemas( userSettings.isCompileSchemas() );
-            options.setCompileServices( userSettings.isCompileServices() );
-            options.setCompileJsonSchemas( userSettings.isCompileJsonSchemas() );
-            options.setCompileSwagger( userSettings.isCompileSwagger() );
-            options.setCompileHtml( userSettings.isCompileHtml() );
-            options.setServiceEndpointUrl( userSettings.getServiceEndpointUrl() );
-            options.setResourceBaseUrl( userSettings.getResourceBaseUrl() );
-            options.setSuppressOtmExtensions( userSettings.isSuppressOtmExtensions() );
-            options.setGenerateExamples( userSettings.isGenerateExamples() );
-            options.setGenerateMaxDetailsForExamples( userSettings.isGenerateMaxDetailsForExamples() );
-            options.setExampleMaxRepeat( userSettings.getExampleMaxRepeat() );
-            options.setExampleMaxDepth( userSettings.getExampleMaxDepth() );
-            options.setSuppressOptionalFields( userSettings.isSuppressOptionalFields() );
+            UserCompilerSettings compilerSettings = userSettings.getCompilerSettings();
+            options.setCompileSchemas( compilerSettings.isCompileSchemas() );
+            options.setCompileServices( compilerSettings.isCompileServices() );
+            options.setCompileJsonSchemas( compilerSettings.isCompileJsonSchemas() );
+            options.setCompileSwagger( compilerSettings.isCompileSwagger() );
+            options.setCompileHtml( compilerSettings.isCompileHtml() );
+            options.setServiceEndpointUrl( compilerSettings.getServiceEndpointUrl() );
+            options.setResourceBaseUrl( compilerSettings.getResourceBaseUrl() );
+            options.setSuppressOtmExtensions( compilerSettings.isSuppressOtmExtensions() );
+            options.setGenerateExamples( compilerSettings.isGenerateExamples() );
+            options.setGenerateMaxDetailsForExamples( compilerSettings.isGenerateMaxDetailsForExamples() );
+            options.setExampleMaxRepeat( compilerSettings.getExampleMaxRepeat() );
+            options.setExampleMaxDepth( compilerSettings.getExampleMaxDepth() );
+            options.setSuppressOptionalFields( compilerSettings.isSuppressOptionalFields() );
         }
     }
 }

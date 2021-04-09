@@ -36,7 +36,8 @@ public class ValidationErrorsAndWarningsTreeTableCellFactory extends TreeTableCe
         // Provide imageView directly - does not update automatically as the observable property would
         // Provide tooltip showing validation results
         String name = "";
-        if (!empty && getTreeTableRow() != null && getTreeTableRow().getItem() != null) {
+        if (!empty && getTreeTableRow() != null && getTreeTableRow().getItem() != null
+            && getTreeTableRow().getItem().getValue() != null) {
             setGraphic( getTreeTableRow().getItem().getValue().validationImage() );
             name = getTreeTableRow().getItem().getValue().getValidationFindingsAsString();
             if (!name.isEmpty())

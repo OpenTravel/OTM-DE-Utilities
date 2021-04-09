@@ -32,9 +32,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 
 /**
- * The TreeItem properties for Library Members and Type Providers.
- * <P>
- * Used in ModelMembersTreeController TreeTableView. Simple Data Access Object that contains and provides gui access.
+ * The TreeItem properties for object findings. Simple Data Access Object that contains data and provides gui access.
  *
  * @author dmh
  * @param <T>
@@ -62,29 +60,32 @@ public class ErrorsAndWarningsDAO implements DexDAO<OtmObject> {
     }
 
     public boolean isEditable() {
-        return otmObject.isEditable();
+        return otmObject != null ? otmObject.isEditable() : false;
     }
 
     public StringProperty errorProperty() {
-        return otmObject.validationProperty();
+        return otmObject != null ? otmObject.validationProperty() : new ReadOnlyStringWrapper();
     }
 
     public ObjectProperty<ImageView> errorImageProperty() {
-        return otmObject.validationImageProperty();
+        return otmObject != null ? otmObject.validationImageProperty() : null;
     }
 
 
     public StringProperty nameProperty() {
-        return otmObject.nameProperty();
+        return otmObject != null ? otmObject.nameProperty() : new ReadOnlyStringWrapper();
     }
 
 
     public StringProperty descriptionProperty() {
-        return new ReadOnlyStringWrapper( finding.getFormattedMessage( FindingMessageFormat.MESSAGE_ONLY_FORMAT ) );
+        return finding != null
+            ? new ReadOnlyStringWrapper( finding.getFormattedMessage( FindingMessageFormat.MESSAGE_ONLY_FORMAT ) )
+            : new ReadOnlyStringWrapper();
     }
 
     public StringProperty levelProperty() {
-        return new ReadOnlyStringWrapper( finding.getType().getDisplayName() );
+        return finding != null ? new ReadOnlyStringWrapper( finding.getType().getDisplayName() )
+            : new ReadOnlyStringWrapper();
     }
 
 
@@ -106,8 +107,10 @@ public class ErrorsAndWarningsDAO implements DexDAO<OtmObject> {
 
         // Decorate if possible
         ImageView graphic = ImageManager.get( otmObject );
-        item.setGraphic( graphic );
-        Tooltip.install( graphic, new Tooltip( otmObject.getObjectTypeName() ) );
+        if (graphic != null && otmObject != null) {
+            item.setGraphic( graphic );
+            Tooltip.install( graphic, new Tooltip( otmObject.getObjectTypeName() ) );
+        }
         return item;
     }
 

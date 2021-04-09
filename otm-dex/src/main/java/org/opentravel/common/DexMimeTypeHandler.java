@@ -19,6 +19,7 @@ package org.opentravel.common;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.actions.resource.SetMimeTypesAction;
 import org.opentravel.model.OtmObject;
+import org.opentravel.objecteditor.UserCompilerSettings;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.model.TLMimeType;
 
@@ -50,9 +51,10 @@ public class DexMimeTypeHandler {
     public DexMimeTypeHandler(OtmObject object, UserSettings settings) {
         this.object = object;
         this.userSettings = settings;
-        if (settings != null)
-            values = new MimeTypeMap( object, settings.getDefaultMimeTypes() );
-        else
+        if (settings != null) {
+            UserCompilerSettings compilierSettings = settings.getCompilerSettings();
+            values = new MimeTypeMap( object, compilierSettings.getDefaultMimeTypes() );
+        } else
             values = new MimeTypeMap( object, null );
     }
 
@@ -100,7 +102,8 @@ public class DexMimeTypeHandler {
 
             // If the user settings was passed in, update them
             if (userSettings != null) {
-                userSettings.setDefaultMimeTypes( values.toString() );
+                UserCompilerSettings compilierSettings = userSettings.getCompilerSettings();
+                compilierSettings.setDefaultMimeTypes( values.toString() );
                 userSettings.save();
             }
 

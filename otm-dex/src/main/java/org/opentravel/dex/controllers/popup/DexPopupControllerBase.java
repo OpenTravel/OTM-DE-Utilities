@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.DexMainControllerBase;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Dimension2D;
 import javafx.scene.control.MenuItem;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -157,6 +158,22 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         popupStage.setTitle( title );
         this.popupStage = popupStage;
         popupStage.setOnHidden( this::doClose );
+
+    }
+
+    /**
+     * Note: caller must save dimensions in user settings.
+     * 
+     * @param title
+     * @param popupStage
+     * @param dimension
+     */
+    protected void setStage(String title, Stage popupStage, Dimension2D dimension) {
+        setStage( title, popupStage );
+        if (dimension != null) {
+            popupStage.setHeight( dimension.getHeight() );
+            popupStage.setWidth( dimension.getWidth() );
+        }
     }
 
     @Override

@@ -17,8 +17,6 @@
 package org.opentravel.objecteditor;
 
 import org.opentravel.application.common.AbstractUserSettings;
-import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +30,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import javafx.geometry.Dimension2D;
 
 /**
  * Persists settings for the <code>DE-x Object Editor</code> application between sessions.
@@ -47,8 +47,6 @@ import java.util.Properties;
 public class UserSettings extends AbstractUserSettings {
     private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
 
-    private static final int EXAMPLE_MAX_REPEAT = 3;
-    private static final int EXAMPLE_MAX_DEPTH = 3;
     private static final String USER_SETTINGS_FILE = "/.ota2/.dex-settings.properties";
     private static final String PROJECT_DIRECTORY_LABEL = "lastProjectFolder";
     private static final String HIDE_PROJECT_OPEN_DIALOG = "hideOpenProjectDialog";
@@ -59,43 +57,20 @@ public class UserSettings extends AbstractUserSettings {
     private static final String GRAPHICS_SIZE = "graphicsSize";
     private static final String GRAPHICS_TRACKING = "graphicsTracking";
 
+
     private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
 
-    private int repeatCount;
 
     // private File lastModelFile;
     private File lastProjectFile;
-
     private boolean hideProjectOpenDialog;
-
-    // Compiler Options
-    private boolean compileSchemas = true;
-    private boolean compileJsonSchemas = true;
-    private boolean compileServices = true;
-    private boolean compileSwagger = true;
-    private boolean compileHtml = true;
-    // private URL serviceLibraryUrl;
-    private String serviceEndpointUrl;
-    private String resourceBaseUrl;
-    private boolean suppressOtmExtensions = false;
-    private boolean generateExamples = true;
-    private boolean generateMaxDetailsForExamples = true;
-
-    private String defaultMimeTypes;
-    private String defaultRequestPayload;
-    private String defaultResponsePayload;
-
-    private String exampleContext;
-    private int exampleMaxRepeat;
-    private int exampleMaxDepth;
-
-    private boolean suppressOptionalFields = false;
-
     private String lastRepositoryId = "";
-
     private String displaySize = "Normal";
 
     private List<String> recentProjects = new ArrayList<>();
+
+    private UserDialogSettings dialogSettings = new UserDialogSettings();
+    private UserCompilerSettings compilerSettings = new UserCompilerSettings();
 
     // Graphics settings
     private boolean graphicsDomains = false;
@@ -113,33 +88,12 @@ public class UserSettings extends AbstractUserSettings {
 
         settings.setWindowPosition( settings.getDefaultWindowPosition() );
         settings.setWindowSize( settings.getDefaultWindowSize() );
-        // settings.setRepeatCount( 2 );
-        // settings.setLastModelFile( new File( userHomeDirectory + "/dummy-file.otm" ) );
         settings.setLastProjectFolder( new File( userHomeDirectory ) );
         // Nothing to do for recentProjects - it is an empty array
         settings.setRecentProject( null );
 
         settings.setHideOpenProjectDialog( false );
         settings.setLastRepositoryId( "" );
-        settings.defaultMimeTypes = "APPLICATION_JSON;APPLICATION_XML";
-        settings.defaultRequestPayload = "";
-        settings.defaultResponsePayload = "";
-
-        // Compiler Options
-        settings.setCompileSchemas( true );
-        settings.setCompileJsonSchemas( true );
-        settings.setCompileServices( true );
-        settings.setCompileSwagger( true );
-        settings.setCompileHtml( true );
-        settings.setResourceBaseUrl( "http://example.com/resource" );
-        settings.setServiceEndpointUrl( "http://example.com/resource" );
-        settings.setSuppressOtmExtensions( false );
-        settings.setGenerateExamples( true );
-        settings.setGenerateMaxDetailsForExamples( true );
-        settings.setExampleContext( "example.com" );
-        settings.setExampleMaxRepeat( EXAMPLE_MAX_REPEAT );
-        settings.setExampleMaxDepth( EXAMPLE_MAX_DEPTH );
-        settings.setSuppressOptionalFields( false );
 
         // Graphics Options
         settings.graphicsDomains = false;
@@ -147,6 +101,9 @@ public class UserSettings extends AbstractUserSettings {
         settings.graphicsSize = 5;
 
         settings.setDisplaySize( "Normal" );
+
+        UserCompilerSettings.getDefaultSettings( settings );
+        UserDialogSettings.getDefaultSettings( settings );
         return settings;
     }
 
@@ -177,41 +134,20 @@ public class UserSettings extends AbstractUserSettings {
         return settings;
     }
 
-    /**
-     * Default resource mime types
-     */
-    public String getDefaultMimeTypes() {
-        return defaultMimeTypes;
-    }
-
-    /**
-     * Default request payload
-     */
-    public OtmObject getDefaultRequestPayload(OtmModelManager mgr) {
-        return mgr.getMember( defaultRequestPayload );
-    }
-
-    /**
-     * Default response payload
-     */
-    public OtmObject getDefaultResponsePayload(OtmModelManager mgr) {
-        return mgr.getMember( defaultResponsePayload );
-    }
-
     public String getDisplaySize() {
         return displaySize;
     }
 
-    public String getExampleContext() {
-        return exampleContext;
+    public UserCompilerSettings getCompilerSettings() {
+        return compilerSettings;
     }
 
-    public int getExampleMaxDepth() {
-        return exampleMaxDepth;
+    public Dimension2D getDimensions(String label) {
+        return dialogSettings.get( label );
     }
 
-    public int getExampleMaxRepeat() {
-        return exampleMaxRepeat;
+    public void setDimensions(String label, Dimension2D dimension) {
+        dialogSettings.put( label, dimension );
     }
 
     public boolean getHideOpenProjectDialog() {
@@ -243,23 +179,6 @@ public class UserSettings extends AbstractUserSettings {
         return files;
     }
 
-    /**
-     * Returns the value of the repeat-count spinner.
-     *
-     * @return int
-     */
-    public int getRepeatCount() {
-        return repeatCount;
-    }
-
-    public String getResourceBaseUrl() {
-        return resourceBaseUrl;
-    }
-
-    public String getServiceEndpointUrl() {
-        return serviceEndpointUrl;
-    }
-
     public boolean getGraphicsDomains() {
         return graphicsDomains;
     }
@@ -272,48 +191,11 @@ public class UserSettings extends AbstractUserSettings {
         return graphicsTracking;
     }
 
-    public boolean isCompileHtml() {
-        return compileHtml;
-    }
-
-    public boolean isCompileJsonSchemas() {
-        return compileJsonSchemas;
-    }
-
-    public boolean isCompileSchemas() {
-        return compileSchemas;
-    }
-
-    public boolean isCompileServices() {
-        return compileServices;
-    }
-
-    public boolean isCompileSwagger() {
-        return compileSwagger;
-    }
-
-    public boolean isGenerateExamples() {
-        return generateExamples;
-    }
-
-    public boolean isGenerateMaxDetailsForExamples() {
-        return generateMaxDetailsForExamples;
-    }
-
-    public boolean isSuppressOptionalFields() {
-        return suppressOptionalFields;
-    }
-
-    public boolean isSuppressOtmExtensions() {
-        return suppressOtmExtensions;
-    }
-
     /**
      * @see org.opentravel.application.common.AbstractUserSettings#load(java.util.Properties)
      */
     @Override
     protected void load(Properties settingsProps) {
-        // String modelFile = settingsProps.getProperty( "lastModelFile" );
         String projectFolder = settingsProps.getProperty( PROJECT_DIRECTORY_LABEL );
         setLastProjectFolder( (projectFolder == null) ? null : new File( projectFolder ) );
         loadRecentlyUsedProjects( settingsProps );
@@ -321,40 +203,20 @@ public class UserSettings extends AbstractUserSettings {
         String hideOpenProjectDialog = settingsProps.getProperty( HIDE_PROJECT_OPEN_DIALOG );
         setHideOpenProjectDialog( Boolean.valueOf( hideOpenProjectDialog ) );
         setLastRepositoryId( settingsProps.getProperty( "lastRepositoryId" ) );
-        // int rptCount = Integer.parseInt( settingsProps.getProperty( "repeatCount" ) );
-        // setRepeatCount( rptCount );
-
-        // Resource defaults
-        setDefaultMimeTypes( settingsProps.getProperty( "defaultMimeTypes" ) );
-        setDefaultRequestPayload( settingsProps.getProperty( "defaultRequestPayload" ) );
-        setDefaultResponsePayload( settingsProps.getProperty( "defaultResponsePayload" ) );
-
-        // Compiler Options
-        setCompileSchemas( Boolean.valueOf( settingsProps.getProperty( "compileSchemas" ) ) );
-        setCompileJsonSchemas( Boolean.valueOf( settingsProps.getProperty( "compileJsonSchemas" ) ) );
-        setCompileServices( Boolean.valueOf( settingsProps.getProperty( "compileServices" ) ) );
-        setCompileSwagger( Boolean.valueOf( settingsProps.getProperty( "compileSwagger" ) ) );
-        setCompileHtml( Boolean.valueOf( settingsProps.getProperty( "compileHtml" ) ) );
-        setSuppressOtmExtensions( Boolean.valueOf( settingsProps.getProperty( "suppressOtmExtensions" ) ) );
-        setGenerateExamples( Boolean.valueOf( settingsProps.getProperty( "generateExamples" ) ) );
-        setSuppressOptionalFields( Boolean.valueOf( settingsProps.getProperty( "suppressOptionalFields" ) ) );
-        setResourceBaseUrl( settingsProps.getProperty( "resourceBaseUrl" ) );
-        setServiceEndpointUrl( settingsProps.getProperty( "serviceEndpointUrl" ) );
-        setExampleContext( settingsProps.getProperty( "exampleContext" ) );
-        setExampleMaxRepeat( settingsProps.getProperty( "exampleMaxRepeat" ) );
-        setExampleMaxDepth( settingsProps.getProperty( "exampleMaxDepth" ) );
 
         setDisplaySize( settingsProps.getProperty( "displaySize" ) );
 
         try {
             graphicsSize = Double.valueOf( settingsProps.getProperty( GRAPHICS_SIZE ) );
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             graphicsSize = 5;
         }
         setGraphicsDomains( Boolean.valueOf( settingsProps.getProperty( GRAPHICS_DOMAINS ) ) );
         setGraphicsTracking( Boolean.valueOf( settingsProps.getProperty( GRAPHICS_TRACKING ) ) );
 
-        // setLastModelFile( (modelFile == null) ? null : new File( modelFile ) );
+        compilerSettings.load( settingsProps );
+        dialogSettings.load( settingsProps );
+
         super.load( settingsProps );
     }
 
@@ -405,45 +267,23 @@ public class UserSettings extends AbstractUserSettings {
     @Override
     protected void save(Properties settingsProps) {
         UserSettings defaultValues = getDefaultSettings();
-        // String modelFile = (this.lastModelFile == null) ?
-        // defaultValues.getLastModelFile().getAbsolutePath() : this.lastModelFile.getAbsolutePath();
         String projectFolder = (this.lastProjectFile == null) ? defaultValues.getLastProjectFolder().getAbsolutePath()
             : this.lastProjectFile.getAbsolutePath();
         putString( settingsProps, "lastRepositoryId", lastRepositoryId );
 
         saveRecentlyUsedProjects( settingsProps );
 
-        // settingsProps.put( "repeatCount", repeatCount + "" );
-        // settingsProps.put( "lastModelFile", modelFile );
         putString( settingsProps, PROJECT_DIRECTORY_LABEL, projectFolder );
         settingsProps.put( HIDE_PROJECT_OPEN_DIALOG, Boolean.toString( hideProjectOpenDialog ) );
-
-        // Resource Defaults
-        putString( settingsProps, "defaultMimeTypes", defaultMimeTypes );
-        putString( settingsProps, "defaultResponsePayload", defaultResponsePayload );
-        putString( settingsProps, "defaultRequestPayload", defaultRequestPayload );
-
-        // Compiler Options
-        settingsProps.put( "compileSchemas", Boolean.toString( compileSchemas ) );
-        settingsProps.put( "compileJsonSchemas", Boolean.toString( compileJsonSchemas ) );
-        settingsProps.put( "compileServices", Boolean.toString( compileServices ) );
-        settingsProps.put( "compileSwagger", Boolean.toString( compileSwagger ) );
-        settingsProps.put( "compileHtml", Boolean.toString( compileHtml ) );
-        putString( settingsProps, "resourceBaseUrl", resourceBaseUrl );
-        putString( settingsProps, "serviceEndpointUrl", serviceEndpointUrl );
-        putString( settingsProps, "suppressOtmExtensions", Boolean.toString( suppressOtmExtensions ) );
-        settingsProps.put( "generateExamples", Boolean.toString( generateExamples ) );
-        settingsProps.put( "generateMaxDetailsForExamples", Boolean.toString( generateMaxDetailsForExamples ) );
-        putString( settingsProps, "exampleContext", exampleContext );
-        settingsProps.put( "exampleMaxRepeat", exampleMaxRepeat + "" );
-        settingsProps.put( "exampleMaxDepth", exampleMaxDepth + "" );
-        settingsProps.put( "suppressOptionalFields", Boolean.toString( suppressOptionalFields ) );
 
         putString( settingsProps, "displaySize", displaySize );
 
         settingsProps.put( GRAPHICS_DOMAINS, Boolean.toString( graphicsDomains ) );
         settingsProps.put( GRAPHICS_SIZE, Double.toString( graphicsSize ) );
         settingsProps.put( GRAPHICS_TRACKING, Boolean.toString( graphicsTracking ) );
+
+        compilerSettings.save( settingsProps );
+        dialogSettings.save( settingsProps );
 
         super.save( settingsProps );
     }
@@ -464,88 +304,8 @@ public class UserSettings extends AbstractUserSettings {
         }
     }
 
-    public void setCompileHtml(boolean compileHtml) {
-        this.compileHtml = compileHtml;
-    }
-
-    public void setCompileJsonSchemas(boolean compileJson) {
-        this.compileJsonSchemas = compileJson;
-    }
-
-    public void setCompileSchemas(boolean compileSchemas) {
-        this.compileSchemas = compileSchemas;
-    }
-
-    public void setCompileServices(boolean compileServices) {
-        this.compileServices = compileServices;
-    }
-
-    public void setCompileSwagger(boolean compileSwagger) {
-        this.compileSwagger = compileSwagger;
-    }
-
-    public void setDefaultMimeTypes(String values) {
-        defaultMimeTypes = values;
-    }
-
-    public void setDefaultRequestPayload(OtmObject payload) {
-        if (payload != null)
-            setDefaultRequestPayload( payload.getNameWithPrefix() );
-    }
-
-    public void setDefaultRequestPayload(String nameWithPrefix) {
-        this.defaultRequestPayload = nameWithPrefix;
-    }
-
-    public void setDefaultResponsePayload(OtmObject payload) {
-        setDefaultResponsePayload( payload.getNameWithPrefix() );
-    }
-
-
-    public void setDefaultResponsePayload(String nameWithPrefix) {
-        this.defaultResponsePayload = nameWithPrefix;
-    }
-
     public void setDisplaySize(String size) {
         displaySize = size;
-    }
-
-    public void setExampleContext(String exampleContext) {
-        this.exampleContext = exampleContext;
-    }
-
-    public void setExampleMaxDepth(int exampleMaxDepth) {
-        this.exampleMaxDepth = exampleMaxDepth;
-    }
-
-    public void setExampleMaxDepth(String exampleMaxDepthString) {
-        try {
-            if (exampleMaxDepthString != null && !exampleMaxDepthString.isEmpty())
-                this.exampleMaxDepth = Integer.parseInt( exampleMaxDepthString );
-        } catch (NumberFormatException e) {
-            exampleMaxDepth = EXAMPLE_MAX_DEPTH;
-        }
-    }
-
-    public void setExampleMaxRepeat(int exampleMaxRepeat) {
-        this.exampleMaxRepeat = exampleMaxRepeat;
-    }
-
-    public void setExampleMaxRepeat(String exampleMaxRepeatString) {
-        try {
-            if (exampleMaxRepeatString != null && !exampleMaxRepeatString.isEmpty())
-                this.exampleMaxRepeat = Integer.parseInt( exampleMaxRepeatString );
-        } catch (NumberFormatException e) {
-            exampleMaxRepeat = EXAMPLE_MAX_REPEAT;
-        }
-    }
-
-    public void setGenerateExamples(boolean generateExamples) {
-        this.generateExamples = generateExamples;
-    }
-
-    public void setGenerateMaxDetailsForExamples(boolean generateMaxDetailsForExamples) {
-        this.generateMaxDetailsForExamples = generateMaxDetailsForExamples;
     }
 
     public void setGraphicsDomains(boolean value) {
@@ -579,10 +339,10 @@ public class UserSettings extends AbstractUserSettings {
         this.lastRepositoryId = lastRepositoryId;
     }
 
-    // TODO - how to assure least recently used order?
-    // List maintains insertion order
     /**
      * Set the project's absolute path into the top of the recentProjects array.
+     * <p>
+     * List maintains insertion order
      * 
      * @param project
      */
@@ -598,30 +358,4 @@ public class UserSettings extends AbstractUserSettings {
                 recentProjects.add( 0, pf ); // set to front
         }
     }
-
-    /**
-     * Assigns the value of the repeat-count spinner.
-     *
-     * @param repeatCount the repeat count value to assign
-     */
-    public void setRepeatCount(int repeatCount) {
-        this.repeatCount = repeatCount;
-    }
-
-    public void setResourceBaseUrl(String resourceBaseUrl) {
-        this.resourceBaseUrl = resourceBaseUrl;
-    }
-
-    public void setServiceEndpointUrl(String serviceEndpointUrl) {
-        this.serviceEndpointUrl = serviceEndpointUrl;
-    }
-
-    public void setSuppressOptionalFields(boolean suppressOptionalFields) {
-        this.suppressOptionalFields = suppressOptionalFields;
-    }
-
-    public void setSuppressOtmExtensions(boolean suppressOtmExtensions) {
-        this.suppressOtmExtensions = suppressOtmExtensions;
-    }
-
 }

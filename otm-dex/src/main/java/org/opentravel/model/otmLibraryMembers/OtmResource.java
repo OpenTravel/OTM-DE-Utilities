@@ -42,6 +42,7 @@ import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmActionResponse;
 import org.opentravel.model.resource.OtmParameterGroup;
 import org.opentravel.model.resource.OtmParentRef;
+import org.opentravel.objecteditor.UserCompilerSettings;
 import org.opentravel.schemacompiler.codegen.util.ResourceCodegenUtils;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLAction;
@@ -132,7 +133,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     public OtmTypeProvider getDefaultRequestPayload() {
         if (defaultRequestPayload == null && getModelManager().getUserSettings() != null) {
-            OtmObject obj = getModelManager().getUserSettings().getDefaultRequestPayload( getModelManager() );
+            UserCompilerSettings compilerSettings = getModelManager().getUserSettings().getCompilerSettings();
+            OtmObject obj = compilerSettings.getDefaultRequestPayload( getModelManager() );
             if (obj instanceof OtmTypeProvider)
                 defaultRequestPayload = (OtmTypeProvider) obj;
         }
@@ -142,14 +144,16 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     public void setDefaultRequestPayload(OtmTypeProvider payload) {
         defaultRequestPayload = payload;
         if (payload != null && getModelManager().getUserSettings() != null) {
-            getModelManager().getUserSettings().setDefaultRequestPayload( payload );
+            UserCompilerSettings compilerSettings = getModelManager().getUserSettings().getCompilerSettings();
+            compilerSettings.setDefaultRequestPayload( payload );
             getModelManager().getUserSettings().save();
         }
     }
 
     public OtmTypeProvider getDefaultResponsePayload() {
         if (defaultResponsePayload == null && getModelManager().getUserSettings() != null) {
-            OtmObject obj = getModelManager().getUserSettings().getDefaultResponsePayload( getModelManager() );
+            UserCompilerSettings compilerSettings = getModelManager().getUserSettings().getCompilerSettings();
+            OtmObject obj = compilerSettings.getDefaultResponsePayload( getModelManager() );
             if (obj instanceof OtmTypeProvider)
                 defaultResponsePayload = (OtmTypeProvider) obj;
         }
@@ -159,7 +163,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     public void setDefaultResponsePayload(OtmTypeProvider payload) {
         defaultResponsePayload = payload;
         if (getModelManager().getUserSettings() != null) {
-            getModelManager().getUserSettings().setDefaultResponsePayload( payload );
+            UserCompilerSettings compilerSettings = getModelManager().getUserSettings().getCompilerSettings();
+            compilerSettings.setDefaultResponsePayload( payload );
             getModelManager().getUserSettings().save();
         }
     }

@@ -25,6 +25,7 @@ import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.model.CompileProjectTask;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmProject;
+import org.opentravel.objecteditor.UserCompilerSettings;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.ioc.CompilerExtensionRegistry;
 import org.opentravel.schemacompiler.validate.FindingMessageFormat;
@@ -32,6 +33,7 @@ import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.validate.ValidationFinding;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -44,6 +46,7 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Dimension2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -73,10 +76,12 @@ public class CompileDialogController extends DexPopupControllerBase implements T
     private static Log log = LogFactory.getLog( CompileDialogController.class );
 
     public static final String LAYOUT_FILE = "/Dialogs/CompileDialog.fxml";
+    public static final String DIALOG_SETTING_LABEL = "compile_dialog";
 
     protected static Stage dialogStage;
     private static String helpText = "Compile Project.";
     private static String dialogTitle = "Compile Project";
+
     @FXML
     private TextField targetDirectoryField;
     @FXML
@@ -243,53 +248,66 @@ public class CompileDialogController extends DexPopupControllerBase implements T
         // On completion, the handleTaskComplete method will run
     }
 
+    @Override
+    public void doOK() {
+        updateCompileOptions();
+        super.doOK();
+    }
+
     public void updateCompileOptions() {
-        CompilerExtensionRegistry.setActiveExtension( bindingStyleChoice.getValue() );
-        userSettings.setCompileSchemas( compileXmlSchemasCheckbox.isSelected() );
-        userSettings.setCompileServices( compileServicesCheckbox.isSelected() );
-        userSettings.setCompileJsonSchemas( compileJsonSchemasCheckbox.isSelected() );
-        userSettings.setCompileSwagger( compileSwaggerCheckbox.isSelected() );
-        userSettings.setCompileHtml( compileDocumentationCheckbox.isSelected() );
-        userSettings.setServiceEndpointUrl( serviceEndpointUrl.textProperty().getValue() );
-        userSettings.setResourceBaseUrl( baseResourceUrl.textProperty().getValue() );
-        userSettings.setSuppressOtmExtensions( suppressExtensionsCheckbox.isSelected() );
-        userSettings.setGenerateExamples( generateExamplesCheckbox.isSelected() );
-        userSettings.setGenerateMaxDetailsForExamples( exampleMaxDetailCheckbox.isSelected() );
-        userSettings.setExampleMaxRepeat( maxRepeatSpinner.getValue() );
-        userSettings.setExampleMaxDepth( maxRecursionDepthSpinner.getValue() );
-        userSettings.setSuppressOptionalFields( suppressOptionalFieldsCheckbox.isSelected() );
+        UserCompilerSettings compilerSettings = userSettings.getCompilerSettings();
+
+        compilerSettings.setBindingStyle( bindingStyleChoice.getSelectionModel().getSelectedItem() );
+        compilerSettings.setCompileSchemas( compileXmlSchemasCheckbox.isSelected() );
+        compilerSettings.setCompileServices( compileServicesCheckbox.isSelected() );
+        compilerSettings.setCompileJsonSchemas( compileJsonSchemasCheckbox.isSelected() );
+        compilerSettings.setCompileSwagger( compileSwaggerCheckbox.isSelected() );
+        compilerSettings.setCompileHtml( compileDocumentationCheckbox.isSelected() );
+        compilerSettings.setServiceEndpointUrl( serviceEndpointUrl.textProperty().getValue() );
+        compilerSettings.setResourceBaseUrl( baseResourceUrl.textProperty().getValue() );
+        compilerSettings.setSuppressOtmExtensions( suppressExtensionsCheckbox.isSelected() );
+        compilerSettings.setGenerateExamples( generateExamplesCheckbox.isSelected() );
+        compilerSettings.setGenerateMaxDetailsForExamples( exampleMaxDetailCheckbox.isSelected() );
+        compilerSettings.setExampleMaxRepeat( maxRepeatSpinner.getValue() );
+        compilerSettings.setExampleMaxDepth( maxRecursionDepthSpinner.getValue() );
+        compilerSettings.setSuppressOptionalFields( suppressOptionalFieldsCheckbox.isSelected() );
+
+        userSettings.setDimensions( DIALOG_SETTING_LABEL,
+            new Dimension2D( dialogStage.getWidth(), dialogStage.getHeight() ) );
+
+        userSettings.save();
+        // log.debug( "Updated compiler user settings." );
     }
 
     public void post(UserSettings userSettings) {
-        // FIXME
-        // options.setBindingStyle( bindingStyleChoice.getValue() );
-        // CompilerExtensionRegistry.getActiveExtension();
-        // CompilerExtensionRegistry.getAvailableExtensionIds();
-        // CompilerExtensionRegistry.setActiveExtension( bindingStyleChoice.getValue() );
+        UserCompilerSettings compilerSettings = userSettings.getCompilerSettings();
+
         ObservableList<String> exIds =
             FXCollections.observableList( CompilerExtensionRegistry.getAvailableExtensionIds() );
         bindingStyleChoice.setItems( exIds );
+        if (compilerSettings.getBindingStyle() != null)
+            bindingStyleChoice.getSelectionModel().select( compilerSettings.getBindingStyle() );
 
-        compileXmlSchemasCheckbox.setSelected( userSettings.isCompileSchemas() );
-        compileServicesCheckbox.setSelected( userSettings.isCompileServices() );
-        compileJsonSchemasCheckbox.setSelected( userSettings.isCompileJsonSchemas() );
-        compileSwaggerCheckbox.setSelected( userSettings.isCompileSwagger() );
-        compileDocumentationCheckbox.setSelected( userSettings.isCompileHtml() );
+        compileXmlSchemasCheckbox.setSelected( compilerSettings.isCompileSchemas() );
+        compileServicesCheckbox.setSelected( compilerSettings.isCompileServices() );
+        compileJsonSchemasCheckbox.setSelected( compilerSettings.isCompileJsonSchemas() );
+        compileSwaggerCheckbox.setSelected( compilerSettings.isCompileSwagger() );
+        compileDocumentationCheckbox.setSelected( compilerSettings.isCompileHtml() );
 
-        serviceEndpointUrl.textProperty().setValue( userSettings.getServiceEndpointUrl() );
-        baseResourceUrl.textProperty().setValue( userSettings.getResourceBaseUrl() );
-        suppressExtensionsCheckbox.setSelected( userSettings.isSuppressOtmExtensions() );
-        generateExamplesCheckbox.setSelected( userSettings.isGenerateExamples() );
-        exampleMaxDetailCheckbox.setSelected( userSettings.isGenerateMaxDetailsForExamples() );
+        serviceEndpointUrl.textProperty().setValue( compilerSettings.getServiceEndpointUrl() );
+        baseResourceUrl.textProperty().setValue( compilerSettings.getResourceBaseUrl() );
+        suppressExtensionsCheckbox.setSelected( compilerSettings.isSuppressOtmExtensions() );
+        generateExamplesCheckbox.setSelected( compilerSettings.isGenerateExamples() );
+        exampleMaxDetailCheckbox.setSelected( compilerSettings.isGenerateMaxDetailsForExamples() );
 
-        Integer maxRepeat = userSettings.getExampleMaxRepeat();
+        Integer maxRepeat = compilerSettings.getExampleMaxRepeat();
         if (maxRepeatSpinner.getValueFactory() != null)
             maxRepeatSpinner.getValueFactory().setValue( (maxRepeat == null) ? 3 : maxRepeat );
-        Integer maxDepth = userSettings.getExampleMaxDepth();
+        Integer maxDepth = compilerSettings.getExampleMaxDepth();
         if (maxRecursionDepthSpinner.getValueFactory() != null)
             maxRecursionDepthSpinner.getValueFactory().setValue( maxDepth == null ? 3 : maxDepth );
 
-        suppressOptionalFieldsCheckbox.setSelected( userSettings.isSuppressOptionalFields() );
+        suppressOptionalFieldsCheckbox.setSelected( compilerSettings.isSuppressOptionalFields() );
     }
 
 
@@ -337,6 +355,11 @@ public class CompileDialogController extends DexPopupControllerBase implements T
         this.modelMgr = manager;
         this.userSettings = settings;
         this.statusController = statusController;
+
+        // Restore user window size settings
+        Dimension size = userSettings.getWindowSize();
+        dialogStage.setHeight( size.height );
+        dialogStage.setWidth( size.width );
     }
 
     private void post(File targetDirectory) {
@@ -387,7 +410,13 @@ public class CompileDialogController extends DexPopupControllerBase implements T
 
     @Override
     protected void setup(String message) {
-        super.setStage( dialogTitle, dialogStage );
+        // 600w x 450h is minimum for this dialog
+        // Dimension2D dimensions = new Dimension2D( 600, 500 );
+        Dimension2D dimensions = null;
+        if (userSettings != null)
+            dimensions = userSettings.getDimensions( DIALOG_SETTING_LABEL );
+
+        super.setStage( dialogTitle, dialogStage, dimensions );
         checkNodes();
 
         // Get the projects from project manager
