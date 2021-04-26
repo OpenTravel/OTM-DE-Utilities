@@ -142,26 +142,5 @@ public class ActionsTestSet {
             assertTrue( "Given", lib.isValid() );
     }
 
-    // public OtmBusinessObject addBO() {
-    // // Major is NOT editable.
-    // majorBO = TestBusiness.buildOtm( major, "TestBO1" );
-    // minorBO = (OtmBusinessObject) majorBO.createMinorVersion( minor );
-    //
-    // assertTrue( majorBO instanceof OtmBusinessObject );
-    // assertTrue( minorBO instanceof OtmBusinessObject );
-    // return minorBO;
-    // }
-    //
-    // OtmQueryFacet addQuery() {
-    // assertTrue( majorBO instanceof OtmBusinessObject );
-    // assertTrue( minorBO instanceof OtmBusinessObject );
-    // String queryName = "Qf1";
-    // majorQF = TestQueryFacet.buildOtm( majorBO, queryName );
-    // minorQF = TestQueryFacet.buildOtm( minorBO, queryName );
-    //
-    // assertTrue( majorQF.getContributedObject() == majorBO );
-    // assertTrue( minorQF.getContributedObject() == minorBO );
-    // return minorQF;
-    // }
 }
 

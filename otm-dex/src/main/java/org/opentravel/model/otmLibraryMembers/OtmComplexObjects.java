@@ -16,8 +16,6 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
@@ -41,7 +39,7 @@ import javafx.beans.property.StringProperty;
  */
 public abstract class OtmComplexObjects<T extends TLComplexTypeBase> extends OtmLibraryMemberBase<TLLibraryMember>
     implements OtmObject, OtmTypeProvider, OtmChildrenOwner {
-    private static Log log = LogFactory.getLog( OtmComplexObjects.class );
+    // private static Log log = LogFactory.getLog( OtmComplexObjects.class );
 
     /**
      * Construct complex library member. Set its model manager, TL object and add a listener.
@@ -50,8 +48,10 @@ public abstract class OtmComplexObjects<T extends TLComplexTypeBase> extends Otm
         super( tl, mgr );
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public T getTL() {
+        // return tlObject instanceof TLComplexTypeBase ? (T) tlObject : null;
         return (T) tlObject;
     }
 
@@ -65,8 +65,8 @@ public abstract class OtmComplexObjects<T extends TLComplexTypeBase> extends Otm
             children.add( child );
             return child;
         }
-        log.debug(
-            "Could not add: " + getName() + " already contained " + child.getObjectTypeName() + " " + child.getName() );
+        // log.debug(
+        // "Could not add: " + getName() + " already contained " + child.getObjectTypeName() + " " + child.getName() );
         return null;
     }
 

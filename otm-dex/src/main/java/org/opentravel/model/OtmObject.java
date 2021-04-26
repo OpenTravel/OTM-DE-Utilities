@@ -21,6 +21,7 @@ import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
+import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
@@ -126,7 +127,11 @@ public interface OtmObject {
     public String getNamespace();
 
     /**
-     * @return
+     * Get prefix from owning member's library + ":" + this object's name
+     * 
+     * @see {@link NamedEntity#getLocalName()}
+     * 
+     * @return prefix + ":" + name
      */
     public String getNameWithPrefix();
 
@@ -195,7 +200,10 @@ public interface OtmObject {
 
     /**
      * Is this object re-nameable and implement a setName() method that changes the underlying TL object?
+     * <p>
+     * <b>Note:</b> this is a property of the class and does not reflect if the type assigned is name controlled.
      * 
+     * @see OtmTypeProvider#isNameControlled()
      * @return True unless overridden.
      */
     boolean isRenameable();

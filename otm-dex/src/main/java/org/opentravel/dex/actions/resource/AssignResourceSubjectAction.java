@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.actions.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.dex.actions.SetAssignedTypeAction;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
@@ -40,7 +38,7 @@ import java.util.List;
 import javafx.application.Platform;
 
 public class AssignResourceSubjectAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( AssignResourceSubjectAction.class );
+    // private static Log log = LogFactory.getLog( AssignResourceSubjectAction.class );
 
     /**
      * Get the users business object selection from the type selection controller.
@@ -192,10 +190,10 @@ public class AssignResourceSubjectAction extends DexRunAction {
             resource.isValid( true );
         }
 
-        if (result != newSubject)
-            log.debug( "ERROR setting subject." );
-
-        log.debug( "Set resource subject to " + get() );
+        // if (result != newSubject)
+        // log.debug( "ERROR setting subject." );
+        //
+        // log.debug( "Set resource subject to " + get() );
         return get();
     }
 
@@ -229,7 +227,7 @@ public class AssignResourceSubjectAction extends DexRunAction {
 
     @Override
     public OtmBusinessObject undoIt() {
-        log.debug( "Undo-ing change" );
+        // log.debug( "Undo-ing change" );
         if (oldSubject != null && oldSubject != resource.setAssignedType( oldSubject ))
             resource.getActionManager().postWarning( "Error undoing change." );
         if (newResource != null && newResource.getLibrary() != null)

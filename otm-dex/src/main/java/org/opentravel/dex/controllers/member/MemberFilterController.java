@@ -272,7 +272,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
     }
 
     private void handleModelChange(DexModelChangeEvent e) {
-        log.debug( "Model change event received." );
+        // log.debug( "Model change event received." );
         // modelMgr = e.getModelManager();
         filters.forEach( DexFilterWidget::refresh );
     }
@@ -293,7 +293,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
     @Override
     public boolean isSelected(OtmLibraryMember member) {
         if (member == null || member.getLibrary() == null) {
-            log.warn( "Filter passed invalid member." );
+            // log.warn( "Filter passed invalid member." );
             return true;
         }
 

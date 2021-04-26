@@ -16,8 +16,6 @@
 
 package org.opentravel.dex.controllers.resources;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
@@ -52,7 +50,7 @@ import javafx.scene.layout.GridPane;
  *
  */
 public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
-    private static Log log = LogFactory.getLog( ResourceDetailsController.class );
+    // private static Log log = LogFactory.getLog( ResourceDetailsController.class );
 
     /**
      * FXML Java FX Nodes this controller is dependent upon
@@ -164,7 +162,7 @@ public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
 
     public void handleEvent(DexResourceChangeEvent event) {
         OtmObject obj = event.get();
-        log.debug( obj );
+        // log.debug( obj );
         // post( event.get() );
     }
 

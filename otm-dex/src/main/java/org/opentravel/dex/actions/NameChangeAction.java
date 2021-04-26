@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
-import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
@@ -40,15 +40,27 @@ public class NameChangeAction extends DexStringAction {
     // Test case - create minor resource with the same name as its Business Object from the chain
 
     public static boolean isEnabled(OtmObject subject) {
-        if (subject == null || !subject.isRenameable())
+        if (subject == null || !subject.isRenameable() || !subject.isEditable())
             return false;
-        if (subject instanceof OtmActionFacet || subject instanceof OtmResource)
-            return subject.isEditable(); // Resource and AF are type users but not name controlled
-        if (subject instanceof OtmTypeUser && ((OtmTypeUser) subject).getAssignedType() != null
-            && ((OtmTypeUser) subject).getAssignedType().isNameControlled())
-            return false;
-        return subject.isEditable();
+
+        if (subject instanceof OtmActionFacet || subject instanceof OtmLibraryMember)
+            return true; // Members ( Resource, VWA, Core...) and AF are type users but not name controlled
+
+        if (subject instanceof OtmTypeUser && ((OtmTypeUser) subject).getAssignedType() != null)
+            return !((OtmTypeUser) subject).getAssignedType().isNameControlled();
+
+        return true;
     }
+    // public static boolean isEnabled(OtmObject subject) {
+    // if (subject == null || !subject.isRenameable())
+    // return false;
+    // if (subject instanceof OtmActionFacet || subject instanceof OtmResource)
+    // return subject.isEditable(); // Resource and AF are type users but not name controlled
+    // if (subject instanceof OtmTypeUser && ((OtmTypeUser) subject).getAssignedType() != null
+    // && ((OtmTypeUser) subject).getAssignedType().isNameControlled())
+    // return false;
+    // return subject.isEditable();
+    // }
 
     public NameChangeAction() {
         // constructor for reflection

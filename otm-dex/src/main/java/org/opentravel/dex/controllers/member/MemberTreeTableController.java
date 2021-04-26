@@ -70,7 +70,7 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
     private static Log log = LogFactory.getLog( MemberTreeTableController.class );
 
     // Column labels
-    // TODO - externalize strings
+    // To Do - externalize strings
     public static final String PREFIXCOLUMNLABEL = "Prefix";
     private static final String NAMECOLUMNLABEL = "Member";
     private static final String VERSIONCOLUMNLABEL = "Version";

@@ -488,8 +488,10 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public List<OtmTypeProvider> getUsedTypes() {
+        // TODO - consider how to make this into lazy evaluated and persisted.
         // if (typesUsed == null) {
-        typesUsed = new ArrayList<>();
+        // typesUsed = new ArrayList<>();
+        typesUsed = Collections.synchronizedList( new ArrayList<>() );
 
         // Type used by this type users
         if (this instanceof OtmTypeUser)
@@ -502,8 +504,13 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         synchronized (descendants) {
             descendants.forEach( d -> addProvider( d, typesUsed ) );
         }
-        typesUsed.sort(
-            (OtmObject o1, OtmObject o2) -> o1.getNameWithPrefix().compareToIgnoreCase( o2.getNameWithPrefix() ) );
+        // DONE - 4/16/2021
+        // Make typesUsed a synchronizedList and added synchronized() to prevent
+        // Exception in thread "JavaFX Application Thread" java.util.ConcurrentModificationException
+        synchronized (typesUsed) {
+            typesUsed.sort(
+                (OtmObject o1, OtmObject o2) -> o1.getNameWithPrefix().compareToIgnoreCase( o2.getNameWithPrefix() ) );
+        }
         // }
         // log.debug( this + " typesUsed size = " + typesUsed.size() );
         return typesUsed;
