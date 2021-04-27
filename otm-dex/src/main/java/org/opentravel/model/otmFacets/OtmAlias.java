@@ -56,8 +56,11 @@ public class OtmAlias extends OtmModelElement<TLAlias> implements OtmTypeProvide
         parent.add( this );
 
         if (tl.getOwningEntity() == null && parent.getTL() instanceof TLAliasOwner)
-            ((TLAliasOwner) parent.getTL()).addAlias( tl );
-
+            try {
+                ((TLAliasOwner) parent.getTL()).addAlias( tl );
+            } catch (UnsupportedOperationException e) {
+                log.warn( "Could not add alias to parent TL object: " + parent.getTL().getClass().getSimpleName() );
+            }
         // if (this.parent == null)
         // throw new IllegalStateException( "Created alias without parent." );
     }

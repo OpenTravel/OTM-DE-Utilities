@@ -29,7 +29,9 @@ import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmChoiceObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmLibraryMembers.TestChoice;
+import org.opentravel.model.otmLibraryMembers.TestValueWithAttributes;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
 
@@ -74,14 +76,31 @@ public abstract class TestActionsIsEnabledBase {
     public void testMember(OtmLibraryMember member, boolean expected) {
         // log.debug( "Testing if " + actionEnum + " is enabled for " + member.getObjectTypeName() + " " + member );
         assertTrue( "Test: ", expected == actionManager.isEnabled( actionEnum, member ) );
+        testMember( member, null, expected );
     }
 
+    /**
+     * Override if two parameter isEnabled uses second parameter.
+     */
+    public void testMember(OtmLibraryMember member, OtmObject param, boolean expected) {
+        // log.debug( "Testing if " + actionEnum + " is enabled for " + member.getObjectTypeName() + " " + member );
+        assertTrue( "Test: ", expected == actionManager.isEnabled( actionEnum, member ) );
+    }
+
+    /**
+     * Properties
+     */
     public void testProperties() {
         OtmChoiceObject choice = TestChoice.buildOtm( lib, "TestChoice" );
         TestOtmPropertiesBase.buildOneOfEach2( choice.getShared() );
-
-        OtmProperty property = null;
         for (OtmObject obj : choice.getShared().getChildren())
+            if (obj instanceof OtmProperty) {
+                testProperty( (OtmProperty) obj );
+            }
+
+        OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtm( lib, "TestVWA" );
+        TestOtmPropertiesBase.buildOneOfEach2( vwa );
+        for (OtmObject obj : vwa.getDescendants())
             if (obj instanceof OtmProperty) {
                 testProperty( (OtmProperty) obj );
             }
@@ -92,7 +111,18 @@ public abstract class TestActionsIsEnabledBase {
     public void testProperty(OtmProperty property, boolean expected) {
         // log.debug( "Testing if " + actionEnum + " is enabled for " + property.getObjectTypeName() + " " + property );
         assertTrue( "Test: ", expected == actionManager.isEnabled( actionEnum, property ) );
+        testProperty( property, null, expected );
     }
+
+    /**
+     * Override if two parameter isEnabled uses second parameter.
+     */
+    public void testProperty(OtmProperty property, OtmObject param, boolean expected) {
+        // log.debug( "Testing if " + actionEnum + " is enabled " + expected + " for " + property.getObjectTypeName()
+        // + " for " + param );
+        assertTrue( "Test: ", expected == actionManager.isEnabled( actionEnum, property, param ) );
+    }
+
 
     // public DexAction getAction(DexActions actionEnum, OtmObject subject) {
     // DexAction<?> action = null;
