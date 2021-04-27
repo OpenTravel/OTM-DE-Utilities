@@ -54,8 +54,7 @@ public class TestAddAliasIsEnabled extends TestActionsIsEnabledBase {
 
     @Override
     public void testProperty(OtmProperty property) {
-        // All should return false, not enabled.
-        super.testProperty( property, false );
+        super.testProperty( property, false ); // All should return false, not enabled.
     }
 
 }

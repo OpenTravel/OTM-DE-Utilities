@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.actions;
+package org.opentravel.dex.actions.enabled;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
-import org.opentravel.dex.actions.enabled.TestActionsIsEnabledBase;
+import org.opentravel.dex.actions.DexActions;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmProperties.OtmProperty;
 
 /**
- * AddAliasAction
+ * DescriptionChangeAction
  */
 public class TestDeprecationChangeIsEnabled extends TestActionsIsEnabledBase {
     private static Log log = LogFactory.getLog( TestDeprecationChangeIsEnabled.class );
@@ -38,9 +40,19 @@ public class TestDeprecationChangeIsEnabled extends TestActionsIsEnabledBase {
         super.testMembers();
     }
 
+    @Override
+    public void testMember(OtmLibraryMember member) {
+        super.testMember( member, true );
+    }
+
     @Test
     public void testProperties() {
         super.testProperties();
+    }
+
+    @Override
+    public void testProperty(OtmProperty property) {
+        super.testProperty( property, true );
     }
 
 

@@ -168,6 +168,8 @@ public class OtmVersionChain {
      * @param member
      * @return
      */
+    // TODO - this seems very wrong. it only checks the minor versions.
+    // for unmanaged, it returns false.
     public boolean isLatestChain() {
         return getLatestVersion() != null ? getLatestVersion().isLatestVersion() : false;
     }

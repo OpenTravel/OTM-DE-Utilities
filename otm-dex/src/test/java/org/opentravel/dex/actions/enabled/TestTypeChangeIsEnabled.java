@@ -26,7 +26,7 @@ import org.opentravel.model.otmProperties.OtmIdAttribute;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 /**
- * SetAssignedTypeAction
+ * UpdateToLaterVersionAction
  */
 public class TestTypeChangeIsEnabled extends TestActionsIsEnabledBase {
     private static Log log = LogFactory.getLog( TestTypeChangeIsEnabled.class );
@@ -56,4 +56,6 @@ public class TestTypeChangeIsEnabled extends TestActionsIsEnabledBase {
     public void testProperty(OtmProperty property) {
         super.testProperty( property, property instanceof OtmTypeUser && !(property instanceof OtmIdAttribute) );
     }
+
+
 }

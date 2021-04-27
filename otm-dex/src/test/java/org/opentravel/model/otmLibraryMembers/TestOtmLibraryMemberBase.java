@@ -39,9 +39,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Abstract base test class for all otm objects. Implementations must provide their own static, type specific,
- * buildOtm() and buildTL() methods. See {@link TestLibraryMemberBase} for static utilities and actual tests on the base
- * class
+ * Abstract base test class for all otm objects (not the base class itself). Implementations must provide their own
+ * static, type specific, buildOtm() and buildTL() methods. See {@link TestLibraryMemberBase} for static utilities and
+ * actual tests on the base class
  * <p>
  * If <i>subject</i> is set in the before class, the following will be automatically run:
  * <ul>

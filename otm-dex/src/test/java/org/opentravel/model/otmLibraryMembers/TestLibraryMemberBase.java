@@ -62,6 +62,22 @@ public class TestLibraryMemberBase {
         // log.debug( "Model manager created." );
     }
 
+    @Test
+    public void testIsLatestVersion() {
+        OtmLibrary lib = TestLibrary.buildOtm();
+        assertTrue( "Given:", lib.isUnmanaged() );
+        assertTrue( "Given: ", lib.getVersionChain() != null );
+        // TODO - create test for this in TestVersionChain
+        assertTrue( "Given: ", !lib.getVersionChain().isLatestChain() );
+
+        buildOneOfEachWithProperties( lib );
+
+        // When - all objects are in un-managed library
+        for (OtmLibraryMember member : lib.getMembers()) {
+            assertTrue( "Then:", !member.isLatestVersion() );
+        }
+        // TODO - create versioned test in a versioned test file
+    }
 
     @Test
     public void testAddAndRemove() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,

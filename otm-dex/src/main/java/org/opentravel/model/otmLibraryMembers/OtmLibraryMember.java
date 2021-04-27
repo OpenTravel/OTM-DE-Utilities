@@ -22,6 +22,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.OtmVersionChain;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.schemacompiler.model.LibraryMember;
@@ -194,6 +195,8 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
 
     /**
      * Is this member the latest in the version chain of its library?
+     * <p>
+     * 4/27/2021 - returns false if unmanaged (see {@link OtmVersionChain#isLatestChain()})
      * 
      * @return
      */

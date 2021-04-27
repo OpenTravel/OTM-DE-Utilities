@@ -50,10 +50,9 @@ public class TestManditoryChangeIsEnabled extends TestActionsIsEnabledBase {
         super.testProperties();
     }
 
-    // All enabled
     @Override
     public void testProperty(OtmProperty property) {
-        super.testProperty( property, true );
+        super.testProperty( property, true ); // All enabled
     }
 
 }

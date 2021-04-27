@@ -22,21 +22,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.opentravel.dex.actions.DexActions;
-import org.opentravel.model.OtmTypeUser;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmProperties.OtmProperty;
-import org.opentravel.schemacompiler.model.TLExampleOwner;
 
 /**
- * AddAliasAction
+ * UpdateToLaterVersionAction
  */
-public class TestExampleChangeIsEnabled extends TestActionsIsEnabledBase {
-    private static Log log = LogFactory.getLog( TestExampleChangeIsEnabled.class );
+public class TestUpdateToLatestVerionIsEnabled extends TestActionsIsEnabledBase {
+    private static Log log = LogFactory.getLog( TestUpdateToLatestVerionIsEnabled.class );
+
 
     /**
-     */
-    public TestExampleChangeIsEnabled() {
-        super( DexActions.EXAMPLECHANGE );
+         */
+    public TestUpdateToLatestVerionIsEnabled() {
+        super( DexActions.VERSIONUPDATE );
     }
 
     @Test
@@ -46,7 +47,16 @@ public class TestExampleChangeIsEnabled extends TestActionsIsEnabledBase {
 
     @Override
     public void testMember(OtmLibraryMember member) {
-        super.testMember( member, false ); // All disabled
+        super.testMember( member, true );
+
+        // tests with two properties - should be false unless providers has minor version
+        // Used in Where Used Tab - TypeProviderCellFactory
+        // FIXME - should not be enabled. Need to test in a versioned junit.
+        OtmTypeProvider provider =
+            TestBusiness.buildOtm( lib, "VU_BO" + member.getObjectTypeName() + member.getName() );
+        assertTrue( !provider.getOwningMember().isLatestVersion() );
+        log.debug( "Testing " + member.getObjectTypeName() + " with provider " + provider );
+        assertTrue( "Test: ", actionManager.isEnabled( actionEnum, member, provider ) );
     }
 
     @Test
@@ -56,20 +66,7 @@ public class TestExampleChangeIsEnabled extends TestActionsIsEnabledBase {
 
     @Override
     public void testProperty(OtmProperty property) {
-        if (property.getTL() instanceof TLExampleOwner) {
-            // log.debug(
-            // "Testing if " + actionEnum + " is enabled for " + property.getObjectTypeName() + " " + property );
-            if (((OtmTypeUser) property).getAssignedType() != null) {
-                // ID References must have a type assigned before examples can be created.
-                assertTrue( "Test: ", property.isEditable() );
-                assertTrue( "Test: ", property instanceof OtmTypeUser );
-                assertTrue( "Test: ", property.getTL() instanceof TLExampleOwner );
-                assertTrue( "Test: ", ((OtmTypeUser) property).getAssignedType() != null );
-
-                assertTrue( "Test: ", actionManager.isEnabled( actionEnum, property ) );
-            } else
-                log.debug( "Skipping property with unassigned type." );
-        }
+        super.testProperty( property, true );
     }
 
 }
