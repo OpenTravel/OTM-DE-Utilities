@@ -76,6 +76,9 @@ public class TestTypeConnection extends AbstractFxTest {
     public static void setupTests() throws Exception {
         setupWorkInProcessArea( TestTypeConnection.class );
         repoManager = repositoryManager.get();
+
+        // Prevent java.nio.BufferOverflowException
+        System.setProperty( "headless.geometry", "2600x2200-32" );
     }
 
     @Test

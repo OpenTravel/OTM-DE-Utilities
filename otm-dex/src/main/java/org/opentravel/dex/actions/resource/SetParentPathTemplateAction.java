@@ -16,7 +16,7 @@
 
 package org.opentravel.dex.actions.resource;
 
-import org.opentravel.dex.actions.DexStringAction;
+import org.opentravel.dex.actions.string.DexStringAction;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.resource.OtmParentRef;
 

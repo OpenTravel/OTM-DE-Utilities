@@ -14,54 +14,41 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.actions.resource;
+package org.opentravel.dex.actions.string;
 
-import org.opentravel.dex.actions.string.DexStringAction;
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.resource.OtmParameter;
 
-public class SetParameterFieldAction extends DexStringAction {
-    // private static Log log = LogFactory.getLog( SetAbstractAction.class );
+public class DescriptionChangeAction extends DexStringAction {
+    // private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
 
-    /**
-     * @param subject
-     * @return
-     */
     public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmParameter)
-            return subject.isEditable();
-        return false;
+        return subject.isEditable();
     }
 
-    public SetParameterFieldAction() {
-        // Constructor for reflection
-    }
-
-    public String get() {
-        return getSubject().getFieldRefName();
+    public DescriptionChangeAction() {
+        // actionType = DexActions.DESCRIPTIONCHANGE;
     }
 
     @Override
-    public OtmParameter getSubject() {
-        return (OtmParameter) otm;
+    protected String get() {
+        return otm.getDescription();
     }
 
-    public void set(String value) {
-        getSubject().setFieldString( value );
-        getSubject().getParent().refresh();
+    @Override
+    protected void set(String value) {
+        otm.setDescription( value );
     }
+
 
     @Override
     public boolean setSubject(OtmObject subject) {
-        if (!(subject instanceof OtmParameter))
-            return false;
         otm = subject;
         return true;
     }
 
     @Override
     public String toString() {
-        return "Parameter field set to " + get();
+        return "Changed description to " + newString;
     }
 
 }

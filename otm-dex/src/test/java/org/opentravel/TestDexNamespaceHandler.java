@@ -26,6 +26,7 @@ import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.common.DexNamespaceHandler;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.objecteditor.ObjectEditorApp;
@@ -75,11 +76,12 @@ public class TestDexNamespaceHandler extends AbstractFxTest {
 
     @Test
     public void testGetPrefix() {
-        DexNamespaceHandler nsHandler = new DexNamespaceHandler( staticModelManager );
+        OtmModelManager modelMgr = TestOtmModelManager.build();
+        DexNamespaceHandler nsHandler = new DexNamespaceHandler( modelMgr );
         String ns1 = "http://example.com/nstest/ns1";
         String pf1 = "pf1";
         String name1 = "testName1";
-        TestLibrary.buildOtm( staticModelManager, ns1, pf1, name1 );
+        TestLibrary.buildOtm( modelMgr, ns1, pf1, name1 );
 
         Set<String> prefixes = nsHandler.getPrefixes();
         assertTrue( "Given: Must have entry for " + pf1, prefixes.contains( pf1 ) );

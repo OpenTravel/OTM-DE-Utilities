@@ -222,7 +222,9 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
                 v = helper.createNewMinorVersion( (Versioned) getTL(), targetTLLib );
                 lm = OtmLibraryMemberFactory.create( (LibraryMember) v, getModelManager() );
             } catch (VersionSchemeException e) {
-                errMsg = "Minor Version Error: " + targetTLLib.getPrefix() + ":" + targetTLLib.getName();
+                errMsg = "Minor Version Error: " + this + " into library: " + targetTLLib.getPrefix() + ":"
+                    + targetTLLib.getName();
+                errMsg += "\n" + e.getLocalizedMessage();
                 exception = e;
                 lm = null;
             } catch (ValidationException e) {

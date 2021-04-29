@@ -66,6 +66,9 @@ public class TestResourceInheritance extends AbstractFxTest {
         setupWorkInProcessArea( TestOtmModelManager.class );
         repoManager = repositoryManager.get();
         mgr = new OtmModelManager( null, repoManager, null );
+
+        // Prevent java.nio.BufferOverflowException
+        System.setProperty( "headless.geometry", "2600x2200-32" );
     }
 
     /**
@@ -84,7 +87,9 @@ public class TestResourceInheritance extends AbstractFxTest {
         OtmLibrary minorLibrary = TestVersionChain.getMinorInChain( mgr );
         assertTrue( "Given", minorLibrary != null );
         assertTrue( "Given", minorLibrary.isEditable() );
-        // assertTrue( "Given - minor is empty.", mgr.getMembers( minorLibrary ).isEmpty() );
+        List<OtmLibraryMember> minors = minorLibrary.getMembers();
+        minors.forEach( m -> minorLibrary.delete( m ) );
+        assertTrue( "Given - minor library is empty.", minorLibrary.getMembers().isEmpty() );
 
         // Given - a business object from the Major version of the library
         OtmLibrary majorLibrary = minorLibrary.getVersionChain().getMajor();

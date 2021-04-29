@@ -49,6 +49,9 @@ public class TestSetAssignedTypeActionVersioned extends AbstractFxTest {
     public static void setupTests() throws Exception {
         setupWorkInProcessArea( TestVersionChain.class );
         repoManager = repositoryManager.get();
+
+        // Prevent java.nio.BufferOverflowException
+        System.setProperty( "headless.geometry", "2600x2200-32" );
     }
 
 

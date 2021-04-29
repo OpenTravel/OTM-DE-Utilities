@@ -14,46 +14,54 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.actions;
+package org.opentravel.dex.actions.string;
 
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.OtmTypeUser;
-import org.opentravel.schemacompiler.model.TLExampleOwner;
+import org.opentravel.model.otmLibraryMembers.OtmResource;
 
-public class ExampleChangeAction extends DexStringAction {
-    // private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+public class BasePathChangeAction extends DexStringAction {
+    // private static Log log = LogFactory.getLog( BasePathChangeAction.class );
 
+    /**
+     * @param subject
+     * @return
+     */
     public static boolean isEnabled(OtmObject subject) {
-        return (subject.isEditable() && subject instanceof OtmTypeUser && subject.getTL() instanceof TLExampleOwner
-            && ((OtmTypeUser) subject).getAssignedType() != null);
-        // return !((OtmTypeUser) subject).getAssignedType().isNameControlled();
-        // return false;
+        if (subject instanceof OtmResource)
+            return subject.isEditable() && !((OtmResource) subject).isAbstract();
+        return false;
     }
 
-    public ExampleChangeAction() {
-        // Constructor for reflection
+    public BasePathChangeAction() {
+        // Constructor of reflection
     }
 
-    @Override
-    protected String get() {
-        return otm.getExample();
+    public String get() {
+        return getSubject().getBasePath();
     }
 
     @Override
-    protected void set(String value) {
-        otm.setExample( value );
+    public OtmResource getSubject() {
+        return (OtmResource) otm;
     }
+
+    public void set(String value) {
+        getSubject().setBasePath( value );
+    }
+
 
 
     @Override
     public boolean setSubject(OtmObject subject) {
+        if (!(subject instanceof OtmResource))
+            return false;
         otm = subject;
         return true;
     }
 
     @Override
     public String toString() {
-        return "Changed example to " + newString;
+        return "Changed base path to " + get();
     }
 
 }

@@ -77,6 +77,9 @@ public class TestInheritance extends AbstractFxTest {
         setupWorkInProcessArea( TestOtmModelManager.class );
         repoManager = repositoryManager.get();
         mgr = new OtmModelManager( null, repoManager, null );
+
+        // Prevent java.nio.BufferOverflowException
+        System.setProperty( "headless.geometry", "2600x2200-32" );
     }
 
     /**
@@ -466,7 +469,10 @@ public class TestInheritance extends AbstractFxTest {
         OtmLibrary minorLibrary = TestVersionChain.getMinorInChain( mgr );
         assertTrue( "Given", minorLibrary != null );
         assertTrue( "Given", minorLibrary.isEditable() );
-        // assertTrue( "Given - minor is empty.", mgr.getMembers( minorLibrary ).isEmpty() );
+
+        List<OtmLibraryMember> minors = minorLibrary.getMembers();
+        minors.forEach( m -> minorLibrary.delete( m ) );
+        assertTrue( "Given - minor library is empty.", minorLibrary.getMembers().isEmpty() );
 
         for (OtmLibraryMember member : mgr.getMembers( minorLibrary.getVersionChain().getMajor() )) {
             List<OtmObject> kids = member.getChildren();
@@ -478,7 +484,7 @@ public class TestInheritance extends AbstractFxTest {
 
                 // Create a minor version
                 OtmLibraryMember minor = member.createMinorVersion( minorLibrary );
-                assertTrue( "Must have created a minor object.", minor != null );
+                assertTrue( "Must have created a minor version of " + member, minor != null );
 
                 // Get a representative facet
                 OtmFacet<?> memberSummary = ((OtmComplexObjects<?>) member).getSummary();

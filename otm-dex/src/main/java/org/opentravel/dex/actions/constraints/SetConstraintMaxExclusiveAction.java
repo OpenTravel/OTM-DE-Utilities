@@ -17,7 +17,7 @@
 package org.opentravel.dex.actions.constraints;
 
 import org.opentravel.common.ValidationUtils;
-import org.opentravel.dex.actions.DexStringAction;
+import org.opentravel.dex.actions.string.DexStringAction;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
 import org.opentravel.schemacompiler.model.TLSimple;

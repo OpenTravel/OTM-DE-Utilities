@@ -57,6 +57,9 @@ public class TestTypeAssignmentAndWhereUsed extends AbstractFxTest {
         setupWorkInProcessArea( TestOtmModelManager.class );
         repoManager = repositoryManager.get();
         mgr = new OtmModelManager( null, repoManager, null );
+
+        // Prevent java.nio.BufferOverflowException
+        System.setProperty( "headless.geometry", "2600x2200-32" );
     }
 
     public static void buildOneOfEachTypeProvider(OtmLibrary lib) {

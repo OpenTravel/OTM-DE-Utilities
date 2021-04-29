@@ -18,7 +18,7 @@ package org.opentravel.dex.actions.resource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.dex.actions.DexStringAction;
+import org.opentravel.dex.actions.string.DexStringAction;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 

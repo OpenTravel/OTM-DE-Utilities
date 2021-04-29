@@ -14,29 +14,34 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.actions;
+package org.opentravel.dex.actions.string;
 
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmTypeUser;
+import org.opentravel.schemacompiler.model.TLExampleOwner;
 
-public class DescriptionChangeAction extends DexStringAction {
+public class ExampleChangeAction extends DexStringAction {
     // private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
-        return subject.isEditable();
+        return (subject.isEditable() && subject instanceof OtmTypeUser && subject.getTL() instanceof TLExampleOwner
+            && ((OtmTypeUser) subject).getAssignedType() != null);
+        // return !((OtmTypeUser) subject).getAssignedType().isNameControlled();
+        // return false;
     }
 
-    public DescriptionChangeAction() {
-        // actionType = DexActions.DESCRIPTIONCHANGE;
+    public ExampleChangeAction() {
+        // Constructor for reflection
     }
 
     @Override
     protected String get() {
-        return otm.getDescription();
+        return otm.getExample();
     }
 
     @Override
     protected void set(String value) {
-        otm.setDescription( value );
+        otm.setExample( value );
     }
 
 
@@ -48,7 +53,7 @@ public class DescriptionChangeAction extends DexStringAction {
 
     @Override
     public String toString() {
-        return "Changed description to " + newString;
+        return "Changed example to " + newString;
     }
 
 }

@@ -48,6 +48,9 @@ public class TestImageManager extends AbstractFxTest {
     @BeforeClass
     public static void beforeClass() {
         staticModelManager = new OtmModelManager( null, null, null ); // no action manager
+
+        // Prevent java.nio.BufferOverflowException
+        System.setProperty( "headless.geometry", "2600x2200-32" );
     }
 
     @Test

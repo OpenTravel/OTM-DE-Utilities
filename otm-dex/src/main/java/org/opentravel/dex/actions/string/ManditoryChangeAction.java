@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.actions;
+package org.opentravel.dex.actions.string;
 
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmProperties.OtmProperty;

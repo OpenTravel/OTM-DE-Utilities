@@ -63,6 +63,9 @@ public class TestTask_ManageLibrary extends AbstractFxTest {
         // assertTrue( "Setup: ", tm != null );
         // log.debug( "Test Repo ID = " + tm.getId() );
 
+        // Prevent java.nio.BufferOverflowException
+        System.setProperty( "headless.geometry", "2600x2200-32" );
+
         log.debug( "Before class setup tests ran." );
     }
 

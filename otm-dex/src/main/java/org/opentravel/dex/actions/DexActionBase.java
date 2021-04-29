@@ -18,6 +18,7 @@ package org.opentravel.dex.actions;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.actions.string.NameChangeAction;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmObject;
 

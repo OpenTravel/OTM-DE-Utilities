@@ -318,6 +318,7 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
      */
     public static void checkURLs(OtmAction a) {
         assertFalse( a.getEndpointURL().isEmpty() );
+        OtmBusinessObject boSubject = a.getOwningMember().getSubject();
         String subjectName = a.getOwningMember().getSubjectName();
         String initialTemplate = a.getRequest().getPathTemplate();
         String url = "";
@@ -339,7 +340,7 @@ public class TestAction extends TestOtmResourceBase<OtmAction> {
             url = a.getEndpointURL();
             // Then
             assertTrue( "Must not use template.", !url.contains( TEMPLATE ) );
-            assertTrue( "Must not have subject name.", !url.contains( subjectName ) );
+            assertTrue( "Must not contain subject name.", !url.contains( subjectName ) );
         } else {
             // Then - url is fixed
             assertFalse(

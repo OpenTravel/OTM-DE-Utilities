@@ -84,6 +84,9 @@ public class TestLibrary extends AbstractFxTest {
         repoManager = repositoryManager.get();
         // assertTrue( "Given: ", repositoryManager != null );
         // assertTrue( "Given: ", repoManager != null );
+
+        // Prevent java.nio.BufferOverflowException
+        System.setProperty( "headless.geometry", "2600x2200-32" );
         log.debug( "Before class setup tests ran." );
     }
     // @Before

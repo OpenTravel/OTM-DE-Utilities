@@ -16,7 +16,7 @@
 
 package org.opentravel.dex.actions.resource;
 
-import org.opentravel.dex.actions.DexStringAction;
+import org.opentravel.dex.actions.string.DexStringAction;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.model.resource.OtmActionRequest;
@@ -66,7 +66,7 @@ public class SetRequestMethodAction extends DexStringAction {
     }
 
     /**
-     * @see org.opentravel.dex.actions.DexStringAction#doIt(javafx.beans.value.ObservableValue, java.lang.String,
+     * @see org.opentravel.dex.actions.string.DexStringAction#doIt(javafx.beans.value.ObservableValue, java.lang.String,
      *      java.lang.String)
      */
     @Override
@@ -79,7 +79,7 @@ public class SetRequestMethodAction extends DexStringAction {
     }
 
     /**
-     * @see org.opentravel.dex.actions.DexStringAction#undoIt()
+     * @see org.opentravel.dex.actions.string.DexStringAction#undoIt()
      */
     @Override
     public String undoIt() {

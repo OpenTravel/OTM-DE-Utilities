@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package org.opentravel.dex.actions;
+package org.opentravel.dex.actions.string;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.dex.actions.DexAction;
+import org.opentravel.dex.actions.DexActionBase;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import javafx.beans.property.SimpleStringProperty;

@@ -23,7 +23,7 @@ import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.actions.DexBooleanAction;
 import org.opentravel.dex.actions.DexRunAction;
-import org.opentravel.dex.actions.DexStringAction;
+import org.opentravel.dex.actions.string.DexStringAction;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmModelElement;

@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.opentravel.dex.action.manager.DexFullActionManager;
-import org.opentravel.dex.actions.PropertyRoleChangeAction;
+import org.opentravel.dex.actions.string.PropertyRoleChangeAction;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;

@@ -34,12 +34,14 @@ public class SetLibraryAction extends DexRunAction {
 
 
     /**
-     * Any OTM object that uses the intended model manager.
+     * Any OTM object whose model manager has editable libraries besides the one the subect is in.
      * 
      * @param subject
      * @return
      */
     public static boolean isEnabled(OtmObject subject) {
+        if (subject == null)
+            return false;
         return subject.getModelManager().hasEditableLibraries( subject.getLibrary() );
     }
 
@@ -54,25 +56,28 @@ public class SetLibraryAction extends DexRunAction {
     }
 
     /**
-     * {@inheritDoc} This action will get the data from the user via modal dialog
+     * This method will get the data from the user via modal dialog
      */
     public OtmLibrary doIt() {
-        if (ignore || otm == null)
+        if (ignore || !isEnabled( otm ))
             return null;
         List<OtmLibrary> candidates = otm.getModelManager().getEditableLibraries();
-        // No libraries
+        candidates.remove( otm.getLibrary() );
+
         if (candidates.isEmpty())
-            return null;
+            return null; // No libraries
         if (candidates.size() == 1)
             return doIt( candidates.get( 0 ) );
 
-        // log.debug( "TEST - select library to set." );
+        // log.debug( "Dialog to select library to set." );
         SelectLibraryDialogController controller = SelectLibraryDialogController.init();
         controller.setModelManager( otm.getModelManager() );
         if (controller.showAndWait( "New Library Member" ) == Results.OK)
             doIt( controller.getSelected() );
-        else
-            log.error( "Invalid selection or cancel." );
+        else {
+            // log.debug( "Invalid selection or cancel." );
+            return null;
+        }
         return get();
     }
 
@@ -120,13 +125,13 @@ public class SetLibraryAction extends DexRunAction {
             member.getTlLM().setOwningLibrary( lib.getTL() );
             member.refresh();
 
-            // Debugging
-            if (member.getLibrary() != lib)
-                log.error( "Missing library." );
-            if (member.getTlLM().getOwningLibrary() != lib.getTL())
-                log.error( "TL Member is missing library." );
-            if (oldLibrary != null && oldLibrary.getTL().getNamedMember( member.getName() ) != null)
-                log.error( "Old library still has member" );
+            // // Debugging
+            // if (member.getLibrary() != lib)
+            // log.error( "Missing library." );
+            // if (member.getTlLM().getOwningLibrary() != lib.getTL())
+            // log.error( "TL Member is missing library." );
+            // if (oldLibrary != null && oldLibrary.getTL().getNamedMember( member.getName() ) != null)
+            // log.error( "Old library still has member" );
 
             // log.debug( "Set library to " + get() );
         }

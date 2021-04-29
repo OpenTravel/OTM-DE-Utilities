@@ -833,11 +833,12 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         if (getAssignedType() == null)
             return getTlAssignedTypeName();
         int major = -1;
-        try {
-            major = getAssignedType().getLibrary().getMajorVersion();
-        } catch (VersionSchemeException e) {
-        }
-        return getAssignedType().getName() + " /v" + major;
+        if (getAssignedType().getLibrary() != null)
+            try {
+                major = getAssignedType().getLibrary().getMajorVersion();
+            } catch (VersionSchemeException e) {
+            }
+        return major > -1 ? getAssignedType().getName() + " /v" + major : getAssignedType().getName();
         // return getAssignedType().getNameWithPrefix();
     }
 
