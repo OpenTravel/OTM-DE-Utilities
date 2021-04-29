@@ -20,14 +20,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractOTMApplication;
-import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.TestOtmModelManager;
-import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestVersionChain;
 import org.opentravel.objecteditor.ObjectEditorApp;
-import org.opentravel.schemacompiler.version.VersionSchemeException;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
 
@@ -76,20 +71,20 @@ public class TestSetAssignedTypeActionVersioned extends AbstractFxTest {
     // // assertTrue( staticModelManager.getMembers().contains( globalBO ) );
     // }
 
-    @Test
-    public void testisEnabled() throws VersionSchemeException, InterruptedException {
-        OtmModelManager mgr = TestOtmModelManager.build();
-
-        // Load project and get latest library
-        if (!TestDexFileHandler.loadVersionProject( mgr ))
-            return; // No editable libraries
-        OtmLibrary latestLib = TestVersionChain.getMinorInChain( mgr );
-
-        log.debug( "TODO" );
-        // New property to pre-existing object
-        // New object
-        // Resource subject
-    }
+    // @Test
+    // public void testisEnabled() throws VersionSchemeException, InterruptedException {
+    // OtmModelManager mgr = TestOtmModelManager.build();
+    //
+    // // Load project and get latest library
+    // if (!TestDexFileHandler.loadVersionProject( mgr ))
+    // return; // No editable libraries
+    // OtmLibrary latestLib = TestVersionChain.getMinorInChain( mgr );
+    //
+    // log.debug( "TODO" );
+    // // New property to pre-existing object
+    // // New object
+    // // Resource subject
+    // }
 
     @Test
     public void testAssignToNewProperty() {}

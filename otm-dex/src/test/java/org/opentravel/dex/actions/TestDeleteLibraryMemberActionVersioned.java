@@ -23,9 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
-import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
-import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.tasks.DexTaskException;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
@@ -70,35 +68,6 @@ public class TestDeleteLibraryMemberActionVersioned extends AbstractFxTest {
 
         // Prevent java.nio.BufferOverflowException
         System.setProperty( "headless.geometry", "2600x2200-32" );
-    }
-
-    /**
-     * Test cases:
-     * <ol>
-     * <li>New Member in major - all types
-     * <li>New Member in minor - all types
-     * </ol>
-     * 
-     * @throws VersionSchemeException
-     * @throws InterruptedException
-     */
-    @Test
-    public void testIsEnabled1() throws VersionSchemeException, InterruptedException {
-
-        // Given - case 1 - all the types of members
-        TestLibrary.addOneOfEach( lib );
-        assertTrue( "Given: ", !staticModelManager.getMembers( lib ).isEmpty() );
-        DexActionManager fullAM = staticModelManager.getActionManager( true );
-        DexActionManager roAM = staticModelManager.getActionManager( false );
-        DexActionManager minorAM = new DexMinorVersionActionManager( fullAM );
-
-        // Read-only case
-        for (OtmLibraryMember member : staticModelManager.getMembers( lib )) {
-            log.debug( "Testing " + member + " in a major library." );
-            assertTrue( fullAM.isEnabled( DexActions.DELETELIBRARYMEMBER, member ) );
-            // assertTrue( "This would be an error.", !minorAM.isEnabled( DexActions.DELETELIBRARYMEMBER, member ) );
-            assertTrue( !roAM.isEnabled( DexActions.DELETELIBRARYMEMBER, member ) );
-        }
     }
 
     @Test
