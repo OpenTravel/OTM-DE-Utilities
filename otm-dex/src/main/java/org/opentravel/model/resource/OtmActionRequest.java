@@ -16,6 +16,8 @@
 
 package org.opentravel.model.resource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
@@ -40,7 +42,7 @@ import javafx.scene.control.Tooltip;
  * 
  */
 public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> implements OtmResourceChild {
-    // private static Log log = LogFactory.getLog( OtmActionRequest.class );
+    private static Log log = LogFactory.getLog( OtmActionRequest.class );
 
     private static final String TOOLTIP = "Specifies the characteristics and payload for a REST Action request.";
 
@@ -286,15 +288,19 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
      * @return path as set or null
      */
     public String setPathTemplate(String basePath, boolean addParameters) {
-        if (basePath == null)
+        if (basePath == null) {
             getTL().setPathTemplate( null );
-        else {
+            if (pathProperty != null)
+                pathProperty.set( "" );
+        } else {
             StringBuilder path = new StringBuilder( basePath );
             if (addParameters)
                 path.append( DexParentRefsEndpointMap.getContribution( getParamGroup() ) );
             getTL().setPathTemplate( path.toString() );
+            if (pathProperty != null)
+                pathProperty.set( getTL().getPathTemplate() );
         }
-        // log.debug( "Set path template to: " + getTL().getPathTemplate() );
+        log.debug( "Set path template to: " + getTL().getPathTemplate() );
         return getTL().getPathTemplate();
     }
 

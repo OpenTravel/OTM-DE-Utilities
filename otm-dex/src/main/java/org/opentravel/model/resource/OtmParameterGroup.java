@@ -303,7 +303,15 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
 
     public void setIdGroup(boolean value) {
         getTL().setIdGroup( value );
-        // log.debug( "Set id group to " + isIdGroup() );
+        log.debug( "Set id group to " + isIdGroup() );
+
+        // Actions that use this parameter group will need to refresh their paths
+        // Preserve the collection contribution, just update the parameter portion.
+        List<OtmActionRequest> arList = getOwningMember().getActionRequests();
+        for (OtmActionRequest ar : arList)
+            if (ar.getParamGroup() == this) {
+                ar.setPathTemplate( DexParentRefsEndpointMap.getCollectionContribution( ar ), true );
+            }
     }
 
     public String setName(String value) {

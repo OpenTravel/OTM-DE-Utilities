@@ -86,7 +86,8 @@ public class OtmActionRequestFieldManager {
     private Node getDefaultPathNode() {
         Button button = new Button( PATH_DEFAULT_LABEL );
         button.setDisable( !ar.isEditable() );
-        button.setOnAction( e -> ar.pathProperty.set( ar.getPathTemplateDefault() ) );
+        button.setOnAction( e -> ar.setPathTemplate( ar.getPathTemplateDefault(), false ) );
+        // button.setOnAction( e -> ar.pathProperty.set( ar.getPathTemplateDefault() ) );
         return button;
     }
 

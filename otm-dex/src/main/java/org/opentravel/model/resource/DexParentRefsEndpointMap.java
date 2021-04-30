@@ -181,11 +181,13 @@ public class DexParentRefsEndpointMap {
 
     /**
      * 
+     * Utility that uses the request to make payload example.
+     * <p>
      * Get the payload name from the request and decorate with xml markup. If request is GET or DELETE which can not
      * have a payload return "--"
      * 
      * @param request
-     * @return the name from the ActionFacet (not the name of the AF)
+     * @return the example string
      */
     public static String getPayloadExample(OtmActionRequest request) {
         String pn = "";
@@ -213,15 +215,20 @@ public class DexParentRefsEndpointMap {
     }
 
     /**
-     * Combine system, version and resource base path into one URL
+     * Utility that uses data from resource to combine system, version and resource base path into one URL
      * 
      * @param resource
      * @return
      */
     public static String getResourceBaseURL(OtmResource resource) {
+        //
+        // return getResourceBaseURL( resource, resource.getModelManager().getUserSettings() );
+        // }
+        //
+        // public static String getResourceBaseURL(OtmResource resource, UserSettings settings) {
         String resourceBaseURL;
         // System
-        resourceBaseURL = getSystemContribution( null );
+        resourceBaseURL = getSystemContribution( resource.getModelManager().getUserSettings() );
         // Base path
         if (!resource.getBasePath().startsWith( PATH_SEPERATOR ))
             resourceBaseURL += PATH_SEPERATOR;
@@ -239,11 +246,13 @@ public class DexParentRefsEndpointMap {
     protected static String getSystemContribution(UserSettings settings) {
         if (settings == null)
             return SYSTEM;
-        return SYSTEM; // TODO
+        else
+            return settings.getCompilerSettings().getResourceBaseUrl();
+        // return SYSTEM; // FIXME
     }
 
     /**
-     * Make the URL string for the version of the resource. No path separators.
+     * Utility that uses the resource to make the URL string for the version. No path separators.
      * 
      * @param resource
      * @return
@@ -252,8 +261,8 @@ public class DexParentRefsEndpointMap {
         String versionContribution = "";
         if (resource != null && resource.getLibrary() != null) {
             try {
-                versionContribution =
-                    "v" + resource.getLibrary().getMajorVersion() + "_" + resource.getLibrary().getMinorVersion();
+                versionContribution = "v" + resource.getLibrary().getMajorVersion();
+                // "v" + resource.getLibrary().getMajorVersion() + "_" + resource.getLibrary().getMinorVersion();
             } catch (VersionSchemeException e) {
                 versionContribution = "";
             }

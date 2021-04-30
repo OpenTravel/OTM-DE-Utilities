@@ -628,12 +628,14 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
     /**
      * Build a fully structured resource with:
      * <ul>
-     * <li>subject
-     * <li>base path
+     * <li>New Business Object subject with subjectName
+     * <li>Name based on subject name
      * <li>First class set to true
+     * <li>ID Parameter group with parameter
+     * <li>Action facet named "af1"
+     * <li>base path
      * <li>actions with payload
      * <li>an action with request that has parameter group added to resource
-     * <li>an action facet named "af1"
      * </ul>
      * 
      * @param pathString

@@ -67,15 +67,16 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
         endpoints.print();
     }
 
-    @Test
-    public void testSystemContribution() {
-        String path1 = "/MyCollection";
-        String subjectName = "MySubject";
-        OtmResource resource = TestResource.buildFullOtm( path1, subjectName, staticModelManager );
-        String rc = DexParentRefsEndpointMap.getContribution( resource );
-
-        assertTrue( !DexParentRefsEndpointMap.getSystemContribution( null ).isEmpty() );
-    }
+    // Fix - changed from static. Access via ????
+    // @Test
+    // public void testSystemContribution() {
+    // String path1 = "/MyCollection";
+    // String subjectName = "MySubject";
+    // OtmResource resource = TestResource.buildFullOtm( path1, subjectName, staticModelManager );
+    // String rc = DexParentRefsEndpointMap.getContribution( resource );
+    //
+    // assertTrue( !DexParentRefsEndpointMap.getSystemContribution( ).isEmpty() );
+    // }
 
     @Test
     public void testActionGetEndpointURL() {
@@ -112,6 +113,44 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
             log.debug( aURL );
             assertTrue( "Must not have double /.", !aURL.substring( 8 ).contains( "//" ) );
             // FIXME - make the base path on resource the collection and do NOT add to action contribution
+        }
+    }
+
+    /**
+     * ActionRequests use String d = DexParentRefsEndpointMap.getContribution( getParent() ); to
+     * getPathTemplateDefault()
+     */
+    @Test
+    public void testActionContributionNotFirstClass() {
+        // Givens
+        String subPath1 = "/Passengers";
+        String subName = "Passenger";
+        OtmResource resource = TestResource.buildFullOtm( subPath1, subName, staticModelManager );
+        OtmParameterGroup paramGroup = resource.getIdGroup();
+        assertTrue( "Given: ", paramGroup != null );
+        String pgContribution = DexParentRefsEndpointMap.getContribution( paramGroup );
+        assertTrue( "Given: ", !pgContribution.isEmpty() );
+        log.debug( "Pg contrib:      " + pgContribution );
+
+        // Create parent resource
+        String subjectName = "Reservation";
+        TestResource.buildParentResource( resource, subjectName, staticModelManager );
+
+        resource.setFirstClass( false );
+
+        //
+        String contrib = "";
+        String defaultPath = "";
+        for (OtmAction action : resource.getActions()) {
+            log.debug( "Testing 2nd class action: " + action );
+            assertTrue( "Given: ", action.getRequest().getParamGroup() == paramGroup );
+            TestAction.check( action );
+
+            contrib = DexParentRefsEndpointMap.getContribution( action );
+            log.debug( "Action contrib: " + contrib );
+            defaultPath = action.getRequest().getPathTemplateDefault();
+            log.debug( "Default path  : " + defaultPath );
+            assertTrue( "Then action contribution must have parameters.", contrib.contains( pgContribution ) );
         }
     }
 
@@ -162,6 +201,7 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
         actions.forEach( a -> TestAction.check( a ) );
 
         for (OtmAction a : actions) {
+            log.debug( "Testing action: " + a );
             assertTrue( "Given: ", a.getRequest() != null );
             a.getRequest().setParamGroup( idGroup );
             assertTrue( "Given: ", a.getRequest().getParamGroup() == idGroup );
@@ -447,40 +487,62 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
      * NOTE -- use the log print to visually check
      */
     public static void check(OtmResource resource, int expectedPathCount) {
-        String pathTemplate = "ThisIsFromParentRefTemplate_";
+        assertTrue( resource.getAllParentRefs( true ).size() == expectedPathCount );
+        check( resource, true );
+    }
+
+    private static final String PARENTREFPATHTEMPLATE = "ThisIsFromParentRefTemplate_";
+
+    /**
+     * Check:
+     * <ul>
+     * <li>Map has entry for all 1st class parents and ancestors
+     * <li>if there are no parentRefs, then the map is empty
+     * <li>For each parentRef, without a template, its entry contains the parent's TL base path
+     * <li>For each parentRef, with a template, its entry contains the template
+     * </ul>
+     * 
+     * @param resource
+     * @param print
+     */
+    public static void check(OtmResource resource, boolean print) {
+        log.debug( "***Testing endpoints map on " + resource );
         String initialTemplate = null;
         DexParentRefsEndpointMap endpoints = resource.getParentRefEndpointsMap();
+        assertTrue( "Must have a endpoint map.", endpoints != null );
+
+        if (print)
+            endpoints.print();
 
         // Then - we have the expected number of paths
-        log.debug( "***Testing endpoint paths on " + resource );
-        endpoints.print();
-        assertTrue( resource.getAllParentRefs( true ).size() == expectedPathCount );
-        assertTrue( endpoints.size() == expectedPathCount );
-
+        assertTrue( "There must be an entry for each 1st class parent.",
+            endpoints.size() == resource.getAllParentRefs( true ).size() );
 
         // Then - if there are no parentRefs, then the map is empty
         if (resource.getParentRefs().isEmpty()) {
             assertTrue( endpoints.size() == 0 );
             assertTrue( endpoints.get( resource ).isEmpty() );
         } else {
-            // Then - all 1st class parentRefs have an entry in the map
             for (OtmParentRef pr : resource.getAllParentRefs( true )) {
-                // for (OtmParentRef pr : resource.getParentRefs()) {
+                initialTemplate = pr.getPathTemplate(); // use to restore after test
+
+                // Then - all 1st class parentRefs have an entry in the map
                 assertFalse( endpoints.get( pr ).isEmpty() );
                 assertFalse( endpoints.get( pr.getParentResource() ).isEmpty() );
-                initialTemplate = pr.getPathTemplate();
 
                 // When - the template is empty
                 pr.setPathTemplate( null );
-                endpoints.build().print();
+                if (print)
+                    endpoints.build().print();
                 // Then - the path contains the parent resource's base path
                 assertTrue( endpoints.get( pr ).contains( pr.getParentResource().getBasePath() ) );
 
                 // When - the template is set
-                pr.setPathTemplate( pathTemplate + pr.getName() );
-                endpoints.build().print();
+                pr.setPathTemplate( PARENTREFPATHTEMPLATE + pr.getName() );
+                if (print)
+                    endpoints.build().print();
                 // Then - the path contains the resource path
-                assertTrue( endpoints.get( pr ).contains( pathTemplate ) );
+                assertTrue( endpoints.get( pr ).contains( PARENTREFPATHTEMPLATE ) );
 
                 pr.setPathTemplate( initialTemplate ); // Restore the template
             }

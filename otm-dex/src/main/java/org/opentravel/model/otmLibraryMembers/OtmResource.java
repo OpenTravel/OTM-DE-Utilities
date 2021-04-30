@@ -676,7 +676,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     /**
      * 
-     * @return list of the parameter group facades for the ParamGroups on the tlResource
+     * @return new list of the parameter group facades for the ParamGroups on the tlResource
      */
     public List<OtmParameterGroup> getParameterGroups() {
         List<OtmParameterGroup> groups = new ArrayList<>();

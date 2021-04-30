@@ -131,8 +131,11 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
 
     public ObservableList<String> getParameterGroupCandidates() {
         ObservableList<String> candidates = FXCollections.observableArrayList();
-        if (getParentResource() != null)
+        if (getParentResource() != null) {
             getParentResource().getParameterGroups().forEach( pg -> candidates.add( pg.getName() ) );
+            getParentResource().getInheritedParameterGroups().forEach( ipg -> candidates.add( ipg.getName() ) );
+            candidates.sort( null );
+        }
         return candidates;
     }
 
@@ -227,9 +230,13 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
      */
     public OtmParameterGroup setParameterGroupString(String name) {
         OtmParameterGroup pg = null;
-        for (OtmParameterGroup c : getParentResource().getParameterGroups())
-            if (c.getName().equals( name ))
-                pg = c;
+        if (getParentResource() != null) {
+            List<OtmParameterGroup> groups = getParentResource().getParameterGroups();
+            groups.addAll( getParentResource().getInheritedParameterGroups() );
+            for (OtmParameterGroup c : groups)
+                if (c.getName().equals( name ))
+                    pg = c;
+        }
         return setParameterGroup( pg );
     }
 

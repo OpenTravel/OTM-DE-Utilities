@@ -303,13 +303,15 @@ public class TestActionRequest<L extends TestOtmResourceBase<OtmActionRequest>>
         }
     }
 
-    // Setting to default in GUI uses:
-    // button.setOnAction( e -> pathProperty.set( getPathPathTemplateDefault() );
-
+    /**
+     * Setting to default in GUI uses:
+     * 
+     * button.setOnAction( e -> pathProperty.set( getPathPathTemplateDefault() );
+     */
     @Test
     public void testDefaultPathTemplate() {
         OtmResource resource = TestResource.buildFullOtm( THEPATH, SUBJECTNAME, staticModelManager );
-        OtmParameterGroup idGroup = TestParamGroup.buildIdGroup( resource );
+        OtmParameterGroup idGroup = TestParamGroup.buildIdGroup( resource ); // second ID group
         String ds;
 
         for (OtmActionRequest rq : resource.getActionRequests()) {
