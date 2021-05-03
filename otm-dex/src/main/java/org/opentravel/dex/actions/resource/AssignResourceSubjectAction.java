@@ -75,7 +75,8 @@ public class AssignResourceSubjectAction extends DexRunAction {
      * @return
      */
     public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmResource) {
+        if (subject instanceof OtmResource
+            && (subject.getLibrary().isUnmanaged() || subject.getLibrary().isMajorVersion())) {
             return SetAssignedTypeAction.isEnabled( subject );
         }
         return false;

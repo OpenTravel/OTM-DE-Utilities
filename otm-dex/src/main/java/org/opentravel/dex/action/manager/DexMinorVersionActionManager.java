@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexActions;
+import org.opentravel.dex.actions.string.NameChangeAction;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeUser;
@@ -109,7 +110,7 @@ public class DexMinorVersionActionManager extends DexActionManagerBase {
             case DELETELIBRARYMEMBER:
             case NAMECHANGE:
                 // Allow name change to objects new to the chain
-                return isNewToChain( subject );
+                return isNewToChain( subject ) && NameChangeAction.isEnabled( subject );
             // if (subject instanceof OtmLibraryMember && subject.getLibrary() != null
             // && subject.getLibrary().getVersionChain() != null)
             // return subject.getLibrary().getVersionChain().isNewToChain( (OtmLibraryMember) subject );

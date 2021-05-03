@@ -60,7 +60,7 @@ public abstract class TestOtmResourceBase<L extends OtmResourceChildBase> {
     // NOTE - does not run in abstract classes - must copy into test sub-types
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         baseObject = TestBusiness.buildOtm( staticModelManager );
         testResource = TestResource.buildOtm( staticModelManager );
         log.debug( "Before class resource base." );

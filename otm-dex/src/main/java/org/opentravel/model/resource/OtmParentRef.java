@@ -132,9 +132,9 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
     public ObservableList<String> getParameterGroupCandidates() {
         ObservableList<String> candidates = FXCollections.observableArrayList();
         if (getParentResource() != null) {
-            getParentResource().getParameterGroups().forEach( pg -> candidates.add( pg.getName() ) );
-            getParentResource().getInheritedParameterGroups().forEach( ipg -> candidates.add( ipg.getName() ) );
-            candidates.sort( null );
+            getParentResource().getParameterGroups( true ).forEach( pg -> candidates.add( pg.getName() ) );
+            // getParentResource().getInheritedParameterGroups().forEach( ipg -> candidates.add( ipg.getName() ) );
+            // candidates.sort( null );
         }
         return candidates;
     }
@@ -217,6 +217,12 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
             getTL().setParentParamGroup( parentParameterGroup.getTL() );
         else
             getTL().setParentParamGroup( null );
+
+        // TODO -
+        // Update the path template to match the selected PG
+        // FIXME String basePath = DexParentRefsEndpointMap.getCollectionContribution( this );
+        setPathTemplate( getPathTemplate(), true );
+
         log.error( "Set parameter group name to " + getParameterGroup() );
         return (getParameterGroup());
     }
@@ -231,8 +237,8 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
     public OtmParameterGroup setParameterGroupString(String name) {
         OtmParameterGroup pg = null;
         if (getParentResource() != null) {
-            List<OtmParameterGroup> groups = getParentResource().getParameterGroups();
-            groups.addAll( getParentResource().getInheritedParameterGroups() );
+            List<OtmParameterGroup> groups = getParentResource().getParameterGroups( true );
+            // groups.addAll( getParentResource().getInheritedParameterGroups() );
             for (OtmParameterGroup c : groups)
                 if (c.getName().equals( name ))
                     pg = c;
@@ -266,6 +272,7 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
         } else
             getTL().setParentResource( null );
         // log.debug( "Set parent resource to " + getParentResource() );
+        // TODO - update parameter group list
         return getParentResource();
     }
 
@@ -279,6 +286,10 @@ public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> impl
         return getTL().getPathTemplate();
     }
 
+    public String setPathTemplate(String path, boolean addParameters) {
+        // FIXME
+        return setPathTemplate( path );
+    }
 
 
 }

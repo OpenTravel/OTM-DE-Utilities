@@ -567,8 +567,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         return DexEditField.makeComboBox( getExtensionCandidates(), selection );
     }
 
-    // FIXME
-    // Add namespace to fields.
     /**
      * Get the fields for this object.
      * 
@@ -675,7 +673,6 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     /**
-     * 
      * @return new list of the parameter group facades for the ParamGroups on the tlResource
      */
     public List<OtmParameterGroup> getParameterGroups() {
@@ -684,6 +681,17 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
             if (OtmModelElement.get( pg ) instanceof OtmParameterGroup)
                 groups.add( (OtmParameterGroup) OtmModelElement.get( pg ) );
         } );
+        groups.sort( null );
+        return groups;
+    }
+
+    /**
+     * @return new list of the natural and inherited parameter groups facades for the ParamGroups on the tlResource
+     */
+    public List<OtmParameterGroup> getParameterGroups(boolean includeInherited) {
+        List<OtmParameterGroup> groups = getParameterGroups();
+        if (includeInherited)
+            groups.addAll( getInheritedParameterGroups() );
         groups.sort( null );
         return groups;
     }
@@ -822,7 +830,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
     }
 
     /**
-     * Get the name of the business object. First trys the business object and if that is missing, trys the business
+     * Get the name of the business object. First tries the business object and if that is missing, tries the business
      * object reference name field.
      * <p>
      * Note: SWAGGER will use the latest minor version of a subject so just show the major version number.
@@ -830,16 +838,40 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      * @return name of the business object assigned or empty string
      */
     public String getSubjectName() {
-        if (getAssignedType() == null)
-            return getTlAssignedTypeName();
-        int major = -1;
-        if (getAssignedType().getLibrary() != null)
-            try {
-                major = getAssignedType().getLibrary().getMajorVersion();
-            } catch (VersionSchemeException e) {
-            }
-        return major > -1 ? getAssignedType().getName() + " /v" + major : getAssignedType().getName();
-        // return getAssignedType().getNameWithPrefix();
+        OtmBusinessObject subject = getAssignedType();
+        String sName = "";
+        // Try the base type if any.
+        if (subject == null && getBaseType() != null) {
+            subject = getBaseType().getAssignedType();
+            // Workaround for defect reported 5/3/2021
+            if (subject != null)
+                setAssignedType( subject );
+        }
+        // If still not found, use the type name from the TL object.
+        if (subject == null)
+            sName = getTlAssignedTypeName();
+        else {
+            // Add the version indicator
+            int major = -1;
+            if (subject.getLibrary() != null)
+                try {
+                    major = subject.getLibrary().getMajorVersion();
+                    sName = subject.getName() + " /v" + major;
+                } catch (VersionSchemeException e) {
+                }
+        }
+        return sName;
+
+        // if (getAssignedType() == null)
+        // return getTlAssignedTypeName();
+        // int major = -1;
+        // if (getAssignedType().getLibrary() != null)
+        // try {
+        // major = getAssignedType().getLibrary().getMajorVersion();
+        // } catch (VersionSchemeException e) {
+        // }
+        // return major > -1 ? getAssignedType().getName() + " /v" + major : getAssignedType().getName();
+        // // return getAssignedType().getNameWithPrefix();
     }
 
     @Override
@@ -917,6 +949,7 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         // ResourceCodegenUtils.getInheritedActionFacets( getTL() ).forEach( a -> new OtmActionFacet( a, this ) );
         // ResourceCodegenUtils.getInheritedParamGroups( getTL() ).forEach( a -> new OtmParameterGroup( a, this ) );
         // ResourceCodegenUtils.getInheritedParentRefs( getTL() ).forEach( a -> new OtmParentRef( a, this ) );
+        // ResourceCodegenUtils.getReferencedFacet( businessObject, referenceFacetName )
 
         for (TLAction tlA : ResourceCodegenUtils.getInheritedActions( getTL() ))
             if (!getTL().getActions().contains( tlA ) && OtmModelElement.get( tlA ) != null)
@@ -940,6 +973,17 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
         children.remove( iKid );
         iKid.setInheritedFrom( base );
         // log.debug( "Made " + iKid + " inherited." );
+    }
+
+    @Override
+    public StringProperty nameProperty() {
+        // Override default behavior of letting the latest version of a member be renamed
+        if (getLibrary() != null && (getLibrary().isMajorVersion() || getLibrary().isUnmanaged()))
+            return super.nameProperty();
+        if (nameProperty == null)
+            nameProperty = new ReadOnlyStringWrapper();
+        nameProperty.set( getName() );
+        return nameProperty;
     }
 
     /**
