@@ -187,6 +187,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
         builtInFilter.set( false );
         builtInFilter.setSelector( m -> m.getLibrary().isBuiltIn() );
         filters.add( builtInFilter );
+        log.debug( "Configured filters." );
     }
 
     private void setErrorsFilter() {

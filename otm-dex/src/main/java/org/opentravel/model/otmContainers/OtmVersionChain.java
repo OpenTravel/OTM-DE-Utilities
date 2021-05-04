@@ -206,6 +206,11 @@ public class OtmVersionChain {
 
     /**
      * False if another library in the chain has a member with the same name.
+     * <p>
+     * True for contextual facets.
+     * <p>
+     * Check all libraries in the chain and return false if one of them {@link OtmLibrary#contains(OtmLibraryMember) }
+     * the member.
      * 
      * @param member
      * @return

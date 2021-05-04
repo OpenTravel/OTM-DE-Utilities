@@ -36,7 +36,6 @@ import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.resource.DexParentRefsEndpointMap;
 import org.opentravel.model.resource.OtmAction;
-import org.opentravel.model.resource.OtmAction.BuildTemplate;
 import org.opentravel.model.resource.OtmActionFacet;
 import org.opentravel.model.resource.OtmActionRequest;
 import org.opentravel.model.resource.OtmActionResponse;
@@ -355,18 +354,27 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
      */
     @Override
     public void build() {
-        OtmParameterGroup pg = new OtmParameterGroup( new TLParamGroup(), this );
-        pg.build();
-
-        OtmActionFacet af = new OtmActionFacet( new TLActionFacet(), this );
-        af.build( org.opentravel.model.resource.OtmActionFacet.BuildTemplate.REQUEST );
-
-        OtmAction action = new OtmAction( new TLAction(), this );
-        action.build( BuildTemplate.GET );
         setFirstClass( true );
 
         if (getBasePath() == null || getBasePath().isEmpty())
             setBasePath( DexParentRefsEndpointMap.PATH_SEPERATOR );
+
+        OtmParameterGroup pg = new OtmParameterGroup( new TLParamGroup(), this );
+        pg.build();
+
+        OtmActionFacet af = null;
+        for (org.opentravel.model.resource.OtmActionFacet.BuildTemplate template : OtmActionFacet.BuildTemplate
+            .values()) {
+            af = new OtmActionFacet( new TLActionFacet(), this );
+            af.build( template );
+        }
+
+        OtmAction action = null;
+        for (OtmAction.BuildTemplate template : OtmAction.BuildTemplate.values()) {
+            action = new OtmAction( new TLAction(), this );
+            action.build( template );
+        }
+
         // TODO - get defaults from settings
     }
 
@@ -977,8 +985,10 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     @Override
     public StringProperty nameProperty() {
-        // Override default behavior of letting the latest version of a member be renamed
-        if (getLibrary() != null && (getLibrary().isMajorVersion() || getLibrary().isUnmanaged()))
+        if (getLibrary() != null && getLibrary().getVersionChain().isNewToChain( this ))
+
+            // Override default behavior of letting the latest version of a member be renamed
+            // if (getLibrary() != null && (getLibrary().isMajorVersion() || getLibrary().isUnmanaged()))
             return super.nameProperty();
         if (nameProperty == null)
             nameProperty = new ReadOnlyStringWrapper();

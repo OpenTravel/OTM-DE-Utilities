@@ -156,8 +156,7 @@ public class NewLibraryMemberAction extends DexRunAction {
 
                 if (member instanceof OtmResource && ((OtmResource) member).getSubject() == null) {
                     ((OtmResource) member).setBasePath( null );
-                    OtmBusinessObject subject =
-                        AssignResourceSubjectAction.getUserTypeSelection( member.getModelManager(), null );
+                    OtmBusinessObject subject = AssignResourceSubjectAction.getUserTypeSelection( member, null );
                     ((OtmResource) member).setSubject( subject );
                 }
 

@@ -125,6 +125,7 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
         prefixColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ResourcesDAO,String>( "prefix" ) );
         setColumnProps( prefixColumn, true, false, true, 100 );
         prefixColumn.setStyle( "-fx-alignment: CENTER-RIGHT;" );
+        prefixColumn.setSortType( SortType.ASCENDING );
 
         nameColumn = new TreeTableColumn<>( NAMECOLUMNLABEL );
         nameColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ResourcesDAO,String>( "name" ) );
@@ -137,17 +138,19 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
         TreeTableColumn<ResourcesDAO,String> libColumn = new TreeTableColumn<>( LIBRARYLABEL );
         libColumn.setCellValueFactory( new TreeItemPropertyValueFactory<ResourcesDAO,String>( "library" ) );
 
-        TreeTableColumn<ResourcesDAO,String> usedTypesCol = new TreeTableColumn<>( WHEREUSEDLABEL );
-        usedTypesCol.setCellValueFactory( new TreeItemPropertyValueFactory<ResourcesDAO,String>( "usedTypes" ) );
+        // TreeTableColumn<ResourcesDAO,String> usedTypesCol = new TreeTableColumn<>( WHEREUSEDLABEL );
+        // usedTypesCol.setCellValueFactory( new TreeItemPropertyValueFactory<ResourcesDAO,String>( "usedTypes" ) );
 
         TreeTableColumn<ResourcesDAO,ImageView> valColumn = new TreeTableColumn<>( "" );
         valColumn.setCellFactory( c -> new ValidationResourceTreeTableCellFactory() );
         setColumnProps( valColumn, true, false, false, 25 );
 
         // Add columns to table
-        resourcesTreeTable.getColumns().addAll( nameColumn, valColumn, libColumn, versionColumn, prefixColumn,
-            usedTypesCol );
+        resourcesTreeTable.getColumns().addAll( nameColumn, valColumn, prefixColumn, libColumn, versionColumn );
+        // resourcesTreeTable.getColumns().addAll( nameColumn, valColumn, prefixColumn, libColumn, versionColumn,
+        // usedTypesCol );
         resourcesTreeTable.getSortOrder().add( nameColumn );
+        resourcesTreeTable.getSortOrder().add( prefixColumn );
     }
 
     @Override

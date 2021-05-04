@@ -30,9 +30,11 @@ import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmFacets.OtmFacet;
+import org.opentravel.model.otmFacets.OtmIdFacet;
 import org.opentravel.model.otmFacets.OtmQueryFacet;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
+import org.opentravel.model.otmProperties.OtmAttribute;
 import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLParamGroup;
 import org.opentravel.schemacompiler.model.TLParamLocation;
@@ -116,12 +118,38 @@ public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
         return parameter;
     }
 
+    /**
+     * Build out the parameter group.
+     * <p>
+     * <li>Make it an id group assigned to subject's ID facet.
+     * <li>Add parameters for all attributes in the facet.
+     */
     public void build() {
-        if (getOwningMember().getSubject() != null) {
-            setReferenceFacet( getOwningMember().getSubject().getIdFacet() );
+        OtmIdFacet idFacet = null;
+        if (getOwningMember() != null && getOwningMember().getSubject() != null)
+            idFacet = getOwningMember().getSubject().getIdFacet();
+
+        if (idFacet != null) {
+            // Get all attributes, direct and inherited.
+            List<OtmObject> idKids = idFacet.getChildren();
+            idKids.addAll( idFacet.getInheritedChildren() );
+
+            setReferenceFacet( idFacet );
             setIdGroup( true );
             setName( "Identifier" );
-            // ? How to add a parameter ?
+
+            // add parameters
+            OtmAttribute<?> attr = null;
+            for (OtmObject property : idKids) {
+                // if (property instanceof OtmIdAttribute) {
+                attr = (OtmAttribute<?>) property;
+                OtmParameter param = new OtmParameter( new TLParameter(), this );
+                param.setFieldRef( attr );
+                param.setLocation( TLParamLocation.PATH );
+                // }
+            }
+        }
+        if (getParameters().isEmpty()) {
             OtmParameter param = new OtmParameter( new TLParameter(), this );
             param.setLocation( TLParamLocation.PATH );
         }

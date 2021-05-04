@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions.resource;
 
+import org.opentravel.dex.action.manager.DexActionManagerBase;
 import org.opentravel.dex.actions.DexRunAction;
-import org.opentravel.dex.actions.SetAssignedTypeAction;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
@@ -47,21 +47,33 @@ public class AssignResourceSubjectAction extends DexRunAction {
      * 
      * @return selected business object or null
      */
-    public static OtmBusinessObject getUserTypeSelection(OtmModelManager mgr, OtmBusinessObject currentSubject) {
+    public static OtmBusinessObject getUserTypeSelection(OtmLibraryMember member, OtmBusinessObject currentSubject) {
+        OtmModelManager mgr = member.getModelManager();
+        if (mgr == null)
+            return null;
         OtmBusinessObject selection = null;
         if (Platform.isFxApplicationThread()) {
             TypeSelectionContoller controller = TypeSelectionContoller.init();
+            controller.setManager( mgr );
             MemberFilterController filter = controller.getMemberFilterController();
             filter.setTypeFilterValue( OtmLibraryMemberType.BUSINESS );
 
             if (currentSubject != null)
                 controller.getMemberFilterController().setMinorVersionFilter( currentSubject );
 
-            controller.setManager( mgr );
             if (controller.showAndWait( "MSG" ) == Results.OK) {
                 MemberAndProvidersDAO selected = controller.getSelected();
                 if (selected != null && selected.getValue() instanceof OtmBusinessObject)
                     selection = (OtmBusinessObject) selected.getValue();
+                else {
+                    // log.debug( "Warn user of no selection." );
+                    String selectionName = "Unknown";
+                    if (selected != null && selected.getValue() instanceof OtmObject)
+                        selectionName = selected.getValue().getName();
+                    if (member.getActionManager() instanceof DexActionManagerBase)
+                        member.getActionManager()
+                            .postWarning( "Not assigned. " + selectionName + " is an invalid business object." );
+                }
             }
         }
         return selection;
@@ -75,11 +87,17 @@ public class AssignResourceSubjectAction extends DexRunAction {
      * @return
      */
     public static boolean isEnabled(OtmObject subject) {
-        if (subject instanceof OtmResource
-            && (subject.getLibrary().isUnmanaged() || subject.getLibrary().isMajorVersion())) {
-            return SetAssignedTypeAction.isEnabled( subject );
-        }
-        return false;
+        if (!(subject instanceof OtmResource))
+            return false;
+        if (subject.getLibrary() == null)
+            return false;
+        return (subject.getLibrary().getVersionChain().isNewToChain( subject.getOwningMember() ));
+
+        // if (subject instanceof OtmResource
+        // && (subject.getLibrary().isUnmanaged() || subject.getLibrary().isMajorVersion())) {
+        // return SetAssignedTypeAction.isEnabled( subject );
+        // }
+        // return false;
     }
 
     public static boolean isEnabled(OtmObject subject, OtmObject value) {
@@ -117,7 +135,7 @@ public class AssignResourceSubjectAction extends DexRunAction {
             currentSubject = resource.getSubject();
 
         // Get the user's selected business object
-        OtmBusinessObject selection = getUserTypeSelection( resource.getModelManager(), currentSubject );
+        OtmBusinessObject selection = getUserTypeSelection( resource, currentSubject );
 
         if (selection != null) {
             // Create new minor version of resource If this resource is in an older minor version

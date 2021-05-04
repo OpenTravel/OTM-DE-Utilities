@@ -33,6 +33,7 @@ import org.opentravel.schemacompiler.model.TLAction;
 import org.opentravel.schemacompiler.model.TLActionRequest;
 import org.opentravel.schemacompiler.model.TLActionResponse;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
+import org.opentravel.schemacompiler.model.TLMimeType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -112,7 +113,18 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
             OtmActionResponse rs = new OtmActionResponse( new TLActionResponse(), this );
             List<Integer> codes = new ArrayList<>();
             codes.add( 200 );
+            List<TLMimeType> mimeTypes = new ArrayList<>();
+            mimeTypes.add( TLMimeType.APPLICATION_JSON );
+            mimeTypes.add( TLMimeType.TEXT_JSON );
 
+            OtmActionFacet rqAF = null;
+            OtmActionFacet rsAF = null;
+            for (OtmActionFacet af : getOwningMember().getActionFacets()) {
+                if (af.getName().endsWith( "Request" ))
+                    rqAF = af;
+                else if (af.getName().endsWith( "Response" ))
+                    rsAF = af;
+            }
             if (getOwningMember().getSubject() != null)
                 baseName = getOwningMember().getSubject().getName();
 
@@ -122,10 +134,26 @@ public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmReso
                     rq.setMethod( TLHttpMethod.GET );
                     rq.setParamGroup( getOwningMember().getIdGroup() );
                     rq.setPathTemplate( rq.getPathTemplateDefault(), false );
+
+                    codes.clear();
+                    codes.add( 200 );
                     rs.setRestStatusCodes( codes );
+                    rs.setPayloadActionFacet( rsAF );
+                    rs.setMimeTypes( mimeTypes );
                     break;
+
                 case POST:
                     setName( baseName + "Post" );
+                    rq.setMethod( TLHttpMethod.POST );
+                    rq.setParamGroup( getOwningMember().getIdGroup() );
+                    rq.setPathTemplate( rq.getPathTemplateDefault(), false );
+                    rq.setPayloadType( rqAF );
+                    rq.setMimeTypes( mimeTypes );
+
+                    rs.setPayloadActionFacetString( "NONE" );
+                    codes.clear();
+                    codes.add( 201 );
+                    rs.setRestStatusCodes( codes );
                     break;
             }
         }
