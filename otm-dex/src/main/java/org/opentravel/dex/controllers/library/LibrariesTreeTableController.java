@@ -324,7 +324,14 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         post( postedData );
     }
 
-    public void setOnMouseClicked(EventHandler<? super MouseEvent> handler) {
+    /**
+     * Use the library tree table only to make selections, no editing. Set the mouse click handler AND make tree table
+     * not editable to allow double click.
+     * 
+     * @param handler set the handler and if null, disable editing
+     */
+    public void selectionMode(EventHandler<? super MouseEvent> handler) {
         librariesTreeTable.setOnMouseClicked( handler );
+        librariesTreeTable.setEditable( handler != null );
     }
 }

@@ -35,7 +35,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
- * Controller for type selection dialog pop-up menu.
+ * Controller for member details as a pop-up dialog menu.
  * 
  * @author dmh
  *

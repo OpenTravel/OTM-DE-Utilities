@@ -123,8 +123,9 @@ public class SelectLibraryDialogController extends DexPopupControllerBase {
 
     public void mouseClick(MouseEvent event) {
         // this fires after the member selection listener
-        log.debug( "Double click selection" );
+        log.debug( "Mouse Event: " + event.getClickCount() );
         if (event.getButton().equals( MouseButton.PRIMARY ) && event.getClickCount() == 2) {
+            log.debug( "Double click selection." );
             doOK();
         }
     }
@@ -139,7 +140,7 @@ public class SelectLibraryDialogController extends DexPopupControllerBase {
         super.setStage( dialogTitle, dialogStage );
         // checkNodes();
         librariesTreeTableController.configure( modelMgr, true );
-        librariesTreeTableController.setOnMouseClicked( this::mouseClick );
+        librariesTreeTableController.selectionMode( this::mouseClick );
 
         dialogButtonCancel.setOnAction( e -> doCancel() );
         dialogButtonOK.setOnAction( e -> doOK() );

@@ -257,6 +257,7 @@ public class MemberDetailsController extends DexIncludedControllerBase<Void> {
         libraryName.setText( member.libraryProperty().get() );
         changeLibraryButton.setDisable( !member.getActionManager().isEnabled( DexActions.SETLIBRARY, member ) );
         changeLibraryButton.setOnAction( e -> {
+            commitChanges();
             member.getActionManager().run( DexActions.SETLIBRARY, member );
             member.libraryProperty().set( member.getLibraryName() );
             libraryName.setText( member.getLibraryName() );
