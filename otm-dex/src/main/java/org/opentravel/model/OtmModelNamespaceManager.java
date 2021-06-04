@@ -14,30 +14,37 @@
  * limitations under the License.
  */
 
-package org.opentravel.common;
+package org.opentravel.model;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
- * Create API for namespace related services.
  * <p>
- * The model manager is the backing store for all namespaces.
+ * junit: {@link TestOtmModelNamespaceManager}
  * 
  * @author dmh
  *
  */
-public class DexNamespaceHandler {
-    private static Log log = LogFactory.getLog( DexNamespaceHandler.class );
+public class OtmModelNamespaceManager {
+    private static Log log = LogFactory.getLog( OtmModelNamespaceManager.class );
 
+    // private Map<OtmLibrary,String> baseNSMap = new HashMap<>();
+    private List<String> baseNSList = new ArrayList<>();
     OtmModelManager modelMgr = null;
 
-    public DexNamespaceHandler(OtmModelManager modelManager) {
+    public static final String XSD_LIBRARY_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
+
+    public static final String OTA_LIBRARY_NAMESPACE = "http://www.opentravel.org/OTM/Common/v0";
+
+    public OtmModelNamespaceManager(OtmModelManager modelManager) {
         this.modelMgr = modelManager;
 
         if (modelMgr == null)
@@ -45,10 +52,26 @@ public class DexNamespaceHandler {
     }
 
     /**
-     * @return New HashSet of strings for both managed and unmanaged base namespaces from model manager.
+     * Add the base namespace for this library if not already added.
+     * 
+     * @param lib
      */
-    public Set<String> getBaseNamespaces() {
-        return modelMgr.getBaseNamespaces();
+    protected void add(OtmLibrary lib) {
+        if (!baseNSList.contains( lib.getBaseNS() )) {
+            baseNSList.add( lib.getBaseNS() );
+            // log.debug( "Added " + lib.getBaseNS() + " to list." );
+        }
+    }
+
+    protected void clear() {
+        baseNSList.clear();
+    }
+
+    /**
+     * @return unmodifiable List of strings for both managed and unmanaged base namespaces from model manager.
+     */
+    public List<String> getBaseNamespaces() {
+        return Collections.unmodifiableList( baseNSList );
     }
 
     /**
@@ -102,6 +125,34 @@ public class DexNamespaceHandler {
 
         // log.debug( "NS check: " + ns );
         return ns;
+    }
+
+    /**
+     * Remove the base namespace IFF there are no other libraries with that baseNS
+     * 
+     * @param lib
+     */
+    public void remove(OtmLibrary lib) {
+        String baseNS = lib.getBaseNS();
+        for (OtmLibrary l : modelMgr.getUserLibraries())
+            if (l != lib && l.getBaseNS().equals( baseNS ))
+                return; // match found, no change made
+        baseNSList.remove( baseNS );
+    }
+
+    /**
+     * @param baseNS
+     * @return new list
+     */
+    // TODO - should the version scheme be used to tring ns?
+    // See the tests.
+    // I hope not. This should be handled by tlLib.getBasenamespace()
+    public List<OtmLibrary> getBaseNsLibraries(String baseNS) {
+        List<OtmLibrary> list = new ArrayList<>();
+        for (OtmLibrary lib : modelMgr.getLibraries())
+            if (lib.getBaseNS().equals( baseNS ))
+                list.add( lib );
+        return list;
     }
 
 }

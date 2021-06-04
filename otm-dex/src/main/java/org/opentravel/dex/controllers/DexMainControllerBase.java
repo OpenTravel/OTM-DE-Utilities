@@ -287,6 +287,7 @@ public abstract class DexMainControllerBase extends AbstractMainWindowController
         imageMgr = new ImageManager( primaryStage );
 
         checkNodes();
+        log.debug( "Primary stage set." );
     }
 
     /**

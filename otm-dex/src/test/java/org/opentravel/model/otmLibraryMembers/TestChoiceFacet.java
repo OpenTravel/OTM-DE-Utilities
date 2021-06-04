@@ -51,13 +51,16 @@ public class TestChoiceFacet extends TestContextualFacet {
         staticLib = TestLibrary.buildOtm( staticModelManager );
 
         // Needed for library member tests
-        subject = buildOtm( staticModelManager );
-        baseObject = buildOtm( staticModelManager );
+        subject = buildOtm( staticLib );
+        baseObject = buildOtm( staticLib );
     }
 
     @Before
     public void beforeTest() {
         member = TestChoice.buildOtm( staticModelManager );
+        staticLib = TestLibrary.buildOtm( staticModelManager );
+        subject = buildOtm( staticLib );
+        baseObject = buildOtm( staticLib );
         cf = buildOtm( staticModelManager, "AnotherCF" );
         contrib = (OtmContributedFacet) member.add( cf );
         testContributedFacet( contrib, cf, member );
@@ -281,6 +284,32 @@ public class TestChoiceFacet extends TestContextualFacet {
      * @param mgr
      * @return
      */
+    public static OtmChoiceFacet buildOtm(OtmLibrary lib) {
+        assertTrue( "Builder - parameter must have library.", lib != null );
+        assertTrue( "Builder - parameter must have model manager.", lib.getModelManager() != null );
+        assertTrue( "Builder - libary must be in model.", lib.getModelManager().contains( lib.getTL() ) );
+
+        // Create a unique name
+        String name = "TestCF";
+        name = OtmLibraryMemberFactory.getUniqueName( lib, name );
+
+        OtmChoiceFacet choice = new OtmChoiceFacet( buildTL( lib.getTL(), name ), lib.getModelManager() );
+        // Already added to library
+        lib.getModelManager().add( choice );
+
+        assertTrue( "Builder: ", lib.getMembers().contains( choice ) );
+        assertNotNull( choice );
+        return choice;
+    }
+
+    /**
+     * Build a choice facet and add to manager.
+     * <p>
+     * It is not in a library. It will not have where contributed or children!
+     * 
+     * @param mgr
+     * @return
+     */
     public static OtmChoiceFacet buildOtm(OtmModelManager mgr) {
         assertTrue( "Builder - parameter must have model manager.", mgr != null );
         OtmChoiceFacet choice = new OtmChoiceFacet( buildTL(), mgr );
@@ -295,10 +324,25 @@ public class TestChoiceFacet extends TestContextualFacet {
         return buildTL( null, null, CF_NAME );
     }
 
+    /**
+     * Build TL facet and add to abstract library.
+     * 
+     * @param abstractLibrary
+     * @param name
+     * @return
+     */
     public static TLContextualFacet buildTL(AbstractLibrary abstractLibrary, String name) {
         return buildTL( abstractLibrary, null, name );
     }
 
+    /**
+     * Build TL facet and add to abstract library.
+     * 
+     * @param abstractLibrary
+     * @param tlCO
+     * @param name
+     * @return
+     */
     public static TLContextualFacet buildTL(AbstractLibrary abstractLibrary, TLChoiceObject tlCO, String name) {
         TLContextualFacet tlcf = new TLContextualFacet();
         tlcf.setName( name );

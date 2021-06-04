@@ -52,9 +52,11 @@ public class TestUpdateToLatestVerionIsEnabled extends TestActionsIsEnabledBase 
         // tests with two properties - should be false unless providers has minor version
         // Used in Where Used Tab - TypeProviderCellFactory
         // FIXME - should not be enabled. Need to test in a versioned junit.
-        OtmTypeProvider provider =
-            TestBusiness.buildOtm( lib, "VU_BO" + member.getObjectTypeName() + member.getName() );
-        assertTrue( !provider.getOwningMember().isLatestVersion() );
+        String typeName = member.getObjectTypeName().replaceAll( "\\s+", "" );
+        OtmTypeProvider provider = TestBusiness.buildOtm( lib, "VU_BO" + typeName + member.getName() );
+
+        assertTrue( "Then: must not be enabled for non-versioned member.",
+            !provider.getOwningMember().isLatestVersion() );
         log.debug( "Testing " + member.getObjectTypeName() + " with provider " + provider );
         assertTrue( "Test: ", actionManager.isEnabled( actionEnum, member, provider ) );
     }

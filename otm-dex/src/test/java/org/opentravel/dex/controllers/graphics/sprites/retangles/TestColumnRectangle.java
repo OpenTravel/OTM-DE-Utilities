@@ -22,32 +22,23 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentravel.application.common.AbstractOTMApplication;
-import org.opentravel.dex.action.manager.DexFullActionManager;
+import org.opentravel.AbstractDexTest;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SpriteManager;
 import org.opentravel.dex.controllers.graphics.sprites.TestSpriteManager;
 import org.opentravel.dex.controllers.graphics.sprites.rectangles.ColumnRectangle;
-import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.objecteditor.ObjectEditorApp;
-import org.opentravel.schemacompiler.model.TLLibrary;
-import org.opentravel.utilities.testutil.AbstractFxTest;
-import org.opentravel.utilities.testutil.TestFxMode;
 
 import javafx.geometry.Point2D;
 
 /**
  * Verifies the functions of the <code>SelectProjectDialog</code>
  */
-public class TestColumnRectangle extends AbstractFxTest {
+public class TestColumnRectangle extends AbstractDexTest {
     private static Log log = LogFactory.getLog( TestOtmModelManager.class );
-
-    public static final boolean RUN_HEADLESS = true;
-    final int WATCH_TIME = 5000; // How long to sleep so we can see what is happening. Can be 0.
 
     final String FXID_PROJECTLIST = "#projectList";
     final String FXID_LIBTREETABLE = "#librariesTreeTable";
@@ -56,17 +47,16 @@ public class TestColumnRectangle extends AbstractFxTest {
 
     @BeforeClass
     public static void setupTests() throws Exception {
-        setupWorkInProcessArea( TestColumnRectangle.class );
-        repoManager = repositoryManager.get();
-        // Prevent java.nio.BufferOverflowException
-        System.setProperty( "headless.geometry", "2600x2200-32" );
+        beforeClassSetup( TestColumnRectangle.class );
     }
 
     @Test
     public void testGetNextInColumn() {
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        // DexFullActionManager fullMgr = new DexFullActionManager( null );
+        // OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
+        // OtmLibrary lib = mgr.addOLD( new TLLibrary() );
+        OtmLibrary lib = TestLibrary.buildOtm();
+
         TestLibrary.addOneOfEach( lib );
         spriteMgr = TestSpriteManager.buildSpriteManager();
 
@@ -100,30 +90,5 @@ public class TestColumnRectangle extends AbstractFxTest {
         // if (sprite != null) {
         // assertTrue( sprite.getX() >= columnX );
         // }
-    }
-
-
-
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
-     */
-    @Override
-    protected Class<? extends AbstractOTMApplication> getApplicationClass() {
-        return ObjectEditorApp.class;
-    }
-
-    /**
-     * Configure headless/normal mode for TestFX execution.
-     */
-    static {
-        TestFxMode.setHeadless( RUN_HEADLESS );
-    }
-
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
-     */
-    @Override
-    protected String getBackgroundTaskNodeQuery() {
-        return "#libraryText";
     }
 }

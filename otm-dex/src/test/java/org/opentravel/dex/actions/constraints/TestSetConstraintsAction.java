@@ -28,9 +28,9 @@ import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
 import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
-import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLSimple;
 
 import java.io.IOException;
@@ -55,8 +55,9 @@ public class TestSetConstraintsAction {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
-        lib = staticModelManager.add( new TLLibrary() );
+        lib = TestLibrary.buildOtm();
+        staticModelManager = lib.getModelManager();
+        assertTrue( lib.getTL().getOwningModel() == staticModelManager.getTlModel() );
         lib.getTL().setOwningModel( staticModelManager.getTlModel() );
         lib.getTL().setNamespace( "http://example.com/testNs" );
 
@@ -65,7 +66,7 @@ public class TestSetConstraintsAction {
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
         assertTrue( lib.getTL().getOwningModel() != null );
-        assertTrue( lib.getBaseNamespace() != null );
+        assertTrue( lib.getBaseNS() != null );
 
         // globalBO = (OtmBusinessObject) lib.add( TestBusiness.buildOtm( staticModelManager, "GlobalBO" ) );
         //
@@ -336,10 +337,11 @@ public class TestSetConstraintsAction {
         assertTrue( !SetConstraintMinLengthAction.isEnabled( s1 ) );
         s1.setAssignedType( decimal );
         assertTrue( !SetConstraintMinLengthAction.isEnabled( s1 ) );
+        // should be enabled, but validation findings veto it
+        s1.setAssignedType( staticModelManager.getXsdMember( "id" ) );
+        assertTrue( !SetConstraintMinLengthAction.isEnabled( s1 ) );
         // Enabled
         s1.setAssignedType( string );
-        assertTrue( SetConstraintMinLengthAction.isEnabled( s1 ) );
-        s1.setAssignedType( staticModelManager.getXsdMember( "id" ) );
         assertTrue( SetConstraintMinLengthAction.isEnabled( s1 ) );
     }
 
@@ -357,11 +359,14 @@ public class TestSetConstraintsAction {
         s1.setAssignedType( integer );
         assertTrue( !SetConstraintMaxLengthAction.isEnabled( s1 ) );
 
+        // Should be enabled, but validation creates veto findings.
+        s1.setAssignedType( staticModelManager.getXsdMember( "id" ) );
+        assertTrue( !SetConstraintMaxLengthAction.isEnabled( s1 ) );
+
         // Enabled
         s1 = buildSimple( string );
         assertTrue( SetConstraintMaxLengthAction.isEnabled( s1 ) );
-        s1.setAssignedType( staticModelManager.getXsdMember( "id" ) );
-        assertTrue( SetConstraintMaxLengthAction.isEnabled( s1 ) );
+
     }
 
     @Test

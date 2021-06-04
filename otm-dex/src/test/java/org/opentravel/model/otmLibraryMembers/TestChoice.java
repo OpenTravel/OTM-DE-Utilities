@@ -21,10 +21,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
@@ -55,6 +57,17 @@ public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
         subject.setName( "SubjectCH" );
         baseObject = buildOtm( staticModelManager );
         baseObject.setName( "BaseCH" );
+    }
+
+    @Before
+    public void beforeMethods() {
+        staticModelManager.clear();
+
+        OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
+        subject = buildOtm( lib, "SubjectCH" );
+        // subject.setName( "SubjectCH" );
+        baseObject = buildOtm( lib, "BaseCH" );
+        // baseObject.setName( "BaseCH" );
     }
 
     @Override
@@ -182,6 +195,9 @@ public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
         assertNotNull( ch );
         ch.getTL().getSharedFacet().addAttribute( new TLAttribute() );
         ch.getTL().getSharedFacet().addElement( new TLProperty() );
+
+        for (OtmTypeUser tu : ch.getDescendantsTypeUsers())
+            tu.setAssignedType( mgr.getStringType() );
 
         assertTrue( !ch.getChildren().isEmpty() );
         assertTrue( ch.getShared().getChildren().size() == 2 );

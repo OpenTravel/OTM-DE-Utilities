@@ -25,7 +25,8 @@ import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
-import org.opentravel.model.otmContainers.OtmProject;
+import org.opentravel.schemacompiler.repository.ProjectItem;
+import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 
@@ -40,7 +41,7 @@ public class LockLibraryTask extends DexTaskBase<OtmLibrary> {
 
     // private DexStatusController statusController;
     private DexIncludedController<?> eventController;
-    private OtmProject proj = null;
+    // private OtmProject proj = null;
     private OtmLibrary library = null;
     // private OtmModelManager modelManager;
 
@@ -64,12 +65,12 @@ public class LockLibraryTask extends DexTaskBase<OtmLibrary> {
         this.eventController = eventController;
         // this.modelManager = modelManager;
 
-        // Try to find the actual modeled library. A modeled library will be created by opening a project.
-        // library = modelManager.get(taskData.getNamespace() + "/" + taskData.getLibraryName());
-        // See if there is an open project to manage this item and use it
-        // if (library != null) {
-        proj = modelManager.getManagingProject( library );
-        // }
+        // // Try to find the actual modeled library. A modeled library will be created by opening a project.
+        // // library = modelManager.get(taskData.getNamespace() + "/" + taskData.getLibraryName());
+        // // See if there is an open project to manage this item and use it
+        // // if (library != null) {
+        // proj = modelManager.getManagingProject( library );
+        // // }
 
         // Replace start message from super-type.
         msgBuilder = new StringBuilder( "Locking: " );
@@ -79,9 +80,16 @@ public class LockLibraryTask extends DexTaskBase<OtmLibrary> {
 
     @Override
     public void doIT() throws RepositoryException {
-        if (proj != null) {
-            proj.getTL().getProjectManager().lock( proj.getProjectItem( library.getTL() ) );
-            library.refresh();
+        if (library != null) {
+            ProjectManager tlPM = library.getTLProjectManager();
+            if (tlPM != null) {
+                ProjectItem item = tlPM.getProjectItem( library.getTL() );
+                if (item != null) {
+                    // proj.getTL().getProjectManager().lock( proj.getProjectItem( library.getTL() ) );
+                    tlPM.lock( item );
+                    library.refresh();
+                }
+            }
         }
     }
 

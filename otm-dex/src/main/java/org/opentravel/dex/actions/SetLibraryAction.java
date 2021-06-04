@@ -23,11 +23,15 @@ import org.opentravel.dex.controllers.popup.SelectLibraryDialogController;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
+import org.opentravel.schemacompiler.model.LibraryMember;
+import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.util.List;
 
 /**
  * Set the library of the library member.
+ * <p>
+ * Junit: {@linkplain TestSetLibraryAction}
  */
 public class SetLibraryAction extends DexRunAction {
     private static Log log = LogFactory.getLog( SetLibraryAction.class );
@@ -40,7 +44,7 @@ public class SetLibraryAction extends DexRunAction {
      * @return
      */
     public static boolean isEnabled(OtmObject subject) {
-        if (subject == null)
+        if (subject == null || subject.getModelManager() == null)
             return false;
         return subject.getModelManager().hasEditableLibraries( subject.getLibrary() );
     }
@@ -108,23 +112,19 @@ public class SetLibraryAction extends DexRunAction {
             if (lib.getTL() == null)
                 return null;
             OtmLibraryMember member = (OtmLibraryMember) otm;
-            if (member.getTlLM() == null)
+            if (!(member.getTlLM() instanceof LibraryMember))
                 return null;
 
             // Save the old library for Undo
             oldLibrary = member.getLibrary();
 
-            // Remove from old library
-            if (oldLibrary != null && oldLibrary.getTL() != null)
-                oldLibrary.getTL().removeNamedMember( member.getTlLM() );
-
-            // Set TL member to new library
-            // If you add and remove from library instead of setting member,
-            // TL model will not update all the dependent type assignments.
-            lib.getTL().addNamedMember( member.getTlLM() );
-            member.getTlLM().setOwningLibrary( lib.getTL() );
-            member.refresh();
-
+            // 6/2/2021 dmh - changed to use TLModel's method. See TestSetLibraryAction.
+            try {
+                member.getModelManager().getTlModel().moveToLibrary( member.getTlLM(), (TLLibrary) lib.getTL() );
+            } catch (Exception e) {
+                log.warn( "Exception moving member to new library: " + e.getLocalizedMessage() );
+                return null;
+            }
             // // Debugging
             // if (member.getLibrary() != lib)
             // log.error( "Missing library." );

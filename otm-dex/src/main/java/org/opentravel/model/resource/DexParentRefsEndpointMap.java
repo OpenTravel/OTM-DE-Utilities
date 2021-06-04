@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
-import org.opentravel.schemacompiler.version.VersionSchemeException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -260,12 +259,12 @@ public class DexParentRefsEndpointMap {
     protected static String getVersionContribution(OtmResource resource) {
         String versionContribution = "";
         if (resource != null && resource.getLibrary() != null) {
-            try {
-                versionContribution = "v" + resource.getLibrary().getMajorVersion();
-                // "v" + resource.getLibrary().getMajorVersion() + "_" + resource.getLibrary().getMinorVersion();
-            } catch (VersionSchemeException e) {
-                versionContribution = "";
-            }
+            // try {
+            versionContribution = "v" + resource.getLibrary().getMajorVersion();
+            // "v" + resource.getLibrary().getMajorVersion() + "_" + resource.getLibrary().getMinorVersion();
+            // } catch (VersionSchemeException e) {
+            // versionContribution = "";
+            // }
         }
         return versionContribution;
     }

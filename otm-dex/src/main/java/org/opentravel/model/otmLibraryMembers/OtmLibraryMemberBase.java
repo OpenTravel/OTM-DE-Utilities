@@ -28,12 +28,15 @@ import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.OtmLocalLibrary;
 import org.opentravel.model.otmContainers.OtmVersionChain;
+import org.opentravel.model.otmContainers.OtmVersionChainBase;
 import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmFacets.OtmFacetFactory;
 import org.opentravel.schemacompiler.codegen.util.FacetCodegenUtils;
+import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.LibraryElement;
 import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.NamedEntity;
@@ -86,6 +89,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     protected List<OtmTypeUser> memberTypeUsers = new ArrayList<>();
 
     // A list of all the types used by this member or its descendants
+    // Computed in getUsedTypes(). Not managed by add/remove.
     protected List<OtmTypeProvider> typesUsed = null;
 
     // A list of all members that have a descendant type user that assigned to this member and its descendants.
@@ -94,6 +98,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     protected boolean editableMinor = false;
 
     private DexActionManager noLibraryActionManager;
+
 
     /**
      * Construct library member. Set its model manager, TL object and add a listener.
@@ -150,13 +155,20 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public void changeWhereUsed(OtmLibraryMember oldUser, OtmLibraryMember newUser) {
-        // TODO - why not just recompute? getWhereUsed(force)?
-        if (whereUsed == null)
-            whereUsed = new ArrayList<>();
-        if (oldUser != null)
-            whereUsed.remove( oldUser );
-        if (newUser != null && !whereUsed.contains( newUser ))
-            whereUsed.add( newUser );
+        // 6/2/2021 - just recompute? Forces getWhereUsed() to recompute.
+        // This solves the multiple users problem noted below.
+        // Leave this in unless performance issues arise.
+        // See junit TestTypeAssignmentAndWhereUsed
+        whereUsed = null;
+        // log.debug( "Cleared " + this + " whereUsed list." );
+        // if (whereUsed == null)
+        // whereUsed = new ArrayList<>();
+        // // TODO - what if there are multiple users in the same owner?
+        // if (oldUser != null)
+        // whereUsed.remove( oldUser );
+        // if (newUser != null && !whereUsed.contains( newUser ))
+        // whereUsed.add( newUser );
+        // log.debug( "Removed " + oldUser + " and added " + newUser + " from " + this );
     }
 
     /**
@@ -203,7 +215,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         Versioned v = null;
         Exception exception = null;
         String errMsg = null;
-        if (!OtmVersionChain.isLaterVersion( getLibrary(), minorLibrary ))
+        if (!OtmVersionChainBase.isLaterVersion( getLibrary(), minorLibrary ))
             errMsg = minorLibrary + " is not later version of this library.";
         if (getLibrary() == minorLibrary)
             errMsg = "Same library.";
@@ -416,9 +428,19 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     public OtmLibrary getLibrary() {
         if (mgr == null)
             return null;
+
+        // Debugging
+        LibraryMember tllm = getTlLM();
+        AbstractLibrary tllmOwingLib = getTlLM().getOwningLibrary();
+        // During construction, the mgr does not have this object or it's TL
+        // OtmLibrary owningLib = mgr.get( getTlLM().getOwningLibrary() );
+        // OtmLibrary owningLib2 = mgr.get( tllmOwingLib );
+
         // Deleted members will have the tl library removed
         return getTlLM() != null && getTlLM().getOwningLibrary() != null ? mgr.get( getTlLM().getOwningLibrary() )
             : null;
+        // return getTlLM() != null && getTlLM().getOwningLibrary() != null ? mgr.get( getTlLM().getOwningLibrary() )
+        // : null;
     }
 
     @Override
@@ -463,6 +485,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
     @Override
     public Map<OtmTypeUser,OtmTypeProvider> getPropertiesWhereUsed() {
         Map<OtmTypeUser,OtmTypeProvider> users = new HashMap<>();
+
         List<OtmTypeProvider> thisProviders = getDescendantsTypeProviders();
         // List<OtmTypeUser> users = new ArrayList<>();
         for (OtmLibraryMember owner : getWhereUsed())
@@ -470,6 +493,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
                 if (user.getAssignedType() == this || thisProviders.contains( user.getAssignedType() ))
                     users.put( user, user.getAssignedType() );
         return users;
+
+        // TODO - what if the owner is a type user?
     }
 
     @Override
@@ -499,8 +524,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         if (this instanceof OtmTypeUser)
             addProvider( (OtmTypeUser) this, typesUsed );
 
-        // Types used by all descendant type users
-        // Prevent concurrent modification
+        // Types used by all descendant type users. Prevent concurrent modification.
         Collection<OtmTypeUser> descendants =
             Collections.synchronizedList( new ArrayList<>( getDescendantsTypeUsers() ) );
         synchronized (descendants) {
@@ -536,7 +560,7 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         }
         if (force) {
             whereUsed.clear();
-            whereUsed.addAll( mgr.findUsersOf( this ) );
+            whereUsed.addAll( mgr.findUsersOf( this ) ); // Relies on list from getUsedTypes()
             whereUsed.addAll( mgr.findSubtypesOf( this ) ); // base types
             // FIXME - get resources when they expose this library member
             // FIXME - aliases???
@@ -560,7 +584,18 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
 
     @Override
     public boolean isEditableMinor() {
+        setEditableMinor();
         return editableMinor;
+    }
+
+    @Override
+    public boolean isLatest() {
+        if (getLibrary() instanceof OtmLocalLibrary)
+            return true;
+        if (getLibrary().getVersionChain().isLatestChain())
+            return getLibrary().getVersionChain().isLatestVersion( this );
+        else
+            return false;
     }
 
     @Override
@@ -576,19 +611,19 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
         if (getLibrary() == null)
             return false; // Can't be valid if not in a library.
         if (force) {
-            // // prevent concurrent access - https://www.geeksforgeeks.org/synchronization-arraylist-java/
-            // List<OtmObject> kids = Collections.synchronizedList( new ArrayList<>( getChildren() ) );
-            // synchronized (kids) {
-            // kids.forEach( c -> {
-            // if (c != this)
-            // c.isValid( force );
-            // } );
-            synchronized (this) {
-                List<OtmObject> kids = getChildren();
+            // prevent concurrent access - https://www.geeksforgeeks.org/synchronization-arraylist-java/
+            List<OtmObject> kids = Collections.synchronizedList( new ArrayList<>( getChildren() ) );
+            synchronized (kids) {
                 kids.forEach( c -> {
                     if (c != this)
                         c.isValid( force );
                 } );
+                // synchronized (this) {
+                // List<OtmObject> kids = getChildren();
+                // kids.forEach( c -> {
+                // if (c != this)
+                // c.isValid( force );
+                // } );
             }
         }
         return super.isValid( force );
@@ -768,7 +803,8 @@ public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends Otm
             editableMinor = true;
         else {
             OtmVersionChain chain = getLibrary().getVersionChain();
-            editableMinor = chain.isChainEditable() && chain.isLatestChain() && chain.isLatestVersion( this );
+            if (chain != null)
+                editableMinor = chain.isChainEditable() && chain.isLatestChain() && chain.isLatestVersion( this );
         }
     }
 

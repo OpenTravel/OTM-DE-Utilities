@@ -50,8 +50,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Worker.State;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -68,6 +70,10 @@ import javafx.stage.Stage;
 
 /**
  * Manage the menu bar.
+ * <p>
+ * Design Note: This was originally designed to be used by other applications and controllers. This is why some of the
+ * event handlers must be set before they work (see doSaveAll*). In the future, the behaviors should either be directly
+ * implemented (see goBack) or the behavior should be made into classes that inject or register themselves.
  * 
  * @author dmh
  *
@@ -75,10 +81,16 @@ import javafx.stage.Stage;
 public class MenuBarWithProjectController extends DexIncludedControllerBase<String> implements TaskResultHandlerI {
     private static Log log = LogFactory.getLog( MenuBarWithProjectController.class );
 
-    //
-    // FIXME - need to add ability to unset user settings
-    // FIXME - need to fix the size of the region used for undo
-    //
+    // FUTURE - need to add ability to unset user settings
+
+    private static final String NOT_IMPLEMENTED = "Not Implemented";
+
+    // All event types listened to by this controller's handlers
+    private static final EventType[] subscribedEvents =
+        {DexRepositorySelectionEvent.REPOSITORY_SELECTED, DexMemberSelectionEvent.MEMBER_SELECTED};
+    private static final EventType[] publishedEvents =
+        {DexMemberDeleteEvent.MEMBER_DELETED, OtmObjectReplacedEvent.OBJECT_REPLACED, DexModelChangeEvent.MODEL_CHANGED,
+            DexMemberSelectionEvent.MEMBER_SELECTED};
 
     // FXML injected objects
     @FXML
@@ -121,71 +133,13 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     private Repository selectedRepository = null;
     private DexEventDispatcher eventDispatcher;
     private boolean ignoreEvents = false;
+    private Map<String,File> projectMap;
 
-    // All event types listened to by this controller's handlers
-    private static final EventType[] subscribedEvents =
-        {DexRepositorySelectionEvent.REPOSITORY_SELECTED, DexMemberSelectionEvent.MEMBER_SELECTED};
-    private static final EventType[] publishedEvents =
-        {DexMemberDeleteEvent.MEMBER_DELETED, OtmObjectReplacedEvent.OBJECT_REPLACED, DexModelChangeEvent.MODEL_CHANGED,
-            DexMemberSelectionEvent.MEMBER_SELECTED};
+    @FXML
+    private MenuItem launchWebRepoWindow;
 
     public MenuBarWithProjectController() {
         super( subscribedEvents, publishedEvents );
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Override to get all the event types published by actions since this eventPublisherNode will be used by main
-     * controller for action initiated events.
-     */
-    @Override
-    public List<EventType<? extends AbstractOtmEvent>> getPublishedEventTypes() {
-        // publishedEventTypes = Collections.unmodifiableList( Arrays.asList( publishedEvents ) );
-        publishedEventTypes = new ArrayList<>();
-        publishedEventTypes.add( DexModelChangeEvent.MODEL_CHANGED );
-        publishedEventTypes.add( DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED );
-        publishedEventTypes.add( DexMemberSelectionEvent.TYPE_USER_SELECTED );
-        publishedEventTypes.add( DexRepositorySelectionEvent.REPOSITORY_SELECTED );
-
-        for (EventType<? extends DexEvent> et : publishedEvents) {
-            publishedEventTypes.add( et );
-        }
-        // TODO - some actions create events (assignTypeAction) that are not in the actions enumeration.
-        // For now, they are added to publishedEvents array. Find a better way to register them.
-        for (DexActions action : DexActions.values()) {
-            DexChangeEvent event = null;
-            try {
-                event = DexActions.getEvent( action );
-                if (event != null && !publishedEventTypes.contains( event.getEventType() ))
-                    publishedEventTypes.add( event.getEventType() );
-            } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException e) {
-            }
-        }
-        return publishedEventTypes;
-    }
-
-    @FXML
-    public void goBack() {
-        eventDispatcher.goBack( this );
-        updateNavigationButtons();
-    }
-
-    @FXML
-    public void goForward() {
-        eventDispatcher.goForward( this );
-        updateNavigationButtons();
-    }
-
-    public void updateNavigationButtons() {
-        doNewLibraryItem.setDisable( modelMgr.getProjects().isEmpty() );
-        if (eventDispatcher != null) {
-            navBackButton.setDisable( !eventDispatcher.canGoBack() );
-            navForwardButton.setDisable( !eventDispatcher.canGoForward() );
-        } else {
-            navBackButton.setDisable( true );
-            navForwardButton.setDisable( true );
-        }
     }
 
     @FXML
@@ -193,12 +147,13 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         AboutDialogController.createAboutDialog( stage ).showAndWait();
     }
 
-    @Override
-    public void handleEvent(AbstractOtmEvent event) {
-        updateNavigationButtons();
-        // log.debug( event.getEventType() + " event received." );
-        if (event instanceof DexRepositorySelectionEvent)
-            selectedRepository = ((DexRepositorySelectionEvent) event).getRepository();
+    public void addViewItem(DexTabController tc) {
+        if (tc.getDialogTitle() != null) {
+            // log.debug( "Add controller" );
+            MenuItem item = new MenuItem( tc.getDialogTitle() );
+            item.setOnAction( tc::launchWindow );
+            viewsMenu.getItems().add( item );
+        }
     }
 
     /**
@@ -206,14 +161,15 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
      */
     @FXML
     public void appExit(Event e) {
-        // Use save and exit controller with will prompt user to save if it finds there are changes in the queue
-        SaveAndExitDialogController controller = SaveAndExitDialogController.init();
-        controller.setModelManager( modelMgr );
-        controller.showAndWait( "" );
-        e.consume(); // take the event away from windows in case they answer no.
-
-        if (controller.okResult())
-            stage.close();
+        if (Platform.isFxApplicationThread()) {
+            // Use save and exit controller with will prompt user to save if it finds there are changes in the queue
+            SaveAndExitDialogController controller = SaveAndExitDialogController.init();
+            controller.setModelManager( modelMgr );
+            controller.showAndWait( "" );
+            e.consume(); // take the event away from windows in case they answer no.
+            if (controller.okResult())
+                stage.close();
+        }
     }
 
     @Override
@@ -237,181 +193,34 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         stage.setEventDispatcher( eventDispatcher );
 
         // Set up to handle opening and closing files
-        setFileOpenHandler( this::handleOpenMenu );
-        setdoCloseHandler( this::handleCloseMenu );
-        setdoSaveAllHandler( this::handleSaveAllMenu );
-        setUndoAction( e -> undoAction() );
+        fileOpenSetHandler( this::fileOpenHandler );
+        doSaveAllSetHandler( this::doSaveAllHandler );
+        undoActionSetHandler( e -> undoAction() );
+        // Close from menu or windows
+        doCloseSetHandler( this::doCloseHandler );
+
+        // If enabled, junit tests will fail to exit (timeout)
+        if (!isJUnitTest())
+            stage.setOnCloseRequest( this::appExit );
 
         updateNavigationButtons();
         setDisplaySizeMenu();
-
-        // Accelerator set up by scene builder
-        // stage.getScene().getAccelerators().put( new KeyCodeCombination( KeyCode.S, KeyCombination.CONTROL_DOWN ),
-        // new Runnable() {
-        // @FXML
-        // public void run() {
-        // doSaveAllItem.fire();
-        // log.debug( "Control S pressed." );
-        // // button.fire();
-        // }
-        // } );
-
     }
 
-    private DialogBoxContoller getDialogBox(UserSettings settings) {
-        // if (getMainController() instanceof DexMainControllerBase)
-        // dialogBox = ((DexMainControllerBase) getMainController()).getDialogBoxController();
-        // else {
-        dialogBox = DialogBoxContoller.init();
-        dialogBox.setUserSettings( settings );
-        // }
-        return dialogBox;
-    }
-
-
-    @FXML
-    public void undoAction(ActionEvent e) {
-        // log.debug( "Close menu item selected." );
-        dialogBox.show( "Undo", "Not Implemented" );
-    }
-
-    @FXML
-    public void setDisplaySize(ActionEvent e) {
-        if (e.getSource() instanceof MenuItem) {
-            MenuItem item = (MenuItem) e.getSource();
-            getMainController().setStyleSheet( item.getText() );
-            setDisplaySizeMenu();
+    /**
+     * Is this being run by the OtmFxRobot? If so, it is a junit test that will fail to exit if windows event is sent to
+     * appExit().
+     */
+    // if (element.getClassName().startsWith( "org.junit." )) {
+    // https://stackoverflow.com/questions/2341943/how-can-i-find-out-if-code-is-running-inside-a-junit-test-or-not
+    private static boolean isJUnitTest() {
+        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+            // log.debug( "Checking: " + element.getClassName() );
+            if (element.getClassName().startsWith( "org.opentravel.utilities.testutil.OtmFxRobot" ))
+                return true;
         }
+        return false;
     }
-
-    private void setDisplaySizeMenu() {
-        // TODO - use labels to create menu entries
-        // disable currently selected size
-        String selector = getMainController().getStyleSheet();
-        displaySizeMenu.getItems().forEach( i -> i.setDisable( i.getText().equals( selector ) ) );
-    }
-
-    public void setUndoAction(EventHandler<ActionEvent> handler) {
-        undoActionButton.setOnAction( handler );
-    }
-
-    public void updateActionManagerDisplay(DexActionManager actionManger) {
-        if (actionManger != null) {
-            actionCount.setText( Integer.toString( actionManger.getQueueSize() ) );
-            undoActionButton.setDisable( actionManger.getQueueSize() <= 0 );
-            String last = "";
-            if (actionManger.getLastAction() != null)
-                last = (actionManger.getLastAction().toString());
-            if (last != null && last.length() > 40)
-                last = last.substring( 0, 40 ); // don't overflow the menu bar space
-            lastAction.setText( last );
-        }
-    }
-
-    // // DONE -- it should get its own size
-    // public void updateActionQueueSize(int size) {
-    // actionCount.setText( Integer.toString( size ) );
-    // undoActionButton.setDisable( size <= 0 );
-    // String last = "";
-    // if (modelMgr != null && modelMgr.getActionManager( true ) != null
-    // && modelMgr.getActionManager( true ).getLastAction() != null)
-    // last = modelMgr.getActionManager( true ).getLastAction().toString();
-    // if (last != null && last.length() > 40)
-    // last = last.substring( 0, 40 ); // don't overflow the menu bar space
-    // lastAction.setText( last );
-    // }
-
-    public void undoAction() {
-        modelMgr.getActionManager( true ).undo();
-        // mainController.refresh();
-    }
-
-    @FXML
-    public void doCompile(ActionEvent e) {
-        // DONE - if not saved, save now
-        CompileDialogController cdc = CompileDialogController.init();
-        cdc.configure( modelMgr, userSettings, mainController.getStatusController() );
-        cdc.show( "" );
-    }
-
-    @FXML
-    public void doClose(ActionEvent e) {
-        // This is only run if the handler is not set.
-        // log.debug( "Close menu item selected." );
-        getDialogBox( null ).show( "Close", "Not Implemented" );
-    }
-
-    @FXML
-    public void doSaveAll(ActionEvent e) {
-        // This is only run if the handler is not set.
-        getDialogBox( null ).show( "Save All", "Not Implemented" );
-    }
-
-    @FXML
-    void doNewLibrary(ActionEvent e) {
-        if (modelMgr.getProjects().isEmpty())
-            mainController.postError( null, "Must have project open before creating libraries." );
-        else {
-            NewLibraryDialogController nldc = NewLibraryDialogController.init();
-            nldc.configure( modelMgr, userSettings );
-            Results results = nldc.showAndWait( "" );
-            if (results == Results.OK) {
-                fireEvent( new DexModelChangeEvent( modelMgr ) );
-            }
-        }
-    }
-
-    @FXML
-    void doNewProject(ActionEvent e) {
-        NewProjectDialogController npdc = NewProjectDialogController.init();
-        npdc.configure( modelMgr, userSettings );
-        Results results = npdc.showAndWait( "" );
-        if (results == Results.OK) {
-            fireEvent( new DexModelChangeEvent( modelMgr ) );
-        }
-        ignoreEvents = true;
-        configureProjectCombo();
-        ignoreEvents = false;
-    }
-
-    @FXML
-    public void fileOpen(ActionEvent e) {
-        // This is only run if the handler is not set.
-        // log.debug( "File Open selected." );
-        getDialogBox( null ).show( "Open", "Not implemented" );
-    }
-
-    public void handleOpenMenu(ActionEvent event) {
-        // log.debug( "Handle file open action event." );
-        DexFileHandler fileHandler = new DexFileHandler();
-        if (event.getTarget() instanceof MenuItem) {
-            File selectedFile = fileHandler.fileChooser( stage, userSettings );
-            // Update Combo in menu bar
-            // TODO - what if the a project was opened? wrong configure param?
-            if (selectedFile != null)
-                configureProjectCombo( selectedFile.getParentFile() );
-            // Run the task
-            openFile( selectedFile );
-        }
-    }
-
-    public void openFile(File selectedFile) {
-        if (selectedFile != null) {
-            if (selectedFile.getName().endsWith( ".otm" )) {
-                if (!userSettings.getHideOpenProjectDialog())
-                    getDialogBox( userSettings ).show( "Opening Library", "Please wait." );
-                new OpenLibraryFileTask( selectedFile, modelMgr, this::handleTaskComplete,
-                    mainController.getStatusController() ).go();
-            } else {
-                if (!userSettings.getHideOpenProjectDialog())
-                    getDialogBox( userSettings ).show( "Opening Project", "Please wait." );
-                new OpenProjectFileTask( selectedFile, modelMgr, this::handleTaskComplete,
-                    mainController.getStatusController() ).go();
-            }
-        }
-    }
-
-    private Map<String,File> projectMap;
 
     public void configureProjectCombo() {
         projectMap = modelMgr.getOtmProjectManager().getRecentProjects();
@@ -422,9 +231,8 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
     }
 
     public void configureProjectCombo(File initialDirectory) {
-        DexFileHandler fileHandler = new DexFileHandler();
         if (initialDirectory != null) {
-            for (File file : fileHandler.getProjectList( initialDirectory )) {
+            for (File file : DexFileHandler.getProjectList( initialDirectory )) {
                 projectMap.put( file.getName(), file );
             }
             // configureProjectCombo();
@@ -433,57 +241,18 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         }
     }
 
-    // /**
-    // * Configure the combo box with a list and listener.
-    // * <p>
-    // * Usage: menuBarWithProjectController.configureProjectMenuButton(projectList,
-    // this::projectComboSelectionListener);
-    // *
-    // * @param projectList
-    // * @param listener
-    // */
-    // private void configureProjectComboBox(ObservableList<String> projectList, EventHandler<ActionEvent> listener) {
-    // // log.debug( "Setting combo." );
-    // projectList.sort( null );
-    // projectCombo.setItems( projectList );
-    // projectCombo.setOnAction( listener );
-    // }
-
-    // FUTURE
-    // public void addViewItems(List<DexIncludedController<?>> controllers) {
-    // for (DexIncludedController<?> c : controllers) {
-    // if (c instanceof DexTabController)
-    // addViewItem( (DexTabController) c );
-    // }
-    // }
-
-    public void addViewItem(DexTabController tc) {
-        if (tc.getDialogTitle() != null) {
-            // log.debug( "Add controller" );
-            MenuItem item = new MenuItem( tc.getDialogTitle() );
-            item.setOnAction( tc::launchWindow );
-            viewsMenu.getItems().add( item );
-        }
+    @FXML
+    public void doClose(ActionEvent e) {
+        // This is only run if the handler is not set.
+        getDialogBox( null ).show( "Close", NOT_IMPLEMENTED );
     }
 
-
-
-    public void projectComboSelectionListener(Event e) {
-        // log.debug( "project selection event" );
-        if (!ignoreEvents && e.getTarget() instanceof ComboBox)
-            openFile( projectMap.get( ((ComboBox<?>) e.getTarget()).getValue() ) );
-    }
-
-    public void handleSaveAllMenu(ActionEvent event) {
-        // log.debug( "Handle save all action event." );
-        String results = DexFileHandler.saveLibraries( modelMgr.getEditableLibraries() );
-        DialogBoxContoller dialog = getDialogBox( null );
-        dialog.show( "Save Results", results );
-    }
-
-    public void handleCloseMenu(ActionEvent event) {
-        // log.debug( "Handle close action event." );
-        // Close all menu item
+    /**
+     * Close from menu item
+     * 
+     * @param event
+     */
+    public void doCloseHandler(ActionEvent event) {
         if (event.getTarget() instanceof MenuItem) {
             clear();
             if (modelMgr != null) {
@@ -520,21 +289,176 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         }
     }
 
+    public void doCloseSetHandler(EventHandler<ActionEvent> handler) {
+        doCloseItem.setOnAction( handler );
+    }
+
+    @FXML
+    public void doCompile(ActionEvent e) {
+        CompileDialogController cdc = CompileDialogController.init();
+        cdc.configure( modelMgr, userSettings, mainController.getStatusController() );
+        cdc.show( "" );
+    }
+
+    @FXML
+    void doNewLibrary(ActionEvent e) {
+        if (modelMgr.getProjects().isEmpty())
+            mainController.postError( null, "Must have project open before creating libraries." );
+        else {
+            NewLibraryDialogController nldc = NewLibraryDialogController.init();
+            nldc.configure( modelMgr, userSettings );
+            Results results = nldc.showAndWait( "" );
+            if (results == Results.OK) {
+                fireEvent( new DexModelChangeEvent( modelMgr ) );
+            }
+        }
+    }
+
+    @FXML
+    void doNewProject(ActionEvent e) {
+        NewProjectDialogController npdc = NewProjectDialogController.init();
+        npdc.configure( modelMgr, userSettings );
+        Results results = npdc.showAndWait( "" );
+        if (results == Results.OK)
+            fireEvent( new DexModelChangeEvent( modelMgr ) );
+        ignoreEvents = true;
+        configureProjectCombo();
+        ignoreEvents = false;
+    }
+
+    @FXML
+    public void doSaveAll(ActionEvent e) {
+        // This is only run if the handler is not set.
+        getDialogBox( null ).show( "Save All", NOT_IMPLEMENTED );
+    }
+
+    public void doSaveAllHandler(ActionEvent event) {
+        // log.debug( "Handle save all action event." );
+        if (event.getTarget() instanceof MenuItem) {
+            String results = DexFileHandler.saveLibraries( modelMgr.getEditableLibraries() );
+            DialogBoxContoller dialog = getDialogBox( null );
+            dialog.show( "Save Results", results );
+        }
+    }
+
+    public void doSaveAllSetHandler(EventHandler<ActionEvent> handler) {
+        doSaveAllItem.setOnAction( handler );
+    }
+
+    @FXML
+    public void fileOpen(ActionEvent e) {
+        // This is only run if the handler is not set.
+        getDialogBox( null ).show( "Open", NOT_IMPLEMENTED );
+    }
+
+    public void fileOpenHandler(ActionEvent event) {
+        DexFileHandler fileHandler = new DexFileHandler();
+        if (event.getTarget() instanceof MenuItem) {
+            File selectedFile = fileHandler.fileChooser( stage, userSettings );
+            // Update Combo in menu bar
+            if (selectedFile != null)
+                configureProjectCombo( selectedFile.getParentFile() );
+            // Run the task
+            openFile( selectedFile );
+        }
+    }
+
+    public void fileOpenSetHandler(EventHandler<ActionEvent> handler) {
+        fileOpenItem.setOnAction( handler );
+    }
+
+    private DialogBoxContoller getDialogBox(UserSettings settings) {
+        dialogBox = DialogBoxContoller.init();
+        dialogBox.setUserSettings( settings );
+        return dialogBox;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Override to get all the event types published by actions since this eventPublisherNode will be used by main
+     * controller for action initiated events.
+     */
+    @Override
+    public List<EventType<? extends AbstractOtmEvent>> getPublishedEventTypes() {
+        // publishedEventTypes = Collections.unmodifiableList( Arrays.asList( publishedEvents ) );
+        publishedEventTypes = new ArrayList<>();
+        publishedEventTypes.add( DexModelChangeEvent.MODEL_CHANGED );
+        publishedEventTypes.add( DexMemberSelectionEvent.TYPE_PROVIDER_SELECTED );
+        publishedEventTypes.add( DexMemberSelectionEvent.TYPE_USER_SELECTED );
+        publishedEventTypes.add( DexRepositorySelectionEvent.REPOSITORY_SELECTED );
+
+        for (EventType<? extends DexEvent> et : publishedEvents) {
+            publishedEventTypes.add( et );
+        }
+        // FUTURE - some actions create events (assignTypeAction) that are not in the actions enumeration.
+        // For now, they are added to publishedEvents array. Find a better way to register them.
+        for (DexActions action : DexActions.values()) {
+            DexChangeEvent event = null;
+            try {
+                event = DexActions.getEvent( action );
+                if (event != null && !publishedEventTypes.contains( event.getEventType() ))
+                    publishedEventTypes.add( event.getEventType() );
+            } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException e) {
+                // NO-OP
+            }
+        }
+        return publishedEventTypes;
+    }
+
+    @FXML
+    public void goBack() {
+        eventDispatcher.goBack( this );
+        updateNavigationButtons();
+    }
+
+    @FXML
+    public void goForward() {
+        eventDispatcher.goForward( this );
+        updateNavigationButtons();
+    }
+
+    @Override
+    public void handleEvent(AbstractOtmEvent event) {
+        updateNavigationButtons();
+        // log.debug( event.getEventType() + " event received." );
+        if (event instanceof DexRepositorySelectionEvent)
+            selectedRepository = ((DexRepositorySelectionEvent) event).getRepository();
+    }
+
+    /**
+     * Handle completion of open file tasks.
+     */
     @Override
     public void handleTaskComplete(WorkerStateEvent event) {
         if (event.getTarget() instanceof OpenProjectFileTask || event.getTarget() instanceof OpenLibraryFileTask) {
             if (dialogBox != null)
                 dialogBox.close();
             fireEvent( new DexModelChangeEvent( modelMgr ) );
+            if (event.getSource() instanceof OpenProjectFileTask) {
+                OpenProjectFileTask task = (OpenProjectFileTask) event.getSource();
+                if (task.getState() == State.FAILED) {
+                    DialogBoxContoller dbc = getDialogBox( userSettings );
+                    // dbc.add( task.getErrorMsg() );
+                    dbc.showAndWait( task.getErrorMsg() );
+                    projectCombo.getSelectionModel().clearSelection();
+                }
+            }
             mainController.refresh();
             ignoreEvents = true;
             configureProjectCombo();
             ignoreEvents = false;
         }
+        updateNavigationButtons();
     }
 
-    @FXML
-    private MenuItem launchWebRepoWindow;
+    // FUTURE
+    // public void addViewItems(List<DexIncludedController<?>> controllers) {
+    // for (DexIncludedController<?> c : controllers) {
+    // if (c instanceof DexTabController)
+    // addViewItem( (DexTabController) c );
+    // }
+    // }
 
     @FXML
     private void launchWebRepoWindow() {
@@ -545,20 +469,52 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         wvdc.show( repoUrl );
     }
 
+
+    /**
+     * Post dialog box and launch open library/project task.
+     * 
+     * @param selectedFile
+     */
+    private void openFile(File selectedFile) {
+        if (selectedFile != null) {
+            if (selectedFile.getName().endsWith( ".otm" )) {
+                if (!userSettings.getHideOpenProjectDialog())
+                    getDialogBox( userSettings ).show( "Opening Library", "Please wait." );
+                new OpenLibraryFileTask( selectedFile, modelMgr, this::handleTaskComplete,
+                    mainController.getStatusController() ).go();
+            } else {
+                if (!userSettings.getHideOpenProjectDialog())
+                    getDialogBox( userSettings ).show( "Opening Project", "Please wait." );
+                new OpenProjectFileTask( selectedFile, modelMgr, this::handleTaskComplete,
+                    mainController.getStatusController() ).go();
+            }
+        }
+    }
+
+    public void projectComboSelectionListener(Event e) {
+        // log.debug( "project selection event" );
+        if (!ignoreEvents && e.getTarget() instanceof ComboBox)
+            openFile( projectMap.get( ((ComboBox<?>) e.getTarget()).getValue() ) );
+    }
+
     public void setComboLabel(String text) {
         projectLabel.setText( text );
     }
 
-    public void setdoCloseHandler(EventHandler<ActionEvent> handler) {
-        doCloseItem.setOnAction( handler );
+    @FXML
+    public void setDisplaySize(ActionEvent e) {
+        if (e.getSource() instanceof MenuItem) {
+            MenuItem item = (MenuItem) e.getSource();
+            getMainController().setStyleSheet( item.getText() );
+            setDisplaySizeMenu();
+        }
     }
 
-    public void setdoSaveAllHandler(EventHandler<ActionEvent> handler) {
-        doSaveAllItem.setOnAction( handler );
-    }
-
-    public void setFileOpenHandler(EventHandler<ActionEvent> handler) {
-        fileOpenItem.setOnAction( handler );
+    private void setDisplaySizeMenu() {
+        // FUTURE - use labels to create menu entries
+        // disable currently selected size
+        String selector = getMainController().getStyleSheet();
+        displaySizeMenu.getItems().forEach( i -> i.setDisable( i.getText().equals( selector ) ) );
     }
 
     /**
@@ -572,6 +528,53 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         // setup to handle project combo
         if (visable)
             configureProjectCombo();
+    }
+
+    public void undoAction() {
+        modelMgr.getActionManager( true ).undo();
+    }
+
+    @FXML
+    public void undoAction(ActionEvent e) {
+        dialogBox.show( "Undo", NOT_IMPLEMENTED );
+    }
+
+    public void undoActionSetHandler(EventHandler<ActionEvent> handler) {
+        undoActionButton.setOnAction( handler );
+    }
+
+    /**
+     * Update the action manager buttons and text.
+     * 
+     * @param actionManger
+     */
+    // FUTURE - why is this not event driven? Why part of main controller interface?
+    // It is called directly from action manager on do (push) and undo
+    public void updateActionManagerDisplay(DexActionManager actionManger) {
+        if (actionManger != null) {
+            actionCount.setText( Integer.toString( actionManger.getQueueSize() ) );
+            undoActionButton.setDisable( actionManger.getQueueSize() <= 0 );
+            String last = "";
+            if (actionManger.getLastAction() != null)
+                last = (actionManger.getLastAction().toString());
+            if (last != null && last.length() > 40)
+                last = last.substring( 0, 40 ); // don't overflow the menu bar space
+            lastAction.setText( last );
+        }
+    }
+
+    /**
+     * Update new library item, forward and back buttons
+     */
+    private void updateNavigationButtons() {
+        doNewLibraryItem.setDisable( modelMgr.getProjects().isEmpty() );
+        if (eventDispatcher != null) {
+            navBackButton.setDisable( !eventDispatcher.canGoBack() );
+            navForwardButton.setDisable( !eventDispatcher.canGoForward() );
+        } else {
+            navBackButton.setDisable( true );
+            navForwardButton.setDisable( true );
+        }
     }
 
 }

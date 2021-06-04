@@ -20,10 +20,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.schemacompiler.model.TLSimple;
 
 /**
@@ -39,6 +41,12 @@ public class TestOtmSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
         baseObject = null;
     }
 
+    @Before
+    public void beforeTests() {
+        staticModelManager.clear();
+        staticLib = TestLibrary.buildOtm( staticModelManager );
+        subject = buildOtm( staticLib );
+    }
 
     /**
      * {@inheritDoc}
@@ -63,7 +71,7 @@ public class TestOtmSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
     public static OtmSimpleObject buildOtm(OtmLibrary lib, String name) {
         assertTrue( lib.isEditable() );
         OtmSimpleObject s = buildOtm( lib.getModelManager() );
-        s.setName( name );
+        s.setName( OtmLibraryMemberFactory.getUniqueName( lib, name ) );
         lib.add( s );
         assertTrue( lib.contains( s ) );
         return s;

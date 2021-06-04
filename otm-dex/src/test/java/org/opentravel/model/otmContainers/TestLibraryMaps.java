@@ -168,10 +168,8 @@ public class TestLibraryMaps extends AbstractFxTest {
         // Given - libraries
         OtmModelManager mgr = TestOtmModelManager.build();
         OtmLibrary providerLib = TestLibrary.buildOtm( mgr );
-        OtmLibrary userLib1 =
-            TestLibrary.buildOtm( mgr, providerLib.getBaseNamespace() + "/Users", "Users1", "Users1" );
-        OtmLibrary userLib2 =
-            TestLibrary.buildOtm( mgr, providerLib.getBaseNamespace() + "/Users", "Users2", "Users2" );
+        OtmLibrary userLib1 = TestLibrary.buildOtm( mgr, providerLib.getBaseNS() + "/Users", "Users", "Users1" );
+        OtmLibrary userLib2 = TestLibrary.buildOtm( mgr, providerLib.getBaseNS() + "/Users", "Users", "Users2" );
         // Given - users and providers
         TestLibrary.addOneOfEach( providerLib );
         List<OtmTypeProvider> providers = TestOtmTypeProviderInterface.buildOneOfEach( providerLib );
@@ -213,11 +211,12 @@ public class TestLibraryMaps extends AbstractFxTest {
      */
     @Test
     public void testGetProvidersMap_OTA_Repo() throws VersionSchemeException, InterruptedException {
-
+        // FIXME - create same test but not using OTA Repo
         OtmModelManager mgr = TestOtmModelManager.build();
         TestDexFileHandler.loadVersionProject( mgr );
         List<OtmLibrary> chainLibs = mgr.getUserLibraries();
-        OtmLibrary minorLibrary = TestVersionChain.getMinorInChain( mgr );
+        OtmLibrary minorLibrary = TestOtmVersionChain.getMinorInChain( mgr );
+        assertTrue( "Given: must have minor library.", minorLibrary != null );
         OtmLibrary majorLibrary = minorLibrary.getVersionChain().getMajor();
         List<OtmLibraryMember> chainMembers = new ArrayList<>();
         for (OtmLibrary cl : chainLibs)
@@ -227,7 +226,7 @@ public class TestLibraryMaps extends AbstractFxTest {
         assertTrue( "Given", !chainMembers.isEmpty() );
         assertTrue( "Given", majorLibrary != null );
         assertTrue( "Given", minorLibrary != null );
-        assertTrue( "Given", minorLibrary.isEditable() );
+        // assertTrue( "Given", minorLibrary.isEditable() );
         // assertTrue( "Given - minor is empty.", mgr.getMembers( minorLibrary ).isEmpty() );
 
         // Initial load - version 0 and version 1, each with a minor version

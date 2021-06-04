@@ -51,25 +51,49 @@ public class OtmModelMapsManager implements TaskResultHandlerI {
         this.modelMgr = modelMgr;
     }
 
-    private void addToUsersMap(Map<OtmLibrary,List<OtmLibraryMember>> usersMap, OtmLibrary lib,
-        List<OtmLibraryMember> users) {
-        users.forEach( u -> {
-            if (u != null && u.getLibrary() != null && u.getLibrary() != lib) {
-                // Get the list for this library
-                List<OtmLibraryMember> mList = usersMap.get( u.getLibrary() );
+    /**
+     * Add entries for each library in the users list.
+     * <p>
+     * Exposed only for testing.
+     * 
+     * @param usersMap
+     * @param lib
+     * @param users
+     */
+    protected void addToUsersMap(Map<OtmLibrary,List<OtmLibraryMember>> usersMap, OtmLibrary lib,
+        OtmLibraryMember member) {
 
-                if (mList != null) {
-                    // Add User
-                    if (!mList.contains( u.getOwningMember() ))
-                        usersMap.get( u.getLibrary() ).add( u.getOwningMember() );
-                } else {
-                    // Create new entry in map with new list
-                    mList = new ArrayList<>();
-                    mList.add( u.getOwningMember() );
-                    usersMap.put( u.getLibrary(), mList );
-                }
+        for (OtmLibraryMember user : member.getWhereUsed()) {
+            if (user == null || user.getLibrary() == null || user.getLibrary() == lib)
+                continue; // skip
+
+            // Get the member list for this library
+            List<OtmLibraryMember> memberList = usersMap.get( user.getLibrary() );
+            if (memberList == null) {
+                memberList = new ArrayList<>();
+                usersMap.put( user.getLibrary(), memberList );
             }
-        } );
+            if (!memberList.contains( user ))
+                memberList.add( user );
+        }
+        // // Done - test using the retrieved list instead of retrieving it again
+        // users.forEach( u -> {
+        // if (u != null && u.getLibrary() != null && u.getLibrary() != lib) {
+        // // Get the member list for this library
+        // List<OtmLibraryMember> memberList = usersMap.get( u.getLibrary() );
+        // // ToDo - test using the retrieved list instead of retrieving it again
+        // if (memberList != null) {
+        // // Already had entry, just add User
+        // if (!memberList.contains( u.getOwningMember() ))
+        // usersMap.get( u.getLibrary() ).add( u.getOwningMember() );
+        // } else {
+        // // Create new entry in map with new list
+        // memberList = new ArrayList<>();
+        // memberList.add( u.getOwningMember() );
+        // usersMap.put( u.getLibrary(), memberList );
+        // }
+        // }
+        // } );
     }
 
     /**
@@ -78,17 +102,17 @@ public class OtmModelMapsManager implements TaskResultHandlerI {
      * The keys are each library that uses types from this library.
      * <p>
      * The values are an array of this library's members that use the key library types.
+     * <p>
+     * Each member is examined using getWhereUsed()
      * 
      * @return new map.
      */
     public Map<OtmLibrary,List<OtmLibraryMember>> getUsersMap(OtmLibrary lib, boolean sort) {
-        usersMap = new HashMap<>();
-
         // log.debug( "Starting getting users map for " + lib );
-        //
+        usersMap = new HashMap<>();
         for (OtmLibraryMember m : lib.getMembers()) {
-            List<OtmLibraryMember> users = m.getWhereUsed();
-            addToUsersMap( usersMap, lib, users );
+            // List<OtmLibraryMember> users = m.getWhereUsed();
+            addToUsersMap( usersMap, lib, m );
         }
         return usersMap;
     }

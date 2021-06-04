@@ -48,9 +48,11 @@ public class TestEnumerationOpen extends TestOtmLibraryMemberBase<OtmEnumeration
 
     @Before
     public void beforeEach() {
-        subject = buildOtm( staticModelManager );
-        baseObject = buildOtm( staticModelManager );
-        baseObject.setName( "BaseEO" );
+        staticModelManager.clear();
+        OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
+        subject = buildOtm( lib, "SubjectEO" );
+        baseObject = buildOtm( lib, "BaseEO" );
+        // baseObject.setName( "BaseEO" );
     }
 
 

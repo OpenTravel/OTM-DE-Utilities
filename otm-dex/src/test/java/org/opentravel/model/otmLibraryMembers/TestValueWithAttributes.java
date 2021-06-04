@@ -19,6 +19,7 @@ package org.opentravel.model.otmLibraryMembers;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.actions.BaseTypeChangeAction;
@@ -60,6 +61,16 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
         baseObject = buildOtm( staticLib, "BaseVWA" );
         // baseObject.setName( "BaseVWA" );
     }
+
+    @Before
+    public void beforeMethods() {
+        staticModelManager.clear();
+
+        staticLib = TestLibrary.buildOtm( staticModelManager );
+        subject = buildOtm( staticLib, "SubjectVWA" );
+        baseObject = buildOtm( staticLib, "BaseVWA" );
+    }
+
 
     /** *********************** VWA Tester ******************** **/
     public static void check(OtmValueWithAttributes vwa) {
@@ -103,11 +114,11 @@ public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWi
      */
     public static OtmValueWithAttributes buildOtm(OtmLibrary lib, String name) {
         assertTrue( lib.isEditable() );
-        assertTrue( "Builder - trying to build a second VWA with same name.",
-            lib.getTL().getNamedMember( name ) == null );
+        name = OtmLibraryMemberFactory.getUniqueName( lib, name );
+        assertTrue( "Builder - must have unique name.", lib.getTL().getNamedMember( name ) == null );
 
         OtmValueWithAttributes vwa = buildOtm( lib.getModelManager() );
-        vwa.setName( name );
+        vwa.setName( OtmLibraryMemberFactory.getUniqueName( lib, name ) );
         lib.add( vwa );
 
         assertTrue( "Builder - new TLVWA must be in TL library.", lib.getTL() == vwa.getTL().getOwningLibrary() );

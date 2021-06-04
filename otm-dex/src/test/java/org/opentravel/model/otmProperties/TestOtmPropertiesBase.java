@@ -30,6 +30,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmResourceChild;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
@@ -296,6 +297,15 @@ public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
             ((TLAttributeOwner) owner.getTL()).addAttribute( tlp );
             attr = new OtmAttribute<>( tlp, owner );
         }
+        return attr;
+    }
+
+    /**
+     * Build a new attribute in the passed owner and assign type without checks.
+     */
+    public static OtmAttribute<TLAttribute> buildAttribute(OtmPropertyOwner owner, OtmTypeProvider provider) {
+        OtmAttribute<TLAttribute> attr = buildAttribute( owner );
+        attr.setAssignedType( provider );
         return attr;
     }
 

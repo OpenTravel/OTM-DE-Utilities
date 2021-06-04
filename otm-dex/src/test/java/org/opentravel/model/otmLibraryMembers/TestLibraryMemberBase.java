@@ -68,7 +68,7 @@ public class TestLibraryMemberBase {
         assertTrue( "Given:", lib.isUnmanaged() );
         assertTrue( "Given: ", lib.getVersionChain() != null );
         // TODO - create test for this in TestVersionChain
-        assertTrue( "Given: ", !lib.getVersionChain().isLatestChain() );
+        assertTrue( "Given: Must be latest in chain.", !lib.getVersionChain().isLatestChain() );
 
         buildOneOfEachWithProperties( lib );
 
@@ -83,7 +83,8 @@ public class TestLibraryMemberBase {
     public void testAddAndRemove() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
         NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
         OtmModelManager mgr = new OtmModelManager( null, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = mgr.addLibrary( new TLLibrary() );
+        // OtmLibrary lib = mgr.addOLD( new TLLibrary() );
 
         for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {
             OtmLibraryMember member = OtmLibraryMemberType.buildMember( type, "Test" + type.toString(), mgr );
@@ -109,7 +110,8 @@ public class TestLibraryMemberBase {
     public void testDelete() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException,
         NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
         OtmModelManager mgr = new OtmModelManager( null, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = mgr.addLibrary( new TLLibrary() );
+        // OtmLibrary lib = mgr.addOLD( new TLLibrary() );
 
         // Given - one of each type added to the library
         for (OtmLibraryMemberType type : OtmLibraryMemberType.values()) {

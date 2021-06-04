@@ -31,7 +31,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
-import org.opentravel.model.otmContainers.TestVersionChain;
+import org.opentravel.model.otmContainers.TestOtmVersionChain;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
@@ -92,6 +92,7 @@ public class TestInheritance extends AbstractFxTest {
     public void testInheritedCustomFacets() throws VersionSchemeException, InterruptedException {
         // Given - the unmanaged project with lots of contextual facets
         mgr.clear();
+        assertTrue( mgr.getBackgroundTaskCount() == 0 );
         TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
         assertTrue( mgr.getTlModel().getAllLibraries().size() == 6 );
 
@@ -102,6 +103,7 @@ public class TestInheritance extends AbstractFxTest {
             // no-op
             waitCount++;
             Thread.sleep( 100 ); // doesn't matter how long this runs
+            assertTrue( "Waiting for background task too long " + mgr.getBackgroundTaskCount(), waitCount < 100 );
         }
         log.debug( "Waited " + waitCount + " iterations." );
 
@@ -466,8 +468,8 @@ public class TestInheritance extends AbstractFxTest {
         if (!TestDexFileHandler.loadVersionProject( mgr ))
             return; // No editable libraries
 
-        OtmLibrary minorLibrary = TestVersionChain.getMinorInChain( mgr );
-        assertTrue( "Given", minorLibrary != null );
+        OtmLibrary minorLibrary = TestOtmVersionChain.getMinorInChain( mgr );
+        assertTrue( "Given: Must have minor library.", minorLibrary != null );
         assertTrue( "Given", minorLibrary.isEditable() );
 
         List<OtmLibraryMember> minors = minorLibrary.getMembers();

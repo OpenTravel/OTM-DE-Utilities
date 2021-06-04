@@ -21,11 +21,14 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.common.ValidationUtils;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
@@ -44,6 +47,7 @@ import org.opentravel.schemacompiler.model.TLFacet;
 import org.opentravel.schemacompiler.model.TLFacetOwner;
 import org.opentravel.schemacompiler.model.TLFacetType;
 import org.opentravel.schemacompiler.model.TLProperty;
+import org.opentravel.schemacompiler.validate.ValidationFinding;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,6 +70,18 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
         OtmCustomFacet cf = TestCustomFacet.buildOtm( (OtmBusinessObject) subject, "CF" );
         OtmCustomFacet bcf = TestCustomFacet.buildOtm( (OtmBusinessObject) baseObject, "BCF" );
     }
+
+    @Before
+    public void beforeMethods() {
+        staticModelManager.clear();
+
+        OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
+        subject = buildOtm( lib, "SubjectBo" );
+        baseObject = buildOtm( lib, "BaseBo" );
+        OtmCustomFacet cf = TestCustomFacet.buildOtm( (OtmBusinessObject) subject, "CF" );
+        OtmCustomFacet bcf = TestCustomFacet.buildOtm( (OtmBusinessObject) baseObject, "BCF" );
+    }
+
 
     @Test
     public void testFacets() {
@@ -188,6 +204,7 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
     @Override
     public void testInheritance(OtmBusinessObject otm) {
         assertTrue( "Given: must have object to test inheritance.", otm != null );
+        TestLibrary.checkLibrary( otm.getLibrary() );
 
         OtmBusinessObject base = (OtmBusinessObject) otm.getBaseType();
         assertTrue( "Given: must have base to test inheritance.", base != null );
@@ -250,8 +267,11 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
     }
 
     /** ****************************************************** **/
+
     /**
-     * Build business object with attribute and element in ID and Summary facets. *
+     * Build business object with attribute and element in ID and Summary facets.
+     * <p>
+     * Assure the business object is valid.
      * 
      * @param mgr
      * @param name
@@ -259,6 +279,9 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
      */
     public static OtmBusinessObject buildOtm(OtmLibrary library, String name) {
         assertTrue( "Library must have model manager.", library.getModelManager() != null );
+        assertTrue( "Given: library must have URL.", library.getTL().getLibraryUrl() != null );
+
+        name = OtmLibraryMemberFactory.getUniqueName( library, name );
         BoName = name; // set global static
         OtmBusinessObject bo = buildOtm( library.getModelManager() );
         bo.setName( name );
@@ -270,11 +293,21 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
             assertTrue( "Contributor must be in library.", library.contains( cf.getContributor() ) );
         }
 
+        // Give everyone an assigned type
+        OtmTypeProvider sType = library.getModelManager().getStringType();
+        bo.getDescendantsTypeUsers().forEach( u -> u.setAssignedType( sType ) );
+
         assertTrue( bo != null );
         assertTrue( bo.getLibrary() == library );
         assertTrue( bo.isEditable() );
         assertTrue( bo.getActionManager() == library.getActionManager() );
         assertTrue( library.getModelManager().getMembers().contains( bo ) );
+
+        if (!bo.isValid()) {
+            List<ValidationFinding> findings = bo.getFindings().getAllFindingsAsList();
+            log.debug( ValidationUtils.getMessagesAsString( bo.getFindings() ) );
+        }
+        assertTrue( "Builder validation: ", bo.isValid() );
 
         return bo;
     }
@@ -295,23 +328,31 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
     // }
 
     /**
-     * Get an element from the summary facet
+     * Get and check an element from the summary facet
      * 
      * @param member
      * @return
      */
     public static OtmElement<?> getElement(OtmBusinessObject member) {
+        OtmElement<?> element = null;
         for (OtmObject child : member.getSummary().getChildren())
-            if (child instanceof OtmElement)
-                return (OtmElement<?>) child;
-        return null;
+            if (child instanceof OtmElement) {
+                element = (OtmElement<?>) child;
+                break;
+            }
+
+        assertTrue( "Given", element != null );
+        assertTrue( "Given", element.getOwningMember() == member );
+        assertTrue( "Given", element.getLibrary() == member.getLibrary() );
+        assertTrue( "Given", member.getDescendantsTypeUsers().contains( element ) );
+        return element;
     }
 
     /**
      * Simply create a business object and add to model manager.
      * <p>
      * <b>Note: </b>New business object and its contextual facets will not have library. Preferred builder for general
-     * us is {@link #buildOtm(OtmLibrary, String)}
+     * use is {@link #buildOtm(OtmLibrary, String)}
      * 
      * @param mgr
      * @return
@@ -358,6 +399,7 @@ public class TestBusiness extends TestOtmLibraryMemberBase<OtmBusinessObject> {
     public static void buildExample(TLExampleOwner tleo) {
         TLExample tle = new TLExample();
         tle.setValue( "ExampleValue123" );
+        tle.setContext( "ExContext" );
         tleo.addExample( tle );
         assertTrue( tleo.getExamples().size() >= 1 );
     }

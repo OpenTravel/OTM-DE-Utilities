@@ -25,6 +25,7 @@ import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmModelMapsManager;
+import org.opentravel.model.OtmModelMembersManager;
 import org.opentravel.model.OtmProjectManager;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
@@ -32,7 +33,6 @@ import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmServiceObject;
-import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryPermission;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.BuiltInLibrary;
 import org.opentravel.schemacompiler.model.LibraryMember;
@@ -40,6 +40,7 @@ import org.opentravel.schemacompiler.model.TLInclude;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.repository.ProjectItem;
+import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.schemacompiler.repository.RepositoryItemState;
 import org.opentravel.schemacompiler.saver.LibraryModelSaver;
 import org.opentravel.schemacompiler.saver.LibrarySaveException;
@@ -58,40 +59,58 @@ import javafx.scene.image.Image;
 /**
  * OTM Object for libraries. Does <b>NOT</b> provide access to members.
  * 
+ * <P>
+ * To Do:
+ * <li>Create local, major, minor and builtIn library sub-types.
+ * <li>Library Factory
+ * <li>Create abstract managedLibrary sub-type
+ * <li>Make this abstract.
+ * <li>Make version chain persistence in model manager
+ * <li>Only major and minor have version chains
+ * <p>
+ * Design Note: this is an abstract class and not an interface because the sub-types are so similar and easily discerned
+ * by their sub-type.
+ * 
  * @author Dave Hollander
  * 
  */
-public class OtmLibrary implements Comparable<OtmLibrary> {
+public abstract class OtmLibrary implements Comparable<OtmLibrary> {
     private static Log log = LogFactory.getLog( OtmLibrary.class );
+
+    public static final String NO_LOCKEDBYUSER = "";
 
     protected OtmModelManager mgr;
     protected List<ProjectItem> projectItems = new ArrayList<>();
     protected AbstractLibrary tlLib;
-    protected OtmVersionChain versionChain = null;
     protected ValidationFindings findings;
     protected Map<OtmLibrary,List<OtmLibraryMember>> providerMap = null;
     protected Map<OtmLibrary,List<OtmLibraryMember>> usersMap = null;
 
     /**
-     * Should only be called by OtmModelManager. See {@link OtmModelManager#add(AbstractLibrary)}
+     * Should only be called by Factory.
+     * <p>
+     * See {@link OtmLibraryFactory#newLibrary(AbstractLibrary, OtmModelManager)}
      * 
      * @param tl
      * @param mgr
      */
-    public OtmLibrary(AbstractLibrary tl, OtmModelManager mgr) {
+    protected OtmLibrary(AbstractLibrary tl, OtmModelManager mgr) {
         this.mgr = mgr;
         tlLib = tl;
     }
 
-    protected OtmLibrary(OtmModelManager mgr) {
-        this.mgr = mgr;
-    }
+    // @Deprecated
+    // protected OtmLibrary(OtmModelManager mgr) {
+    // this.mgr = mgr;
+    // }
 
-    public OtmLibrary(ProjectItem pi, OtmModelManager mgr) {
-        this.mgr = mgr;
-        projectItems.add( pi );
-        tlLib = pi.getContent();
-    }
+    // // DONE - delete this constructor
+    // @Deprecated
+    // public OtmLibrary(ProjectItem pi, OtmModelManager mgr) {
+    // this.mgr = mgr;
+    // projectItems.add( pi );
+    // tlLib = pi.getContent();
+    // }
 
     @Override
     public int compareTo(OtmLibrary o) {
@@ -132,11 +151,22 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
                 // Add to model manager
                 if (getModelManager() != null)
                     getModelManager().add( member );
+
                 // Sanity check
+                // FIXME - comment all this out! Name the junit where tested.
                 if (member.getTlLM().getOwningLibrary() != getTL())
-                    log.warn( "Member does not have correct owning library." );
-                if (member.getLibrary() != this)
+                    log.warn( "TLMember does not have correct owning library." );
+                if (getModelManager().get( getTL() ) != this)
+                    log.warn( "Could not find this library in manager." );
+                if (getModelManager() != member.getModelManager())
+                    log.warn( "Model managers are different." );
+                if (member.getLibrary() != this) {
+                    // if (member.getTlLM() == null || member.getTlLM().getOwningLibrary() == null)
+                    // log.warn( "OOPs1" );
+                    // OtmLibrary owningLib = mgr.get( member.getTlLM().getOwningLibrary() );
+                    // OtmLibrary owningLib2 = member.getLibrary();
                     log.warn( "Newly added member does not have correct library." );
+                }
                 return member;
             } catch (IllegalArgumentException e) {
                 log.warn( "Exception: " + e.getLocalizedMessage() );
@@ -163,18 +193,21 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     /**
-     * @return
+     * Can this library in its current state and status be locked?
+     * 
+     * @return false unless managed and allowed by {@linkplain OtmManagedLibrary#canBeLocked()}.
      */
     public boolean canBeLocked() {
-        if (getStatus() == TLLibraryStatus.DRAFT && getState() == RepositoryItemState.MANAGED_UNLOCKED
-            && getManagingProject() != null && getManagingProject().getPermission() != null)
-            return getManagingProject().getPermission().equals( RepositoryPermission.WRITE );
         return false;
     }
 
+    /**
+     * Can this library be unlocked?
+     * 
+     * @return false unless managed and allowed by {@linkplain OtmManagedLibrary#canBeUnlocked()}.
+     */
     public boolean canBeUnlocked() {
-        // TODO - check to see if this is the user that locked it
-        return getState() == RepositoryItemState.MANAGED_LOCKED || getState() == RepositoryItemState.MANAGED_WIP;
+        return false;
     }
 
     public boolean contains(AbstractLibrary aLib) {
@@ -198,6 +231,11 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
 
     /**
      * Delete member. Remove from this library and underlying TL library and from the model manager.
+     * <ul>
+     * <li>{@linkplain OtmModelMembersManager#remove(OtmLibraryMember)}
+     * <li>{@linkplain AbstractLibrary#removeNamedMember(LibraryMember)}
+     * <li>Handle Contextual facet
+     * </ul>
      */
     public void delete(OtmLibraryMember member) {
         if (member != null) {
@@ -216,63 +254,39 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     public boolean sameBaseNamespace(OtmLibrary otherLibrary) {
-        if (otherLibrary == null || this.getBaseNamespace() == null || otherLibrary.getBaseNamespace() == null)
+        if (otherLibrary == null || this.getBaseNS() == null || otherLibrary.getBaseNS() == null)
             return false;
-        return this.getBaseNamespace().equals( otherLibrary.getBaseNamespace() );
+        return this.getBaseNS().equals( otherLibrary.getBaseNS() );
     }
 
     /**
-     * Get Read-only, Minor or Full action manager. To determine which manager to return, consider
-     * <ul>
-     * <li>library version
-     * <li>library status
-     * </ul>
-     * See also {@link #getActionManager(OtmLibraryMember)}
+     * Get Read-only, Minor or Full action manager.
      * 
      * @return action manager
      */
-    public DexActionManager getActionManager() {
-        if (isMinorVersion())
-            return getModelManager().getMinorActionManager( isEditable() );
-        return getModelManager().getActionManager( isEditable() );
-    }
+    public abstract DexActionManager getActionManager();
 
     /**
-     * Get Read-only, Minor or Full action manager. To determine which manager to return, consider
-     * <ul>
-     * <li>managed or unmanaged - when unmanaged, use isEditable() to return the action manager from model manager
-     * <li>library version
-     * <li>library status
-     * <li>if the member is new to the chain and editable library
-     * <li>if the member is the latest in the version chain.
-     * </ul>
+     * Get Read-only, Minor or Full action manager based on type of the library and its chain.
      *
      * @return action manager
      */
-    public DexActionManager getActionManager(OtmLibraryMember member) {
-        if (isUnmanaged())
-            return getModelManager().getActionManager( isEditable() );
-        if (isMajorVersion() && isEditable())
-            return getModelManager().getActionManager( true );
-        if (isChainEditable()) {
-            if (isEditable() && getVersionChain().isNewToChain( member ))
-                return getModelManager().getActionManager( true );
-            return getModelManager().getMinorActionManager( getVersionChain().isLatestVersion( member ) );
-        }
-        return getModelManager().getActionManager( false );
-    }
+    public abstract DexActionManager getActionManager(OtmLibraryMember member);
 
     /**
-     * Get the base namespace from the first project item
+     * Get the base namespace as reported by the underlying library.
+     * <p>
+     * The base namespace URI is the portion that does not include the version identifier suffix.
      * 
      * @return project item's base namespace or empty string
      */
-    public String getBaseNamespace() {
-        if (getTL() instanceof TLLibrary)
-            return ((TLLibrary) getTL()).getBaseNamespace();
-        // Fail-safe: if fails the instance test, try the PI
-        return projectItems.isEmpty() ? "" : projectItems.get( 0 ).getBaseNamespace();
-    }
+    public abstract String getBaseNS();
+    // * Get the base namespace from the first project item
+    // * @return project item's base namespace or empty string
+    // // TESTME
+    // // Fail-safe: if fails the instance test, try the PI
+    // return projectItems.isEmpty() ? "" : projectItems.get( 0 ).getBaseNamespace();
+
 
     /**
      * 
@@ -300,37 +314,43 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         return libs;
     }
 
+    /**
+     * Override if lock-able
+     * 
+     * @return
+     */
     public String getLockedBy() {
-        for (ProjectItem pi : projectItems)
-            if (pi.getLockedByUser() != null)
-                return pi.getLockedByUser();
-        return "";
+        // for (ProjectItem pi : projectItems)
+        // if (pi.getLockedByUser() != null)
+        // return pi.getLockedByUser();
+        return NO_LOCKEDBYUSER;
     }
 
     /**
      * @param namespace
      * @return the major version number
-     * @throws VersionSchemeException
      */
-    public int getMajorVersion() throws VersionSchemeException {
-        int vn = 0;
-        if (!isBuiltIn() && getTL().getNamespace() != null) {
-            try {
-                String versionScheme = getTL().getVersionScheme();
-                VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
-                String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
-                vn = Integer.valueOf( vScheme.getMajorVersion( versionId ) );
-            } catch (NumberFormatException e) {
-                log.debug( "Error converting version string." + e.getCause() );
-            } catch (VersionSchemeException e) {
-                log.debug( "Error determining version. " + e.getCause() );
-            }
-        }
-        return vn;
+    public int getMajorVersion() {
+        return OtmLibraryFactory.getMajorVersionNumber( getTL() );
     }
 
-    public OtmProject getManagingProject() {
-        return mgr.getManagingProject( this );
+    // /**
+    // * Get the managing project from the model manager. {@link OtmModelManager#getManagingProject(OtmLibrary)}
+    // *
+    // * @return
+    // */
+    // @Deprecated
+    // public OtmProject getManagingProject() {
+    // return mgr.getManagingProject( this );
+    // }
+
+    /**
+     * Get the TL Project Manager from this library's model manager.
+     * 
+     * @return Project Manager or null
+     */
+    public ProjectManager getTLProjectManager() {
+        return getModelManager() != null ? getModelManager().getProjectManager() : null;
     }
 
     /**
@@ -347,25 +367,28 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
      * @throws VersionSchemeException
      */
     public int getMinorVersion() {
-        int vn = 0;
-        if (!isBuiltIn() && getTL().getNamespace() != null) {
-            try {
-                String versionScheme = getTL().getVersionScheme();
-                VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
-                String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
-                vn = Integer.valueOf( vScheme.getMinorVersion( versionId ) );
-            } catch (NumberFormatException e) {
-                log.debug( "Error converting version string." + e.getCause() );
-            } catch (VersionSchemeException e) {
-                log.debug( "Error determining version. " + e.getCause() );
-            }
-        }
-        return vn;
+        return OtmLibraryFactory.getMinorVersionNumber( getTL() );
+        //
+        // int vn = 0;
+        // if (!isBuiltIn() && getTL().getNamespace() != null) {
+        // try {
+        // String versionScheme = getTL().getVersionScheme();
+        // VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
+        // String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
+        // vn = Integer.valueOf( vScheme.getMinorVersion( versionId ) );
+        // } catch (NumberFormatException e) {
+        // log.debug( "Error converting version string." + e.getCause() );
+        // } catch (VersionSchemeException e) {
+        // log.debug( "Error determining version. " + e.getCause() );
+        // }
+        // }
+        // return vn;
     }
 
     /**
+     * handles VersionSchemeException
+     * 
      * @return the minor version number
-     * @throws VersionSchemeException
      */
     public int getPatchVersion() {
         int vn = 0;
@@ -389,11 +412,10 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     /**
-     * Get all type users in this library.
+     * Get all type users in this library. For each member, add it if a type user and all descendant type users.
      * 
      * @return new list that can be empty
      */
-    // FIXME - add to junit tests
     public List<OtmTypeUser> getUsers() {
         List<OtmTypeUser> users = new ArrayList<>();
         for (OtmLibraryMember member : getMembers()) {
@@ -449,38 +471,78 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         return mgr != null ? mgr.getOtmProjectManager() : null;
     }
 
+    /**
+     * @return the name from the TL Library or empty string if no Abstract Library.
+     */
     public String getName() {
         return getTL() != null ? getTL().getName() : "";
     }
 
+    /**
+     * @deprecated use {@link #getChainName()}
+     * @return baseNamespace + / + name
+     */
+    @Deprecated
     public String getNameWithBasenamespace() {
-        return getBaseNamespace() + "/" + getName();
+        return getChainName();
+        // return getBaseNS() + "/" + getName();
     }
 
+    /**
+     * @return baseNamespace + / + name + /v+ major version number
+     */
+    public String getChainName() {
+        return getBaseNS() + "/" + getName() + "/v" + getMajorVersion();
+        // return getBaseNS() + "/" + getName();
+    }
+
+    /**
+     * @return the prefix from the Abstract Library or empty string if no Abstract Library.
+     */
     public String getPrefix() {
-        return getTL().getPrefix();
+        return getTL() != null ? getTL().getPrefix() : "";
     }
 
+    /**
+     * Get the library name with prefix from the chain.
+     * <p>
+     * Used in library where used displays.
+     * 
+     * @return "prefix:name" which could be just ":"
+     */
     public String getVersionChainName() {
-        if (versionChain != null && versionChain.size() > 1)
-            return versionChain.getPrefix() + " : " + getName();
+        // if (getVersionChain() != null && versionChain.size() > 1)
+        if (getVersionChain() != null)
+            return getVersionChain().getPrefix() + " : " + getName();
         else
             return getPrefix() + " : " + getName();
     }
 
     /**
-     * @see #getManagingProject()
-     * @return the project item for this library in the managing project
+     * Simply get the project item for this TLLib from the TL Project Manager
+     * 
+     * @return PI or null
      */
     public ProjectItem getProjectItem() {
-        ProjectItem pi = null;
-        OtmProject project = getManagingProject();
-        if (project != null)
-            for (ProjectItem candidate : project.getTL().getProjectItems())
-                if (getProjectItems().contains( candidate ))
-                    pi = candidate;
-        return pi;
+        return getTLProjectManager() != null ? getTLProjectManager().getProjectItem( getTL() ) : null;
     }
+
+    // /**
+    // * From the managing TL project, return the item that contains this library.
+    // *
+    // * @see #getManagingProject()
+    // * @return the project item for this library in the managing project
+    // */
+    // @Deprecated
+    // public ProjectItem getProjectItemOLD() {
+    // ProjectItem pi = null;
+    // OtmProject project = getManagingProject();
+    // if (project != null)
+    // for (ProjectItem candidate : project.getTL().getProjectItems())
+    // if (getProjectItems().contains( candidate ))
+    // pi = candidate;
+    // return pi;
+    // }
 
     public List<ProjectItem> getProjectItems() {
         return projectItems;
@@ -498,6 +560,12 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         return names;
     }
 
+    /**
+     * Get a list of all projects this library is in. Uses this library's ProjectItem list to get project names used to
+     * get projects from OTM project manager.
+     * 
+     * @return new list of OtmProjects which may be empty
+     */
     public List<OtmProject> getProjects() {
         List<OtmProject> projects = new ArrayList<>();
         if (projectItems != null)
@@ -506,54 +574,22 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     /**
-     * Examine all project items and return the state that grants the user the most rights.
+     * Get the repository item state. *
      * 
-     * @return
+     * @return UNMANAGED unless managed, {@linkplain OtmManagedLibrary#getState()} otherwise
      */
-    public RepositoryItemState getState() {
-        RepositoryItemState state = RepositoryItemState.MANAGED_UNLOCKED; // the weakest state
-        if (projectItems != null) {
-            // If not in a project, it must be unmanaged.
-            if (projectItems.isEmpty())
-                return RepositoryItemState.UNMANAGED;
-
-            for (ProjectItem pi : projectItems) {
-                // log.debug("state = " + pi.getState());
-                switch (pi.getState()) {
-                    case MANAGED_UNLOCKED:
-                        break;
-                    case BUILT_IN:
-                    case UNMANAGED:
-                        // These are true regardless of user or user actions
-                        return pi.getState();
-
-                    case MANAGED_LOCKED:
-                        if (state != RepositoryItemState.MANAGED_WIP)
-                            state = pi.getState();
-                        break;
-
-                    case MANAGED_WIP:
-                        // This gives user most rights and is therefore always used as state
-                        return pi.getState();
-                }
-            }
-        }
-        return state;
-    }
+    public abstract RepositoryItemState getState();
 
     /**
-     * @return actual status of TL Libraries otherwise DRAFT
+     * @return actual status from the underlying abstract library.
      */
-    public TLLibraryStatus getStatus() {
-        if (tlLib instanceof TLLibrary)
-            return ((TLLibrary) tlLib).getStatus();
-        else
-            return TLLibraryStatus.FINAL;
-    }
+    public abstract TLLibraryStatus getStatus();
 
-    public AbstractLibrary getTL() {
-        return tlLib;
-    }
+    /**
+     * 
+     * @return the abstract library underlying this facade
+     */
+    public abstract AbstractLibrary getTL();
 
     /**
      * @return
@@ -569,84 +605,99 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         return false;
     }
 
+    /**
+     * @deprecated use instanceof OtmBuiltinLibrary
+     * @return
+     */
+    @Deprecated
     public boolean isBuiltIn() {
         return getTL() instanceof BuiltInLibrary;
     }
 
     /**
-     * A library is editable regardless of action manager.
-     * 
-     * @return false if TLLibraryStatus is not DRAFT. Else, return true if any associated project item state is
-     *         Managed_WIP -OR- unmanaged.
-     * 
-     * 
+     * Is the library editable based on its Abstract Library and its PI?
+     * <p>
+     * Note: A library is editable regardless of action manager.
      */
-    public boolean isEditable() {
-        // log.debug( getName() + " State = " + getState().toString() + " Status = " + getStatus() );
-        if (getStatus() != TLLibraryStatus.DRAFT)
-            return false;
-        return getState() == RepositoryItemState.MANAGED_WIP || getState() == RepositoryItemState.UNMANAGED;
-    }
+    public abstract boolean isEditable();
 
     /**
-     * Are any of the libraries in the version chain (same major version number) editable? Always true if this library
-     * is editable.
+     * True if any library in the chain is editable.
+     * <p>
+     * Facade for {@link OtmVersionChain#isChainEditable()} False if no version chain.
      * 
      * @return
      */
     public boolean isChainEditable() {
-        if (isEditable())
-            return true;
-        return getVersionChain().isChainEditable();
+        // if (isEditable())
+        // return true;
+        return getVersionChain() != null && getVersionChain().isChainEditable();
     }
 
-    // FIXME - clear version chain when new library added
     /**
-     * @return existing or new version chain for this library
+     * Version chain for either managed or local library. Local libraries will have empty sub-class.
+     * 
+     * @return existing or new version chain for this library.
      */
     public OtmVersionChain getVersionChain() {
-        if (versionChain == null)
-            versionChain = new OtmVersionChain( this );
-        return versionChain;
+        return getModelManager().getVersionChain( this );
+        // if (this instanceof OtmManagedLibrary)
+        // getModelManager().getVersionChain( (OtmManagedLibrary) this );
+        // return null;
+        // // return null;
+        // if (versionChain == null)
+        // versionChain = new OtmVersionChain( this );
+        // return versionChain;
     }
 
     /**
-     * Ask the model manager if this is the latest version of the library {@link OtmModelManager#isLatest(OtmLibrary)}
+     * Ask the model manager if this is the latest version of the library. {@link OtmModelManager#isLatest(OtmLibrary)}
      * 
      * @return
      */
-    public boolean isLatestVersion() {
-        return mgr.isLatest( this );
-    }
+    public abstract boolean isLatestVersion();
 
     /**
+     * @deprecated use instanceof OtmMinorLibrary
      * @return true if minor version number is > 0 and managed in repository
      */
+    @Deprecated
     public boolean isMinorVersion() {
-        if (getPatchVersion() > 0)
-            return false;
-        return (getMinorVersion() > 0 && getState() != RepositoryItemState.UNMANAGED);
+        return this instanceof OtmMinorLibrary;
+        // if (getPatchVersion() > 0)
+        // return false;
+        // return (getMinorVersion() > 0 && getState() != RepositoryItemState.UNMANAGED);
     }
 
     /**
+     * @deprecated use instanceof OtmMajorLibrary
      * @return true if minor version number is = 0 and managed in repository
      */
+    @Deprecated
     public boolean isMajorVersion() {
-        if (getPatchVersion() > 0)
-            return false;
-        return (getMinorVersion() == 0 && getState() != RepositoryItemState.UNMANAGED);
+        return this instanceof OtmMajorLibrary;
     }
 
     /**
+     * @deprecated use instanceof OtmLocalLibrary
      * @return true if the state equals RepositoryItemStage.UNMANAGED
      */
+    @Deprecated
     public boolean isUnmanaged() {
-        return getState() == RepositoryItemState.UNMANAGED;
+        return this instanceof OtmLocalLibrary;
+        // return getState() == RepositoryItemState.UNMANAGED;
     }
 
+    /**
+     * Get the validation findings.
+     * <p>
+     * Lazy evaluated: If they are null, validate the library then return those findings.
+     * 
+     * @return
+     */
     public ValidationFindings getFindings() {
         if (findings == null)
-            isValid();
+            isValid(); // Runs validation and creates findings
         return findings;
     }
 
@@ -668,12 +719,19 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         // No-op
     }
 
+    /**
+     * Simply remove the item from the list.
+     * 
+     * @param item
+     */
     public void remove(ProjectItem item) {
         projectItems.remove( item );
     }
 
     /**
+     * Run a new instance of the {@link LibraryModelSaver}
      * 
+     * @see #save(LibraryModelSaver)
      */
     public String save() {
         return save( new LibraryModelSaver() );
@@ -683,6 +741,7 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
      * Use the passed saver. Intended for use in saving multiple libraries in one action.
      * 
      * @param lms
+     * @return a string with user oriented results message
      */
     public String save(LibraryModelSaver lms) {
         String results = "Error saving library.";
@@ -704,9 +763,14 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     public String toString() {
-        return getNameWithBasenamespace() + " " + getVersion();
+        return getChainName() + " " + getVersion();
     }
 
+    /**
+     * Run the validator to create new findings.
+     * 
+     * @see TLModelCompileValidator#validateModelElement(org.opentravel.schemacompiler.model.TLModelElement, boolean)
+     */
     public void validate() {
         findings = TLModelCompileValidator.validateModelElement( getTL(), true );
     }
@@ -716,7 +780,6 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
      * 
      * @return new list that can be empty
      */
-    // FIXME - add to junit tests
     public List<OtmTypeProvider> getProviders() {
         List<OtmTypeProvider> providers = new ArrayList<>();
         for (OtmLibraryMember member : getMembers()) {
@@ -726,8 +789,6 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
         }
         return providers;
     }
-
-
 
     /**
      * Refresh each member
@@ -750,15 +811,18 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     /**
-     * Refresh (null out) just the version chain field
+     * Refresh (null out) the version chain field
+     * 
+     * @deprecated - model manager and its chains manager keeps the chains.
      */
+    @Deprecated
     public void refreshVersionChain() {
         // log.debug( this.getFullName() + " version chain refreshed" );
-        versionChain = null;
+        // versionChain = null;
     }
 
     /**
-     * @return
+     * @return prefix : name
      */
     public String getNameWithPrefix() {
         return getPrefix() + " : " + getName();
@@ -777,8 +841,10 @@ public class OtmLibrary implements Comparable<OtmLibrary> {
     }
 
     /**
+     * Find library member with the passed name.
+     * 
      * @param name
-     * @return
+     * @return member or null
      */
     public OtmLibraryMember getMember(String name) {
         for (OtmLibraryMember m : getMembers())

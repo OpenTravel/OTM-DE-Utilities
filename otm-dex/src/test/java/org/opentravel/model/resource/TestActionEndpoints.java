@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.otmContainers.OtmLibrary;
@@ -49,6 +50,11 @@ public class TestActionEndpoints extends TestOtmResourceBase<OtmAction> {
 
         subject = TestAction.buildOtm( testResource );
         log.debug( "Before class ran." );
+    }
+
+    @Before
+    public void beforeTest() {
+        staticModelManager.clear();
     }
 
     /**

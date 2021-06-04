@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmFacets.OtmChoiceFacet;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmFacets.OtmFacetFactory;
@@ -112,6 +113,26 @@ public class OtmLibraryMemberFactory {
 
         manager.add( otmMember );
         return otmMember;
+    }
+
+    /**
+     * Utility to modify a name until it is unique within libraries with same prefix.
+     * 
+     * @param lib prefix used t
+     * @param name
+     * @return
+     */
+    public static String getUniqueName(OtmLibrary lib, String name) {
+        String prefix = lib.getPrefix();
+        String nameWithPrefix = prefix + ":" + name;
+        // lib.getModelManager().getMember( nameWithPrefix );
+        int i = 1;
+        String newName = name;
+        while (lib.getModelManager().getMember( nameWithPrefix ) != null) {
+            newName = name + i++;
+            nameWithPrefix = prefix + ":" + newName;
+        }
+        return newName;
     }
 
 

@@ -214,7 +214,7 @@ public class SetAssignedTypeAction extends DexRunAction {
     /**
      * This action will use the passed data as the type provider
      * 
-     * @return
+     * @return resulting assigned provider using {@linkplain OtmTypeUser#getAssignedType()}
      */
     @Override
     public Object doIt(Object data) {

@@ -165,8 +165,7 @@ public class MemberFilterController extends DexIncludedControllerBase<Void> impl
 
         // 12/15/2020 - started making filters on demand to improve performance, but it proved to be insignificant
         // performance hit.
-        latestButtonFilter =
-            new ButtonFilterWidget( this, latestButton ).setSelector( OtmLibraryMember::isLatestVersion );
+        latestButtonFilter = new ButtonFilterWidget( this, latestButton ).setSelector( OtmLibraryMember::isLatest );
         latestButton.setOnAction( e -> setLatestFilter() );
         // filters.add( new ButtonFilterWidget( this, latestButton ).setSelector( OtmLibraryMember::isLatestVersion ) );
 

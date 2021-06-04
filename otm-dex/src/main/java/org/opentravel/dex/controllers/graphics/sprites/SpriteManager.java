@@ -333,7 +333,7 @@ public class SpriteManager {
     }
 
     protected DomainSprite factory(OtmLibrary library) {
-        DomainSprite ds = new DomainSprite( this, library.getBaseNamespace() );
+        DomainSprite ds = new DomainSprite( this, library.getBaseNS() );
         domainSprites.add( ds ); // FIXME
         spritePane.getChildren().add( ds.getCanvas() );
         return ds;

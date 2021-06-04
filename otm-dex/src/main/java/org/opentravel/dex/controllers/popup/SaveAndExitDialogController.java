@@ -145,8 +145,8 @@ public class SaveAndExitDialogController extends DexPopupControllerBase {
      * @param mgr
      */
     private void post(OtmModelManager mgr) {
-        changeNotice.setVisible( false );
-        savePrompt.setVisible( false );
+        // changeNotice.setVisible( false );
+        // savePrompt.setVisible( false );
 
         if (mgr == null)
             return;
@@ -154,9 +154,20 @@ public class SaveAndExitDialogController extends DexPopupControllerBase {
         if (actionMgr == null)
             return;
 
+        cancelButton.setCancelButton( true );
         if (actionMgr.getQueueSize() > 0) {
-            changeNotice.setVisible( true );
+            // changeNotice.setVisible( true );
+            changeNotice.setText( "There have been changes to the libraries." );
             savePrompt.setVisible( true );
+            savePrompt.setText( "Do you want to save before exiting? (Enter)" );
+            saveButton.setDefaultButton( true );
+            exitButton.setDefaultButton( false );
+        } else {
+            changeNotice.setText( "Model has not changed." );
+            savePrompt.setText( "Exit (Enter) or Cancel (Esc)." );
+            saveButton.setVisible( false );
+            exitButton.setText( "Exit" );
+            exitButton.setDefaultButton( true );
         }
     }
 

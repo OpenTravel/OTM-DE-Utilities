@@ -36,6 +36,8 @@ import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.version.MajorVersionHelper;
 import org.opentravel.schemacompiler.version.MinorVersionHelper;
 
+import java.util.List;
+
 import javafx.application.Platform;
 
 /**
@@ -53,6 +55,7 @@ public class VersionLibraryTask extends DexTaskBase<OtmLibrary> {
 
     // private DexIncludedController<?> eventController;
     private OtmProject proj = null;
+    private List<OtmProject> projects = null;
     private OtmLibrary library = null;
     private VersionType type = null;
     private static String errorMsg;
@@ -75,8 +78,13 @@ public class VersionLibraryTask extends DexTaskBase<OtmLibrary> {
         this.library = taskData;
         // this.eventController = eventController;
 
-        if (modelManager != null)
-            proj = modelManager.getManagingProject( library );
+        // Get all the projects this library is in
+        projects = library.getProjects();
+        if (!projects.isEmpty())
+            proj = projects.get( 0 );
+        // if (modelManager != null)
+        // proj = modelManager.getManagingProject( library );
+
         this.type = type;
 
         // Replace start message from super-type.
@@ -151,18 +159,43 @@ public class VersionLibraryTask extends DexTaskBase<OtmLibrary> {
                         // tlNewLibrary = patchVH.createNewPatchVersion( (TLLibrary) library.getTL() );
                         break;
                 }
+                // FIXME - use project
+                // // Manage the library in the repository
+                // try {
+                // proj.publish( library, repository );
+                // } catch (DexProjectException e) {
+                // if (dialogBoxController != null)
+                // Platform.runLater( () -> dialogBoxController.close() );
+                // throw new DexTaskException( e );
+                // }
 
                 if (tlNewLibrary != null) {
                     // Manage the library in the repository
                     ProjectManager pm = proj.getTL().getProjectManager();
                     Repository repo = library.getProjectItem().getRepository();
                     ProjectItem item = proj.getProjectItem( tlNewLibrary );
+
+                    // Publish the newly created version in the same repository
                     pm.publish( item, repo );
 
-                    // Add to project and model
-                    proj.getTL().getProjectManager().addManagedProjectItem( item, proj.getTL() );
-                    library.getModelManager().addProjects();
-                    // Add projects will refresh libraries and end task handler will refresh main controller
+                    // Add to project
+                    ProjectItem newPI = item;
+                    // 5/19/2021 - commented out. See TestVersionLibraryTask
+                    // // WHY? item was retrieved from project
+                    // ProjectItem newPI = proj.add( item );
+                    // if (newPI != item)
+                    // log.warn( "Unexpected behavior: PI changed when managed." );
+
+                    // Model and add to model manager
+                    library.getModelManager().addLibrary( newPI );
+
+                    // Where/how does it get added to OtmProject?
+                    // How to add to other projects?
+
+                    // 5/19/2021 - was already commented out. See TestVersionLibraryTask
+                    //// Add to model manager
+                    // library.getModelManager().addProjects();
+                    // // Add projects will refresh libraries and end task handler will refresh main controller
                 }
                 // log.debug( "Version library task complete. " );
             } catch (Exception e) {
@@ -171,6 +204,8 @@ public class VersionLibraryTask extends DexTaskBase<OtmLibrary> {
                     Platform.runLater( () -> dialogBoxController.close() );
                 throw new DexTaskException( e );
             }
+
+            library.refresh();
             if (dialogBoxController != null)
                 Platform.runLater( () -> dialogBoxController.close() );
         }

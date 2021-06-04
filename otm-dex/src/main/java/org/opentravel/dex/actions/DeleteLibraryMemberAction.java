@@ -37,7 +37,7 @@ public class DeleteLibraryMemberAction extends DexRunAction {
 
 
     /**
-     * Any OTM object that uses the intended model manager.
+     * Any OTM object that is a library member and editable.
      * 
      * @param subject
      * @return
@@ -50,12 +50,11 @@ public class DeleteLibraryMemberAction extends DexRunAction {
         return isEnabled( subject );
     }
 
-
-    private OtmLibraryMember deletedMember = null;
-    // Contextual facets need the name of the contributed owner
+    // Set by doIt(), used by undoIt()
+    private OtmLibraryMember deletedMember = null; // Contextual facets need the name of the contributed owner
     private String deletedMemberName = "";
     private OtmLibrary memberLibrary = null;
-    private Map<OtmTypeUser,OtmTypeProvider> typeUsers = null;
+    private Map<OtmTypeUser,OtmTypeProvider> typeUserMap = null;
 
     public DeleteLibraryMemberAction() {
         // Constructor for reflection
@@ -73,7 +72,7 @@ public class DeleteLibraryMemberAction extends DexRunAction {
             deletedMember = (OtmLibraryMember) otm;
             deletedMemberName = otm.getName();
             memberLibrary = otm.getLibrary();
-            typeUsers = ((OtmLibraryMember) otm).getPropertiesWhereUsed();
+            typeUserMap = ((OtmLibraryMember) otm).getPropertiesWhereUsed();
 
             // Delete from TL library and model manager
             memberLibrary.delete( (OtmLibraryMember) otm );
@@ -129,6 +128,7 @@ public class DeleteLibraryMemberAction extends DexRunAction {
     public OtmLibraryMember undoIt() {
         // TESTME - on undo, the types assigned to this member are no longer assigned
         memberLibrary.add( deletedMember );
+
         // Contextual facets are the only library members that also are children of other members via the
         // contributed facet.
         if (deletedMember instanceof OtmContextualFacet) {
@@ -138,7 +138,7 @@ public class DeleteLibraryMemberAction extends DexRunAction {
         }
 
         // TESTME - assigns to LM even if a descendant was assigned
-        for (Entry<OtmTypeUser,OtmTypeProvider> entry : typeUsers.entrySet())
+        for (Entry<OtmTypeUser,OtmTypeProvider> entry : typeUserMap.entrySet())
             entry.getKey().setAssignedType( entry.getValue() );
 
         // log.debug( "Undo delete of " + get() );

@@ -26,6 +26,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.otmContainers.OtmVersionChain;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
@@ -91,6 +92,18 @@ public class AssignResourceSubjectAction extends DexRunAction {
             return false;
         if (subject.getLibrary() == null)
             return false;
+        if (subject.getLibrary().getVersionChain() == null)
+            return false;
+
+        if (!subject.isEditable())
+            return false;
+        OtmVersionChain chain = subject.getLibrary().getVersionChain();
+        boolean canAssign = chain.canAssignLaterVersion( (OtmResource) subject );
+        // FIXME - test and assure conditions are correct
+        // Should be canAssignLaterVersion?
+        // Should not be isEditable() ?
+        // if (!subject.getLibrary().isChainEditable())
+        // return false;
         return (subject.getLibrary().getVersionChain().isNewToChain( subject.getOwningMember() ));
 
         // if (subject instanceof OtmResource

@@ -104,7 +104,7 @@ public class TestOtmDomain {
     public static OtmDomain buildOtm(String fullName, OtmModelManager mgr) {
         String libName = "DomainLib_" + OtmDomain.getDomainName( fullName );
         OtmLibrary lib = TestLibrary.buildOtm( mgr, fullName, "Pre", libName );
-        mgr.add( lib.getTL() );
+        mgr.addLibrary( lib.getTL() );
         OtmDomain domain = mgr.getDomain( fullName );
         assertTrue( domain != null );
         assertTrue( domain.getDomain().equals( fullName ) );

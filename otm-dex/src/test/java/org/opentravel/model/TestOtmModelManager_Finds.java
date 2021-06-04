@@ -59,6 +59,9 @@ import java.util.List;
 /**
  * Verifies the functions of the <code>Otm Model Manager</code>.
  */
+// TODO - these all test OtmModelMembersManager methods.
+// Leave facade tests here, move business logic tests to their own junit.
+
 // @Ignore
 public class TestOtmModelManager_Finds extends AbstractFxTest {
     // public class TestOtmModelManager_Gets extends AbstractFxTest {
@@ -234,8 +237,8 @@ public class TestOtmModelManager_Finds extends AbstractFxTest {
     @Test
     public void testFindUsersOf_ProviderLibraryChanged() {
         OtmModelManager mgr = new OtmModelManager( null, null, null );
-        OtmLibrary lib = TestLibrary.buildOtm( mgr );
-        OtmLibrary lib2 = TestLibrary.buildOtm( mgr );
+        OtmLibrary lib = TestLibrary.buildOtm( mgr, "http://example.com/ns1", "p1", "Name1" );
+        OtmLibrary lib2 = TestLibrary.buildOtm( mgr, "http://example.com/ns2", "p2", "Name2" );
 
         // Given - a provider
         OtmSimpleObject provider = TestOtmSimple.buildOtm( lib, "TheProvider" );
@@ -268,7 +271,7 @@ public class TestOtmModelManager_Finds extends AbstractFxTest {
     }
 
     /**
-     * This setup was failing in {@link TestSetLibraryAction#testSetWhenAssigned()}
+     * This setup was failing in {@link TestSetLibraryAction#testDoIt()}
      * 
      * @throws IllegalAccessException
      * @throws InstantiationException

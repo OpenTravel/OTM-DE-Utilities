@@ -40,4 +40,5 @@ public class DexReadOnlyActionManager extends DexActionManagerBase {
             return CopyLibraryMemberAction.isEnabled( subject );
         return false;
     }
+    // TODO - should this also account for chainEditable?
 }

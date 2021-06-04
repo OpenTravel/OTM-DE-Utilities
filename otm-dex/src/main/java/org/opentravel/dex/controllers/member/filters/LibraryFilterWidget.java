@@ -31,7 +31,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Tooltip;
 
 /**
- * Widget for library selection.
+ * Widget for library selection filter based on member name.
  * 
  * @author dmh
  *
@@ -46,6 +46,7 @@ public class LibraryFilterWidget extends FilterWidget {
     private OtmModelManager modelMgr;
     private TreeMap<String,OtmLibrary> libraryMap = new TreeMap<>();
     private String libraryFilter = null;
+    private OtmLibrary eventLibrary = null;
 
     public LibraryFilterWidget(MemberFilterController parent, ChoiceBox<String> librarySelector) {
         super( parent );
@@ -111,6 +112,11 @@ public class LibraryFilterWidget extends FilterWidget {
         if (member == null || member.getLibrary() == null || member.getLibrary().getName() == null)
             return true;
 
+        // Specific library mode
+        if (eventLibrary != null)
+            return member.getLibrary() == eventLibrary;
+
+        // Matching library name mode
         // Filter is active, return true if it matches
         return member.getLibrary().getName().startsWith( libraryFilter );
     }
@@ -128,9 +134,14 @@ public class LibraryFilterWidget extends FilterWidget {
      * @param event
      */
     public void selectionHandler(DexLibrarySelectionEvent event) {
-        if (event != null && event.getLibrary() != null && !event.getLibrary().getName().equals( libraryFilter )) {
-            libraryFilter = event.getLibrary().getName();
-            librarySelector.getSelectionModel().select( event.getLibrary().getName() );
+        if (event != null && event.getLibrary() != null) {
+            if (!event.getLibrary().getName().equals( libraryFilter )) {
+                libraryFilter = event.getLibrary().getName();
+                librarySelector.getSelectionModel().select( event.getLibrary().getName() );
+            }
+            // Enable specific library mode
+            // setLibraryFilter() is called when selector is set
+            eventLibrary = event.getLibrary();
             parentController.fireFilterChangeEvent();
         }
     }
@@ -172,6 +183,7 @@ public class LibraryFilterWidget extends FilterWidget {
      * @param lib
      */
     private void setLibraryFilter(OtmLibrary lib) {
+        eventLibrary = null; // Go back to namespace mode
         if (lib == null) {
             librarySelector.getSelectionModel().select( 0 );
             libraryFilter = null;

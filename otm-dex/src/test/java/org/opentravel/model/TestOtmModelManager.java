@@ -16,7 +16,6 @@
 
 package org.opentravel.model;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -24,14 +23,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.AbstractDexTest;
 import org.opentravel.TestDexFileHandler;
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.AbstractOTMApplication;
+import org.opentravel.common.DexProjectException;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.OtmLocalLibrary;
+import org.opentravel.model.otmContainers.OtmMajorLibrary;
+import org.opentravel.model.otmContainers.OtmProject;
+import org.opentravel.model.otmContainers.OtmVersionChainEmpty;
+import org.opentravel.model.otmContainers.OtmVersionChainVersioned;
+import org.opentravel.model.otmContainers.TestLibrary;
+import org.opentravel.model.otmContainers.TestOtmVersionChain;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.objecteditor.ObjectEditorController;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.model.LibraryMember;
@@ -39,8 +46,9 @@ import org.opentravel.schemacompiler.model.TLModel;
 import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.ProjectManager;
-import org.opentravel.utilities.testutil.AbstractFxTest;
-import org.opentravel.utilities.testutil.TestFxMode;
+import org.opentravel.schemacompiler.repository.PublishWithLocalDependenciesException;
+import org.opentravel.schemacompiler.repository.RepositoryException;
+import org.opentravel.schemacompiler.repository.RepositoryManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,22 +57,19 @@ import java.util.List;
  * Verifies the functions of the <code>Otm Model Manager</code>.
  */
 // @Ignore
-public class TestOtmModelManager extends AbstractFxTest {
+public class TestOtmModelManager extends AbstractDexTest {
     private static Log log = LogFactory.getLog( TestOtmModelManager.class );
 
-    public static final boolean RUN_HEADLESS = true;
-    final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.
-
-    final static String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector
-    final static String FILE_TESTOPENTRAVELREPO = "TestOpenTravelRepo.otp";
-    final static String FILE_TESTLOCAL = "TestLocalFiles.otp";
+    // final static String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector
+    // final static String FILE_TESTOPENTRAVELREPO = "TestOpenTravelRepo.otp";
+    // final static String FILE_TESTLOCAL = "TestLocalFiles.otp";
 
     @BeforeClass
     public static void setupTests() throws Exception {
-        setupWorkInProcessArea( TestOtmModelManager.class );
-        repoManager = repositoryManager.get();
-        // Prevent java.nio.BufferOverflowException
-        System.setProperty( "headless.geometry", "2600x2200-32" );
+        beforeClassSetup( TestOtmModelManager.class );
+        // setupWorkInProcessArea( TestOtmModelManager.class );
+        // // Prevent java.nio.BufferOverflowException
+        // System.setProperty( "headless.geometry", "2600x2200-32" );
     }
 
     /**
@@ -76,7 +81,13 @@ public class TestOtmModelManager extends AbstractFxTest {
     public static OtmModelManager build() {
         DexFullActionManager fullMgr = new DexFullActionManager( null );
         OtmModelManager mgr = new OtmModelManager( fullMgr, repoManager, null );
-        mgr.addBuiltInLibraries( new TLModel() );
+        // Done in constructor - mgr.addLibraries_BuiltIn( new TLModel() );
+
+        // Assure - manually check
+        // TLModel tlModel = mgr.getTlModel();
+        // tlModel.setListenersEnabled( true );
+        // tlModel.addListener( new ModelIntegrityChecker() );
+
         return mgr;
     }
 
@@ -88,7 +99,7 @@ public class TestOtmModelManager extends AbstractFxTest {
      */
     public static OtmModelManager buildModelManager(DexActionManager actionManager) {
         OtmModelManager mgr = new OtmModelManager( actionManager, repoManager, null );
-        mgr.addBuiltInLibraries( new TLModel() );
+        mgr.addLibraries_BuiltIn( new TLModel() );
         return mgr;
     }
 
@@ -112,36 +123,6 @@ public class TestOtmModelManager extends AbstractFxTest {
         return users;
     }
 
-
-    // @Test
-    // public void testAddingManagedProject() throws Exception {
-    //
-    // // Given a project that uses the OpenTravel repository
-    // OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
-    // TestDexFileHandler.loadAndAddManagedProject( mgr );
-    //
-    // //
-    // for (OtmLibrary lib : mgr.getLibraries())
-    // log.debug( "Library " + lib + " opened." );
-    //
-    // // Then - Expect 4 libraries and 63 members
-    // assertTrue( mgr.getLibraries().size() > 2 );
-    // assertTrue( !mgr.getMembers().isEmpty() );
-    // log.debug( "Read " + mgr.getMembers().size() + " members." );
-    // for (OtmLibraryMember m : mgr.getMembers()) {
-    // assertTrue( m.getTL().getOwningModel() == mgr.getTlModel() );
-    // // if (m instanceof OtmContextualFacet)
-    // // TestContextualFacet.testContributedFacet( ((OtmContextualFacet) m).getWhereContributed(),
-    // // (OtmContextualFacet) m, ((OtmContextualFacet) m).getContributedObject() );
-    // }
-    // // Then - assure each base namespace has an non-empty chain
-    // assertNotNull( mgr.getBaseNamespaces() );
-    // assertTrue( !mgr.getBaseNamespaces().isEmpty() ); // There should be base namespaces
-    // mgr.getBaseNamespaces().forEach( b -> assertTrue( !mgr.getLibraryChain( b ).isEmpty() ) );
-    //
-    // mapTests( mgr );
-    // }
-
     @Test
     public void testClose() throws Exception {
         // Given - project added to the model manager
@@ -150,15 +131,11 @@ public class TestOtmModelManager extends AbstractFxTest {
         // mapTests( mgr );
 
         // Given assertions
-        assertFalse( mgr.getBaseNamespaces().isEmpty() );
-        for (String baseNS : mgr.getBaseNamespaces()) {
-            assertFalse( mgr.getLibraryChain( baseNS ).isEmpty() );
-        }
+        assertTrue( "Given: ", !mgr.getBaseNamespaces().isEmpty() );
         int baseNSCount = mgr.getBaseNamespaces().size();
-        // OtmModelManager mgr = new OtmModelManager( null, null );
-        // mgr.addBuiltInLibraries( new TLModel() );
         assertNotNull( mgr.getIdType() );
         assertNotNull( mgr.getEmptyType() );
+
 
         // When - cleared
         mgr.clear();
@@ -201,40 +178,6 @@ public class TestOtmModelManager extends AbstractFxTest {
         checkContains( mgr.getProjectManager(), mgr );
     }
 
-    // @Test
-    // public void testAddingLibrariesToEmptyModel() {
-    // // Given a model manager and TL Model with library loaded
-    // OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
-    // TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr );
-    // assertTrue( "Given: no user libraries in model manager yet.", mgr.getUserLibraries().isEmpty() );
-    //
-    // // When - libraries are added to model manager
-    // mgr.getTlModel().getUserDefinedLibraries().forEach( tlLib -> {
-    // OtmLibrary newLib = mgr.add( tlLib );
-    // assertTrue( newLib != null );
-    // } );
-    //
-    // // Then - there will be user libraries
-    // assertTrue( !mgr.getUserLibraries().isEmpty() );
-    // }
-    //
-    // @Test
-    // public void testAddingLibrariesToModel() {
-    // OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
-    // TestDexFileHandler.loadUnmanagedProject( mgr );
-    //
-    // int initialMemberCount = mgr.getMembers().size();
-    // TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLOCALLIBRARY, mgr );
-    //
-    // // int initialMemberCount = mgr.getMembers().size();
-    // log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
-    // + " members." );
-    // mgr.getTlModel().getUserDefinedLibraries().forEach( tlLib -> mgr.add( tlLib ) );
-    // log.debug( "Model size is now: " + mgr.getLibraries().size() + " libraries and " + mgr.getMembers().size()
-    // + " members." );
-    // assertTrue( mgr.getMembers().size() > initialMemberCount );
-    // }
-    //
     private void checkContains(ProjectManager pm, OtmModelManager mgr) {
         for (ProjectItem pi : pm.getAllProjectItems()) {
             assertTrue( "Must contain the tlLibrary in project item.", mgr.contains( pi.getContent() ) );
@@ -255,86 +198,7 @@ public class TestOtmModelManager extends AbstractFxTest {
         }
     }
 
-    // /**
-    // * Test libraries in the manger to assure they have TL libraries and managing projects.
-    // *
-    // * @param mgr
-    // */
-    // private void mapTests(OtmModelManager mgr) {
-    //
-    // // Then - assure each library maps to the same TL as the otmLibrary's tlObject
-    // for (OtmLibrary otmLibrary : mgr.getLibraries()) {
-    // assertNotNull( mgr.get( otmLibrary ) );
-    // assertTrue( otmLibrary == mgr.get( mgr.get( otmLibrary ) ) );
-    // assertTrue( otmLibrary == mgr.get( otmLibrary.getTL() ) );
-    // }
-    //
-    // // Then - there are projects and each library is managed by a project
-    // Collection<OtmProject> projects = mgr.getProjects();
-    // assertTrue( !projects.isEmpty() );
-    // mgr.getLibraries().forEach( l -> assertTrue( projects.contains( mgr.getManagingProject( l ) ) ) );
-    // }
 
-    // // Moved to TestOtmModelManager_Adds
-    // @Test
-    // public void testAddingUnmangedProject() throws Exception {
-    //
-    // OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
-    // TLModel tlModel = mgr.getTlModel();
-    // assertNotNull( tlModel );
-    //
-    // // Given a project that uses local library files
-    // TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
-    // assertTrue( "Must have project items.", !mgr.getProjectManager().getAllProjectItems().isEmpty() );
-    //
-    // // Then - expect at least one project
-    // Collection<OtmProject> p = mgr.getProjects();
-    // assertTrue( mgr.getUserProjects().size() == 1 );
-    // assertTrue( mgr.getProjects().size() == 2 );
-    //
-    // // Then - Expect 6 libraries and 70 members
-    // assertTrue( mgr.getLibraries().size() > 2 );
-    // assertTrue( !mgr.getMembers().isEmpty() );
-    // log.debug( "Read " + mgr.getMembers().size() + " members." );
-    //
-    // // Then - assure each base namespace has an non-empty set. Library view lists libraries by baseNS.
-    // assertNotNull( mgr.getBaseNamespaces() );
-    // assertTrue( !mgr.getBaseNamespaces().isEmpty() ); // There should be base namespaces
-    // mgr.getBaseNamespaces().forEach( b -> assertTrue( !mgr.getLibraryChain( b ).isEmpty() ) );
-    //
-    //
-    // mapTests( mgr );
-    // }
-
-    // /**
-    // * moved to {@link TestContextualFacet}
-    // */
-    // @Test
-    // public void testOpenedContextualFacets() {
-    // OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
-    // // Given a project that uses local library files
-    // TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
-    // for (OtmLibrary lib : mgr.getLibraries())
-    // log.debug( "Library " + lib + " opened." );
-    // assertTrue( "Must have project items.", !mgr.getProjectManager().getAllProjectItems().isEmpty() );
-    //
-    // for (OtmLibraryMember m : mgr.getMembers()) {
-    // if (m instanceof OtmContextualFacet) {
-    // OtmContributedFacet contrib = ((OtmContextualFacet) m).getWhereContributed();
-    // OtmLibraryMember base = ((OtmContextualFacet) m).getContributedObject();
-    // if (contrib != null && base != null)
-    // TestContextualFacet.testContributedFacet( contrib, (OtmContextualFacet) m, base );
-    // else {
-    // String oeName = ((TLContextualFacet) m.getTL()).getOwningEntityName();
-    // log.debug( "Bad contextual facet: " + m + " Entity name = " + oeName );
-    // for (OtmLibraryMember candidate : mgr.getMembers()) {
-    // if (candidate.getNameWithPrefix().equals( oeName ))
-    // log.debug( "Name Match Found " );
-    // }
-    // }
-    // }
-    // }
-    // }
 
     /**
      * Test hasEditableLibraries() hasEditableLibraries(library) hasProjects()
@@ -358,6 +222,62 @@ public class TestOtmModelManager extends AbstractFxTest {
             mgr.hasEditableLibraries( lib ); // NPE check
             mgr.isLatest( lib ); // NPE check
         }
+    }
+
+    @Test
+    public void testChangeToManaged()
+        throws DexProjectException, RepositoryException, PublishWithLocalDependenciesException {
+        // Givens - set up a library most of the way through publishing
+        OtmModelManager mgr = getModelManager();
+        OtmProject proj = TestOtmProjectManager.buildProject( getModelManager() );
+        OtmProjectManager otmProjectManager = mgr.getOtmProjectManager();
+        ProjectManager tlProjectManager = mgr.getProjectManager();
+        RepositoryManager repository = getRepository();
+        assertTrue( "Given: ", repository != null );
+
+        OtmLocalLibrary localLib = buildTempLibrary( null, null, "TMMCTM" );
+        proj.add( localLib );
+
+        // Do part of the publish process.
+        // Get and check the project item
+        ProjectItem item = otmProjectManager.getProjectItem( localLib.getTL() ); // Throws exception
+        tlProjectManager.publish( item, repository );
+        OtmMajorLibrary newLib = new OtmMajorLibrary( localLib );
+
+        assertTrue( "Given: ", mgr.getLibraries().contains( localLib ) );
+        assertTrue( "Given: ", !mgr.getLibraries().contains( newLib ) );
+        assertTrue( "Given: ", mgr.getVersionChain( localLib ) instanceof OtmVersionChainEmpty );
+        assertTrue( "Given: ", mgr.getVersionChain( newLib ) == null );
+
+        // When
+        mgr.changeToManaged( localLib, newLib );
+
+        // Then
+        assertTrue( "Then: ", !mgr.getLibraries().contains( localLib ) );
+        assertTrue( "Then: ", mgr.getLibraries().contains( newLib ) );
+        assertTrue( "Then: ", mgr.getVersionChain( localLib ) == null );
+        assertTrue( "Then: ", mgr.getVersionChain( newLib ) instanceof OtmVersionChainVersioned );
+
+    }
+
+    /**
+     * Don't fix problems here, fix in {@link TestOtmVersionChain#testIsLatest()}
+     */
+    @Test
+    public void testIsLatest() {
+        OtmModelManager mgr = getModelManager();
+
+        OtmLibrary localLib = TestLibrary.buildOtm( mgr );
+        OtmLibrary majorLib = buildMajor( "TMM1" );
+        OtmLibrary minor1 = buildMinor( majorLib );
+        OtmLibrary minor2 = buildMinor( minor1 );
+        OtmLibrary majorLib2 = buildMajor( "TMM2" );
+
+        assertTrue( "Then: ", mgr.isLatest( localLib ) == true );
+        assertTrue( "Then: ", mgr.isLatest( majorLib ) == false );
+        assertTrue( "Then: ", mgr.isLatest( minor1 ) == false );
+        assertTrue( "Then: ", mgr.isLatest( minor2 ) == true );
+        assertTrue( "Then: ", mgr.isLatest( majorLib2 ) == true );
     }
 
     @Test
@@ -415,27 +335,5 @@ public class TestOtmModelManager extends AbstractFxTest {
         return settings;
     }
 
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
-     */
-    @Override
-    protected Class<? extends AbstractOTMApplication> getApplicationClass() {
-        return ObjectEditorApp.class;
-    }
-
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
-     */
-    @Override
-    protected String getBackgroundTaskNodeQuery() {
-        return "#libraryText";
-    }
-
-    /**
-     * Configure headless/normal mode for TestFX execution.
-     */
-    static {
-        TestFxMode.setHeadless( RUN_HEADLESS );
-    }
 }
 

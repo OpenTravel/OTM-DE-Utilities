@@ -19,13 +19,22 @@ package org.opentravel.model;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.common.DexFileHandler;
+import org.opentravel.common.DexProjectException;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.OtmLibraryFactory;
+import org.opentravel.model.otmContainers.OtmLocalLibrary;
+import org.opentravel.model.otmContainers.OtmMajorLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.repository.Project;
+import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.ProjectManager;
+import org.opentravel.schemacompiler.repository.PublishWithLocalDependenciesException;
+import org.opentravel.schemacompiler.repository.Repository;
+import org.opentravel.schemacompiler.repository.RepositoryException;
+import org.opentravel.schemacompiler.repository.RepositoryItemState;
 import org.opentravel.schemacompiler.repository.impl.BuiltInProject;
 import org.opentravel.schemacompiler.saver.LibrarySaveException;
 
@@ -51,19 +60,20 @@ import javafx.concurrent.WorkerStateEvent;
 public class OtmProjectManager implements TaskResultHandlerI {
     private static Log log = LogFactory.getLog( OtmProjectManager.class );
 
+    // TODO - why have a duplicate project store? Consider just using the TLProjMrg's project list.
     // Open projects - projectName and otmProject
     private Map<String,OtmProject> projects = new HashMap<>();
     private OtmModelManager modelManager = null;
 
     private HashMap<String,File> projectFileMap = new HashMap<>();
 
-    private ProjectManager projectManager;
+    private ProjectManager tlProjectManager;
     private UserSettings userSettings;
 
 
 
     /**
-     * Create a model manager.
+     * Create an OTM Project manager.
      * 
      * @param fullActionManager edit-enabled action manager to assign to all members. If null, read-only action manager
      *        will be used.
@@ -73,14 +83,14 @@ public class OtmProjectManager implements TaskResultHandlerI {
     public OtmProjectManager(OtmModelManager modelManager, ProjectManager projectManager) {
         this.modelManager = modelManager;
         this.userSettings = modelManager.getUserSettings();
-        this.projectManager = projectManager;
+        this.tlProjectManager = projectManager;
     }
 
 
     /**
-     * Check all the libraries in the TL Model and add those that have not already been added.
+     * Using the TLProject's name, add project to project map and to recent projects in user settings.
      */
-    public void add(OtmProject project) {
+    private void add(OtmProject project) {
         if (project.getTL() != null && project.getTL().getName() != null) {
             projects.putIfAbsent( project.getTL().getName(), project );
             if (hasSettings()) {
@@ -91,13 +101,18 @@ public class OtmProjectManager implements TaskResultHandlerI {
     }
 
     /**
-     * Add the compiler (TL) project if it has not already been added.
+     * If the TL-Project'name is not in the map, create a new OtmProject facade and {@link #add(OtmProject)}.
      * 
      * @param tlProject
      */
-    public void add(Project tlProject) {
-        if (!projects.containsKey( tlProject.getName() ))
-            add( new OtmProject( tlProject, modelManager ) );
+    public OtmProject add(Project tlProject) {
+        OtmProject otp = null;
+        if (tlProject != null && tlProject.getName() != null && !tlProject.getName().isEmpty()
+            && !projects.containsKey( tlProject.getName() )) {
+            otp = new OtmProject( tlProject, modelManager );
+            add( otp );
+        }
+        return otp;
     }
 
     /**
@@ -116,8 +131,8 @@ public class OtmProjectManager implements TaskResultHandlerI {
      */
     public void clear() {
         projects.clear();
-        if (projectManager != null)
-            projectManager.closeAll();
+        if (tlProjectManager != null)
+            tlProjectManager.closeAll();
         // log.debug( "Cleared projects. ");
     }
 
@@ -212,9 +227,8 @@ public class OtmProjectManager implements TaskResultHandlerI {
      * @return project file map which may be empty
      */
     public Map<String,File> getProjects(File initialDirectory) {
-        DexFileHandler fileHandler = new DexFileHandler();
         if (initialDirectory != null) {
-            for (File file : fileHandler.getProjectList( initialDirectory )) {
+            for (File file : DexFileHandler.getProjectList( initialDirectory )) {
                 projectFileMap.put( file.getName(), file );
             }
         }
@@ -229,12 +243,15 @@ public class OtmProjectManager implements TaskResultHandlerI {
      * @param library
      * @return
      */
+    // FIXME - this whole idea is flawed. Fix it or remove it if it is not really needed.
+    // This not even used!!!
+    @Deprecated
     public OtmProject getManagingProject(OtmLibrary library) {
-        library.getBaseNamespace();
+        library.getBaseNS();
         OtmProject foundProject = null;
         for (OtmProject project : projects.values()) {
             if (project.contains( library.getTL() ))
-                if (foundProject == null || library.getBaseNamespace().startsWith( project.getTL().getProjectId() ))
+                if (foundProject == null || library.getBaseNS().startsWith( project.getTL().getProjectId() ))
                     foundProject = project;
         }
         return foundProject;
@@ -268,7 +285,7 @@ public class OtmProjectManager implements TaskResultHandlerI {
      * @return userSettings or null
      */
     private Boolean hasSettings() {
-        if (userSettings == null)
+        if (userSettings == null && modelManager != null)
             userSettings = modelManager.getUserSettings();
         return userSettings != null;
     }
@@ -292,6 +309,7 @@ public class OtmProjectManager implements TaskResultHandlerI {
         // log.debug( "Task complete" );
     }
 
+
     /**
      * Create a new project.
      * 
@@ -314,34 +332,38 @@ public class OtmProjectManager implements TaskResultHandlerI {
 
         OtmProject op = null;
 
-        // if (projectManager == null) {
-        // // Try to find one to use - this should be dead code (7/15/2019)
-        // for (OtmProject o : projects.values())
-        // projectManager = o.getTL().getProjectManager();
-        // }
-        if (projectManager == null)
+        if (tlProjectManager == null)
             throw new IllegalArgumentException( "Missing required project manager." );
 
         // log.debug( "Creating new project in file: " + projectFile.getAbsolutePath() );
 
-        Project p = new Project( projectManager );
+        // The only way to add a project to the tlProjectManager is via newProject()
+        Project p = null;
         try {
-            p.setProjectFile( projectFile );
-            p.setProjectId( projectId );
+            p = tlProjectManager.newProject( projectFile, projectId, name, description );
+            // p = new Project( tlProjectManager );
+        } catch (LibrarySaveException e) {
+            log.debug( "NewProject exception: " + e.getLocalizedMessage() );
+        }
+        if (p != null) {
+            try {
+                op = new OtmProject( p, modelManager );
+                op.setDefaultContextId( defaultContextId );
+                // These values are stored in the TLProject
+                // op.setDescription( description );
+                // op.setName( name );
 
-            op = new OtmProject( p, modelManager );
-            op.setDefaultContextId( defaultContextId );
-            op.setDescription( description );
-            op.setName( name );
+                // Saving project causes file write of contents
+                tlProjectManager.saveProject( p );
 
-            // Saving project causes file write of contents
-            projectManager.saveProject( p );
-
-            // register project in projects map
-            projects.put( name, op );
-        } catch (IllegalArgumentException e) {
-            log.warn( "Exception creating project: " + e.getLocalizedMessage() );
-            throw new IllegalArgumentException( "Could not create valid project: " + e.getLocalizedMessage() );
+                // register project in projects map
+                if (projects.get( name ) != null)
+                    log.warn( "Already had project with same name." );
+                projects.put( name, op );
+            } catch (IllegalArgumentException e) {
+                log.warn( "Exception creating project: " + e.getLocalizedMessage() );
+                throw new IllegalArgumentException( "Could not create valid project: " + e.getLocalizedMessage() );
+            }
         }
         return op;
     }
@@ -353,9 +375,63 @@ public class OtmProjectManager implements TaskResultHandlerI {
      * @return compiler/repository/tlModel's project manager
      */
     public ProjectManager getTLProjectManager() {
-        return projectManager;
+        return tlProjectManager;
     }
 
+    /**
+     * Publish library into passed repository. Creates new library when successful.
+     * <p>
+     * Used by ManageLibraryTask
+     * 
+     * @param library
+     * @param repository
+     * @throws DexProjectException
+     */
+    public OtmMajorLibrary publish(OtmLocalLibrary library, Repository repository) throws DexProjectException {
+        // Pre-checks
+        if (library == null || library.getTL() == null || library.getModelManager() == null)
+            throw new DexProjectException( "Missing library information." );
+        if (!(library instanceof OtmLocalLibrary))
+            throw new DexProjectException( "Library must be an unmanged, local library." );
+        if (repository == null)
+            throw new DexProjectException( "Missing repository to publish into." );
+        if (tlProjectManager == null)
+            throw new DexProjectException( "Missing TL Project Manager." );
 
+        // Get and check the project item
+        ProjectItem item = getProjectItem( library.getTL() ); // Throws exception
 
+        // Publish the item
+        try {
+            tlProjectManager.publish( item, repository );
+        } catch (RepositoryException | PublishWithLocalDependenciesException e) {
+            throw new DexProjectException( "Project Publish Exception: " + e.getLocalizedMessage() );
+        }
+
+        // Post-check
+        if (item.getState() == RepositoryItemState.UNMANAGED)
+            throw new DexProjectException( "Library was not managed in repository." );
+
+        // Create new library for the item and inform the model manager
+        // OtmMajorLibrary newLib = OtmLibraryFactory.newLibrary( library );
+        // return newLib;
+        return OtmLibraryFactory.newLibrary( library );
+    }
+
+    /**
+     * Get the project item for the passed library from the TL Project Manager.
+     * 
+     * @param tlLib
+     * @return item
+     * @throws DexProjectException if not found or state is not UNMANAGED
+     */
+    public ProjectItem getProjectItem(AbstractLibrary tlLib) throws DexProjectException {
+        // Get and check the project item
+        ProjectItem item = tlProjectManager.getProjectItem( tlLib );
+        if (item == null)
+            throw new DexProjectException( "Missing project item information." );
+        if (item.getState() != RepositoryItemState.UNMANAGED)
+            throw new DexProjectException( "Library item is already managed in repository." );
+        return item;
+    }
 }

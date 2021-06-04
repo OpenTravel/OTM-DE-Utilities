@@ -122,19 +122,5 @@ public abstract class TestActionsIsEnabledBase {
         // + " for " + param );
         assertTrue( "Test: ", expected == actionManager.isEnabled( actionEnum, property, param ) );
     }
-
-
-    // public DexAction getAction(DexActions actionEnum, OtmObject subject) {
-    // DexAction<?> action = null;
-    // try {
-    // action = DexActions.getAction( actionEnum, subject, actionManager );
-    // } catch (ExceptionInInitializerError | InstantiationException | IllegalAccessException e) {
-    // log.debug( "Error getting action. " + e.getMessage() );
-    // }
-    // // Then
-    // assertTrue( action instanceof DexAction );
-    // return action;
-    // }
-
 }
 

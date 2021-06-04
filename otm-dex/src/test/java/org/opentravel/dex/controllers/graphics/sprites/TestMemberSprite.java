@@ -22,11 +22,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentravel.application.common.AbstractOTMApplication;
-import org.opentravel.dex.action.manager.DexFullActionManager;
+import org.opentravel.AbstractDexTest;
 import org.opentravel.dex.controllers.graphics.sprites.rectangles.PropertyRectangle;
 import org.opentravel.dex.controllers.graphics.sprites.rectangles.Rectangle;
-import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
@@ -41,22 +39,15 @@ import org.opentravel.model.otmProperties.OtmAttribute;
 import org.opentravel.model.otmProperties.OtmElement;
 import org.opentravel.model.otmProperties.TestElement;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
-import org.opentravel.objecteditor.ObjectEditorApp;
-import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLProperty;
-import org.opentravel.utilities.testutil.AbstractFxTest;
-import org.opentravel.utilities.testutil.TestFxMode;
 
 import java.util.List;
 
 /**
  * Verifies the functions of the <code>SelectProjectDialog</code>
  */
-public class TestMemberSprite extends AbstractFxTest {
+public class TestMemberSprite extends AbstractDexTest {
     private static Log log = LogFactory.getLog( TestOtmModelManager.class );
-
-    public static final boolean RUN_HEADLESS = true;
-    final int WATCH_TIME = 5000; // How long to sleep so we can see what is happening. Can be 0.
 
     final String FXID_PROJECTLIST = "#projectList";
     final String FXID_LIBTREETABLE = "#librariesTreeTable";
@@ -65,17 +56,13 @@ public class TestMemberSprite extends AbstractFxTest {
 
     @BeforeClass
     public static void setupTests() throws Exception {
-        setupWorkInProcessArea( TestMemberSprite.class );
-        repoManager = repositoryManager.get();
-        // Prevent java.nio.BufferOverflowException
-        System.setProperty( "headless.geometry", "2600x2200-32" );
+        beforeClassSetup( TestMemberSprite.class );
     }
 
     @Test
     public void testConstructor() {
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = TestLibrary.buildOtm();
+
         TestLibrary.addOneOfEach( lib );
         spriteMgr = TestSpriteManager.buildSpriteManager();
 
@@ -93,9 +80,7 @@ public class TestMemberSprite extends AbstractFxTest {
     @Test
     public void testGetProperty() {
         // Set up
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = TestLibrary.buildOtm();
         spriteMgr = TestSpriteManager.buildSpriteManager();
 
         // Givens
@@ -126,10 +111,7 @@ public class TestMemberSprite extends AbstractFxTest {
 
     @Test
     public void testDraw() {
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
-        // TestLibrary.addOneOfEach( lib );
+        OtmLibrary lib = TestLibrary.buildOtm();
         spriteMgr = TestSpriteManager.buildSpriteManager();
 
         OtmCore otm1 = TestCore.buildOtm( lib );
@@ -151,28 +133,5 @@ public class TestMemberSprite extends AbstractFxTest {
         csExpanded.draw( null, 10, 10 ); // 433 x 216
         assertTrue( csExpanded.getWidth() > csCollapsed.getWidth() );
         assertTrue( csExpanded.getHeight() > csCollapsed.getHeight() );
-    }
-
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
-     */
-    @Override
-    protected Class<? extends AbstractOTMApplication> getApplicationClass() {
-        return ObjectEditorApp.class;
-    }
-
-    /**
-     * Configure headless/normal mode for TestFX execution.
-     */
-    static {
-        TestFxMode.setHeadless( RUN_HEADLESS );
-    }
-
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
-     */
-    @Override
-    protected String getBackgroundTaskNodeQuery() {
-        return "#libraryText";
     }
 }

@@ -25,6 +25,7 @@ import org.opentravel.dex.events.DexLibrarySelectionEvent;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.OtmVersionChain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -303,10 +304,15 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
             postedData = modelMgr;
             clear();
 
-            // create cells for libraries in a namespace. Latest at top, older ones under it.
-            for (String baseNS : modelMgr.getBaseNamespaces()) {
-                LibraryDAO.createNSItems( baseNS, modelMgr, root, editableOnlyFilter );
+            for (OtmVersionChain chain : modelMgr.getChains()) {
+                LibraryDAO.createNSItems( chain, root, editableOnlyFilter );
             }
+
+            // // create cells for libraries in a namespace. Latest at top, older ones under it.
+            // // for (String baseNS : modelMgr.getBaseNamespaces()) {
+            // for (String chainName : modelMgr.getChainNames()) {
+            // LibraryDAO.createNSItems( chainName, modelMgr, root, editableOnlyFilter );
+            // }
         }
         librariesTreeTable.getSortOrder().add( nameColumn );
 

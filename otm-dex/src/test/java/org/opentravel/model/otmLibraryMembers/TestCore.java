@@ -21,15 +21,22 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
-import org.opentravel.model.otmProperties.OtmIdAttribute;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLCoreObject;
 import org.opentravel.schemacompiler.model.TLProperty;
+import org.opentravel.schemacompiler.model.XSDSimpleType;
+import org.opentravel.schemacompiler.validate.ValidationFinding;
+
+import java.net.URL;
+import java.util.List;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 
@@ -48,6 +55,16 @@ public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
         baseObject = buildOtm( staticModelManager );
         baseObject.setName( "BaseCO" );
     }
+
+    @Before
+    public void beforeMethods() {
+        staticModelManager.clear();
+
+        staticLib = TestLibrary.buildOtm();
+        subject = buildOtm( staticLib, "SubjectCF" );
+        baseObject = buildOtm( staticLib, "BaseCF" );
+    }
+
 
     @Test
     public void testFacets() {
@@ -77,18 +94,26 @@ public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
      * @return
      */
     public static OtmCore buildOtm(OtmModelManager mgr) {
-        OtmCore core = new OtmCore( buildTL(), mgr );
+        OtmCore core = new OtmCore( buildTL( mgr.getStringType().getTL() ), mgr );
         mgr.add( core );
         assertNotNull( core );
-        core.setAssignedType( TestXsdSimple.buildOtm( mgr ) );
-        // core.getTL().getSummaryFacet().addAttribute( new TLAttribute() );
-        core.getTL().getSummaryFacet().addElement( new TLProperty() );
-        TLAttribute tlId = new TLAttribute();
-        core.getTL().getSummaryFacet().addAttribute( tlId );
-        OtmIdAttribute<TLAttribute> id = new OtmIdAttribute<TLAttribute>( tlId, core.getSummary() );
-        core.getSummary().add( id );
 
-        assertTrue( core.getChildren().size() > 3 );
+        // OtmXsdSimple sType = mgr.getStringType();
+        // core.setAssignedType( sType );
+        // int i = 1;
+        //
+        // TLProperty tlp = new TLProperty();
+        // tlp.setName( "P"+i++ );
+        // tlp.setType( sType.getTL() );
+        // core.getTL().getSummaryFacet().addElement( tlp );
+        //
+        // TLAttribute tlA = new TLAttribute();
+        // tlA.setName( "P"+i++ );
+        // core.getTL().getSummaryFacet().addAttribute( tlA );
+        // OtmIdAttribute<TLAttribute> id = new OtmIdAttribute<TLAttribute>( tlId, core.getSummary() );
+        // core.getSummary().add( id );
+
+        assertTrue( core.getChildren().size() > 3 ); // Is 6
         assertTrue( core.getSummary().getChildren().size() == 2 );
         assertTrue( "Builder - must be managed.", mgr.getMembers().contains( core ) );
         return core;
@@ -97,6 +122,25 @@ public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
     public static TLCoreObject buildTL() {
         TLCoreObject tlCore = new TLCoreObject();
         tlCore.setName( CORE_NAME );
+        return tlCore;
+    }
+
+    public static TLCoreObject buildTL(XSDSimpleType sType) {
+        TLCoreObject tlCore = buildTL();
+        int i = 1;
+
+        tlCore.getSimpleFacet().setSimpleType( sType );
+
+        TLProperty tlp = new TLProperty();
+        tlp.setName( "P" + i++ );
+        tlp.setType( sType );
+        tlCore.getSummaryFacet().addElement( tlp );
+
+        TLAttribute tlA = new TLAttribute();
+        tlA.setName( "P" + i++ );
+        tlA.setType( sType );
+        tlCore.getSummaryFacet().addAttribute( tlA );
+
         return tlCore;
     }
 
@@ -120,9 +164,25 @@ public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
      * @return
      */
     public static OtmCore buildOtm(OtmLibrary lib, String name) {
-        OtmCore core = buildOtm( lib );
-        core.setName( name );
-        assertTrue( "BuildOTM Given", lib.getMembers().contains( core ) );
+        OtmModelManager mgr = lib.getModelManager();
+        URL url = lib.getTL().getLibraryUrl();
+        if (url == null)
+            log.debug( "Missing URL on library." );
+        assertTrue( "Library must have an URL.", url != null );
+
+        OtmCore core = new OtmCore( buildTL( mgr.getStringType().getTL() ), mgr );
+        lib.add( core );
+        mgr.add( core );
+        assertNotNull( core );
+        core.setName( OtmLibraryMemberFactory.getUniqueName( lib, name ) );
+        assertTrue( "Build: ", lib.getMembers().contains( core ) );
+
+        if (!core.isValid()) {
+            log.debug( ValidationUtils.getMessagesAsString( core.getFindings() ) );
+            List<ValidationFinding> findings = core.getFindings().getAllFindingsAsList();
+        }
+        assertTrue( core.isValid() );
+
         return core;
     }
 

@@ -21,10 +21,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
+import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.schemacompiler.model.TLAttribute;
 import org.opentravel.schemacompiler.model.TLExtensionPointFacet;
 import org.opentravel.schemacompiler.model.TLProperty;
@@ -45,6 +48,16 @@ public class TestExtensionPointFacet extends TestOtmLibraryMemberBase<OtmExtensi
         // Needed for library member tests
         baseObject = TestCore.buildOtm( staticModelManager );
         subject = buildOtm( staticModelManager, ((OtmCore) baseObject).getSummary() );
+    }
+
+    @Before
+    public void beforeMethods() {
+        staticModelManager.clear();
+        staticLib = TestLibrary.buildOtm( staticModelManager );
+
+        OtmLibrary baseLib = TestLibrary.buildOtm( staticModelManager, "http://ns2", "bpf", "BaseLib" );
+        baseObject = TestCore.buildOtm( baseLib, "BaseCore" );
+        subject = buildOtm( staticLib, ((OtmCore) baseObject).getSummary() );
     }
 
     @Override
@@ -73,6 +86,13 @@ public class TestExtensionPointFacet extends TestOtmLibraryMemberBase<OtmExtensi
      * ******************************************
      * 
      */
+    private static OtmExtensionPointFacet buildOtm(OtmLibrary lib, OtmObject baseFacet) {
+        assertTrue( "Given: must build into a different library than base object.", lib != baseFacet.getLibrary() );
+        epf = buildOtm( lib.getModelManager(), baseFacet );
+        lib.add( epf );
+        return epf;
+    }
+
     /**
      * Create custom facet and contribute it to the passed business object.
      * 

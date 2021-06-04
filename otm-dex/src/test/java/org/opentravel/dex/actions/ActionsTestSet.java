@@ -30,8 +30,8 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.model.otmContainers.OtmVersionChain;
+import org.opentravel.model.otmContainers.TestOtmVersionChain;
 import org.opentravel.model.otmContainers.TestProject;
-import org.opentravel.model.otmContainers.TestVersionChain;
 import org.opentravel.model.otmFacets.OtmQueryFacet;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.schemacompiler.repository.RepositoryException;
@@ -62,6 +62,13 @@ public class ActionsTestSet {
     public OtmQueryFacet majorQF;
     public OtmQueryFacet minorQF;
 
+    /**
+     * Test set containing model manager, project test set, full/minor/read-only action manager.
+     * 
+     * @param application
+     * @throws DexTaskException
+     * @throws RepositoryException
+     */
     public ActionsTestSet(AbstractOTMApplication application) throws DexTaskException, RepositoryException {
 
         // Create a project
@@ -100,13 +107,19 @@ public class ActionsTestSet {
     // log.debug( "Is major editable? " + major.isEditable() );
 
 
+    /**
+     * Load versioned project and set minor and major library.
+     * 
+     * @throws InterruptedException
+     * @throws VersionSchemeException
+     */
     public void loadWithResource() throws InterruptedException, VersionSchemeException {
         // Load versioned project
         OtmProject vProj = pts.loadVersionedProjectWithResource();
         // OtmProject vProj = pts.loadVersionedProject();
         assertTrue( vProj != null );
 
-        minor = TestVersionChain.getMinorInChain( mgr );
+        minor = TestOtmVersionChain.getMinorInChain( mgr );
         chain = minor.getVersionChain();
         major = chain.getMajor();
 
@@ -121,13 +134,19 @@ public class ActionsTestSet {
             assertTrue( "Given", lib.isValid() );
     }
 
+    /**
+     * Load the versioned project and set minor, chain and major.
+     * 
+     * @throws InterruptedException
+     * @throws VersionSchemeException
+     */
     public void load() throws InterruptedException, VersionSchemeException {
         // Load versioned project
         // OtmProject vProj = pts.loadVersionedProjectWithResource();
         OtmProject vProj = pts.loadVersionedProject();
         assertTrue( vProj != null );
 
-        minor = TestVersionChain.getMinorInChain( mgr );
+        minor = TestOtmVersionChain.getMinorInChain( mgr );
         chain = minor.getVersionChain();
         major = chain.getMajor();
 

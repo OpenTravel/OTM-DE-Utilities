@@ -16,7 +16,6 @@
 
 package org.opentravel.dex.actions;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
@@ -26,7 +25,6 @@ import org.junit.Test;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.tasks.model.TypeResolverTask;
-import org.opentravel.dex.tasks.model.ValidateModelManagerItemsTask;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
@@ -54,9 +52,9 @@ import java.util.Map.Entry;
 /**
  * Verifies the functions of the <code>delete library member action</code> class.
  */
-public class TestDeletePropertyAction {
+public class TestDeleteLibraryMemberOldAction {
 
-    private static Log log = LogFactory.getLog( TestDeletePropertyAction.class );
+    private static Log log = LogFactory.getLog( TestDeleteLibraryMemberOldAction.class );
 
     private static OtmModelManager staticModelManager = null;
     static OtmLibrary lib = null;
@@ -107,38 +105,49 @@ public class TestDeletePropertyAction {
         // runWhereUsedTest( alias );
     }
 
+    /**
+     * Using the passed type provider's owner, assign to every library member's type user.
+     * 
+     * @param assignedType
+     */
     private void runWhereUsedTest(OtmTypeProvider assignedType) {
         // Keep action manager because it will not be accessible after type is deleted.
         DexActionManager fullMgr = assignedType.getActionManager();
         OtmModelManager mgr = assignedType.getModelManager();
+        assertTrue( "Given: ", fullMgr instanceof DexFullActionManager );
+
         // Where used and model manager only works on library members.
         OtmLibraryMember typeOwner = assignedType.getOwningMember();
-        assertTrue( assignedType.getActionManager() instanceof DexFullActionManager );
+        OtmLibrary typeOwnerLib = typeOwner.getLibrary();
 
         // Given - Assign everything to assignedType
-        List<OtmTypeUser> users = TestOtmModelManager.assignTypeToEveryUser( (OtmTypeProvider) assignedType, mgr );
+        List<OtmTypeUser> users = TestOtmModelManager.assignTypeToEveryUser( assignedType, mgr );
         List<OtmLibraryMember> userOwners = typeOwner.getWhereUsed();
-        assertFalse( userOwners.isEmpty() );
-        assertFalse( users.isEmpty() );
+        assertTrue( "Given: ", !userOwners.isEmpty() );
+        assertTrue( "Given: ", !users.isEmpty() );
 
         //
-        // When - run create action to delete simple.
+        // When - run to create DeleteLibraryMemberAction action to delete the assigned type.
         //
         int queueSize = fullMgr.getQueueSize();
-        assignedType.getActionManager().run( DexActions.DELETELIBRARYMEMBER, typeOwner );
+        fullMgr.run( DexActions.DELETELIBRARYMEMBER, typeOwner );
+        TestLibrary.checkDeleted( typeOwner, typeOwnerLib );
+
         // Then
         assertTrue( "Then - queue size increased.", ++queueSize == fullMgr.getQueueSize() );
-        assertTrue( assignedType.getLibrary() == null );
-        assertTrue( !mgr.contains( typeOwner ) );
-        assertTrue( "Can no longer get the full manager from object.", assignedType.getActionManager() != fullMgr );
+        assertTrue( "Then: ", assignedType.getLibrary() == null );
+        assertTrue( "Then: ", !mgr.contains( typeOwner ) );
+        assertTrue( "Then: Can no longer get the full manager from object.",
+            assignedType.getActionManager() != fullMgr );
 
-        // Then - check type users and make sure the type has no library
-        for (OtmTypeUser user : users) {
-            assertTrue( user.getAssignedType() != null );
-            assertTrue( user.getAssignedType().getLibrary() == null );
-            assertTrue( user.getAssignedTLType().getOwningLibrary() == null );
-            // log.debug( "Type user " + user + " is valid? " + user.isValid() );
-        }
+        // // See TestLibrary -
+        // // Then
+        // for (OtmTypeUser user : users) {
+        // assertTrue( "Then: must have assigned type.", user.getAssignedType() != null );
+        // assertTrue( "Then: assigned type must have library.", user.getAssignedType().getLibrary() == null );
+        // assertTrue( "Then: assigned TL must have library.", user.getAssignedTLType().getOwningLibrary() == null );
+        // // log.debug( "Type user " + user + " is valid? " + user.isValid() );
+        // }
 
         // Then - make sure whereUsed is the same and type resolver does not change it
         assertTrue( typeOwner.getWhereUsed() == userOwners );
@@ -151,26 +160,27 @@ public class TestDeletePropertyAction {
         fullMgr.undo();
         assertTrue( "Then - queue size dicreased.", --queueSize == fullMgr.getQueueSize() );
 
-        // Then - type resolver will force change in whereUsed list
-        assertTrue( typeOwner.getWhereUsed() == userOwners );
-        TypeResolverTask.runResolver( mgr );
-        ValidateModelManagerItemsTask.runValidator( mgr );
-        // assertFalse( typeOwner.getWhereUsed() == userOwners );
-        // 2/28/2020 - reuses the same array list when recomputed.
-        assertTrue( typeOwner.getWhereUsed() == userOwners );
-
-        // Then - Check list contents to verify resolver restored the contents correctly
-        for (OtmLibraryMember owner : userOwners)
-            assertTrue( typeOwner.getWhereUsed().contains( owner ) );
-        for (OtmLibraryMember owner : typeOwner.getWhereUsed())
-            assertTrue( userOwners.contains( owner ) );
-
-        // Then - check type users and make sure they are valid and the type has library
-        for (OtmTypeUser user : users) {
-            assertTrue( user.getAssignedType() == assignedType );
-            assertTrue( user.getAssignedType().getLibrary() != null );
-            assertTrue( user.getAssignedTLType().getOwningLibrary() != null );
-        }
+        // FIXME - refactor to assure undo restores assignment, whereUsed and typesUsed
+        // // Then - type resolver will force change in whereUsed list
+        // assertTrue( typeOwner.getWhereUsed() == userOwners );
+        // TypeResolverTask.runResolver( mgr );
+        // ValidateModelManagerItemsTask.runValidator( mgr );
+        // // assertFalse( typeOwner.getWhereUsed() == userOwners );
+        // // 2/28/2020 - reuses the same array list when recomputed.
+        // assertTrue( typeOwner.getWhereUsed() == userOwners );
+        //
+        // // Then - Check list contents to verify resolver restored the contents correctly
+        // for (OtmLibraryMember owner : userOwners)
+        // assertTrue( typeOwner.getWhereUsed().contains( owner ) );
+        // for (OtmLibraryMember owner : typeOwner.getWhereUsed())
+        // assertTrue( userOwners.contains( owner ) );
+        //
+        // // Then - check type users and make sure they are valid and the type has library
+        // for (OtmTypeUser user : users) {
+        // assertTrue( user.getAssignedType() == assignedType );
+        // assertTrue( user.getAssignedType().getLibrary() != null );
+        // assertTrue( user.getAssignedTLType().getOwningLibrary() != null );
+        // }
         log.debug( "Test delete and undelete done." );
     }
 
@@ -254,7 +264,7 @@ public class TestDeletePropertyAction {
         DexFullActionManager fullMgr = (DexFullActionManager) mgr.getActionManager( true );
         assertTrue( "Given", lib.isEditable() );
         assertTrue( "Given", !lib.getName().isEmpty() );
-        assertTrue( "Given ", !lib.getBaseNamespace().isEmpty() );
+        assertTrue( "Given ", !lib.getBaseNS().isEmpty() );
         String scheme = lib.getTL().getVersionScheme();
         assertTrue( "Given ", !lib.getTL().getVersionScheme().isEmpty() );
 

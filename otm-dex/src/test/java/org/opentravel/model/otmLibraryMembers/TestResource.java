@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.common.ValidationUtils;
@@ -79,6 +80,16 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         baseObject.setName( "BaseR" );
 
         exposedObject = TestBusiness.buildOtm( staticModelManager );
+    }
+
+    @Before
+    public void beforeMethods() {
+        staticModelManager.clear();
+
+        OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
+        subject = buildOtm( lib, "SubjectR" );
+        baseObject = buildOtm( lib, "BaseR" );
+        exposedObject = TestBusiness.buildOtm( lib, "ResourceSubject" );
     }
 
     @Override
@@ -478,7 +489,7 @@ public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
         if (testValid) {
             if (!r.isValid())
                 log.debug( r.getValidationFindingsAsString() );
-            assertTrue( r.isValid() );
+            assertTrue( "Check: resource must be valid.", r.isValid() );
         }
     }
 

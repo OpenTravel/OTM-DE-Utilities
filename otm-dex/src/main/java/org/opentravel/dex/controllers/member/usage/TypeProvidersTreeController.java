@@ -258,7 +258,8 @@ public class TypeProvidersTreeController extends DexIncludedControllerBase<OtmLi
             else if (event instanceof OtmObjectChangeEvent)
                 refresh();
             else if (event instanceof DexModelChangeEvent)
-                refresh();
+                // refresh();
+                clear();
             else
                 refresh();
         }

@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
@@ -48,7 +49,7 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         baseObject = TestBusiness.buildOtm( staticModelManager );
         testResource = TestResource.buildOtm( staticModelManager );
 
@@ -56,6 +57,10 @@ public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction>
         log.debug( "Before class ran." );
     }
 
+    @Before
+    public void beforeTest() {
+        staticModelManager.clear();
+    }
 
     @Test
     public void testConstructor() {

@@ -69,7 +69,7 @@ public class TestSelectProjectDialog extends AbstractFxTest {
 
         // Library
         TestDexFileHandler.loadLocalLibrary( TestDexFileHandler.FILE_TESTLIBRARYNOTINPROJECT, mgr );
-        mgr.add();
+        mgr.addLibraries();
         assertTrue( mgr.getLibraries().size() > libraryCount );
         libraryCount = mgr.getLibraries().size();
         return mgr;

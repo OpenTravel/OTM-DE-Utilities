@@ -39,7 +39,6 @@ import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestEnumerationClosed;
 import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.model.otmLibraryMembers.TestValueWithAttributes;
-import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -60,8 +59,9 @@ public class TestDexActionManager {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
-        lib = staticModelManager.add( new TLLibrary() );
+        lib = TestLibrary.buildOtm();
+        staticModelManager = lib.getModelManager();
+
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 
@@ -136,8 +136,6 @@ public class TestDexActionManager {
 
     @Test
     public void testPushAction() {
-        // lib = staticModelManager.add( new TLLibrary() );
-        // DexActionManager am = lib.getActionManager();
         lib = TestLibrary.buildOtm();
         DexActionManager am = lib.getActionManager();
         assertTrue( am.getQueueSize() == 0 );
@@ -168,10 +166,10 @@ public class TestDexActionManager {
 
     @Test
     public void testNameChangeAction() {
-        DexFullActionManager am = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( am, null, null );
+        lib = TestLibrary.buildOtm();
+        OtmModelManager mgr = lib.getModelManager();
+        DexFullActionManager am = (DexFullActionManager) mgr.getActionManager( true );
         assertTrue( am.getQueueSize() == 0 );
-        lib = mgr.add( new TLLibrary() );
 
         // Given a OtmObject
         OtmEnumeration<?> closedEnum = TestEnumerationClosed.buildOtm( mgr );
@@ -201,10 +199,10 @@ public class TestDexActionManager {
 
     @Test
     public void testDescriptionChangeAction() {
-        DexFullActionManager am = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( am, null, null );
+        lib = TestLibrary.buildOtm();
+        OtmModelManager mgr = lib.getModelManager();
+        DexFullActionManager am = (DexFullActionManager) mgr.getActionManager( true );
         assertTrue( am.getQueueSize() == 0 );
-        lib = mgr.add( new TLLibrary() );
 
         // Given a OtmObject
         OtmEnumeration<?> closedEnum = TestEnumerationClosed.buildOtm( mgr );
@@ -279,9 +277,10 @@ public class TestDexActionManager {
 
     @Test
     public void testReadOnlyActionManager() {
-        DexActionManager am = new DexReadOnlyActionManager();
-        OtmModelManager mgr = new OtmModelManager( am, null, null );
-        lib = mgr.add( new TLLibrary() );
+        lib = TestLibrary.buildOtm();
+        OtmModelManager mgr = lib.getModelManager();
+        DexFullActionManager am = (DexFullActionManager) mgr.getActionManager( true );
+
         OtmBusinessObject newBO = TestBusiness.buildOtm( lib, "NewBO" );
         lib.add( newBO );
         assertTrue( newBO.isEditable() );

@@ -75,6 +75,7 @@ public abstract class AbstractFxTest extends AbstractRepositoryTest {
     public void closeApplication() throws TimeoutException {
         FxToolkit.setupFixture(
             () -> primaryStage.fireEvent( new WindowEvent( primaryStage, WindowEvent.WINDOW_CLOSE_REQUEST ) ) );
+        System.out.println( "After: close application ran." );
     }
 
     /**

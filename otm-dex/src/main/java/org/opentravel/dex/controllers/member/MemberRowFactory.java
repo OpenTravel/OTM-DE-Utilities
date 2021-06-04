@@ -240,8 +240,11 @@ public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> 
         // Set font css class
         if (obj instanceof OtmLibraryMember) {
             setStateChanged( tc, obj.isDeprecated(), ((OtmLibraryMember) obj).isEditableMinor() );
-        } else
+            log.debug( obj + " member editable? " + ((OtmLibraryMember) obj).isEditableMinor() );
+        } else {
             setStateChanged( tc, obj.isDeprecated(), obj.isEditable() );
+            // log.debug( obj + " editable? " + obj.isEditable() );
+        }
 
         DexActionManager actionManager = obj.getActionManager();
         if (actionManager == null)

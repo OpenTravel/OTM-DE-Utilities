@@ -26,6 +26,7 @@ import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.schemacompiler.event.ModelElementListener;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLModelElement;
+import org.opentravel.schemacompiler.model.TLPropertyType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 import java.util.ArrayList;
@@ -329,6 +330,31 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
         nameProperty = null;
         nameEditingProperty = null;
         // log.debug( "Refreshed " + getName() );
+    }
+
+    public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
+        if (this instanceof OtmTypeUser) {
+            OtmTypeUser user = (OtmTypeUser) this;
+            NamedEntity result = null;
+
+            // Take this's owning member out of the current assigned type's where used list
+            if (user.getAssignedType() != null && user.getAssignedType().getOwningMember() != null)
+                user.getAssignedType().getOwningMember().changeWhereUsed( getOwningMember(), null );
+
+            if (type == null)
+                result = user.setAssignedTLType( null );
+            else if (type.getTL() instanceof TLPropertyType) {
+                result = user.setAssignedTLType( (TLPropertyType) type.getTL() );
+            }
+            if (result != null && type != null) {
+                type.getOwningMember().changeWhereUsed( null, getOwningMember() );
+                if (type.isNameControlled())
+                    setName( type.getName() );
+                clearNameProperty();
+            }
+            return user.getAssignedType();
+        }
+        return null;
     }
 
     @Override

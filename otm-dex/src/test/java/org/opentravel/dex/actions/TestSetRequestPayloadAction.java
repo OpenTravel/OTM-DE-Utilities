@@ -34,7 +34,6 @@ import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.model.resource.OtmAction;
 import org.opentravel.model.resource.OtmActionRequest;
-import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -52,8 +51,8 @@ public class TestSetRequestPayloadAction {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
-        lib = staticModelManager.add( new TLLibrary() );
+        lib = TestLibrary.buildOtm();
+        staticModelManager = lib.getModelManager();
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 

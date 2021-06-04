@@ -22,9 +22,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmTypeProvider;
+import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
@@ -33,10 +34,14 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestCore;
 import org.opentravel.model.otmProperties.OtmElement;
+import org.opentravel.model.otmProperties.TestElement;
+import org.opentravel.model.otmProperties.TestOtmTypeUserInterface;
 import org.opentravel.schemacompiler.model.TLLibrary;
+import org.opentravel.schemacompiler.model.TLLibraryMember;
+import org.opentravel.schemacompiler.model.TLProperty;
+import org.opentravel.schemacompiler.model.TLPropertyType;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Verifies the functions of the <code>new library member action</code> class.
@@ -51,14 +56,68 @@ public class TestSetLibraryAction {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
-        lib = staticModelManager.add( new TLLibrary() );
+        lib = TestLibrary.buildOtm();
+        staticModelManager = lib.getModelManager();
+        // staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
+        // lib = staticModelManager.addOLD( new TLLibrary() );
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 
         globalBO = TestBusiness.buildOtm( lib, "GlobalBO" ); // Tested in buildOtm()
     }
 
+    /**
+     * Build the Action with subject set to the member. Check the lib2
+     * 
+     * @param member
+     * @param targetLib
+     * @return action
+     * @throws Exception
+     */
+    public static SetLibraryAction build(OtmLibraryMember member, OtmLibrary targetLib)
+        throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
+        // Check the libraries
+        OtmLibrary sourceLib = member.getLibrary();
+        assertTrue( "Builder", sourceLib.isEditable() );
+        assertTrue( "Builder", targetLib.isEditable() );
+
+        // Check the action manager
+        assertTrue( "Builder", sourceLib.getActionManager() instanceof DexFullActionManager );
+        assertTrue( "Builder", sourceLib.getActionManager().getQueueSize() == 0 );
+
+        // Build the Action handler with subject set to the member
+        SetLibraryAction setLibraryAction =
+            (SetLibraryAction) DexActions.getAction( DexActions.SETLIBRARY, member, sourceLib.getActionManager() );
+        assertTrue( "Builder", setLibraryAction != null );
+
+        return setLibraryAction;
+    }
+
+    /**
+     * Check the member is correctly in its library and <b>not</b> in the old library.
+     * <ul>
+     * <li>member has a new library
+     * <li>new library (otm and tl) contains member
+     * <li>old library (otm and tl) does not contain member
+     * </ul>
+     * 
+     * @param member
+     * @param oldLibrary can be null
+     */
+    public static void check(OtmLibraryMember member, OtmLibrary oldLibrary) {
+        OtmLibrary newLib = member.getLibrary();
+        assertTrue( "Check: Member has a new library.", newLib != null && newLib != oldLibrary );
+        assertTrue( "Check: New library must contain member.", newLib.contains( member ) );
+        assertTrue( "Check: New TL Library must contain named member.",
+            newLib.getTL().getNamedMember( member.getName() ) != null );
+
+        // Then - member is not in the original library
+        if (oldLibrary != null) {
+            assertTrue( "Check: Original library must not contain member.", !oldLibrary.contains( member ) );
+            assertTrue( "Check: Original TL Library must not contain named member.",
+                oldLibrary.getTL().getNamedMember( member.getName() ) == null );
+        }
+    }
 
     @Test
     public void testMultipleMembers() {
@@ -96,116 +155,111 @@ public class TestSetLibraryAction {
     @Test
     public void testSimpleChangeLibrary()
         throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib1 = mgr.add( new TLLibrary() );
-        assertTrue( "Given", lib1.isEditable() );
+        // Givens - model manager and 2 libraries
+        OtmModelManager mgr = TestOtmModelManager.build();
+        OtmLibrary sourceLib = TestLibrary.buildOtm( mgr );
+        OtmLibrary targetLib = TestLibrary.buildOtm( mgr );
 
-        OtmLibrary lib2 = mgr.add( new TLLibrary() );
-        assertTrue( "Given", lib2.isEditable() );
-
-        DexActionManager actionManager = lib1.getActionManager();
-        assertTrue( "Given", actionManager instanceof DexFullActionManager );
-        assertTrue( "Given", actionManager.getQueueSize() == 0 );
-
-        OtmBusinessObject member = TestBusiness.buildOtm( lib1, "TestBusinessObject" );
+        // Given - a member to move to new library
+        OtmBusinessObject member = TestBusiness.buildOtm( sourceLib, "TestBusinessObject" );
         assertTrue( "Given", member.getModelManager() == mgr );
-        assertTrue( "Given", member.getLibrary() == lib1 );
+        assertTrue( "Given", member.getLibrary() == sourceLib );
 
-        // Action handler with subject set to the member
-        SetLibraryAction setLibraryHandler =
-            (SetLibraryAction) DexActions.getAction( DexActions.SETLIBRARY, member, actionManager );
-        assertTrue( "Given", setLibraryHandler != null );
+        // Given - an action to move the member
+        SetLibraryAction setLibraryAction = build( member, targetLib );
+        assertTrue( "Given", setLibraryAction != null );
 
         // When
-        OtmLibrary result = setLibraryHandler.doIt( lib2 );
+        OtmLibrary result = setLibraryAction.doIt( targetLib );
+
         // Then - member is in the new library (lib2)
-        assertTrue( "doIt did not return the new library.", result == lib2 );
-        assertTrue( "Then member's library is library 2.", member.getLibrary() == lib2 );
-        assertTrue( "New library must contain member.", lib2.contains( member ) );
-        assertTrue( "New TL Library must contain named member.",
-            lib2.getTL().getNamedMember( member.getName() ) != null );
-
-        // Then - member is not in the original library (lib1)
-        assertTrue( "Original library must not contain member.", !lib1.contains( member ) );
-        assertTrue( "Original TL Library must not contain named member.",
-            lib1.getTL().getNamedMember( member.getName() ) == null );
+        assertTrue( "Then: doIt must return the new library.", result == targetLib );
+        assertTrue( "Then: member's library must be target library.", member.getLibrary() == targetLib );
+        check( member, sourceLib );
 
         // When
-        setLibraryHandler.undoIt();
-        assertTrue( "Then member's library must be library 1.", member.getLibrary() == lib1 );
+        setLibraryAction.undoIt();
+        assertTrue( "Then member's library must be source library.", member.getLibrary() == sourceLib );
+        check( member, targetLib );
     }
 
     @Test
-    public void testSetWhenAssigned()
-        throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib1 = TestLibrary.buildOtm( mgr, "Namespace1", "p1", "Library1" );
-        log.debug( "Lib 1 name is: " + lib1.getFullName() );
-        OtmLibrary lib2 = TestLibrary.buildOtm( mgr, "Namespace2", "p2", "Library2" );
-        DexActionManager actionManager = lib1.getActionManager();
+    public void testDoIt_TL() {
+        OtmModelManager mgr = TestOtmModelManager.build();
+        OtmLibrary sourceLib = TestLibrary.buildOtm( mgr );
+        OtmLibrary targetLib = TestLibrary.buildOtm( mgr );
+        // Given - provider and dependents
+        OtmTypeProvider provider = TestBusiness.buildOtm( sourceLib, "SetLibMember" );
+        OtmCore core = TestCore.buildOtm( sourceLib, "SetLibCore" );
+        OtmElement<?> user = TestElement.buildOtm( core.getSummary(), provider );
+        OtmBusinessObject extendedBO = TestBusiness.buildOtm( sourceLib, "SetLibEx" );
+        extendedBO.setBaseType( provider );
 
-        // Given - a member with element to assign the moved object.
-        OtmBusinessObject member = TestBusiness.buildOtm( lib1, "TestBusinessObject" );
-        assertTrue( "Given", member.getLibrary() == lib1 );
+        //
+        TLLibrary srcTL = (TLLibrary) sourceLib.getTL();
+        TLLibrary targetTL = (TLLibrary) targetLib.getTL();
+        TLLibraryMember providerTL = (TLLibraryMember) provider.getTL();
+        TLProperty userTL = user.getTL();
+        assertTrue( "Given: base type", extendedBO.getTL().getExtension().getExtendsEntity() == providerTL );
+
+        // When - as done in action's doIt() method
+        mgr.getTlModel().moveToLibrary( providerTL, targetTL );
+
+        // Then - library ownership
+        assertTrue( "Then: ", targetTL.getNamedMembers().contains( providerTL ) );
+        assertTrue( "Then: ", !srcTL.getNamedMembers().contains( providerTL ) );
+        assertTrue( "Then: ", providerTL.getOwningLibrary() == targetTL );
+
+        // Then - type assignment
+        TLPropertyType type = userTL.getType();
+        assertTrue( "Then: ", type == providerTL );
+        assertTrue( "Then: base type", extendedBO.getTL().getExtension().getExtendsEntity() == providerTL );
+
+        check( (OtmLibraryMember) provider, sourceLib );
+        TestOtmTypeUserInterface.check( user, provider );
+    }
+
+    @Test
+    public void testDoIt() throws ExceptionInInitializerError, InstantiationException, IllegalAccessException {
+        // Givens - model manager and 2 libraries
+        OtmModelManager mgr = TestOtmModelManager.build();
+        OtmLibrary sourceLib = TestLibrary.buildOtm( mgr );
+        OtmLibrary targetLib = TestLibrary.buildOtm( mgr );
+
+        // Given - a member with element to assign the object to be moved.
+        OtmBusinessObject member = TestBusiness.buildOtm( sourceLib, "TestBusinessObject" );
         OtmElement<?> element = TestBusiness.getElement( member );
-        assertTrue( "Given", element != null );
-        assertTrue( "Given", element.getOwningMember() == member );
-        assertTrue( "Given", element.getLibrary() == lib1 );
 
         // Given - the object to move assigned to the member's element
-        OtmCore assignedType = TestCore.buildOtm( lib1, "AssignedCore" );
-        element.setAssignedType( assignedType );
-        assertTrue( "Given", element.getTL().getType() == assignedType.getTL() );
-        assertTrue( "Given", element.getAssignedType() == assignedType );
-        assertTrue( "Given - property set.", element.assignedTypeProperty().get().equals( assignedType.getName() ) );
-        log.debug(
-            element.getAssignedType().getNameWithPrefix() + "  property = " + element.assignedTypeProperty().get() );
-        List<OtmLibraryMember> initialFoundUsers = mgr.findUsersOf( assignedType );
+        OtmCore provider = TestCore.buildOtm( sourceLib, "AssignedCore" );
+        element.setAssignedType( provider );
+        TestOtmTypeUserInterface.check( element, provider );
+
+        assertTrue( "Given - assignedType's library must be source library.", provider.getLibrary() == sourceLib );
+        check( provider, targetLib );
+
+        // List<OtmLibraryMember> initialFoundUsers = mgr.findUsersOf( provider );
 
         // Given - The action to test with subject set to assignedType object
-        SetLibraryAction setLibraryHandler =
-            (SetLibraryAction) DexActions.getAction( DexActions.SETLIBRARY, assignedType, actionManager );
-        assertTrue( "Given", setLibraryHandler != null );
+        SetLibraryAction setLibraryAction = build( provider, targetLib );
 
         // When
-        setLibraryHandler.doIt( lib2 );
+        OtmLibrary result = setLibraryAction.doIt( targetLib );
+        assertTrue( "Then: action result must be target library. ", result == targetLib );
 
-        // Then - library must be lib2
-        assertTrue( "Then - assignedType's library be library 2.", assignedType.getLibrary() == lib2 );
-        assertTrue( "Then - assignedType's TL's owning library must be tlLib 2.",
-            assignedType.getTL().getOwningLibrary() == lib2.getTL() );
-        assertTrue( "Then - assignedType's library's TLlib must be tlLib 2.",
-            assignedType.getLibrary().getTL() == lib2.getTL() );
+        // Then - library
+        assertTrue( "Then - assignedType's library must be target library.", provider.getLibrary() == targetLib );
+        check( provider, sourceLib );
 
-        // Then - must still be assigned to element
-        assertTrue( "Then - element must still be assigned to type.", element.getAssignedType() == assignedType );
-        assertTrue( "Then - element's TL type must still be assignedType's TL.",
-            element.getTL().getType() == assignedType.getTL() );
+        // Then - assignment
+        TestOtmTypeUserInterface.check( element, provider );
 
-        // Then - the whereUsed list must still contain member
-        List<OtmLibraryMember> foundUsers = mgr.findUsersOf( assignedType );
-        List<OtmLibraryMember> wu = assignedType.getWhereUsed();
-        assertTrue( "Then - the whereUsed list must still contain member.", wu.contains( member ) );
-
-        // Then - the FX Property must have lib2's prefix
-        log.debug(
-            element.getAssignedType().getNameWithPrefix() + "  property = " + element.assignedTypeProperty().get() );
-        assertTrue( "Then - property p2 prefix.",
-            element.assignedTypeProperty().get().contains( assignedType.getPrefix() ) );
 
         // When
-        setLibraryHandler.undoIt();
-        assertTrue( "When assignedType's library is library 1.", assignedType.getLibrary() == lib1 );
-        assertTrue( "When assignedType;s TLlib is tlLib 1.", assignedType.getTL().getOwningLibrary() == lib1.getTL() );
-        assertTrue( "When assignedType;s TLlib is tlLib 1.", assignedType.getLibrary().getTL() == lib1.getTL() );
-        assertTrue( "Then - TL type must still be assignedType's TL.",
-            element.getTL().getType() == assignedType.getTL() );
-        assertTrue( "Then - element must still be assigned to type.", element.getAssignedType() == assignedType );
-        assertTrue( "Then - assigned type still has element's member in where used.",
-            assignedType.getWhereUsed().contains( member ) );
-        assertTrue( "Then - property has name.",
-            element.assignedTypeProperty().get().equals( assignedType.getName() ) );
+        setLibraryAction.undoIt();
+        // Then
+        assertTrue( "When assignedType's library is source library.", provider.getLibrary() == sourceLib );
+        check( provider, targetLib );
+        TestOtmTypeUserInterface.check( element, provider );
     }
 }

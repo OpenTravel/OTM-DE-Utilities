@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmChildrenOwner;
@@ -29,6 +30,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmFacets.OtmAbstractFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmRoleEnumeration;
@@ -70,6 +72,11 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
     public static void beforeClass() {
         staticModelManager = new OtmModelManager( null, null, null );
         log.debug( "Model manager created." );
+    }
+
+    @Before
+    public void beforeMethods() {
+        staticModelManager.clear();
     }
 
     @SuppressWarnings("unchecked")
@@ -196,8 +203,8 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
     }
 
     public void testLibrary(L member) {
-        OtmLibrary lib = staticModelManager.add( new TLLibrary() );
-        assertTrue( "Must register library.", staticModelManager.get( lib ) == lib.getTL() );
+        OtmLibrary lib = member.getModelManager().addLibrary( new TLLibrary() );
+        assertTrue( "Must register library.", member.getModelManager().get( lib ) == lib.getTL() );
         OtmLibraryMember result = lib.add( member );
 
         // Then the underlying TL model changed.
@@ -215,8 +222,8 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
         kids.forEach( c -> subject.delete( c ) );
 
         if (subject != null && baseObject != null) {
-            extendObject( (L) baseObject, (L) subject );
-            testInheritance( (L) subject );
+            if (extendObject( (L) baseObject, (L) subject ) != null)
+                testInheritance( (L) subject );
         }
     }
 
@@ -259,6 +266,13 @@ public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
      * @return extension if successful or null
      */
     public L extendObject(L base, L extension) {
+        TestLibrary.checkLibrary( base.getLibrary() );
+        if (staticLib == null || extension.getName() == null) {
+            log.error( "FIXME - INVALID Library in extension object." );
+            return null;
+        }
+        TestLibrary.checkLibrary( extension.getLibrary() );
+
         // Equivalent code
         // if (base.getTL() instanceof NamedEntity && extension.getTL() instanceof TLExtensionOwner) {
         // TLExtension tlex = new TLExtension();

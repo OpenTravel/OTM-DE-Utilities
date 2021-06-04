@@ -53,7 +53,6 @@ import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.model.TLParamGroup;
 import org.opentravel.schemacompiler.model.TLResource;
 import org.opentravel.schemacompiler.model.TLResourceParentRef;
-import org.opentravel.schemacompiler.version.VersionSchemeException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -862,11 +861,11 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
             // Add the version indicator
             int major = -1;
             if (subject.getLibrary() != null)
-                try {
-                    major = subject.getLibrary().getMajorVersion();
-                    sName = subject.getName() + " /v" + major;
-                } catch (VersionSchemeException e) {
-                }
+                // try {
+                major = subject.getLibrary().getMajorVersion();
+            sName = subject.getName() + " /v" + major;
+            // } catch (VersionSchemeException e) {
+            // }
         }
         return sName;
 
@@ -985,7 +984,8 @@ public class OtmResource extends OtmLibraryMemberBase<TLResource> implements Otm
 
     @Override
     public StringProperty nameProperty() {
-        if (getLibrary() != null && getLibrary().getVersionChain().isNewToChain( this ))
+        if (getLibrary() != null && getLibrary().getVersionChain() != null
+            && getLibrary().getVersionChain().isNewToChain( this ))
 
             // Override default behavior of letting the latest version of a member be renamed
             // if (getLibrary() != null && (getLibrary().isMajorVersion() || getLibrary().isUnmanaged()))

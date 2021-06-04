@@ -28,6 +28,8 @@ import org.opentravel.schemacompiler.repository.RepositoryException;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A JavaFX task for locking repository items
@@ -57,11 +59,16 @@ public class ValidateModelManagerItemsTask extends DexTaskBase<OtmModelManager> 
 
     @Override
     public void doIT() throws RepositoryException {
-        // Work from private copy since other tasks could change the collection
-        Collection<OtmLibraryMember> members = new ArrayList<>( taskData.getMembers() );
-        // log.debug( "Starting to validate " + members.size() + " model members." );
-        members.forEach( m -> m.isValid( true ) );
-        // log.debug( "Finished validating " + members.size() + " model members." );
+        List<OtmLibraryMember> members = Collections.synchronizedList( new ArrayList<>() );
+        synchronized (members) {
+            members.forEach( m -> m.isValid( true ) );
+        }
+        // 5/26/2021
+        // // Work from private copy since other tasks could change the collection
+        // Collection<OtmLibraryMember> members = new ArrayList<>( taskData.getMembers() );
+        // // log.debug( "Starting to validate " + members.size() + " model members." );
+        // members.forEach( m -> m.isValid( true ) );
+        // // log.debug( "Finished validating " + members.size() + " model members." );
     }
 
     /**

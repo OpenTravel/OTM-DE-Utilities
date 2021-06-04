@@ -18,6 +18,7 @@ package org.opentravel.dex.tasks.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.DexFileException;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.common.OpenProjectProgressMonitor;
 import org.opentravel.dex.controllers.DexStatusController;
@@ -65,10 +66,11 @@ public class OpenProjectFileTask extends DexTaskBase<File> {
     @Override
     public synchronized void doIT() throws DexTaskException {
         // log.debug( "Opening " + taskData.getName() );
-        DexFileHandler fileHandler = new DexFileHandler();
-        boolean result = fileHandler.openProject( taskData, modelMgr, new OpenProjectProgressMonitor( status ) );
-        if (!result) // get string from file handler
-            throw new DexTaskException( fileHandler.getErrorMessage() );
+        try {
+            DexFileHandler.openProject( taskData, modelMgr, new OpenProjectProgressMonitor( status ) );
+        } catch (DexFileException e) {
+            throw new DexTaskException( e.getLocalizedMessage() );
+        }
     }
 
 }

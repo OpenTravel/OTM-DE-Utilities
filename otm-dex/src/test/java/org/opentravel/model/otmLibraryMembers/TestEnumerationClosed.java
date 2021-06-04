@@ -19,6 +19,7 @@ package org.opentravel.model.otmLibraryMembers;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.actions.AddPropertyAction;
@@ -46,6 +47,16 @@ public class TestEnumerationClosed extends TestOtmLibraryMemberBase<OtmEnumerati
         baseObject = buildOtm( staticModelManager );
         baseObject.setName( "BaseBO" );
     }
+
+    @Before
+    public void beforeMethods() {
+        staticModelManager.clear();
+        OtmLibrary lib = TestLibrary.buildOtm( staticModelManager );
+        subject = buildOtm( lib, "SubjectEC" );
+        baseObject = buildOtm( lib, "BaseEC" );
+        // baseObject.setName( "BaseBO" );
+    }
+
 
     // Tests both open and closed because add/delete are on abstract enumeration super-type
     @Test

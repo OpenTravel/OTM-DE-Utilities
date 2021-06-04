@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Handle requests for project related services.
+ * Handle requests for project related services. Orchestrate GUI and project/project manager behaviors.
  * 
  * @author dmh
  *
@@ -51,7 +51,6 @@ public class DexProjectHandler {
 
         // Remove projects the library is already in
         library.getProjects().forEach( projects::remove );
-        // library.getProjects().forEach( p -> projects.remove( p ) );
 
         OtmProject project = selectOneProject( projects );
 

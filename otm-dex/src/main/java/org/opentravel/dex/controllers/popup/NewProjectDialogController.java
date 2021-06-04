@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.popup;
 
+import org.assertj.core.util.Files;
+import org.opentravel.common.DexFileException;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmProject;
@@ -146,31 +148,22 @@ public class NewProjectDialogController extends DexPopupControllerBase {
      * @return true if directory is writable
      */
     public boolean checkDirectory() {
-        if (!directoryField.getText().isEmpty()) {
-            File tmpDir = new File( directoryField.getText() );
-            String cPath = "";
-            try {
-                cPath = tmpDir.getCanonicalPath();
-            } catch (IOException e) {
-                postResults( "Error accessing directory: " + getFileName() + "\n" + e.getLocalizedMessage() );
-                return false;
-            }
-            if (!tmpDir.isDirectory())
-                postResults( "Invalid directory: " + cPath );
-            else if (!tmpDir.canWrite())
-                postResults( "Can't create file in the directory: " + cPath );
-            else
-                return true;
+        try {
+            DexFileHandler.checkDir( directoryField.getText(), getFileName() );
+        } catch (DexFileException e) {
+            postResults( e.getLocalizedMessage() );
+            return false;
         }
-        return false;
+        return true;
     }
 
     public boolean checkFileName() {
         if (checkDirectory()) {
+
             if (fileNameField.getText().isEmpty())
                 return false;
-            File tmpFile = new File( getFileName() );
-            if (tmpFile.exists()) {
+
+            if (new File( getFileName() ).exists()) {
                 postResults( "Project already exists." );
                 return false;
             }
@@ -254,14 +247,19 @@ public class NewProjectDialogController extends DexPopupControllerBase {
                 contextIdField.getText(), idField.getText(), descriptionField.getText() );
         } catch (Exception er) {
             postResults( "Could not create new project in model. " + er.getLocalizedMessage() );
-            projFile.delete();
+            Files.delete( projFile );
+            // projFile.delete();
             return;
         }
 
         // Now, close and reopen. See TestProject for details on why this patch is needed.
         if (newProject != null && newProject.getTL() != null) {
             newProject.close();
-            new DexFileHandler().openProject( projFile, modelMgr, null );
+            try {
+                new DexFileHandler().openProject( projFile, modelMgr, null );
+            } catch (DexFileException e) {
+                // log.debug("File Exception: "+e.getLocalizedMessage());
+            }
         }
         // log.debug( "Created project: " + projFile.getAbsolutePath() );
         super.doOK(); // all OK - close window
@@ -317,9 +315,10 @@ public class NewProjectDialogController extends DexPopupControllerBase {
 
         postHelp( helpText, dialogHelp );
 
-        if (userSettings != null)
-            directoryField.setText( userSettings.getLastProjectFolder().getPath() );
-        else
-            directoryField.setText( DexFileHandler.getUserHome() );
+        directoryField.setText( DexFileHandler.getDefaultProjectFolder( userSettings ) );
+        // if (userSettings != null)
+        // directoryField.setText( userSettings.getLastProjectFolder().getPath() );
+        // else
+        // directoryField.setText( DexFileHandler.getUserHome() );
     }
 }

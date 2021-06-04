@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
-import org.opentravel.model.otmContainers.TestVersionChain;
+import org.opentravel.model.otmContainers.TestOtmVersionChain;
 import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
@@ -42,7 +42,7 @@ public class TestSetAssignedTypeActionVersioned extends AbstractFxTest {
 
     @BeforeClass
     public static void setupTests() throws Exception {
-        setupWorkInProcessArea( TestVersionChain.class );
+        setupWorkInProcessArea( TestOtmVersionChain.class );
         repoManager = repositoryManager.get();
 
         // Prevent java.nio.BufferOverflowException

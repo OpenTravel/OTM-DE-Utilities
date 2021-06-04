@@ -34,6 +34,7 @@ import org.opentravel.dex.events.OtmObjectModifiedEvent;
 import org.opentravel.dex.events.OtmObjectReplacedEvent;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.OtmModelMembersManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmAbstractDisplayFacet;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
@@ -224,7 +225,8 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
         refresh();
     }
 
-    private Map<OtmObject,TreeItem<MemberAndProvidersDAO>> itemMap = new HashMap<>( OtmModelManager.MEMBERCOUNT );
+    private Map<OtmObject,TreeItem<MemberAndProvidersDAO>> itemMap =
+        new HashMap<>( OtmModelMembersManager.MEMBERCOUNT );
 
     private OtmEmptyTableFacet emptyTableFacet = null;
 

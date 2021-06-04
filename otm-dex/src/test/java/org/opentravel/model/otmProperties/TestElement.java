@@ -112,6 +112,8 @@ public class TestElement extends TestOtmPropertiesBase<OtmElement<?>> {
             e.setName( "E_" + assignedType.getName() );
             e.setAssignedType( assignedType );
             assertTrue( "Builder: must have assigned type.", e.getAssignedType() == assignedType );
+            assertTrue( "Builder: Owner must find new element as a type user.",
+                parent.getOwningMember().getDescendantsTypeUsers().contains( e ) );
             assertTrue( "Builder: must have this owner in assigned types.",
                 assignedType.getOwningMember().getWhereUsed().contains( parent.getOwningMember() ) );
         }

@@ -18,19 +18,18 @@ package org.opentravel.dex.controllers.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.DexProjectException;
 import org.opentravel.common.DexProjectHandler;
 import org.opentravel.dex.controllers.DexMainController;
+import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.controllers.popup.UnlockLibraryDialogContoller;
 import org.opentravel.dex.controllers.popup.WebViewDialogController;
 import org.opentravel.dex.events.DexModelChangeEvent;
 import org.opentravel.dex.tasks.repository.UnlockItemTask;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
-import org.opentravel.schemacompiler.loader.LibraryLoaderException;
-import org.opentravel.schemacompiler.repository.ProjectItem;
-import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
-import org.opentravel.schemacompiler.repository.RepositoryManager;
 
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
@@ -71,7 +70,8 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
 
     public NamespaceLibrariesRowFactory(NamespaceLibrariesTreeTableController controller) {
         this.controller = controller;
-        mainController = controller.getMainController();
+        if (controller != null)
+            mainController = controller.getMainController();
 
         // Create Context menu
         // lockLibrary = new MenuItem("Lock");
@@ -108,7 +108,7 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
 
     private void addToProject(ActionEvent e) {
         log.debug( "Add to project in Row Factory. " );
-        RepositoryManager rm = mainController.getRepositoryManager();
+        // RepositoryManager rm = mainController.getRepositoryManager();
         OtmModelManager mm = mainController.getModelManager();
 
         RepositoryItem repoItem = null;
@@ -117,17 +117,30 @@ public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO
         if (repoItem == null)
             return;
 
+        // Consider - eliminate project handler. SelectOneProject used elsewhere!
+        //// DONE - simplify the 3 mm calls
+        //// DONE - add junit tests
+        //
         // Find out which project the want to add the repository item (library) to.
         OtmProject oProject = new DexProjectHandler().selectOneProject( mm.getProjects() );
+        OtmLibrary newLibrary = null;
+        String result = "";
         if (oProject != null)
             try {
-                ProjectItem pi = mm.getProjectManager().addManagedProjectItem( repoItem, oProject.getTL() );
-                mm.addProjects();
-                mm.add( pi.getContent() );
+                newLibrary = oProject.addManaged( repoItem );
+                // ProjectItem pi = mm.getProjectManager().addManagedProjectItem( repoItem, oProject.getTL() );
+                // mm.addProjectsOLD();
+                // mm.addOLD( pi.getContent() );
                 controller.fireEvent( new DexModelChangeEvent( mm ) );
-            } catch (LibraryLoaderException | RepositoryException e1) {
+                result = "Added " + newLibrary + " to " + oProject + ".";
+            } catch (DexProjectException e1) {
+                result = "Failed to add to project because " + e1.getLocalizedMessage();
                 log.error( "Error opening repo item. " + e1.getLocalizedMessage() );
             }
+
+        DialogBoxContoller dbc = DialogBoxContoller.init();
+        if (dbc != null)
+            dbc.show( "Add to Project.", result );
     }
 
     // /**

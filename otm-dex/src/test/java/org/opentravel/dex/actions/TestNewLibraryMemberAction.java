@@ -33,7 +33,6 @@ import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMemberType;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
-import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.io.IOException;
 
@@ -50,8 +49,11 @@ public class TestNewLibraryMemberAction {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
-        lib = staticModelManager.add( new TLLibrary() );
+        lib = TestLibrary.buildOtm();
+        staticModelManager = lib.getModelManager();
+
+        // staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null );
+        // lib = staticModelManager.addOLD( new TLLibrary() );
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 
@@ -96,8 +98,10 @@ public class TestNewLibraryMemberAction {
 
     @Test
     public void testUsingWizardActionManager() {
-        OtmModelManager mgr = new OtmModelManager( null, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        // OtmModelManager mgr = new OtmModelManager( null, null, null );
+        // OtmLibrary lib = mgr.addLibrary( new TLLibrary() );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmModelManager mgr = lib.getModelManager();
         DexActionManager actionManager = lib.getActionManager();
         assertTrue( actionManager.getQueueSize() == 0 );
         DexActionManager wizardAM = new DexWizardActionManager( null );

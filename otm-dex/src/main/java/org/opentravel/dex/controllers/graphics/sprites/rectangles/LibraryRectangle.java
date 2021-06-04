@@ -61,7 +61,7 @@ public class LibraryRectangle extends Rectangle {
     }
 
     public String getBaseNamespace() {
-        return library.getBaseNamespace();
+        return library.getBaseNS();
     }
 
     public OtmLibrary getLibrary() {
@@ -70,12 +70,12 @@ public class LibraryRectangle extends Rectangle {
 
     public boolean contains(MemberSprite<?> sprite) {
         OtmLibrary sLib = sprite.getMember().getLibrary();
-        return sLib.getBaseNamespace().equals( library.getBaseNamespace() );
+        return sLib.getBaseNS().equals( library.getBaseNS() );
     }
 
     public static boolean contains(String baseNamespace, MemberSprite<?> sprite) {
         OtmLibrary sLib = sprite.getMember().getLibrary();
-        return sLib.getBaseNamespace().equals( baseNamespace );
+        return sLib.getBaseNS().equals( baseNamespace );
     }
 
     @Override

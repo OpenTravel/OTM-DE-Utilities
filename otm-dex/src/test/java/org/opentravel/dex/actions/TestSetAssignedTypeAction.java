@@ -46,7 +46,6 @@ import org.opentravel.model.otmLibraryMembers.TestValueWithAttributes;
 import org.opentravel.model.otmLibraryMembers.TestXsdSimple;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyType;
-import org.opentravel.schemacompiler.model.TLLibrary;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -63,8 +62,8 @@ public class TestSetAssignedTypeAction {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
-        lib = staticModelManager.add( new TLLibrary() );
+        lib = TestLibrary.buildOtm();
+        staticModelManager = lib.getModelManager();
         assertTrue( lib.isEditable() );
         assertTrue( lib.getActionManager() instanceof DexFullActionManager );
 
@@ -80,10 +79,8 @@ public class TestSetAssignedTypeAction {
 
     @Test
     public void testMultipleAssignments() {
-        // Given - action manager with an empty queue
-        DexFullActionManager am = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( am, null, null );
-        lib = mgr.add( new TLLibrary() );
+        lib = TestLibrary.buildOtm();
+        DexFullActionManager am = (DexFullActionManager) lib.getModelManager().getActionManager( true );
         assertTrue( am.getQueueSize() == 0 );
 
         // Given - a type user

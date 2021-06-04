@@ -63,6 +63,7 @@ public class ImageManager {
         DOMAIN("/icons/domain.gif"),
         LIBRARY("/icons/Library.png"),
         NAMESPACEFACET("/icons/namespace.gif"),
+        LIBRARYCHAIN("/icons/LibraryChain.gif"),
         // Otm Objects
         ALIAS("/icons/Alias.gif"),
         ATTRIBUTE("/icons/Attribute.jpg"),

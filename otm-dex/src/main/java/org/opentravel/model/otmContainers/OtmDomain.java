@@ -32,15 +32,13 @@ import java.util.Map.Entry;
 import javafx.scene.image.Image;
 
 /**
- * OTM Object Node for business objects. Project does NOT extend model element
+ * 
  * 
  * @author Dave Hollander
  * 
  */
 public class OtmDomain {
     private static Log log = LogFactory.getLog( OtmDomain.class );
-
-    Map<OtmLibrary,List<OtmLibraryMember>> libraryProvidersMap = null;
 
     /**
      * Utility to create domain name from a base namespace. Name is the portion after the last slash.
@@ -84,13 +82,12 @@ public class OtmDomain {
         return remainder;
     }
 
+    private Map<OtmLibrary,List<OtmLibraryMember>> libraryProvidersMap = null;
     private OtmModelManager modelManager;
-
     private String baseNamespace;
     private List<OtmLibrary> libraries = null;
     // private List<OtmVersionChain> chains = null;
     private List<OtmDomain> subDomains = null;
-
     private List<String> providerDomains = null;
     private List<String> userDomains = null;
 
@@ -130,6 +127,24 @@ public class OtmDomain {
         subDomains.remove( this );
     }
 
+    /**
+     * Remove all user libraries in this domain or its sub-domains.
+     * <p>
+     * Also, remove duplicates and remove all built-in libraries.
+     * 
+     * @param libList
+     * @return
+     */
+    private List<OtmLibrary> filterList(List<OtmLibrary> libList) {
+        List<OtmLibrary> externalLibs = new ArrayList<>();
+        for (OtmLibrary lib : libList) {
+            if (!lib.isBuiltIn() && !externalLibs.contains( lib )
+                && !lib.getBaseNS().startsWith( baseNamespace ))
+                externalLibs.add( lib );
+        }
+        return externalLibs;
+    }
+
     public String getBaseNamespace() {
         return baseNamespace;
     }
@@ -156,6 +171,10 @@ public class OtmDomain {
         return libraries;
     }
 
+    public OtmModelManager getModelManager() {
+        return modelManager;
+    }
+
     /**
      * The name of the domain is the portion after the last slash.
      * 
@@ -164,91 +183,6 @@ public class OtmDomain {
      */
     public String getName() {
         return getDomainName( baseNamespace );
-    }
-
-    public OtmModelManager getModelManager() {
-        return modelManager;
-    }
-
-    /**
-     * 
-     * @return new list of sub-domain full names
-     */
-    public List<String> getSubDomainNames() {
-        List<String> names = new ArrayList<>();
-        getSubDomains().forEach( s -> names.add( s.getBaseNamespace() ) );
-        return names;
-    }
-
-    /**
-     * 
-     * @return new list of sub-domain names
-     */
-    public List<OtmDomain> getSubDomains() {
-        if (subDomains == null)
-            buildSubDomains();
-        return subDomains;
-    }
-
-    public String toString() {
-        return getName() + " = " + getBaseNamespace();
-    }
-
-
-    public List<String> getUserDomains() {
-        if (userDomains == null) {
-            userDomains = new ArrayList<>();
-            // Get a list of all the libraries that use types from any library in this domain
-            List<OtmLibrary> userLibs = new ArrayList<>();
-            for (OtmLibrary lib : libraries) {
-                userLibs.addAll( lib.getUsersMap().keySet() );
-            }
-            List<OtmLibrary> externalLibs = filterList( userLibs );
-            // De-dup and add to list field
-            for (OtmLibrary lib : externalLibs)
-                if (!userDomains.contains( lib.getBaseNamespace() ))
-                    userDomains.add( lib.getBaseNamespace() );
-        }
-        return userDomains;
-    }
-
-
-
-    /**
-     * Remove all user libraries in this domain or its sub-domains.
-     * <p>
-     * Also, remove duplicates and remove all built-in libraries.
-     * 
-     * @param libList
-     * @return
-     */
-    private List<OtmLibrary> filterList(List<OtmLibrary> libList) {
-        List<OtmLibrary> externalLibs = new ArrayList<>();
-        for (OtmLibrary lib : libList) {
-            if (!lib.isBuiltIn() && !externalLibs.contains( lib )
-                && !lib.getBaseNamespace().startsWith( baseNamespace ))
-                externalLibs.add( lib );
-        }
-        return externalLibs;
-    }
-
-    /**
-     * Create a map of library:members entries for all type providers to users in all the libraries in this domain.
-     * 
-     * @return
-     */
-    // Used only by domainProvidersFR
-    public Map<OtmLibrary,List<OtmLibraryMember>> getProvidersMap() {
-        libraryProvidersMap = new HashMap<>();
-        for (OtmLibrary lib : libraries) {
-            Map<OtmLibrary,List<OtmLibraryMember>> map = lib.getProvidersMap();
-            for (Entry<OtmLibrary,List<OtmLibraryMember>> entry : map.entrySet()) {
-                String ebs = entry.getKey().getBaseNamespace();
-                if (!entry.getKey().isBuiltIn() && !ebs.startsWith( getBaseNamespace() ))
-                    libraryProvidersMap.put( entry.getKey(), entry.getValue() );
-            }
-        }
-        return libraryProvidersMap;
     }
 
     // consider creating task for this and updating count on task complete
@@ -268,10 +202,73 @@ public class OtmDomain {
         List<OtmLibrary> externalLibs = filterList( pLibs );
         // De-dup and add to list field
         for (OtmLibrary lib : externalLibs)
-            if (!providerDomains.contains( lib.getBaseNamespace() ))
-                providerDomains.add( lib.getBaseNamespace() );
+            if (!providerDomains.contains( lib.getBaseNS() ))
+                providerDomains.add( lib.getBaseNS() );
         // }
         return providerDomains;
+    }
+
+    /**
+     * Create a map of library:members entries for all type providers to users in all the libraries in this domain.
+     * 
+     * @return
+     */
+    // Used only by domainProvidersFR
+    public Map<OtmLibrary,List<OtmLibraryMember>> getProvidersMap() {
+        libraryProvidersMap = new HashMap<>();
+        for (OtmLibrary lib : libraries) {
+            Map<OtmLibrary,List<OtmLibraryMember>> map = lib.getProvidersMap();
+            for (Entry<OtmLibrary,List<OtmLibraryMember>> entry : map.entrySet()) {
+                String ebs = entry.getKey().getBaseNS();
+                if (!entry.getKey().isBuiltIn() && !ebs.startsWith( getBaseNamespace() ))
+                    libraryProvidersMap.put( entry.getKey(), entry.getValue() );
+            }
+        }
+        return libraryProvidersMap;
+    }
+
+
+    /**
+     * 
+     * @return new list of sub-domain full names
+     */
+    public List<String> getSubDomainNames() {
+        List<String> names = new ArrayList<>();
+        getSubDomains().forEach( s -> names.add( s.getBaseNamespace() ) );
+        return names;
+    }
+
+
+
+    /**
+     * 
+     * @return new list of sub-domain names
+     */
+    public List<OtmDomain> getSubDomains() {
+        if (subDomains == null)
+            buildSubDomains();
+        return subDomains;
+    }
+
+    public List<String> getUserDomains() {
+        if (userDomains == null) {
+            userDomains = new ArrayList<>();
+            // Get a list of all the libraries that use types from any library in this domain
+            List<OtmLibrary> userLibs = new ArrayList<>();
+            for (OtmLibrary lib : libraries) {
+                userLibs.addAll( lib.getUsersMap().keySet() );
+            }
+            List<OtmLibrary> externalLibs = filterList( userLibs );
+            // De-dup and add to list field
+            for (OtmLibrary lib : externalLibs)
+                if (!userDomains.contains( lib.getBaseNS() ))
+                    userDomains.add( lib.getBaseNS() );
+        }
+        return userDomains;
+    }
+
+    public String toString() {
+        return getName() + " = " + getBaseNamespace();
     }
 
 }

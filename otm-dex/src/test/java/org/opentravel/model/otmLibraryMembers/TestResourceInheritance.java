@@ -31,7 +31,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
-import org.opentravel.model.otmContainers.TestVersionChain;
+import org.opentravel.model.otmContainers.TestOtmVersionChain;
 import org.opentravel.model.otmFacets.OtmCustomFacet;
 import org.opentravel.model.otmFacets.TestFacet;
 import org.opentravel.model.resource.OtmAction;
@@ -84,8 +84,8 @@ public class TestResourceInheritance extends AbstractFxTest {
             return; // No editable libraries
 
         // Given - the latest minor in the chain
-        OtmLibrary minorLibrary = TestVersionChain.getMinorInChain( mgr );
-        assertTrue( "Given", minorLibrary != null );
+        OtmLibrary minorLibrary = TestOtmVersionChain.getMinorInChain( mgr );
+        assertTrue( "Given: Must have minor library.", minorLibrary != null );
         assertTrue( "Given", minorLibrary.isEditable() );
         List<OtmLibraryMember> minors = minorLibrary.getMembers();
         minors.forEach( m -> minorLibrary.delete( m ) );

@@ -22,8 +22,6 @@ import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.otmContainers.OtmLibrary;
-import org.opentravel.model.otmContainers.OtmProject;
-import org.opentravel.schemacompiler.repository.Project;
 import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.schemacompiler.repository.RepositoryException;
@@ -54,15 +52,26 @@ public class CommitLibraryTask extends DexTaskBase<OtmLibrary> {
     @Override
     public void doIT() throws RepositoryException {
         log.debug( TASKNAME );
-        OtmProject managingProject = taskData.getManagingProject();
-        if (managingProject != null) {
-            Project managingTLProject = managingProject.getTL();
-            ProjectItem pi = managingProject.getProjectItem( taskData.getTL() );
-            if (managingTLProject != null && pi != null) {
-                ProjectManager projectManager = managingTLProject.getProjectManager();
-                if (projectManager != null)
-                    projectManager.commit( pi, remarks );
+        OtmLibrary lib = taskData;
+        if (lib != null) {
+            ProjectManager tlPM = lib.getTLProjectManager();
+            if (tlPM != null) {
+                ProjectItem item = tlPM.getProjectItem( lib.getTL() );
+                if (item != null) {
+                    tlPM.commit( item, remarks );
+                }
             }
         }
+
+        // OtmProject managingProject = taskData.getManagingProject();
+        // if (managingProject != null) {
+        // Project managingTLProject = managingProject.getTL();
+        // ProjectItem pi = managingProject.getProjectItem( taskData.getTL() );
+        // if (managingTLProject != null && pi != null) {
+        // ProjectManager projectManager = managingTLProject.getProjectManager();
+        // if (projectManager != null)
+        // projectManager.commit( pi, remarks );
+        // }
+        // }
     }
 }

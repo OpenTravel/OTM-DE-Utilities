@@ -24,8 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentravel.AbstractDexTest;
 import org.opentravel.TestDexFileHandler;
-import org.opentravel.application.common.AbstractOTMApplication;
+import org.opentravel.common.DexProjectException;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
@@ -33,50 +34,36 @@ import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.model.otmContainers.OtmDomain;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
+import org.opentravel.model.otmContainers.OtmVersionChain;
+import org.opentravel.model.otmContainers.OtmVersionChainEmpty;
+import org.opentravel.model.otmContainers.OtmVersionChainVersioned;
 import org.opentravel.model.otmContainers.TestLibrary;
-import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
-import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
-import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLModel;
-import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.repository.ProjectManager;
-import org.opentravel.utilities.testutil.AbstractFxTest;
-import org.opentravel.utilities.testutil.TestFxMode;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 /**
  * Verifies the functions of the <code>Otm Model Manager</code>.
  */
-// @Ignore
-public class TestOtmModelManager_Gets extends AbstractFxTest {
-    // public class TestOtmModelManager_Gets extends AbstractFxTest {
+public class TestOtmModelManager_Gets extends AbstractDexTest {
     private static Log log = LogFactory.getLog( TestOtmModelManager_Gets.class );
-
-    public static final boolean RUN_HEADLESS = true;
-    final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.
-
-    final static String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector
-    final static String FILE_TESTOPENTRAVELREPO = "TestOpenTravelRepo.otp";
-    final static String FILE_TESTLOCAL = "TestLocalFiles.otp";
 
     @BeforeClass
     public static void setupTests() throws Exception {
-        setupWorkInProcessArea( TestOtmModelManager_Gets.class );
-        repoManager = repositoryManager.get();
-        // Prevent java.nio.BufferOverflowException
-        System.setProperty( "headless.geometry", "2600x2200-32" );
+        beforeClassSetup( TestOtmModelManager_Gets.class );
     }
 
     @Test
     public void testGetPredefinedTypes() {
         // Given
         OtmModelManager mgr = new OtmModelManager( null, null, null );
-        mgr.addBuiltInLibraries( new TLModel() );
+        mgr.addLibraries_BuiltIn( mgr.getTlModel() );
 
         // Then - id and empty will be non-null
         OtmXsdSimple id = mgr.getIdType();
@@ -199,58 +186,6 @@ public class TestOtmModelManager_Gets extends AbstractFxTest {
             assertTrue( mgr.get( library ) instanceof TLLibrary );
     }
 
-    /**
-     * getMember(String) getMember(TLModelElement)
-     */
-    @Test
-    public void testGetMember() {
-        // Given a project that uses local library files
-        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
-        TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
-        TestDexFileHandler.loadAndAddManagedProject( mgr );
-        TLModel tlModel = mgr.getTlModel();
-        assertNotNull( tlModel );
-
-        for (AbstractLibrary absLibrary : tlModel.getUserDefinedLibraries()) {
-            for (LibraryMember namedMember : absLibrary.getNamedMembers()) {
-                // get member with string
-                assertTrue( namedMember.getOwningLibrary() != null );
-                assertTrue( namedMember.getOwningLibrary().getPrefix() != null );
-                assertTrue( namedMember.getLocalName() != null );
-                String nameWithPrefix = namedMember.getOwningLibrary().getPrefix() + ":" + namedMember.getLocalName();
-                assertTrue( mgr.getMember( nameWithPrefix ) instanceof OtmLibraryMember );
-
-                // get member with tl model element
-                assertTrue( namedMember instanceof TLModelElement );
-                assertTrue( mgr.getMember( (TLModelElement) namedMember ) instanceof OtmLibraryMember );
-            }
-        }
-    }
-
-    /**
-     * getMembers() getMembers(OtmLibrary) getMembers(OtmLibraryMember)
-     */
-    @Test
-    public void testGetMembers() {
-        // Given a project that uses local library files
-        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
-        TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
-        TestDexFileHandler.loadAndAddManagedProject( mgr );
-
-        assertFalse( mgr.getMembers().isEmpty() );
-
-        for (OtmLibrary lib : mgr.getLibraries())
-            assertFalse( mgr.getMembers( lib ).isEmpty() );
-
-        // Test name matching get
-        for (OtmLibrary lib : mgr.getLibraries())
-            for (OtmLibraryMember otm : lib.getMembers()) {
-                List<OtmLibraryMember> matches = mgr.getMembers( otm );
-                assertTrue( matches != null );
-                if (!matches.isEmpty())
-                    log.debug( "Match found: " + matches );
-            }
-    }
 
     /**
      * getProjectManager() getProject(String) getProjects() getProjects(AbstractLibrary) getUserProjects()
@@ -281,52 +216,141 @@ public class TestOtmModelManager_Gets extends AbstractFxTest {
     }
 
     /**
-     * getBaseNamespaces()
+     * getBaseNamespaces() constructed
      * 
+     * @throws DexProjectException
+     */
+    @Test
+    public void testGetBaseNamespaces() throws DexProjectException {
+        String ns = "http://example.com/namespaces/";
+        String prefix = "pf";
+        String name = "TestModelGetBaseNS";
+        // Given - 2 local libraries in different namespaces
+        String libName = "lib1";
+        OtmLibrary lib = TestLibrary.buildOtm( getModelManager(), ns + libName, prefix + libName, libName );
+        libName = "lib2";
+        lib = TestLibrary.buildOtm( getModelManager(), ns + libName, prefix + libName, libName );
+
+        // Given - 2 published major lib in different namespaces
+        OtmProject proj = TestOtmProjectManager.buildProject( getModelManager() );
+        libName = "lib3";
+        lib = buildMajor( libName, proj, ns + libName );
+        libName = "lib4";
+        lib = buildMajor( libName, proj, ns + libName );
+
+        List<OtmLibrary> libs = getModelManager().getUserLibraries();
+        assertTrue( "Given: must have 4 libraries.", libs.size() == 4 );
+        List<String> namespaces = new ArrayList<>();
+        libs.forEach( l -> namespaces.add( l.getBaseNS() ) );
+        assertTrue( "Given: must have 4 namespaces.", namespaces.size() == 4 );
+
+        // When
+        List<String> nsList = getModelManager().getBaseNamespaces();
+
+        // Then
+        assertTrue( "Then: Must have base namespaces.", !nsList.isEmpty() );
+        assertTrue( "Then: Must have 4 base namespaces.", nsList.size() == 4 );
+
+        // Then compare the lists
+        nsList.forEach( b -> assertTrue( "Then: retrieved ns must be in namespaces.", namespaces.contains( b ) ) );
+        for (String n : namespaces)
+            assertTrue( "Then: namespace must be in retrieved list.", nsList.contains( n ) );
+    }
+
+    /**
+     * getBaseNamespaces() from loaded projects
+     */
+    @Test
+    public void testGetBaseNamespaces_LoadedProjects() {
+        // Given a project that uses local library files
+        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+        TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
+        TestDexFileHandler.loadAndAddManagedProject( mgr );
+        TLModel tlModel = mgr.getTlModel();
+        assertTrue( "Given: ", tlModel != null );
+
+        // When
+        List<String> nsList = mgr.getBaseNamespaces();
+
+        // Then - 5/25/2021 - loads 6 namespaces
+        assertTrue( "Then: Must have base namespaces.", !nsList.isEmpty() );
+        assertTrue( "Then: Must have 6 base namespaces.", nsList.size() == 6 );
+    }
+
+    /**
      * getUserSettings()
      * 
      * getLibraryChain(string) getVersionChain(OtmLibrary) getVersionChainFactory()
      * 
      */
     @Test
-    public void testGetOther() {
+    public void testGetUserSettings() {
+        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+
+        // Running headless
+        assertTrue( mgr.getUserSettings() == null );
+    }
+
+    /**
+     * Facade for {@link OtmModelChainsManager#getChainName(OtmLibrary)}
+     */
+    @Test
+    public void testGetChainLibraries() {
         // Given a project that uses local library files
         OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
         TestDexFileHandler.loadAndAddUnmanagedProject( mgr );
         TestDexFileHandler.loadAndAddManagedProject( mgr );
         TLModel tlModel = mgr.getTlModel();
-        assertNotNull( tlModel );
+        assertTrue( "Given: ", tlModel != null );
 
-        assertFalse( mgr.getBaseNamespaces().isEmpty() );
-
-        // Running headless
-        assertTrue( mgr.getUserSettings() == null );
-
-        for (OtmLibrary lib : mgr.getLibraries())
-            assertFalse( mgr.getVersionChain( lib ) == null );
+        // Then
+        for (OtmLibrary lib : mgr.getUserLibraries())
+            assertTrue( mgr.getChainLibraries( lib ).contains( lib ) );
     }
 
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
-     */
-    @Override
-    protected Class<? extends AbstractOTMApplication> getApplicationClass() {
-        return ObjectEditorApp.class;
-    }
+    @Test
+    public void TestGetVersionChain() {
+        OtmModelManager mgr = getModelManager();
+        OtmProject proj = TestOtmProjectManager.buildProject( mgr );
+        String ns1 = "http://example.com/ns1/chaintest";
+        String ns2 = "http://example.com/ns2/chaintest";
 
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
-     */
-    @Override
-    protected String getBackgroundTaskNodeQuery() {
-        return "#libraryText";
-    }
+        // Library with empty chain
+        OtmLibrary localLib = TestLibrary.buildOtm( mgr );
+        OtmVersionChain lChain = mgr.getVersionChain( localLib );
+        assertTrue( lChain instanceof OtmVersionChainEmpty );
+        assertTrue( lChain.getLibraries().contains( localLib ) );
 
-    /**
-     * Configure headless/normal mode for TestFX execution.
-     */
-    static {
-        TestFxMode.setHeadless( RUN_HEADLESS );
+        // A major library
+        OtmLibrary majorLib = buildMajor( "TMM1", proj, ns1 );
+        OtmVersionChain mChain = mgr.getVersionChain( majorLib );
+        assertTrue( mChain instanceof OtmVersionChainVersioned );
+        assertTrue( mChain.getLibraries().contains( majorLib ) );
+
+        // A major library
+        OtmLibrary majorLibA = buildMajor( "TMM1a", proj, ns1 );
+        OtmVersionChain mChainA = mgr.getVersionChain( majorLibA );
+        assertTrue( mChainA instanceof OtmVersionChainVersioned );
+        assertTrue( mChainA.getLibraries().contains( majorLibA ) );
+
+        // A minor library
+        OtmLibrary minor1 = buildMinor( majorLib );
+        OtmVersionChain mChain1 = mgr.getVersionChain( minor1 );
+        assertTrue( mChain1 instanceof OtmVersionChainVersioned );
+        assertTrue( mChain1.getLibraries().contains( minor1 ) );
+
+        OtmLibrary minor2 = buildMinor( minor1 );
+        OtmVersionChain mChain2 = mgr.getVersionChain( minor2 );
+        assertTrue( mChain2 instanceof OtmVersionChainVersioned );
+        assertTrue( mChain2.getLibraries().contains( minor2 ) );
+
+        OtmLibrary majorLib2 = buildMajor( "TMM2", proj, ns2 );
+        OtmVersionChain mChainA2 = mgr.getVersionChain( majorLib2 );
+        assertTrue( mChainA2 instanceof OtmVersionChainVersioned );
+        assertTrue( mChainA2.getLibraries().contains( majorLib2 ) );
+
+        List<OtmVersionChain> chains = new ArrayList<>();
+        mgr.getUserLibraries().forEach( l -> chains.add( mgr.getVersionChain( l ) ) );
     }
 }
 

@@ -86,7 +86,6 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     public LibraryRowFactory() {
         // Create Context menu
         lockLibrary = new MenuItem( "Lock" );
-        // unlockLibrary = new MenuItem( "Commit and Unlock" );
         projectAdd = new MenuItem( "Add to project" );
         projectRemove = new MenuItem( "Remove from project" );
         saveLibrary = new MenuItem( "Save" );
@@ -190,7 +189,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
     }
 
     /**
-     * Promote a library state
+     * Manage library in repository
      */
     private void manageLibrary(ActionEvent e) {
         OtmLibrary lib = getSelected();
@@ -288,6 +287,7 @@ public final class LibraryRowFactory extends TreeTableRow<LibraryDAO> {
         if (newTreeItem != null && newTreeItem.getValue() != null) {
             OtmLibrary library = newTreeItem.getValue().getValue();
             if (library != null && library.getModelManager() != null) {
+                // TODO - use task to test is enabled
                 lockLibrary.setDisable( !library.canBeLocked() );
                 commitLibrary.setDisable( !library.canBeUnlocked() );
                 projectAdd.setDisable( !library.getModelManager().getOtmProjectManager().hasProjects() );

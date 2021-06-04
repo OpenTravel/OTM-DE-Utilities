@@ -57,7 +57,11 @@ public class TestQueryFacet extends TestContextualFacet {
 
     @Before
     public void beforeTest() {
-        // member = TestBusiness.buildOtm( staticLib, "MemberBO" );
+        staticModelManager.clear();
+        staticLib = TestLibrary.buildOtm( staticModelManager );
+        member = TestBusiness.buildOtm( staticLib, "MemberBO" );
+        subject = buildOtm( (OtmBusinessObject) member, "Subject" );
+        baseObject = buildOtm( (OtmBusinessObject) member, "Base" );
         cf = buildOtm( (OtmBusinessObject) member, "QF1" );
         contrib = (OtmContributedFacet) member.add( cf );
         testContributedFacet( contrib, cf, member );

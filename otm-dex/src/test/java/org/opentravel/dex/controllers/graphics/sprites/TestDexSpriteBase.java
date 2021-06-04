@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentravel.application.common.AbstractOTMApplication;
+import org.opentravel.AbstractDexTest;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.controllers.graphics.sprites.rectangles.ColumnRectangle;
 import org.opentravel.model.OtmModelManager;
@@ -33,21 +33,15 @@ import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.TestCore;
-import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.model.TLLibrary;
-import org.opentravel.utilities.testutil.AbstractFxTest;
-import org.opentravel.utilities.testutil.TestFxMode;
 
 import javafx.geometry.Point2D;
 
 /**
  * Verifies the functions of the <code>SelectProjectDialog</code>
  */
-public class TestDexSpriteBase extends AbstractFxTest {
+public class TestDexSpriteBase extends AbstractDexTest {
     private static Log log = LogFactory.getLog( TestOtmModelManager.class );
-
-    public static final boolean RUN_HEADLESS = true;
-    final int WATCH_TIME = 5000; // How long to sleep so we can see what is happening. Can be 0.
 
     final String FXID_PROJECTLIST = "#projectList";
     final String FXID_LIBTREETABLE = "#librariesTreeTable";
@@ -56,17 +50,14 @@ public class TestDexSpriteBase extends AbstractFxTest {
 
     @BeforeClass
     public static void setupTests() throws Exception {
-        setupWorkInProcessArea( TestDexSpriteBase.class );
-        repoManager = repositoryManager.get();
-        // Prevent java.nio.BufferOverflowException
-        System.setProperty( "headless.geometry", "2600x2200-32" );
+        beforeClassSetup( TestDexSpriteBase.class );
     }
 
     @Test
     public void testRender() {
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmModelManager mgr = lib.getModelManager();
+
         TestLibrary.addOneOfEach( lib );
         spriteMgr = TestSpriteManager.buildSpriteManager();
 
@@ -95,9 +86,9 @@ public class TestDexSpriteBase extends AbstractFxTest {
      */
     @Test
     public void testRenderColumnLayout() {
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmModelManager mgr = lib.getModelManager();
+
         TestLibrary.addOneOfEach( lib );
         spriteMgr = TestSpriteManager.buildSpriteManager();
 
@@ -136,9 +127,8 @@ public class TestDexSpriteBase extends AbstractFxTest {
 
     @Test
     public void testSetCollapse_True() {
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmModelManager mgr = lib.getModelManager();
 
         spriteMgr = TestSpriteManager.buildSpriteManager();
 
@@ -165,9 +155,8 @@ public class TestDexSpriteBase extends AbstractFxTest {
 
     @Test
     public void testSetCollapse_Width() {
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmModelManager mgr = lib.getModelManager();
 
         spriteMgr = TestSpriteManager.buildSpriteManager();
 
@@ -200,9 +189,8 @@ public class TestDexSpriteBase extends AbstractFxTest {
 
     @Test
     public void testSetCollapse_False() {
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = TestLibrary.buildOtm();
+        OtmModelManager mgr = lib.getModelManager();
 
         spriteMgr = TestSpriteManager.buildSpriteManager();
 
@@ -233,7 +221,7 @@ public class TestDexSpriteBase extends AbstractFxTest {
     public void testSetCollapse() {
         DexFullActionManager fullMgr = new DexFullActionManager( null );
         OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = mgr.addLibrary( new TLLibrary() );
         TestLibrary.addOneOfEach( lib );
 
         spriteMgr = TestSpriteManager.buildSpriteManager();
@@ -281,28 +269,5 @@ public class TestDexSpriteBase extends AbstractFxTest {
             } else
                 log.debug( "No sprite for " + member + " of class " + member.getClass().getSimpleName() );
         }
-    }
-
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
-     */
-    @Override
-    protected Class<? extends AbstractOTMApplication> getApplicationClass() {
-        return ObjectEditorApp.class;
-    }
-
-    /**
-     * Configure headless/normal mode for TestFX execution.
-     */
-    static {
-        TestFxMode.setHeadless( RUN_HEADLESS );
-    }
-
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
-     */
-    @Override
-    protected String getBackgroundTaskNodeQuery() {
-        return "#libraryText";
     }
 }

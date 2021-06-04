@@ -18,19 +18,20 @@ package org.opentravel.dex.controllers.popup;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.DexFileException;
 import org.opentravel.common.DexFileHandler;
-import org.opentravel.common.DexNamespaceHandler;
+import org.opentravel.common.DexProjectException;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.OtmLocalLibrary;
 import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.objecteditor.UserSettings;
-import org.opentravel.schemacompiler.model.AbstractLibrary;
-import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.repository.ProjectItem;
-import org.opentravel.schemacompiler.repository.RepositoryException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 import javafx.collections.FXCollections;
@@ -131,17 +132,12 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
 
     private File libraryFile = null;
     private OtmModelManager modelMgr;
-    private OtmLibrary otmLibrary = null;
+    private OtmLocalLibrary otmLibrary = null;
     private OtmProject selectedProject = null;
     private String resultText;
     private UserSettings userSettings;
     private Map<String,OtmProject> projectFileMap;
-
-    private DexNamespaceHandler nsHandler;
-
-    public String getResultText() {
-        return resultText;
-    }
+    // private OtmModelNamespaceManager nsHandler;
 
     @Override
     public void checkNodes() {
@@ -152,23 +148,28 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
             throw new IllegalStateException( "Missing injected field." );
     }
 
+    private void cleanUp(Path path) {
+        try {
+            Files.delete( path );
+        } catch (IOException e) {
+            postResults( "Could not delete " + path + " because " + e.getLocalizedMessage() );
+        }
+    }
+
     @Override
     public void clear() {
         dialogHelp.getChildren().clear();
     }
 
     /**
-     * Event handler invoked by fxml when the selection button is pushed.
      * 
-     * @param e
+     * @param manager used to create project
+     * @param initialProjectFolder used in user file selection dialog
      */
-    @FXML
-    public void selectFile(ActionEvent e) {
-        log.debug( "Button: " + e.toString() );
-        DexFileHandler fileHandler = new DexFileHandler();
-        libraryFile = fileHandler.directoryChooser( dialogStage, "Select Library Directory", userSettings );
-        if (libraryFile != null)
-            directoryField.setText( libraryFile.getPath() );
+    public void configure(OtmModelManager manager, UserSettings settings) {
+        this.modelMgr = manager;
+        this.userSettings = settings;
+        // this.nsHandler = new OtmModelNamespaceManager( manager );
     }
 
     /**
@@ -176,7 +177,6 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
      */
     @Override
     public void doOK() {
-
         if (selectedProject == null) {
             postResults( "Must select a project for the new library. " );
             return;
@@ -191,53 +191,39 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         }
         if (nameField.getText().isEmpty())
             nameField.setText( fileNameField.getText() );
-        if (nsCombo.getValue().isEmpty())
+        if (nsCombo.getValue() == null || nsCombo.getValue().isEmpty())
             nsCombo.setValue( "http://opentravel.org/Sandbox" );
 
-        DexFileHandler fileHandler = new DexFileHandler();
-        libraryFile = fileHandler.createLibraryFile( getFileName() );
-        if (libraryFile == null) {
-            postResults( fileHandler.getErrorMessage() );
+        try {
+            otmLibrary =
+                DexFileHandler.createLibrary( getFileName(), nsCombo.getValue(), nameField.getText(), modelMgr );
+        } catch (DexFileException e) {
+            postResults( e.getLocalizedMessage() );
             return;
         }
 
-        if (modelMgr != null)
+        if (otmLibrary != null)
             try {
-                AbstractLibrary tlLib = DexFileHandler.createLibrary( libraryFile );
-                String namespace = DexNamespaceHandler.fixNamespaceVersion( nsCombo.getValue() );
-                String prefix = nsHandler.getPrefix( namespace );
-
-                tlLib.setOwningModel( modelMgr.getTlModel() );
-                tlLib.setName( nameField.getText() );
-                tlLib.setNamespace( namespace );
-                tlLib.setPrefix( prefix );
-
-                // TODO - refactor how lib added to project. see DexProjectHandler
-                ProjectItem pi = selectedProject.getTL().getProjectManager().addUnmanagedProjectItem( tlLib,
-                    selectedProject.getTL() );
+                ProjectItem pi = selectedProject.add( otmLibrary );
                 if (pi == null) {
+                    cleanUp( libraryFile.toPath() );
                     postResults( "Error adding new library to project." );
-                    libraryFile.delete();
                     return;
                 }
-                if (tlLib instanceof TLLibrary)
-                    ((TLLibrary) tlLib).setComments( "" );
-                otmLibrary = modelMgr.addUnmanaged( tlLib );
-                otmLibrary.add( pi );
                 otmLibrary.save();
             } catch (IllegalArgumentException er) {
-                postResults( "Could not create new library in model. " + er.getLocalizedMessage() );
-                libraryFile.delete();
+                cleanUp( libraryFile.toPath() );
+                postResults( "Could not create new library in model: " + er.getLocalizedMessage() );
                 otmLibrary = null;
                 return;
-            } catch (RepositoryException e) {
-                postResults( "Could not add library to project." + e.getLocalizedMessage() );
-                libraryFile.delete();
+            } catch (DexProjectException e) {
+                cleanUp( libraryFile.toPath() );
+                postResults( "Could not add library to project: " + e.getLocalizedMessage() );
                 otmLibrary = null;
                 return;
             }
 
-        // log.debug( "Created library: " + libraryFile.getAbsolutePath() );
+        log.debug( "Created library: " + otmLibrary );
         super.doOK(); // all OK - close window
     }
 
@@ -263,6 +249,10 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
         return fileName;
     }
 
+    public String getResultText() {
+        return resultText;
+    }
+
     private void postResults(String text) {
         resultsArea.setWrapText( true );
         if (libraryFile != null)
@@ -271,14 +261,42 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
     }
 
     /**
+     * Event handler invoked by fxml when the selection button is pushed.
      * 
-     * @param manager used to create project
-     * @param initialProjectFolder used in user file selection dialog
+     * @param e
      */
-    public void configure(OtmModelManager manager, UserSettings settings) {
-        this.modelMgr = manager;
-        this.userSettings = settings;
-        this.nsHandler = new DexNamespaceHandler( manager );
+    @FXML
+    public void selectFile(ActionEvent e) {
+        // log.debug( "Button: " + e.toString() );
+        DexFileHandler fileHandler = new DexFileHandler();
+        libraryFile = fileHandler.directoryChooser( dialogStage, "Select Library Directory", userSettings );
+        if (libraryFile != null)
+            directoryField.setText( libraryFile.getPath() );
+    }
+
+    private void setSelectedProject(ActionEvent e) {
+        selectedProject = projectFileMap.get( projectCombo.getValue() );
+    }
+
+    @Override
+    protected void setup(String message) {
+        super.setStage( dialogTitle, dialogStage );
+
+        dialogButtonCancel.setOnAction( e -> doCancel() );
+        dialogButtonOK.setOnAction( e -> doOK() );
+        postHelp( helpText, dialogHelp );
+
+        setupNS();
+        setupProject();
+
+        directoryField.setText( DexFileHandler.getDefaultProjectFolder( userSettings ) );
+    }
+
+    private void setupNS() {
+        // Get the namespaces
+        modelMgr.getBaseNamespaces().forEach( ns -> nsCombo.getItems().add( ns ) );
+        // nsHandler.getBaseNamespaces().forEach( ns -> nsCombo.getItems().add( ns ) );
+        nsCombo.setEditable( true );
     }
 
     private void setupProject() {
@@ -292,34 +310,5 @@ public class NewLibraryDialogController extends DexPopupControllerBase {
             selectedProject = projectFileMap.get( projectCombo.getValue() );
         }
         projectCombo.setOnAction( this::setSelectedProject );
-    }
-
-    private void setSelectedProject(ActionEvent e) {
-        selectedProject = projectFileMap.get( projectCombo.getValue() );
-    }
-
-    private void setupNS() {
-        // Get the namespaces
-        nsHandler.getBaseNamespaces().forEach( ns -> nsCombo.getItems().add( ns ) );
-        nsCombo.setEditable( true );
-    }
-
-    @Override
-    protected void setup(String message) {
-        super.setStage( dialogTitle, dialogStage );
-        // checkNodes();
-
-        dialogButtonCancel.setOnAction( e -> doCancel() );
-        dialogButtonOK.setOnAction( e -> doOK() );
-        postHelp( helpText, dialogHelp );
-
-        setupNS();
-        setupProject();
-
-        if (userSettings != null)
-            directoryField.setText( userSettings.getLastProjectFolder().getPath() );
-        else
-            directoryField.setText( DexFileHandler.getUserHome() );
-
     }
 }

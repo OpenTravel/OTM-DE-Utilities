@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentravel.application.common.AbstractOTMApplication;
+import org.opentravel.AbstractDexTest;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.controllers.graphics.sprites.ContextualFacetSprite;
 import org.opentravel.dex.controllers.graphics.sprites.ResourceSprite;
@@ -32,6 +32,7 @@ import org.opentravel.dex.controllers.graphics.sprites.rectangles.FacetRectangle
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -39,21 +40,15 @@ import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestCustomFacet;
 import org.opentravel.model.otmLibraryMembers.TestResource;
 import org.opentravel.model.resource.OtmAction;
-import org.opentravel.objecteditor.ObjectEditorApp;
 import org.opentravel.schemacompiler.model.TLLibrary;
-import org.opentravel.utilities.testutil.AbstractFxTest;
-import org.opentravel.utilities.testutil.TestFxMode;
 
 import javafx.scene.canvas.GraphicsContext;
 
 /**
  * Verifies the functions of the <code>SelectProjectDialog</code>
  */
-public class TestFacetRectangle extends AbstractFxTest {
+public class TestFacetRectangle extends AbstractDexTest {
     private static Log log = LogFactory.getLog( TestOtmModelManager.class );
-
-    public static final boolean RUN_HEADLESS = true;
-    final int WATCH_TIME = 5000; // How long to sleep so we can see what is happening. Can be 0.
 
     final String FXID_PROJECTLIST = "#projectList";
     final String FXID_LIBTREETABLE = "#librariesTreeTable";
@@ -62,18 +57,13 @@ public class TestFacetRectangle extends AbstractFxTest {
 
     @BeforeClass
     public static void setupTests() throws Exception {
-        setupWorkInProcessArea( TestFacetRectangle.class );
-        repoManager = repositoryManager.get();
-
-        // Prevent java.nio.BufferOverflowException
-        System.setProperty( "headless.geometry", "2600x2200-32" );
+        beforeClassSetup( TestFacetRectangle.class );
     }
 
     @Test
     public void testFacet() {
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = TestLibrary.buildOtm();
+
         // TestLibrary.addOneOfEach( lib );
         spriteMgr = TestSpriteManager.buildSpriteManager();
 
@@ -84,7 +74,7 @@ public class TestFacetRectangle extends AbstractFxTest {
     public void testAction() {
         DexFullActionManager fullMgr = new DexFullActionManager( null );
         OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = mgr.addLibrary( new TLLibrary() );
         // TestLibrary.addOneOfEach( lib );
         spriteMgr = TestSpriteManager.buildSpriteManager();
         GraphicsContext gc = spriteMgr.getSettingsManager().getGc();
@@ -103,7 +93,7 @@ public class TestFacetRectangle extends AbstractFxTest {
     public void testValueWithAttributes() {
         DexFullActionManager fullMgr = new DexFullActionManager( null );
         OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = mgr.addLibrary( new TLLibrary() );
         // TestLibrary.addOneOfEach( lib );
         spriteMgr = TestSpriteManager.buildSpriteManager();
 
@@ -112,9 +102,7 @@ public class TestFacetRectangle extends AbstractFxTest {
 
     @Test
     public void testContextualFacet() {
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = TestLibrary.buildOtm();
         spriteMgr = TestSpriteManager.buildSpriteManager();
 
         OtmBusinessObject bo = TestBusiness.buildOtm( lib, "Bo1" );
@@ -129,28 +117,4 @@ public class TestFacetRectangle extends AbstractFxTest {
         assertTrue( fc.getMaxX() < cfSprite.getX() + cfSprite.getWidth() );
     }
 
-
-
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
-     */
-    @Override
-    protected Class<? extends AbstractOTMApplication> getApplicationClass() {
-        return ObjectEditorApp.class;
-    }
-
-    /**
-     * Configure headless/normal mode for TestFX execution.
-     */
-    static {
-        TestFxMode.setHeadless( RUN_HEADLESS );
-    }
-
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
-     */
-    @Override
-    protected String getBackgroundTaskNodeQuery() {
-        return "#libraryText";
-    }
 }

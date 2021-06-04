@@ -18,8 +18,8 @@ package org.opentravel.dex.tasks.repository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentravel.common.DexFileException;
 import org.opentravel.common.DexFileHandler;
-import org.opentravel.common.OpenProjectProgressMonitor;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
@@ -62,16 +62,20 @@ public class OpenLibraryFileTask extends DexTaskBase<File> {
 
     @Override
     public void doIT() {
-        log.debug( "Opening " + taskData.getName() );
+        // log.debug( "Opening " + taskData.getName() );
 
-        // new DexFileHandler().openFile( taskData, modelMgr, new OpenProjectProgressMonitor( status ) );
-        new DexFileHandler().openLibrary( taskData, modelMgr, new OpenProjectProgressMonitor( status ) );
+        try {
+            DexFileHandler.openLibrary( taskData, modelMgr );
+            // Now resolve types and validate again
+            modelMgr.startValidatingAndResolvingTasks();
+        } catch (DexFileException e) {
+            // NO-OP
+        }
+        // new DexFileHandler().openLibrary( taskData, modelMgr );
+        //
+        // // Add all the libraries -- model manager will ignore those already added
+        // modelMgr.add();
 
-        // Add all the libraries -- model manager will ignore those already added
-        modelMgr.add();
-
-        // Now resolve types and validate again
-        modelMgr.startValidatingAndResolvingTasks();
     }
 
 }

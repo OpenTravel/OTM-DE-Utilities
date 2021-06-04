@@ -24,17 +24,15 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
-import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.controllers.graphics.sprites.rectangles.Rectangle;
-import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.TestOtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
+import org.opentravel.model.otmContainers.TestLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmProperties.OtmAttribute;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
 import org.opentravel.objecteditor.ObjectEditorApp;
-import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.utilities.testutil.AbstractFxTest;
 import org.opentravel.utilities.testutil.TestFxMode;
 
@@ -68,9 +66,7 @@ public class TestBusinessSprite extends AbstractFxTest {
 
     @Test
     public void testConstructor() {
-        DexFullActionManager fullMgr = new DexFullActionManager( null );
-        OtmModelManager mgr = new OtmModelManager( fullMgr, null, null );
-        OtmLibrary lib = mgr.add( new TLLibrary() );
+        OtmLibrary lib = TestLibrary.buildOtm();
         spriteMgr = TestSpriteManager.buildSpriteManager();
         gc = spriteMgr.getSettingsManager().getGc();
 

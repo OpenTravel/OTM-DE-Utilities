@@ -100,6 +100,7 @@ public enum OtmLibraryMemberType {
      * @throws NoSuchMethodException
      * @throws InvocationTargetException
      */
+    // FIXME - catch exceptions
     public static OtmLibraryMember buildMember(OtmLibraryMemberType memberType, String name, OtmModelManager mgr)
         throws ExceptionInInitializerError, InstantiationException, IllegalAccessException, NoSuchMethodException,
         InvocationTargetException {

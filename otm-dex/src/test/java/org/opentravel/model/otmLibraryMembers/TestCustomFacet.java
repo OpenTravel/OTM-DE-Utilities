@@ -58,6 +58,15 @@ public class TestCustomFacet extends TestContextualFacet {
         baseObject = buildOtm( staticLib, "BaseCF" );
     }
 
+    @Before
+    public void beforeMethods() {
+        staticModelManager.clear();
+
+        staticLib = TestLibrary.buildOtm();
+        subject = buildOtm( staticLib, "SubjectCF" );
+        baseObject = buildOtm( staticLib, "BaseCF" );
+    }
+
     /** ******************* Static Builders **************************************/
 
     /**

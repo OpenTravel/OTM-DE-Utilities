@@ -23,83 +23,168 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentravel.application.common.AbstractOTMApplication;
+import org.opentravel.common.DexFileException;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.OtmProjectManager;
-import org.opentravel.model.otmContainers.OtmLibrary;
-import org.opentravel.objecteditor.ObjectEditorApp;
-import org.opentravel.schemacompiler.model.TLModel;
-import org.opentravel.utilities.testutil.AbstractFxTest;
-import org.opentravel.utilities.testutil.TestFxMode;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Verifies the functions of the <code>Dex File Handler</code>.
+ * <p>
+ * Extends TestDexFileHandlerUtils to provider file loading utilities.
  */
-public class TestDexFileHandler extends AbstractFxTest {
+public class TestDexFileHandler extends TestDexFileHandlerUtils {
     private static Log log = LogFactory.getLog( TestDexFileHandler.class );
 
-    public static final boolean RUN_HEADLESS = true;
-    final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.
-
-    public final static String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector
-    // 27 named objects in 2 libraries. All valid, one warning.
-    public final static String FILE_TESTOPENTRAVELREPO = "TestOpenTravelRepo.otp";
-    public final static String FILE_TESTVERSIONS_REPO = "TestVersionsFromOpenTravelRepo.otp";
-    public final static String FILE_TESTVERSIONSWITHRESOURCE_REPO = "TestVersionsFromRepoWithResource.otp";
-    public final static String FILE_TESTLOCAL = "TestLocalFiles.otp";
-    public final static String FILE_TESTLOCALLIBRARY = "StandAloneLibrary.otm";
-    public final static String FILE_TESTLOCALLIBRARYBASE = "base_library.otm";
-    public final static String FILE_TESTLOCALLIBRARY1 = "facets1_library.otm";
-    public final static String FILE_TESTLOCALLIBRARY2 = "facets2_library.otm";
-    public final static String FILE_TESTLIBRARYNOTINPROJECT = "LibraryNotInProject.otm";
 
     @BeforeClass
     public static void setupTests() throws Exception {
         setupWorkInProcessArea( TestDexFileHandler.class );
         // startTestServer( "versions-repository", 9480, repositoryConfig, true, false, TestDexFileHandler.class );
-        repoManager = repositoryManager.get();
+        // repoManager = repositoryManager.get();
 
         // Prevent java.nio.BufferOverflowException
         System.setProperty( "headless.geometry", "2600x2200-32" );
 
     }
 
-    /**
-     * Note, non-empty directories will not be deleted.
-     * 
-     * @param fileName
-     * @param subDirectory
-     * @return
-     * @throws IOException
-     */
-    public static File getTempFile(String fileName, String subDirectory) throws IOException {
-        File outputFolder = new File( wipFolder.get(), subDirectory );
-        outputFolder.mkdir();
-        outputFolder.deleteOnExit();
-        File file = new File( outputFolder, fileName );
-        if (!file.createNewFile()) {
-            log.error( "Error creating temporary file." );
-        }
-        file.deleteOnExit();
-        log.debug( "Created Temporary File: " + file.getCanonicalPath() );
-        return file;
+    @Test
+    public void testCheckDir() {
+        // TODO
     }
 
-    public static File getTempDir(String subDirectory) {
-        File outputFolder = new File( wipFolder.get(), subDirectory );
-        return outputFolder;
+    @Test
+    public void testSaveLibraries() {
+        // TODO
+    }
+
+    @Test
+    public void testCreateFile() {
+        // TODO
+    }
+
+    @Test
+    public void testCreateLibrary() {
+        // TODO - error cases
+    }
+
+    @Test
+    public void testCanWrite() {
+        // TODO
+    }
+
+    @Test
+    public void testOpenProject() {
+        // OtmModelManager modelManager = TestOtmModelManager.build();
+        OtmModelManager modelManager = getModelManager();
+
+        File localProject = new File( wipFolder.get(), "/" + FILE_TESTLOCAL );
+        assertNotNull( localProject );
+        // openProject( localProject, modelManager );
+        try {
+            DexFileHandler.openProject( localProject, modelManager, null );
+        } catch (DexFileException e) {
+            assertTrue( "Then must not throw exception." + e.getLocalizedMessage(), true );
+        }
+    }
+
+    @Test(expected = DexFileException.class)
+    public void testOpenProject_BadFile() throws Exception {
+        // OtmModelManager modelManager = TestOtmModelManager.build();
+        OtmModelManager modelManager = getModelManager();
+        File localProject = new File( wipFolder.get(), "/" + FILE_TESTLOCAL + "ZZXXCCVFFDDSS" );
+        assertNotNull( localProject );
+        DexFileHandler.openProject( localProject, modelManager, null );
+    }
+
+    @Test(expected = DexFileException.class)
+    public void testOpenProject_NoMgr() throws Exception {
+        File localProject = new File( wipFolder.get(), "/" + FILE_TESTLOCAL );
+        assertNotNull( localProject );
+        DexFileHandler.openProject( localProject, null, null );
+    }
+
+    @Test
+    public void testCreateLibraryFile() {
+
+    }
+
+    @Test
+    public void testFileHandlerUtils() throws Exception {
+        // OtmModelManager modelManager = TestOtmModelManager.build();
+        OtmModelManager modelManager = getModelManager();
+        // getTempFile();
+        loadAndAddManagedProject( modelManager );
+        loadAndAddUnmanagedProject( modelManager );
+        modelManager.clear();
+
+        loadLocalLibrary( modelManager );
+        // see testOpenLocalLibrary() - loadLocalLibrary(path, modelManager);
+        loadVersionProject( modelManager );
+        loadVersionProjectWithResource( modelManager );
+        // Used by loadVersion* - loadVersionProject(projectFile, modelManager);
+    }
+
+    @Test(expected = DexFileException.class)
+    public void testOpenLibrary_NoMgr() throws Exception {
+        File localLibrary = new File( wipFolder.get(), "/" + FILE_TESTLOCALLIBRARY1 );
+        DexFileHandler.openLibrary( localLibrary, (OtmModelManager) null );
+    }
+
+    @Test(expected = DexFileException.class)
+    public void testOpenLibrary_BadFile() throws Exception {
+        // OtmModelManager mgr = TestOtmModelManager.build();
+        OtmModelManager mgr = getModelManager();
+        File localLibrary =
+            new File( wipFolder.get(), "/" + FILE_TESTLOCALLIBRARY1 + "NOT_A_REAL_FILE_NAME_ZZZZZAAAAAQQQQQ" );
+        DexFileHandler.openLibrary( localLibrary, mgr );
+        // TODO - error cases
+    }
+
+    @Test
+    public void testOpenLocalLibrary() {
+        // OtmModelManager mgr = TestOtmModelManager.build();
+        OtmModelManager mgr = getModelManager();
+        assertTrue( mgr.getTlModel().getUserDefinedLibraries().size() == 0 );
+        // Uses DexFileHandler#openLibrary(file, mgr.getTL());
+        loadLocalLibrary( FILE_TESTLOCALLIBRARY, mgr );
+        loadLocalLibrary( FILE_TESTLOCALLIBRARY1, mgr );
+        loadLocalLibrary( FILE_TESTLOCALLIBRARY2, mgr );
+        assertTrue( mgr.getTlModel().getUserDefinedLibraries().size() >= 3 );
+    }
+
+    @Test
+    public void testOpenLocalLibrary3() throws Exception {
+        // OtmModelManager mgr = TestOtmModelManager.build();
+        OtmModelManager mgr = getModelManager();
+        assertTrue( mgr.getUserLibraries().size() == 0 );
+        // Uses DexFileHandler#openLibrary(file, mgr);
+        loadAndAddLocalLibrary( FILE_TESTLOCALLIBRARY, mgr );
+        loadAndAddLocalLibrary( FILE_TESTLOCALLIBRARY1, mgr );
+        loadAndAddLocalLibrary( FILE_TESTLOCALLIBRARY2, mgr );
+        assertTrue( mgr.getUserLibraries().size() >= 3 );
+    }
+
+    @Test
+    public void testOpenLocalProject() throws Exception {
+        // When the local files are used in the project
+        // OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+        OtmModelManager mgr = getModelManager();
+        loadAndAddUnmanagedProject( mgr );
+        // mgr.addProjects();
+
+        // Then - Expect libraries and members
+        assertTrue( mgr.getLibraries().size() > 2 );
+        assertTrue( !mgr.getMembers().isEmpty() );
+        log.debug( "Read " + mgr.getMembers().size() + " members." );
     }
 
     @Test
     public void testOpenOTAProject() throws Exception {
         // When the OpenTravel repository is used in the project
-        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+        // OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
+        OtmModelManager mgr = getModelManager();
         // When the project is loaded and added to the model manager
         loadAndAddManagedProject( mgr );
 
@@ -112,298 +197,6 @@ public class TestDexFileHandler extends AbstractFxTest {
     @Test
     public void testOpenProjectError() throws Exception {
         // TODO
-    }
-
-    @Test
-    public void testOpenLocalProject() throws Exception {
-        // When the local files are used in the project
-        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
-        loadAndAddUnmanagedProject( mgr );
-        // mgr.addProjects();
-
-        // Then - Expect libraries and members
-        assertTrue( mgr.getLibraries().size() > 2 );
-        assertTrue( !mgr.getMembers().isEmpty() );
-        log.debug( "Read " + mgr.getMembers().size() + " members." );
-    }
-
-    /**
-     * Uses file handler to open the named file in the wipFolder. Does not change model manager.
-     * 
-     * @see {@link DexFileHandler#openLibrary(File, TLModel, org.opentravel.common.OpenProjectProgressMonitor)}
-     * 
-     * @param path
-     * @param OtmModel used to get the tlModel
-     */
-    public static void loadLocalLibrary(String path, OtmModelManager modelManager) {
-        File localLibrary = new File( wipFolder.get(), "/" + path );
-        assertNotNull( localLibrary );
-        assertTrue( localLibrary.exists() );
-        // Path should be:
-        // C:\Users\dmh\Git\OTM-DE-Utilities\otm-dex\target\test-workspace\TestDexFileHandler\wip\StandAloneLibrary.otm
-
-        // int initialLibCount = tlModel.getAllLibraries().size();
-        new DexFileHandler().openLibrary( localLibrary, modelManager, null );
-        // assertTrue( tlModel.getAllLibraries().size() > initialLibCount );
-        // log.debug( "Model now has " + tlModel.getAllLibraries().size() + " libraries." );
-    }
-
-
-    @Test
-    public void testOpenLocalLibrary() throws Exception {
-        OtmModelManager mgr = new OtmModelManager( null, repoManager, null );
-
-        loadLocalLibrary( FILE_TESTLOCALLIBRARY, mgr );
-        loadLocalLibrary( FILE_TESTLOCALLIBRARY1, mgr );
-        loadLocalLibrary( FILE_TESTLOCALLIBRARY2, mgr );
-
-    }
-    // @AfterClass
-    // public static void tearDownTests() throws Exception {
-    // shutdownTestServer();
-    // }
-
-
-    /**
-     * 
-     * load TestLocalFiles.otp project that uses local library files and add to model
-     */
-    public static void loadAndAddUnmanagedProject(OtmModelManager modelManager) {
-        loadUnmanagedProject( modelManager );
-        modelManager.addProjects();
-    }
-
-    /**
-     * Load the project that uses local library files but do NOT add to the model.
-     * <p>
-     * To load into the OtmModelManager, use {@link OtmModelManager#addProjects()} or
-     * {@link #loadAndAddUnmanagedProject(OtmModelManager)}
-     * 
-     * @param modelManager
-     */
-    public static void loadUnmanagedProject(OtmModelManager modelManager) {
-        File localProject = new File( wipFolder.get(), "/" + FILE_TESTLOCAL );
-        assertNotNull( localProject );
-
-        new DexFileHandler().openProject( localProject, modelManager.getProjectManager(), null );
-        log.debug( "Model now has " + modelManager.getTlModel().getAllLibraries().size() + " libraries." );
-    }
-
-
-    /**
-     * 
-     * load project that uses the OpenTravel repository and add to model. 27 named objects in 2 libraries. All valid,
-     * one warning.
-     * <p>
-     * Note: calling class must extend AbstractFxTest
-     */
-    public static void loadAndAddManagedProject(OtmModelManager modelManager) {
-        File repoProject = new File( wipFolder.get(), "/" + FILE_TESTOPENTRAVELREPO );
-        assertNotNull( repoProject );
-
-        new DexFileHandler().openProject( repoProject, modelManager, null );
-
-        assertTrue( "Must have project items.", modelManager.getProjectManager().getAllProjectItems().size() > 1 );
-
-        // TODO - where do these tests belong?
-        OtmProjectManager pMgr = modelManager.getOtmProjectManager();
-        assertTrue( modelManager.getProjects().size() > 0 );
-        assertTrue( pMgr.getProjects().size() > 0 );
-        if (modelManager.getUserSettings() != null)
-            assertTrue( pMgr.getRecentlyUsedProjectFileNames().size() > 0 );
-
-        // log.debug( "Model now has " + modelManager.getTlModel().getAllLibraries().size() + " libraries." );
-        // log.debug( "Model now has " + modelManager.getTlModel().getUserDefinedLibraries().size() + " user libraries."
-        // );
-    }
-
-    /**
-     * Load project that uses the OpenTravel repository. Note: it uses credentials so may not contain editable
-     * libraries.
-     * <p>
-     * FILE_TESTVERSIONS_REPO = "TestVersionsFromOpenTravelRepo.otp";
-     * <p>
-     * 1 Library with version 0.0, 0.1, 1.0 and 1.1
-     * <p>
-     * 11 objects, one of each type
-     * 
-     * @return true if there is an editable library
-     * @throws InterruptedException
-     */
-    public static boolean loadVersionProject(OtmModelManager modelManager) throws InterruptedException {
-        File repoProject = new File( wipFolder.get(), "/" + FILE_TESTVERSIONS_REPO );
-        return loadVersionProject( repoProject, modelManager );
-    }
-
-    public static boolean loadVersionProjectWithResource(OtmModelManager modelManager) throws InterruptedException {
-        File repoProject = new File( wipFolder.get(), "/" + FILE_TESTVERSIONSWITHRESOURCE_REPO );
-        return loadVersionProject( repoProject, modelManager );
-    }
-
-    public static boolean loadVersionProject(File repoProject, OtmModelManager modelManager)
-        throws InterruptedException {
-        // File repoProject = new File( wipFolder.get(), "/" + FILE_TESTVERSIONS_REPO );
-        assertNotNull( repoProject );
-        assertNotNull( modelManager );
-        // Check wipFolder
-        log.debug( "WipFolder = " + wipFolder.get() );
-        assertTrue( "Loader: must be able to read wipFolder.", repoProject.canRead() );
-
-        // List<OtmProject> initialProjects = modelManager.getProjects();
-
-        new DexFileHandler().openProject( repoProject, modelManager, null );
-        assertTrue( "Must have project items.", modelManager.getProjectManager().getAllProjectItems().size() > 1 );
-        // log.debug( "Model now has " + modelManager.getTlModel().getAllLibraries().size() + " libraries." );
-
-        List<OtmLibrary> libs = new ArrayList<>( modelManager.getLibraries() );
-        assertTrue( "Must have libraries.", libs.size() > 1 );
-        boolean editable = false;
-        for (OtmLibrary lib : libs)
-            if (lib.isEditable())
-                editable = true;
-        if (!editable)
-            log.warn( "No editable libraries. Check access to repository for libraries in " + FILE_TESTVERSIONS_REPO );
-
-        // List<OtmProject> newProjects = new ArrayList<>();
-        // modelManager.getProjects().forEach( p -> {
-        // if (!initialProjects.contains( p ))
-        // newProjects.add( p );
-        // } );
-        // log.debug( newProjects.size() + " projects loaded." );
-
-        // Wait for the background tasks to complete
-        while (modelManager.getBackgroundTaskCount() > 0)
-            Thread.sleep( 100 );
-
-        return editable;
-    }
-
-
-    @Test
-    public void testFileChooser() throws Exception {
-        // robot.clickOn( "Properties" );
-        // robot.targetWindow( "Login Dialog" ).clickOn( "Cancel" );
-    }
-
-    @Test
-    public void projectTest() throws Exception {
-        // DexMainController controller = (DexMainController) application.getController();
-        // int bgTasks = controller.getStatusController().getQueueSize();
-        // assertTrue( bgTasks == 0 );
-        //
-        // robot.clickOn( FXID_PROJECTCOMBO );
-        // selectFirstEntity( FXID_PROJECTCOMBO );
-        // robot.sleep( 5 * WATCH_TIME );
-
-        // try {
-        // robot.clickOn( FILE_TESTPROJECT2 );
-        // } catch (Exception e) {
-        // // Expected if it could not find project
-        // return; // all done
-        // }
-
-        // do {
-        // robot.sleep( 100 );
-        // bgTasks = controller.getStatusController().getQueueSize();
-        // } while (bgTasks > 0);
-        //
-        // robot.sleep( 5 * WATCH_TIME );
-        // WaitForAsyncUtils.waitForFxEvents(); // make sure the event queue is empty
-        //
-        // try {
-        // Node price = robot.lookup( "Price" ).query();
-        // WaitForAsyncUtils.waitForFxEvents(); // make sure the event queue is empty
-        // assertNotNull( "Must find Price column.", price );
-        // } catch (Exception e) {
-        // // Expected if it could not find project
-        // }
-
-        // See TestDiffManagedModels
-        // verifyThat( FXID_MEMBERTREE, (TreeTableView<MemberAndProvidersDAO> treeTableView) -> {
-        // return true;
-        // } );
-        // robot.verifyThat( FXID_MEMBERTREE, NodeMatchers.hasChild( "Price" ) );
-
-        // WaitForAsyncUtils.waitForFxEvents(); // make sure the event queue is empty
-        // TreeTableView<MemberAndProvidersDAO> members = robot.lookup( FXID_MEMBERTREE ).query();
-        // assertNotNull( members );
-        // assertTrue( "Must have children in the members.", members.getRoot().getChildren().size() > 4 );
-        // members.getSelectionModel().select( 1 );
-        // robot.sleep( WATCH_TIME );
-        // members.getSelectionModel().select( 4 );
-        //
-        // robot.sleep( WATCH_TIME );
-        //
-        // WaitForAsyncUtils.waitForFxEvents(); // make sure the event queue is empty
-        // TreeTableView<PropertiesDAO> properties = robot.lookup( FXID_PROPERTIESTABLE ).query();
-        // assertNotNull( properties );
-        // assertTrue( "Must have children in the tree.", !properties.getRoot().getChildren().isEmpty() );
-        // for (TreeItem<PropertiesDAO> c : properties.getRoot().getChildren()) {
-        // properties.getSelectionModel().select( c );
-        // robot.sleep( WATCH_TIME );
-        // log.debug( properties.getSelectionModel().getSelectedItem().getValue().nameProperty().getValue() );
-        // }
-        // properties.getSelectionModel().select( 1 );
-        // properties.getSelectionModel().select( 3 );
-        // robot.sleep( WATCH_TIME );
-
-        log.debug( "Done" );
-    }
-
-    // private void selectFirstEntity(String fxid) {
-    // robot.clickOn( fxid );
-    // robot.type( KeyCode.DOWN );
-    // // robot.type( KeyCode.ENTER );
-    // WaitForAsyncUtils.waitForFxEvents();
-    // }
-
-    // @Test
-    // public void exitTest() throws Exception {
-    // exit();
-    // }
-    //
-    // public void exit() {
-    // // Click on the file menu's exit entry
-    // robot.clickOn( "File" ).clickOn( "Exit" );
-    // // Click on popup dialog's exit button
-    // robot.targetWindow( "Exit" ).clickOn( "Exit" );
-    // }
-
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
-     */
-    @Override
-    protected Class<? extends AbstractOTMApplication> getApplicationClass() {
-        return ObjectEditorApp.class;
-    }
-
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
-     */
-    @Override
-    protected String getBackgroundTaskNodeQuery() {
-        return "#libraryText";
-    }
-
-    // Suggested by: https://www.youtube.com/watch?v=NG03nNpSmgU
-    // Assumes class extends "ApplicationTest" private ApplicationTest at;
-    //
-    // @After
-    // public void afterEachTest() throws TimeoutException {
-    // FxToolkit.hideStage();
-    //// release(new KeyCode[]{});
-    //// release(new MouseButton[]{});
-    // }
-    // public <T extends Node> T find(final String query) {
-    // return (T) lookup(query).queryAll().iterator().next();
-    // }
-
-
-    /**
-     * Configure headless/normal mode for TestFX execution.
-     */
-    static {
-        TestFxMode.setHeadless( RUN_HEADLESS );
     }
 }
 

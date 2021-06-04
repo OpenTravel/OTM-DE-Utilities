@@ -16,15 +16,16 @@
 
 package org.opentravel.model.otmContainers;
 
-import org.opentravel.common.ImageManager;
-import org.opentravel.common.ImageManager.Icons;
+import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.BuiltInLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
+import org.opentravel.schemacompiler.repository.RepositoryItemState;
 
 /**
- * OTM Object for libraries.
+ * OTM Facade for built-in libraries.
  * 
  * @author Dave Hollander
  * 
@@ -32,10 +33,8 @@ import org.opentravel.schemacompiler.model.TLLibraryStatus;
 public class OtmBuiltInLibrary extends OtmLibrary {
     // private static Log log = LogFactory.getLog( OtmBuiltInLibrary.class );
 
-
-    public OtmBuiltInLibrary(BuiltInLibrary lib, OtmModelManager mgr) {
-        super( mgr );
-        tlLib = lib;
+    protected OtmBuiltInLibrary(BuiltInLibrary lib, OtmModelManager mgr) {
+        super( lib, mgr );
     }
 
     @Override
@@ -43,20 +42,40 @@ public class OtmBuiltInLibrary extends OtmLibrary {
         return tlLib;
     }
 
+    /**
+     * Built-in libraries return read-only action manger.
+     * <p>
+     * {@inheritDoc}
+     */
     @Override
-    public String getName() {
-        return getTL() != null ? getTL().getName() : "";
+    public DexActionManager getActionManager(OtmLibraryMember member) {
+        return mgr.getActionManager( false );
     }
 
+    /**
+     * Built-in libraries return read-only action manger.
+     * <p>
+     * {@inheritDoc}
+     */
     @Override
-    public String getPrefix() {
-        return getTL().getPrefix();
+    public DexActionManager getActionManager() {
+        return mgr.getActionManager( false );
     }
 
-    @Override
-    public Icons getIconType() {
-        return ImageManager.Icons.LIBRARY;
-    }
+    // @Override
+    // public String getName() {
+    // return getTL() != null ? getTL().getName() : "";
+    // }
+    //
+    // @Override
+    // public String getPrefix() {
+    // return getTL().getPrefix();
+    // }
+    //
+    // @Override
+    // public Icons getIconType() {
+    // return ImageManager.Icons.LIBRARY;
+    // }
 
     @Override
     public boolean isEditable() {
@@ -72,41 +91,48 @@ public class OtmBuiltInLibrary extends OtmLibrary {
     }
 
     // @Override
-    // public String getStateName() {
-    // return "Built in library.";
+    // public String getNameWithBasenamespace() {
+    // return getBaseNS() + "/" + getName();
     // }
 
+    // @Override
+    // public String getLockedBy() {
+    // return "";
+    // }
+
+    /**
+     * Built-in libraries are always unmanaged.
+     * <p>
+     * {@inheritDoc}
+     */
     @Override
-    public String getNameWithBasenamespace() {
-        return getBaseNamespace() + "/" + getName();
+    public RepositoryItemState getState() {
+        return RepositoryItemState.UNMANAGED;
     }
 
+    /**
+     * Built-in libraries just return their namespace.
+     * <p>
+     * {@inheritDoc}
+     */
     @Override
-    public String getLockedBy() {
-        return "";
-    }
-
-    @Override
-    public String getBaseNamespace() {
-        return projectItems.isEmpty() ? "" : projectItems.get( 0 ).getBaseNamespace();
+    public String getBaseNS() {
+        return getTL().getNamespace();
+        // return projectItems.isEmpty() ? "" : projectItems.get( 0 ).getBaseNamespace();
     }
 
     @Override
     public boolean isLatestVersion() {
-        return mgr.isLatest( this );
+        return true;
+        // return mgr.isLatest( this );
     }
 
+    // /**
+    // * @return
+    // */
     // @Override
-    // public void validate() {
-    // findings = TLModelCompileValidator.validateModelElement(getTL(), true);
+    // public String getVersion() {
+    // return getTL().getVersion();
     // }
-
-    /**
-     * @return
-     */
-    @Override
-    public String getVersion() {
-        return getTL().getVersion();
-    }
 
 }

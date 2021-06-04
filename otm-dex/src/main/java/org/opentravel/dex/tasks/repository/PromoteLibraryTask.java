@@ -24,9 +24,9 @@ import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
-import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.repository.ProjectItem;
+import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 import org.opentravel.schemacompiler.repository.RepositoryItemState;
@@ -41,7 +41,7 @@ public class PromoteLibraryTask extends DexTaskBase<OtmLibrary> {
     private static Log log = LogFactory.getLog( PromoteLibraryTask.class );
 
     private DexIncludedController<?> eventController;
-    private OtmProject proj = null;
+    // private OtmProject proj = null;
     private OtmLibrary library = null;
     private static String errorMsg;
 
@@ -62,7 +62,7 @@ public class PromoteLibraryTask extends DexTaskBase<OtmLibrary> {
 
         this.library = taskData;
         this.eventController = eventController;
-        proj = modelManager.getManagingProject( library );
+        // proj = modelManager.getManagingProject( library );
 
         // Replace start message from super-type.
         msgBuilder = new StringBuilder( "Promoting: " );
@@ -103,11 +103,16 @@ public class PromoteLibraryTask extends DexTaskBase<OtmLibrary> {
     @Override
     public void doIT() throws RepositoryException {
         // log.debug( "Promote library task: " + library );
-
-        if (proj != null) {
-            // log.debug( "Promote with project item: " + proj.getProjectItem( library.getTL() ).hashCode() );
-            proj.getTL().getProjectManager().promote( proj.getProjectItem( library.getTL() ) );
+        if (library != null) {
+            ProjectManager tlPM = library.getTLProjectManager();
+            if (tlPM != null) {
+                ProjectItem item = tlPM.getProjectItem( library.getTL() );
+                if (item != null) {
+                    tlPM.promote( item );
+                }
+                // log.debug( "Promote with project item: " + proj.getProjectItem( library.getTL() ).hashCode() );
+                // proj.getTL().getProjectManager().promote( proj.getProjectItem( library.getTL() ) );
+            }
         }
     }
-
 }

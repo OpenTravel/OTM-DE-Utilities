@@ -32,12 +32,15 @@ import org.opentravel.model.otmLibraryMembers.OtmCore;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
+import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
 import org.opentravel.model.otmLibraryMembers.TestBusiness;
 import org.opentravel.model.otmLibraryMembers.TestChoice;
 import org.opentravel.model.otmLibraryMembers.TestCore;
 import org.opentravel.model.otmLibraryMembers.TestOtmSimple;
 import org.opentravel.model.otmLibraryMembers.TestResource;
+import org.opentravel.model.otmLibraryMembers.TestValueWithAttributes;
 import org.opentravel.model.otmProperties.OtmElement;
+import org.opentravel.model.otmProperties.TestElement;
 import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
 import org.opentravel.schemacompiler.model.TLAlias;
 import org.opentravel.schemacompiler.model.TLProperty;
@@ -46,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Tests and utilities for testing maps of providers and users. {@link TestLibraryMaps} for tests in versioned
@@ -95,15 +99,71 @@ public class TestOtmModelMapsManager {
         assertTrue( "Given: ", userLib.getMembers().size() > 0 );
         assertTrue( "Given: ", !tMap.isEmpty() );
 
-        // When
+        // When - get the map from model manager's map manager
         Map<OtmLibrary,List<OtmLibraryMember>> uMap = mapMgr.getUsersMap( userLib, false );
         // Then
         compareMaps( mgr, tMap, uMap );
 
     }
 
+    /**
+     * Assure addToUsersMap finds members that have properties that use types from the library.
+     */
+    @Test
+    public void testAddToUsersMap() {
+        OtmModelManager mgr = new OtmModelManager( null, null, null );
+        OtmModelMapsManager mapMgr = mgr.getMapManager();
+
+        // Map is a new map
+        Map<OtmLibrary,List<OtmLibraryMember>> usersMap = new HashMap<>();
+
+        // Library to test containing the provider
+        OtmLibrary lib = TestLibrary.buildOtm( mgr );
+        OtmCore coreMember = TestCore.buildOtm( lib, "CoreMember" );
+
+        // Library and its users
+        OtmLibrary userLib = TestLibrary.buildOtm( mgr );
+        OtmBusinessObject bo = TestBusiness.buildOtm( userLib, "UserBO" );
+        TestElement.buildOtm( bo.getSummary(), coreMember );
+        OtmChoiceObject ch = TestChoice.buildOtm( userLib, "UserChoice" );
+        TestElement.buildOtm( ch.getShared(), coreMember );
+
+        // Library2 and its users
+        OtmLibrary userLib2 = TestLibrary.buildOtm( mgr );
+        OtmValueWithAttributes vwa = TestValueWithAttributes.buildOtm( userLib2, "UserVwa" );
+        TestOtmPropertiesBase.buildAttribute( vwa, coreMember );
+        // Assign a descendant of coreMember
+        OtmCore core = TestCore.buildOtm( userLib2, "UserCore" );
+        TestElement.buildOtm( core.getSummary(), coreMember.getDetail() );
+
+        // Where used list from a member of the library
+        List<OtmLibraryMember> users = coreMember.getWhereUsed();
+        assertTrue( "Given: check to assure where used contains users.",
+            users.contains( core ) && users.contains( bo ) && users.contains( ch ) && users.contains( vwa ) );
+
+        // When
+        mapMgr.addToUsersMap( usersMap, lib, coreMember );
+
+        assertTrue( "Then: map has two entries.", usersMap.size() == 2 );
+
+        for (Entry<OtmLibrary,List<OtmLibraryMember>> entry : usersMap.entrySet()) {
+            OtmLibrary key = entry.getKey();
+            List<OtmLibraryMember> values = entry.getValue();
+            log.debug( "Entry for " + key + " = " + values );
+            if (key == userLib)
+                assertTrue( "Then: ", values.contains( bo ) && values.contains( ch ) );
+            else if (key == userLib2)
+                assertTrue( "Then: ", values.contains( core ) && values.contains( vwa ) );
+            else
+                assertTrue( "Then: error.", false );
+        }
+        // TODO - finish test
+    }
+
     public void compareMaps(OtmModelManager mgr, Map<OtmLibrary,List<OtmLibraryMember>> map1,
         Map<OtmLibrary,List<OtmLibraryMember>> map2) {
+        print( map1 );
+        print( map2 );
         assertTrue( map1.size() == map2.size() );
 
         for (OtmLibrary l : mgr.getUserLibraries()) {
@@ -126,20 +186,30 @@ public class TestOtmModelMapsManager {
         }
     }
 
-
+    /**
+     * Populate the passed map with two entries. Each entry has a library and a list of custom built type users that use
+     * types from a different library.
+     * 
+     * @param mgr
+     * @param map
+     * @return the library containing the type providers
+     */
     public static OtmLibrary buildTestUserMap(OtmModelManager mgr, Map<OtmLibrary,List<OtmLibraryMember>> map) {
         String namespace = "http://example.com/ns";
         String prefix = "ns";
         String name = "Library";
         int i = 1;
 
+        // Build 3 libraries (not valid namespaces!)
         OtmLibrary targetLib = TestLibrary.buildOtm( mgr, namespace + i, prefix + i, name + i++ );
         OtmLibrary lib2 = TestLibrary.buildOtm( mgr, namespace + i, prefix + i, name + i++ );
-        List<OtmLibraryMember> users2 = new ArrayList<>();
         OtmLibrary lib3 = TestLibrary.buildOtm( mgr, namespace + i, prefix + i, name + i++ );
+
+        // Lists containing built users in that library
+        List<OtmLibraryMember> users2 = new ArrayList<>();
         List<OtmLibraryMember> users3 = new ArrayList<>();
 
-        // Put types in library 1 that are used in library 2 and 3
+        // Put types in target library that are used in library 2 and 3
         OtmSimpleObject simple1 = TestOtmSimple.buildOtm( targetLib, "Simple1" );
         OtmCore core1T = TestCore.buildOtm( targetLib, "Core1InLib1" );
         OtmCore core2T = TestCore.buildOtm( targetLib, "Core2InLib1" );
@@ -147,20 +217,19 @@ public class TestOtmModelMapsManager {
 
         // Use the simple type which is a library member
         OtmCore core2 = TestCore.buildOtm( lib2, "CoreInLib2" );
-        OtmCore core3 = TestCore.buildOtm( lib3, "CoreInLib3" );
         core2.setAssignedType( simple1 );
-        core3.setAssignedType( simple1 );
         users2.add( core2 );
+        OtmCore core3 = TestCore.buildOtm( lib3, "CoreInLib3" );
+        core3.setAssignedType( simple1 );
         users3.add( core3 );
 
         // Use a child property as assigned type
         OtmCore core2a = TestCore.buildOtm( lib2, "CoreInLib2withAssignedType" );
-        OtmElement<TLProperty> e2 = new OtmElement<>( new TLProperty(), core2a.getSummary() );
-        e2.setAssignedType( core1T.getDetail() );
-        OtmCore core3a = TestCore.buildOtm( lib3, "CoreInLib3withChildPropetyAssigned" );
-        OtmElement<TLProperty> e3 = new OtmElement<>( new TLProperty(), core3a.getSummary() );
-        e3.setAssignedType( core1T.getDetail() );
+        TestElement.buildOtm( core2a.getSummary(), core1T.getDetail() );
         users2.add( core2a );
+
+        OtmCore core3a = TestCore.buildOtm( lib3, "CoreInLib3withAssignedType" );
+        TestElement.buildOtm( core3a.getSummary(), core1T.getDetail() );
         users3.add( core3a );
 
         // Use a child as base type
@@ -175,6 +244,14 @@ public class TestOtmModelMapsManager {
 
         map.put( lib2, users2 );
         map.put( lib3, users3 );
+
+        // Verify whereUsed
+        assertTrue( "Builder check: ", simple1.getWhereUsed().contains( core2 ) );
+        assertTrue( "Builder check: ", simple1.getWhereUsed().contains( core3 ) );
+        assertTrue( "Builder check: ", core1T.getWhereUsed().contains( core2a ) );
+        assertTrue( "Builder check: ", core1T.getWhereUsed().contains( core3a ) );
+        assertTrue( "Builder check: ", core2T.getWhereUsed().contains( core4 ) );
+        assertTrue( "Builder check: ", bo1T.getWhereUsed().contains( r ) );
 
         return targetLib;
     }

@@ -17,7 +17,9 @@
 package org.opentravel.model.otmLibraryMembers;
 
 import org.opentravel.dex.action.manager.DexActionManager;
+import org.opentravel.dex.actions.DeleteLibraryMemberAction;
 import org.opentravel.model.OtmChildrenOwner;
+import org.opentravel.model.OtmModelMembersManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
@@ -132,11 +134,17 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public OtmTypeProvider getMatchingProvider(OtmTypeProvider provider);
 
     /**
+     * From the {@linkplain #getWhereUsed()} list, map each owner's type users to the specific type provider they are
+     * assigned. Provider can be the member or any of its descendants. Examines each owner to get actual type users and
+     * its specific type provider (not just the owner).
+     * <p>
+     * Used to restore type assignments by {@linkplain DeleteLibraryMemberAction#undoIt()}
+     * <p>
      * Get the actual type users that use this library member or descendants as assigned type.
      * 
      * @return new map of user -> provider
      */
-    Map<OtmTypeUser,OtmTypeProvider> getPropertiesWhereUsed();
+    public Map<OtmTypeUser,OtmTypeProvider> getPropertiesWhereUsed();
 
     /**
      * TLContextualFacet or TLLibraryMember
@@ -155,11 +163,14 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     public List<OtmTypeUser> getTypeUsers(OtmTypeProvider provider);
 
     /**
-     * @return non-null, sorted list of type providers used by all descendants of this member.
+     * Create list containing type assigned to this (if any), and types assigned to all descendants.
+     * 
+     * @return non-null, sorted, synchronized list of type providers used by all descendants of this member.
      */
     public List<OtmTypeProvider> getUsedTypes();
 
     /**
+     * 
      * @return number of type users for this member and its descendants.
      */
     public int getUsedTypesCount();
@@ -180,6 +191,9 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
      * <p>
      * When <i>forced</i> by type resolver or list is null, it will get users of the library member and all its type
      * provider descendants.
+     * <p>
+     * List created using {@linkplain OtmModelMembersManager#findUsersOf(OtmTypeProvider)} and
+     * {@linkplain OtmModelMembersManager#findSubtypesOf(OtmLibraryMember)}
      * 
      * @param force will clear list and recompute users to add to existing list
      * @return
@@ -194,9 +208,21 @@ public interface OtmLibraryMember extends OtmChildrenOwner {
     boolean isEditableMinor();
 
     /**
-     * Is this member the latest in the version chain of its library?
+     * Is this member the latest library? Must be either unmanaged, local library or the latest version in a chain
+     * {@linkplain #isLatestVersion()}.
      * <p>
-     * 4/27/2021 - returns false if unmanaged (see {@link OtmVersionChain#isLatestChain()})
+     * 
+     * @return
+     */
+    boolean isLatest();
+
+    /**
+     * Is this member in a versioned library that is the latest in a version chain? Use {@linkplain #isLatest()} for
+     * either local or latest-in-chain.
+     * <p>
+     * Facade for {@code getLibrary().getVersionChain().isLatestVersion( this ); }
+     * <p>
+     * 4/27/2021 - returns false if unmanaged (see {@link OtmVersionChain#isLatestChain()}).
      * 
      * @return
      */

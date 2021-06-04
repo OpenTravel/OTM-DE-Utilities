@@ -22,52 +22,43 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentravel.application.common.AbstractOTMApplication;
-import org.opentravel.dex.action.manager.DexFullActionManager;
+import org.opentravel.AbstractDexTest;
 import org.opentravel.dex.tasks.DexTaskException;
-import org.opentravel.model.OtmModelManager;
-import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.TestLibrary;
-import org.opentravel.model.otmContainers.TestVersionChain;
-import org.opentravel.model.otmLibraryMembers.OtmBusinessObject;
+import org.opentravel.model.otmContainers.TestOtmVersionChain;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.otmLibraryMembers.TestBusiness;
-import org.opentravel.objecteditor.ObjectEditorApp;
-import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.version.VersionSchemeException;
-import org.opentravel.utilities.testutil.AbstractFxTest;
-import org.opentravel.utilities.testutil.TestFxMode;
-
-import java.io.IOException;
 
 /**
  * Verifies the functions of the <code>delete property action</code> class on versioned objects.
  */
-public class TestDeleteLibraryMemberActionVersioned extends AbstractFxTest {
+public class TestDeleteLibraryMemberActionVersioned extends AbstractDexTest {
     private static Log log = LogFactory.getLog( TestDeleteLibraryMemberActionVersioned.class );
 
-    public static final boolean RUN_HEADLESS = true;
-    final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.
-
-    private static OtmModelManager staticModelManager = null;
-    static OtmLibrary lib = null;
-    static OtmBusinessObject globalBO = null;
+    // private static OtmModelManager staticModelManager = null;
+    // static OtmLibrary lib = null;
+    // static OtmBusinessObject globalBO = null;
 
     @BeforeClass
-    public static void beforeClass() throws IOException {
-        setupWorkInProcessArea( TestDeleteLibraryMemberActionVersioned.class );
-        repoManager = repositoryManager.get();
+    public static void beforeClass() throws Exception {
+        beforeClassSetup( null );
 
-        staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
-        lib = staticModelManager.add( new TLLibrary() );
-        assertTrue( lib.isEditable() );
-        assertTrue( lib.getActionManager() instanceof DexFullActionManager );
-
-        globalBO = TestBusiness.buildOtm( lib, "GlobalBO" ); // Tested in buildOtm()
-
-        // Prevent java.nio.BufferOverflowException
-        System.setProperty( "headless.geometry", "2600x2200-32" );
+        // setupWorkInProcessArea( TestDeleteLibraryMemberActionVersioned.class );
+        // repoManager = repositoryManager.get();
+        //
+        // lib = TestLibrary.buildOtm();
+        // staticModelManager = lib.getModelManager();
+        //
+        // // staticModelManager = new OtmModelManager( new DexFullActionManager( null ), null, null );
+        // // lib = staticModelManager.addOLD( new TLLibrary() );
+        // assertTrue( lib.isEditable() );
+        // assertTrue( lib.getActionManager() instanceof DexFullActionManager );
+        //
+        // globalBO = TestBusiness.buildOtm( lib, "GlobalBO" ); // Tested in buildOtm()
+        //
+        // // Prevent java.nio.BufferOverflowException
+        // System.setProperty( "headless.geometry", "2600x2200-32" );
     }
 
     @Test
@@ -79,7 +70,7 @@ public class TestDeleteLibraryMemberActionVersioned extends AbstractFxTest {
         // VersionTestSet ts = new VersionTestSet();
 
         // Given - minor has minor members for all major members
-        TestVersionChain.createMinorMembers( ts.major );
+        TestOtmVersionChain.createMinorMembers( ts.major );
 
         // Given - minor library has new minor members of all types
         // Note - do after creating minors or else the createMinorMembers will fail due to invalid objects
@@ -115,31 +106,4 @@ public class TestDeleteLibraryMemberActionVersioned extends AbstractFxTest {
     // assertTrue( minorQF.getContributedObject() == minorBO );
     //
     // }
-
-    /* ********************************************************************** */
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getApplicationClass()
-     */
-    @Override
-    protected Class<? extends AbstractOTMApplication> getApplicationClass() {
-        return ObjectEditorApp.class;
-    }
-
-    /**
-     * @see org.opentravel.utilities.testutil.AbstractFxTest#getBackgroundTaskNodeQuery()
-     */
-    @Override
-    protected String getBackgroundTaskNodeQuery() {
-        return "#libraryText";
-    }
-
-    /**
-     * Configure headless/normal mode for TestFX execution.
-     */
-    static {
-        TestFxMode.setHeadless( RUN_HEADLESS );
-    }
-
-
-
 }

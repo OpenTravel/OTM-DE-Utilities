@@ -191,21 +191,31 @@ public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeU
 
     @Override
     public OtmTypeProvider setAssignedType(OtmTypeProvider type) {
-        OtmLibraryMember oldUser = null;
-        if (getAssignedType() != null)
-            oldUser = getAssignedType().getOwningMember();
-        if (type != null && type.getTL() instanceof NamedEntity)
-            setAssignedTLType( (NamedEntity) type.getTL() );
+        // Take this's owning member out of the current assigned type's where used list
+        if (getAssignedType() != null && getAssignedType().getOwningMember() != null)
+            getAssignedType().getOwningMember().changeWhereUsed( getOwningMember(), null );
 
-        // add to type's typeUsers
-        type.getOwningMember().changeWhereUsed( oldUser, getOwningMember() );
+        // OtmLibraryMember oldUser = null;
+        // if (getAssignedType() != null)
+        // oldUser = getAssignedType().getOwningMember();
 
+        if (type == null) {
+            setAssignedTLType( null );
+        } else {
+            if (type.getTL() instanceof NamedEntity) {
+                NamedEntity result = setAssignedTLType( (NamedEntity) type.getTL() );
+                if (result != null)
+                    type.getOwningMember().changeWhereUsed( null, getOwningMember() );
+            }
+        }
+        // What about typesUsed ?
+        // log.debug( "Set assigned type to: " + getAssignedType() );
         return getAssignedType();
     }
 
     @Override
     public NamedEntity setAssignedTLType(NamedEntity type) {
-        if (type instanceof NamedEntity)
+        if (type instanceof NamedEntity || type == null)
             getTL().getSimpleFacet().setSimpleType( type );
         assignedTypeProperty = null;
         // log.debug( "Set assigned TL type" );

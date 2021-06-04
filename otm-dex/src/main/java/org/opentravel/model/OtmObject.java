@@ -136,8 +136,13 @@ public interface OtmObject {
     public String getNameWithPrefix();
 
     /**
-     * @return display name for this type of object. Library member display name is declared in the
-     *         {@link OtmLibraryMemberType} enumeration.
+     * Get user display name of the object type. Display name is declared in the {@link OtmLibraryMemberType}
+     * enumeration.
+     * <p>
+     * To use as a name, strip white space: <br>
+     * {@code String typeName = member.getObjectTypeName().replaceAll( "\\s+", "" );}
+     * 
+     * @return display name for this type of object
      */
     public String getObjectTypeName();
 

@@ -108,7 +108,7 @@ public class OtmSimpleObject extends OtmSimpleObjects<TLSimple> implements OtmTy
     @Override
     public TLPropertyType setAssignedTLType(NamedEntity type) {
         // 11/11/2020 - Will fail if namespace is null
-        if (type instanceof TLAttributeType)
+        if (type instanceof TLAttributeType || type == null)
             getTL().setParentType( (TLAttributeType) type );
         assignedTypeProperty = null;
         // log.debug( "Set assigned TL type" );
@@ -120,11 +120,15 @@ public class OtmSimpleObject extends OtmSimpleObjects<TLSimple> implements OtmTy
         OtmLibraryMember oldUser = null;
         if (getAssignedType() != null)
             oldUser = getAssignedType().getOwningMember();
-        if (type != null && type.getTL() instanceof TLAttributeType) {
-            setAssignedTLType( (TLAttributeType) type.getTL() );
+        if (type == null) {
+            setAssignedTLType( null );
+        } else {
+            if (type.getTL() instanceof TLAttributeType) {
+                setAssignedTLType( (TLAttributeType) type.getTL() );
 
-            // add to type's typeUsers
-            type.getOwningMember().changeWhereUsed( oldUser, getOwningMember() );
+                // add to type's typeUsers
+                type.getOwningMember().changeWhereUsed( oldUser, getOwningMember() );
+            }
         }
         return getAssignedType();
     }

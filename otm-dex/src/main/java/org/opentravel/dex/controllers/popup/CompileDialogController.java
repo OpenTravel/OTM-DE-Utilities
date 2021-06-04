@@ -64,10 +64,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
- * Dialog controller for creating a library.
+ * Dialog controller for compiling the model.
  * <p>
- * Create the controller using the static {@link CompileDialogController#init() } method. If the model manager is set
- * before showing, the library will be created.
+ * Create the controller using the static {@link CompileDialogController#init() } method.
  * 
  * @author dmh
  *

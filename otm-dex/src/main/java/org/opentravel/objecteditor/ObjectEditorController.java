@@ -178,10 +178,7 @@ public class ObjectEditorController extends DexMainControllerBase {
 
         setMainController( this );
 
-        // Catch close requests (works after popup)
-        // TODO - how to catch windows close and not close from appExit?
-        // stage.setOnHiding( event -> menuBarWithProjectController.appExit( event ) );
-        // stage.setOnHiding( event -> log.debug( "Trying to close application." ) );
+        // Catch close requests in menu bar controller
 
         // Try opening the last repository they used
         // Repository lastRepo = getRepositoryManager().getRepository( userSettings.getLastRepositoryId() );

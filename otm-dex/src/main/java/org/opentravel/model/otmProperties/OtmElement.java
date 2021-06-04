@@ -188,10 +188,6 @@ public class OtmElement<T extends TLProperty> extends OtmPropertyBase<TLProperty
         if (type == null)
             setAssignedTLType( null );
         else if (type.getTL() instanceof TLPropertyType) {
-            // // Sanity check
-            // if (OtmModelElement.get( type.getTL() ) != type)
-            // log.debug( "ERROR - invalid identity listener on TLObject." );
-
             setAssignedTLType( (TLPropertyType) type.getTL() );
             type.getOwningMember().changeWhereUsed( null, getOwningMember() );
             if (type.isNameControlled())
