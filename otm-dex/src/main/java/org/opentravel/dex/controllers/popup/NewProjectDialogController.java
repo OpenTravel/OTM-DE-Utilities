@@ -16,7 +16,7 @@
 
 package org.opentravel.dex.controllers.popup;
 
-import org.assertj.core.util.Files;
+//import org.assertj.core.util.Files;
 import org.opentravel.common.DexFileException;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.model.OtmModelManager;
@@ -247,8 +247,8 @@ public class NewProjectDialogController extends DexPopupControllerBase {
                 contextIdField.getText(), idField.getText(), descriptionField.getText() );
         } catch (Exception er) {
             postResults( "Could not create new project in model. " + er.getLocalizedMessage() );
-            Files.delete( projFile );
-            // projFile.delete();
+            // Files.delete( projFile );
+            projFile.delete();
             return;
         }
 
@@ -256,7 +256,8 @@ public class NewProjectDialogController extends DexPopupControllerBase {
         if (newProject != null && newProject.getTL() != null) {
             newProject.close();
             try {
-                new DexFileHandler().openProject( projFile, modelMgr, null );
+                DexFileHandler.openProject( projFile, modelMgr, null );
+                // new DexFileHandler().openProject( projFile, modelMgr, null );
             } catch (DexFileException e) {
                 // log.debug("File Exception: "+e.getLocalizedMessage());
             }

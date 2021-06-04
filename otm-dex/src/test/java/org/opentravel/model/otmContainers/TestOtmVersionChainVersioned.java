@@ -24,6 +24,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.AbstractDexTest;
+import org.opentravel.schemacompiler.model.TLLibrary;
+import org.opentravel.schemacompiler.version.VersionChain;
 
 /**
  * Verifies the functions of the <code>Otm Version Chain - Versioned</code>.
@@ -54,9 +56,29 @@ public class TestOtmVersionChainVersioned extends AbstractDexTest {
      */
     @Test
     public void testGetTlVersionChain() {
-        OtmLibrary major = buildMajor( "TestMajor" );
-        OtmVersionChain majorChain = major.getVersionChain();
+        OtmMajorLibrary major = buildMajor( "TestMajor" );
+        OtmVersionChainVersioned majorChain = major.getVersionChain();
+        VersionChain<TLLibrary> majorVc = majorChain.getTlVersionChain( major.getTL() );
+        assertTrue( "Given: ", majorVc != null );
+        assertTrue( "Given: ", majorVc.getVersions().contains( major.getTL() ) );
+
+        // When
+        TLLibrary result = majorVc.getNextVersion( major.getTL() );
+        assertTrue( "Then: get next version must be null.", result == null );
         assertTrue( majorChain.isLatest( major ) );
+
+        // Given - add a minor library to the chain
+        OtmMinorLibrary minor = buildMinor( major );
+        OtmVersionChainVersioned minorChain = minor.getVersionChain();
+        assertTrue( "Given: ", minorChain == majorChain );
+        VersionChain<TLLibrary> minorVc = minorChain.getTlVersionChain( minor.getTL() );
+        assertTrue( "Given: ", minorVc != null );
+        assertTrue( "Given: ", minorVc.getVersions().contains( major.getTL() ) );
+        assertTrue( "Given: ", minorVc.getVersions().contains( minor.getTL() ) );
+
+        // Finally
+        assertTrue( "Then: major is NOT latest.", !majorChain.isLatest( major ) );
+        assertTrue( "Then: minor is the latest.", majorChain.isLatest( minor ) );
         // FIXME - todo
     }
 

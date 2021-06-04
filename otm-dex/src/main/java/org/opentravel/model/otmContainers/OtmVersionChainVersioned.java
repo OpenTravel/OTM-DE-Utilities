@@ -58,6 +58,14 @@ public class OtmVersionChainVersioned extends OtmVersionChainBase {
         return tlVersionChain;
     }
 
+    /**
+     * Get the version chain factory for the TLModel. Note, this is not a static factory and must be replaced when the
+     * model's libraries change.
+     * <p>
+     * See {@linkplain TestOtmVersionChainVersioned#testGetTlVersionChain()} to demonstrate
+     * 
+     * @return
+     */
     protected VersionChainFactory getTlVersionChainFactory() {
         if (vcFactory == null)
             vcFactory = new VersionChainFactory( modelManager.getTlModel() );
@@ -141,6 +149,8 @@ public class OtmVersionChainVersioned extends OtmVersionChainBase {
         if (mLib instanceof OtmManagedLibrary && !libraries.contains( mLib )) {
             libraries.add( mLib );
             tlVersionChain = null;
+            // The factory itself must be updated.
+            vcFactory = null;
         }
     }
 

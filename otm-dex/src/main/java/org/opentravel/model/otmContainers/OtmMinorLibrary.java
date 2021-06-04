@@ -83,4 +83,9 @@ public class OtmMinorLibrary extends OtmManagedLibrary {
         // }
         // return getModelManager().getActionManager( false );
     }
+
+    @Override
+    public OtmVersionChainVersioned getVersionChain() {
+        return (OtmVersionChainVersioned) getModelManager().getVersionChain( this );
+    }
 }

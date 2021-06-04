@@ -23,7 +23,6 @@ import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmLibraryMembers.OtmXsdSimple;
-import org.opentravel.model.otmLibraryMembers.TestInheritance;
 import org.opentravel.schemacompiler.model.LibraryMember;
 import org.opentravel.schemacompiler.model.TLModelElement;
 
@@ -184,8 +183,8 @@ public class OtmModelMembersManager {
     }
 
     /**
-     * Notes: using the commented out sync'ed code causes {@link TestInheritance#testInheritedCustomFacets()} to time
-     * out. getMembers() uses the synchronized member list.
+     * Notes: using the commented out sync'ed code causes TestInheritance#testInheritedCustomFacets() to time out.
+     * getMembers() uses the synchronized member list.
      * <p>
      * 
      * @param filter DexFilter to use to select members. If null, all members are selected.
