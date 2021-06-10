@@ -16,7 +16,7 @@
 
 package org.opentravel.utilities.testutil;
 
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Rule;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.DirectoryChooserDelegate;
@@ -37,11 +37,14 @@ import javafx.stage.WindowEvent;
  */
 public abstract class AbstractFxTest extends AbstractRepositoryTest {
 
+    public static final boolean RUN_HEADLESS = true;
+    final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.
+
     protected static File repositoryConfig =
         new File( System.getProperty( "user.dir" ) + "/src/test/resources/ota2-repository-config.xml" );
     protected static RepositoryManager repoManager;
 
-    protected Stage primaryStage;
+    protected static Stage primaryStage;
     protected AbstractOTMApplication application;
     protected FileChooserDelegate mockFileChooser;
     protected DirectoryChooserDelegate mockDirectoryChooser;
@@ -71,8 +74,11 @@ public abstract class AbstractFxTest extends AbstractRepositoryTest {
         }
     }, getBackgroundTaskNodeQuery() );
 
-    @After
-    public void closeApplication() throws TimeoutException {
+    // // @After
+    // public void closeApplication() throws TimeoutException {}
+
+    @AfterClass
+    public static void closeApplication() throws TimeoutException {
         FxToolkit.setupFixture(
             () -> primaryStage.fireEvent( new WindowEvent( primaryStage, WindowEvent.WINDOW_CLOSE_REQUEST ) ) );
         System.out.println( "After: close application ran." );

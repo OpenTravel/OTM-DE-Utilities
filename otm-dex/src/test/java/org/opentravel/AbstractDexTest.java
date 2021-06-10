@@ -97,11 +97,11 @@ import java.util.Map;
 public abstract class AbstractDexTest extends AbstractFxTest {
     private static Log log = LogFactory.getLog( AbstractDexTest.class );
 
-    public static final boolean RUN_HEADLESS = true;
-    final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.
-
-    protected static File repositoryConfig =
-        new File( System.getProperty( "user.dir" ) + "/src/test/resources/ota2-repository-config.xml" );
+    // public static final boolean RUN_HEADLESS = true;
+    // final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.
+    //
+    // protected static File repositoryConfig =
+    // new File( System.getProperty( "user.dir" ) + "/src/test/resources/ota2-repository-config.xml" );
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -117,6 +117,7 @@ public abstract class AbstractDexTest extends AbstractFxTest {
         mockFileManager = spy( new DefaultRepositoryFileManager( folder.getRoot() ) );
 
         // This repository manager has temporary file for local repository and no remote repositories
+        // Fairly expensive in that it reads all the repo info and creates local repo
         repositoryManager = new RepositoryManager( mockFileManager );
         // Add known remote repositories to the controller's repository manager
         for (RemoteRepository r : RepositoryManager.getDefault().listRemoteRepositories())
@@ -174,7 +175,7 @@ public abstract class AbstractDexTest extends AbstractFxTest {
     // public static void tearDownTests() throws Exception {
     // shutdownTestServer();
     // }
-
+    //
 
     /**
      * 

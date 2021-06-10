@@ -327,6 +327,10 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
     /**
      * Use the library tree table only to make selections, no editing. Set the mouse click handler AND make tree table
      * not editable to allow double click.
+     * <p>
+     * <b>Note:</b> double click should be on the row, not on tree's selection model. For a discussion of why, see
+     * https://stackoverflow.com/questions/26563390/detect-doubleclick-on-row-of-tableview-javafx . <blockquote>Just
+     * attach the listener directly to the table row when it's created. – James_D </blockquote>
      * 
      * @param handler set the handler and if null, disable editing
      */
