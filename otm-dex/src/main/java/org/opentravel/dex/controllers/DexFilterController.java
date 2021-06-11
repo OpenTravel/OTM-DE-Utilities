@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers;
 
+import org.apache.http.annotation.Obsolete;
+
 /**
  * Abstract interface for all included OTM-DE FX filter controllers. These controllers must be able to respond if an
  * object is selected or not.
@@ -29,6 +31,7 @@ package org.opentravel.dex.controllers;
  * @author dmh
  *
  */
+@Obsolete
 public interface DexFilterController<T> extends DexController {
 
     /**

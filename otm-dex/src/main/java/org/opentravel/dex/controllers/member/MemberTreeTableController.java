@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.cellfactories.ValidationMemberTreeTableCellFactory;
-import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexChangeEvent;
@@ -67,7 +66,7 @@ import javafx.scene.layout.VBox;
  * @author dmh
  *
  */
-public class MemberTreeTableController extends DexIncludedControllerBase<OtmModelManager> implements DexController {
+public class MemberTreeTableController extends DexIncludedControllerBase<OtmModelManager> {
     private static Log log = LogFactory.getLog( MemberTreeTableController.class );
 
     // Column labels

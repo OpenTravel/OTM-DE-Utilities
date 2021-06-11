@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.cellfactories.ValidationErrorsAndWarningsTreeTableCellFactory;
-import org.opentravel.dex.controllers.DexController;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.events.DexMemberSelectionEvent;
@@ -51,7 +50,7 @@ import javafx.scene.image.ImageView;
  * @author dmh
  *
  */
-public class ResourceErrorsTreeTableController extends DexIncludedControllerBase<OtmResource> implements DexController {
+public class ResourceErrorsTreeTableController extends DexIncludedControllerBase<OtmResource> {
     private static Log log = LogFactory.getLog( ResourceErrorsTreeTableController.class );
 
     // Column labels
