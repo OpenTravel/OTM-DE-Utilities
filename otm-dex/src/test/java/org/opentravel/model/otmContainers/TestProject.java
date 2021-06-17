@@ -94,7 +94,7 @@ public class TestProject extends TestProjectUtils {
     }
 
     @Test
-    public void testAdd_PI() throws DexProjectException {
+    public void testAddManaged_PI() throws DexProjectException {
         // Given - a PI
         OtmProject managingProject = TestOtmProjectManager.buildProject( getModelManager() );
         OtmManagedLibrary mLib = buildMajor( "TestProject_Lib1", managingProject );
@@ -224,13 +224,15 @@ public class TestProject extends TestProjectUtils {
         // Test - adding managed libraries
         OtmManagedLibrary mLib = buildMajor( "TestProject_Lib1", p );
         ProjectItem mPI = mLib.getProjectItem();
-        // When
-        assertTrue( mPI instanceof RepositoryItem );
-        OtmManagedLibrary newLib = p.addManaged( mPI );
-        // Then
-        // OtmProject nMP = getModelManager().getManagingProject( newLib );
-        // assertTrue( "FIXME", getModelManager().getManagingProject( newLib ) == p );
-        check( newLib, p );
+
+        // // 6/17/2021 - this will fail because mPI is already in project.
+        // // When
+        // assertTrue( mPI instanceof RepositoryItem );
+        // OtmManagedLibrary newLib = p.addManaged( mPI );
+        // // Then
+        // // OtmProject nMP = getModelManager().getManagingProject( newLib );
+        // // assertTrue( "FIXME", getModelManager().getManagingProject( newLib ) == p );
+        // check( newLib, p );
 
         // Closing then opening project fixes adding items problem
         // TODO - i am guessing that the version chain is a problem.

@@ -28,7 +28,7 @@ import org.opentravel.model.OtmModelManager;
 import java.io.File;
 
 /**
- * A JavaFX opening a project file
+ * A JavaFX opening a library file. Called by Menu Bar.
  * 
  * @author dmh
  *

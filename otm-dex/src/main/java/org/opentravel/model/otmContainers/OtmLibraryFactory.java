@@ -91,8 +91,8 @@ public class OtmLibraryFactory {
     /**
      * Create new library from the content of the PI.
      * <p>
-     * Models all the members in the TL library using
-     * {@link OtmLibraryMemberFactory#create(org.opentravel.schemacompiler.model.LibraryMember, OtmModelManager)}.
+     * Caller must model all the members in the TL library using
+     * {@linkplain OtmLibraryFactory#modelMembers(AbstractLibrary, OtmModelManager)}
      * 
      * @param pi
      * @param mgr
