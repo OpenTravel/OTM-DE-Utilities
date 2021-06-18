@@ -170,7 +170,8 @@ public class OtmProjectManager implements TaskResultHandlerI {
     public Map<String,File> getRecentProjects() {
         Map<String,File> fileMap = new LinkedHashMap<>();
         for (File file : getRecentlyUsedProjectFiles())
-            fileMap.put( file.getName(), file );
+            if (file.canRead())
+                fileMap.put( file.getName(), file );
         return fileMap;
     }
 

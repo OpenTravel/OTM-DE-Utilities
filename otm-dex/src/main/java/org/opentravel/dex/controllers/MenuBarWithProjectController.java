@@ -41,6 +41,7 @@ import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.repository.OpenLibraryFileTask;
 import org.opentravel.dex.tasks.repository.OpenProjectFileTask;
 import org.opentravel.model.OtmModelManager;
+import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.impl.RemoteRepositoryClient;
@@ -319,10 +320,14 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
         NewProjectDialogController npdc = NewProjectDialogController.init();
         npdc.configure( modelMgr, userSettings );
         Results results = npdc.showAndWait( "" );
-        if (results == Results.OK)
+        if (results == Results.OK) {
             fireEvent( new DexModelChangeEvent( modelMgr ) );
+            OtmProject newProject = npdc.getResultProject();
+            userSettings.setRecentProject( newProject );
+        }
         ignoreEvents = true;
         configureProjectCombo();
+        projectCombo.getSelectionModel().select( 0 );
         ignoreEvents = false;
     }
 
@@ -497,6 +502,7 @@ public class MenuBarWithProjectController extends DexIncludedControllerBase<Stri
             openFile( projectMap.get( ((ComboBox<?>) e.getTarget()).getValue() ) );
     }
 
+    @Deprecated
     public void setComboLabel(String text) {
         projectLabel.setText( text );
     }

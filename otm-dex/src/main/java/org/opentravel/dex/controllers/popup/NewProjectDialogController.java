@@ -58,6 +58,8 @@ public class NewProjectDialogController extends DexPopupControllerBase {
     private static String helpText = "Select the project.";
     private static String dialogTitle = "Project Selection";
 
+    private OtmProject newProject = null;
+
     /**
      * Initialize this controller using the passed FXML loader.
      * <p>
@@ -241,7 +243,6 @@ public class NewProjectDialogController extends DexPopupControllerBase {
         }
 
         // Use model manager to create the project using the file and data.
-        OtmProject newProject = null;
         try {
             newProject = modelMgr.getOtmProjectManager().newProject( projFile, nameField.getText(),
                 contextIdField.getText(), idField.getText(), descriptionField.getText() );
@@ -281,6 +282,10 @@ public class NewProjectDialogController extends DexPopupControllerBase {
 
     public String getResultText() {
         return resultText;
+    }
+
+    public OtmProject getResultProject() {
+        return newProject;
     }
 
     private void postResults(String text) {

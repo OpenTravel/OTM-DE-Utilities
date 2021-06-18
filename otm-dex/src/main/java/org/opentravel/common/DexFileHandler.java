@@ -26,6 +26,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmModelNamespaceManager;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmLocalLibrary;
+import org.opentravel.model.otmContainers.OtmProject;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.loader.LibraryInputSource;
 import org.opentravel.schemacompiler.loader.LibraryLoaderException;
@@ -35,6 +36,7 @@ import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.TLLibrary;
 import org.opentravel.schemacompiler.model.TLLibraryStatus;
 import org.opentravel.schemacompiler.model.TLModel;
+import org.opentravel.schemacompiler.repository.Project;
 import org.opentravel.schemacompiler.saver.LibraryModelSaver;
 import org.opentravel.schemacompiler.saver.LibrarySaveException;
 import org.opentravel.schemacompiler.util.URLUtils;
@@ -344,10 +346,11 @@ public class DexFileHandler extends AbstractMainWindowController {
      * @param selectedProjectFile name must end with the PROJECT_FILE_EXTENSION
      * @param mgr
      * @param monitor
+     * @return
      * @throws DexFileException
      */
-    public static void openProject(File selectedProjectFile, OtmModelManager mgr, OpenProjectProgressMonitor monitor)
-        throws DexFileException {
+    public static OtmProject openProject(File selectedProjectFile, OtmModelManager mgr,
+        OpenProjectProgressMonitor monitor) throws DexFileException {
         if (selectedProjectFile == null)
             throw new DexFileException( "Missing project file parameter." );
         if (!selectedProjectFile.getName().endsWith( PROJECT_FILE_EXTENSION ))
@@ -357,15 +360,18 @@ public class DexFileHandler extends AbstractMainWindowController {
             throw new DexFileException( "Missing model or project manager." );
 
         ValidationFindings findings = null;
+        Project newProject = null;
         try {
-            mgr.getProjectManager().loadProject( selectedProjectFile, findings, monitor );
+            newProject = mgr.getProjectManager().loadProject( selectedProjectFile, findings, monitor );
         } catch (Exception e) {
             mgr.getProjectManager().closeAll();
             throw new DexFileException( "Error Opening Project: " + e.getLocalizedMessage() );
         }
 
-        // mgr.addProjectsOLD();
         mgr.addProjects();
+
+        // Find the new project to return
+        return mgr.getOtmProjectManager().get( newProject );
     }
 
     /**
