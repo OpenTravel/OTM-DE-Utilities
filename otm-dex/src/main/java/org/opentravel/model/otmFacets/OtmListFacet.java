@@ -20,12 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
-import org.opentravel.model.otmProperties.OtmProperty;
-import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.schemacompiler.model.TLListFacet;
-import org.opentravel.schemacompiler.model.TLModelElement;
-
-import java.util.ArrayList;
 
 /**
  * @author Dave Hollander
@@ -41,15 +36,15 @@ public class OtmListFacet<T extends TLListFacet> extends OtmAbstractFacet<TLList
         this.parent = parent;
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * False
-     */
-    @Override
-    public boolean canAdd(OtmProperty property) {
-        return false;
-    }
+    // /**
+    // * {@inheritDoc}
+    // * <p>
+    // * False
+    // */
+    // @Override
+    // public boolean canAdd(OtmProperty property) {
+    // return false;
+    // }
 
     public DexActionManager getActionManger() {
         return parent.getActionManager();
@@ -64,39 +59,39 @@ public class OtmListFacet<T extends TLListFacet> extends OtmAbstractFacet<TLList
         return getParent();
     }
 
-    /**
-     * @see org.opentravel.model.OtmPropertyOwner#add(org.opentravel.schemacompiler.model.TLModelElement)
-     */
-    @Override
-    public OtmPropertyBase<?> add(TLModelElement newTL) {
-        // NO-OP
-        return null;
-    }
+    // /**
+    // * @see org.opentravel.model.OtmPropertyOwner#add(org.opentravel.schemacompiler.model.TLModelElement)
+    // */
+    // @Override
+    // public OtmPropertyBase<?> add(TLModelElement newTL) {
+    // // NO-OP
+    // return null;
+    // }
 
     @Override
     public boolean isNameControlled() {
         return true;
     }
-
-    /**
-     * @see org.opentravel.model.OtmChildrenOwner#modelChildren()
-     */
-    @Override
-    public void modelChildren() {
-        // Only model once
-        if (children == null)
-            children = new ArrayList<>();
-        else
-            children.clear();
-    }
-
-    @Override
-    public void modelInheritedChildren() {
-        // Only model once
-        if (inheritedChildren == null)
-            inheritedChildren = new ArrayList<>();
-        else
-            inheritedChildren.clear();
-    }
-
+    //
+    // /**
+    // * @see org.opentravel.model.OtmChildrenOwner#modelChildren()
+    // */
+    // @Override
+    // public void modelChildren() {
+    // // Only model once
+    // if (children == null)
+    // children = new ArrayList<>();
+    // else
+    // children.clear();
+    // }
+    //
+    // @Override
+    // public void modelInheritedChildren() {
+    // // Only model once
+    // if (inheritedChildren == null)
+    // inheritedChildren = new ArrayList<>();
+    // else
+    // inheritedChildren.clear();
+    // }
+    //
 }

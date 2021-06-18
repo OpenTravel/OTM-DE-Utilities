@@ -39,7 +39,6 @@ public class AddPropertyAction extends DexRunAction {
      * @return
      */
     public static boolean isEnabled(OtmObject subject) {
-        // if (subject instanceof OtmLibraryDisplayFacet)
         if (subject.getLibrary() == null)
             return false;
         // Enumeration values are properties that are NOT allowed to be added in a minor version.

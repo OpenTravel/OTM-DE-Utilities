@@ -285,8 +285,8 @@ public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO
                 deleteItem.setDisable( !am.isEnabled( DexActions.DELETEALIAS, getAlias( object ) ) );
             } else {
                 OtmProperty property = getProperty( object );
-
                 OtmPropertyOwner propertyOwner = getPropertyOwner( object );
+
                 if (propertyOwner != null)
                     addMenu.setDisable(
                         !propertyOwner.getActionManager().isEnabled( DexActions.ADDPROPERTY, propertyOwner ) );

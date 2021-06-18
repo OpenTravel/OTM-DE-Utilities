@@ -253,26 +253,36 @@ public class OtmProject {
         } catch (LibraryLoaderException | RepositoryException e) {
             throw new DexProjectException( "Exception managing project item: " + e.getLocalizedMessage() );
         }
-        List<ProjectItem> afterItems = getTL().getProjectItems();
+
+        // Have model manager model and manage all the new libraries
+        getModelManager().addProjects();
+
+        // Get a return value
         OtmManagedLibrary mLib = null; // Return value
-        for (ProjectItem item : afterItems) {
-            if (!beforeItems.contains( item )) {
-                OtmLibrary lib = getModelManager().addLibrary( item );
-                // 6/17/2021 - changed to using model manager on all new project items
-                // OtmLibrary lib = null;
-                // try {
-                // lib = OtmLibraryFactory.newLibrary( item, getModelManager() );
-                // if (lib instanceof OtmManagedLibrary) {
-                // getModelManager().addToMaps( lib );
-                // }
-                if (item == newPI)
-                    mLib = (OtmManagedLibrary) lib;
-                // } catch (DexLibraryException e) {
-                // throw new DexProjectException( "Exception building OTM library: " + e.getLocalizedMessage() );
-                // }
-                //
-            }
-        }
+        OtmLibrary lib = getModelManager().get( newPI.getContent() );
+        if (lib instanceof OtmManagedLibrary)
+            mLib = (OtmManagedLibrary) lib;
+
+        // List<ProjectItem> afterItems = getTL().getProjectItems();
+        // OtmManagedLibrary mLib = null; // Return value
+        // for (ProjectItem item : afterItems) {
+        // if (!beforeItems.contains( item )) {
+        // OtmLibrary lib = getModelManager().addLibrary( item );
+        // // 6/17/2021 - changed to using model manager on all new project items
+        // // OtmLibrary lib = null;
+        // // try {
+        // // lib = OtmLibraryFactory.newLibrary( item, getModelManager() );
+        // // if (lib instanceof OtmManagedLibrary) {
+        // // getModelManager().addToMaps( lib );
+        // // }
+        // if (item == newPI)
+        // mLib = (OtmManagedLibrary) lib;
+        // // } catch (DexLibraryException e) {
+        // // throw new DexProjectException( "Exception building OTM library: " + e.getLocalizedMessage() );
+        // // }
+        // //
+        // }
+        // }
         // // Create new OTM Managed library
         // OtmManagedLibrary mLib = null; // Return value
         // OtmLibrary lib = null;

@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.opentravel.dex.actions.DexActions;
+import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmProperty;
@@ -44,6 +45,9 @@ public class TestAddPropertyIsEnabled extends TestActionsIsEnabledBase {
     @Override
     public void testMember(OtmLibraryMember member) {
         super.testMember( member, member instanceof OtmPropertyOwner );
+
+        for (OtmChildrenOwner child : member.getDescendantsChildrenOwners())
+            super.testChildrenOwner( child, child instanceof OtmPropertyOwner );
     }
 
     @Test

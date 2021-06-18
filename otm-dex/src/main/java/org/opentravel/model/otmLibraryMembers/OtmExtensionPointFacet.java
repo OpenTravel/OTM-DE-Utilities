@@ -24,7 +24,7 @@ import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
-import org.opentravel.model.otmFacets.OtmAbstractFacet;
+import org.opentravel.model.otmFacets.OtmAbstractFacetPropertyOwner;
 import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyBase;
 import org.opentravel.model.otmProperties.OtmPropertyFactory;
@@ -80,7 +80,7 @@ public class OtmExtensionPointFacet extends OtmLibraryMemberBase<TLExtensionPoin
     @Override
     public OtmProperty add(TLModelElement tlChild) {
         OtmObject otm = OtmModelElement.get( tlChild );
-        if (OtmAbstractFacet.addTL( tlChild, getTL() )) {
+        if (OtmAbstractFacetPropertyOwner.addTL( tlChild, getTL() )) {
             if (otm instanceof OtmProperty)
                 add( otm );
             else

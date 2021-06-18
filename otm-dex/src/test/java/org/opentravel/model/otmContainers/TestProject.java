@@ -225,7 +225,8 @@ public class TestProject extends TestProjectUtils {
         OtmManagedLibrary mLib = buildMajor( "TestProject_Lib1", p );
         ProjectItem mPI = mLib.getProjectItem();
 
-        // // 6/17/2021 - this will fail because mPI is already in project.
+        // FIXME
+        // 6/17/2021 - this will fail because mPI is already in project.
         // // When
         // assertTrue( mPI instanceof RepositoryItem );
         // OtmManagedLibrary newLib = p.addManaged( mPI );

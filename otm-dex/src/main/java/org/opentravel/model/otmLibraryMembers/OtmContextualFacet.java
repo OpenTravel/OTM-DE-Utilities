@@ -27,6 +27,7 @@ import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmFacets.OtmAbstractFacet;
+import org.opentravel.model.otmFacets.OtmAbstractFacetPropertyOwner;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
 import org.opentravel.model.otmFacets.OtmFacet;
 import org.opentravel.model.otmFacets.OtmFacetFactory;
@@ -114,7 +115,7 @@ public abstract class OtmContextualFacet extends OtmLibraryMemberBase<TLContextu
     @Override
     public OtmProperty add(TLModelElement tlChild) {
         OtmObject otm = OtmModelElement.get( tlChild );
-        if (OtmAbstractFacet.addTL( tlChild, getTL() )) {
+        if (OtmAbstractFacetPropertyOwner.addTL( tlChild, getTL() )) {
             if (otm instanceof OtmProperty)
                 add( otm );
             else

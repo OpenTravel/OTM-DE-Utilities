@@ -53,7 +53,7 @@ public class TestFacet {
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         log.debug( "Before class resource base." );
     }
 

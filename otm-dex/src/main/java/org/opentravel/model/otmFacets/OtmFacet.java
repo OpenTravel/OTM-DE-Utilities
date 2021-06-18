@@ -20,8 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmObject;
-import org.opentravel.model.OtmPropertyOwner;
-import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.model.otmProperties.OtmAttribute;
 import org.opentravel.model.otmProperties.OtmElement;
@@ -36,8 +34,7 @@ import org.opentravel.schemacompiler.model.TLFacet;
  * @author Dave Hollander
  * 
  */
-public abstract class OtmFacet<T extends TLFacet> extends OtmAbstractFacet<TLFacet>
-    implements OtmPropertyOwner, OtmTypeProvider {
+public abstract class OtmFacet<T extends TLFacet> extends OtmAbstractFacetPropertyOwner<TLFacet> {
     private static Log log = LogFactory.getLog( OtmFacet.class );
 
     protected OtmLibraryMember parent;

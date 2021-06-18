@@ -35,7 +35,7 @@ import java.util.List;
  * @author Dave Hollander
  * 
  */
-public class OtmOperationFacet extends OtmAbstractFacet<TLFacet> {
+public class OtmOperationFacet extends OtmAbstractFacetPropertyOwner<TLFacet> {
     private static Log log = LogFactory.getLog( OtmOperationFacet.class );
 
     // This is the only facet whose parent is not an library member
