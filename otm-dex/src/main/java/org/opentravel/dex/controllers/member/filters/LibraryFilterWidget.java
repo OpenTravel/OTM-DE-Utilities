@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.controllers.member.filters;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexLibrarySelectionEvent;
@@ -37,9 +39,10 @@ import javafx.scene.control.Tooltip;
  *
  */
 public class LibraryFilterWidget extends FilterWidget {
-    // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
+    private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
 
     private static final String ALLLIBS = "All Libraries";
+    private static final String SELECTEDLIB = "Selected Library";
     private static final String TOOLTIP = "Filter to only show members from libraries that start with selected name.";
 
     private ChoiceBox<String> librarySelector;
@@ -135,13 +138,17 @@ public class LibraryFilterWidget extends FilterWidget {
      */
     public void selectionHandler(DexLibrarySelectionEvent event) {
         if (event != null && event.getLibrary() != null) {
+            librarySelector.getSelectionModel().select( SELECTEDLIB );
             if (!event.getLibrary().getName().equals( libraryFilter )) {
                 libraryFilter = event.getLibrary().getName();
-                librarySelector.getSelectionModel().select( event.getLibrary().getName() );
+                librarySelector.getSelectionModel().select( SELECTEDLIB );
+                // librarySelector.getSelectionModel().select( event.getLibrary().getName() );
             }
+
             // Enable specific library mode
             // setLibraryFilter() is called when selector is set
             eventLibrary = event.getLibrary();
+            updateMap();
             parentController.fireFilterChangeEvent();
         }
     }
@@ -187,13 +194,15 @@ public class LibraryFilterWidget extends FilterWidget {
         if (lib == null) {
             librarySelector.getSelectionModel().select( 0 );
             libraryFilter = null;
-            parentController.fireFilterChangeEvent();
+            // parentController.fireFilterChangeEvent();
         } else if (!lib.getName().equals( libraryFilter )) {
             librarySelector.getSelectionModel().select( lib.getName() );
             libraryFilter = lib.getName();
-            parentController.fireFilterChangeEvent();
+            // parentController.fireFilterChangeEvent();
         }
-        // log.debug( "Set Library filter to: " + libraryFilter );
+        updateMap();
+        parentController.fireFilterChangeEvent();
+        log.debug( "Set Library filter to: " + libraryFilter );
     }
 
     /**
@@ -205,8 +214,19 @@ public class LibraryFilterWidget extends FilterWidget {
             add( lib );
         ObservableList<String> libList = FXCollections.observableArrayList( libraryMap.keySet() );
         libList.add( 0, ALLLIBS );
+        if (eventLibrary != null)
+            libList.add( 1, SELECTEDLIB );
+        else if (libList.get( 1 ).equals( SELECTEDLIB ))
+            libList.remove( 1 );
+
         librarySelector.setItems( libList );
-        // log.debug( "Updated library selection map. It has " + libraryMap.size() + " entries." );
+        if (eventLibrary != null) {
+            OtmLibrary savedLibrary = eventLibrary;
+            librarySelector.getSelectionModel().select( 1 );
+            eventLibrary = savedLibrary;
+            libraryFilter = savedLibrary.getName();
+        }
+        log.debug( "Updated library selection map. It has " + libraryMap.size() + " entries." );
     }
 
 }
