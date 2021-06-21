@@ -58,7 +58,7 @@ public class OtmMinorLibrary extends OtmManagedLibrary {
      * Minor libraries return Read-only, Minor or Full action manager.
      * <ul>
      * <li>Full if the member is new to the chain and editable library
-     * <li>Minor if the member is the latest in the version chain.
+     * <li>else Minor if the member is the latest in the version chain.
      * <li>Read-only otherwise.
      * </ul>
      *

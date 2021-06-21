@@ -978,6 +978,11 @@ public class OtmModelManager implements TaskResultHandlerI {
         return full ? fullActionManager : readOnlyActionManager;
     }
 
+    /**
+     * 
+     * @param minor
+     * @return minor action manager if minor == true
+     */
     public DexActionManager getMinorActionManager(boolean minor) {
         return minor ? minorActionManager : readOnlyActionManager;
     }

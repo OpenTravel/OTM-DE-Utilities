@@ -116,6 +116,12 @@ public enum OtmPropertyType {
         return items;
     }
 
+    /**
+     * For each item's user data property type in the menu, enable or disable based on suitability with property owner.
+     * 
+     * @param menu
+     * @param owner
+     */
     public static void enableMenuItems(Menu menu, OtmPropertyOwner owner) {
         for (MenuItem item : menu.getItems()) {
             if (item.getUserData() instanceof OtmPropertyType) {

@@ -75,22 +75,30 @@ public class OtmMajorLibrary extends OtmManagedLibrary {
     /**
      * Members in a major library are editable if the major library is editable. If a minor library has been created,
      * the major will not be editable.
+     * <li>If the major library is editable, full action manager.
+     * <li>If the chain is editable AND member is latest in chain, minor action manager
+     * <li>else read-only action manager
      * <p>
      * {@inheritDoc}
      */
     @Override
     public DexActionManager getActionManager(OtmLibraryMember member) {
-        return getActionManager();
 
-        // // TODO - check logic
-        // if (isMajorVersion() && isEditable())
-        // return getModelManager().getActionManager( true );
+        if (isEditable())
+            return getModelManager().getActionManager( true );
+
+        if (isChainEditable())
+            return getModelManager().getMinorActionManager( getVersionChain().isLatestVersion( member ) );
+
+        return getModelManager().getActionManager( false );
+
+        // // Done 6/21/2021 - check logic
         // if (isChainEditable()) {
-        // if (isEditable() && getVersionChain().isNewToChain( member ))
-        // return getModelManager().getActionManager( true );
-        // return getModelManager().getMinorActionManager( getVersionChain().isLatestVersion( member ) );
+        // // if (isEditable() && getVersionChain().isNewToChain( member ))
+        // // return getModelManager().getActionManager( true );
+        // // return getModelManager().getMinorActionManager( getVersionChain().isLatestVersion( member ) );
         // }
-        // return getModelManager().getActionManager( false );
+        // // return getModelManager().getActionManager( false );
     }
 
     @Override

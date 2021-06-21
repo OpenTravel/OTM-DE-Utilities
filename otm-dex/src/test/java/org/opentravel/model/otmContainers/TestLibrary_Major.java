@@ -24,6 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.AbstractDexTest;
 import org.opentravel.dex.action.manager.DexFullActionManager;
+import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
 import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
@@ -68,14 +69,28 @@ public class TestLibrary_Major extends AbstractDexTest {
             assertTrue( "Then: Unlocked and new so must not have full action manager.",
                 lib.getActionManager( m ) instanceof DexReadOnlyActionManager );
 
-        // When a minor is created from major
+        // When an unlocked minor is created from major, then major must return read only action manager
         OtmManagedLibrary minor = buildMinor( lib );
-        // Then major must not be editable and all members are read-only
         assertTrue( "Given: ", !lib.isEditable() );
         for (OtmLibraryMember m : lib.getMembers())
             assertTrue( "Then: Minor created so must not have full action manager.",
                 lib.getActionManager( m ) instanceof DexReadOnlyActionManager );
 
+        // When minor is locked to be editable, objects in major must return Minor Action manager.
+        rtuLock( minor );
+        for (OtmLibraryMember m : lib.getMembers())
+            assertTrue( "Then: Minor created so must not have full action manager.",
+                lib.getActionManager( m ) instanceof DexMinorVersionActionManager );
+
+        // When minor version of member is created, then the major object then return read only action manager
+        for (OtmLibraryMember m : lib.getMembers()) {
+            OtmLibraryMember newMember = m.createMinorVersion( minor );
+            assertTrue( "Given: new member must have been created.", newMember != null );
+            assertTrue( "Then: Minor created so must not have full action manager.",
+                lib.getActionManager( m ) instanceof DexReadOnlyActionManager );
+            assertTrue( "Then: Minor must have minor action manager.",
+                lib.getActionManager( newMember ) instanceof DexMinorVersionActionManager );
+        }
     }
 
 }

@@ -202,7 +202,7 @@ public class LibraryFilterWidget extends FilterWidget {
         }
         updateMap();
         parentController.fireFilterChangeEvent();
-        log.debug( "Set Library filter to: " + libraryFilter );
+        // log.debug( "Set Library filter to: " + libraryFilter );
     }
 
     /**
@@ -220,13 +220,14 @@ public class LibraryFilterWidget extends FilterWidget {
             libList.remove( 1 );
 
         librarySelector.setItems( libList );
+
         if (eventLibrary != null) {
             OtmLibrary savedLibrary = eventLibrary;
-            librarySelector.getSelectionModel().select( 1 );
+            librarySelector.getSelectionModel().select( 1 ); // clears event library
             eventLibrary = savedLibrary;
             libraryFilter = savedLibrary.getName();
         }
-        log.debug( "Updated library selection map. It has " + libraryMap.size() + " entries." );
+        // log.debug( "Updated library selection map. It has " + libraryMap.size() + " entries." );
     }
 
 }
