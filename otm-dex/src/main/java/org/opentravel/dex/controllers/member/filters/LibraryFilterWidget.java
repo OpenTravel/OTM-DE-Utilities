@@ -63,8 +63,7 @@ public class LibraryFilterWidget extends FilterWidget {
 
         updateMap();
 
-        librarySelector.getSelectionModel().select( 0 );
-        librarySelector.setOnAction( e -> setLibraryFilter() );
+        setSelection( 0 );
         librarySelector.setTooltip( new Tooltip( TOOLTIP ) );
         // log.debug("Configured library selection combo control.");
     }
@@ -138,18 +137,11 @@ public class LibraryFilterWidget extends FilterWidget {
      */
     public void selectionHandler(DexLibrarySelectionEvent event) {
         if (event != null && event.getLibrary() != null) {
-            librarySelector.getSelectionModel().select( SELECTEDLIB );
-            if (!event.getLibrary().getName().equals( libraryFilter )) {
-                libraryFilter = event.getLibrary().getName();
-                librarySelector.getSelectionModel().select( SELECTEDLIB );
-                // librarySelector.getSelectionModel().select( event.getLibrary().getName() );
-            }
-
             // Enable specific library mode
-            // setLibraryFilter() is called when selector is set
             eventLibrary = event.getLibrary();
             updateMap();
             parentController.fireFilterChangeEvent();
+            // log.debug( "Handled library selection event: " + event.getLibrary() );
         }
     }
 
@@ -192,17 +184,21 @@ public class LibraryFilterWidget extends FilterWidget {
     private void setLibraryFilter(OtmLibrary lib) {
         eventLibrary = null; // Go back to namespace mode
         if (lib == null) {
-            librarySelector.getSelectionModel().select( 0 );
+            setSelection( 0 );
             libraryFilter = null;
-            // parentController.fireFilterChangeEvent();
         } else if (!lib.getName().equals( libraryFilter )) {
             librarySelector.getSelectionModel().select( lib.getName() );
             libraryFilter = lib.getName();
-            // parentController.fireFilterChangeEvent();
         }
         updateMap();
         parentController.fireFilterChangeEvent();
         // log.debug( "Set Library filter to: " + libraryFilter );
+    }
+
+    private void setSelection(int i) {
+        librarySelector.setOnAction( null );
+        librarySelector.getSelectionModel().select( i );
+        librarySelector.setOnAction( e -> setLibraryFilter() );
     }
 
     /**
@@ -212,6 +208,7 @@ public class LibraryFilterWidget extends FilterWidget {
         libraryMap.clear();
         for (OtmLibrary lib : modelMgr.getLibraries())
             add( lib );
+
         ObservableList<String> libList = FXCollections.observableArrayList( libraryMap.keySet() );
         libList.add( 0, ALLLIBS );
         if (eventLibrary != null)
@@ -223,9 +220,9 @@ public class LibraryFilterWidget extends FilterWidget {
 
         if (eventLibrary != null) {
             OtmLibrary savedLibrary = eventLibrary;
-            librarySelector.getSelectionModel().select( 1 ); // clears event library
-            eventLibrary = savedLibrary;
-            libraryFilter = savedLibrary.getName();
+            setSelection( 1 );
+            // eventLibrary = savedLibrary;
+            // libraryFilter = savedLibrary.getName();
         }
         // log.debug( "Updated library selection map. It has " + libraryMap.size() + " entries." );
     }
