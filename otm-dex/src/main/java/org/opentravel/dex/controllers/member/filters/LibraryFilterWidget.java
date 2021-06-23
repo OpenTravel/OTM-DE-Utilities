@@ -141,7 +141,7 @@ public class LibraryFilterWidget extends FilterWidget {
             eventLibrary = event.getLibrary();
             updateMap();
             parentController.fireFilterChangeEvent();
-            log.debug( "Handled library selection event: " + event.getLibrary() );
+            // log.debug( "Handled library selection event: " + event.getLibrary() );
         }
     }
 
@@ -153,7 +153,7 @@ public class LibraryFilterWidget extends FilterWidget {
         OtmLibrary lib = getSelectedLibrary();
         updateMap();
         setLibraryFilter( lib );
-        log.debug( "Refreshed." );
+        // log.debug( "Refreshed." );
     }
 
 
@@ -172,7 +172,7 @@ public class LibraryFilterWidget extends FilterWidget {
                 setLibraryFilter( libraryMap.get( selection ) );
         }
         librarySelector.setValue( selection );
-        log.debug( "Set filter to " + libraryFilter );
+        // log.debug( "Set filter to " + libraryFilter );
     }
 
 
@@ -229,7 +229,7 @@ public class LibraryFilterWidget extends FilterWidget {
             // eventLibrary = savedLibrary;
             // libraryFilter = savedLibrary.getName();
         }
-        log.debug( "Updated library selection map. It has " + libraryMap.size() + " entries." );
+        // log.debug( "Updated library selection map. It has " + libraryMap.size() + " entries." );
     }
 
 }
