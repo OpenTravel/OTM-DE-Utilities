@@ -30,27 +30,6 @@ import org.opentravel.schemacompiler.model.TLModelElement;
 public interface OtmPropertyOwner extends OtmChildrenOwner {
 
     /**
-     * 
-     * @return the library member that owns this property owner
-     */
-    @Override
-    public OtmLibraryMember getOwningMember();
-
-    // /**
-    // * Add the OtmProperty to the owner if the owner does not already contain it. If the child reports it is inherited
-    // * (isInherited() = true) then it is added to inherited children.
-    // * <p>
-    // * Does not modify the TL object. Use {@link #add(TLModelElement)} to add to TL and Otm parents.
-    // * <p>
-    // * Typically, the child will add itself when constructed with non-null parent.
-    // *
-    // * @param child
-    // * @return
-    // */
-    // @Override
-    // public OtmProperty add(OtmObject child);
-
-    /**
      * Add the tl object (TLAttribute, TLIndicator or TLProperty) to this facade's underlying TLFacet. Then If the TL
      * object has a facade, add it to this parent; if not, create a OtmProperty to wrap the TL property setting this as
      * the parent.
@@ -67,12 +46,18 @@ public interface OtmPropertyOwner extends OtmChildrenOwner {
      */
     public boolean canAdd(OtmProperty property);
 
-    // TODO - why is getActionManager() here?
     /**
-     * @return
+     * {@inheritDoc} Property Owner is needed in member property row factory
      */
     @Override
     public DexActionManager getActionManager();
+
+    /**
+     * 
+     * @return the library member that owns this property owner
+     */
+    @Override
+    public OtmLibraryMember getOwningMember();
 
     /**
      * @return

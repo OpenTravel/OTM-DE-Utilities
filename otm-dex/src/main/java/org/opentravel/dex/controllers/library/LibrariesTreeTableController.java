@@ -231,13 +231,6 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         return libs;
     }
 
-    // private void setSelectedItem(OtmLibrary lib) {
-    // // for (TreeItem<LibraryDAO> item : librariesTreeTable.getRoot().getChildren()) {
-    // // if (item.getValue().getValue() == lib)
-    // // librariesTreeTable.getSelectionModel().select( item );
-    // // }
-    // }
-
     /**
      * @return the currently selected library or null
      */
@@ -251,8 +244,6 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
         // log.debug( "HandleEvent received: " + event.getClass().getSimpleName() );
         if (event instanceof DexModelChangeEvent)
             post( ((DexModelChangeEvent) event).getModelManager() );
-        // if (event instanceof DexLibrarySelectionEvent)
-        // setSelectedItem( ((DexLibrarySelectionEvent) event).getLibrary() );
     }
 
     /**
@@ -307,12 +298,6 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
             for (OtmVersionChain chain : modelMgr.getChains()) {
                 LibraryDAO.createNSItems( chain, root, editableOnlyFilter );
             }
-
-            // // create cells for libraries in a namespace. Latest at top, older ones under it.
-            // // for (String baseNS : modelMgr.getBaseNamespaces()) {
-            // for (String chainName : modelMgr.getChainNames()) {
-            // LibraryDAO.createNSItems( chainName, modelMgr, root, editableOnlyFilter );
-            // }
         }
         librariesTreeTable.getSortOrder().add( nameColumn );
 

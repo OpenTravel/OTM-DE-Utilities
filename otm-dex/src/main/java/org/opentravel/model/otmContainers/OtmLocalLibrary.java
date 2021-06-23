@@ -36,7 +36,9 @@ public class OtmLocalLibrary extends OtmLibrary {
     private static Log log = LogFactory.getLog( OtmLocalLibrary.class );
 
     /**
-     * Should only be called by Factory. See {@link OtmLibraryFactory#newLibrary(AbstractLibrary, OtmModelManager)}
+     * Should only be called by Factory.
+     * 
+     * @see OtmLibraryFactory#newLibrary(AbstractLibrary, OtmModelManager)
      * 
      * @param tl
      * @param mgr
@@ -46,9 +48,9 @@ public class OtmLocalLibrary extends OtmLibrary {
     }
 
     /**
-     * Local libraries only return full or read-only.
-     * <p>
      * {@inheritDoc}
+     * <p>
+     * Local libraries always return full action manager.
      * 
      */
     @Override
@@ -57,9 +59,9 @@ public class OtmLocalLibrary extends OtmLibrary {
     }
 
     /**
-     * Local libraries only return full or read-only.
-     * <p>
      * {@inheritDoc}
+     * <p>
+     * Members of local libraries always return full action manager.
      * 
      */
     @Override
@@ -68,13 +70,12 @@ public class OtmLocalLibrary extends OtmLibrary {
     }
 
     /**
-     * \ * {@inheritDoc}
+     * {@inheritDoc}
      */
     @Override
     public String getBaseNS() {
         return getTL().getBaseNamespace();
     }
-
 
     /**
      * Local libraries are always UNMANAGED.
@@ -107,9 +108,9 @@ public class OtmLocalLibrary extends OtmLibrary {
     }
 
     /**
-     * A local library is editable regardless of action manager.
-     * <p>
      * {@inheritDoc}
+     * <p>
+     * A local library is always editable.
      */
     @Override
     public boolean isEditable() {
@@ -117,14 +118,13 @@ public class OtmLocalLibrary extends OtmLibrary {
     }
 
     /**
-     * A local library is always the latest version.
-     * <p>
      * {@inheritDoc}
+     * <p>
+     * A local library is always the latest version.
      */
     @Override
     public boolean isLatestVersion() {
         return true;
-        // return mgr.isLatest( this );
     }
 
     /**

@@ -34,7 +34,9 @@ public class OtmMinorLibrary extends OtmManagedLibrary {
     private static Log log = LogFactory.getLog( OtmMinorLibrary.class );
 
     /**
-     * Should only be called by Factory. See {@link OtmLibraryFactory#newLibrary(AbstractLibrary, OtmModelManager)}
+     * Should only be called by Factory.
+     * 
+     * @see OtmLibraryFactory#newLibrary(AbstractLibrary, OtmModelManager)
      * 
      * @param tl
      * @param mgr
@@ -42,7 +44,6 @@ public class OtmMinorLibrary extends OtmManagedLibrary {
     protected OtmMinorLibrary(TLLibrary tl, OtmModelManager mgr) {
         super( tl, mgr );
     }
-
 
     /**
      * {@inheritDoc}
@@ -55,14 +56,12 @@ public class OtmMinorLibrary extends OtmManagedLibrary {
     /**
      * {@inheritDoc}
      * <p>
-     * Minor libraries return Read-only, Minor or Full action manager.
+     * Members of minor libraries return Read-only, Minor or Full action manager.
      * <ul>
      * <li>Full if the member is new to the chain and editable library
      * <li>else Minor if the member is the latest in the version chain.
      * <li>Read-only otherwise.
      * </ul>
-     *
-     * @return action manager
      */
     @Override
     public DexActionManager getActionManager(OtmLibraryMember member) {
@@ -84,8 +83,8 @@ public class OtmMinorLibrary extends OtmManagedLibrary {
         // return getModelManager().getActionManager( false );
     }
 
-    @Override
-    public OtmVersionChainVersioned getVersionChain() {
-        return (OtmVersionChainVersioned) getModelManager().getVersionChain( this );
-    }
+    // @Override
+    // public OtmVersionChainVersioned getVersionChain() {
+    // return (OtmVersionChainVersioned) getModelManager().getVersionChain( this );
+    // }
 }

@@ -62,8 +62,6 @@ public class DexFileHandler extends AbstractMainWindowController {
     public static final String LIBRARY_FILE_EXTENSION = ".otm";
     public static final String FILE_SEPARATOR = "/";
 
-    // ValidationFindings findings = null;
-
     private static String buildSaveResults(StringBuilder successfulSaves, StringBuilder errorSaves) {
         // Return the results
         final StringBuilder userMessage = new StringBuilder();

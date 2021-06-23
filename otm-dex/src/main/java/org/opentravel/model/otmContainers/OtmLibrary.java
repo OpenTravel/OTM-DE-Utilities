@@ -267,7 +267,7 @@ public abstract class OtmLibrary implements Comparable<OtmLibrary> {
     public abstract DexActionManager getActionManager();
 
     /**
-     * Get Read-only, Minor or Full action manager based on type of the library and its chain.
+     * Get Read-only, Minor or Full action manager based on member, library state and chain.
      *
      * @return action manager
      */
@@ -281,12 +281,6 @@ public abstract class OtmLibrary implements Comparable<OtmLibrary> {
      * @return project item's base namespace or empty string
      */
     public abstract String getBaseNS();
-    // * Get the base namespace from the first project item
-    // * @return project item's base namespace or empty string
-    // // TESTME
-    // // Fail-safe: if fails the instance test, try the PI
-    // return projectItems.isEmpty() ? "" : projectItems.get( 0 ).getBaseNamespace();
-
 
     /**
      * 
@@ -320,9 +314,6 @@ public abstract class OtmLibrary implements Comparable<OtmLibrary> {
      * @return
      */
     public String getLockedBy() {
-        // for (ProjectItem pi : projectItems)
-        // if (pi.getLockedByUser() != null)
-        // return pi.getLockedByUser();
         return NO_LOCKEDBYUSER;
     }
 
@@ -333,16 +324,6 @@ public abstract class OtmLibrary implements Comparable<OtmLibrary> {
     public int getMajorVersion() {
         return OtmLibraryFactory.getMajorVersionNumber( getTL() );
     }
-
-    // /**
-    // * Get the managing project from the model manager. {@link OtmModelManager#getManagingProject(OtmLibrary)}
-    // *
-    // * @return
-    // */
-    // @Deprecated
-    // public OtmProject getManagingProject() {
-    // return mgr.getManagingProject( this );
-    // }
 
     /**
      * Get the TL Project Manager from this library's model manager.
@@ -368,21 +349,6 @@ public abstract class OtmLibrary implements Comparable<OtmLibrary> {
      */
     public int getMinorVersion() {
         return OtmLibraryFactory.getMinorVersionNumber( getTL() );
-        //
-        // int vn = 0;
-        // if (!isBuiltIn() && getTL().getNamespace() != null) {
-        // try {
-        // String versionScheme = getTL().getVersionScheme();
-        // VersionScheme vScheme = VersionSchemeFactory.getInstance().getVersionScheme( versionScheme );
-        // String versionId = vScheme.getVersionIdentifier( getTL().getNamespace() );
-        // vn = Integer.valueOf( vScheme.getMinorVersion( versionId ) );
-        // } catch (NumberFormatException e) {
-        // log.debug( "Error converting version string." + e.getCause() );
-        // } catch (VersionSchemeException e) {
-        // log.debug( "Error determining version. " + e.getCause() );
-        // }
-        // }
-        // return vn;
     }
 
     /**
@@ -527,23 +493,6 @@ public abstract class OtmLibrary implements Comparable<OtmLibrary> {
         return getTLProjectManager() != null ? getTLProjectManager().getProjectItem( getTL() ) : null;
     }
 
-    // /**
-    // * From the managing TL project, return the item that contains this library.
-    // *
-    // * @see #getManagingProject()
-    // * @return the project item for this library in the managing project
-    // */
-    // @Deprecated
-    // public ProjectItem getProjectItemOLD() {
-    // ProjectItem pi = null;
-    // OtmProject project = getManagingProject();
-    // if (project != null)
-    // for (ProjectItem candidate : project.getTL().getProjectItems())
-    // if (getProjectItems().contains( candidate ))
-    // pi = candidate;
-    // return pi;
-    // }
-
     public List<ProjectItem> getProjectItems() {
         return projectItems;
     }
@@ -641,13 +590,6 @@ public abstract class OtmLibrary implements Comparable<OtmLibrary> {
      */
     public OtmVersionChain getVersionChain() {
         return getModelManager().getVersionChain( this );
-        // if (this instanceof OtmManagedLibrary)
-        // getModelManager().getVersionChain( (OtmManagedLibrary) this );
-        // return null;
-        // // return null;
-        // if (versionChain == null)
-        // versionChain = new OtmVersionChain( this );
-        // return versionChain;
     }
 
     /**
@@ -664,9 +606,6 @@ public abstract class OtmLibrary implements Comparable<OtmLibrary> {
     @Deprecated
     public boolean isMinorVersion() {
         return this instanceof OtmMinorLibrary;
-        // if (getPatchVersion() > 0)
-        // return false;
-        // return (getMinorVersion() > 0 && getState() != RepositoryItemState.UNMANAGED);
     }
 
     /**

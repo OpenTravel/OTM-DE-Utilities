@@ -108,7 +108,7 @@ public class LibraryFilterWidget extends FilterWidget {
      */
     @Override
     public boolean isSelected(OtmLibraryMember member) {
-        if (libraryFilter == null)
+        if (libraryFilter == null && eventLibrary == null)
             return true; // Not activated
 
         if (member == null || member.getLibrary() == null || member.getLibrary().getName() == null)
@@ -141,7 +141,7 @@ public class LibraryFilterWidget extends FilterWidget {
             eventLibrary = event.getLibrary();
             updateMap();
             parentController.fireFilterChangeEvent();
-            // log.debug( "Handled library selection event: " + event.getLibrary() );
+            log.debug( "Handled library selection event: " + event.getLibrary() );
         }
     }
 
@@ -153,7 +153,7 @@ public class LibraryFilterWidget extends FilterWidget {
         OtmLibrary lib = getSelectedLibrary();
         updateMap();
         setLibraryFilter( lib );
-        // log.debug( "Refreshed." );
+        log.debug( "Refreshed." );
     }
 
 
@@ -172,7 +172,7 @@ public class LibraryFilterWidget extends FilterWidget {
                 setLibraryFilter( libraryMap.get( selection ) );
         }
         librarySelector.setValue( selection );
-        // log.debug( "Set filter to " + libraryFilter );
+        log.debug( "Set filter to " + libraryFilter );
     }
 
 
@@ -195,6 +195,11 @@ public class LibraryFilterWidget extends FilterWidget {
         // log.debug( "Set Library filter to: " + libraryFilter );
     }
 
+    /**
+     * Set the selection without invoking the setLibraryFilter event handler.
+     * 
+     * @param i
+     */
     private void setSelection(int i) {
         librarySelector.setOnAction( null );
         librarySelector.getSelectionModel().select( i );
@@ -219,12 +224,12 @@ public class LibraryFilterWidget extends FilterWidget {
         librarySelector.setItems( libList );
 
         if (eventLibrary != null) {
-            OtmLibrary savedLibrary = eventLibrary;
+            // OtmLibrary savedLibrary = eventLibrary;
             setSelection( 1 );
             // eventLibrary = savedLibrary;
             // libraryFilter = savedLibrary.getName();
         }
-        // log.debug( "Updated library selection map. It has " + libraryMap.size() + " entries." );
+        log.debug( "Updated library selection map. It has " + libraryMap.size() + " entries." );
     }
 
 }

@@ -36,8 +36,8 @@ public class OtmMajorLibrary extends OtmManagedLibrary {
 
     /**
      * Should only be called by Factory.
-     * <p>
-     * See {@link OtmLibraryFactory#newLibrary(AbstractLibrary, OtmModelManager)}
+     * 
+     * @see OtmLibraryFactory#newLibrary(AbstractLibrary, OtmModelManager)
      * 
      * @param tl
      * @param mgr
@@ -48,8 +48,8 @@ public class OtmMajorLibrary extends OtmManagedLibrary {
 
     /**
      * Should only be called by Factory.
-     * <p>
-     * See {@link OtmLibraryFactory#newLibrary(AbstractLibrary, OtmModelManager)}
+     * 
+     * @see OtmLibraryFactory#newLibrary(OtmLocalLibrary)
      * 
      * @param unmanaged local library
      */
@@ -73,13 +73,17 @@ public class OtmMajorLibrary extends OtmManagedLibrary {
     }
 
     /**
-     * Members in a major library are editable if the major library is editable. If a minor library has been created,
-     * the major will not be editable.
+     * {@inheritDoc}
+     * <p>
+     * A member of a major library returns:
+     * <ul>
      * <li>If the major library is editable, full action manager.
      * <li>If the chain is editable AND member is latest in chain, minor action manager
      * <li>else read-only action manager
+     * </ul>
      * <p>
-     * {@inheritDoc}
+     * Members in a major library are editable if the major library is editable. If a minor library has been created,
+     * the major library will not be editable.
      */
     @Override
     public DexActionManager getActionManager(OtmLibraryMember member) {
@@ -92,7 +96,7 @@ public class OtmMajorLibrary extends OtmManagedLibrary {
 
         return getModelManager().getActionManager( false );
 
-        // // Done 6/21/2021 - check logic
+        // // Done 6/21/2021 - check logic, see junit: TestLibrary_Major
         // if (isChainEditable()) {
         // // if (isEditable() && getVersionChain().isNewToChain( member ))
         // // return getModelManager().getActionManager( true );
@@ -101,8 +105,8 @@ public class OtmMajorLibrary extends OtmManagedLibrary {
         // // return getModelManager().getActionManager( false );
     }
 
-    @Override
-    public OtmVersionChainVersioned getVersionChain() {
-        return (OtmVersionChainVersioned) getModelManager().getVersionChain( this );
-    }
+    // @Override
+    // public OtmVersionChainVersioned getVersionChain() {
+    // return (OtmVersionChainVersioned) getModelManager().getVersionChain( this );
+    // }
 }

@@ -58,7 +58,6 @@ import org.opentravel.schemacompiler.repository.Project;
 import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.ProjectManager;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
-import org.opentravel.schemacompiler.version.VersionChainFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -69,7 +68,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javafx.application.Platform;
 import javafx.concurrent.WorkerStateEvent;
 
 /**
@@ -284,7 +282,7 @@ public class OtmModelManager implements TaskResultHandlerI {
     // log.debug( "Has PI" ); // If this is true, the OtmLibraryFactory should do the test.
     // return addLibrary( absLibrary );
     // // return add( absLibrary, getVersionChainFactory() );
-    // // FIXME - return add( absLibrary );
+    // // Done - return add( absLibrary );
     // }
 
     /**
@@ -470,7 +468,7 @@ public class OtmModelManager implements TaskResultHandlerI {
             // }
             // // End deprecation
 
-            // // TODO - move to factory
+            // // DONE - move to factory
             // // Model Members - use the factory to create and add OtmObjects
             // absLibrary.getNamedMembers().forEach( nm -> OtmLibraryMemberFactory.create( nm, this ) );
 
@@ -626,25 +624,25 @@ public class OtmModelManager implements TaskResultHandlerI {
         return absLibrary != null && libraries.containsKey( absLibrary );
     }
 
-    /**
-     * Use the TL Model to attempt to get a version chain factory.
-     * 
-     * @return the factory or null if factory throws exception
-     */
-    @Deprecated
-    private VersionChainFactory getVersionChainFactory() {
-        VersionChainFactory versionChainFactory = null;
-        try {
-            versionChainFactory = new VersionChainFactory( tlModel );
-        } catch (Exception e) {
-            if (!showingError) {
-                showingError = true;
-                Platform.runLater( this::chainError );
-            }
-            // log.debug( "Exception trying to construct version chain factory: " + e.getLocalizedMessage() );
-        }
-        return versionChainFactory;
-    }
+    // /**
+    // * Use the TL Model to attempt to get a version chain factory.
+    // *
+    // * @return the factory or null if factory throws exception
+    // */
+    // @Deprecated
+    // private VersionChainFactory getVersionChainFactory() {
+    // VersionChainFactory versionChainFactory = null;
+    // try {
+    // versionChainFactory = new VersionChainFactory( tlModel );
+    // } catch (Exception e) {
+    // if (!showingError) {
+    // showingError = true;
+    // Platform.runLater( this::chainError );
+    // }
+    // // log.debug( "Exception trying to construct version chain factory: " + e.getLocalizedMessage() );
+    // }
+    // return versionChainFactory;
+    // }
 
     /**
      * Used by the OtmLibraryFactory when converting local to major library.
@@ -660,7 +658,7 @@ public class OtmModelManager implements TaskResultHandlerI {
         addToMaps( newLib );
 
         // TEST
-        // TODO - remove(lib)
+        // ?? - remove(lib)
 
         // // Marshal parameters
         // String baseNS = lib.getNameWithBasenamespace();
@@ -688,9 +686,9 @@ public class OtmModelManager implements TaskResultHandlerI {
         //
         // libraries.put( newLib.getTL(), newLib );
         // putLibrary( newLib.getTL(), newLib );
-        // // FIXME - need to update other maps
+        // // DONE - need to update other maps
         //
-        // // add( newLib.getTL() ); // FIXME - this will duplicate members
+        // // add( newLib.getTL() ); // DONE - this will duplicate members
         //
         // // Collection<OtmLibrary> libsNew = getUserLibraries();
         // // log.debug( "Changed unmanaged to managed: " + newLib );
@@ -725,7 +723,7 @@ public class OtmModelManager implements TaskResultHandlerI {
     // otmProjectManager.add( project );
     // // otmProjectManager.addProject( project.getName(), new OtmProject( project, this ) );
     // //
-    // // TODO - examine and if needed improve JUNIT
+    // // DONE - examine and if needed improve JUNIT
     // //
     //
     // // Get the built in libraries, will do nothing if already added

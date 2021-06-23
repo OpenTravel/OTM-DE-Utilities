@@ -63,7 +63,6 @@ public class OpenLibraryFileTask extends DexTaskBase<File> {
     @Override
     public void doIT() {
         // log.debug( "Opening " + taskData.getName() );
-
         try {
             DexFileHandler.openLibrary( taskData, modelMgr );
             // Now resolve types and validate again
@@ -71,11 +70,6 @@ public class OpenLibraryFileTask extends DexTaskBase<File> {
         } catch (DexFileException e) {
             // NO-OP
         }
-        // new DexFileHandler().openLibrary( taskData, modelMgr );
-        //
-        // // Add all the libraries -- model manager will ignore those already added
-        // modelMgr.add();
-
     }
 
 }

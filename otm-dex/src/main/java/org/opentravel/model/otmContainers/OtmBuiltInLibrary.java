@@ -43,9 +43,9 @@ public class OtmBuiltInLibrary extends OtmLibrary {
     }
 
     /**
-     * Built-in libraries return read-only action manger.
-     * <p>
      * {@inheritDoc}
+     * <p>
+     * Built-in libraries always return read-only action manger.
      */
     @Override
     public DexActionManager getActionManager(OtmLibraryMember member) {
@@ -62,21 +62,6 @@ public class OtmBuiltInLibrary extends OtmLibrary {
         return mgr.getActionManager( false );
     }
 
-    // @Override
-    // public String getName() {
-    // return getTL() != null ? getTL().getName() : "";
-    // }
-    //
-    // @Override
-    // public String getPrefix() {
-    // return getTL().getPrefix();
-    // }
-    //
-    // @Override
-    // public Icons getIconType() {
-    // return ImageManager.Icons.LIBRARY;
-    // }
-
     @Override
     public boolean isEditable() {
         return false;
@@ -89,16 +74,6 @@ public class OtmBuiltInLibrary extends OtmLibrary {
     public TLLibraryStatus getStatus() {
         return TLLibraryStatus.FINAL;
     }
-
-    // @Override
-    // public String getNameWithBasenamespace() {
-    // return getBaseNS() + "/" + getName();
-    // }
-
-    // @Override
-    // public String getLockedBy() {
-    // return "";
-    // }
 
     /**
      * Built-in libraries are always unmanaged.
@@ -126,13 +101,4 @@ public class OtmBuiltInLibrary extends OtmLibrary {
         return true;
         // return mgr.isLatest( this );
     }
-
-    // /**
-    // * @return
-    // */
-    // @Override
-    // public String getVersion() {
-    // return getTL().getVersion();
-    // }
-
 }

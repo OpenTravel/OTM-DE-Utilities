@@ -102,10 +102,6 @@ public abstract class OtmManagedLibrary extends OtmLibrary {
         return "";
     }
 
-    // public Icons getIconType() {
-    // return ImageManager.Icons.LIBRARY;
-    // }
-
     /**
      * Managed libraries are always TLLibraries.
      * <p>
@@ -156,10 +152,12 @@ public abstract class OtmManagedLibrary extends OtmLibrary {
      * @return actual status of TL Library
      */
     public TLLibraryStatus getStatus() {
-        // if (tlLib instanceof TLLibrary)
-        return ((TLLibrary) tlLib).getStatus();
-        // else
-        // return TLLibraryStatus.FINAL;
+        return getTL().getStatus();
+    }
+
+    @Override
+    public OtmVersionChainVersioned getVersionChain() {
+        return (OtmVersionChainVersioned) getModelManager().getVersionChain( this );
     }
 
     /**
