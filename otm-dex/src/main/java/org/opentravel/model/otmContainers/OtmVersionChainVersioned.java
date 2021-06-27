@@ -85,36 +85,6 @@ public class OtmVersionChainVersioned extends OtmVersionChainBase {
         return versionChainFactory;
     }
 
-    // /**
-    // * Is candidate a later minor version of the reference library? Return true if all are true about the candidate:
-    // * <ol>
-    // * <li>is different than library
-    // * <li>has the same name and base namespace {@link OtmLibrary#getNameWithBasenamespace()}
-    // * <li>has the same major version number
-    // * <li>has a minor version number greater than library
-    // * </ol>
-    // *
-    // * @param library
-    // * @param candidate
-    // * @return
-    // */
-    // public static boolean isLaterVersion(OtmLibrary library, OtmLibrary candidate) {
-    // if (library == candidate)
-    // return false;
-    // if (!library.getNameWithBasenamespace().equals( candidate.getNameWithBasenamespace() ))
-    // return false;
-    // // try {
-    // if (library.getMajorVersion() != candidate.getMajorVersion())
-    // return false;
-    // if (library.getMinorVersion() >= candidate.getMinorVersion())
-    // return false;
-    // // } catch (VersionSchemeException e) {
-    // // log.debug( "Version scheme excption: " + e.getLocalizedMessage() );
-    // // return false;
-    // // }
-    // return true;
-    // }
-
 
     /**
      * Create a version chain.
@@ -250,95 +220,7 @@ public class OtmVersionChainVersioned extends OtmVersionChainBase {
         return null;
     }
 
-    // /**
-    // * Create a copy of the subject's owning member in an minor library.
-    // * <p>
-    // * Minor library must be in the same chain as the subject and editable. The latest version of the subject's owning
-    // * member will be used to make the minor version.
-    // *
-    // * @param subject
-    // * @return a property owner in the new object with the matching name or null if the minor version could not be
-    // * created or error
-    // */
-    // public OtmLibraryMember getNewMinorLibraryMember(OtmLibraryMember subject) {
-    // OtmLibrary subjectLibrary = subject.getLibrary();
-    // if (subjectLibrary == null)
-    // return null;
-    // OtmLibrary minorLibrary = subjectLibrary.getVersionChain().getEditable();
-    // if (minorLibrary == null)
-    // return null;
-    // // Get the latest version of this member
-    // OtmLibraryMember latestMember = subjectLibrary.getVersionChain().getLatestVersion( subject );
-    // if (latestMember == null)
-    // return null;
-    //
-    // // If the latest member is in the target minor library use it
-    // OtmLibraryMember newMinorLibraryMember = null;
-    // if (latestMember.getLibrary() == minorLibrary)
-    // newMinorLibraryMember = latestMember;
-    // else
-    // // Create new minor version of this member
-    // newMinorLibraryMember = latestMember.createMinorVersion( minorLibrary );
-    //
-    // if (newMinorLibraryMember == null)
-    // return null; // how to inform user of error?
-    //
-    // // Contextual facets?
-    // for (OtmContributedFacet cf : newMinorLibraryMember.getChildrenContributedFacets())
-    // log.debug( "What to do here? " );
-    //
-    // return newMinorLibraryMember;
-    // }
 
-    // /**
-    // * Create a new minor version of the owning member and VWA and enumerations will be returned, otherwise returns
-    // the
-    // * facet with matching name.
-    // *
-    // * @param subject
-    // * @return property owner or null on error or facet not found.
-    // */
-    // public OtmPropertyOwner getNewMinorPropertyOwner(OtmPropertyOwner subject) {
-    //
-    // // Create minor version of owning member
-    // OtmLibraryMember newMinorLibraryMember = getNewMinorLibraryMember( subject.getOwningMember() );
-    //
-    // // Find the property owner to return
-    // OtmPropertyOwner newPropertyOwner = null;
-    // // VWA and Enum do not have descendant property owners, they are the property owner
-    // if (newMinorLibraryMember instanceof OtmValueWithAttributes)
-    // newPropertyOwner = (OtmValueWithAttributes) newMinorLibraryMember;
-    // else if (newMinorLibraryMember instanceof OtmEnumeration)
-    // newPropertyOwner = (OtmEnumeration<?>) newMinorLibraryMember;
-    // // Find name matching propertyOwner
-    // else if (newMinorLibraryMember != null) {
-    // for (OtmPropertyOwner p : newMinorLibraryMember.getDescendantsPropertyOwners())
-    // if (p.getName().equals( subject.getName() ))
-    // newPropertyOwner = p;
-    // }
-    // return newPropertyOwner;
-    // }
-
-    // public OtmTypeUser getNewMinorTypeUser(OtmTypeUser subject) {
-    // OtmPropertyOwner np = getNewMinorPropertyOwner( ((OtmProperty) subject).getParent() );
-    // if (np == null)
-    // return null;
-    // // OtmLibraryMember newMinorLibraryMember = getNewMinorLibraryMember( subject.getOwningMember() );
-    // OtmTypeUser newTypeUser = null;
-    // OtmProperty newProperty = null;
-    // // New objects will NOT have any type users!
-    // LibraryElement newTL = subject.getTL().cloneElement( np.getLibrary().getTL() );
-    // if (newTL instanceof TLModelElement)
-    // newProperty = OtmPropertyFactory.create( (TLModelElement) newTL, np );
-    // if (newProperty instanceof OtmTypeUser)
-    // newTypeUser = (OtmTypeUser) newProperty;
-    //
-    // return newTypeUser;
-    // }
-
-    // public String getPrefix() {
-    // return prefix;
-    // }
 
     /**
      * Return true if any library in the chain is editable.
@@ -381,18 +263,6 @@ public class OtmVersionChainVersioned extends OtmVersionChainBase {
         // return false;
         return isLaterVersion( member.getLibrary(), candidate.getLibrary() );
     }
-
-    // /**
-    // * Is the major version of these libraries the latest in the model?
-    // *
-    // * @param member
-    // * @return
-    // */
-    // // TODO - this seems very wrong. it only checks the minor versions.
-    // // for unmanaged, it returns false.
-    // public boolean isLatestChain() {
-    // return getLatestVersion() != null ? getLatestVersion().isLatestVersion() : false;
-    // }
 
     // /**
     // * {@inheritDoc}

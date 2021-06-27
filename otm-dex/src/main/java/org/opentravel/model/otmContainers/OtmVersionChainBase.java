@@ -105,40 +105,6 @@ public abstract class OtmVersionChainBase implements OtmVersionChain {
 
     /** ********************************************************** **/
 
-    // private String getPrefix(OtmLibrary library) {
-    // if (library == null)
-    // return "";
-    // String result = library.getPrefix();
-    // // // If there is more than one library in the minor version chain, change the prefix
-    // // int dash = result.indexOf( '-' );
-    // // if (dash > 0)
-    // // result = result.substring( 0, dash );
-    // // try {
-    // // result += "-" + Integer.toString( library.getMajorVersion() );
-    // // result += ".*";
-    // // } catch (Exception e) {
-    // // // NO-OP
-    // // }
-    // return result;
-    // }
-
-    // /**
-    // * Is there a newer minor version of the subject's assigned type provider?
-    // * <ul>
-    // * <li>The subject must be the latest version of the subject.
-    // * <li>The assigned type must not be the latest version.
-    // * </ul>
-    // * <p>
-    // * From language specification document:
-    // * <p>
-    // * For one term to be considered a later minor version of another term, all of the following conditions MUST be
-    // met:
-    // * <li>1. The terms must be of the same type (business object, core, etc.) and have the same name
-    // * <li>2. The terms MUST be declared in different libraries, and both libraries must have the same name, version
-    // * scheme, and base namespace URI
-    // * <li>3. The version of the extended term’s library MUST be lower than that of the extending term’s library
-    // * version, but both libraries MUST belong to the same major version chain
-    // */
     /**
      * {@inheritDoc}
      * 
@@ -160,22 +126,6 @@ public abstract class OtmVersionChainBase implements OtmVersionChain {
     public String getBaseNamespace() {
         return chainName;
     }
-
-    // public abstract void add(OtmLibrary mLib);
-    // public abstract boolean contains(OtmLibrary lib);
-    // public abstract OtmLibrary getEditable();
-    // public abstract OtmLibrary getLatestVersion();
-    // public abstract OtmLibraryMember getLatestVersion(OtmLibraryMember member);
-    // public abstract List<OtmLibrary> getLibraries();
-    // public abstract OtmLibrary getMajor();
-    // public abstract boolean isChainEditable();
-    // public abstract boolean isEmpty();
-    // public abstract boolean isLaterVersion(OtmObject member, OtmObject candidate);
-    // public abstract boolean isLatestVersion(OtmLibraryMember member);
-    // public abstract boolean isNewToChain(OtmLibraryMember member);
-    // public abstract void refresh();
-    // public abstract void remove(OtmLibrary lib);
-    // public abstract int size();
 
     /**
      * Create a copy of the subject's owning member in an minor library.
@@ -265,17 +215,6 @@ public abstract class OtmVersionChainBase implements OtmVersionChain {
     public String getPrefix() {
         return prefix;
     }
-
-
-    // /**
-    // * Look into the chain and return true if this is the latest version (next version = null)
-    // * <p>
-    // * True if not in a chain.
-    // *
-    // * @param lib
-    // * @return
-    // */
-    // public abstract boolean isLatest(OtmLibrary lib);
 
     /**
      * Is the major version of these libraries the latest in the model?
