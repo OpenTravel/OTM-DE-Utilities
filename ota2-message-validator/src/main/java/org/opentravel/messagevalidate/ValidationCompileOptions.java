@@ -103,6 +103,10 @@ public class ValidationCompileOptions implements CompileAllTaskOptions {
         return false;
     }
 
+    public boolean isCompileOpenApi() {
+        return false;
+    }
+
     public boolean isSuppressOtmExtensions() {
         return true;
     }

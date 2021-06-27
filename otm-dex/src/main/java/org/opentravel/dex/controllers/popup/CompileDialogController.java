@@ -140,6 +140,8 @@ public class CompileDialogController extends DexPopupControllerBase implements T
     @FXML
     private CheckBox compileSwaggerCheckbox;
     @FXML
+    private CheckBox compileOpenApiCheckbox;
+    @FXML
     private CheckBox compileDocumentationCheckbox;
     @FXML
     private TextField serviceEndpointUrl;
@@ -209,6 +211,7 @@ public class CompileDialogController extends DexPopupControllerBase implements T
         compileServicesCheckbox.setDisable( true );
         compileJsonSchemasCheckbox.setDisable( true );
         compileSwaggerCheckbox.setDisable( true );
+        compileOpenApiCheckbox.setDisable( true );
         compileDocumentationCheckbox.setDisable( true );
         serviceEndpointUrl.setDisable( true );
         baseResourceUrl.setDisable( true );
@@ -261,6 +264,7 @@ public class CompileDialogController extends DexPopupControllerBase implements T
         compilerSettings.setCompileServices( compileServicesCheckbox.isSelected() );
         compilerSettings.setCompileJsonSchemas( compileJsonSchemasCheckbox.isSelected() );
         compilerSettings.setCompileSwagger( compileSwaggerCheckbox.isSelected() );
+        compilerSettings.setCompileOpenApi( compileOpenApiCheckbox.isSelected() );
         compilerSettings.setCompileHtml( compileDocumentationCheckbox.isSelected() );
         compilerSettings.setServiceEndpointUrl( serviceEndpointUrl.textProperty().getValue() );
         compilerSettings.setResourceBaseUrl( baseResourceUrl.textProperty().getValue() );
@@ -291,6 +295,7 @@ public class CompileDialogController extends DexPopupControllerBase implements T
         compileServicesCheckbox.setSelected( compilerSettings.isCompileServices() );
         compileJsonSchemasCheckbox.setSelected( compilerSettings.isCompileJsonSchemas() );
         compileSwaggerCheckbox.setSelected( compilerSettings.isCompileSwagger() );
+        compileOpenApiCheckbox.setSelected( compilerSettings.isCompileOpenApi() );
         compileDocumentationCheckbox.setSelected( compilerSettings.isCompileHtml() );
 
         serviceEndpointUrl.textProperty().setValue( compilerSettings.getServiceEndpointUrl() );

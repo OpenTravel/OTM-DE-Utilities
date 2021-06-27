@@ -167,27 +167,32 @@
 																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Compile OpenAPI (Swagger)" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+																				<Label text="Compile Swagger (OpenAPI 2.0)" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
 																					<padding>
 																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Compile Documentation" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+																				<Label text="Compile OpenAPI 3.0" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
 																					<padding>
 																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Service Endpoint URL" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
+																				<Label text="Compile Documentation" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
 																					<padding>
 																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Base Resource URL" GridPane.halignment="RIGHT" GridPane.rowIndex="7" GridPane.valignment="CENTER">
+																				<Label text="Service Endpoint URL" GridPane.halignment="RIGHT" GridPane.rowIndex="7" GridPane.valignment="CENTER">
 																					<padding>
 																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
 																				</Label>
-																				<Label text="Suppress OTM Extensions" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.valignment="CENTER">
+																				<Label text="Base Resource URL" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.valignment="CENTER">
+																					<padding>
+																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+																					</padding>
+																				</Label>
+																				<Label text="Suppress OTM Extensions" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
 																					<padding>
 																						<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 																					</padding>
@@ -197,19 +202,20 @@
 																				<CheckBox fx:id="compileServicesCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 																				<CheckBox fx:id="compileJsonSchemasCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 																				<CheckBox fx:id="compileSwaggerCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-																				<CheckBox fx:id="compileDocumentationCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-																				<CheckBox fx:id="suppressExtensionsCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-																				<TextField fx:id="serviceEndpointUrl" GridPane.columnIndex="1" GridPane.rowIndex="6">
+																				<CheckBox fx:id="compileOpenApiCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+																				<CheckBox fx:id="compileDocumentationCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+																				<CheckBox fx:id="suppressExtensionsCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+																				<TextField fx:id="serviceEndpointUrl" GridPane.columnIndex="1" GridPane.rowIndex="7">
 																					<GridPane.margin>
 																						<Insets right="5.0" />
 																					</GridPane.margin>
 																				</TextField>
-																				<TextField fx:id="baseResourceUrl" GridPane.columnIndex="1" GridPane.rowIndex="7">
+																				<TextField fx:id="baseResourceUrl" GridPane.columnIndex="1" GridPane.rowIndex="8">
 																					<GridPane.margin>
 																						<Insets right="5.0" />
 																					</GridPane.margin>
 																				</TextField>
-																				<HBox GridPane.rowIndex="9">
+																				<HBox GridPane.rowIndex="10">
 																					<children>
 																						<CheckBox fx:id="generateExamplesCheckbox" mnemonicParsing="false">
 																							<HBox.margin>

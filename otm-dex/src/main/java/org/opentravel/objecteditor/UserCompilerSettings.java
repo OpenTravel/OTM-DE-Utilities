@@ -42,12 +42,14 @@ public class UserCompilerSettings {
     public static void getDefaultSettings(UserSettings settings) {
         // Done on instantiation
     }
+
     // Compiler Options
     private String bindingStyle = "";
     private boolean compileSchemas = true;
     private boolean compileJsonSchemas = true;
     private boolean compileServices = true;
     private boolean compileSwagger = true;
+    private boolean compileOpenApi = true;
     private boolean compileHtml = true;
     private String serviceEndpointUrl = "http://example.com/resource";
     private String resourceBaseUrl = "http://example.com/resource";
@@ -140,6 +142,10 @@ public class UserCompilerSettings {
         return compileSwagger;
     }
 
+    public boolean isCompileOpenApi() {
+        return compileOpenApi;
+    }
+
     public boolean isGenerateExamples() {
         return generateExamples;
     }
@@ -172,6 +178,7 @@ public class UserCompilerSettings {
         setCompileJsonSchemas( Boolean.valueOf( settingsProps.getProperty( "compileJsonSchemas" ) ) );
         setCompileServices( Boolean.valueOf( settingsProps.getProperty( "compileServices" ) ) );
         setCompileSwagger( Boolean.valueOf( settingsProps.getProperty( "compileSwagger" ) ) );
+        setCompileOpenApi( Boolean.valueOf( settingsProps.getProperty( "compileOpenApi" ) ) );
         setCompileHtml( Boolean.valueOf( settingsProps.getProperty( "compileHtml" ) ) );
         setSuppressOtmExtensions( Boolean.valueOf( settingsProps.getProperty( "suppressOtmExtensions" ) ) );
         setGenerateExamples( Boolean.valueOf( settingsProps.getProperty( "generateExamples" ) ) );
@@ -207,6 +214,7 @@ public class UserCompilerSettings {
         settingsProps.put( "compileJsonSchemas", Boolean.toString( compileJsonSchemas ) );
         settingsProps.put( "compileServices", Boolean.toString( compileServices ) );
         settingsProps.put( "compileSwagger", Boolean.toString( compileSwagger ) );
+        settingsProps.put( "compileOpenApi", Boolean.toString( compileOpenApi ) );
         settingsProps.put( "compileHtml", Boolean.toString( compileHtml ) );
         putString( settingsProps, "resourceBaseUrl", resourceBaseUrl );
         putString( settingsProps, "serviceEndpointUrl", serviceEndpointUrl );
@@ -242,6 +250,10 @@ public class UserCompilerSettings {
 
     public void setCompileSwagger(boolean compileSwagger) {
         this.compileSwagger = compileSwagger;
+    }
+
+    public void setCompileOpenApi(boolean compileOpenApi) {
+        this.compileOpenApi = compileOpenApi;
     }
 
     public void setDefaultMimeTypes(String values) {
