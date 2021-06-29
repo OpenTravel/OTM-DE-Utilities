@@ -40,7 +40,7 @@ public class TestIDReferenceAttribute extends TestOtmPropertiesBase<OtmAttribute
 
     @BeforeClass
     public static void beforeClass() {
-        staticModelManager = new OtmModelManager( null, null );
+        staticModelManager = new OtmModelManager( null, null, null );
         baseObject = TestBusiness.buildOtm( staticModelManager );
         // testResource = TestResource.buildOtm( staticModelManager );
 
