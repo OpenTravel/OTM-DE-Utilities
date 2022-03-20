@@ -16,6 +16,8 @@
 
 package org.opentravel.examplehelper;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.opentravel.application.common.AbstractMainWindowController;
@@ -60,8 +62,6 @@ import org.opentravel.schemacompiler.validate.FindingMessageFormat;
 import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 import org.opentravel.schemacompiler.xml.XMLPrettyPrinter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -113,7 +113,7 @@ public class ExampleHelperController extends AbstractMainWindowController {
     public static final String FXML_FILE = "/ota2-example-helper.fxml";
 
     private static final FacetCodegenDelegateFactory facetDelegateFactory = new FacetCodegenDelegateFactory( null );
-    private static final Logger log = LoggerFactory.getLogger( ExampleHelperController.class );
+    private static final Logger log = LogManager.getLogger( ExampleHelperController.class );
 
     @FXML
     private TextField libraryText;
@@ -632,10 +632,10 @@ public class ExampleHelperController extends AbstractMainWindowController {
 
         saveButton.setDisable( true );
 
-        primaryStage.getScene().getStylesheets()
-            .add( ExampleHelperController.class.getResource( "/styles/xml-highlighting.css" ).toExternalForm() );
-        primaryStage.getScene().getStylesheets()
-            .add( ExampleHelperController.class.getResource( "/styles/json-highlighting.css" ).toExternalForm() );
+        primaryStage.getScene().getStylesheets().add( ExampleHelperController.class
+            .getResource( "/org/opentravel/examplehelper/styles/xml-highlighting.css" ).toExternalForm() );
+        primaryStage.getScene().getStylesheets().add( ExampleHelperController.class
+            .getResource( "/org/opentravel/examplehelper/styles/json-highlighting.css" ).toExternalForm() );
     }
 
     /**

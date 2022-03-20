@@ -48,7 +48,7 @@ import java.util.List;
 // NOTE - member filter depends on sub-types starting with this class name!
 public abstract class OtmEnumeration<E extends TLAbstractEnumeration>
     extends OtmLibraryMemberBase<TLAbstractEnumeration> implements OtmObject, OtmPropertyOwner {
-    // private static Log log = LogFactory.getLog( OtmEnumeration.class );
+    // private static Logger log = LogManager.getLogger( OtmEnumeration.class );
 
     public OtmEnumeration(E tlo, OtmModelManager mgr) {
         super( tlo, mgr );

@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -50,7 +50,7 @@ import javafx.scene.input.ClipboardContent;
  *
  */
 public class NamespaceLibrariesTreeTableController extends DexIncludedControllerBase<NamespacesDAO> {
-    private static Log log = LogFactory.getLog( NamespaceLibrariesTreeTableController.class );
+    private static Logger log = LogManager.getLogger( NamespaceLibrariesTreeTableController.class );
 
     private static final EventType[] publishedEvents = {DexRepositoryItemSelectionEvent.REPOSITORY_ITEM_SELECTED,
         DexRepositoryItemReplacedEvent.REPOSITORY_ITEM_REPLACED, DexModelChangeEvent.MODEL_CHANGED};

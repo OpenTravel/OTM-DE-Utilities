@@ -19,8 +19,8 @@ package org.opentravel.model.otmLibraryMembers;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,7 +46,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 public class TestCore extends TestOtmLibraryMemberBase<OtmCore> {
     private static final String CORE_NAME = "TestCore";
 
-    private static Log log = LogFactory.getLog( TestCore.class );
+    private static Logger log = LogManager.getLogger( TestCore.class );
 
     @BeforeClass
     public static void beforeClass() {

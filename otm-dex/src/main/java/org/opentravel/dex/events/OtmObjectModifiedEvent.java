@@ -27,7 +27,7 @@ import javafx.event.EventType;
  *
  */
 public class OtmObjectModifiedEvent extends DexChangeEvent {
-    // private static Log log = LogFactory.getLog( OtmObjectModifiedEvent.class );
+    // private static Logger log = LogManager.getLogger( OtmObjectModifiedEvent.class );
     private static final long serialVersionUID = 20190909L;
 
     public static final EventType<OtmObjectModifiedEvent> OBJECT_MODIFIED =

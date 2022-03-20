@@ -23,7 +23,7 @@ import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
 import org.opentravel.schemacompiler.model.TLSimple;
 
 public class SetConstraintPatternAction extends DexStringAction {
-    // private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+    // private static Logger log = LogManager.getLogger( DescriptionChangeAction.class );
 
     private static final String VETO1 = "org.opentravel.schemacompiler.TLSimple.pattern.MUST_BE_NULL_OR_BLANK";
     private static final String[] VETOKEYS = {VETO1};

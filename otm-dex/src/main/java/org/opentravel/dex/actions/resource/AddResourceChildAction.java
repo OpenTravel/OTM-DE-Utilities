@@ -32,7 +32,7 @@ import org.opentravel.schemacompiler.model.TLModelElement;
  *
  */
 public class AddResourceChildAction extends DexRunAction {
-    // private static Log log = LogFactory.getLog( AddResourceChildAction.class );
+    // private static Logger log = LogManager.getLogger( AddResourceChildAction.class );
 
     private OtmResourceChild newChild = null;
     private OtmResource newResource = null;

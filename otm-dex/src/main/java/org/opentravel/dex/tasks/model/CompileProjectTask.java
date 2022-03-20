@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.tasks.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.DexTaskSingleton;
@@ -38,7 +38,7 @@ import java.io.File;
  *
  */
 public class CompileProjectTask extends DexTaskBase<OtmProject> implements DexTaskSingleton {
-    private static Log log = LogFactory.getLog( CompileProjectTask.class );
+    private static Logger log = LogManager.getLogger( CompileProjectTask.class );
     private static final String COMPILER_SUFFIX = "CompilerOutput";
 
     private OtmProject selectedProject = null;

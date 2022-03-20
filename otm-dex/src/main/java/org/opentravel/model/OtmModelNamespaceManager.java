@@ -16,8 +16,8 @@
 
 package org.opentravel.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.otmContainers.OtmLibrary;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ import java.util.Set;
  *
  */
 public class OtmModelNamespaceManager {
-    private static Log log = LogFactory.getLog( OtmModelNamespaceManager.class );
+    private static Logger log = LogManager.getLogger( OtmModelNamespaceManager.class );
 
     // private Map<OtmLibrary,String> baseNSMap = new HashMap<>();
     private List<String> baseNSList = new ArrayList<>();

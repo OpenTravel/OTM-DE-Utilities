@@ -16,10 +16,10 @@
 
 package org.opentravel.messagevalidate;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.schemacompiler.codegen.json.JsonSchemaCodegenUtils;
 import org.opentravel.schemacompiler.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3._2001.xmlschema.OpenAttrs;
 import org.w3._2001.xmlschema.TopLevelElement;
 import org.w3c.dom.Document;
@@ -70,7 +70,7 @@ import javax.xml.validation.Validator;
  */
 public class MessageValidator {
 
-    private static final Logger log = LoggerFactory.getLogger( MessageValidator.class );
+    private static final Logger log = LogManager.getLogger( MessageValidator.class );
     private static DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
     private static JAXBContext jaxbContext;
 

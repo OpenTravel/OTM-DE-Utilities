@@ -10,7 +10,7 @@
    <children>
       <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 		<children>
-			<Label fx:id="webViewLabel" stylesheets="../@DavesViper.css" text="Web View: " />
+			<Label fx:id="webViewLabel" stylesheets="@../DavesViper.css" text="Web View: " />
 			<TextField fx:id="webURL"/>
 			<WebView fx:id="webView" minHeight="150.0" minWidth="200.0" VBox.vgrow="ALWAYS" />
 		</children>

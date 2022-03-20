@@ -18,8 +18,8 @@ package org.opentravel.model.otmContainers;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,7 +39,7 @@ import java.util.Set;
  * Verifies the functions of the <code>OtmDomain</code> class. Test contract (api methods) the Sprite needs
  */
 public class TestOtmDomain_Providers {
-    private static Log log = LogFactory.getLog( TestOtmDomain_Providers.class );
+    private static Logger log = LogManager.getLogger( TestOtmDomain_Providers.class );
 
     // private static final String defaultDomain = "http://www.example.com/domains/domain1";
     private static OtmModelManager modelManager;

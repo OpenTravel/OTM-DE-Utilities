@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -27,7 +27,7 @@ import org.opentravel.model.resource.OtmActionFacet;
  * This action remove base payload from action facet.
  */
 public class RemoveActionFacetBasePayloadAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( RemoveActionFacetBasePayloadAction.class );
+    private static Logger log = LogManager.getLogger( RemoveActionFacetBasePayloadAction.class );
 
     /**
      * An action facet with base payload set.

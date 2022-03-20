@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
@@ -37,7 +37,7 @@ import javafx.scene.text.Font;
  *
  */
 public class LabelRectangle extends Rectangle {
-    private static Log log = LogFactory.getLog( LabelRectangle.class );
+    private static Logger log = LogManager.getLogger( LabelRectangle.class );
 
     // un-comment if going to use the rectangle for mouse click handling
     // /**

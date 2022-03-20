@@ -16,8 +16,8 @@
 
 package org.opentravel.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.schemacompiler.event.ModelElementListener;
 import org.opentravel.schemacompiler.event.OwnershipEvent;
 import org.opentravel.schemacompiler.event.ValueChangeEvent;
@@ -27,7 +27,7 @@ import org.opentravel.schemacompiler.event.ValueChangeEvent;
  *
  */
 public class OtmModelElementListener implements ModelElementListener {
-    private static Log log = LogFactory.getLog( OtmModelElementListener.class );
+    private static Logger log = LogManager.getLogger( OtmModelElementListener.class );
 
     OtmObject otm;
 

@@ -41,7 +41,7 @@ import org.opentravel.schemacompiler.model.TLProperty;
  * owning object.
  */
 public class TestChoiceFacet extends TestContextualFacet {
-    // private static Log log = LogFactory.getLog( TestContextualFacet.class );
+    // private static Logger log = LogManager.getLogger( TestContextualFacet.class );
     public static final String CF_NAME = "TestCF";
 
 

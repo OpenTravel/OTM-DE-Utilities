@@ -28,7 +28,7 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
  *
  */
 public class MinorVersionFilterWidget extends FilterWidget {
-    // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
+    // private static Logger log = LogManager.getLogger( LibraryFilterWidget.class );
 
     private OtmTypeProvider provider = null;
     private OtmVersionChain chain = null;

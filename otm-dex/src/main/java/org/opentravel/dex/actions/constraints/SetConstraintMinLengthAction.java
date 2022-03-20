@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.actions.constraints;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.model.OtmObject;
@@ -26,7 +28,7 @@ import org.opentravel.schemacompiler.model.TLSimple;
  * Set the repeat count on a property.
  */
 public class SetConstraintMinLengthAction extends DexRunAction {
-    // private static Log log = LogFactory.getLog( SetRepeatCountAction.class );
+    private static Logger log = LogManager.getLogger( SetConstraintMinLengthAction.class );
 
     private static final String VETO1 =
         "org.opentravel.schemacompiler.TLSimple.constraintFacet.RESTRICTION_NOT_APPLICABLE";

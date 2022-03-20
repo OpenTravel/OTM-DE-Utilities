@@ -33,7 +33,7 @@ import javafx.scene.canvas.GraphicsContext;
  *
  */
 public class CoreObjectSprite extends MemberSprite<OtmCore> implements DexSprite {
-    // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
+    // private static Logger log = LogManager.getLogger( BusinessObjectSprite.class );
 
     double dxID;
     double dxSummary;

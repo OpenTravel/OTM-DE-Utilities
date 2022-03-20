@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.ToggleSwitch;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.ImageManager;
@@ -79,7 +79,7 @@ import javafx.scene.text.FontWeight;
  * @author dmh
  */
 public class GraphicsCanvasController extends DexIncludedControllerBase<OtmObject> {
-    private static Log log = LogFactory.getLog( GraphicsCanvasController.class );
+    private static Logger log = LogManager.getLogger( GraphicsCanvasController.class );
 
     public static final Font DEFAULT_FONT = new Font( "Monospaced", 15 );
     public static final Font DEFAULT_FONT_ITALIC = Font.font( "Monospaced", FontWeight.NORMAL, FontPosture.ITALIC, 15 );

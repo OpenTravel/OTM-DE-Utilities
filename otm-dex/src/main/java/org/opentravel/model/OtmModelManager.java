@@ -16,8 +16,8 @@
 
 package org.opentravel.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.common.DexLibraryException;
 import org.opentravel.dex.action.manager.DexActionManager;
@@ -56,6 +56,7 @@ import org.opentravel.schemacompiler.model.TLModelElement;
 import org.opentravel.schemacompiler.repository.Project;
 import org.opentravel.schemacompiler.repository.ProjectItem;
 import org.opentravel.schemacompiler.repository.ProjectManager;
+import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
 
 import java.util.ArrayList;
@@ -76,7 +77,7 @@ import javafx.concurrent.WorkerStateEvent;
  *
  */
 public class OtmModelManager implements TaskResultHandlerI {
-    private static Log log = LogFactory.getLog( OtmModelManager.class );
+    private static Logger log = LogManager.getLogger( OtmModelManager.class );
 
     public static final String OTA_EMPTY_NAME = "Empty";
     public static final String XSD_ID_NAME = "ID";

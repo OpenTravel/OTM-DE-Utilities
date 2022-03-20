@@ -20,8 +20,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.AbstractDexTest;
@@ -52,7 +52,7 @@ import java.util.List;
  * Verifies the functions of the <code>Otm Model Manager</code>.
  */
 public class TestOtmModelManager_Gets extends AbstractDexTest {
-    private static Log log = LogFactory.getLog( TestOtmModelManager_Gets.class );
+    private static Logger log = LogManager.getLogger( TestOtmModelManager_Gets.class );
 
     @BeforeClass
     public static void setupTests() throws Exception {

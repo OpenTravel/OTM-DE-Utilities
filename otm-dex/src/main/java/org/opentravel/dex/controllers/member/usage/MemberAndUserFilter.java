@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.member.usage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexFilter;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
@@ -31,7 +31,7 @@ import org.opentravel.model.otmFacets.OtmContributedFacet;
  *
  */
 public class MemberAndUserFilter implements DexFilter<OtmObject> {
-    private static Log log = LogFactory.getLog( MemberAndUserFilter.class );
+    private static Logger log = LogManager.getLogger( MemberAndUserFilter.class );
 
     @Override
     public boolean isSelected(OtmObject obj) {

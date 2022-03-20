@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.member.usage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -44,7 +44,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibraryMember> {
-    private static Log log = LogFactory.getLog( TypeUsersTreeController.class );
+    private static Logger log = LogManager.getLogger( TypeUsersTreeController.class );
 
     /*
      * FXML injected
@@ -138,7 +138,8 @@ public class TypeUsersTreeController extends DexIncludedControllerBase<OtmLibrar
 
     public PropertiesDAO getSelected() {
         return typeUsersTree.getSelectionModel().getSelectedItem() != null
-            ? typeUsersTree.getSelectionModel().getSelectedItem().getValue() : null;
+            ? typeUsersTree.getSelectionModel().getSelectedItem().getValue()
+            : null;
     }
 
     private void handleEvent(DexMemberSelectionEvent event) {

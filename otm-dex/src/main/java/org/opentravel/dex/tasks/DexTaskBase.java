@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.tasks;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 
@@ -33,7 +33,7 @@ import javafx.concurrent.Task;
  *
  */
 public abstract class DexTaskBase<T> extends Task<String> implements DexTask {
-    public static Log log = LogFactory.getLog( DexTaskBase.class );
+    public static Logger log = LogManager.getLogger( DexTaskBase.class );
 
     protected T taskData;
 

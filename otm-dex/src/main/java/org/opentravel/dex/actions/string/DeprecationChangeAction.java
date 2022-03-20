@@ -21,7 +21,7 @@ import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
 public class DeprecationChangeAction extends DexStringAction {
-    // private static Log log = LogFactory.getLog( DeprecationChangeAction.class );
+    // private static Logger log = LogManager.getLogger( DeprecationChangeAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
         return subject.isEditable() && subject.getLibrary().isChainEditable();

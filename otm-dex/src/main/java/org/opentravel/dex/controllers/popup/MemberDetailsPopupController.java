@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.popup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.member.MemberDetailsController;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 
@@ -41,7 +41,7 @@ import javafx.stage.Stage;
  *
  */
 public class MemberDetailsPopupController extends DexPopupControllerBase {
-    private static Log log = LogFactory.getLog( MemberDetailsPopupController.class );
+    private static Logger log = LogManager.getLogger( MemberDetailsPopupController.class );
 
     public static final String LAYOUT_FILE = "/Dialogs/MemberDetailsPopup.fxml";
 

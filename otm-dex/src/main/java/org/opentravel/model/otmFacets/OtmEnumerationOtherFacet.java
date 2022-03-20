@@ -30,7 +30,7 @@ import java.util.List;
  * 
  */
 public class OtmEnumerationOtherFacet extends OtmAbstractDisplayFacet {
-    // private static Log log = LogFactory.getLog( OtmEnumerationOtherFacet.class );
+    // private static Logger log = LogManager.getLogger( OtmEnumerationOtherFacet.class );
 
     private static final String OTHER = "Extension";
     private Collection<OtmObject> kids = new ArrayList<>();

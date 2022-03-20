@@ -16,9 +16,9 @@
 
 package org.opentravel.messagevalidate;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.AbstractUserSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,7 +37,7 @@ public class UserSettings extends AbstractUserSettings {
 
     private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
 
-    private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
+    private static final Logger log = LogManager.getLogger( UserSettings.class );
 
     private File projectFolder;
     private File messageFolder;
@@ -79,7 +79,7 @@ public class UserSettings extends AbstractUserSettings {
         String currentFolder = System.getProperty( "user.dir" );
         String prjFolder = settingsProps.getProperty( "projectFolder", currentFolder );
         String msgFolder = settingsProps.getProperty( "messageFolder", currentFolder );
-    
+
         setProjectFolder( new File( prjFolder ) );
         setMessageFolder( new File( msgFolder ) );
         super.load( settingsProps );
@@ -112,7 +112,7 @@ public class UserSettings extends AbstractUserSettings {
         String currentFolder = System.getProperty( "user.dir" );
         String pFolder = (projectFolder == null) ? currentFolder : projectFolder.getAbsolutePath();
         String mFolder = (messageFolder == null) ? currentFolder : messageFolder.getAbsolutePath();
-    
+
         settingsProps.put( "projectFolder", pFolder );
         settingsProps.put( "messageFolder", mFolder );
         super.save( settingsProps );

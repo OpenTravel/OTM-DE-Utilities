@@ -19,8 +19,8 @@ package org.opentravel.dex.controllers.graphics.sprites;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
@@ -42,7 +42,7 @@ import javafx.scene.canvas.GraphicsContext;
  * Verifies the functions of the <code>SelectProjectDialog</code>
  */
 public class TestBusinessSprite extends AbstractFxTest {
-    private static Log log = LogFactory.getLog( TestOtmModelManager.class );
+    private static Logger log = LogManager.getLogger( TestOtmModelManager.class );
 
     public static final boolean RUN_HEADLESS = true;
     final int WATCH_TIME = 5000; // How long to sleep so we can see what is happening. Can be 0.

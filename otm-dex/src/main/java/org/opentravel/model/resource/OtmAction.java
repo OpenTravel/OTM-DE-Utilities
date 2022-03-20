@@ -51,7 +51,7 @@ import javafx.scene.control.Tooltip;
  * 
  */
 public class OtmAction extends OtmResourceChildBase<TLAction> implements OtmResourceChild, OtmChildrenOwner {
-    // private static Log log = LogFactory.getLog( OtmAction.class );
+    // private static Logger log = LogManager.getLogger( OtmAction.class );
 
     private static final String TOOLTIP = "Specify an action request and possible responses.";
     private static final String COMMON_LABEL = "Common";

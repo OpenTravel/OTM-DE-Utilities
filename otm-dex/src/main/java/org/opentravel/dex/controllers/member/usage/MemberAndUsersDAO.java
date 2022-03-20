@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.member.usage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.model.OtmObject;
@@ -45,7 +45,7 @@ import javafx.scene.image.ImageView;
  *
  */
 public class MemberAndUsersDAO implements DexDAO<OtmObject> {
-    private static Log log = LogFactory.getLog( MemberAndUsersDAO.class );
+    private static Logger log = LogManager.getLogger( MemberAndUsersDAO.class );
 
     protected OtmObject otmObject;
 

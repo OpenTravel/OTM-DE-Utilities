@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmProperties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.otmFacets.OtmRoleEnumeration;
 import org.opentravel.schemacompiler.model.TLRole;
 
@@ -26,7 +26,7 @@ import org.opentravel.schemacompiler.model.TLRole;
  *
  */
 public class OtmRoleValue extends OtmValueProperty implements OtmProperty {
-    private static Log log = LogFactory.getLog( OtmRoleValue.class );
+    private static Logger log = LogManager.getLogger( OtmRoleValue.class );
 
     private OtmRoleEnumeration parent;
 

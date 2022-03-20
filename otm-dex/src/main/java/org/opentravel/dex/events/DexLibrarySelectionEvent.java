@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.events;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.otmContainers.OtmLibrary;
 
 import javafx.event.EventType;
@@ -29,7 +29,7 @@ import javafx.event.EventType;
  *
  */
 public class DexLibrarySelectionEvent extends DexEvent {
-    private static Log log = LogFactory.getLog( DexLibrarySelectionEvent.class );
+    private static Logger log = LogManager.getLogger( DexLibrarySelectionEvent.class );
     private static final long serialVersionUID = 20200409L;
 
     public static final EventType<DexLibrarySelectionEvent> LIBRARY_SELECTED =

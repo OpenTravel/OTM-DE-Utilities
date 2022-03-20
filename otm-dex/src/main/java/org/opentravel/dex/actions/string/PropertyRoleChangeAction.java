@@ -21,7 +21,7 @@ import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmPropertyType;
 
 public class PropertyRoleChangeAction extends DexStringAction {
-    // private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+    // private static Logger log = LogManager.getLogger( DescriptionChangeAction.class );
 
     private OtmProperty oldProperty = null;
     private OtmProperty newProperty = null;

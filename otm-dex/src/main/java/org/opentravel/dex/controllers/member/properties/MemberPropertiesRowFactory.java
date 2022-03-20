@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.member.properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.CopyPropertyAction;
 import org.opentravel.dex.actions.DexActions;
@@ -49,7 +49,7 @@ import javafx.scene.input.TransferMode;
  *
  */
 public final class MemberPropertiesRowFactory extends TreeTableRow<PropertiesDAO> {
-    private static Log log = LogFactory.getLog( MemberPropertiesRowFactory.class );
+    private static Logger log = LogManager.getLogger( MemberPropertiesRowFactory.class );
 
     private static final PseudoClass EDITABLE = PseudoClass.getPseudoClass( "editable" );
     private static final PseudoClass INHERITED = PseudoClass.getPseudoClass( "inherited" );

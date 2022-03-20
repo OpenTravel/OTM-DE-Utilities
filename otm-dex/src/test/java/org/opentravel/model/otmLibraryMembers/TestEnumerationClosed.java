@@ -38,7 +38,7 @@ import java.util.List;
 /**
  */
 public class TestEnumerationClosed extends TestOtmLibraryMemberBase<OtmEnumerationClosed> {
-    // private static Log log = LogFactory.getLog( TestEnumerationClosed.class );
+    // private static Logger log = LogManager.getLogger( TestEnumerationClosed.class );
 
     @BeforeClass
     public static void beforeClass() {

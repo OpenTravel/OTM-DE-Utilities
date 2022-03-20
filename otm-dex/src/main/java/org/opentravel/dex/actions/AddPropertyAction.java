@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmContainers.OtmLibrary;
@@ -30,7 +30,7 @@ import org.opentravel.model.otmProperties.OtmPropertyType;
  * This action creates a new property in the subject property owner.
  */
 public class AddPropertyAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( AddPropertyAction.class );
+    private static Logger log = LogManager.getLogger( AddPropertyAction.class );
 
     /**
      * Any OTM object that uses the intended model manager.

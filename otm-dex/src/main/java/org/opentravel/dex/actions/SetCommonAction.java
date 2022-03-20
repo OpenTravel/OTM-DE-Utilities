@@ -20,7 +20,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.resource.OtmAction;
 
 public class SetCommonAction extends DexBooleanAction {
-    // private static Log log = LogFactory.getLog( SetAbstractAction.class );
+    // private static Logger log = LogManager.getLogger( SetAbstractAction.class );
 
     /**
      * @param subject

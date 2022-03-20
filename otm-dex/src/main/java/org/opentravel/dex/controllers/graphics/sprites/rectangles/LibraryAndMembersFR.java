@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.controllers.graphics.sprites.ProvidersSprite;
@@ -41,7 +41,7 @@ import javafx.scene.canvas.GraphicsContext;
  *
  */
 public class LibraryAndMembersFR extends CollapsableRectangle {
-    private static Log log = LogFactory.getLog( LibraryAndMembersFR.class );
+    private static Logger log = LogManager.getLogger( LibraryAndMembersFR.class );
 
     private OtmLibrary providerLib = null;
     // private Map<OtmLibrary,List<OtmLibraryMember>> map;

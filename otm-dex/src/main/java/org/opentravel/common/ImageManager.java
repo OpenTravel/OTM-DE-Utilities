@@ -16,8 +16,8 @@
 
 package org.opentravel.common;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmObject;
 
 import java.util.EnumMap;
@@ -34,7 +34,7 @@ import javafx.stage.Stage;
  *
  */
 public class ImageManager {
-    private static Log log = LogFactory.getLog( ImageManager.class );
+    private static Logger log = LogManager.getLogger( ImageManager.class );
 
     public enum Icons {
         // Navigation
@@ -95,6 +95,7 @@ public class ImageManager {
         SIMPLE("/icons/SimpleObject.gif"),
         VWA("/icons/VWA.gif"),
         XSD_SIMPLE("/icons/XSDSimpleType.gif");
+
         private String label; // User displayed value
 
         Icons(String label) {

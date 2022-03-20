@@ -21,7 +21,7 @@ import org.opentravel.model.otmProperties.OtmProperty;
 import org.opentravel.model.otmProperties.OtmValueProperty;
 
 public class ManditoryChangeAction extends DexStringAction {
-    // private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+    // private static Logger log = LogManager.getLogger( DescriptionChangeAction.class );
     public static final String REQUIRED = "Required";
     public static final String OPTIONAL = "Optional";
 

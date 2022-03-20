@@ -26,7 +26,7 @@ import org.opentravel.objecteditor.UserSettings;
  * Verifies the functions of the <code>UserSettings</code> class.
  */
 public class TestUserSettings {
-    // private static Log log = LogFactory.getLog(TestUserSettings.class);
+    // private static Logger log = LogManager.getLogger(TestUserSettings.class);
     // static final Logger log = LoggerFactory.getLogger(TestUserSettings.class);
 
     @Test

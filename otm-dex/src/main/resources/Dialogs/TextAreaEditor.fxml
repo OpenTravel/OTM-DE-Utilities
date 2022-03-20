@@ -12,14 +12,14 @@
 
 <BorderPane fx:id="dialogBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.opentravel.dex.controllers.popup.TextAreaEditorContoller">
    <top>
-      <VBox prefHeight="32.0" prefWidth="600.0" styleClass="menu-bar" stylesheets="../@DavesViper.css" BorderPane.alignment="CENTER">
+      <VBox prefHeight="32.0" prefWidth="600.0" styleClass="menu-bar" stylesheets="@../DavesViper.css" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="dialogTitleLabel" style="-fx-alignment: center;" styleClass="bold-label" stylesheets="../@DavesViper.css" text="Text Editor">
+            <Label fx:id="dialogTitleLabel" style="-fx-alignment: center;" styleClass="bold-label" stylesheets="@../DavesViper.css" text="Text Editor">
                <VBox.margin>
                   <Insets left="20.0" top="10.0" />
                </VBox.margin>
             </Label>
-            <TextFlow fx:id="dialogTitle" prefHeight="45.0" prefWidth="600.0" styleClass="label" stylesheets="../@DavesViper.css">
+            <TextFlow fx:id="dialogTitle" prefHeight="45.0" prefWidth="600.0" styleClass="label" stylesheets="@../DavesViper.css">
                <VBox.margin>
                   <Insets left="20.0" />
                </VBox.margin>
@@ -35,12 +35,12 @@
          <children>
             <ButtonBar HBox.hgrow="ALWAYS">
                <buttons>
-                  <Button fx:id="dialogButtonClose" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-red" stylesheets="../@DavesViper.css" text="Cancel" textAlignment="CENTER">
+                  <Button fx:id="dialogButtonClose" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-red" stylesheets="@../DavesViper.css" text="Cancel" textAlignment="CENTER">
                      <opaqueInsets>
                         <Insets bottom="10.0" />
                      </opaqueInsets>
                   </Button>
-                <Button fx:id="dialogButtonOK" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-blue" stylesheets="../@DavesViper.css" text="Save" textAlignment="CENTER">
+                <Button fx:id="dialogButtonOK" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefWidth="75.0" styleClass="button-blue" stylesheets="@../DavesViper.css" text="Save" textAlignment="CENTER">
                      <opaqueInsets>
                         <Insets bottom="10.0" />
                      </opaqueInsets>
@@ -51,6 +51,6 @@
       </HBox>
    </bottom>
    <center>
-      <TextArea fx:id="editingArea" editable="false" styleClass="text" stylesheets="../@DavesViper.css" BorderPane.alignment="CENTER" />
+      <TextArea fx:id="editingArea" editable="false" styleClass="text" stylesheets="@../DavesViper.css" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

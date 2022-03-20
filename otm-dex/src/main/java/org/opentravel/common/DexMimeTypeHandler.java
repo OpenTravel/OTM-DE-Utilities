@@ -37,7 +37,7 @@ import javafx.scene.layout.HBox;
  *
  */
 public class DexMimeTypeHandler {
-    // private static Log log = LogFactory.getLog( DexMimeTypeHandler.class );
+    // private static Logger log = LogManager.getLogger( DexMimeTypeHandler.class );
 
     private OtmObject object;
     private MimeTypeMap values;

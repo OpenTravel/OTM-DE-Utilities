@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmFacets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmPropertyOwner;
 
 /**
@@ -25,7 +25,7 @@ import org.opentravel.model.OtmPropertyOwner;
  * 
  */
 public class OtmVWAAttributeFacet extends OtmAbstractDisplayFacet {
-    private static Log log = LogFactory.getLog( OtmVWAAttributeFacet.class );
+    private static Logger log = LogManager.getLogger( OtmVWAAttributeFacet.class );
 
     public OtmVWAAttributeFacet(OtmPropertyOwner parent) {
         super( parent );

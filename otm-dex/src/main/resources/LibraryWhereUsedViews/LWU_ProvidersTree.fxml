@@ -9,7 +9,7 @@
 		fx:controller="org.opentravel.dex.controllers.library.usage.ProvidersTreeController">
    <children>
       <Label fx:id="columnLabel" alignment="CENTER" contentDisplay="CENTER" textAlignment="CENTER" 
-      		prefHeight="18.0" prefWidth="300.0" stylesheets="../@DavesViper.css" text="Providers" />
+      		prefHeight="18.0" prefWidth="300.0" stylesheets="@../DavesViper.css" text="Providers" />
       <TreeView fx:id="providersTree" prefWidth="300.0" VBox.vgrow="ALWAYS" />
    </children>
 </VBox>

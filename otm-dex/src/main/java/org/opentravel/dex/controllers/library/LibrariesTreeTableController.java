@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.library;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -52,7 +52,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmModelManager> {
-    private static Log log = LogFactory.getLog( LibrariesTreeTableController.class );
+    private static Logger log = LogManager.getLogger( LibrariesTreeTableController.class );
 
     public static final String PREFIXCOLUMNLABEL = "Prefix";
     private static final String NAMELABEL = "Name";
@@ -218,7 +218,8 @@ public class LibrariesTreeTableController extends DexIncludedControllerBase<OtmM
      */
     private LibraryDAO getSelectedItem() {
         return librariesTreeTable.getSelectionModel().getSelectedItem() != null
-            ? librariesTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
+            ? librariesTreeTable.getSelectionModel().getSelectedItem().getValue()
+            : null;
     }
 
     protected List<OtmLibrary> getSelectedLibraries() {

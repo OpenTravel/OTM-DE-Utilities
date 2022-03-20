@@ -20,8 +20,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.opentravel.dex.action.manager.DexFullActionManager;
 import org.opentravel.dex.actions.string.PropertyRoleChangeAction;
@@ -58,7 +58,7 @@ import java.util.List;
  * <p>
  */
 public class TestOtmPropertiesBase<L extends OtmPropertyBase<?>> {
-    private static Log log = LogFactory.getLog( TestOtmPropertiesBase.class );
+    private static Logger log = LogManager.getLogger( TestOtmPropertiesBase.class );
 
     protected static OtmModelManager staticModelManager = null;
     protected static OtmResource testResource;

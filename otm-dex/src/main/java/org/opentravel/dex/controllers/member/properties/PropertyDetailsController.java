@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.member.properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
@@ -59,7 +59,7 @@ import javafx.scene.layout.GridPane;
  *
  */
 public class PropertyDetailsController extends DexIncludedControllerBase<OtmObject> {
-    private static Log log = LogFactory.getLog( PropertyDetailsController.class );
+    private static Logger log = LogManager.getLogger( PropertyDetailsController.class );
 
     // All event types fired by this controller.
     private static final EventType[] publishedEvents = {OtmObjectModifiedEvent.OBJECT_MODIFIED};

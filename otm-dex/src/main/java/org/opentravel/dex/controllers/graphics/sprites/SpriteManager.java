@@ -51,7 +51,7 @@ import javafx.scene.paint.Paint;
  * @author dmh
  */
 public class SpriteManager {
-    // private static Log log = LogFactory.getLog( SpriteManager.class );
+    // private static Logger log = LogManager.getLogger( SpriteManager.class );
 
     private SettingsManager settingsManager;
     private Pane spritePane;

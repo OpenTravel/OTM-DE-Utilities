@@ -16,8 +16,8 @@
 
 package org.opentravel.repositoryviewer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.DexMainControllerBase;
@@ -38,7 +38,7 @@ import javafx.stage.Stage;
  *
  */
 public class RepositoryViewerController extends DexMainControllerBase implements DexMainController {
-    private static Log log = LogFactory.getLog( RepositoryViewerController.class );
+    private static Logger log = LogManager.getLogger( RepositoryViewerController.class );
 
     // Let FXML inject controllers
     @FXML

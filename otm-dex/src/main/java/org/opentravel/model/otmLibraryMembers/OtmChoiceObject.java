@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
@@ -40,7 +40,7 @@ import java.util.HashSet;
  * 
  */
 public class OtmChoiceObject extends OtmComplexObjects<TLChoiceObject> {
-    private static Log log = LogFactory.getLog( OtmChoiceObject.class );
+    private static Logger log = LogManager.getLogger( OtmChoiceObject.class );
 
     public OtmChoiceObject(TLChoiceObject tlo, OtmModelManager mgr) {
         super( tlo, mgr );

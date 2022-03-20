@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>org.opentravel.otm</groupId>
 		<artifactId>ota2-utilities-parent-pom</artifactId>
-		<version>4.0-SNAPSHOT</version>
+		<version>5.0-SNAPSHOT</version>
 	</parent>
 	
 	<properties>

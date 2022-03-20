@@ -21,7 +21,7 @@ import org.opentravel.model.OtmTypeUser;
 import org.opentravel.schemacompiler.model.TLExampleOwner;
 
 public class ExampleChangeAction extends DexStringAction {
-    // private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+    // private static Logger log = LogManager.getLogger( DescriptionChangeAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
         return (subject.isEditable() && subject instanceof OtmTypeUser && subject.getTL() instanceof TLExampleOwner

@@ -24,7 +24,7 @@ import javafx.scene.image.Image;
 public class Images {
 
     public static final Image launcherIcon =
-        new Image( Images.class.getResourceAsStream( "/images/otm_model_check.png" ) );
+        new Image( Images.class.getResourceAsStream( "/org/opentravel/modelcheck/images/otm_model_check.png" ) );
 
     /**
      * Private constructor to prevent instantiation of this class.

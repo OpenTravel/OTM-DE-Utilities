@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.events;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmContributedFacet;
@@ -34,7 +34,7 @@ import javafx.scene.control.TreeItem;
  *
  */
 public class DexMemberSelectionEvent extends DexNavigationEvent {
-    private static Log log = LogFactory.getLog( DexMemberSelectionEvent.class );
+    private static Logger log = LogManager.getLogger( DexMemberSelectionEvent.class );
     private static final long serialVersionUID = 20190409L;
 
     public static final EventType<DexMemberSelectionEvent> MEMBER_SELECTED =

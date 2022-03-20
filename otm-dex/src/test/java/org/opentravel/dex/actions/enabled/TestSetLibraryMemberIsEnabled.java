@@ -18,8 +18,8 @@ package org.opentravel.dex.actions.enabled;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -29,7 +29,7 @@ import org.opentravel.model.otmProperties.OtmProperty;
  * SetLibraryAction
  */
 public class TestSetLibraryMemberIsEnabled extends TestActionsIsEnabledBase {
-    private static Log log = LogFactory.getLog( TestSetLibraryMemberIsEnabled.class );
+    private static Logger log = LogManager.getLogger( TestSetLibraryMemberIsEnabled.class );
 
     /**
      */

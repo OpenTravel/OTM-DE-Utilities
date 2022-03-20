@@ -16,9 +16,9 @@
 
 package org.opentravel.messagevalidate;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.OtmApplicationRuntimeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
@@ -34,7 +34,7 @@ import java.io.Reader;
  */
 public class FileSystemResourceResolver implements LSResourceResolver {
 
-    private static final Logger log = LoggerFactory.getLogger( FileSystemResourceResolver.class );
+    private static final Logger log = LogManager.getLogger( FileSystemResourceResolver.class );
 
     private File sourceFolder;
     private File builtInsFolder;

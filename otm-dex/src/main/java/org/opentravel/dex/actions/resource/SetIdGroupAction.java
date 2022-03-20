@@ -21,7 +21,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.resource.OtmParameterGroup;
 
 public class SetIdGroupAction extends DexBooleanAction {
-    // private static Log log = LogFactory.getLog( SetAbstractAction.class );
+    // private static Logger log = LogManager.getLogger( SetAbstractAction.class );
 
     /**
      * @param subject

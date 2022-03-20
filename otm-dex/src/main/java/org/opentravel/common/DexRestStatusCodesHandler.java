@@ -34,7 +34,7 @@ import javafx.scene.layout.HBox;
  *
  */
 public class DexRestStatusCodesHandler {
-    // private static Log log = LogFactory.getLog( DexRestStatusCodesHandler.class );
+    // private static Logger log = LogManager.getLogger( DexRestStatusCodesHandler.class );
 
     private OtmObject object;
     private RestStatusCodesMap codes;

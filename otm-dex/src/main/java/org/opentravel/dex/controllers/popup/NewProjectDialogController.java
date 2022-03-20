@@ -50,7 +50,7 @@ import javafx.stage.Stage;
  *
  */
 public class NewProjectDialogController extends DexPopupControllerBase {
-    // private static Log log = LogFactory.getLog( NewProjectDialogController.class );
+    // private static Logger log = LogManager.getLogger( NewProjectDialogController.class );
 
     public static final String LAYOUT_FILE = "/Dialogs/NewProjectDialog.fxml";
 

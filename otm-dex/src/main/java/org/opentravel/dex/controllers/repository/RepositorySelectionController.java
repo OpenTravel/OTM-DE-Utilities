@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -44,7 +44,7 @@ import javafx.scene.control.Label;
  *
  */
 public class RepositorySelectionController extends DexIncludedControllerBase<RepositoryManager> {
-    private static Log log = LogFactory.getLog( RepositorySelectionController.class );
+    private static Logger log = LogManager.getLogger( RepositorySelectionController.class );
 
     private static final String LOCAL_REPO = "Local";
 

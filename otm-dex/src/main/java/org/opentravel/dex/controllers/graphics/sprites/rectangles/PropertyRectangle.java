@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
 import org.opentravel.dex.controllers.graphics.sprites.MemberSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
@@ -44,7 +44,7 @@ import javafx.scene.paint.Paint;
  *
  */
 public class PropertyRectangle extends ClickableRectangle {
-    private static Log log = LogFactory.getLog( PropertyRectangle.class );
+    private static Logger log = LogManager.getLogger( PropertyRectangle.class );
 
     // /**
     // * Render methods that create rectangles may set the event to run if the implement this interface.

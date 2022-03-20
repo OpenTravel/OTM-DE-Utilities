@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmProperties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
@@ -44,7 +44,7 @@ import org.opentravel.schemacompiler.model.TLRoleEnumeration;
  *
  */
 public class OtmPropertyFactory {
-    private static Log log = LogFactory.getLog( OtmPropertyFactory.class );
+    private static Logger log = LogManager.getLogger( OtmPropertyFactory.class );
 
     private OtmPropertyFactory() {
         // NO-OP - only static methods

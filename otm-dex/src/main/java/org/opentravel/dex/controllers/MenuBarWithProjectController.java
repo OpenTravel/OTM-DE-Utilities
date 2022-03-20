@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.dex.action.manager.DexActionManager;
@@ -80,7 +80,7 @@ import javafx.stage.Stage;
  *
  */
 public class MenuBarWithProjectController extends DexIncludedControllerBase<String> implements TaskResultHandlerI {
-    private static Log log = LogFactory.getLog( MenuBarWithProjectController.class );
+    private static Logger log = LogManager.getLogger( MenuBarWithProjectController.class );
 
     // FUTURE - need to add ability to unset user settings
 

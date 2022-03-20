@@ -20,8 +20,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.action.manager.DexFullActionManager;
@@ -50,7 +50,7 @@ import java.util.Map.Entry;
  */
 public class TestLibraryMemberBase {
 
-    private static Log log = LogFactory.getLog( TestLibraryMemberBase.class );
+    private static Logger log = LogManager.getLogger( TestLibraryMemberBase.class );
 
     protected static OtmModelManager staticModelManager = null;
     protected static OtmLibraryMember subject;

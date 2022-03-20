@@ -39,7 +39,7 @@ import javafx.scene.image.ImageView;
  *
  */
 public class ErrorsAndWarningsDAO implements DexDAO<OtmObject> {
-    // private static Log log = LogFactory.getLog( ErrorsAndWarningsDAO.class );
+    // private static Logger log = LogManager.getLogger( ErrorsAndWarningsDAO.class );
 
     protected OtmObject otmObject;
     protected ValidationFinding finding;

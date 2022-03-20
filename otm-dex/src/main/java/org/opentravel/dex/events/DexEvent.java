@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.events;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.controllers.member.MemberFilterController;
@@ -57,7 +57,7 @@ import javafx.event.EventType;
  *
  */
 public abstract class DexEvent extends AbstractOtmEvent {
-    private static Log log = LogFactory.getLog( DexEvent.class );
+    private static Logger log = LogManager.getLogger( DexEvent.class );
     private static final long serialVersionUID = 20190406L;
     public static final EventType<DexEvent> DEX_ALL = new EventType<>( "DEX_ALL" );
 

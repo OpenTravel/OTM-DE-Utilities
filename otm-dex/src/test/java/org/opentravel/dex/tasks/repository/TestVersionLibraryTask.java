@@ -18,8 +18,8 @@ package org.opentravel.dex.tasks.repository;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.AbstractDexTest;
@@ -43,7 +43,7 @@ import org.opentravel.schemacompiler.repository.RepositoryItemState;
  *
  */
 public class TestVersionLibraryTask extends AbstractDexTest {
-    private static Log log = LogFactory.getLog( TestVersionLibraryTask.class );
+    private static Logger log = LogManager.getLogger( TestVersionLibraryTask.class );
 
     @BeforeClass
     public static void setupTests() throws Exception {

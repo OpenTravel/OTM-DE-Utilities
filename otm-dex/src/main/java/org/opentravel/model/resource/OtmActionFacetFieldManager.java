@@ -16,8 +16,8 @@
 
 package org.opentravel.model.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.DexEditField;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
@@ -40,7 +40,7 @@ import javafx.scene.control.Spinner;
  * 
  */
 public class OtmActionFacetFieldManager {
-    private static Log log = LogFactory.getLog( OtmActionFacetFieldManager.class );
+    private static Logger log = LogManager.getLogger( OtmActionFacetFieldManager.class );
 
     private static final String REFERENCE_FACET_LABEL = "Reference Facet";
     private static final String REFERENCE_FACET_TOOLTIP =

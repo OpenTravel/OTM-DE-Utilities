@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmChildrenOwner;
@@ -78,7 +78,7 @@ import javafx.beans.property.StringProperty;
  */
 public abstract class OtmLibraryMemberBase<T extends TLModelElement> extends OtmModelElement<TLModelElement>
     implements OtmLibraryMember, OtmTypeProvider, OtmChildrenOwner {
-    private static Log log = LogFactory.getLog( OtmLibraryMemberBase.class );
+    private static Logger log = LogManager.getLogger( OtmLibraryMemberBase.class );
 
     protected OtmModelManager mgr = null;
 

@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.popup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryInfoType;
 import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryPermission;
 import org.opentravel.schemacompiler.repository.RemoteRepository;
@@ -54,7 +54,7 @@ import javafx.stage.Stage;
  *
  */
 public class RepositoryLoginDialogContoller extends DexPopupControllerBase {
-    private static Log log = LogFactory.getLog( RepositoryLoginDialogContoller.class );
+    private static Logger log = LogManager.getLogger( RepositoryLoginDialogContoller.class );
 
     public static final String LAYOUT_FILE = "/RepositoryViews/RepositoryLoginDialog.fxml";
 

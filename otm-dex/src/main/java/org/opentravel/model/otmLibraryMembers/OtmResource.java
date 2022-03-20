@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.DexMimeTypeHandler;
 import org.opentravel.common.ImageManager;
@@ -80,7 +80,7 @@ import javafx.scene.layout.HBox;
  * 
  */
 public class OtmResource extends OtmLibraryMemberBase<TLResource> implements OtmTypeUser {
-    private static Log log = LogFactory.getLog( OtmResource.class );
+    private static Logger log = LogManager.getLogger( OtmResource.class );
 
     public static final String NONE = "None";
     public static final String SUBGROUP = "Substitution Group";

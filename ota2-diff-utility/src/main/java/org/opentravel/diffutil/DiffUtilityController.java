@@ -16,6 +16,8 @@
 
 package org.opentravel.diffutil;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.BrowseRepositoryDialogController;
 import org.opentravel.application.common.FileChooserDelegate;
@@ -50,8 +52,6 @@ import org.opentravel.schemacompiler.util.SchemaCompilerException;
 import org.opentravel.schemacompiler.validate.FindingMessageFormat;
 import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -98,7 +98,7 @@ public class DiffUtilityController extends AbstractMainWindowController {
     private static final String LOADING_LIBRARY_MSG = "Loading Library: ";
     private static final String HTML_EXTENSION = ".html";
 
-    private static final Logger log = LoggerFactory.getLogger( DiffUtilityController.class );
+    private static final Logger log = LogManager.getLogger( DiffUtilityController.class );
 
     public static final String FXML_FILE = "/ota2-diff-util.fxml";
 

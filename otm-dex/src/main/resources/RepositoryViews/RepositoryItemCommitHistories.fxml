@@ -9,7 +9,7 @@
    <children>
       <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 		<children>
-			<Label fx:id="historyLabel" stylesheets="../@DavesViper.css" text="History" />
+			<Label fx:id="historyLabel" stylesheets="@../DavesViper.css" text="History" />
 			<TableView fx:id="commitHistoriesTable" minHeight="150.0" minWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS" />
 		</children>
 	  </VBox>

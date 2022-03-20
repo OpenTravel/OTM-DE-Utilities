@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.action.manager.DexActionManagerBase;
 import org.opentravel.dex.action.manager.DexMinorVersionActionManager;
@@ -48,7 +48,7 @@ import javax.xml.namespace.QName;
  * TYPECHANGE(SetAssignedTypeAction.class, OtmObjectChangeEvent.class),
  */
 public class SetAssignedTypeAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( SetAssignedTypeAction.class );
+    private static Logger log = LogManager.getLogger( SetAssignedTypeAction.class );
 
     // 4/22/2020 - veto1 is still valid, the name will have to change to get rid of warning
     // private static final String VETO1 = "org.opentravel.schemacompiler.TLProperty.name.ELEMENT_REF_NAME_MISMATCH";

@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.events;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.repository.NamespacesDAO;
 
 import javafx.event.EventType;
@@ -29,7 +29,7 @@ import javafx.event.EventType;
  *
  */
 public class DexRepositoryNamespaceSelectionEvent extends DexEvent {
-    private static Log log = LogFactory.getLog( DexRepositoryNamespaceSelectionEvent.class );
+    private static Logger log = LogManager.getLogger( DexRepositoryNamespaceSelectionEvent.class );
     private static final long serialVersionUID = 20190409L;
 
     public static final EventType<DexRepositoryNamespaceSelectionEvent> REPOSITORY_NS_SELECTED =

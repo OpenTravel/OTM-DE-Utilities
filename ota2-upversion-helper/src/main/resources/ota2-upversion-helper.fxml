@@ -193,7 +193,7 @@
                                              <graphic>
                                                 <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
-                                                      <Image url="@images/arrow_left.png" />
+                                                      <Image url="@org/opentravel/upversion/images/arrow_left.png" />
                                                    </image>
                                                 </ImageView>
                                              </graphic>
@@ -205,7 +205,7 @@
                                              <graphic>
                                                 <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
-                                                      <Image url="@images/arrow_right.png" />
+                                                      <Image url="@org/opentravel/upversion/images/arrow_right.png" />
                                                    </image>
                                                 </ImageView>
                                              </graphic>

@@ -3,17 +3,12 @@
           "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
           "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 
-<!--
-    Checkstyle configuration that checks the Google coding conventions from Google Java Style
-    that can be found at https://google.github.io/styleguide/javaguide.html.
-
-    Checkstyle is very configurable. Be sure to read the documentation at
-    http://checkstyle.sf.net (or in your downloaded distribution).
-
-    To completely disable a check, just comment it out or delete it from the file.
-
-    Authors: Max Vetrenko, Ruslan Diachenko, Roman Ivanov.
- -->
+<!-- Checkstyle configuration that checks the Google coding conventions from 
+	Google Java Style that can be found at https://google.github.io/styleguide/javaguide.html. 
+	Checkstyle is very configurable. Be sure to read the documentation at http://checkstyle.sf.net 
+	(or in your downloaded distribution). To completely disable a check, just 
+	comment it out or delete it from the file. Authors: Max Vetrenko, Ruslan 
+	Diachenko, Roman Ivanov. -->
 
 <module name="Checker">
 	<property name="charset" value="UTF-8" />
@@ -27,6 +22,12 @@
 		<property name="eachLine" value="true" />
 	</module>
 
+	<module name="LineLength">
+		<property name="max" value="120" />
+		<property name="ignorePattern"
+			value="^package.*|^import.*|a href|href|http://|https://|ftp://|\* @see*|\{@link*" />
+	</module>
+
 	<module name="TreeWalker">
 		<module name="OuterTypeFilename" />
 		<module name="IllegalTokenText">
@@ -37,14 +38,10 @@
 				value="Avoid using corresponding octal or Unicode escape." />
 		</module>
 		<module name="AvoidEscapedUnicodeCharacters">
-			<property name="allowEscapesForControlCharacters" value="true" />
+			<property name="allowEscapesForControlCharacters"
+				value="true" />
 			<property name="allowByTailComment" value="true" />
 			<property name="allowNonPrintableEscapes" value="true" />
-		</module>
-		<module name="LineLength">
-			<property name="max" value="120" />
-			<property name="ignorePattern"
-				value="^package.*|^import.*|a href|href|http://|https://|ftp://|\* @see*|\{@link*" />
 		</module>
 		<module name="AvoidStarImport" />
 		<module name="OneTopLevelClass" />
@@ -56,7 +53,12 @@
 		</module>
 		<module name="NeedBraces" />
 		<module name="LeftCurly">
-			<property name="maxLineLength" value="100" />
+			<property name="tokens"
+				value="ANNOTATION_DEF, CLASS_DEF, CTOR_DEF, ENUM_CONSTANT_DEF, ENUM_DEF,
+                    INTERFACE_DEF, LAMBDA, LITERAL_CASE, LITERAL_CATCH, LITERAL_DEFAULT,
+                    LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF,
+                    LITERAL_SWITCH, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, METHOD_DEF,
+                    OBJBLOCK, STATIC_INIT" />
 		</module>
 		<module name="RightCurly" />
 		<module name="RightCurly">
@@ -98,7 +100,8 @@
 				value="Package name ''{0}'' must match pattern ''{1}''." />
 		</module>
 		<module name="TypeName">
-			<message key="name.invalidPattern" value="Type name ''{0}'' must match pattern ''{1}''." />
+			<message key="name.invalidPattern"
+				value="Type name ''{0}'' must match pattern ''{1}''." />
 		</module>
 		<module name="MemberName">
 			<property name="format" value="^[a-z][a-zA-Z0-9]*$" />
@@ -123,17 +126,20 @@
 				value="Local variable name ''{0}'' must match pattern ''{1}''." />
 		</module>
 		<module name="ClassTypeParameterName">
-			<property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)" />
+			<property name="format"
+				value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)" />
 			<message key="name.invalidPattern"
 				value="Class type name ''{0}'' must match pattern ''{1}''." />
 		</module>
 		<module name="MethodTypeParameterName">
-			<property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)" />
+			<property name="format"
+				value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)" />
 			<message key="name.invalidPattern"
 				value="Method type name ''{0}'' must match pattern ''{1}''." />
 		</module>
 		<module name="InterfaceTypeParameterName">
-			<property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)" />
+			<property name="format"
+				value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)" />
 			<message key="name.invalidPattern"
 				value="Interface type name ''{0}'' must match pattern ''{1}''." />
 		</module>
@@ -159,14 +165,16 @@
 		<module name="AbbreviationAsWordInName">
 			<property name="ignoreFinal" value="false" />
 			<property name="allowedAbbreviationLength" value="3" />
-			<property name="allowedAbbreviations" value="WSDL,JSON,IDREF,JAXB,JNDI,SMTP,NTLM" />
+			<property name="allowedAbbreviations"
+				value="WSDL,JSON,IDREF,JAXB,JNDI,SMTP,NTLM" />
 		</module>
 		<module name="OverloadMethodsDeclarationOrder" />
-		<!--module name="VariableDeclarationUsageDistance" /-->
+		<!--module name="VariableDeclarationUsageDistance" / -->
 		<module name="CustomImportOrder">
 			<property name="specialImportsRegExp" value="org" />
 			<property name="thirdPartyPackageRegExp" value="com" />
-			<property name="sortImportsInGroupAlphabetically" value="true" />
+			<property name="sortImportsInGroupAlphabetically"
+				value="true" />
 			<property name="customImportOrderRules"
 				value="STATIC###SPECIAL_IMPORTS###THIRD_PARTY_PACKAGE###STANDARD_JAVA_PACKAGE" />
 		</module>
@@ -182,31 +190,28 @@
 		</module>
 		<module name="AnnotationLocation">
 			<property name="tokens" value="VARIABLE_DEF" />
-			<property name="allowSamelineMultipleAnnotations" value="true" />
+			<property name="allowSamelineMultipleAnnotations"
+				value="true" />
 		</module>
 		<module name="NonEmptyAtclauseDescription" />
 		<module name="JavadocTagContinuationIndentation" />
-        <!--
-        <module name="SummaryJavadoc">
-            <property name="forbiddenSummaryFragments" value="^@return the *|^This method returns |^A [{]@code [a-zA-Z0-9]+[}]( is a )"/>
-        </module>
-        -->
+		<!-- <module name="SummaryJavadoc"> <property name="forbiddenSummaryFragments" 
+			value="^@return the *|^This method returns |^A [{]@code [a-zA-Z0-9]+[}]( 
+			is a )"/> </module> -->
 		<module name="JavadocParagraph">
 			<property name="allowNewlineParagraph" value="false" />
 		</module>
 		<module name="AtclauseOrder">
-			<property name="tagOrder" value="@param, @return, @throws, @deprecated" />
+			<property name="tagOrder"
+				value="@param, @return, @throws, @deprecated" />
 			<property name="target"
 				value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF, VARIABLE_DEF" />
 		</module>
 		<module name="JavadocMethod">
 			<property name="scope" value="public" />
 			<property name="allowMissingParamTags" value="true" />
-			<property name="allowMissingThrowsTags" value="true" />
 			<property name="allowMissingReturnTag" value="true" />
-			<property name="minLineCount" value="2" />
 			<property name="allowedAnnotations" value="Override, Test" />
-			<property name="allowThrowsTagsForSubclasses" value="true" />
 		</module>
 		<module name="MethodName">
 			<property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9_]*$" />

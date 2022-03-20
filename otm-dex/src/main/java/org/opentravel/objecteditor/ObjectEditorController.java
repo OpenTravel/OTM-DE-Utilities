@@ -16,8 +16,8 @@
 
 package org.opentravel.objecteditor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.DexStyleSheetHandler;
 import org.opentravel.dex.controllers.DexMainControllerBase;
 import org.opentravel.dex.controllers.DexStatusController;
@@ -44,7 +44,7 @@ import javafx.stage.Stage;
  *
  */
 public class ObjectEditorController extends DexMainControllerBase {
-    private static Log log = LogFactory.getLog( ObjectEditorController.class );
+    private static Logger log = LogManager.getLogger( ObjectEditorController.class );
 
     @FXML
     private MenuBarWithProjectController menuBarWithProjectController;

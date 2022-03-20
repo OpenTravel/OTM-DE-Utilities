@@ -33,7 +33,7 @@ import org.opentravel.model.resource.OtmParameterGroup;
  *
  */
 public class DeleteResourceChildAction extends DexRunAction {
-    // private static Log log = LogFactory.getLog( AddResourceChildAction.class );
+    // private static Logger log = LogManager.getLogger( AddResourceChildAction.class );
 
     public static boolean isEnabled(OtmObject otm) {
         if (otm instanceof OtmResourceChild) {

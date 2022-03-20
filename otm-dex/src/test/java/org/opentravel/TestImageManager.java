@@ -18,8 +18,8 @@ package org.opentravel;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
@@ -41,7 +41,7 @@ public class TestImageManager extends AbstractFxTest {
 
     public static final boolean RUN_HEADLESS = true;
 
-    private static Log log = LogFactory.getLog( TestImageManager.class );
+    private static Logger log = LogManager.getLogger( TestImageManager.class );
 
     private static OtmModelManager staticModelManager = null;
 

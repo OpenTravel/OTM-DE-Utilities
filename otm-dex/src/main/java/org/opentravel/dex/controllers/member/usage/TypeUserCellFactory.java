@@ -33,7 +33,7 @@ import javafx.scene.image.ImageView;
  */
 @SuppressWarnings("squid:MaximumInheritanceDepth")
 public final class TypeUserCellFactory extends TreeCell<PropertiesDAO> {
-    // private static Log log = LogFactory.getLog( TypeUserCellFactory.class );
+    // private static Logger log = LogManager.getLogger( TypeUserCellFactory.class );
 
     private static final PseudoClass EDITABLE = PseudoClass.getPseudoClass( "editable" );
     private static final PseudoClass DIVIDER = PseudoClass.getPseudoClass( "divider" );

@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
@@ -35,7 +35,7 @@ import javafx.scene.text.Font;
  *
  */
 public class Demos {
-    private static Log log = LogFactory.getLog( Demos.class );
+    private static Logger log = LogManager.getLogger( Demos.class );
 
     private Demos() {
         // NO-OP static methods

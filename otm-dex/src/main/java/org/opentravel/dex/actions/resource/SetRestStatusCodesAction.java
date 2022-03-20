@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.actions.resource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.RestStatusCodesMap;
 import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.model.OtmObject;
@@ -25,7 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class SetRestStatusCodesAction extends DexRunAction {
-    // private static Log log = LogFactory.getLog( SetRestStatusCodesAction.class );
+    private static Logger log = LogManager.getLogger( SetRestStatusCodesAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
         return (subject.isEditable() && subject instanceof OtmActionResponse);

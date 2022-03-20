@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.tasks.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
@@ -33,7 +33,7 @@ import org.opentravel.schemacompiler.repository.RepositoryException;
  *
  */
 public class CommitLibraryTask extends DexTaskBase<OtmLibrary> {
-    private static Log log = LogFactory.getLog( CommitLibraryTask.class );
+    private static Logger log = LogManager.getLogger( CommitLibraryTask.class );
 
     public static final String TASKNAME = "Committing";
     String remarks = "";

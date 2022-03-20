@@ -24,7 +24,7 @@ import javafx.scene.image.Image;
 public class Images {
 
     public static final Image launcherIcon =
-        new Image( Images.class.getResourceAsStream( "/images/otm_example_helper.png" ) );
+        new Image( Images.class.getResourceAsStream( "/org/opentravel/examplehelper/images/otm_example_helper.png" ) );
 
     /**
      * Private constructor to prevent instantiation.

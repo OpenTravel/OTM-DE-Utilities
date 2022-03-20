@@ -16,8 +16,8 @@
 
 package org.opentravel.common;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.resource.OtmActionResponse;
 import org.opentravel.model.resource.RestStatusCodes;
@@ -35,7 +35,7 @@ import java.util.TreeMap;
  *
  */
 public class RestStatusCodesMap {
-    private static Log log = LogFactory.getLog( RestStatusCodesMap.class );
+    private static Logger log = LogManager.getLogger( RestStatusCodesMap.class );
 
     private SortedMap<RestStatusCodes,Boolean> values = new TreeMap<>();
 

@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmProperties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelElement;
@@ -33,7 +33,7 @@ import org.opentravel.schemacompiler.model.TLModelElement;
  * 
  */
 public class OtmIndicator<TL extends TLIndicator> extends OtmPropertyBase<TLIndicator> {
-    private static Log log = LogFactory.getLog( OtmIndicator.class );
+    private static Logger log = LogManager.getLogger( OtmIndicator.class );
 
     /**
      * Create a new indicator and set the parent. Adds tl to parent's tl.

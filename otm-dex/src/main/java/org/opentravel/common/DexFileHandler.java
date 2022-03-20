@@ -16,8 +16,8 @@
 
 package org.opentravel.common;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.DirectoryChooserDelegate;
 import org.opentravel.application.common.FileChooserDelegate;
@@ -56,7 +56,7 @@ import javafx.stage.Stage;
  *
  */
 public class DexFileHandler extends AbstractMainWindowController {
-    private static Log log = LogFactory.getLog( DexFileHandler.class );
+    private static Logger log = LogManager.getLogger( DexFileHandler.class );
 
     public static final String PROJECT_FILE_EXTENSION = ".otp";
     public static final String LIBRARY_FILE_EXTENSION = ".otm";

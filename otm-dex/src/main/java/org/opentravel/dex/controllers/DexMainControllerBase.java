@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.OtmEventUser;
 import org.opentravel.application.common.StatusType;
@@ -55,7 +55,7 @@ import javafx.stage.Stage;
  */
 public abstract class DexMainControllerBase extends AbstractMainWindowController
     implements DexMainController, TaskResultHandlerI {
-    private static Log log = LogFactory.getLog( DexMainControllerBase.class );
+    private static Logger log = LogManager.getLogger( DexMainControllerBase.class );
 
     protected DexMainController mainController;
     protected ImageManager imageMgr = null;

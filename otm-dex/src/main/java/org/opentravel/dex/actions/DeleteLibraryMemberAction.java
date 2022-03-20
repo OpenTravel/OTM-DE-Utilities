@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
 import org.opentravel.model.OtmTypeUser;
@@ -33,7 +33,7 @@ import java.util.Map.Entry;
  * This action deletes a library member.
  */
 public class DeleteLibraryMemberAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( DeleteLibraryMemberAction.class );
+    private static Logger log = LogManager.getLogger( DeleteLibraryMemberAction.class );
 
 
     /**

@@ -18,8 +18,8 @@ package org.opentravel.model.otmProperties;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.opentravel.dex.actions.AddAliasAction;
 import org.opentravel.model.OtmObject;
@@ -48,7 +48,7 @@ import java.util.List;
  * <p>
  */
 public class TestOtmTypeProviderInterface {
-    private static Log log = LogFactory.getLog( TestOtmTypeProviderInterface.class );
+    private static Logger log = LogManager.getLogger( TestOtmTypeProviderInterface.class );
 
     // @BeforeClass
     // public static void beforeClass() {

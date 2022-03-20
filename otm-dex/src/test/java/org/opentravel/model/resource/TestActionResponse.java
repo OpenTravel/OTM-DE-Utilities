@@ -18,8 +18,8 @@ package org.opentravel.model.resource;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelElement;
@@ -46,7 +46,7 @@ import org.opentravel.schemacompiler.model.TLReferenceType;
  */
 public class TestActionResponse<L extends TestOtmResourceBase<OtmActionResponse>>
     extends TestOtmResourceBase<OtmActionResponse> {
-    private static Log log = LogFactory.getLog( TestActionResponse.class );
+    private static Logger log = LogManager.getLogger( TestActionResponse.class );
 
     @BeforeClass
     public static void beforeClass() {

@@ -20,6 +20,8 @@ import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.AbstractUserSettings;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
 
+import java.net.URL;
+
 /**
  * JavaFX application for the OTM Upversion Helper.
  */
@@ -52,8 +54,8 @@ public class UpversionHelperApplication extends AbstractOTMApplication {
      * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowFxmlLocation()
      */
     @Override
-    protected String getMainWindowFxmlLocation() {
-        return UpversionHelperController.FXML_FILE;
+    protected URL getMainWindowFxmlLocation() {
+        return UpversionHelperApplication.class.getResource( UpversionHelperController.FXML_FILE );
     }
 
     /**

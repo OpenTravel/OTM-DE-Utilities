@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.member;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexFilter;
 import org.opentravel.dex.controllers.DexFilterWidget;
@@ -59,7 +59,7 @@ import javafx.scene.layout.HBox;
  *
  */
 public class MemberFilterController extends DexIncludedControllerBase<Void> implements DexFilter<OtmLibraryMember> {
-    private static Log log = LogFactory.getLog( MemberFilterController.class );
+    private static Logger log = LogManager.getLogger( MemberFilterController.class );
 
     // All event types fired by this controller.
     private static final EventType[] publishedEvents =

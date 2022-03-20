@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.graphics.sprites.rectangles.Rectangle;
 
@@ -37,7 +37,7 @@ import javafx.scene.text.Text;
  *
  */
 public class GraphicsUtils {
-    private static Log log = LogFactory.getLog( GraphicsUtils.class );
+    private static Logger log = LogManager.getLogger( GraphicsUtils.class );
 
     // private static final double LABEL_MARGIN = 4;
 

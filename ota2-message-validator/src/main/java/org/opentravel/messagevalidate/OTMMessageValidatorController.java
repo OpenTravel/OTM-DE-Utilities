@@ -16,6 +16,8 @@
 
 package org.opentravel.messagevalidate;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.FileChooserDelegate;
 import org.opentravel.application.common.OtmApplicationException;
@@ -27,8 +29,6 @@ import org.opentravel.schemacompiler.util.SchemaCompilerException;
 import org.opentravel.schemacompiler.validate.FindingMessageFormat;
 import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -50,7 +50,7 @@ public class OTMMessageValidatorController extends AbstractMainWindowController 
 
     public static final String FXML_FILE = "/ota2-message-validator.fxml";
 
-    private static final Logger log = LoggerFactory.getLogger( OTMMessageValidatorController.class );
+    private static final Logger log = LogManager.getLogger( OTMMessageValidatorController.class );
 
     @FXML
     private TextField projectFilename;

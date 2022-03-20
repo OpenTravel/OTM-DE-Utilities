@@ -39,7 +39,7 @@ import javafx.stage.Stage;
  *
  */
 public class UnlockAndCommitLibraryDialogController extends DexPopupControllerBase {
-    // private static Log log = LogFactory.getLog( UnlockAndCommitLibraryDialogController.class );
+    // private static Logger log = LogManager.getLogger( UnlockAndCommitLibraryDialogController.class );
 
     /**
      * Task will be used by the caller who creates the controller.

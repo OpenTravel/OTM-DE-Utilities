@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.dex.controllers.DexIncludedController;
@@ -43,7 +43,7 @@ import javafx.scene.image.ImageView;
  *
  */
 public class NamespacesDAO implements DexDAO<String>, TaskResultHandlerI {
-    private static Log log = LogFactory.getLog( NamespacesDAO.class );
+    private static Logger log = LogManager.getLogger( NamespacesDAO.class );
 
     // Namespaces - for root namespaces it will be like: http://www.opentravel.org/OTM
     // for sub-namespaces it will be just the sub-ns: e.g. hospitality

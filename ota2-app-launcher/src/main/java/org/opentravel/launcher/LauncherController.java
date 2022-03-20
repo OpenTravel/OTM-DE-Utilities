@@ -17,6 +17,8 @@
 package org.opentravel.launcher;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.AbstractMainWindowController;
 import org.opentravel.application.common.OTA2ApplicationProvider;
 import org.opentravel.application.common.OTA2ApplicationSpec;
@@ -27,8 +29,6 @@ import org.opentravel.application.common.StatusType;
 import org.opentravel.schemacompiler.repository.RemoteRepository;
 import org.opentravel.schemacompiler.repository.RepositoryException;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -71,7 +71,7 @@ public class LauncherController extends AbstractMainWindowController {
 
     public static final String FXML_FILE = "/ota2-launcher.fxml";
 
-    private static final Logger log = LoggerFactory.getLogger( LauncherController.class );
+    private static final Logger log = LogManager.getLogger( LauncherController.class );
 
     private static final String APP_CLASS_KEY = "appClass";
     private static final String APP_LIBFOLDER_KEY = "appLibraryFolderPath";
@@ -174,8 +174,11 @@ public class LauncherController extends AbstractMainWindowController {
             String javaHome = System.getProperty( "java.home" );
             String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
             String classpath = getClasspath( appLibraryFolderPath );
+            String modulePath = System.getProperty( "jdk.module.path" );
+            String javafxModules = "javafx.controls,javafx.graphics,javafx.web,javafx.media,javafx.fxml";
             UserSettings settings = UserSettings.load();
-            List<String> cmds = new ArrayList<>( Arrays.asList( javaBin, "-cp", classpath ) );
+            List<String> cmds = new ArrayList<>( Arrays.asList( javaBin, "-cp", classpath, "--module-path", modulePath,
+                "--add-modules", javafxModules ) );
             ProcessBuilder builder;
             Process newProcess;
 

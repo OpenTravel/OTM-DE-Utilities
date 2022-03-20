@@ -16,14 +16,14 @@
 
 package org.opentravel.dex.actions.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.actions.string.DexStringAction;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 
 public class SetResourceExtensionAction extends DexStringAction {
-    private static Log log = LogFactory.getLog( SetResourceExtensionAction.class );
+    private static Logger log = LogManager.getLogger( SetResourceExtensionAction.class );
 
     /**
      * @param subject

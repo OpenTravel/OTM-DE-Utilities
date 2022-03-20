@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.tasks.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.DexFileException;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.dex.controllers.DexStatusController;
@@ -34,7 +34,7 @@ import java.io.File;
  *
  */
 public class OpenLibraryFileTask extends DexTaskBase<File> {
-    private static Log log = LogFactory.getLog( OpenLibraryFileTask.class );
+    private static Logger log = LogManager.getLogger( OpenLibraryFileTask.class );
 
     private OtmModelManager modelMgr;
     private DexStatusController status;

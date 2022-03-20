@@ -19,8 +19,8 @@ package org.opentravel;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -45,7 +45,7 @@ import javafx.scene.input.KeyCode;
  */
 @Ignore
 public class TestDExUnmanaged extends AbstractFxTest {
-    private static Log log = LogFactory.getLog( TestDExUnmanaged.class );
+    private static Logger log = LogManager.getLogger( TestDExUnmanaged.class );
 
     public static final boolean RUN_HEADLESS = true;
     final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.

@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmFacets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.action.manager.DexActionManager;
@@ -34,7 +34,7 @@ import org.opentravel.schemacompiler.model.TLAbstractFacet;
  */
 public abstract class OtmAbstractFacet<T extends TLAbstractFacet> extends OtmModelElement<TLAbstractFacet>
     implements OtmTypeProvider {
-    private static Log log = LogFactory.getLog( OtmAbstractFacet.class );
+    private static Logger log = LogManager.getLogger( OtmAbstractFacet.class );
 
 
     // Collapsed is only for graphical views. Tree and table views should use Expanded.

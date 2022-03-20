@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
@@ -30,7 +30,7 @@ import org.opentravel.utilities.testutil.TestFxMode;
  * Verifies the functions of the <code>TYPECHANGE</code> action.
  */
 public class TestSetAssignedTypeActionVersioned extends AbstractFxTest {
-    private static Log log = LogFactory.getLog( TestSetAssignedTypeActionVersioned.class );
+    private static Logger log = LogManager.getLogger( TestSetAssignedTypeActionVersioned.class );
 
 
     public static final boolean RUN_HEADLESS = true;

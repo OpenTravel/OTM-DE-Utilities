@@ -25,7 +25,7 @@ import org.opentravel.schemacompiler.model.TLHttpMethod;
 import javafx.beans.value.ObservableValue;
 
 public class SetRequestMethodAction extends DexStringAction {
-    // private static Log log = LogFactory.getLog( SetAbstractAction.class );
+    // private static Logger log = LogManager.getLogger( SetAbstractAction.class );
 
     // Setting method to get will remove old payload
     private OtmActionFacet oldPayload = null;

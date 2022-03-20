@@ -23,7 +23,7 @@ import org.opentravel.model.OtmPropertyOwner;
  * 
  */
 public class OtmEnumerationValueFacet extends OtmAbstractDisplayFacet {
-    // private static Log log = LogFactory.getLog( OtmEnumerationValueFacet.class );
+    // private static Logger log = LogManager.getLogger( OtmEnumerationValueFacet.class );
 
     public OtmEnumerationValueFacet(OtmPropertyOwner parent) {
         super( parent );

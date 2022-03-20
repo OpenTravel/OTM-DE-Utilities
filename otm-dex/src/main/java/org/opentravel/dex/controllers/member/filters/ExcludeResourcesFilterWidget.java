@@ -27,7 +27,7 @@ import org.opentravel.model.otmLibraryMembers.OtmResource;
  *
  */
 public class ExcludeResourcesFilterWidget extends FilterWidget {
-    // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
+    // private static Logger log = LogManager.getLogger( LibraryFilterWidget.class );
 
     /**
      * Exclude resources filter widget.

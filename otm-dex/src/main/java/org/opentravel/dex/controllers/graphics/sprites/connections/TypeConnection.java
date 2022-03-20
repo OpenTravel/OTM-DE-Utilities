@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.connections;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager;
 import org.opentravel.dex.controllers.graphics.sprites.rectangles.PropertyRectangle;
@@ -30,7 +30,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;
 
 public class TypeConnection extends Connection {
-    private static Log log = LogFactory.getLog( TypeConnection.class );
+    private static Logger log = LogManager.getLogger( TypeConnection.class );
 
     protected OtmProperty fromProperty;
 

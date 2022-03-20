@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
 import org.opentravel.dex.controllers.graphics.sprites.connections.SuperTypeConnection;
 import org.opentravel.dex.controllers.graphics.sprites.connections.TypeConnection;
@@ -49,7 +49,7 @@ import javafx.scene.input.MouseEvent;
  */
 public abstract class MemberSprite<M extends OtmLibraryMember> extends DexSpriteBase
     implements DexSprite, RectangleEventHandler {
-    private static Log log = LogFactory.getLog( MemberSprite.class );
+    private static Logger log = LogManager.getLogger( MemberSprite.class );
 
     private static final double MIN_HEIGHT = 50;
     private static final double MIN_WIDTH = 50;

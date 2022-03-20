@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.DomainSprite;
@@ -41,7 +41,7 @@ import javafx.scene.paint.Paint;
  *
  */
 public abstract class CollapsableRectangle extends Rectangle {
-    private static Log log = LogFactory.getLog( CollapsableRectangle.class );
+    private static Logger log = LogManager.getLogger( CollapsableRectangle.class );
 
     protected DexSprite parent;
     protected String label;

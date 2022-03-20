@@ -19,8 +19,8 @@ package org.opentravel.model.otmLibraryMembers;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.opentravel.model.OtmModelElement;
@@ -36,7 +36,7 @@ import org.opentravel.schemacompiler.model.TLProperty;
  * Verifies the functions of the <code>OtmContextualFacet</code> class.
  */
 public class TestExtensionPointFacet extends TestOtmLibraryMemberBase<OtmExtensionPointFacet> {
-    private static Log log = LogFactory.getLog( TestExtensionPointFacet.class );
+    private static Logger log = LogManager.getLogger( TestExtensionPointFacet.class );
     private static final String EPF_NAME = "TestEPF";
 
     protected static OtmLibraryMember member = null;

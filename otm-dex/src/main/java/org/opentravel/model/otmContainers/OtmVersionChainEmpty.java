@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmContainers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeUser;
@@ -35,7 +35,7 @@ import java.util.List;
  * 
  */
 public class OtmVersionChainEmpty extends OtmVersionChainBase {
-    private static Log log = LogFactory.getLog( OtmVersionChainEmpty.class );
+    private static Logger log = LogManager.getLogger( OtmVersionChainEmpty.class );
 
     private OtmLocalLibrary library;
 

@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.member.usage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -49,7 +49,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMember> {
-    private static Log log = LogFactory.getLog( UsersTreeController.class );
+    private static Logger log = LogManager.getLogger( UsersTreeController.class );
 
     //
     // FIXME - does not display an object when one of the choice facets is used as a type
@@ -213,7 +213,8 @@ public class UsersTreeController extends DexIncludedControllerBase<OtmLibraryMem
 
     public MemberAndUsersDAO getSelected() {
         return usersTree.getSelectionModel().getSelectedItem() != null
-            ? usersTree.getSelectionModel().getSelectedItem().getValue() : null;
+            ? usersTree.getSelectionModel().getSelectedItem().getValue()
+            : null;
     }
 
     private void handleEvent(DexMemberSelectionEvent event) {

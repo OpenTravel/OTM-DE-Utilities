@@ -19,8 +19,8 @@ package org.opentravel;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
@@ -95,7 +95,7 @@ import java.util.Map;
  */
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractDexTest extends AbstractFxTest {
-    private static Log log = LogFactory.getLog( AbstractDexTest.class );
+    private static Logger log = LogManager.getLogger( AbstractDexTest.class );
 
     // public static final boolean RUN_HEADLESS = true;
     // final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.

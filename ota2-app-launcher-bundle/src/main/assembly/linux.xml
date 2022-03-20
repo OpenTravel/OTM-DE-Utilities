@@ -22,7 +22,7 @@
 	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2
       http://maven.apache.org/xsd/assembly-1.1.2.xsd">
 
-	<id>bin</id>
+	<id>linux</id>
 	<formats>
 		<format>zip</format>
 	</formats>
@@ -32,10 +32,17 @@
 			<directory>${project.basedir}/src/main/bin</directory>
 			<outputDirectory>OTM-Utilities-${build.timestamp}</outputDirectory>
 			<fileMode>755</fileMode>
+			<includes>
+				<include>*.sh</include>
+			</includes>
 		</fileSet>
 		<fileSet>
 			<directory>${project.basedir}/native-utilities/target/libs</directory>
 			<outputDirectory>OTM-Utilities-${build.timestamp}/lib</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}/native-utilities/target/fxlibs-linux</directory>
+			<outputDirectory>OTM-Utilities-${build.timestamp}/fxlib</outputDirectory>
 		</fileSet>
 	</fileSets>
 	

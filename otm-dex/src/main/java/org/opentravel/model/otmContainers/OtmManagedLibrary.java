@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmContainers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
 import org.opentravel.ns.ota2.repositoryinfo_v01_00.RepositoryPermission;
@@ -34,7 +34,7 @@ import org.opentravel.schemacompiler.repository.RepositoryItemState;
  * 
  */
 public abstract class OtmManagedLibrary extends OtmLibrary {
-    private static Log log = LogFactory.getLog( OtmManagedLibrary.class );
+    private static Logger log = LogManager.getLogger( OtmManagedLibrary.class );
 
     /**
      * Should only be called by Factory.

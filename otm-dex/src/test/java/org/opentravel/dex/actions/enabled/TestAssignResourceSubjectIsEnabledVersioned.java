@@ -18,8 +18,8 @@ package org.opentravel.dex.actions.enabled;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.application.common.AbstractOTMApplication;
@@ -55,7 +55,7 @@ import java.util.List;
  * AssignResourceSubjectAction
  */
 public class TestAssignResourceSubjectIsEnabledVersioned extends AbstractFxTest {
-    private static Log log = LogFactory.getLog( TestAssignResourceSubjectIsEnabledVersioned.class );
+    private static Logger log = LogManager.getLogger( TestAssignResourceSubjectIsEnabledVersioned.class );
 
     public static final boolean RUN_HEADLESS = true;
     final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.

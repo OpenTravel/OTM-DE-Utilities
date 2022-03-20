@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmFacets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmChildrenOwner;
@@ -57,7 +57,7 @@ import java.util.List;
  * 
  */
 public class OtmContributedFacet extends OtmFacet<TLContextualFacet> {
-    private static Log log = LogFactory.getLog( OtmContributedFacet.class );
+    private static Logger log = LogManager.getLogger( OtmContributedFacet.class );
 
     // The library member that defines this facet.
     private OtmContextualFacet contributor = null;

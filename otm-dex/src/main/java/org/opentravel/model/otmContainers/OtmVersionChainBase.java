@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmContainers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.OtmTypeUser;
@@ -41,7 +41,7 @@ import org.opentravel.schemacompiler.model.TLModelElement;
  * 
  */
 public abstract class OtmVersionChainBase implements OtmVersionChain {
-    private static Log log = LogFactory.getLog( OtmVersionChainBase.class );
+    private static Logger log = LogManager.getLogger( OtmVersionChainBase.class );
 
     /**
      * Is candidate a later minor version of the reference library? Return true if all are true about the candidate:

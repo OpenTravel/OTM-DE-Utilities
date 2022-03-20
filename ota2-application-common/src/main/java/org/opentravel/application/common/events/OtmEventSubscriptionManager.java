@@ -16,8 +16,8 @@
 
 package org.opentravel.application.common.events;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.OtmEventUser;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ import javafx.event.EventType;
  * 
  */
 public class OtmEventSubscriptionManager {
-    private static Log log = LogFactory.getLog( OtmEventSubscriptionManager.class );
+    private static Logger log = LogManager.getLogger( OtmEventSubscriptionManager.class );
 
     // Map of event types to list of publishers of that event type
     private Map<EventType<? extends AbstractOtmEvent>,List<OtmEventUser>> publishedEvents = new HashMap<>();

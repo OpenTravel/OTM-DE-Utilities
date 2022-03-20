@@ -16,8 +16,8 @@
 
 package org.opentravel.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexFilter;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
@@ -41,7 +41,7 @@ import java.util.Map;
  *
  */
 public class OtmModelMembersManager {
-    private static Log log = LogFactory.getLog( OtmModelMembersManager.class );
+    private static Logger log = LogManager.getLogger( OtmModelMembersManager.class );
 
     // All members - Library Members are TLLibraryMembers and contextual facets
     public static final int MEMBERCOUNT = 2666; // 2000 / .075 +1;

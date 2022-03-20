@@ -19,8 +19,8 @@ package org.opentravel;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Ignore;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.common.DexFileException;
@@ -45,7 +45,7 @@ import java.util.List;
  */
 @Ignore
 public class TestDexFileHandlerUtils extends AbstractDexTest {
-    private static Log log = LogFactory.getLog( TestDexFileHandlerUtils.class );
+    private static Logger log = LogManager.getLogger( TestDexFileHandlerUtils.class );
 
     public final static String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector
 

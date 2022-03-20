@@ -26,7 +26,7 @@ import org.opentravel.schemacompiler.model.TLSimple;
  * Set the repeat count on a property.
  */
 public class SetConstraintFractionDigitsAction extends DexRunAction {
-    // private static Log log = LogFactory.getLog( SetRepeatCountAction.class );
+    // private static Logger log = LogManager.getLogger( SetRepeatCountAction.class );
 
     private static final String VETO1 =
         "org.opentravel.schemacompiler.TLSimple.constraintFacet.RESTRICTION_NOT_APPLICABLE";

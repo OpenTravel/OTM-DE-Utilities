@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
@@ -34,7 +34,7 @@ import org.opentravel.schemacompiler.model.TLExtensionOwner;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 
 public class BaseTypeChangeAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( BaseTypeChangeAction.class );
+    private static Logger log = LogManager.getLogger( BaseTypeChangeAction.class );
 
     private static final String VETO1 =
         "org.opentravel.schemacompiler.TLBusinessObject.versionExtension.INVALID_VERSION_EXTENSION";

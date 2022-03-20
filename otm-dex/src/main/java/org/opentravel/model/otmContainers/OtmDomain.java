@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmContainers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
@@ -38,7 +38,7 @@ import javafx.scene.image.Image;
  * 
  */
 public class OtmDomain {
-    private static Log log = LogFactory.getLog( OtmDomain.class );
+    private static Logger log = LogManager.getLogger( OtmDomain.class );
 
     /**
      * Utility to create domain name from a base namespace. Name is the portion after the last slash.
@@ -138,8 +138,7 @@ public class OtmDomain {
     private List<OtmLibrary> filterList(List<OtmLibrary> libList) {
         List<OtmLibrary> externalLibs = new ArrayList<>();
         for (OtmLibrary lib : libList) {
-            if (!lib.isBuiltIn() && !externalLibs.contains( lib )
-                && !lib.getBaseNS().startsWith( baseNamespace ))
+            if (!lib.isBuiltIn() && !externalLibs.contains( lib ) && !lib.getBaseNS().startsWith( baseNamespace ))
                 externalLibs.add( lib );
         }
         return externalLibs;

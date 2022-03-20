@@ -41,7 +41,7 @@ import javafx.scene.layout.Pane;
  *
  */
 public class ColumnRectangle extends Rectangle {
-    // private static Log log = LogFactory.getLog( ColumnRectangle.class );
+    // private static Logger log = LogManager.getLogger( ColumnRectangle.class );
 
     public static final int COLUMN_HEIGHT_MIN = 1000;
     public static final int COLUMN_MARGIN_X = 50;

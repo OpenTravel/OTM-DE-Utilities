@@ -1,8 +1,5 @@
 language: java
-jdk: openjdk8
-addons:
-  apt:
-    packages: openjfx
+jdk: openjdk17
 install: true
 script: mvn clean install -B -DskipTests=true -DciBuildEnv=true -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 cache:
@@ -12,7 +9,10 @@ deploy:
   provider: releases
   api_key:
     secure: myx2mM/yh8g5Tusl5Kq7oa0zni/K2apMwp3aPelmUoNpd+Lf8Q1Big2bDD6rUPAp8o/rCn6yI+Qv9EhUe6qiGuc0FYg6Jo9voDKEv79q7uRTbuAgYv4et7jcYBLt9kkOxfzbEkAU2TdOmGsrsK//BPVkYdVqyu2scwalHEoUkx3XSbWPTWvFC4hRJ+QE7J9czQ1nf8g/KhiiEAv4m7I88wKlpqR9I8n5MF/T4++4E5rhHd1qEQTyM6GMK3ufl4ODRW52E2Ukl4TpQk4U5zsj4biYi5NLvQ4Pu1xiMCl9IS8XfYJGHXQ5WZj89F7T0F2DQlmxvj9v0VMOkc+kAmrfta0P1znLxwmUm/+yCqEKBEjgNdDZTBmnebWVhCAVilZv7Lu+jng0ayN4IdMKMJ5n9cC1AcAI/8bVlcB4kxCzocl+YIl0WoqgZ6a8sh+GAjefa3Tx7hmgC4vb3AU3QAl18szC5qxmktgGu7wja0+R3z8z5yVTC41SdVZPyiAQFd6rafRC675AvdZDUoPGwxFGpe7XilLyGPFcakmHVvE3LLs8Fe/5IKOFplhbaZGJGJfU0BuLPlOvl2JAbMfalVqsx9eGl9hsiQiZ2gfmWpTXcS9nUYtcCuxlvpzk4yXbPQ2D5iYiXnROSiFC711qmb0XI3R9q+fxkDj6f7AyfWVSpoI=
-  file: ota2-app-launcher-bundle/target/ota2-app-launcher.zip
+  file:
+  - ota2-app-launcher-bundle/target/ota2-app-launcher-win.zip
+  - ota2-app-launcher-bundle/target/ota2-app-launcher-linux.zip
+  - ota2-app-launcher-bundle/target/ota2-app-launcher-mac.zip
   skip_cleanup: true
   on:
     repo: OpenTravel/OTM-DE-Utilities

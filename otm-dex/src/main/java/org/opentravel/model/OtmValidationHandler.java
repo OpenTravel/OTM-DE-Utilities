@@ -16,8 +16,8 @@
 
 package org.opentravel.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -37,7 +37,7 @@ import javafx.scene.image.ImageView;
  * 
  */
 public class OtmValidationHandler {
-    private static Log log = LogFactory.getLog( OtmValidationHandler.class );
+    private static Logger log = LogManager.getLogger( OtmValidationHandler.class );
 
     public static ValidationFindings isValid(TLModelElement tl) {
         if (tl == null)

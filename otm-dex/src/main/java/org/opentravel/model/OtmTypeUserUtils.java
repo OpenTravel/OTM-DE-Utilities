@@ -16,8 +16,8 @@
 
 package org.opentravel.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.schemacompiler.model.AbstractLibrary;
 import org.opentravel.schemacompiler.model.NamedEntity;
 import org.opentravel.schemacompiler.model.TLModelElement;
@@ -30,7 +30,7 @@ import org.opentravel.schemacompiler.model.TLModelElement;
  *
  */
 public class OtmTypeUserUtils {
-    private static Log log = LogFactory.getLog( OtmTypeUserUtils.class );
+    private static Logger log = LogManager.getLogger( OtmTypeUserUtils.class );
 
     private OtmTypeUserUtils() {
         // NO-OP - static methods only. Do not instantiate this class.

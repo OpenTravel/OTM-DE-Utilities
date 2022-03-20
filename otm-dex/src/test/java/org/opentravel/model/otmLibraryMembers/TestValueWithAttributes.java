@@ -48,7 +48,7 @@ import java.util.List;
  * Verifies the functions of the <code>UserSettings</code> class.
  */
 public class TestValueWithAttributes extends TestOtmLibraryMemberBase<OtmValueWithAttributes> {
-    // private static Log log = LogFactory.getLog( TestValueWithAttributes.class );
+    // private static Logger log = LogManager.getLogger( TestValueWithAttributes.class );
 
     static String NAME = "TestVWA";
 

@@ -18,8 +18,8 @@ package org.opentravel.model.otmContainers;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
@@ -34,7 +34,7 @@ import java.util.List;
  * Verifies the functions of the <code>OtmDomain</code> class.
  */
 public class TestOtmDomain {
-    private static Log log = LogFactory.getLog( TestOtmDomain.class );
+    private static Logger log = LogManager.getLogger( TestOtmDomain.class );
 
     private static final String defaultDomain = "http://www.example.com/domains/domain1";
     private static OtmModelManager modelManager;

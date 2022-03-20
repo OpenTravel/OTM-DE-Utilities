@@ -16,8 +16,8 @@
 
 package org.opentravel.common;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.actions.DexRunAction;
@@ -53,7 +53,7 @@ import javafx.scene.layout.HBox;
  *
  */
 public class DexEditField {
-    private static Log log = LogFactory.getLog( DexEditField.class );
+    private static Logger log = LogManager.getLogger( DexEditField.class );
 
     public Node fxNode;
     public String label;

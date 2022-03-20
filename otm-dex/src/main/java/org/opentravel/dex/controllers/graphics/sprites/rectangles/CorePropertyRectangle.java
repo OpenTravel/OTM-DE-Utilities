@@ -27,7 +27,7 @@ import org.opentravel.model.otmLibraryMembers.OtmCore;
  *
  */
 public class CorePropertyRectangle extends PropertyRectangle {
-    // private static Log log = LogFactory.getLog( CorePropertyRectangle.class );
+    // private static Logger log = LogManager.getLogger( CorePropertyRectangle.class );
 
     private OtmCore core;
 

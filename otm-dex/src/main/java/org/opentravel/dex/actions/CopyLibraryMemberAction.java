@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
 import org.opentravel.dex.controllers.popup.SelectLibraryDialogController;
 import org.opentravel.model.OtmObject;
@@ -32,7 +32,7 @@ import javafx.application.Platform;
  * Make a copy of a library member.
  */
 public class CopyLibraryMemberAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( CopyLibraryMemberAction.class );
+    private static Logger log = LogManager.getLogger( CopyLibraryMemberAction.class );
 
 
     /**

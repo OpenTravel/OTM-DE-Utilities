@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.actions.resource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.action.manager.DexActionManagerBase;
 import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.dex.controllers.member.MemberAndProvidersDAO;
@@ -39,7 +41,7 @@ import java.util.List;
 import javafx.application.Platform;
 
 public class AssignResourceSubjectAction extends DexRunAction {
-    // private static Log log = LogFactory.getLog( AssignResourceSubjectAction.class );
+    private static Logger log = LogManager.getLogger( AssignResourceSubjectAction.class );
 
     /**
      * Get the users business object selection from the type selection controller.

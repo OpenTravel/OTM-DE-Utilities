@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.MimeTypeMap;
 import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.model.OtmObject;
@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class SetMimeTypesAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( SetMimeTypesAction.class );
+    private static Logger log = LogManager.getLogger( SetMimeTypesAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
         return (subject.isEditable() && subject instanceof OtmActionRequest || subject instanceof OtmActionResponse);

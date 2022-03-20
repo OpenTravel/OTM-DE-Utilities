@@ -18,8 +18,8 @@ package org.opentravel.dex.actions.constraints;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.action.manager.DexActionManager;
@@ -43,7 +43,7 @@ import javafx.beans.property.StringProperty;
  */
 public class TestSetConstraintsAction {
 
-    private static Log log = LogFactory.getLog( TestSetConstraintsAction.class );
+    private static Logger log = LogManager.getLogger( TestSetConstraintsAction.class );
 
     private static OtmModelManager staticModelManager = null;
     static OtmLibrary lib = null;

@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.member.filters;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.member.MemberFilterController;
 import org.opentravel.dex.events.DexEvent;
 import org.opentravel.dex.events.DexLibrarySelectionEvent;
@@ -39,7 +39,7 @@ import javafx.scene.control.Tooltip;
  *
  */
 public class LibraryFilterWidget extends FilterWidget {
-    private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
+    private static Logger log = LogManager.getLogger( LibraryFilterWidget.class );
 
     private static final String ALLLIBS = "All Libraries";
     private static final String SELECTEDLIB = "Selected Library";

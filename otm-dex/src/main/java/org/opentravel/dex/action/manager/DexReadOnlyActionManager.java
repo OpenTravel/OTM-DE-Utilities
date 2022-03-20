@@ -27,7 +27,7 @@ import org.opentravel.model.OtmObject;
  *
  */
 public class DexReadOnlyActionManager extends DexActionManagerBase {
-    // private static Log log = LogFactory.getLog( DexReadOnlyActionManager.class );
+    // private static Logger log = LogManager.getLogger( DexReadOnlyActionManager.class );
 
     public DexReadOnlyActionManager() {
         super();

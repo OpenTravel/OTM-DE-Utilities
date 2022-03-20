@@ -16,12 +16,14 @@
 
 package org.opentravel.repositoryviewer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.AbstractUserSettings;
 import org.opentravel.common.DialogBox;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
+
+import java.net.URL;
 
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -32,7 +34,7 @@ import javafx.stage.WindowEvent;
  */
 public class RepositoryViewerApp extends AbstractOTMApplication {
 
-    private static Log log = LogFactory.getLog( RepositoryViewerApp.class );
+    private static Logger log = LogManager.getLogger( RepositoryViewerApp.class );
 
     Stage window;
     private static final String LAYOUT_FILE = "/RepositoryViewer.fxml";
@@ -75,8 +77,8 @@ public class RepositoryViewerApp extends AbstractOTMApplication {
      * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowFxmlLocation()
      */
     @Override
-    protected String getMainWindowFxmlLocation() {
-        return LAYOUT_FILE;
+    protected URL getMainWindowFxmlLocation() {
+        return RepositoryViewerApp.class.getResource( LAYOUT_FILE );
     }
 
     /*

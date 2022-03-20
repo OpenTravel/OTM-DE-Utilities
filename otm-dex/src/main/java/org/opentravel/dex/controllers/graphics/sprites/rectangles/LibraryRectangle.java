@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
@@ -35,7 +35,7 @@ import javafx.scene.input.MouseEvent;
  *
  */
 public class LibraryRectangle extends Rectangle {
-    private static Log log = LogFactory.getLog( LibraryRectangle.class );
+    private static Logger log = LogManager.getLogger( LibraryRectangle.class );
 
     private OtmLibrary library;
     private DexSprite parent;

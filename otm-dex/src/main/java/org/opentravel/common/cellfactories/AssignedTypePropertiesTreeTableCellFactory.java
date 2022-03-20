@@ -16,8 +16,8 @@
 
 package org.opentravel.common.cellfactories;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.member.properties.MemberPropertiesTreeTableController;
 import org.opentravel.dex.controllers.member.properties.PropertiesDAO;
@@ -40,7 +40,7 @@ import javafx.scene.input.MouseEvent;
  */
 @SuppressWarnings("squid:MaximumInheritanceDepth")
 public class AssignedTypePropertiesTreeTableCellFactory extends TreeTableCell<PropertiesDAO,String> {
-    private static Log log = LogFactory.getLog( AssignedTypePropertiesTreeTableCellFactory.class );
+    private static Logger log = LogManager.getLogger( AssignedTypePropertiesTreeTableCellFactory.class );
     private MemberPropertiesTreeTableController controller;
     private OtmTypeProvider assignedType = null;
 

@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmModelElement;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
@@ -49,7 +49,7 @@ import org.opentravel.schemacompiler.model.XSDSimpleType;
  *
  */
 public class OtmLibraryMemberFactory {
-    private static Log log = LogFactory.getLog( OtmLibraryMemberFactory.class );
+    private static Logger log = LogManager.getLogger( OtmLibraryMemberFactory.class );
 
     private OtmLibraryMemberFactory() {
         // NO-OP - only static methods

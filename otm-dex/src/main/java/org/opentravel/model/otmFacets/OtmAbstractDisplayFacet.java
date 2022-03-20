@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmFacets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.action.manager.DexActionManager;
@@ -56,7 +56,7 @@ import javafx.scene.image.ImageView;
  * 
  */
 public abstract class OtmAbstractDisplayFacet implements OtmPropertyOwner {
-    private static Log log = LogFactory.getLog( OtmAbstractDisplayFacet.class );
+    private static Logger log = LogManager.getLogger( OtmAbstractDisplayFacet.class );
 
     // Will be null for some sub-types
     private OtmPropertyOwner parent;

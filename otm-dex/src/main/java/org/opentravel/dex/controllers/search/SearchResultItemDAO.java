@@ -33,7 +33,7 @@ import javafx.scene.image.ImageView;
  *
  */
 public class SearchResultItemDAO implements DexDAO<String> {
-    // private static Log log = LogFactory.getLog( SearchResultItemDAO.class );
+    // private static Logger log = LogManager.getLogger( SearchResultItemDAO.class );
 
     protected String resultString;
     private RepositorySearchResult result = null;

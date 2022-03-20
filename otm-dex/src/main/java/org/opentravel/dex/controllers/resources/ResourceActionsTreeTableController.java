@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.resources;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -58,7 +58,7 @@ import javafx.scene.control.cell.TreeItemPropertyValueFactory;
  *
  */
 public class ResourceActionsTreeTableController extends DexIncludedControllerBase<OtmResource> {
-    private static Log log = LogFactory.getLog( ResourceActionsTreeTableController.class );
+    private static Logger log = LogManager.getLogger( ResourceActionsTreeTableController.class );
 
     // Column labels
     private static final String NAMECOLUMNLABEL = "";
@@ -215,7 +215,8 @@ public class ResourceActionsTreeTableController extends DexIncludedControllerBas
 
     public ActionsDAO getSelected() {
         return resourceActionsTreeTable.getSelectionModel().getSelectedItem() != null
-            ? resourceActionsTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
+            ? resourceActionsTreeTable.getSelectionModel().getSelectedItem().getValue()
+            : null;
     }
 
     private void handleEvent(DexMemberSelectionEvent event) {

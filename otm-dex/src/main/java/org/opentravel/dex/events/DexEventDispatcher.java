@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.events;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.model.OtmObject;
 
@@ -41,7 +41,7 @@ import javafx.event.EventDispatcher;
  *
  */
 public class DexEventDispatcher implements EventDispatcher {
-    private static Log log = LogFactory.getLog( DexEventDispatcher.class );
+    private static Logger log = LogManager.getLogger( DexEventDispatcher.class );
     private final EventDispatcher originalDispatcher;
     private final Deque<DexNavigationEvent> navQueue = new ArrayDeque<>();
     private final Deque<DexNavigationEvent> navUndoneQueue = new ArrayDeque<>();

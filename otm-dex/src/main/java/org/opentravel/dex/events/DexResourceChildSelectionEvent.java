@@ -27,7 +27,7 @@ import javafx.event.EventType;
  *
  */
 public class DexResourceChildSelectionEvent extends DexEvent {
-    // private static Log log = LogFactory.getLog( DexResourceChildSelectionEvent.class );
+    // private static Logger log = LogManager.getLogger( DexResourceChildSelectionEvent.class );
     private static final long serialVersionUID = 20190409L;
 
     public static final EventType<DexResourceChildSelectionEvent> RESOURCE_CHILD_SELECTED =

@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.events;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.otmProperties.OtmProperty;
 
 import javafx.event.EventType;
@@ -29,7 +29,7 @@ import javafx.event.EventType;
  *
  */
 public class DexPropertySelectionEvent extends DexNavigationEvent {
-    private static Log log = LogFactory.getLog( DexPropertySelectionEvent.class );
+    private static Logger log = LogManager.getLogger( DexPropertySelectionEvent.class );
     private static final long serialVersionUID = 20190409L;
 
     public static final EventType<DexPropertySelectionEvent> PROPERTY_SELECTED =

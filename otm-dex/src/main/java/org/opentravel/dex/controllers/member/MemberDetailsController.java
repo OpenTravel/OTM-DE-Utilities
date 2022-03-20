@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.member;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
@@ -62,7 +62,7 @@ import javafx.scene.layout.GridPane;
  *
  */
 public class MemberDetailsController extends DexIncludedControllerBase<Void> {
-    private static Log log = LogFactory.getLog( MemberDetailsController.class );
+    private static Logger log = LogManager.getLogger( MemberDetailsController.class );
 
     public static final String TIP_FULLEDIT = "Full editing enabled for new objects in a library.";
     public static final String TIP_MINOREDIT =

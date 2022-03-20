@@ -16,6 +16,8 @@
 
 package org.opentravel.dex.actions.constraints;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.actions.DexRunAction;
 import org.opentravel.model.OtmObject;
@@ -30,7 +32,7 @@ import org.opentravel.schemacompiler.model.TLSimple;
  * Set the max length on a property.
  */
 public class SetConstraintMaxLengthAction extends DexRunAction {
-    // private static Log log = LogFactory.getLog( SetRepeatCountAction.class );
+    private static Logger log = LogManager.getLogger( SetConstraintMaxLengthAction.class );
 
     private static final String VETO1 = "org.opentravel.schemacompiler.TLSimple.maxLength.MUST_BE_LESS_THAN_OR_EQUAL";
     private static final String VETO2 =

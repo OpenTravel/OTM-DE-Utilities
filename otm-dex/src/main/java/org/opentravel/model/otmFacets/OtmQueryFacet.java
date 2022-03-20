@@ -30,7 +30,7 @@ import org.opentravel.schemacompiler.model.TLFacetType;
  * 
  */
 public class OtmQueryFacet extends OtmContextualFacet {
-    // private static Log log = LogFactory.getLog( OtmQueryFacet.class );
+    // private static Logger log = LogManager.getLogger( OtmQueryFacet.class );
 
     /**
      */

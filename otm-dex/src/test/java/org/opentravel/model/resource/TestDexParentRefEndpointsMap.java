@@ -19,8 +19,8 @@ package org.opentravel.model.resource;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,7 +45,7 @@ import java.util.Map;
  * Note: the GUI uses action.getEndpointURL()
  */
 public class TestDexParentRefEndpointsMap extends TestOtmResourceBase<OtmAction> {
-    private static Log log = LogFactory.getLog( TestDexParentRefEndpointsMap.class );
+    private static Logger log = LogManager.getLogger( TestDexParentRefEndpointsMap.class );
 
     @BeforeClass
     public static void beforeClass() {

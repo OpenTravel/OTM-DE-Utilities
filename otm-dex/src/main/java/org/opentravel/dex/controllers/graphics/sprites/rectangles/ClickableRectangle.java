@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.graphics.sprites.DexSprite;
 import org.opentravel.dex.controllers.graphics.sprites.DomainSprite;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
@@ -50,7 +50,7 @@ import javafx.scene.paint.Paint;
 // TODO - merge this with FacetRectangle
 // TODO - merge - use instead of hand-jam code in propertyRec
 public abstract class ClickableRectangle extends Rectangle {
-    private static Log log = LogFactory.getLog( ClickableRectangle.class );
+    private static Logger log = LogManager.getLogger( ClickableRectangle.class );
 
     protected DexSprite sprite;
     protected String label;

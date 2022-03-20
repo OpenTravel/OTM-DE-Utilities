@@ -16,8 +16,8 @@
 
 package org.opentravel.common;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.schemacompiler.loader.LoaderProgressMonitor;
 
@@ -26,7 +26,7 @@ import org.opentravel.schemacompiler.loader.LoaderProgressMonitor;
  *
  */
 public class OpenProjectProgressMonitor implements LoaderProgressMonitor {
-    private static Log log = LogFactory.getLog( OpenProjectProgressMonitor.class );
+    private static Logger log = LogManager.getLogger( OpenProjectProgressMonitor.class );
 
     private DexStatusController controller;
     private double percentDone = 0;

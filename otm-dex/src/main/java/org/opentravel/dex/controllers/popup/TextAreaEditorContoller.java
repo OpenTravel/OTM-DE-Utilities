@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.popup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.objecteditor.UserSettings;
 
 import java.io.IOException;
@@ -46,7 +46,7 @@ import javafx.stage.Stage;
  *
  */
 public class TextAreaEditorContoller extends DexPopupControllerBase {
-    private static Log log = LogFactory.getLog( TextAreaEditorContoller.class );
+    private static Logger log = LogManager.getLogger( TextAreaEditorContoller.class );
 
     public static final String LAYOUT_FILE = "/Dialogs/TextAreaEditor.fxml";
 

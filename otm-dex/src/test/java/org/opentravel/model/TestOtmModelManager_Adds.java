@@ -19,8 +19,8 @@ package org.opentravel.model;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.AbstractDexTest;
@@ -56,7 +56,7 @@ import java.util.List;
 
 // @Ignore
 public class TestOtmModelManager_Adds extends AbstractDexTest {
-    private static Log log = LogFactory.getLog( TestOtmModelManager_Adds.class );
+    private static Logger log = LogManager.getLogger( TestOtmModelManager_Adds.class );
 
     final static String FILE_TESTLOCAL = "TestLocalFiles.otp";
 

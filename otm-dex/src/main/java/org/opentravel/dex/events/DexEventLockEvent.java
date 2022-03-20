@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.events;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javafx.event.EventType;
 
@@ -35,7 +35,7 @@ import javafx.event.EventType;
  *
  */
 public class DexEventLockEvent extends DexNavigationEvent {
-    private static Log log = LogFactory.getLog( DexEventLockEvent.class );
+    private static Logger log = LogManager.getLogger( DexEventLockEvent.class );
     private static final long serialVersionUID = 20200530L;
 
     public static final EventType<DexEventLockEvent> EVENT_LOCK = new EventType<>( DEX_ALL, "EVENT_LOCK" );

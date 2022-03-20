@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.resources;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.cellfactories.ValidationResourceTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexFilter;
@@ -66,7 +66,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmModelManager> {
-    private static Log log = LogFactory.getLog( ResourcesTreeTableController.class );
+    private static Logger log = LogManager.getLogger( ResourcesTreeTableController.class );
 
     // Column labels
     public static final String PREFIXCOLUMNLABEL = "Prefix";
@@ -260,7 +260,8 @@ public class ResourcesTreeTableController extends DexIncludedControllerBase<OtmM
     @Override
     public ResourcesDAO getSelection() {
         return resourcesTreeTable.getSelectionModel().getSelectedItem() != null
-            ? resourcesTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
+            ? resourcesTreeTable.getSelectionModel().getSelectedItem().getValue()
+            : null;
     }
 
     private void handleEvent(DexFilterChangeEvent event) {

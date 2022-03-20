@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.tasks.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.controllers.repository.RepositorySearchCriteria;
 import org.opentravel.dex.tasks.DexTaskBase;
@@ -38,7 +38,7 @@ import java.util.List;
  *
  */
 public class SearchRepositoryTask extends DexTaskBase<RepositorySearchCriteria> {
-    private static Log log = LogFactory.getLog( SearchRepositoryTask.class );
+    private static Logger log = LogManager.getLogger( SearchRepositoryTask.class );
 
     private List<RepositorySearchResult> repoResults = null;
 

@@ -16,8 +16,8 @@
 
 package org.opentravel.model.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
@@ -60,7 +60,7 @@ import javafx.scene.control.Tooltip;
  */
 public class OtmParameterGroup extends OtmResourceChildBase<TLParamGroup>
     implements OtmResourceChild, OtmChildrenOwner {
-    private static Log log = LogFactory.getLog( OtmParameterGroup.class );
+    private static Logger log = LogManager.getLogger( OtmParameterGroup.class );
 
     private static final String TOOLTIP =
         "Provides a collection of field references to the resource's business object that will be used as parameters on a REST request.";

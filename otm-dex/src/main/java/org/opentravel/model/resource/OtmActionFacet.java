@@ -16,8 +16,8 @@
 
 package org.opentravel.model.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
@@ -55,7 +55,7 @@ import javafx.scene.control.Tooltip;
  * 
  */
 public class OtmActionFacet extends OtmResourceChildBase<TLActionFacet> implements OtmResourceChild, OtmTypeUser {
-    private static Log log = LogFactory.getLog( OtmActionFacet.class );
+    private static Logger log = LogManager.getLogger( OtmActionFacet.class );
 
     private static final String TOOLTIP =
         "            Action facets describe the message payload for RESTful action requests and responses.  In addition to their own payload, they provide basic information about how the resource's business object should be referenced in the message.";

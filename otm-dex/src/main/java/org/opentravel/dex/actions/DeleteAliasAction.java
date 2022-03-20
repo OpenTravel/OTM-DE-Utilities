@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmFacets.OtmAlias;
@@ -31,7 +31,7 @@ import org.opentravel.schemacompiler.model.TLAliasOwner;
  *
  */
 public class DeleteAliasAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( DeleteAliasAction.class );
+    private static Logger log = LogManager.getLogger( DeleteAliasAction.class );
 
     /**
      * Can the passed alias be deleted?

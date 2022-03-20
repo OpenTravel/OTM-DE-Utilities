@@ -16,8 +16,8 @@
 
 package org.opentravel.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.schemacompiler.model.TLDocumentation;
@@ -38,7 +38,7 @@ import javafx.beans.property.StringProperty;
  * 
  */
 public class OtmDocHandler {
-    private static Log log = LogFactory.getLog( OtmDocHandler.class );
+    private static Logger log = LogManager.getLogger( OtmDocHandler.class );
 
     private static final String EXAMPLE_CONTEXT = "Example";
     protected OtmObject obj;

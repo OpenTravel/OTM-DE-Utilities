@@ -9,7 +9,7 @@
 		fx:controller="org.opentravel.dex.controllers.library.usage.UsersTreeController">
    <children>
       <Label fx:id="columnLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="18.0" 
-     	 prefWidth="300.0" stylesheets="../@DavesViper.css" text="Users" 
+     	 prefWidth="300.0" stylesheets="@../DavesViper.css" text="Users" 
      	 textAlignment="CENTER" />
       <TreeView fx:id="usersTree" prefWidth="300.0" VBox.vgrow="ALWAYS" />
    </children>

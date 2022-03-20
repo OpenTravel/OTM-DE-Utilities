@@ -18,8 +18,8 @@ package org.opentravel.dex.controllers.popup;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.AbstractDexTest;
@@ -37,7 +37,7 @@ import java.io.IOException;
  * Verifies the functions of the <code>New Library Dialog Controller</code>.
  */
 public class TestNewLibraryDialogController extends AbstractDexTest {
-    private static Log log = LogFactory.getLog( TestNewLibraryDialogController.class );
+    private static Logger log = LogManager.getLogger( TestNewLibraryDialogController.class );
 
     @BeforeClass
     public static void setupTests() throws Exception {

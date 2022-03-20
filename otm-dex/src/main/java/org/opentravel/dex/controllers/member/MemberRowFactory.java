@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.member;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedController;
@@ -50,7 +50,7 @@ import javafx.scene.input.TransferMode;
  */
 @SuppressWarnings("squid:MaximumInheritanceDepth")
 public final class MemberRowFactory extends TreeTableRow<MemberAndProvidersDAO> {
-    private static Log log = LogFactory.getLog( MemberRowFactory.class );
+    private static Logger log = LogManager.getLogger( MemberRowFactory.class );
 
     private final ContextMenu memberMenu = new ContextMenu();
     private static final PseudoClass EDITABLE = PseudoClass.getPseudoClass( "editable" );

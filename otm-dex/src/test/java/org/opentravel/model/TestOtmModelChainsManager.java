@@ -18,8 +18,8 @@ package org.opentravel.model;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.AbstractDexTest;
@@ -44,7 +44,7 @@ import java.util.Map;
  * Verifies the functions of the <code>Otm Model Manager's Version Chain Manager</code>.
  */
 public class TestOtmModelChainsManager extends AbstractDexTest {
-    private static Log log = LogFactory.getLog( TestOtmModelChainsManager.class );
+    private static Logger log = LogManager.getLogger( TestOtmModelChainsManager.class );
 
     /**
      * Check to assure chain manager:

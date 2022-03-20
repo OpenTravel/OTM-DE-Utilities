@@ -40,7 +40,7 @@ import javafx.scene.canvas.GraphicsContext;
  *
  */
 public class BusinessObjectSprite extends MemberSprite<OtmLibraryMember> implements DexSprite {
-    // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
+    // private static Logger log = LogManager.getLogger( BusinessObjectSprite.class );
 
     double dxID;
     double dxSummary;

@@ -18,8 +18,8 @@ package org.opentravel.model.otmContainers;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.opentravel.dex.action.manager.DexReadOnlyActionManager;
 import org.opentravel.model.OtmModelManager;
@@ -33,7 +33,7 @@ import java.util.List;
  *
  */
 public class TestLibrary_BuiltIn {
-    private static Log log = LogFactory.getLog( TestLibrary_BuiltIn.class );
+    private static Logger log = LogManager.getLogger( TestLibrary_BuiltIn.class );
 
     // @BeforeClass
     // public static void setupTests() throws Exception {

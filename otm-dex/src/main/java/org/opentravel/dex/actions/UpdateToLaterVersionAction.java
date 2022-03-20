@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.events.DexChangeEvent;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
@@ -32,7 +32,7 @@ import java.util.List;
  * Update the type user to a later version of the type provider.
  */
 public class UpdateToLaterVersionAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( UpdateToLaterVersionAction.class );
+    private static Logger log = LogManager.getLogger( UpdateToLaterVersionAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
         return subject != null && subject.isEditable();

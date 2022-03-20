@@ -19,8 +19,8 @@ package org.opentravel.model.otmProperties;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.OtmModelManager;
@@ -36,7 +36,7 @@ import org.opentravel.schemacompiler.model.TLAttributeOwner;
  * <p>
  */
 public class TestIDReferenceAttribute extends TestOtmPropertiesBase<OtmAttribute<?>> {
-    private static Log log = LogFactory.getLog( TestIDReferenceAttribute.class );
+    private static Logger log = LogManager.getLogger( TestIDReferenceAttribute.class );
 
     @BeforeClass
     public static void beforeClass() {

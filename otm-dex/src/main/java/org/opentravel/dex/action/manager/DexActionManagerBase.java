@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.action.manager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexActions;
@@ -49,7 +49,7 @@ import javafx.beans.value.ObservableValue;
  *
  */
 public abstract class DexActionManagerBase implements DexActionManager {
-    private static Log log = LogFactory.getLog( DexActionManagerBase.class );
+    private static Logger log = LogManager.getLogger( DexActionManagerBase.class );
 
     // Development Notes:
     // "The ObservableValue stores a strong reference to the listener which will prevent the listener from being garbage

@@ -34,7 +34,7 @@ import javafx.scene.canvas.GraphicsContext;
  *
  */
 public class ChoiceObjectSprite extends MemberSprite<OtmChoiceObject> implements DexSprite {
-    // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
+    // private static Logger log = LogManager.getLogger( BusinessObjectSprite.class );
 
     double dxID;
     double dxShared;

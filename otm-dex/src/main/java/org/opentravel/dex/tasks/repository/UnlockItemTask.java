@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.tasks.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
@@ -31,7 +31,7 @@ import org.opentravel.schemacompiler.repository.RepositoryItem;
  *
  */
 public class UnlockItemTask extends DexTaskBase<RepositoryItem> {
-    private static Log log = LogFactory.getLog( UnlockItemTask.class );
+    private static Logger log = LogManager.getLogger( UnlockItemTask.class );
 
     boolean commitWIP = true;
     String remarks = "testing";

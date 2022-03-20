@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.events;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.search.SearchResultsDAO;
 
 import javafx.event.EventType;
@@ -29,7 +29,7 @@ import javafx.event.EventType;
  *
  */
 public class DexSearchResultsEvent extends DexEvent {
-    private static Log log = LogFactory.getLog( DexSearchResultsEvent.class );
+    private static Logger log = LogManager.getLogger( DexSearchResultsEvent.class );
     private static final long serialVersionUID = 20191109L;
 
     public static final EventType<DexSearchResultsEvent> SEARCH_RESULTS = new EventType<>( DEX_ALL, "SEARCH_RESULTS" );

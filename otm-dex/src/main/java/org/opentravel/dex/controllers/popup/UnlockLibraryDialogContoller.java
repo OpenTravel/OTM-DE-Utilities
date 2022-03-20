@@ -38,7 +38,7 @@ import javafx.stage.Stage;
  *
  */
 public class UnlockLibraryDialogContoller extends DexPopupControllerBase {
-    // private static Log log = LogFactory.getLog( UnlockLibraryDialogContoller.class );
+    // private static Logger log = LogManager.getLogger( UnlockLibraryDialogContoller.class );
 
     public static final String LAYOUT_FILE = "/UnlockLibraryDialog.fxml";
 

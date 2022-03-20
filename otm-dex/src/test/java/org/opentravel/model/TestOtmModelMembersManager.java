@@ -18,8 +18,8 @@ package org.opentravel.model;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.AbstractDexTest;
@@ -43,7 +43,7 @@ import java.util.List;
  * Verifies the functions of the <code>DEX Namespace Handler</code> class.
  */
 public class TestOtmModelMembersManager extends AbstractDexTest {
-    private static Log log = LogFactory.getLog( TestOtmModelMembersManager.class );
+    private static Logger log = LogManager.getLogger( TestOtmModelMembersManager.class );
 
     @BeforeClass
     public static void beforeClass() throws Exception {

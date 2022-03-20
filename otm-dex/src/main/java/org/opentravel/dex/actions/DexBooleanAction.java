@@ -29,7 +29,7 @@ import javafx.beans.value.ObservableValue;
  *
  */
 public abstract class DexBooleanAction extends DexActionBase implements DexAction<Boolean> {
-    // private static Log log = LogFactory.getLog( DexBooleanAction.class );
+    // private static Logger log = LogManager.getLogger( DexBooleanAction.class );
 
     protected ObservableValue<? extends Boolean> observable;
 

@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.opentravel.otm</groupId>
 	<artifactId>ota2-utilities-parent-pom</artifactId>
-	<version>4.0-SNAPSHOT</version>
+	<version>5.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<inceptionYear>2014</inceptionYear>
 
@@ -31,19 +29,22 @@
 		<appVersion>${project.version}-${maven.build.timestamp}</appVersion>
 		<maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
-		
+		<java.version>17</java.version>
+
 		<!-- Dependency Versions -->
+		<javafx.version>17.0.2</javafx.version>
 		<fge.version>2.2.6</fge.version>
-		<richtextfx.version>0.7-M2</richtextfx.version>
+		<richtextfx.version>0.10.9</richtextfx.version>
+		<flowless.version>0.6.9</flowless.version>
+		<reactfx.version>2.0-M5</reactfx.version>
 		<jfxtras.version>8.0-r5</jfxtras.version>
-		<controlsfx.version>8.40.14</controlsfx.version>
+		<controlsfx.version>11.1.1</controlsfx.version>
 		<junit.version>4.12</junit.version>
 		<testfx.version>4.0.15-alpha</testfx.version>
 		<monocle.version>8u76-b04</monocle.version>
 		<loadui.version>3.1.2</loadui.version>
 		<mockito.version>2.23.4</mockito.version>
-		
+
 		<!-- Plugin Versions -->
 		<compiler.plugin.version>3.8.0</compiler.plugin.version>
 		<resources.plugin.version>3.1.0</resources.plugin.version>
@@ -59,7 +60,7 @@
 		<license.plugin.version>2.10</license.plugin.version>
 		<surefire.plugin.version>2.19.1</surefire.plugin.version>
 		<jacoco.plugin.version>0.8.3</jacoco.plugin.version>
-		<checkstyle.plugin.version>3.0.0</checkstyle.plugin.version>
+		<checkstyle.plugin.version>3.1.2</checkstyle.plugin.version>
 		<javadoc.plugin.version>3.1.0</javadoc.plugin.version>
 		<copyrename.version>1.0.1</copyrename.version>
 
@@ -155,6 +156,8 @@
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<configuration>
 					<configLocation>${checkstyle.config}</configLocation>
+					<excludes>**/module-info.java</excludes>
+					<skip>${skipTests}</skip>
 				</configuration>
 				<executions>
 					<execution>
@@ -197,6 +200,7 @@
 						<exclude>**/*.properties</exclude>
 						<exclude>**/*.sql</exclude>
 						<exclude>**/*.jrxml</exclude>
+						<exclude>**/module-info.java</exclude>
 						<exclude>src/test/resources/**</exclude>
 						<exclude>src/main/resources/**</exclude>
 					</excludes>
@@ -309,6 +313,26 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>org.openjfx</groupId>
+				<artifactId>javafx-base</artifactId>
+				<version>${javafx.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openjfx</groupId>
+				<artifactId>javafx-fxml</artifactId>
+				<version>${javafx.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openjfx</groupId>
+				<artifactId>javafx-controls</artifactId>
+				<version>${javafx.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openjfx</groupId>
+				<artifactId>javafx-web</artifactId>
+				<version>${javafx.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.github.fge</groupId>
 				<artifactId>json-schema-validator</artifactId>
 				<version>${fge.version}</version>
@@ -317,6 +341,16 @@
 				<groupId>org.fxmisc.richtext</groupId>
 				<artifactId>richtextfx</artifactId>
 				<version>${richtextfx.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.fxmisc.flowless</groupId>
+				<artifactId>flowless</artifactId>
+				<version>${flowless.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.reactfx</groupId>
+				<artifactId>reactfx</artifactId>
+				<version>${reactfx.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jfxtras</groupId>

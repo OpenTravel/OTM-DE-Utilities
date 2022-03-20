@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.action.manager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.actions.string.NameChangeAction;
@@ -41,7 +41,7 @@ import org.opentravel.model.otmProperties.OtmProperty;
  *
  */
 public class DexMinorVersionActionManager extends DexActionManagerBase {
-    private static Log log = LogFactory.getLog( DexMinorVersionActionManager.class );
+    private static Logger log = LogManager.getLogger( DexMinorVersionActionManager.class );
     private DexActionManager actionManager = null;
 
     /**

@@ -27,7 +27,7 @@ import org.opentravel.schemacompiler.model.TLEnumValue;
  *
  */
 public class OtmEnumerationValue extends OtmValueProperty {
-    // private static Log log = LogFactory.getLog( OtmEnumerationValue.class );
+    // private static Logger log = LogManager.getLogger( OtmEnumerationValue.class );
 
     private OtmPropertyOwner parent;
 

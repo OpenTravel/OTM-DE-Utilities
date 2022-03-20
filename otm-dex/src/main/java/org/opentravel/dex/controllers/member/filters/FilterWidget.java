@@ -28,7 +28,7 @@ import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
  *
  */
 public class FilterWidget implements DexFilterWidget<OtmLibraryMember> {
-    // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
+    // private static Logger log = LogManager.getLogger( LibraryFilterWidget.class );
 
     public interface Selector {
         public boolean isSelected(OtmLibraryMember m);

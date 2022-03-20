@@ -20,6 +20,8 @@ import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.AbstractUserSettings;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
 
+import java.net.URL;
+
 /**
  * JavaFX application for the OTA2 Example Upgrade Utility.
  */
@@ -52,8 +54,8 @@ public class ExampleUpgradeApplication extends AbstractOTMApplication {
      * @see org.opentravel.application.common.AbstractOTMApplication#getMainWindowFxmlLocation()
      */
     @Override
-    protected String getMainWindowFxmlLocation() {
-        return ExampleUpgradeController.FXML_FILE;
+    protected URL getMainWindowFxmlLocation() {
+        return ExampleUpgradeApplication.class.getResource( ExampleUpgradeController.FXML_FILE );
     }
 
     /**

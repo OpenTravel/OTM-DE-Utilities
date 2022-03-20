@@ -16,13 +16,13 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
 
 public class SetListAction extends DexBooleanAction {
-    private static Log log = LogFactory.getLog( SetListAction.class );
+    private static Logger log = LogManager.getLogger( SetListAction.class );
 
     /**
      * @param subject

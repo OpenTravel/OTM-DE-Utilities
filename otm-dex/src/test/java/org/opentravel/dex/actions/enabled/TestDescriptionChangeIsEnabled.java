@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions.enabled;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -27,7 +27,7 @@ import org.opentravel.model.otmProperties.OtmProperty;
  * AddAliasAction
  */
 public class TestDescriptionChangeIsEnabled extends TestActionsIsEnabledBase {
-    private static Log log = LogFactory.getLog( TestDescriptionChangeIsEnabled.class );
+    private static Logger log = LogManager.getLogger( TestDescriptionChangeIsEnabled.class );
 
     /**
      */

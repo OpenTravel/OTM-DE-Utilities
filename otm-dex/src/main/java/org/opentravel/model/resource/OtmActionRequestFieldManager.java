@@ -37,7 +37,7 @@ import javafx.scene.control.Button;
  * 
  */
 public class OtmActionRequestFieldManager {
-    // private static Log log = LogFactory.getLog( OtmActionRequestFieldManager.class );
+    // private static Logger log = LogManager.getLogger( OtmActionRequestFieldManager.class );
 
 
     private static final String MIME_LABEL = "Mime Types";

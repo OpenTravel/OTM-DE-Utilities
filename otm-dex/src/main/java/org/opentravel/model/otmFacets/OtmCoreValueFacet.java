@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmFacets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmCore;
 
@@ -29,7 +29,7 @@ import java.util.Collections;
  * 
  */
 public class OtmCoreValueFacet extends OtmAbstractDisplayFacet {
-    private static Log log = LogFactory.getLog( OtmCoreValueFacet.class );
+    private static Logger log = LogManager.getLogger( OtmCoreValueFacet.class );
 
     private OtmCore owner;
 

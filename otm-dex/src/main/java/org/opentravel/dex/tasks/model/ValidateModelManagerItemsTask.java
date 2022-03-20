@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.tasks.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.DexTaskSingleton;
@@ -40,7 +40,7 @@ import java.util.List;
 // FIXME - will get concurrent modification error if the model is closed before validation is finsihed
 //
 public class ValidateModelManagerItemsTask extends DexTaskBase<OtmModelManager> implements DexTaskSingleton {
-    private static Log log = LogFactory.getLog( ValidateModelManagerItemsTask.class );
+    private static Logger log = LogManager.getLogger( ValidateModelManagerItemsTask.class );
 
     /**
      * Create a lock repository item task.

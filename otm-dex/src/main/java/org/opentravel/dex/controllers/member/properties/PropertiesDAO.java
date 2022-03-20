@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.member.properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.actions.resource.SetRepeatCountAction;
@@ -57,7 +57,7 @@ import javafx.scene.image.ImageView;
  *
  */
 public class PropertiesDAO implements DexDAO<OtmObject> {
-    private static Log log = LogFactory.getLog( PropertiesDAO.class );
+    private static Logger log = LogManager.getLogger( PropertiesDAO.class );
 
     protected final OtmObject element;
     // TODO - remove controller, it is no longer needed for images

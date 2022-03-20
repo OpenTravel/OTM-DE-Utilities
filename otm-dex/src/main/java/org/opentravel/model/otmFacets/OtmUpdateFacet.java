@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmFacets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -32,7 +32,7 @@ import org.opentravel.schemacompiler.model.TLFacetType;
  * 
  */
 public class OtmUpdateFacet extends OtmContextualFacet {
-    private static Log log = LogFactory.getLog( OtmUpdateFacet.class );
+    private static Logger log = LogManager.getLogger( OtmUpdateFacet.class );
 
     /**
      */

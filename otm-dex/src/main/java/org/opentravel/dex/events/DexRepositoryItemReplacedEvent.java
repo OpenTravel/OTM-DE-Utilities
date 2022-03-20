@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.events;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.schemacompiler.repository.RepositoryItem;
 
 import javafx.event.EventType;
@@ -30,7 +30,7 @@ import javafx.event.EventType;
  *
  */
 public class DexRepositoryItemReplacedEvent extends DexEvent {
-    private static Log log = LogFactory.getLog( DexRepositoryItemReplacedEvent.class );
+    private static Logger log = LogManager.getLogger( DexRepositoryItemReplacedEvent.class );
     private static final long serialVersionUID = 20190606L;
 
     public static final EventType<DexRepositoryItemReplacedEvent> REPOSITORY_ITEM_REPLACED =

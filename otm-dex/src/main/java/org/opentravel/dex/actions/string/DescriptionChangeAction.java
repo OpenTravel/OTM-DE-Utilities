@@ -19,7 +19,7 @@ package org.opentravel.dex.actions.string;
 import org.opentravel.model.OtmObject;
 
 public class DescriptionChangeAction extends DexStringAction {
-    // private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+    // private static Logger log = LogManager.getLogger( DescriptionChangeAction.class );
 
     public static boolean isEnabled(OtmObject subject) {
         return subject.isEditable();

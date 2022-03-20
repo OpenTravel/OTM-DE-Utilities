@@ -16,8 +16,8 @@
 
 package org.opentravel.common;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.schemacompiler.repository.RemoteRepository;
 import org.opentravel.schemacompiler.repository.Repository;
 import org.opentravel.schemacompiler.repository.RepositoryAvailabilityChecker;
@@ -36,7 +36,7 @@ import java.util.List;
  */
 // UNUSED (5/18/2021)
 public class DexRepositoryHandler {
-    private static Log log = LogFactory.getLog( DexRepositoryHandler.class );
+    private static Logger log = LogManager.getLogger( DexRepositoryHandler.class );
 
     private RepositoryManager repositoryManager;
     private RepositoryAvailabilityChecker availabilityChecker;

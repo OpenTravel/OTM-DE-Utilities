@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.IOException;
+import java.net.URL;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -69,9 +70,9 @@ public abstract class AbstractOTMApplication extends Application {
     /**
      * Returns the classpath location of the FXML file for the application's main window.
      * 
-     * @return String
+     * @return URL
      */
-    protected abstract String getMainWindowFxmlLocation();
+    protected abstract URL getMainWindowFxmlLocation();
 
     /**
      * Returns the user settings for this application.
@@ -88,8 +89,7 @@ public abstract class AbstractOTMApplication extends Application {
     @Override
     public void start(final Stage primaryStage) {
         try {
-            FXMLLoader loader =
-                new FXMLLoader( AbstractOTMApplication.class.getResource( getMainWindowFxmlLocation() ) );
+            FXMLLoader loader = new FXMLLoader( getMainWindowFxmlLocation() );
             Parent root = loader.load();
             AbstractUserSettings userSettings = getUserSettings();
 

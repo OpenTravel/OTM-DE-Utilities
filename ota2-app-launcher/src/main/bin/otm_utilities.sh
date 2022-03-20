@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+SCRIPTDIR="$( cd "$( dirname "$0" )" && pwd )"
+JAVA_CLASSPATH=$(echo $SCRIPTDIR/lib/*.jar | tr ' ' ':')
 JVM_OPTS=-Xms512m
 
-java $JVM_OPTS -jar ota2-app-launcher.jar "$@"&
+java $JVM_OPTS -cp $JAVA_CLASSPATH -jar ota2-app-launcher.jar "$@"&

@@ -16,8 +16,8 @@
 
 package org.opentravel.common;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmObject;
 import org.opentravel.schemacompiler.validate.FindingMessageFormat;
 import org.opentravel.schemacompiler.validate.FindingType;
@@ -33,7 +33,7 @@ import java.util.List;
  *
  */
 public class ValidationUtils {
-    private static Log log = LogFactory.getLog( ValidationUtils.class );
+    private static Logger log = LogManager.getLogger( ValidationUtils.class );
 
     private ValidationUtils() {
         // NO-OP - static methods only. Do not instantiate this class.

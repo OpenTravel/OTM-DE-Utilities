@@ -16,6 +16,8 @@
 
 package org.opentravel.exampleupgrade;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.opentravel.application.common.AbstractMainWindowController;
@@ -45,8 +47,6 @@ import org.opentravel.schemacompiler.validate.FindingType;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
 import org.opentravel.schemacompiler.visitor.ModelNavigator;
 import org.opentravel.schemacompiler.xml.XMLPrettyPrinter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import java.io.ByteArrayOutputStream;
@@ -119,7 +119,7 @@ public class ExampleUpgradeController extends AbstractMainWindowController {
     public static final String FXML_FILE = "/ota2-EXAMPLE-upgrade.fxml";
 
     private static final DataFormat DRAG_FORMAT = new DataFormat( "application/ota2-original-dom-node" );
-    private static final Logger log = LoggerFactory.getLogger( ExampleUpgradeController.class );
+    private static final Logger log = LogManager.getLogger( ExampleUpgradeController.class );
 
     @FXML
     private TextField libraryText;

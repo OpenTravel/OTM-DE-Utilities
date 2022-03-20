@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelManager;
@@ -37,7 +37,7 @@ import java.util.Collection;
  * 
  */
 public class OtmEnumerationOpen extends OtmEnumeration<TLOpenEnumeration> {
-    private static Log log = LogFactory.getLog( OtmEnumerationOpen.class );
+    private static Logger log = LogManager.getLogger( OtmEnumerationOpen.class );
 
     public OtmEnumerationOpen(String name, OtmModelManager mgr) {
         super( new TLOpenEnumeration(), mgr );

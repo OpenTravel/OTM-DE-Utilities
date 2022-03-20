@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmContainers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -32,7 +32,7 @@ import org.opentravel.schemacompiler.model.TLLibrary;
  * 
  */
 public class OtmMajorLibrary extends OtmManagedLibrary {
-    private static Log log = LogFactory.getLog( OtmMajorLibrary.class );
+    private static Logger log = LogManager.getLogger( OtmMajorLibrary.class );
 
     /**
      * Should only be called by Factory.

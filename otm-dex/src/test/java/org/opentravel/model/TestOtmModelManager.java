@@ -19,8 +19,8 @@ package org.opentravel.model;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.AbstractDexTest;
@@ -58,7 +58,7 @@ import java.util.List;
  */
 // @Ignore
 public class TestOtmModelManager extends AbstractDexTest {
-    private static Log log = LogFactory.getLog( TestOtmModelManager.class );
+    private static Logger log = LogManager.getLogger( TestOtmModelManager.class );
 
     // final static String FXID_PROJECTCOMBO = "#projectCombo"; // if .projectCombo that would be css selector
     // final static String FILE_TESTOPENTRAVELREPO = "TestOpenTravelRepo.otp";

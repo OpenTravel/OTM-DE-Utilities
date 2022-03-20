@@ -18,8 +18,8 @@ package org.opentravel.model.otmContainers;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
 import org.opentravel.common.DexProjectException;
@@ -38,7 +38,7 @@ import java.io.File;
  */
 // @Ignore
 public class TestProject extends TestProjectUtils {
-    private static Log log = LogFactory.getLog( TestProject.class );
+    private static Logger log = LogManager.getLogger( TestProject.class );
 
     @Test
     public void testConstructor() {

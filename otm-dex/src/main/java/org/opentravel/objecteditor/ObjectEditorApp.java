@@ -16,11 +16,13 @@
 
 package org.opentravel.objecteditor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.AbstractOTMApplication;
 import org.opentravel.application.common.AbstractUserSettings;
 import org.opentravel.schemacompiler.repository.RepositoryManager;
+
+import java.net.URL;
 
 import javafx.stage.Stage;
 
@@ -33,7 +35,7 @@ import javafx.stage.Stage;
  */
 public class ObjectEditorApp extends AbstractOTMApplication {
 
-    private static Log log = LogFactory.getLog( ObjectEditorApp.class );
+    private static Logger log = LogManager.getLogger( ObjectEditorApp.class );
 
     private static final String LAYOUT_FILE = "/OtmObjectEditorLayout.fxml";
     private static final String APPLICATION_TITLE = "DEx - OpenTravel Development Environment Object Editor";
@@ -70,8 +72,8 @@ public class ObjectEditorApp extends AbstractOTMApplication {
 
 
     @Override
-    protected String getMainWindowFxmlLocation() {
-        return LAYOUT_FILE;
+    protected URL getMainWindowFxmlLocation() {
+        return ObjectEditorApp.class.getResource( LAYOUT_FILE );
     }
 
     @Override

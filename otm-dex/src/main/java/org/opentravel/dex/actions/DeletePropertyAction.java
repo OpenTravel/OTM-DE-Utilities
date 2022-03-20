@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.actions.resource.AddResourceChildAction;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmResourceChild;
@@ -31,7 +31,7 @@ import org.opentravel.model.otmProperties.OtmProperty;
  *
  */
 public class DeletePropertyAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( AddResourceChildAction.class );
+    private static Logger log = LogManager.getLogger( AddResourceChildAction.class );
 
     public static boolean isEnabled(OtmObject otm) {
         if (otm instanceof OtmProperty) {

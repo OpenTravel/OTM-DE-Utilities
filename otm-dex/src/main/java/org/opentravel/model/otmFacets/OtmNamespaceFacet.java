@@ -31,7 +31,7 @@ import java.util.Collections;
  * 
  */
 public class OtmNamespaceFacet extends OtmAbstractDisplayFacet {
-    // private static Log log = LogFactory.getLog( OtmEmptyTableFacet.class );
+    // private static Logger log = LogManager.getLogger( OtmEmptyTableFacet.class );
 
     private OtmModelManager modelManager;
     private OtmObject object;

@@ -18,8 +18,8 @@ package org.opentravel.dex.controllers.popup;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.AbstractDexTest;
@@ -36,7 +36,7 @@ import org.opentravel.schemacompiler.repository.RepositoryItem;
  * Verifies the functions of the action methods in <code>NamespaceLibrariesRowFactory</code>.
  */
 public class TestNamespaceLibrariesRowFactory extends AbstractDexTest {
-    private static Log log = LogFactory.getLog( TestNamespaceLibrariesRowFactory.class );
+    private static Logger log = LogManager.getLogger( TestNamespaceLibrariesRowFactory.class );
 
     @BeforeClass
     public static void setupTests() throws Exception {

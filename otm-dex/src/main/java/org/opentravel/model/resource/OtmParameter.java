@@ -53,7 +53,7 @@ import javafx.scene.control.Tooltip;
  * 
  */
 public class OtmParameter extends OtmResourceChildBase<TLParameter> implements OtmResourceChild {
-    // private static Log log = LogFactory.getLog( OtmParameter.class );
+    // private static Logger log = LogManager.getLogger( OtmParameter.class );
     private static TLParamLocation defaultLocation = TLParamLocation.PATH;
 
     private static final String TOOLTIP =

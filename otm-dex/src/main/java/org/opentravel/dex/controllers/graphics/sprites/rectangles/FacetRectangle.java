@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils.DrawType;
@@ -54,7 +54,7 @@ import javafx.scene.paint.Paint;
  *
  */
 public class FacetRectangle extends Rectangle {
-    private static Log log = LogFactory.getLog( FacetRectangle.class );
+    private static Logger log = LogManager.getLogger( FacetRectangle.class );
 
     private OtmFacet<?> facet = null;
     private OtmObject otmObject = null;

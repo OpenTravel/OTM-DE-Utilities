@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.popup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.DexFileException;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.common.DexProjectException;
@@ -61,7 +61,7 @@ import javafx.stage.Stage;
  *
  */
 public class NewLibraryDialogController extends DexPopupControllerBase {
-    private static Log log = LogFactory.getLog( NewLibraryDialogController.class );
+    private static Logger log = LogManager.getLogger( NewLibraryDialogController.class );
 
     public static final String LAYOUT_FILE = "/Dialogs/NewLibraryDialog.fxml";
 

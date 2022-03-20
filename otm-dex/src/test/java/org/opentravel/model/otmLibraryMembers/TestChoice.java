@@ -19,8 +19,8 @@ package org.opentravel.model.otmLibraryMembers;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,7 +44,7 @@ import java.util.List;
 public class TestChoice extends TestOtmLibraryMemberBase<OtmChoiceObject> {
     private static final String CH_NAME = "TestChoice";
 
-    private static Log log = LogFactory.getLog( TestChoice.class );
+    private static Logger log = LogManager.getLogger( TestChoice.class );
 
     @BeforeClass
     public static void beforeClass() {

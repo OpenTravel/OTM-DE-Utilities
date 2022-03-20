@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.dex.tasks.repository.SearchRepositoryTask;
@@ -49,7 +49,7 @@ import javafx.scene.control.TextField;
 @Deprecated
 public class RepositorySearchController extends DexIncludedControllerBase<RepositoryManager>
     implements TaskResultHandlerI {
-    private static Log log = LogFactory.getLog( RepositorySearchController.class );
+    private static Logger log = LogManager.getLogger( RepositorySearchController.class );
 
     @FXML
     private ChoiceBox<String> statusChoice;

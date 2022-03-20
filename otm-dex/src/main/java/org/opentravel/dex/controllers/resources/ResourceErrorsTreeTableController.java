@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.resources;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.cellfactories.ValidationErrorsAndWarningsTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
@@ -51,7 +51,7 @@ import javafx.scene.image.ImageView;
  *
  */
 public class ResourceErrorsTreeTableController extends DexIncludedControllerBase<OtmResource> {
-    private static Log log = LogFactory.getLog( ResourceErrorsTreeTableController.class );
+    private static Logger log = LogManager.getLogger( ResourceErrorsTreeTableController.class );
 
     // Column labels
     public static final String LEVELLABEL = "Level";
@@ -191,7 +191,8 @@ public class ResourceErrorsTreeTableController extends DexIncludedControllerBase
 
     public ErrorsAndWarningsDAO getSelected() {
         return resourceErrors.getSelectionModel().getSelectedItem() != null
-            ? resourceErrors.getSelectionModel().getSelectedItem().getValue() : null;
+            ? resourceErrors.getSelectionModel().getSelectedItem().getValue()
+            : null;
     }
 
     private void handleEvent(DexMemberSelectionEvent event) {

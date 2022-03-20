@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.search;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.schemacompiler.repository.EntitySearchResult;
@@ -38,7 +38,7 @@ import javafx.scene.image.ImageView;
  *
  */
 public class SearchResultsDAO implements DexDAO<String> {
-    private static Log log = LogFactory.getLog( SearchResultsDAO.class );
+    private static Logger log = LogManager.getLogger( SearchResultsDAO.class );
 
     private Repository repository;
     //

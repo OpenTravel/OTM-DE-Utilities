@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.OtmEventUser;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.events.DexEvent;
@@ -45,7 +45,7 @@ import javafx.scene.control.TreeTableColumn;
  *
  */
 public abstract class DexIncludedControllerBase<C> implements DexIncludedController<C>, OtmEventUser {
-    private static Log log = LogFactory.getLog( DexIncludedControllerBase.class );
+    private static Logger log = LogManager.getLogger( DexIncludedControllerBase.class );
 
     protected DexMainController mainController;
     protected C postedData;

@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.tasks.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTaskBase;
 import org.opentravel.dex.tasks.DexTaskSingleton;
@@ -32,7 +32,7 @@ import org.opentravel.schemacompiler.repository.RepositoryException;
  *
  */
 public class ValidateOtmLibraryMemberTask extends DexTaskBase<OtmLibrary> implements DexTaskSingleton {
-    private static Log log = LogFactory.getLog( ValidateOtmLibraryMemberTask.class );
+    private static Logger log = LogManager.getLogger( ValidateOtmLibraryMemberTask.class );
 
     /**
      * Create a lock repository item task.

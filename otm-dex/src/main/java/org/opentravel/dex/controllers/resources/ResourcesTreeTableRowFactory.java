@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.resources;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexIncludedController;
@@ -57,7 +57,7 @@ import javafx.scene.control.TreeTableRow;
  */
 @SuppressWarnings("squid:MaximumInheritanceDepth")
 public final class ResourcesTreeTableRowFactory extends TreeTableRow<ResourcesDAO> {
-    private static Log log = LogFactory.getLog( ResourcesTreeTableRowFactory.class );
+    private static Logger log = LogManager.getLogger( ResourcesTreeTableRowFactory.class );
 
     private static final PseudoClass EDITABLE = PseudoClass.getPseudoClass( "editable" );
     private static final PseudoClass INHERITED = PseudoClass.getPseudoClass( "inherited" );

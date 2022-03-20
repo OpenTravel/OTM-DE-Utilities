@@ -27,7 +27,7 @@ import java.util.List;
 import javafx.beans.value.ObservableValue;
 
 public class SetParameterGroupFacetAction extends DexStringAction {
-    // private static Log log = LogFactory.getLog( SetAbstractAction.class );
+    // private static Logger log = LogManager.getLogger( SetAbstractAction.class );
 
     /**
      * @param subject

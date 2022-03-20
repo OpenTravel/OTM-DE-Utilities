@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.events.DexRepositoryItemSelectionEvent;
@@ -41,7 +41,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
  *
  */
 public class RepositoryItemCommitHistoriesController extends DexIncludedControllerBase<RepoItemDAO> {
-    private static Log log = LogFactory.getLog( RepositoryItemCommitHistoriesController.class );
+    private static Logger log = LogManager.getLogger( RepositoryItemCommitHistoriesController.class );
 
     private static final EventType[] subscribedEvents = {DexRepositoryItemSelectionEvent.REPOSITORY_ITEM_SELECTED,
         DexRepositoryNamespaceSelectionEvent.REPOSITORY_NS_SELECTED, DexRepositorySelectionEvent.REPOSITORY_SELECTED};

@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.popup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.StatusType;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.dex.controllers.DexStatusController;
@@ -72,7 +72,7 @@ import javafx.stage.Stage;
  *
  */
 public class CompileDialogController extends DexPopupControllerBase implements TaskResultHandlerI {
-    private static Log log = LogFactory.getLog( CompileDialogController.class );
+    private static Logger log = LogManager.getLogger( CompileDialogController.class );
 
     public static final String LAYOUT_FILE = "/Dialogs/CompileDialog.fxml";
     public static final String DIALOG_SETTING_LABEL = "compile_dialog";

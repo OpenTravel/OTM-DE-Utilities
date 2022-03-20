@@ -16,8 +16,8 @@
 
 package org.opentravel.model.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
@@ -44,7 +44,7 @@ import javafx.scene.control.Tooltip;
  * 
  */
 public class OtmParentRef extends OtmResourceChildBase<TLResourceParentRef> implements OtmResourceChild {
-    private static Log log = LogFactory.getLog( OtmParentRef.class );
+    private static Logger log = LogManager.getLogger( OtmParentRef.class );
 
     private static final String TOOLTIP = "Specifies a parent reference for a REST resource.";
 

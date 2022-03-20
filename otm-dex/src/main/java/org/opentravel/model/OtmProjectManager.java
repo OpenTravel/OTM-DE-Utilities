@@ -16,8 +16,8 @@
 
 package org.opentravel.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.common.DexProjectException;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
@@ -58,7 +58,7 @@ import javafx.concurrent.WorkerStateEvent;
  *
  */
 public class OtmProjectManager implements TaskResultHandlerI {
-    private static Log log = LogFactory.getLog( OtmProjectManager.class );
+    private static Logger log = LogManager.getLogger( OtmProjectManager.class );
 
     // TODO - why have a duplicate project store? Consider just using the TLProjMrg's project list.
     // Open projects - projectName and otmProject

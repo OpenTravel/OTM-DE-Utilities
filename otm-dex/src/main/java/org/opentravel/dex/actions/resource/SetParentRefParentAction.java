@@ -22,7 +22,7 @@ import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.resource.OtmParentRef;
 
 public class SetParentRefParentAction extends DexStringAction {
-    // private static Log log = LogFactory.getLog( SetAbstractAction.class );
+    // private static Logger log = LogManager.getLogger( SetAbstractAction.class );
 
     /**
      * @param subject

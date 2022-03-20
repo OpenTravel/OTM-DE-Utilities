@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.resources;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.model.OtmObject;
@@ -44,7 +44,7 @@ import javafx.scene.image.ImageView;
  *
  */
 public class ResourcesDAO implements DexDAO<OtmObject> {
-    private static Log log = LogFactory.getLog( ResourcesDAO.class );
+    private static Logger log = LogManager.getLogger( ResourcesDAO.class );
 
     protected OtmObject otmObject;
     // private OtmObject iniheritingParent = null;

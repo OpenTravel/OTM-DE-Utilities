@@ -18,8 +18,8 @@ package org.opentravel.model.otmContainers;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.opentravel.AbstractDexTest;
@@ -51,7 +51,7 @@ import java.util.List;
 // FIXME - do not pass in prefix, or check and warn if namespace is already known but different prefix.
 @Ignore
 public class TestLibraryUtils extends AbstractDexTest {
-    private static Log log = LogFactory.getLog( TestLibraryUtils.class );
+    private static Logger log = LogManager.getLogger( TestLibraryUtils.class );
 
     @BeforeClass
     public static void setupTests() throws Exception {

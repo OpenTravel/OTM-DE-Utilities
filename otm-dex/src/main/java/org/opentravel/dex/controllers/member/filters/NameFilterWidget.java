@@ -29,7 +29,7 @@ import javafx.scene.control.Tooltip;
  *
  */
 public class NameFilterWidget extends FilterWidget {
-    // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
+    // private static Logger log = LogManager.getLogger( LibraryFilterWidget.class );
 
     private TextField nameSelector;
     private String selector = "";

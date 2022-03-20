@@ -46,7 +46,7 @@ import java.util.List;
  */
 public class TestCustomFacet extends TestContextualFacet {
     // Extends TestOtmLibraryMemberBase
-    // private static Log log = LogFactory.getLog( TestContextualFacet.class );
+    // private static Logger log = LogManager.getLogger( TestContextualFacet.class );
     private static final String CF_NAME = "TestCF";
 
 

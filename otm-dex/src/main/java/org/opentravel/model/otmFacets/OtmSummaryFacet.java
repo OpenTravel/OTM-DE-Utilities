@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmFacets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmComplexObjects;
@@ -36,7 +36,7 @@ import java.util.List;
  * 
  */
 public class OtmSummaryFacet extends OtmFacet<TLFacet> {
-    private static Log log = LogFactory.getLog( OtmSummaryFacet.class );
+    private static Logger log = LogManager.getLogger( OtmSummaryFacet.class );
 
     /**
      * @param tlBusinessObject

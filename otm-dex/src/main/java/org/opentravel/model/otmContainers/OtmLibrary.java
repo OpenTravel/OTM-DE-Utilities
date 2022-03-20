@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmContainers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.common.ValidationUtils;
@@ -75,7 +75,7 @@ import javafx.scene.image.Image;
  * 
  */
 public abstract class OtmLibrary implements Comparable<OtmLibrary> {
-    private static Log log = LogFactory.getLog( OtmLibrary.class );
+    private static Logger log = LogManager.getLogger( OtmLibrary.class );
 
     public static final String NO_LOCKEDBYUSER = "";
 

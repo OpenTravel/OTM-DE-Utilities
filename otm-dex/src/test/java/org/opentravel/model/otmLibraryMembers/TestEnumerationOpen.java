@@ -39,7 +39,7 @@ import java.util.Collection;
 /**
  */
 public class TestEnumerationOpen extends TestOtmLibraryMemberBase<OtmEnumerationOpen> {
-    // private static Log log = LogFactory.getLog( TestEnumerationOpen.class );
+    // private static Logger log = LogManager.getLogger( TestEnumerationOpen.class );
 
     @BeforeClass
     public static void beforeClass() {

@@ -23,8 +23,8 @@ import javafx.scene.image.Image;
  */
 public class Images {
 
-    public static final Image launcherIcon =
-        new Image( Images.class.getResourceAsStream( "/images/otm_example_upgrade.png" ) );
+    public static final Image launcherIcon = new Image(
+        Images.class.getResourceAsStream( "/org/opentravel/exampleupgrade/images/otm_example_upgrade.png" ) );
 
     /**
      * Private constructor to prevent instantiation.

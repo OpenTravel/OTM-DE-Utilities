@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.dex.controllers.DexStatusController;
@@ -48,7 +48,7 @@ import javafx.scene.image.ImageView;
  *
  */
 public class RepoItemDAO implements DexDAO<RepositoryItem>, TaskResultHandlerI {
-    private static Log log = LogFactory.getLog( RepoItemDAO.class );
+    private static Logger log = LogManager.getLogger( RepoItemDAO.class );
 
     protected RepositoryItem repoItem;
     SimpleStringProperty lastHistory = new SimpleStringProperty( ":> working..." );

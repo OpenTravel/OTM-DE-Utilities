@@ -50,7 +50,7 @@ import javafx.scene.layout.GridPane;
  *
  */
 public class ResourceDetailsController extends DexIncludedControllerBase<Void> {
-    // private static Log log = LogFactory.getLog( ResourceDetailsController.class );
+    // private static Logger log = LogManager.getLogger( ResourceDetailsController.class );
 
     /**
      * FXML Java FX Nodes this controller is dependent upon

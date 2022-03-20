@@ -19,8 +19,8 @@ package org.opentravel.dex.actions;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.action.manager.DexFullActionManager;
@@ -42,7 +42,7 @@ import java.io.IOException;
  */
 public class TestDeleteAliasAction {
 
-    private static Log log = LogFactory.getLog( TestDeleteAliasAction.class );
+    private static Logger log = LogManager.getLogger( TestDeleteAliasAction.class );
 
     private static OtmModelManager staticModelManager = null;
     static OtmLibrary lib = null;

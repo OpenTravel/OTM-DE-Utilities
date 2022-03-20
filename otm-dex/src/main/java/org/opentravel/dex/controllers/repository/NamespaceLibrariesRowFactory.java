@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.DexProjectException;
 import org.opentravel.common.DexProjectHandler;
 import org.opentravel.dex.controllers.DexMainController;
@@ -51,7 +51,7 @@ import javafx.scene.control.TreeTableRow;
  */
 @SuppressWarnings("squid:MaximumInheritanceDepth")
 public final class NamespaceLibrariesRowFactory extends TreeTableRow<RepoItemDAO> {
-    private static Log log = LogFactory.getLog( NamespaceLibrariesRowFactory.class );
+    private static Logger log = LogManager.getLogger( NamespaceLibrariesRowFactory.class );
 
     private static final PseudoClass EDITABLE = PseudoClass.getPseudoClass( "editable" );
     private static final PseudoClass DIVIDER = PseudoClass.getPseudoClass( "divider" );

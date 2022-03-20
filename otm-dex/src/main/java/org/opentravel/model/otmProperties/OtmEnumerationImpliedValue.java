@@ -30,7 +30,7 @@ import javafx.scene.control.Tooltip;
  */
 public class OtmEnumerationImpliedValue extends OtmValueProperty {
 
-    // private static Log log = LogFactory.getLog( OtmEnumerationImpliedValue.class );
+    // private static Logger log = LogManager.getLogger( OtmEnumerationImpliedValue.class );
 
     private OtmPropertyOwner parent;
     private static final String OTHER = "Other_";

@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.action.manager.DexWizardActionManager;
 import org.opentravel.dex.actions.resource.AssignResourceSubjectAction;
 import org.opentravel.dex.controllers.popup.DexPopupControllerBase.Results;
@@ -42,7 +42,7 @@ import javafx.application.Platform;
  * initial details.
  */
 public class NewLibraryMemberAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( NewLibraryMemberAction.class );
+    private static Logger log = LogManager.getLogger( NewLibraryMemberAction.class );
 
     /**
      * Any OTM object that uses the intended model manager.

@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.popup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexMainControllerBase;
 
 import javafx.fxml.FXML;
@@ -39,7 +39,7 @@ public abstract class DexPopupControllerBase implements DexPopupController {
         OK, CANCEL, ERROR;
     }
 
-    private static Log log = LogFactory.getLog( DexPopupControllerBase.class );
+    private static Logger log = LogManager.getLogger( DexPopupControllerBase.class );
     protected static String helpText = "";
 
     /**

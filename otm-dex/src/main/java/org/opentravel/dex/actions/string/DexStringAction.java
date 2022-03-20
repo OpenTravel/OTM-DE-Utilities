@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions.string;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexActionBase;
 import org.opentravel.schemacompiler.validate.ValidationFindings;
@@ -37,7 +37,7 @@ import javafx.beans.value.ObservableValue;
  *
  */
 public abstract class DexStringAction extends DexActionBase implements DexAction<String> {
-    private static Log log = LogFactory.getLog( DexStringAction.class );
+    private static Logger log = LogManager.getLogger( DexStringAction.class );
 
     protected String oldString;
     protected String newString;

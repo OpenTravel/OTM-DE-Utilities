@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.search;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -37,7 +37,7 @@ import javafx.scene.control.cell.TreeItemPropertyValueFactory;
  * @author dmh
  */
 public class SearchResultsController extends DexIncludedControllerBase<SearchResultsDAO> {
-    private static Log log = LogFactory.getLog( SearchResultsController.class );
+    private static Logger log = LogManager.getLogger( SearchResultsController.class );
 
     @FXML
     private TreeTableView<SearchResultItemDAO> resultsTreeView;

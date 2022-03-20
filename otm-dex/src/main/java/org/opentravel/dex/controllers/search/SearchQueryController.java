@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.search;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
 import org.opentravel.dex.controllers.DexMainController;
@@ -54,7 +54,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class SearchQueryController extends DexIncludedControllerBase<OtmLibraryMember> implements TaskResultHandlerI {
-    private static Log log = LogFactory.getLog( SearchQueryController.class );
+    private static Logger log = LogManager.getLogger( SearchQueryController.class );
 
     @FXML
     private VBox searchQueryVBox;

@@ -19,8 +19,8 @@ package org.opentravel.model.otmLibraryMembers;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.opentravel.model.OtmChildrenOwner;
 import org.opentravel.model.OtmModelElement;
@@ -32,7 +32,7 @@ import org.w3._2001.xmlschema.TopLevelSimpleType;
  * Verifies the functions of the <code>UserSettings</code> class.
  */
 public class TestXsdSimple extends TestOtmLibraryMemberBase<OtmXsdSimple> {
-    private static Log log = LogFactory.getLog( TestXsdSimple.class );
+    private static Logger log = LogManager.getLogger( TestXsdSimple.class );
 
     @BeforeClass
     public static void beforeClass() {

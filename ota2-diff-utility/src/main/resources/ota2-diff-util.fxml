@@ -63,7 +63,7 @@
                                        <graphic>
                                           <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true" translateX="3.0">
                                              <image>
-                                                <Image url="@images/repository.gif" />
+                                                <Image url="@org/opentravel/diffutil/images/repository.gif" />
                                              </image>
                                           </ImageView>
                                        </graphic>
@@ -269,7 +269,7 @@
                <graphic>
                   <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@images/settings.png" />
+                        <Image url="@org/opentravel/diffutil/images/settings.png" />
                      </image>
                   </ImageView>
                </graphic>

@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.popup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.DexFileHandler;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.model.OtmModelManager;
@@ -44,7 +44,7 @@ import javafx.stage.Stage;
  *
  */
 public class SaveAndExitDialogController extends DexPopupControllerBase {
-    private static Log log = LogFactory.getLog( SaveAndExitDialogController.class );
+    private static Logger log = LogManager.getLogger( SaveAndExitDialogController.class );
 
     public static final String LAYOUT_FILE = "/Dialogs/SaveAndExitDialog.fxml";
 

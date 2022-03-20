@@ -31,7 +31,7 @@ import javafx.scene.control.TreeItem;
  *
  */
 public abstract class DexNavigationEvent extends DexEvent {
-    // private static Log log = LogFactory.getLog( DexChangeEvent.class );
+    // private static Logger log = LogManager.getLogger( DexChangeEvent.class );
     private static final long serialVersionUID = 20190826L;
 
     protected OtmLibraryMember member = null;

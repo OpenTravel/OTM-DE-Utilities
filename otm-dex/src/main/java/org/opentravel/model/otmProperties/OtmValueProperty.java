@@ -32,7 +32,7 @@ import javafx.beans.property.StringProperty;
  *
  */
 public abstract class OtmValueProperty extends OtmModelElement<TLModelElement> implements OtmProperty {
-    // private static Log log = LogFactory.getLog( OtmValueProperty.class );
+    // private static Logger log = LogManager.getLogger( OtmValueProperty.class );
 
     public OtmValueProperty(TLModelElement tl) {
         super( tl );

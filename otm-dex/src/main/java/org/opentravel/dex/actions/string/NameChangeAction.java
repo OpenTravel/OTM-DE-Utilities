@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions.string;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeUser;
@@ -29,7 +29,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 
 public class NameChangeAction extends DexStringAction {
-    private static Log log = LogFactory.getLog( NameChangeAction.class );
+    private static Logger log = LogManager.getLogger( NameChangeAction.class );
 
     private static final String VETO1 = "org.opentravel.schemacompiler.TLProperty.name.ELEMENT_REF_NAME_MISMATCH";
     // private static final String VETO2 = "org.opentravel.schemacompiler.TLAttribute.name.INVALID_REFERENCE_NAME";

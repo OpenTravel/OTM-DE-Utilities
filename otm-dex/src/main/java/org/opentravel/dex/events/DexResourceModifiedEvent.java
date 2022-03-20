@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.events;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmResourceChild;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 
@@ -32,7 +32,7 @@ import javafx.event.EventType;
  *
  */
 public class DexResourceModifiedEvent extends DexChangeEvent {
-    private static Log log = LogFactory.getLog( DexResourceModifiedEvent.class );
+    private static Logger log = LogManager.getLogger( DexResourceModifiedEvent.class );
     private static final long serialVersionUID = 20190909L;
 
     public static final EventType<DexResourceModifiedEvent> RESOURCE_MODIFIED =

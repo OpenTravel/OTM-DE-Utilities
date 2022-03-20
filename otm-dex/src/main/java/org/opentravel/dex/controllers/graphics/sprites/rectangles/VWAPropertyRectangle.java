@@ -27,7 +27,7 @@ import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
  *
  */
 public class VWAPropertyRectangle extends PropertyRectangle {
-    // private static Log log = LogFactory.getLog( VWAPropertyRectangle.class );
+    // private static Logger log = LogManager.getLogger( VWAPropertyRectangle.class );
 
     private OtmValueWithAttributes vwa;
 

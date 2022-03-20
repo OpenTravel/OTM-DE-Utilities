@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites.rectangles;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.graphics.sprites.DexSpriteBase;
 import org.opentravel.dex.controllers.graphics.sprites.DomainSprite;
 
@@ -31,7 +31,7 @@ import javafx.scene.canvas.GraphicsContext;
  *
  */
 public class LibraryFacetRectangle extends CollapsableRectangle {
-    private static Log log = LogFactory.getLog( LibraryFacetRectangle.class );
+    private static Logger log = LogManager.getLogger( LibraryFacetRectangle.class );
 
     /**
      * 

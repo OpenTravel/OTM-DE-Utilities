@@ -16,8 +16,8 @@
 
 package org.opentravel.model.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.DexEditField;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
@@ -42,7 +42,7 @@ import javafx.scene.control.Tooltip;
  * 
  */
 public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> implements OtmResourceChild {
-    private static Log log = LogFactory.getLog( OtmActionRequest.class );
+    private static Logger log = LogManager.getLogger( OtmActionRequest.class );
 
     private static final String TOOLTIP = "Specifies the characteristics and payload for a REST Action request.";
 
@@ -129,7 +129,8 @@ public class OtmActionRequest extends OtmResourceChildBase<TLActionRequest> impl
 
     public OtmAction getOwner() {
         return OtmModelElement.get( getTL().getOwner() ) instanceof OtmAction
-            ? ((OtmAction) OtmModelElement.get( getTL().getOwner() )) : null;
+            ? ((OtmAction) OtmModelElement.get( getTL().getOwner() ))
+            : null;
     }
 
     public ObservableList<String> getParameterGroupCandidates() {

@@ -18,8 +18,8 @@ package org.opentravel;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.common.DexProjectException;
@@ -51,7 +51,7 @@ import org.opentravel.model.otmContainers.TestProject;
  * Repository setup follows example in: org.opentravel.schemacompiler.repository.TestRepositoryManager
  */
 public class TestAbstractDexTest extends AbstractDexTest {
-    private static Log log = LogFactory.getLog( TestAbstractDexTest.class );
+    private static Logger log = LogManager.getLogger( TestAbstractDexTest.class );
 
 
     // @Before

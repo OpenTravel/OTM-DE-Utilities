@@ -16,8 +16,8 @@
 
 package org.opentravel.model.resource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.objecteditor.UserSettings;
 import org.opentravel.schemacompiler.model.TLHttpMethod;
@@ -69,7 +69,7 @@ public class DexParentRefsEndpointMap {
     public static final String PATH_SEPERATOR = "/";
     private static final String SYSTEM = "http://example.com";
 
-    private static Log log = LogFactory.getLog( DexParentRefsEndpointMap.class );
+    private static Logger log = LogManager.getLogger( DexParentRefsEndpointMap.class );
 
     /**
      * Collection contribution is from the request template <b>or</b> from the subject.

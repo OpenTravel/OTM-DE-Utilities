@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.popup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.objecteditor.UserSettings;
 
@@ -41,7 +41,7 @@ import javafx.stage.Stage;
  *
  */
 public class WebViewDialogController extends DexPopupControllerBase {
-    private static Log log = LogFactory.getLog( WebViewDialogController.class );
+    private static Logger log = LogManager.getLogger( WebViewDialogController.class );
 
     public static final String LAYOUT_FILE = "/Dialogs/WebViewDialog.fxml";
 

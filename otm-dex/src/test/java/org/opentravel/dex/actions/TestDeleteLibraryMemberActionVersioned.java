@@ -18,8 +18,8 @@ package org.opentravel.dex.actions;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.AbstractDexTest;
@@ -34,7 +34,7 @@ import org.opentravel.schemacompiler.version.VersionSchemeException;
  * Verifies the functions of the <code>delete property action</code> class on versioned objects.
  */
 public class TestDeleteLibraryMemberActionVersioned extends AbstractDexTest {
-    private static Log log = LogFactory.getLog( TestDeleteLibraryMemberActionVersioned.class );
+    private static Logger log = LogManager.getLogger( TestDeleteLibraryMemberActionVersioned.class );
 
     // private static OtmModelManager staticModelManager = null;
     // static OtmLibrary lib = null;

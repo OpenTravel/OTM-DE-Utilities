@@ -32,7 +32,7 @@ import java.util.Collections;
  * 
  */
 public class OtmLibraryDisplayFacet extends OtmAbstractDisplayFacet {
-    // private static Log log = LogFactory.getLog( OtmEmptyTableFacet.class );
+    // private static Logger log = LogManager.getLogger( OtmEmptyTableFacet.class );
 
     private OtmModelManager modelManager = null;
     private OtmLibrary library;

@@ -20,7 +20,7 @@ import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 
 public class BasePathChangeAction extends DexStringAction {
-    // private static Log log = LogFactory.getLog( BasePathChangeAction.class );
+    // private static Logger log = LogManager.getLogger( BasePathChangeAction.class );
 
     /**
      * @param subject

@@ -19,8 +19,8 @@ package org.opentravel.model.otmLibraryMembers;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -57,7 +57,7 @@ import java.util.List;
  * Verifies the functions of the <code>OtmContextualFacet</code> class.
  */
 public class TestContextualFacet extends TestOtmLibraryMemberBase<OtmContextualFacet> {
-    private static Log log = LogFactory.getLog( TestContextualFacet.class );
+    private static Logger log = LogManager.getLogger( TestContextualFacet.class );
     private static final String CF_NAME = "TestCF";
 
     protected static OtmLibraryMember member = null;

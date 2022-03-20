@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.constraints.SetConstraintFractionDigitsAction;
 import org.opentravel.dex.actions.constraints.SetConstraintMaxExclusiveAction;
@@ -185,7 +185,7 @@ public enum DexActions {
         return getAction( action, subject, null, actionManager );
     }
 
-    private static Log log = LogFactory.getLog( DexActions.class );
+    private static Logger log = LogManager.getLogger( DexActions.class );
 
     public static DexAction<?> getAction(DexActions action, OtmObject subject, OtmObject target,
         DexActionManager actionManager)

@@ -16,6 +16,8 @@
 
 package org.opentravel.exampleupgrade;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.OtmApplicationRuntimeException;
 import org.opentravel.schemacompiler.codegen.example.ExampleGeneratorOptions;
 import org.opentravel.schemacompiler.codegen.example.ExampleValueGenerator;
@@ -41,8 +43,6 @@ import org.opentravel.schemacompiler.model.TLMemberField;
 import org.opentravel.schemacompiler.model.TLModel;
 import org.opentravel.schemacompiler.model.TLProperty;
 import org.opentravel.schemacompiler.model.TLSimpleFacet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -72,7 +72,7 @@ import javafx.scene.image.ImageView;
  */
 public class UpgradeTreeBuilder {
 
-    private static final Logger log = LoggerFactory.getLogger( UpgradeTreeBuilder.class );
+    private static final Logger log = LogManager.getLogger( UpgradeTreeBuilder.class );
 
     private Document upgradeDocument;
     private String defaultNamespace;

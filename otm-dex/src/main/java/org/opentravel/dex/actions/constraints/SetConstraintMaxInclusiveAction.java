@@ -23,7 +23,7 @@ import org.opentravel.model.otmLibraryMembers.OtmSimpleObject;
 import org.opentravel.schemacompiler.model.TLSimple;
 
 public class SetConstraintMaxInclusiveAction extends DexStringAction {
-    // private static Log log = LogFactory.getLog( DescriptionChangeAction.class );
+    // private static Logger log = LogManager.getLogger( DescriptionChangeAction.class );
 
     private static final String VETO1 = "org.opentravel.schemacompiler.TLProperty.name.INVALID_RESTRICTION";
     private static final String VETO2 = "org.opentravel.schemacompiler.TLSimple.maxInclusive.MUST_BE_NULL_OR_BLANK";

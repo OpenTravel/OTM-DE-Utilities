@@ -19,8 +19,8 @@ package org.opentravel.model.otmLibraryMembers;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -61,7 +61,7 @@ import java.util.List;
  */
 public abstract class TestOtmLibraryMemberBase<L extends OtmLibraryMember> {
 
-    static Log log = LogFactory.getLog( TestOtmLibraryMemberBase.class );
+    static Logger log = LogManager.getLogger( TestOtmLibraryMemberBase.class );
 
     protected static OtmModelManager staticModelManager = null;
     protected static OtmLibrary staticLib = null;

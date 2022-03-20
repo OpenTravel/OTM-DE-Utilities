@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.member;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.cellfactories.ValidationMemberTreeTableCellFactory;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
@@ -67,7 +67,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class MemberTreeTableController extends DexIncludedControllerBase<OtmModelManager> {
-    private static Log log = LogFactory.getLog( MemberTreeTableController.class );
+    private static Logger log = LogManager.getLogger( MemberTreeTableController.class );
 
     // Column labels
     // To Do - externalize strings
@@ -298,7 +298,8 @@ public class MemberTreeTableController extends DexIncludedControllerBase<OtmMode
 
     public MemberAndProvidersDAO getSelected() {
         return memberTree.getSelectionModel().getSelectedItem() != null
-            ? memberTree.getSelectionModel().getSelectedItem().getValue() : null;
+            ? memberTree.getSelectionModel().getSelectedItem().getValue()
+            : null;
     }
 
     @Override

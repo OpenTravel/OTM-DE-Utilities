@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmFacets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelElement;
@@ -32,7 +32,7 @@ import org.opentravel.schemacompiler.model.TLAlias;
  * 
  */
 public class OtmAliasFacet extends OtmModelElement<TLAlias> implements OtmTypeProvider {
-    private static Log log = LogFactory.getLog( OtmAliasFacet.class );
+    private static Logger log = LogManager.getLogger( OtmAliasFacet.class );
 
     private OtmAlias parent = null;
 

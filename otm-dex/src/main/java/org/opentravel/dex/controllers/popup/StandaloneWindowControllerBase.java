@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.popup;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.controllers.DexMainController;
 
@@ -40,7 +40,7 @@ import javafx.stage.Stage;
  *
  */
 public abstract class StandaloneWindowControllerBase extends DexPopupControllerBase {
-    private static Log log = LogFactory.getLog( StandaloneWindowControllerBase.class );
+    private static Logger log = LogManager.getLogger( StandaloneWindowControllerBase.class );
 
     protected static Stage dialogStage;
     protected int viewGroupId = 0;

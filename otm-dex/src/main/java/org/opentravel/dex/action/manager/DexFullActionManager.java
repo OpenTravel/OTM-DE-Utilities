@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.action.manager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.model.OtmObject;
@@ -36,7 +36,7 @@ import java.lang.reflect.Method;
  *
  */
 public class DexFullActionManager extends DexActionManagerBase {
-    private static Log log = LogFactory.getLog( DexFullActionManager.class );
+    private static Logger log = LogManager.getLogger( DexFullActionManager.class );
 
     /**
      * Full editing action manager that can update status and display queue size and contents.

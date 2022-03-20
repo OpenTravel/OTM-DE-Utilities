@@ -18,8 +18,8 @@ package org.opentravel.model.otmContainers;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,7 +31,7 @@ import org.opentravel.schemacompiler.version.VersionChain;
  * Verifies the functions of the <code>Otm Version Chain - Versioned</code>.
  */
 public class TestOtmVersionChainVersioned extends AbstractDexTest {
-    private static Log log = LogFactory.getLog( TestOtmVersionChainVersioned.class );
+    private static Logger log = LogManager.getLogger( TestOtmVersionChainVersioned.class );
 
     // // Populated by buildOtm()
     // OtmMajorLibrary majorLib = null;

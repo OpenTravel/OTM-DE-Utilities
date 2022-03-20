@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.library.usage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.dex.controllers.DexDAO;
 import org.opentravel.dex.controllers.DexIncludedControllerBase;
@@ -47,7 +47,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class ProvidersTreeController extends DexIncludedControllerBase<OtmLibrary> {
-    private static Log log = LogFactory.getLog( ProvidersTreeController.class );
+    private static Logger log = LogManager.getLogger( ProvidersTreeController.class );
 
     /*
      * FXML injected

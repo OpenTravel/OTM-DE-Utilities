@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmProperties.OtmProperty;
@@ -29,7 +29,7 @@ import org.opentravel.schemacompiler.model.TLModelElement;
  * Make a copy of a member's property.
  */
 public class CopyPropertyAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( CopyPropertyAction.class );
+    private static Logger log = LogManager.getLogger( CopyPropertyAction.class );
 
 
     /**

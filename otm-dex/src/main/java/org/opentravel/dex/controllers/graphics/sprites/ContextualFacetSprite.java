@@ -31,7 +31,7 @@ import javafx.scene.canvas.GraphicsContext;
  *
  */
 public class ContextualFacetSprite extends MemberSprite<OtmContextualFacet> implements DexSprite {
-    // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
+    // private static Logger log = LogManager.getLogger( BusinessObjectSprite.class );
 
     double margin;
     double dx = 0;

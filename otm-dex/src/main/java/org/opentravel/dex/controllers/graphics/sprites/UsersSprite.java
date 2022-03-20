@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.dex.controllers.graphics.sprites.rectangles.LabelRectangle;
@@ -44,7 +44,7 @@ import javafx.scene.paint.Paint;
  *
  */
 public class UsersSprite extends DexSpriteBase {
-    private static Log log = LogFactory.getLog( UsersSprite.class );
+    private static Logger log = LogManager.getLogger( UsersSprite.class );
 
     // private String baseNamespace = "";
     // private Map<OtmLibrary,LibraryRectangle> libMap = new HashMap<>();

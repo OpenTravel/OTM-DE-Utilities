@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.graphics.sprites;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.controllers.graphics.sprites.GraphicsUtils.DrawType;
 import org.opentravel.dex.controllers.graphics.sprites.SettingsManager.Margins;
@@ -47,7 +47,7 @@ import javafx.scene.text.Font;
  *
  */
 public abstract class DexSpriteBase implements DexSprite, RectangleEventHandler {
-    private static Log log = LogFactory.getLog( DexSpriteBase.class );
+    private static Logger log = LogManager.getLogger( DexSpriteBase.class );
 
     protected static final double MIN_HEIGHT = 20;
     protected static final double MIN_WIDTH = 50;

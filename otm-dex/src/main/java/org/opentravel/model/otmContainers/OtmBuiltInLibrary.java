@@ -31,7 +31,7 @@ import org.opentravel.schemacompiler.repository.RepositoryItemState;
  * 
  */
 public class OtmBuiltInLibrary extends OtmLibrary {
-    // private static Log log = LogFactory.getLog( OtmBuiltInLibrary.class );
+    // private static Logger log = LogManager.getLogger( OtmBuiltInLibrary.class );
 
     protected OtmBuiltInLibrary(BuiltInLibrary lib, OtmModelManager mgr) {
         super( lib, mgr );

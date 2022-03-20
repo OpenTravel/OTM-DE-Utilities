@@ -18,8 +18,8 @@ package org.opentravel.dex.actions;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.action.manager.DexActionManager;
@@ -51,7 +51,7 @@ import java.util.List;
  * Verifies the functions of the <code>delete property action</code> class.
  */
 public class TestDeleteLibraryMemberAction {
-    private static Log log = LogFactory.getLog( TestDeleteLibraryMemberAction.class );
+    private static Logger log = LogManager.getLogger( TestDeleteLibraryMemberAction.class );
 
     private static OtmModelManager staticModelManager = null;
     static OtmLibrary lib = null;

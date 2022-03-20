@@ -16,8 +16,8 @@
 
 package org.opentravel.common;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.controllers.popup.SelectProjectDialogController;
 import org.opentravel.model.OtmModelManager;
@@ -36,7 +36,7 @@ import java.util.Set;
  *
  */
 public class DexProjectHandler {
-    private static Log log = LogFactory.getLog( DexProjectHandler.class );
+    private static Logger log = LogManager.getLogger( DexProjectHandler.class );
 
     // public DexProjectHandler() {}
 

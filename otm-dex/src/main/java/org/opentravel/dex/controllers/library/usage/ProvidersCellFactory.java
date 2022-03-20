@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.library.usage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.actions.UpdateToLaterVersionAction;
@@ -42,7 +42,7 @@ import javafx.scene.image.ImageView;
  */
 @SuppressWarnings("squid:MaximumInheritanceDepth")
 public final class ProvidersCellFactory extends TreeCell<MemberAndProvidersDAO> {
-    private static Log log = LogFactory.getLog( ProvidersCellFactory.class );
+    private static Logger log = LogManager.getLogger( ProvidersCellFactory.class );
 
     private static final PseudoClass EDITABLE = PseudoClass.getPseudoClass( "editable" );
     private static final PseudoClass DIVIDER = PseudoClass.getPseudoClass( "divider" );

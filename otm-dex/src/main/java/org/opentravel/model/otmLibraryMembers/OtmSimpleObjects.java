@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmTypeProvider;
@@ -38,7 +38,7 @@ import java.util.List;
  */
 public abstract class OtmSimpleObjects<T extends TLLibraryMember> extends OtmLibraryMemberBase<TLLibraryMember>
     implements OtmObject, OtmTypeProvider {
-    private static Log log = LogFactory.getLog( OtmSimpleObjects.class );
+    private static Logger log = LogManager.getLogger( OtmSimpleObjects.class );
 
     public OtmSimpleObjects(T tl, OtmModelManager mgr) {
         super( tl, mgr );

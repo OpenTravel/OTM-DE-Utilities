@@ -16,8 +16,8 @@
 
 package org.opentravel.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexActions;
@@ -46,7 +46,7 @@ import javafx.scene.image.ImageView;
  * 
  */
 public abstract class OtmModelElement<T extends TLModelElement> implements OtmObject, Comparable<OtmObject> {
-    private static Log log = LogFactory.getLog( OtmModelElement.class );
+    private static Logger log = LogManager.getLogger( OtmModelElement.class );
 
     private static final String NONAMESPACE = "no-namespace-for-for-this-object";
     private static final String NONAME = "no-name-for-for-this-object";
@@ -244,7 +244,8 @@ public abstract class OtmModelElement<T extends TLModelElement> implements OtmOb
     @Override
     public String getPrefix() {
         return getOwningMember() != null && getOwningMember().getLibrary() != null
-            ? getOwningMember().getLibrary().getPrefix() : "---";
+            ? getOwningMember().getLibrary().getPrefix()
+            : "---";
     }
 
     @Override

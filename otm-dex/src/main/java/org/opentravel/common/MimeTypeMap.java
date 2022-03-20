@@ -16,8 +16,8 @@
 
 package org.opentravel.common;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmLibraryMembers.OtmResource;
 import org.opentravel.model.resource.OtmActionRequest;
@@ -38,7 +38,7 @@ import java.util.TreeMap;
  *
  */
 public class MimeTypeMap {
-    private static Log log = LogFactory.getLog( MimeTypeMap.class );
+    private static Logger log = LogManager.getLogger( MimeTypeMap.class );
 
     private SortedMap<String,Boolean> values = new TreeMap<>();
 

@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmFacets;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.OtmPropertyOwner;
 import org.opentravel.model.otmLibraryMembers.OtmValueWithAttributes;
@@ -32,7 +32,7 @@ import javafx.beans.property.StringProperty;
  * 
  */
 public class OtmVWAValueFacet extends OtmAbstractDisplayFacet {
-    private static Log log = LogFactory.getLog( OtmVWAValueFacet.class );
+    private static Logger log = LogManager.getLogger( OtmVWAValueFacet.class );
 
     public OtmVWAValueFacet(OtmPropertyOwner parent) {
         super( parent );

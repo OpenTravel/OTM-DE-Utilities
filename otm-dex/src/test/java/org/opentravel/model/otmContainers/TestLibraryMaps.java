@@ -18,8 +18,8 @@ package org.opentravel.model.otmContainers;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
@@ -49,7 +49,7 @@ import java.util.TreeMap;
  */
 public class TestLibraryMaps extends AbstractFxTest {
 
-    private static Log log = LogFactory.getLog( TestLibraryMaps.class );
+    private static Logger log = LogManager.getLogger( TestLibraryMaps.class );
 
     public static final boolean RUN_HEADLESS = true;
     final int WATCH_TIME = 0; // How long to sleep so we can see what is happening. Can be 0.

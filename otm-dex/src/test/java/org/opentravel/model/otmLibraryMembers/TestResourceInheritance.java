@@ -18,8 +18,8 @@ package org.opentravel.model.otmLibraryMembers;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
@@ -57,7 +57,7 @@ import java.util.List;
  * {@link TestFacet#testModelInheritedChildren()}
  */
 public class TestResourceInheritance extends AbstractFxTest {
-    private static Log log = LogFactory.getLog( TestResourceInheritance.class );
+    private static Logger log = LogManager.getLogger( TestResourceInheritance.class );
     public static final boolean RUN_HEADLESS = true;
     static OtmModelManager mgr = null;
 

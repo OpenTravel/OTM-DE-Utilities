@@ -34,7 +34,7 @@ import javafx.scene.canvas.GraphicsContext;
  */
 public class VWASprite extends MemberSprite<OtmValueWithAttributes> implements DexSprite {
     // gets log from base class
-    // private static Log log = LogFactory.getLog( BusinessObjectSprite.class );
+    // private static Logger log = LogManager.getLogger( BusinessObjectSprite.class );
 
     double dxSummary;
     double margin;

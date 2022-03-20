@@ -24,7 +24,7 @@ import org.opentravel.model.otmProperties.OtmElement;
  * Set the repeat count on a property.
  */
 public class SetRepeatCountAction extends DexRunAction {
-    // private static Log log = LogFactory.getLog( SetRepeatCountAction.class );
+    // private static Logger log = LogManager.getLogger( SetRepeatCountAction.class );
 
 
     /**

@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmChildrenOwner;
@@ -40,7 +40,7 @@ import java.util.List;
  * 
  */
 public class OtmOperation extends OtmModelElement<TLOperation> implements OtmChildrenOwner {
-    private static Log log = LogFactory.getLog( OtmOperation.class );
+    private static Logger log = LogManager.getLogger( OtmOperation.class );
 
     private OtmServiceObject parent;
 

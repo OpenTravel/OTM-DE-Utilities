@@ -18,8 +18,8 @@ package org.opentravel.dex.controllers.popup;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.TestDexFileHandler;
@@ -35,7 +35,7 @@ import org.opentravel.utilities.testutil.TestFxMode;
  */
 public class TestSelectProjectDialog extends AbstractFxTest {
 
-    private static Log log = LogFactory.getLog( TestOtmModelManager.class );
+    private static Logger log = LogManager.getLogger( TestOtmModelManager.class );
 
     public static final boolean RUN_HEADLESS = false;
     final int WATCH_TIME = 5000; // How long to sleep so we can see what is happening. Can be 0.

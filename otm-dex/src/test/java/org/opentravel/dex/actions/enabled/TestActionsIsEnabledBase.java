@@ -18,8 +18,8 @@ package org.opentravel.dex.actions.enabled;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.action.manager.DexActionManager;
 import org.opentravel.dex.actions.DexAction;
 import org.opentravel.dex.actions.DexActions;
@@ -44,7 +44,7 @@ import org.opentravel.model.otmProperties.TestOtmPropertiesBase;
  * This does not require AbstractFxTest
  */
 public abstract class TestActionsIsEnabledBase {
-    private static Log log = LogFactory.getLog( TestActionsIsEnabledBase.class );
+    private static Logger log = LogManager.getLogger( TestActionsIsEnabledBase.class );
 
     protected static OtmModelManager modelManager = null;
     protected DexActionManager actionManager = null;

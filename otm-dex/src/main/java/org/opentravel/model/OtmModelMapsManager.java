@@ -16,8 +16,8 @@
 
 package org.opentravel.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmLibraryMembers.OtmLibraryMember;
@@ -37,7 +37,7 @@ import javafx.concurrent.WorkerStateEvent;
  *
  */
 public class OtmModelMapsManager implements TaskResultHandlerI {
-    private static Log log = LogFactory.getLog( OtmModelMapsManager.class );
+    private static Logger log = LogManager.getLogger( OtmModelMapsManager.class );
 
     // TODO - make this into a handler
     // // TODO - make this into a structure

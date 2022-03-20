@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.tasks.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.tasks.DexTask;
 import org.opentravel.dex.tasks.DexTaskBase;
@@ -33,7 +33,7 @@ import org.opentravel.schemacompiler.repository.RepositoryItemHistory;
  *
  */
 public class GetRepositoryItemHistoryTask extends DexTaskBase<RepositoryItem> implements DexTask {
-    private static Log log = LogFactory.getLog( GetRepositoryItemHistoryTask.class );
+    private static Logger log = LogManager.getLogger( GetRepositoryItemHistoryTask.class );
 
     RepositoryItemHistory history = null;
 

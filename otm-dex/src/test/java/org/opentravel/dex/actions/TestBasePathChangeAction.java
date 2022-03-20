@@ -18,8 +18,8 @@ package org.opentravel.dex.actions;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.action.manager.DexActionManager;
@@ -39,7 +39,7 @@ import java.io.IOException;
  */
 public class TestBasePathChangeAction {
 
-    private static Log log = LogFactory.getLog( TestBasePathChangeAction.class );
+    private static Logger log = LogManager.getLogger( TestBasePathChangeAction.class );
 
     private static OtmModelManager staticModelManager = null;
     static OtmLibrary lib = null;

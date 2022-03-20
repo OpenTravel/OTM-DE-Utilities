@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.actions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmObject;
 import org.opentravel.model.otmFacets.OtmAlias;
 import org.opentravel.model.otmLibraryMembers.OtmContextualFacet;
@@ -29,7 +29,7 @@ import org.opentravel.schemacompiler.model.TLAliasOwner;
  * This action creates a new OtmAlias the subject library member.
  */
 public class AddAliasAction extends DexRunAction {
-    private static Log log = LogFactory.getLog( AddAliasAction.class );
+    private static Logger log = LogManager.getLogger( AddAliasAction.class );
 
     /**
      * Enabled for any editable OTM object whose TL is an TLAliasOwner and not a contextual facet.

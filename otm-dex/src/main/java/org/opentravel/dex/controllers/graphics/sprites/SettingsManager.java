@@ -38,7 +38,7 @@ import javafx.scene.text.FontWeight;
  * @author dmh
  */
 public class SettingsManager {
-    // private static Log log = LogFactory.getLog( SettingsManager.class );
+    // private static Logger log = LogManager.getLogger( SettingsManager.class );
 
     public static final double FONT_BASE = 8;
     public static final double FONT_INCREMENT = 1;

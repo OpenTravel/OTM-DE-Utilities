@@ -45,7 +45,7 @@ import javafx.scene.control.Tooltip;
  * 
  */
 public class OtmActionResponse extends OtmResourceChildBase<TLActionResponse> implements OtmResourceChild {
-    // private static Log log = LogFactory.getLog( OtmActionResponse.class );
+    // private static Logger log = LogManager.getLogger( OtmActionResponse.class );
 
     private static final String TOOLTIP = "Specifies the characteristics and payload for a REST Action response.";
     private static final String PAYLOAD_LABEL = "Payload Type";

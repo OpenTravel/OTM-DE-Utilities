@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.member.usage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.events.AbstractOtmEvent;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.cellfactories.ValidationMemberTreeTableCellFactory;
@@ -60,7 +60,7 @@ import javafx.scene.layout.VBox;
  *
  */
 public class WhereUsedTableController extends DexIncludedControllerBase<OtmModelManager> {
-    private static Log log = LogFactory.getLog( WhereUsedTableController.class );
+    private static Logger log = LogManager.getLogger( WhereUsedTableController.class );
 
     // Column labels
     // TODO - externalize strings
@@ -267,7 +267,8 @@ public class WhereUsedTableController extends DexIncludedControllerBase<OtmModel
 
     public MemberAndProvidersDAO getSelected() {
         return whereUsedTreeTable.getSelectionModel().getSelectedItem() != null
-            ? whereUsedTreeTable.getSelectionModel().getSelectedItem().getValue() : null;
+            ? whereUsedTreeTable.getSelectionModel().getSelectedItem().getValue()
+            : null;
     }
 
     private void handleEvent(DexFilterChangeEvent event) {

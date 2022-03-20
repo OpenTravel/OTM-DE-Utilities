@@ -18,8 +18,8 @@ package org.opentravel.model;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.model.otmContainers.OtmLibrary;
@@ -57,7 +57,7 @@ import java.util.Map.Entry;
  * <p>
  */
 public class TestOtmModelMapsManager {
-    private static Log log = LogFactory.getLog( TestOtmModelMapsManager.class );
+    private static Logger log = LogManager.getLogger( TestOtmModelMapsManager.class );
 
     // protected static OtmModelManager staticModelManager = null;
 

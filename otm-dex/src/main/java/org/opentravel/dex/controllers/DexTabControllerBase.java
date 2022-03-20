@@ -32,7 +32,7 @@ import javafx.scene.control.MenuItem;
  *
  */
 public abstract class DexTabControllerBase implements DexTabController {
-    // private static Log log = LogFactory.getLog( DexTabControllerBase.class );
+    // private static Logger log = LogManager.getLogger( DexTabControllerBase.class );
 
     protected List<DexIncludedController<?>> includedControllers = new ArrayList<>();
     protected DexMainController mainController;

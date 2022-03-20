@@ -18,8 +18,8 @@ package org.opentravel.model.otmFacets;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentravel.dex.action.manager.DexFullActionManager;
@@ -44,7 +44,7 @@ import java.util.List;
  * <p>
  */
 public class TestFacet {
-    private static Log log = LogFactory.getLog( TestFacet.class );
+    private static Logger log = LogManager.getLogger( TestFacet.class );
 
     protected static OtmModelManager staticModelManager = null;
     protected static OtmResource testResource;

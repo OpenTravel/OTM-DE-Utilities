@@ -20,8 +20,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -69,7 +69,7 @@ import java.util.List;
 public class TestResource extends TestOtmLibraryMemberBase<OtmResource> {
     private static final String R_NAME = "Testbo";
 
-    private static Log log = LogFactory.getLog( TestResource.class );
+    private static Logger log = LogManager.getLogger( TestResource.class );
     private static OtmBusinessObject exposedObject;
 
     @BeforeClass

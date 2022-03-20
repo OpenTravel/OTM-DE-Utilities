@@ -17,4 +17,4 @@
 @echo off
 set JVM_OPTS=-Xms512m
 
-javaw %JVM_OPTS% -cp ./lib/* org.opentravel.launcher.LauncherApplication %*
+javaw %JVM_OPTS% -cp ./lib/* --module-path ./fxlibs/ --add-modules javafx.controls,javafx.graphics,javafx.web,javafx.media,javafx.fxml org.opentravel.launcher.LauncherApplication %*

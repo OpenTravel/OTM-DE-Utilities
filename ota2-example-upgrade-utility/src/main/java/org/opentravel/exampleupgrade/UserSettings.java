@@ -16,9 +16,9 @@
 
 package org.opentravel.exampleupgrade;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.application.common.AbstractUserSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,7 +36,7 @@ public class UserSettings extends AbstractUserSettings {
     private static final String USER_SETTINGS_FILE = "/.ota2/.eu-settings.properties";
 
     private static File settingsFile = new File( System.getProperty( "user.home" ), USER_SETTINGS_FILE );
-    private static final Logger log = LoggerFactory.getLogger( UserSettings.class );
+    private static final Logger log = LogManager.getLogger( UserSettings.class );
 
     private int repeatCount;
     private File lastModelFile;
@@ -77,7 +77,7 @@ public class UserSettings extends AbstractUserSettings {
         int rptCount = Integer.parseInt( settingsProps.getProperty( "repeatCount" ) );
         String modelFile = settingsProps.getProperty( "lastModelFile" );
         String exampleFolder = settingsProps.getProperty( "lastExampleFolder" );
-    
+
         setRepeatCount( rptCount );
         setLastModelFile( (modelFile == null) ? null : new File( modelFile ) );
         setLastExampleFolder( (exampleFolder == null) ? null : new File( exampleFolder ) );
@@ -113,7 +113,7 @@ public class UserSettings extends AbstractUserSettings {
             : this.lastModelFile.getAbsolutePath();
         String exampleFolder = (this.lastExampleFolder == null) ? defaultValues.getLastExampleFolder().getAbsolutePath()
             : this.lastExampleFolder.getAbsolutePath();
-    
+
         settingsProps.put( "repeatCount", repeatCount + "" );
         settingsProps.put( "lastModelFile", modelFile );
         settingsProps.put( "lastExampleFolder", exampleFolder );

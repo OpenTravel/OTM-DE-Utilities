@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.member.usage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.OtmModelManager;
 import org.opentravel.model.otmFacets.OtmEmptyTableFacet;
 import org.opentravel.model.otmFacets.OtmNamespaceFacet;
@@ -33,7 +33,7 @@ import javafx.scene.control.TreeItem;
  *
  */
 public class UsersManager {
-    private static Log log = LogFactory.getLog( UsersManager.class );
+    private static Logger log = LogManager.getLogger( UsersManager.class );
 
     protected OtmLibraryMember subject;
     private String nsPrefix;

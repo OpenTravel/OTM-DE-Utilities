@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.controllers.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.dex.controllers.popup.DialogBoxContoller;
 import org.opentravel.dex.tasks.TaskResultHandlerI;
@@ -33,7 +33,7 @@ import javafx.concurrent.WorkerStateEvent;
  *
  */
 public class RepositoryResultHandler implements TaskResultHandlerI {
-    private static Log log = LogFactory.getLog( RepositoryResultHandler.class );
+    private static Logger log = LogManager.getLogger( RepositoryResultHandler.class );
     private static final String TITLE_ERROR = "Repository Error";
     private static final String TITLE_OK = "Repository Results";
     private DexMainController mainController;

@@ -16,8 +16,8 @@
 
 package org.opentravel.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.model.otmContainers.OtmLibrary;
 import org.opentravel.model.otmContainers.OtmLocalLibrary;
 import org.opentravel.model.otmContainers.OtmManagedLibrary;
@@ -43,7 +43,7 @@ import java.util.TreeMap;
  *
  */
 public class OtmModelChainsManager {
-    private static Log log = LogFactory.getLog( OtmModelChainsManager.class );
+    private static Logger log = LogManager.getLogger( OtmModelChainsManager.class );
 
     // Map of name+base namespace and their version chain
     // Map assures NO Duplicate Keys, allows null keys and values

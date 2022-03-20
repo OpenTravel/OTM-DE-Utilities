@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.events;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.member.MemberFilterController;
 
 import javafx.event.EventTarget;
@@ -30,7 +30,7 @@ import javafx.event.EventType;
  *
  */
 public class DexFilterChangeEvent extends DexEvent {
-    private static Log log = LogFactory.getLog( DexFilterChangeEvent.class );
+    private static Logger log = LogManager.getLogger( DexFilterChangeEvent.class );
     private static final long serialVersionUID = 20190409L;
 
     public static final EventType<DexFilterChangeEvent> FILTER_CHANGED = new EventType<>( DEX_ALL, "FILTER_CHANGED" );

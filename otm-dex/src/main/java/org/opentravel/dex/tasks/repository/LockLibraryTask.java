@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.tasks.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.controllers.DexIncludedController;
 import org.opentravel.dex.controllers.DexStatusController;
 import org.opentravel.dex.events.DexRepositoryItemReplacedEvent;
@@ -37,7 +37,7 @@ import org.opentravel.schemacompiler.repository.RepositoryItem;
  *
  */
 public class LockLibraryTask extends DexTaskBase<OtmLibrary> {
-    private static Log log = LogFactory.getLog( LockLibraryTask.class );
+    private static Logger log = LogManager.getLogger( LockLibraryTask.class );
 
     // private DexStatusController statusController;
     private DexIncludedController<?> eventController;

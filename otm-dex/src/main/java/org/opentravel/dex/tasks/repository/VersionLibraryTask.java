@@ -47,7 +47,7 @@ import javafx.application.Platform;
  *
  */
 public class VersionLibraryTask extends DexTaskBase<OtmLibrary> {
-    // private static Log log = LogFactory.getLog( VersionLibraryTask.class );
+    // private static Logger log = LogManager.getLogger( VersionLibraryTask.class );
 
     public enum VersionType {
         MAJOR, MINOR, PATCH;

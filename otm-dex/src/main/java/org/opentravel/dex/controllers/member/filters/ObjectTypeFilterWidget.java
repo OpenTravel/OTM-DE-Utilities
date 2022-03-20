@@ -36,7 +36,7 @@ import javafx.scene.control.Tooltip;
  */
 // Future - use fxControls or other package to get a multiple check box or even check tree to select versions.
 public class ObjectTypeFilterWidget implements DexFilterWidget<OtmLibraryMember> {
-    // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
+    // private static Logger log = LogManager.getLogger( LibraryFilterWidget.class );
 
     private static final String ALL = "All Objects";
     private static final String TOOLTIP = "Only show members of selected object type.";

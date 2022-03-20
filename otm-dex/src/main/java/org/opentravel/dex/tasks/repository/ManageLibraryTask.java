@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.tasks.repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.DexProjectException;
 import org.opentravel.common.ValidationUtils;
 import org.opentravel.dex.controllers.DexMainController;
@@ -43,7 +43,7 @@ import javafx.application.Platform;
  *
  */
 public class ManageLibraryTask extends DexTaskBase<OtmLibrary> {
-    private static Log log = LogFactory.getLog( ManageLibraryTask.class );
+    private static Logger log = LogManager.getLogger( ManageLibraryTask.class );
 
     private static String errorMsg;
     public static final String LOCAL_REPO = "Local";

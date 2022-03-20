@@ -16,8 +16,8 @@
 
 package org.opentravel.dex.action.manager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.dex.actions.DexActions;
 import org.opentravel.dex.controllers.DexMainController;
 import org.opentravel.model.OtmObject;
@@ -32,7 +32,7 @@ import org.opentravel.model.OtmObject;
  *
  */
 public class DexWizardActionManager extends DexActionManagerBase {
-    private static Log log = LogFactory.getLog( DexWizardActionManager.class );
+    private static Logger log = LogManager.getLogger( DexWizardActionManager.class );
 
     public DexWizardActionManager(DexMainController mainController) {
         super( mainController );

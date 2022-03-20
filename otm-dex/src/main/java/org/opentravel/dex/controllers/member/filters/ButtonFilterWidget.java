@@ -28,7 +28,7 @@ import javafx.scene.control.RadioButton;
  *
  */
 public class ButtonFilterWidget extends FilterWidget {
-    // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
+    // private static Logger log = LogManager.getLogger( LibraryFilterWidget.class );
 
     protected RadioButton button = null;
 

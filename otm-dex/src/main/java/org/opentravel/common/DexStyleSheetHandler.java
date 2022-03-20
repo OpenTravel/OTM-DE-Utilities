@@ -16,8 +16,8 @@
 
 package org.opentravel.common;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.objecteditor.UserSettings;
 
 import javafx.stage.Stage;
@@ -29,7 +29,7 @@ import javafx.stage.Stage;
  *
  */
 public class DexStyleSheetHandler {
-    private static Log log = LogFactory.getLog( DexStyleSheetHandler.class );
+    private static Logger log = LogManager.getLogger( DexStyleSheetHandler.class );
 
     /**
      * Known values for style sheets to apply across the application.

@@ -16,8 +16,8 @@
 
 package org.opentravel.model.otmLibraryMembers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opentravel.common.ImageManager;
 import org.opentravel.common.ImageManager.Icons;
 import org.opentravel.model.OtmModelElement;
@@ -52,7 +52,7 @@ import javafx.beans.property.StringProperty;
  * 
  */
 public class OtmCore extends OtmComplexObjects<TLCoreObject> implements OtmTypeUser {
-    private static Log log = LogFactory.getLog( OtmCore.class );
+    private static Logger log = LogManager.getLogger( OtmCore.class );
 
     private StringProperty assignedTypeProperty;
 

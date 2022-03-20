@@ -28,7 +28,7 @@ import javafx.scene.control.RadioButton;
  *
  */
 public class ButtonToggleFilterWidget extends ButtonFilterWidget {
-    // private static Log log = LogFactory.getLog( LibraryFilterWidget.class );
+    // private static Logger log = LogManager.getLogger( LibraryFilterWidget.class );
 
     /**
      * Widget for filter buttons. When <b>not</b> selected, only those that do <b>not</b> match the selector are shown.
