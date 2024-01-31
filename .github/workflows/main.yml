@@ -1,0 +1,70 @@
+name: Publish OTM Utilities Build
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 17
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn clean install -DskipTests=true
+
+      - name: Get the version from the tag label
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+  
+      - name: Create release
+        uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ steps.get_version.outputs.VERSION }}
+          tag_name: ${{ github.ref }}
+          body: 'Version ${{ steps.get_version.outputs.VERSION }} release'
+
+      - name: Upload OTM Repository Service artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./ota2-app-launcher-bundle/target/ota2-app-launcher-win.zip
+          asset_name: ota2-app-launcher-win.zip
+          asset_content_type: application/zip
+
+      - name: Upload OTM Indexing Service artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./ota2-app-launcher-bundle/target/ota2-app-launcher-linux.zip
+          asset_name: ota2-app-launcher-linux.zip
+          asset_content_type: application/zip
+
+      - name: Upload Nagios JMX Plugin artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./ota2-app-launcher-bundle/target/ota2-app-launcher-mac.zip
+          asset_name: ota2-app-launcher-mac.zip
+          asset_content_type: application/zip
